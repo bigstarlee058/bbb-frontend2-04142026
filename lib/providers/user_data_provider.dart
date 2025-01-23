@@ -132,7 +132,7 @@ class UserDataProvider extends ChangeNotifier {
       streaksData = jsonDecode(tempData);
     }
     log('tempData :::::::::::::::::: $tempData');
-    DateTime startDate;
+    DateTime startDate = DateTime.now();
     DateTime todayDate = DateTime.now();
 
     // If data exists, find the last recorded date; otherwise, use the start date

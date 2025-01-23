@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/Month/new_time_progress.dart';
-import 'package:bbb/pages/new/Month/sql_database.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Month/widgets/new_time_progress.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
@@ -14,7 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../ExerciseView/widgets/notes_slideout.dart';
+import '../../../ExerciseView/widgets/notes_slideout.dart';
 
 class NewExerciseCard extends StatefulWidget {
   const NewExerciseCard({

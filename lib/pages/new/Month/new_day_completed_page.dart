@@ -1,6 +1,6 @@
 import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';

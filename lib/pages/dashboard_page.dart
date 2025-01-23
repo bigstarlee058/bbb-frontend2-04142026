@@ -11,8 +11,8 @@ import 'package:bbb/models/challenges.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/day.dart';
 import 'package:bbb/pages/Charts/time_spent.dart';
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/exercise_history_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -422,13 +422,15 @@ class _DashboardPageState extends State<DashboardPage> {
                                       ],
                                     ),
                                   ),
-                                  Consumer2<MonthProvider, UserDataProvider>(
-                                    builder: (context, monthData, userData, child) {
-                                      if (monthData.monthDataModel?.weeks != null && monthData.todayTitleId.isNotEmpty) {
+                                  Consumer<MonthProvider>(
+                                    builder: (context, monthData, child) {
+                                      if (monthData.monthDataModel?.weeks == null) {
+                                        return const SizedBox();
+                                      }
+                                      if (monthData.todayTitleId.isNotEmpty) {
                                         int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.indexWhere(
                                           (element) => element == monthData.todayTitleId,
                                         );
-
                                         String dataId =
                                             "${monthData.splitType}-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
 
@@ -463,21 +465,26 @@ class _DashboardPageState extends State<DashboardPage> {
                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
+                                              Text(
+                                                'Your current workout:',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
                                               SizedBox(
                                                 child: Column(
                                                   children: [
                                                     Text(
-                                                      'Your current workout:',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: ScreenUtil.verticalScale(2),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 5,
-                                                    ),
-                                                    Text(
-                                                      (monthData.monthDataModel?.weeks?[monthData.week! - 1].dayList?[index ?? 0]) ?? "",
+                                                      monthData.allDayHistoryModel.any(
+                                                        (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                                      )
+                                                          ? "Pump Day"
+                                                          : (monthData.monthDataModel?.weeks?[monthData.week! - 1].dayList?[index ?? 0]) ??
+                                                              "",
                                                       textAlign: TextAlign.center,
                                                       style: TextStyle(
                                                         color: Colors.white,
@@ -489,32 +496,102 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
-                                              userData.userName != ""
-                                                  ? ButtonWidget(
-                                                      text: status == "Started" ? 'Continue Workout' : 'Start Workout',
-                                                      textColor: AppColors.primaryColor,
-                                                      color: status == "Completed" || status == "Skipped" ? Colors.white70 : Colors.white,
-                                                      onPress: status == "Completed" || status == "Skipped"
-                                                          ? null
-                                                          : () async {
-                                                              monthData.overviewCurrentWeek = monthData.week ?? 1;
-                                                              monthData.overviewCurrentDay = ((index ?? 1) + 1);
-                                                              monthData.dayDataModel = dayData;
-                                                              monthData.alternateEquipmentType = monthData.equipmentType;
-                                                              monthData.weekDataModel =
-                                                                  monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
-                                                              monthData.updateIsPastWeek(
-                                                                  monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
-                                                              Navigator.pushNamed(context, '/dayOverview');
-                                                            },
-                                                      isLoading: false,
-                                                    )
-                                                  : const SizedBox()
+                                              Container(
+                                                decoration: status == "Completed"
+                                                    ? BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3.2)))
+                                                    : const BoxDecoration(),
+                                                child: status == "Completed"
+                                                    ? const ButtonWidget(
+                                                        text: "Completed",
+                                                        textColor: Colors.white,
+                                                        onPress: null,
+                                                        color: Colors.white,
+                                                        isLoading: false,
+                                                      )
+                                                    : ButtonWidget(
+                                                        text: status == "Started" ? 'Continue Workout' : 'Start Workout',
+                                                        textColor: AppColors.primaryColor,
+                                                        color: status == "Completed" || status == "Skipped" ? Colors.white70 : Colors.white,
+                                                        onPress: status == "Completed" || status == "Skipped"
+                                                            ? null
+                                                            : () async {
+                                                                monthData.overviewCurrentWeek = monthData.week ?? 1;
+                                                                monthData.overviewCurrentDay = ((index ?? 1) + 1);
+                                                                monthData.dayDataModel = dayData;
+                                                                monthData.alternateEquipmentType = monthData.equipmentType;
+                                                                monthData.weekDataModel =
+                                                                    monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
+                                                                monthData.updateIsPastWeek(
+                                                                    monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
+                                                                Navigator.pushNamed(context, '/dayOverview');
+                                                              },
+                                                        isLoading: false,
+                                                      ),
+                                              )
                                             ],
                                           ),
                                         );
                                       } else {
-                                        return const SizedBox();
+                                        String dataId =
+                                            "${monthData.splitType}-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
+                                        return Container(
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: ScreenUtil.horizontalScale(8),
+                                            vertical: ScreenUtil.verticalScale(2),
+                                          ),
+                                          height: media.height * 0.22,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Your current workout:',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              SizedBox(
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      monthData.allDayHistoryModel.any(
+                                                        (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                                      )
+                                                          ? "Pump Day"
+                                                          : (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList?.last) ??
+                                                              "",
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil.verticalScale(3),
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3.2))),
+                                                child: const ButtonWidget(
+                                                  text: "Completed",
+                                                  textColor: Colors.white,
+                                                  onPress: null,
+                                                  color: Colors.white,
+                                                  isLoading: false,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        );
                                       }
                                     },
                                   )

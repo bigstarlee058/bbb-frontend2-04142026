@@ -1,12 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
-import 'package:bbb/pages/new/Month/Model/day_history_model.dart';
-import 'package:bbb/pages/new/Month/sql_database.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -17,6 +14,8 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import '../Providers/month_provider.dart';
 
 class NewDayOverviewPage extends StatefulWidget {
   const NewDayOverviewPage({super.key});
@@ -429,20 +428,22 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                     ),
                                   ),
                                   Consumer<MonthProvider>(
-                                    builder: (context, monthProvider, child) => monthProvider.dayDataModel!.formats != null &&
-                                            monthProvider.dayDataModel!.formats!
-                                                .contains(monthProvider.splitType.toString().replaceAll("split", "")) &&
-                                            !monthProvider.isPumpDay
-                                        ? BulletPoint(text: monthProvider.dayDataModel!.description!)
-                                        : monthProvider.isPumpDay
-                                            ? BulletPoint(
-                                                text: (context.watch<MonthProvider>().pumpDayModel?.description ?? ""),
-                                              )
-                                            : monthProvider.restDayModel[monthProvider.overviewCurrentWeek].description!.isNotEmpty
-                                                ? BulletPoint(
-                                                    text: monthProvider.restDayModel[monthProvider.overviewCurrentWeek].description!,
-                                                  )
-                                                : const SizedBox(),
+                                    builder: (context, monthProvider, child) {
+                                      return monthProvider.dayDataModel!.formats != null &&
+                                              monthProvider.dayDataModel!.formats!
+                                                  .contains(monthProvider.splitType.toString().replaceAll("split", "")) &&
+                                              !monthProvider.isPumpDay
+                                          ? BulletPoint(text: monthProvider.dayDataModel!.description!)
+                                          : monthProvider.isPumpDay
+                                              ? BulletPoint(
+                                                  text: (context.watch<MonthProvider>().pumpDayModel?.description ?? ""),
+                                                )
+                                              : monthProvider.restDayModel[monthProvider.overviewCurrentWeek].description!.isNotEmpty
+                                                  ? BulletPoint(
+                                                      text: monthProvider.restDayModel[monthProvider.overviewCurrentWeek].description!,
+                                                    )
+                                                  : const SizedBox();
+                                    },
                                   ),
                                 ],
                               ),
@@ -765,6 +766,101 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
   }
 
+  Future<void> unSkipped(String status) async {
+    if (monthProvider!.isPumpDay) {
+      if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
+        final data = monthProvider!.pumpDayModel!.circuits!;
+        for (int i = 0; i < data.length; i++) {
+          var elementI = data[i];
+          for (int j = 0; j < elementI.round!; j++) {
+            for (int z = 0; z < elementI.circuitExercises!.length; z++) {
+              var elementZ = elementI.circuitExercises?[z];
+              String dataId =
+                  "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+              bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
+              if (val == true) {
+                await _unskipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
+              }
+            }
+          }
+        }
+      }
+    }
+    if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises != null : monthProvider!.dayDataModel!.exercises != null) {
+      final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises : monthProvider!.dayDataModel!.exercises;
+      for (int i = 0; i < data!.length; i++) {
+        var elementI = data[i];
+        String dataId =
+            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
+        if (val == true) {
+          await _unskipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
+        }
+      }
+    }
+    if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups != null : monthProvider!.dayDataModel!.warmups != null) {
+      final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups : monthProvider!.dayDataModel!.warmups;
+      for (int i = 0; i < data!.length; i++) {
+        var elementI = data[i];
+        String dataId =
+            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
+        if (val == true) {
+          await _unskipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
+        }
+      }
+    }
+  }
+
+  Future<void> skipped(String status) async {
+    if (monthProvider!.isPumpDay) {
+      if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
+        final data = monthProvider!.pumpDayModel!.circuits!;
+        for (int i = 0; i < data.length; i++) {
+          var elementI = data[i];
+          for (int j = 0; j < elementI.round!; j++) {
+            for (int z = 0; z < elementI.circuitExercises!.length; z++) {
+              var elementZ = elementI.circuitExercises?[z];
+              String dataId =
+                  "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+              bool? val = monthProvider?.exerciseHistoryModel
+                  .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+              if (val == false) {
+                await _skipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
+              }
+            }
+          }
+        }
+      }
+    }
+    if (monthProvider!.dayDataModel!.exercises != null) {
+      final data = monthProvider!.dayDataModel!.exercises;
+      for (int i = 0; i < data!.length; i++) {
+        var elementI = data[i];
+        String dataId =
+            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+        bool? val = monthProvider?.exerciseHistoryModel
+            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+        if (val == false) {
+          await _skipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
+        }
+      }
+    }
+    if (monthProvider!.dayDataModel!.warmups != null) {
+      final data = monthProvider!.dayDataModel!.warmups;
+      for (int i = 0; i < data!.length; i++) {
+        var elementI = data[i];
+        String dataId =
+            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
+        bool? val = monthProvider?.exerciseHistoryModel
+            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+        if (val == false) {
+          await _skipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
+        }
+      }
+    }
+  }
+
   Future<void> _skipUnskipDayData({required String status, required String type}) async {
     if (type != "Rest Day" || monthProvider!.isPumpDay) {
       if (status == "Skipped") {
@@ -810,104 +906,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     await monthProvider?.updateDayData();
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
-  }
-
-  Future<void> unSkipped(String status) async {
-    if (monthProvider!.isPumpDay) {
-      if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
-        final data = monthProvider!.pumpDayModel!.circuits!;
-        for (int i = 0; i < data.length; i++) {
-          var elementI = data[i];
-          for (int j = 0; j < elementI.round!; j++) {
-            for (int z = 0; z < elementI.circuitExercises!.length; z++) {
-              var elementZ = elementI.circuitExercises?[z];
-              String dataId =
-                  "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
-              bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
-              if (val == true) {
-                await _unskipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises != null : monthProvider!.dayDataModel!.exercises != null) {
-      final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises : monthProvider!.dayDataModel!.exercises;
-      for (int i = 0; i < data!.length; i++) {
-        var elementI = data[i];
-        String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
-        if (val == true) {
-          await _unskipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
-        }
-      }
-    }
-
-    if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups != null : monthProvider!.dayDataModel!.warmups != null) {
-      final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups : monthProvider!.dayDataModel!.warmups;
-      for (int i = 0; i < data!.length; i++) {
-        var elementI = data[i];
-        String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
-        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
-        if (val == true) {
-          await _unskipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
-        }
-      }
-    }
-  }
-
-  Future<void> skipped(String status) async {
-    if (monthProvider!.isPumpDay) {
-      if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
-        final data = monthProvider!.pumpDayModel!.circuits!;
-        for (int i = 0; i < data.length; i++) {
-          var elementI = data[i];
-          for (int j = 0; j < elementI.round!; j++) {
-            for (int z = 0; z < elementI.circuitExercises!.length; z++) {
-              var elementZ = elementI.circuitExercises?[z];
-              String dataId =
-                  "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
-              bool? val = monthProvider?.exerciseHistoryModel
-                  .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
-              if (val == false) {
-                await _skipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (monthProvider!.dayDataModel!.exercises != null) {
-      final data = monthProvider!.dayDataModel!.exercises;
-      for (int i = 0; i < data!.length; i++) {
-        var elementI = data[i];
-        String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-        bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
-        if (val == false) {
-          await _skipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
-        }
-      }
-    }
-    if (monthProvider!.dayDataModel!.warmups != null) {
-      final data = monthProvider!.dayDataModel!.warmups;
-      for (int i = 0; i < data!.length; i++) {
-        var elementI = data[i];
-        String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
-        bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
-        if (val == false) {
-          await _skipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
-        }
-      }
-    }
+    monthProvider?.manageStreak();
   }
 
   Future<void> _saveDayData({required String status, required String type}) async {
@@ -924,7 +923,8 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type,
-      "startTime": status == "Started" ? "${DateTime.now().toUtc()}" : "",
+      "startTime": (status == "Started" || status == "Completed") ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == "Completed") ? "${DateTime.now().toUtc()}" : "",
     };
 
     final data1 = {
@@ -945,6 +945,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.updateDayData();
+    monthProvider?.manageStreak();
   }
 }
 

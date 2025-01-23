@@ -1,4 +1,5 @@
 import 'package:bbb/models/month.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -34,7 +35,6 @@ class _CalendarPageState extends State<CalendarPage> {
     {"month": 'July1', "year": "2024"},
     {"month": 'July2', "year": "2024"},
     {"month": 'August', "year": "2024"},
-
   ];
 
   @override
@@ -57,6 +57,7 @@ class _CalendarPageState extends State<CalendarPage> {
   void dispose() {
     super.dispose();
   }
+
   void loadUserInfo() async {
     userData?.loadUserInfo();
   }
@@ -111,8 +112,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                     horizontal: 10,
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         width: ScreenUtil.horizontalScale(9),
@@ -124,12 +124,10 @@ class _CalendarPageState extends State<CalendarPage> {
                                         child: Center(
                                           child: IconButton(
                                             padding: EdgeInsets.zero,
-                                            onPressed: () =>
-                                                {Navigator.pop(context)},
+                                            onPressed: () => {Navigator.pop(context)},
                                             icon: Icon(
                                               Icons.arrow_back_ios_new,
-                                              size:
-                                                  ScreenUtil.verticalScale(2.5),
+                                              size: ScreenUtil.verticalScale(2.5),
                                               color: Colors.white,
                                             ),
                                           ),
@@ -158,15 +156,18 @@ class _CalendarPageState extends State<CalendarPage> {
                                           height: 1,
                                         ),
                                       ),
-                                      Text(
-                                        '${userData?.streakCount}',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(4),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.3,
-                                        ),
-                                      ),
+                                      Builder(builder: (context) {
+                                        final streak = context.watch<MonthProvider>().streak;
+                                        return Text(
+                                          '$streak',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: ScreenUtil.verticalScale(4),
+                                            fontWeight: FontWeight.bold,
+                                            height: 1.3,
+                                          ),
+                                        );
+                                      }),
                                     ],
                                   ),
                                 ),
@@ -322,12 +323,13 @@ class _CalendarPageState extends State<CalendarPage> {
                     top: media.height / 2.85,
                     bottom: ScreenUtil.verticalScale(15),
                   ),
-                  child: const SingleChildScrollView( // Wrap in SingleChildScrollView to make it scrollable
+                  child: const SingleChildScrollView(
+                    // Wrap in SingleChildScrollView to make it scrollable
                     child: SizedBox(
                       height: 600, // Set a fixed or dynamic height as needed
                       child: CalendarWidget(),
                     ),
-                  ), 
+                  ),
                 ),
               ],
             ),

@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'dart:developer';
-
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
@@ -247,6 +244,8 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
                               return !matchingExerciseIds.contains(element.exerciseId);
                             },
                           ).length;
+                        } else {
+                          exerciseCount = exerciseDetails?.length;
                         }
 
                         String dataId =

@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/ExerciseView/widgets/add_notes.dart';
-import 'package:bbb/pages/new/Month/4_1_new_exercise_card.dart';
-import 'package:bbb/pages/new/Month/Model/circuit_model.dart';
-import 'package:bbb/pages/new/Month/Model/extra_set_model.dart';
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/Month/new_equipment_section.dart';
-import 'package:bbb/pages/new/Month/sql_database.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/circuit_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/extra_set_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Month/widgets/4_1_new_exercise_card.dart';
+import 'package:bbb/pages/new/Month/widgets/new_equipment_section.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
@@ -19,7 +20,6 @@ import 'package:video_player/video_player.dart';
 import '../../../middleware/notification_service.dart';
 import '../../../providers/weekly_graph_provider.dart';
 import '../../../values/clip_path.dart';
-import '../provider/month_provider.dart';
 
 class NewExercisePage extends StatefulWidget {
   const NewExercisePage({super.key});
@@ -548,8 +548,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                     itemBuilder: (context, index) {
                                       final extraItem = monthProvider?.selectedExercise!.extra![index];
 
-                                      setCount =
-                                          int.parse(extraItem!.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length ?? 0) : 0);
+                                      setCount = int.parse(extraItem!.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
 
                                       return ListView.builder(
                                         itemCount: setCount,

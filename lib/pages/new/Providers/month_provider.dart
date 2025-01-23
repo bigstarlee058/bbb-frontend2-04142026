@@ -1,25 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:bbb/middleware/notification_service.dart';
-import 'package:bbb/pages/new/Month/Model/circuit_model.dart';
-import 'package:bbb/pages/new/Month/Model/day_history_model.dart';
-import 'package:bbb/pages/new/Month/Model/exercise_history_model.dart';
-import 'package:bbb/pages/new/Month/Model/extra_set_model.dart';
-import 'package:bbb/pages/new/Month/Model/history_data_model.dart';
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/Month/Model/pump_day_model.dart';
-import 'package:bbb/pages/new/Month/Model/removed_exercise_model.dart';
-import 'package:bbb/pages/new/Month/Model/rest_day_model.dart';
-import 'package:bbb/pages/new/Month/Model/warm_up_model.dart';
-import 'package:bbb/pages/new/Month/new_exercise_manager.dart';
-import 'package:bbb/pages/new/Month/sql_database.dart';
+import 'package:bbb/pages/new/Month/Database/month_prefrence.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/circuit_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/excersie_detail_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/exercise_history_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/history_data_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/pump_day_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/removed_exercise_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/rest_day_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/warm_up_model.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../values/app_constants.dart';
-import '../Month/Model/excersie_detail_model.dart';
 
 enum WeekType { pastWeek, currentWeek, futureWeek }
 
@@ -40,6 +41,7 @@ class MonthProvider extends ChangeNotifier {
   bool isCircuit = false;
   String circuitIndex = "";
   int circuitsIndex = 0;
+  int streak = 0;
 
   updateCircuit(String val, int index) {
     circuitIndex = val;
@@ -156,11 +158,9 @@ class MonthProvider extends ChangeNotifier {
   updateLocalData() async {
     findWeekStatuses();
     await fetchToday();
+    await fetchAllDayStatusLocalData();
     await fetchDayStatusLocalData();
     await fetchSingleDayHistoryLocalData();
-    await fetchAllDayStatusLocalData();
-    await fetchExerciseHistoryLocalData();
-    await fetchExerciseStatusLocalData();
     findWeekStatuses();
     await fetchToday();
   }
@@ -173,6 +173,7 @@ class MonthProvider extends ChangeNotifier {
   }
 
   fetchToday() async {
+    todayTitleId = "";
     for (var element in monthDataModel!.weeks![week! - 1].idList!) {
       bool? value = allDayHistoryModel.any((ele1) =>
           "${ele1.split}-${ele1.monthId}-${ele1.weekId}-$element" == ele1.dataId &&
@@ -313,10 +314,17 @@ class MonthProvider extends ChangeNotifier {
     weeksDataList = [];
     String monthId = preferences.getString(SharedPreference.monthId) ?? "";
     String split = preferences.getString(SharedPreference.split) ?? "";
+
     final rawTempData = preferences.getString("$split-$monthId");
+
+    final rawTempData1 = preferences.getString("REST-$monthId");
     if (rawTempData!.isNotEmpty) {
       monthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
       weeksDataList = monthDataModel!.weeks!;
+    }
+
+    if (rawTempData1!.isNotEmpty) {
+      restDayModel = List<RestDayModel>.from(json.decode(rawTempData1).map((x) => RestDayModel.fromJson(x)));
     }
 
     notifyListeners();
@@ -560,7 +568,47 @@ class MonthProvider extends ChangeNotifier {
     await prefs.setString("timeWhenExitScreen", DateTime.now().toString());
   }
 
-  /// EXCERSIE CARD =============================++++++++++++++++++++++++++++++++++
+  /// STREAK COUNT =============================++++++++++++++++++++++++++++++++++
+
+  manageStreak() async {
+    String encodedTempData = jsonEncode(allDayHistoryModel);
+    final decodedData = List<DayHistoryModel>.from(json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)));
+    decodedData.removeWhere((element) => element.status == "" || element.status == "Started");
+    decodedData.sort((a, b) => b.endTime!.compareTo(a.endTime!));
+    Map<String, Map<String, dynamic>> latestByDay = {};
+    for (var entry in decodedData) {
+      String dayKey = entry.endTime.toString().substring(0, 10);
+      DateTime dateTime = entry.endTime!;
+      if (!latestByDay.containsKey(dayKey) || DateTime.parse(latestByDay[dayKey]!['date']).isBefore(dateTime)) {
+        latestByDay[dayKey] = entry.toJson();
+      }
+    }
+    decodedData.removeWhere((entry) {
+      String dayKey = entry.endTime.toString().substring(0, 10);
+      return latestByDay[dayKey]!['id'] != entry.id;
+    });
+
+    streak = 0;
+    DateTime? pastDate;
+
+    for (var element in decodedData) {
+      DateTime currentDate = element.endTime!;
+      if (pastDate != null) {
+        int difference = pastDate.difference(currentDate).inDays;
+        if (difference == 1) {
+          break;
+        }
+      }
+      if (element.status == 'Completed') {
+        streak++;
+      } else {
+        break;
+      }
+      pastDate = currentDate;
+    }
+    await preferences.putInt(SharedPreference.lastStreakCount, streak);
+    notifyListeners();
+  }
 
   /// LOCAL DATA =============================++++++++++++++++++++++++++++++++++
 
@@ -649,9 +697,11 @@ class MonthProvider extends ChangeNotifier {
   fetchAllDayStatusLocalData() async {
     allDayHistoryModel = [];
     final data = await DatabaseHelper().getFilteredWithMData(
+      split: splitType!,
       tableName: DatabaseHelper.dayStatus,
       monthId: monthDataModel?.id ?? "",
     );
+    log('data :::::::::::::::::: $data');
     if (data.isNotEmpty) {
       allDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data)).map((x) => DayHistoryModel.fromJson(x)));
     } else {

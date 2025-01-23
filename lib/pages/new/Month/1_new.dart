@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
@@ -6,9 +5,10 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/components/select_dropdown1.dart';
 import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
-import 'package:bbb/pages/new/Month/1_1_new_track_card.dart';
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/Database/month_prefrence.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Month/widgets/1_1_new_track_card.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
@@ -18,6 +18,8 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import 'Database/month_database.dart';
 
 class New extends StatefulWidget {
   const New({super.key});
@@ -39,6 +41,7 @@ class _NewState extends State<New> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
+
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
@@ -277,6 +280,7 @@ class _NewState extends State<New> {
                                     await value.changeDaySplit(newValue);
                                     await value.filterWorkouts();
                                     await value.updateLocalData();
+                                    await value.manageStreak();
                                   },
                                 ),
                               ),

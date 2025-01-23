@@ -1,5 +1,6 @@
 import 'package:path/path.dart' as path1;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
@@ -80,7 +81,6 @@ class DatabaseHelper {
         status TEXT,
         startTime TEXT,
         endTime TEXT,
-        workoutTime TEXT,
         type TEXT
       )
     ''');
@@ -186,13 +186,17 @@ class DatabaseHelper {
     return results;
   }
 
-  Future<List<Map<String, dynamic>>> getFilteredWithMData({required String tableName, required String monthId}) async {
+  Future<List<Map<String, dynamic>>> getFilteredWithMData({
+    required String tableName,
+    required String monthId,
+    required String split,
+  }) async {
     Database db = await database;
 
     List<Map<String, dynamic>> results = await db.query(
       tableName,
-      where: 'monthId = ?',
-      whereArgs: [monthId],
+      where: 'monthId = ? AND split = ?',
+      whereArgs: [monthId, split],
     );
 
     return results;

@@ -1,10 +1,9 @@
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../../utils/screen_util.dart';
-import '../../../values/app_colors.dart';
+import '../../../../utils/screen_util.dart';
+import '../../../../values/app_colors.dart';
 
 class NewEquipmentSection extends StatefulWidget {
   const NewEquipmentSection({super.key});

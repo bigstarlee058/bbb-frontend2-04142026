@@ -4,11 +4,11 @@ import 'dart:developer';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/Month/Model/removed_exercise_model.dart';
-import 'package:bbb/pages/new/Month/new_circuits_view.dart';
-import 'package:bbb/pages/new/Month/sql_database.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/removed_exercise_model.dart';
+import 'package:bbb/pages/new/Month/widgets/new_circuits_view.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
@@ -137,7 +137,6 @@ class _NewTodayPageState extends State<NewTodayPage> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
     return Scaffold(
@@ -1246,31 +1245,14 @@ class _NewTodayPageState extends State<NewTodayPage> {
     String dataId =
         "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
-    final data = {
-      "dataId": dataId,
-      "monthId": monthProvider?.monthDataModel?.id,
-      "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "split": monthProvider?.splitType,
-      "date": "${DateTime.now().toUtc()}",
-      "status": status1,
-      "type": type,
-    };
     final data1 = {
       "status": status1,
       "type": type,
       "endTime": (status == "Completed" || status == "Skipped") ? "${DateTime.now().toUtc()}" : "",
     };
 
-    if (monthProvider!.dayHistoryModel.isNotEmpty) {
-      if (monthProvider!.dayHistoryModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
-      } else {
-        DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
-      }
-    } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
-    }
+    DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.updateDayData();

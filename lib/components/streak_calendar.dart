@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/month.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -20,7 +22,6 @@ class StreakCalendarPage extends StatefulWidget {
   @override
   State<StreakCalendarPage> createState() => _StreakCalendarPageState();
 }
-
 
 class _StreakCalendarPageState extends State<StreakCalendarPage> {
   DataProvider? dataProvider;
@@ -62,8 +63,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-
-
     log('4. Buttons position on sign in screen');
     var media = MediaQuery.of(context).size;
     final mainPageProvider = context.watch<MainPageProvider>();
@@ -93,7 +92,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                     opacity: 1,
                   ),
                 ),
-                child:  SizedBox(
+                child: SizedBox(
                   height: media.height / 1.8,
                   width: media.width,
                   child: SafeArea(
@@ -105,18 +104,21 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                           children: [
                             Container(
                               margin: EdgeInsets.only(
-                                left:ScreenUtil.horizontalScale(4),
+                                left: ScreenUtil.horizontalScale(4),
                               ),
                               decoration: const BoxDecoration(
-                                color:Color(0XFFd18a9b),
+                                color: Color(0XFFd18a9b),
                                 shape: BoxShape.circle,
                               ),
                               child: SizedBox(
                                 width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                height:ScreenUtil.horizontalScale(10),
+                                height: ScreenUtil.horizontalScale(10),
                                 child: IconButton(
                                   padding: EdgeInsets.zero, // Removes the default padding
-                                  icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white,),
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_left,
+                                    color: Colors.white,
+                                  ),
                                   onPressed: () {
                                     Navigator.pop(context);
                                     // mainPageProvider.changeTab(mainPageProvider.selectedPage);
@@ -130,19 +132,18 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               "Streaks",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize:
-                                ScreenUtil.verticalScale(3),
+                                fontSize: ScreenUtil.verticalScale(3),
                                 fontWeight: FontWeight.bold,
                                 height: 1,
                               ),
                             ),
                             Container(
                               margin: EdgeInsets.only(
-                                right:ScreenUtil.horizontalScale(4),
+                                right: ScreenUtil.horizontalScale(4),
                               ),
                               child: SizedBox(
                                 width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                height:ScreenUtil.horizontalScale(10),
+                                height: ScreenUtil.horizontalScale(10),
                               ),
                             ),
                             const CommonStreakWithNotification(),
@@ -166,21 +167,23 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                 'Your current Streak',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize:
-                                  ScreenUtil.verticalScale(2.5),
+                                  fontSize: ScreenUtil.verticalScale(2.5),
                                   fontWeight: FontWeight.normal,
                                   height: 1,
                                 ),
                               ),
-                              Text(
-                                userData!.streakCount.toString(),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: ScreenUtil.verticalScale(4),
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.3,
-                                ),
-                              ),
+                              Builder(builder: (context) {
+                                final streak = context.watch<MonthProvider>().streak;
+                                return Text(
+                                  '$streak',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: ScreenUtil.verticalScale(4),
+                                    fontWeight: FontWeight.bold,
+                                    height: 1.3,
+                                  ),
+                                );
+                              }),
                             ],
                           ),
                         ),
@@ -194,9 +197,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
               ),
             ),
           ),
-
           Positioned(
-           bottom: 0,
+            bottom: 0,
             child: Column(
               children: [
                 SizedBox(
@@ -230,7 +232,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                         height: ScreenUtil.verticalScale(4),
                       ),
                       Padding(
-                        padding:  EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(14), 1, ScreenUtil.horizontalScale(14), 0),
+                        padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(14), 1, ScreenUtil.horizontalScale(14), 0),
                         child: Text(
                           'Mark a day a complete every day to keep the perfect flame streak going.',
                           style: TextStyle(
@@ -243,24 +245,55 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                       SizedBox(
                         height: ScreenUtil.verticalScale(2),
                       ),
-
                       const CustomCalendarWidget(),
                       Container(
                         margin: EdgeInsets.symmetric(
                           vertical: 25.0, //
                           horizontal: ScreenUtil.horizontalScale(10),
                         ),
-                        child: ButtonWidget(
-                          text: "Start your next workout",
-                          textColor: Colors.white,
-                          onPress: () {
-                            mainPageProvider.changeTab(0);
-                          },
-                          color: AppColors.primaryColor,
-                          isLoading: false,
-                        ),
+                        child: Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                          return ButtonWidget(
+                            text: "Start your next workout",
+                            textColor: Colors.white,
+                            onPress: () {
+                              int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
+                                (element) {
+                                  return element == monthProvider.todayTitleId;
+                                },
+                              );
+                              final dayIndex = int.parse((monthProvider
+                                          .monthDataModel?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
+                                          .toString()
+                                          .replaceAll("Workout", "")
+                                          .replaceAll("Rest", "")
+                                          .replaceAll("Day", "")
+                                          .replaceAll(" ", "") ??
+                                      "0")) -
+                                  1;
+                              DayDataModel dayData =
+                                  "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                          .toString()
+                                          .contains("Workout")
+                                      ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
+                                      : DayDataModel();
+                              monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;
+                              monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
+                              monthProvider.dayDataModel = dayData;
+                              monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+                              monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
+                              monthProvider
+                                  .updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/dayOverview');
+                            },
+                            color: AppColors.primaryColor,
+                            isLoading: false,
+                          );
+                        }),
                       ),
-                       SizedBox(height:ScreenUtil.verticalScale(10),)
+                      SizedBox(
+                        height: ScreenUtil.verticalScale(10),
+                      )
                     ],
                   ),
                 ),

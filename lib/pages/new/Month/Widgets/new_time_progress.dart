@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bbb/middleware/notification_service.dart';
-import 'package:bbb/pages/new/Month/sql_database.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

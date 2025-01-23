@@ -7,7 +7,6 @@ import 'package:bbb/components/streak_calendar.dart';
 import 'package:bbb/firebase_options.dart';
 import 'package:bbb/pages/ChallengeView/joined_challeng_page.dart';
 import 'package:bbb/pages/CollectionView/collection_detail_page.dart';
-import 'package:bbb/pages/MonthlyView/day_completed_page.dart';
 import 'package:bbb/pages/Notification/notifications_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/language_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/myprofile_page.dart';
@@ -26,8 +25,7 @@ import 'package:bbb/pages/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/pages/meet_our_staff.dart';
 import 'package:bbb/pages/new/Month/4_new_excerise_page.dart';
-import 'package:bbb/pages/new/Month/new_exercise_manager.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/pages/on_boarding_page.dart';
 import 'package:bbb/pages/register_page.dart';
 import 'package:bbb/pages/reset_password_page.dart';
@@ -53,8 +51,9 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'pages/new/Month/2_new_month_overview.dart';
 import 'pages/new/Month/3_new_today_page.dart';
+import 'pages/new/Month/Database/month_prefrence.dart';
 import 'pages/new/Month/new_day_completed_page.dart';
-import 'pages/new/Month/sql_database.dart';
+import 'pages/new/Month/database/month_database.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -81,8 +80,8 @@ void main() async {
     initSettings,
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     onDidReceiveNotificationResponse: (details) {
-      var data = jsonDecode(details.payload!);
-      log('details :::::::::::::::::: ${details.payload}');
+      // var data = jsonDecode(details.payload!);
+      // log('details :::::::::::::::::: ${details.payload}');
       // Navigator.pushNamed(c!, '/exercise', arguments: [
       //   data['name'] as String,
       //   '1',

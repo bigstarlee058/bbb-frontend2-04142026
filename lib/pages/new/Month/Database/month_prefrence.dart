@@ -8,6 +8,7 @@ class SharedPreference {
   static const String monthId = "MONTH-ID";
   static const String split = "SPLIT-TYPE";
   static const String todayTitleId = "TODAY-TITLE-ID";
+  static const String lastStreakCount = "STREAK-COUNT";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();
@@ -19,5 +20,13 @@ class SharedPreference {
 
   String? getString(String key, {String defValue = ""}) {
     return _preferences == null ? defValue : _preferences!.getString(key) ?? defValue;
+  }
+
+  Future<bool?> putInt(String key, int value) async {
+    return _preferences?.setInt(key, value);
+  }
+
+  int? getInt(String key, {int defValue = 0}) {
+    return _preferences == null ? defValue : _preferences!.getInt(key) ?? defValue;
   }
 }

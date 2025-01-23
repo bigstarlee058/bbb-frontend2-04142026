@@ -1,4 +1,5 @@
 // import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:flutter/material.dart';
@@ -14,38 +15,32 @@ class CommonStreakWithNotification extends StatefulWidget {
 class _CommonStreakWithNotificationState extends State<CommonStreakWithNotification> {
   @override
   Widget build(BuildContext context) {
-
-    final userData = context.watch<UserDataProvider>();
-    // final mainPageProvider = context.watch<MainPageProvider>();
+    final streak = context.watch<MonthProvider>();
 
     return Row(
       children: [
-
         GestureDetector(
           onTap: () {
             // mainPageProvider.changeTab(4);
-            Navigator.pushNamed(context,'/streak-calendar');
+            Navigator.pushNamed(context, '/streak-calendar');
             // Navigator.pushNamed(
             // context, '/streak');
           },
-          child:         Row(
+          child: Row(
             children: [
               Container(
                 alignment: Alignment.center,
-                padding: EdgeInsets.all(
-                    ScreenUtil.verticalScale(0.65)),
+                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
                 decoration: BoxDecoration(
                   color: Colors.black12,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Colors.white),
+                  border: Border.all(color: Colors.white),
                 ),
                 child: Text(
-                  '${userData.streakCount}',
+                  '${streak.streak}',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize:
-                    ScreenUtil.verticalScale(0.8),
+                    fontSize: ScreenUtil.verticalScale(0.8),
                   ),
                 ),
               ),
@@ -59,7 +54,7 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
         ),
         IconButton(
           onPressed: () {
-            Navigator.pushNamed(context,'/notifications');
+            Navigator.pushNamed(context, '/notifications');
           },
           icon: Icon(
             Icons.notifications_none,

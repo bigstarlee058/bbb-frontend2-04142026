@@ -16,9 +16,10 @@ import 'package:bbb/models/pump_day_model.dart';
 import 'package:bbb/models/staffs.dart';
 import 'package:bbb/models/tutorials.dart';
 import 'package:bbb/models/week.dart';
-import 'package:bbb/pages/new/Month/Model/new_model.dart';
-import 'package:bbb/pages/new/Month/new_exercise_manager.dart';
-import 'package:bbb/pages/new/provider/month_provider.dart';
+import 'package:bbb/pages/new/Month/Database/month_prefrence.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/storage/exercise_manager.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:flutter/foundation.dart';
@@ -716,6 +717,7 @@ class DataProvider extends ChangeNotifier {
       ];
 
       await preferences.putString(SharedPreference.monthId, "${monthDataModelSplit3.id}");
+
       monthDataModelSplit3.weeks?.forEach(
         (element) {
           element.dayList = split3;
@@ -774,12 +776,15 @@ class DataProvider extends ChangeNotifier {
       );
 
       await preferences.putString("${SplitType.split5}-${monthDataModelSplit5.id}", jsonEncode(monthDataModelSplit5));
-      monthProvider?.restDayModel = [];
+
+      final dataList = [];
 
       monthDataModelSplit3.weeks?.forEach(
         (element) async {
           final data = await monthProvider?.fetchRestDay(element.restdayId ?? "");
-          monthProvider?.restDayModel.add(data!);
+          dataList.add(data!);
+          log('dataList :::::::::::::::::: $dataList');
+          await preferences.putString("REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
         },
       );
 

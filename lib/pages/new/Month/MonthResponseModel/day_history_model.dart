@@ -16,7 +16,6 @@ class DayHistoryModel {
   String? status;
   DateTime? startTime;
   DateTime? endTime;
-  String? workoutTime;
   String? type;
 
   DayHistoryModel({
@@ -30,7 +29,6 @@ class DayHistoryModel {
     this.status,
     this.startTime,
     this.endTime,
-    this.workoutTime,
     this.type,
   });
 
@@ -45,7 +43,6 @@ class DayHistoryModel {
         status: json["status"],
         startTime: json["startTime"] == null || json["startTime"] == "" ? null : DateTime.parse(json["startTime"]),
         endTime: json["endTime"] == null || json["endTime"] == "" ? null : DateTime.parse(json["endTime"]),
-        workoutTime: json["workoutTime"],
         type: json["type"],
       );
 
@@ -60,7 +57,6 @@ class DayHistoryModel {
         "status": status,
         "startTime": startTime?.toIso8601String(),
         "endTime": endTime?.toIso8601String(),
-        "workoutTime": workoutTime,
         "type": type,
       };
 }
