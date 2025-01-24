@@ -1,21 +1,23 @@
+import 'dart:convert';
 import 'dart:developer';
 
-import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
 
 class CalendarWidget extends StatefulWidget {
   const CalendarWidget({super.key});
 
   @override
-  _CalendarWidgetState createState() => _CalendarWidgetState();
+  State<CalendarWidget> createState() => _CalendarWidgetState();
 }
 
 class _CalendarWidgetState extends State<CalendarWidget> {
@@ -66,38 +68,36 @@ class CustomCalendarWidget extends StatefulWidget {
   const CustomCalendarWidget({super.key});
 
   @override
-  _CustomCalendarWidgetState createState() => _CustomCalendarWidgetState();
+  State<CustomCalendarWidget> createState() => _CustomCalendarWidgetState();
 }
 
 class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   late DateTime _focusedDay;
   DateTime? _selectedDay;
-  UserDataProvider? userData;
-  DataProvider? dataProvider;
+  MonthProvider? monthProvider;
 
   @override
   void initState() {
     super.initState();
     _focusedDay = DateTime.now();
-    userData = Provider.of<UserDataProvider>(context, listen: false);
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
   }
 
-  void _onLeftArrowTap() {
-    setState(() {
-      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
-    });
-  }
-
-  void _onRightArrowTap() {
-    setState(() {
-      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
-    });
-  }
-
-  String _getFormattedDate() {
-    return DateFormat.yMMMM().format(_focusedDay);
-  }
+  // void _onLeftArrowTap() {
+  //   setState(() {
+  //     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
+  //   });
+  // }
+  //
+  // void _onRightArrowTap() {
+  //   setState(() {
+  //     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
+  //   });
+  // }
+  //
+  // String _getFormattedDate() {
+  //   return DateFormat.yMMMM().format(_focusedDay);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +125,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           //   ),
           // ),
           Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
             child: Card(
               color: Colors.grey.shade50,
               elevation: 4,
@@ -161,21 +160,13 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                     //   CalendarFormat.month: 'Month',
                     // },
                     headerStyle: HeaderStyle(
-                      headerPadding: EdgeInsets.only(bottom: 10),
+                      headerPadding: const EdgeInsets.only(bottom: 10),
                       formatButtonVisible: false,
                       titleCentered: true,
-                      leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded,
-                          size: 20, color: AppColors.primaryColor),
-                      rightChevronIcon: const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 20,
-                          color: AppColors.primaryColor),
-                      titleTextFormatter: (date, locale) =>
-                          DateFormat.yMMMM().format(date),
-                      titleTextStyle: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryColor),
+                      leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+                      rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+                      titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+                      titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
                     ),
                     calendarStyle: const CalendarStyle(
                       // selectedDecoration: BoxDecoration(
@@ -191,8 +182,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                       outsideTextStyle: TextStyle(fontSize: 10.0),
                     ),
                     calendarBuilders: CalendarBuilders(
-                      todayBuilder: (context, day, focusedDay) =>
-                          _buildDayState(day),
+                      todayBuilder: (context, day, focusedDay) => _buildDayState(day),
                       // disabledBuilder: (context, date, _) {
                       //   return _buildDayState(date);
                       // },
@@ -214,36 +204,39 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   }
 
   Widget? _buildDayState(DateTime date) {
-    bool isCurrentDay = date.year == DateTime.now().year &&
-        date.month == DateTime.now().month &&
-        date.day == DateTime.now().day;
-    // Loop through dayHistory and calculate dates
+    DateTime? oldestStartDate =
+        monthProvider?.monthLocalDataModel.map((e) => DateTime.parse(e.monthStartDate!)).reduce((a, b) => a.isBefore(b) ? a : b);
+    List<DayHistoryModel> data = monthProvider!.decodedData();
+    bool isCurrentDay = date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day;
 
-    for (var day in userData!.streaksDataCalender) {
-      final workoutDate = DateTime.parse(day['date']);
+    if (data.isEmpty) {
+      if (isCurrentDay) {
+        return _buildCurrentWorkoutDay(date);
+      } else if (oldestStartDate!.isBefore(date) && DateTime.now().isAfter(date)) {
+        return _buildCustomDayCircle(date, Colors.blue);
+      }
+    }
 
-      // Check if the daySplit matches the selectedDaySplit
-      if (day['selectedDaySplit'] == userData!.selectedDaySplit &&
-          (workoutDate.day == date.day &&
-              workoutDate.month == date.month &&
-              workoutDate.year == date.year)) {
-        if (day['status'] == AppConstants.STATE_FINISHED) {
-          return _buildCustomDayCircle(
-              date, AppColors.primaryColor);
-
-          // Green for finished
-        } else if (day['status'] == AppConstants.STATE_SKIPPED) {
-          return _buildCustomDayCircle(date, Colors.blue); // Blue for skipped
+    for (var day in data) {
+      final workoutDate = day.endTime!;
+      if ((workoutDate.day == date.day && workoutDate.month == date.month && workoutDate.year == date.year)) {
+        if (day.status == "Completed") {
+          return _buildCustomDayCircle(date, AppColors.primaryColor);
+        } else if (day.status == "Skipped") {
+          return _buildCustomDayCircle(date, Colors.blue);
         }
       }
     }
 
-    // If it's the current day and no other state applies
     if (isCurrentDay) {
       return _buildCurrentWorkoutDay(date);
     }
 
-    return null; // Default styling for other days
+    if (oldestStartDate!.isBefore(date) && DateTime.now().isAfter(date)) {
+      return _buildCustomDayCircle(date, Colors.blue);
+    }
+
+    return null;
   }
 
   Widget _buildCustomDayCircle(DateTime date, Color circleColor) {
@@ -275,8 +268,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white,
-        border: Border.all(
-            color: AppColors.primaryColor), // Set the color based on state
+        border: Border.all(color: AppColors.primaryColor), // Set the color based on state
       ),
       child: Text(
         '${date.day}', // Display the day number

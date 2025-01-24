@@ -83,7 +83,6 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                               return Container(
                                 height: ScreenUtil.verticalScale(4),
                                 width: ScreenUtil.verticalScale(4),
-                                // padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
                                 margin: const EdgeInsets.only(left: 10),
                                 decoration: BoxDecoration(
                                   color: data == null

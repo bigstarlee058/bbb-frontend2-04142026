@@ -4,9 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
+  static const String monthHistory = "MonthHistory";
+  static const String dayStatus = "DayStatus";
   static const String exerciseHistory = "ExerciseHistory";
   static const String exerciseStatus = "ExerciseStatus";
-  static const String dayStatus = "DayStatus";
   static const String circuitManager = "CircuitManager";
   static const String extraSetHistory = "ExtraSetHistory";
   static const String removedExerciseHistory = "RemovedExerciseHistory";
@@ -66,7 +67,8 @@ class DatabaseHelper {
         dayId TEXT,
         type TEXT,
         date TEXT,  
-        status TEXT
+        status TEXT,
+        totalWeight TEXT
       )
     ''');
     await db.execute('''
@@ -81,7 +83,9 @@ class DatabaseHelper {
         status TEXT,
         startTime TEXT,
         endTime TEXT,
-        type TEXT
+        type TEXT,
+        totalWeight TEXT,
+        completedExercise TEXT
       )
     ''');
     await db.execute('''
@@ -112,6 +116,14 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY autoincrement,
         dataId TEXT,
         exerciseId TEXT
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $monthHistory (
+        id INTEGER PRIMARY KEY autoincrement,
+        monthId TEXT,
+        monthStartDate TEXT,
+        monthEndDate TEXT
       )
     ''');
   }

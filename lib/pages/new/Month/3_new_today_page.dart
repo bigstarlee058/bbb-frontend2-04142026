@@ -97,7 +97,6 @@ class _NewTodayPageState extends State<NewTodayPage> {
     String dataId =
         "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
     final data = await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.removedExerciseHistory, where: 'dataId', id: dataId);
-    log('data :::::::::::::::::: ${jsonEncode(data)}');
     if (data.isNotEmpty) {
       removedExercise = List<RemovedExerciseModel>.from(json.decode(jsonEncode(data)).map((x) => RemovedExerciseModel.fromJson(x)));
     } else {

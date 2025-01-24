@@ -346,7 +346,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               ),
                             ),
                           ),
-                          Container(
+                          SizedBox(
                             height: media.height / 2,
                             width: media.width,
                             child: SafeArea(

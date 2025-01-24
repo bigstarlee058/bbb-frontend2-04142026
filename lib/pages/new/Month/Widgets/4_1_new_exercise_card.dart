@@ -279,12 +279,12 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
   Widget build(BuildContext context) {
     super.build(context);
 
-    _isExpanded = "$index:$subIndex" == monthProvider?.currentExpandedItem;
+    _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
 
     if (monthProvider!.timerAddress.isNotEmpty) {
-      _showTimer = monthProvider?.timerAddress == "$index-$subIndex-${monthProvider?.selectedExIndex}";
+      _showTimer = monthProvider!.timerAddress == "$index-$subIndex-${monthProvider!.selectedExIndex}";
       if (_showTimer) {
-        monthProvider?.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
+        monthProvider!.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
       }
     }
 

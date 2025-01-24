@@ -1,4 +1,6 @@
 // import 'package:bbb/providers/main_page_provider.dart';
+import 'dart:developer';
+
 import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -16,7 +18,7 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
   @override
   Widget build(BuildContext context) {
     final streak = context.watch<MonthProvider>();
-
+    log('streak :::::::::::::::::: ${streak.streak}');
     return Row(
       children: [
         GestureDetector(

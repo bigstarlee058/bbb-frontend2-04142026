@@ -1,12 +1,16 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class NewDayCompletedPage extends StatefulWidget {
@@ -18,33 +22,65 @@ class NewDayCompletedPage extends StatefulWidget {
 
 class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
   MonthProvider? monthProvider;
+
+  DateTime today = DateTime.now();
+  List<String> formattedDates = [];
+  List<DayHistoryModel> data = [];
   late int totalWeight = 0;
   late String time = "";
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    loadTime();
+    onInit();
     super.initState();
   }
 
-  loadTime() {
-    // String tempTime = weeklyGraphProvider.weeklyProgress[6]['exercise_completed'][weeklyGraphProvider.splitIndex]['workout_time'];
-    // List<String> parts = tempTime.split(':');
-    // int hours = int.parse(parts[0]);
-    // int minutes = int.parse(parts[1]);
-    // time = "$hours hours,\n$minutes minutes";
+  onInit() async {
+    formattedDates = [];
+    await monthProvider?.fetchAllDayStatusLocalData();
+    data = monthProvider!.decodedData();
+    DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
+    List<DateTime> dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
+    formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
+
+    Duration totalWorkoutDuration = Duration.zero;
+
+    final dayHistoryModel = monthProvider?.allDayHistoryModel.where((element) =>
+        (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now())) &&
+        element.status == "Completed");
+
+    if (dayHistoryModel != null) {
+      for (var element in dayHistoryModel) {
+        if (formattedDates.contains(DateFormat('yyyy-MM-dd').format(element.endTime!)) && element.status == "Completed") {
+          Duration duration = element.endTime!.difference(element.startTime!);
+          totalWorkoutDuration += duration;
+        }
+      }
+    }
+
+    time = formatDuration(totalWorkoutDuration);
+    log('time :::::::::::::::::: $time');
+
     setState(() {});
+  }
+
+  String formatDuration(Duration duration) {
+    int hours = duration.inHours;
+    int minutes = duration.inMinutes % 60;
+    return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentDay = ModalRoute.of(context)!.settings.arguments ?? 0;
     final mainPageProvider = context.watch<MainPageProvider>();
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => onInit(),
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -67,7 +103,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 2,
                           width: media.width,
                           child: SafeArea(
@@ -95,13 +131,16 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                                 shape: BoxShape.circle,
                                                 border: Border.all(color: Colors.white),
                                               ),
-                                              child: Text(
-                                                '${0}',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.verticalScale(0.8),
-                                                ),
-                                              ),
+                                              child: Builder(builder: (context) {
+                                                final streak = context.watch<MonthProvider>();
+                                                return Text(
+                                                  streak.streak.toString(),
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: ScreenUtil.verticalScale(0.8),
+                                                  ),
+                                                );
+                                              }),
                                             ),
                                             Icon(
                                               Icons.local_fire_department_outlined,
@@ -150,8 +189,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                         ),
                                       ),
                                       Text(
-                                        // "Week ${userData!.currentWeek}, Day ${userData!.currentDay}",
-                                        "Week",
+                                        "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: ScreenUtil.verticalScale(3),
@@ -199,7 +237,38 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                       margin: EdgeInsets.only(top: media.height / 19),
                       child: Column(
                         children: [
-                          // IconRowWithDot(data: data),
+                          Builder(
+                            builder: (context) {
+                              return Container(
+                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
+                                child: IconRow(
+                                  icons: List.generate(
+                                    formattedDates.length,
+                                    (index) => data.any(
+                                      (element) =>
+                                          DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
+                                          element.status == "Completed" &&
+                                          element.split == monthProvider?.splitType,
+                                    )
+                                        ? IconDataWithDot(
+                                            icon: Icons.check,
+                                            iconColor: Colors.white,
+                                            backgroundColor: AppColors.primaryColor,
+                                            showDot: true,
+                                            dotColor: Colors.transparent,
+                                          )
+                                        : IconDataWithDot(
+                                            icon: Icons.close,
+                                            iconColor: Colors.white,
+                                            backgroundColor: Colors.blue,
+                                            showDot: true,
+                                            dotColor: Colors.transparent,
+                                          ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                           SizedBox(height: ScreenUtil.horizontalScale(6)),
                           Text(
                             "Here's an overview of your today's workout.",
@@ -268,86 +337,93 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 16),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.verticalScale(3.5),
-                                        vertical: ScreenUtil.verticalScale(2),
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(ScreenUtil.verticalScale(3)),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil.verticalScale(3.9),
+                                          vertical: ScreenUtil.verticalScale(2),
                                         ),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black12,
-                                            spreadRadius: 2,
-                                            blurRadius: 10,
-                                            offset: Offset(0, 1),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(ScreenUtil.verticalScale(3)),
                                           ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Time Spent',
-                                            style: TextStyle(color: Colors.black54),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Text(
-                                            time, // Display totalWeight
-                                            style: const TextStyle(color: Color(0xFFDD1166), fontSize: 16, fontWeight: FontWeight.w500),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.verticalScale(3.5),
-                                        vertical: ScreenUtil.verticalScale(2),
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(
-                                            ScreenUtil.verticalScale(3),
-                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              spreadRadius: 2,
+                                              blurRadius: 10,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
                                         ),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black12,
-                                            spreadRadius: 2,
-                                            blurRadius: 10,
-                                            offset: Offset(0, 1),
-                                          ),
-                                        ],
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Time Spent',
+                                              style: TextStyle(color: Colors.black54),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              time,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Color(0xFFDD1166),
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      child: const Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Weight Lifted',
-                                            style: TextStyle(
-                                              color: Colors.black54,
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil.verticalScale(3.5),
+                                          vertical: ScreenUtil.verticalScale(2),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                              ScreenUtil.verticalScale(3),
                                             ),
                                           ),
-                                          SizedBox(height: 10),
-                                          Text(
-                                            // '${exerciseHistoryProvider.history[exerciseHistoryProvider.today]['totalWeightLifted']} Lbs',
-                                            '0',
-                                            style: TextStyle(color: Color(0xFFDD1166), fontSize: 20, fontWeight: FontWeight.w500),
-                                          ),
-                                        ],
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              spreadRadius: 2,
+                                              blurRadius: 10,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Weight Lifted',
+                                              style: TextStyle(
+                                                color: Colors.black54,
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              // '${exerciseHistoryProvider.history[exerciseHistoryProvider.today]['totalWeightLifted']} Lbs',
+                                              '0',
+                                              style: TextStyle(color: Color(0xFFDD1166), fontSize: 20, fontWeight: FontWeight.w500),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
@@ -359,8 +435,8 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                               text: "Back to Dashboard",
                               textColor: const Color(0x40000000),
                               onPress: () {
-                                mainPageProvider.changeTab(0);
-                                Navigator.pushNamed(context, '/home');
+                                // mainPageProvider.changeTab(0);
+                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                               },
                               color: const Color(0xC0FFFFFF),
                               isLoading: false,
@@ -373,8 +449,8 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                               text: "Next Workout",
                               textColor: Colors.white,
                               onPress: () {
-                                mainPageProvider.changeTab(1);
-                                Navigator.pushNamed(context, '/home');
+                                // mainPageProvider.changeTab(1);
+                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                               },
                               color: AppColors.primaryColor,
                               isLoading: false,
@@ -423,39 +499,6 @@ class BulletPoint extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class IconRowWithDot extends StatelessWidget {
-  final List data;
-  const IconRowWithDot({super.key, required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenUtil.init(context);
-
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
-      child: IconRow(
-        icons: List.generate(
-            data.length,
-            (index) => data[index]['status'] == AppConstants.STATE_SKIPPED
-                ? IconDataWithDot(
-                    icon: Icons.close,
-                    iconColor: Colors.white,
-                    backgroundColor: Colors.blue,
-                    showDot: true,
-                    dotColor: Colors.transparent,
-                  )
-                : IconDataWithDot(
-                    icon: Icons.check,
-                    iconColor: Colors.white,
-                    backgroundColor: AppColors.primaryColor,
-                    showDot: true,
-                    dotColor: Colors.transparent,
-                  )),
       ),
     );
   }

@@ -110,7 +110,6 @@ class _NewExercisePageState extends State<NewExercisePage> {
 
   fetchExtraSetLocalData(String dataId) async {
     final data = await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.extraSetHistory, where: 'dataId', id: dataId);
-    log('data :::::::::::::::::: ${jsonEncode(data)}');
     if (data.isNotEmpty) {
       extraSetModel = List<ExtraSetModel>.from(json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
     } else {

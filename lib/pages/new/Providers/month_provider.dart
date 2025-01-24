@@ -9,6 +9,7 @@ import 'package:bbb/pages/new/Month/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/exercise_history_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/history_data_model.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/pump_day_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/removed_exercise_model.dart';
@@ -18,6 +19,7 @@ import 'package:bbb/pages/new/Month/database/month_database.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../values/app_constants.dart';
@@ -93,11 +95,9 @@ class MonthProvider extends ChangeNotifier {
       final dataList = dayHistoryModel.where((element) => element.type!.contains("Pump Day"));
       if (dataList.isNotEmpty) {
         String dataId = "$splitType-${monthDataModel?.id}-${weekDataModel?.id}-${weekDataModel?.idList![overviewCurrentDay - 1]}";
-        log('dataId :::::::::::::::::: $dataId');
         for (var element in dataList) {
           if (element.dataId == dataId) {
             changeIsPumpDay(true);
-            log('element.type! :::::::::::::::::: ${element.type!}');
             await pumpDayData(element.type!.split("- ").last, title);
           }
         }
@@ -242,7 +242,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> onInit() async {
     String split = (preferences.getString(SharedPreference.split) ?? "").replaceAll("split", "");
-    log('split :::::::::::::::::: $split');
     await changeDaySplit(split);
     splitType ??= SplitType.split3;
     await fetchAllRemovedExerciseLocalData();
@@ -251,7 +250,9 @@ class MonthProvider extends ChangeNotifier {
         filter();
         startTime = monthDataModel?.startDate ?? DateTime.now();
         endTime = monthDataModel?.endDate ?? DateTime.now();
+        await fetchMonthLocalData();
         await fetchAllDayStatusLocalData();
+        manageStreak();
         int dayDelta = today.difference(startTime!).inDays;
         week = (dayDelta ~/ 7) + 1;
         currentWeek = week!;
@@ -268,7 +269,6 @@ class MonthProvider extends ChangeNotifier {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/warmups/get/$warmUpId');
     url = Uri.http(url.authority, url.path);
     String? userIdToken = await getAuthToken();
-    log('userIdToken :::::::::::::::::: $userIdToken');
     final response = await http.get(
       url,
       headers: <String, String>{
@@ -410,8 +410,6 @@ class MonthProvider extends ChangeNotifier {
     }
     isFilterLoading = false;
     notifyListeners();
-
-    log('weeksDataList :::::::::::::::::: ${jsonEncode(weeksDataList)}');
   }
 
   /// EXCERSIE =============================++++++++++++++++++++++++++++++++++
@@ -553,9 +551,6 @@ class MonthProvider extends ChangeNotifier {
     if (timerAddress != '') {
       timePassed = timePassed1;
       int newTime = totalTime - int.parse(timePassed);
-
-      log('timePassed :::::::::::::::::: $timePassed');
-
       if (newTime.isNegative || newTime == 0) {
       } else {
         NotificationService.zonedScheduleNotification(
@@ -571,6 +566,31 @@ class MonthProvider extends ChangeNotifier {
   /// STREAK COUNT =============================++++++++++++++++++++++++++++++++++
 
   manageStreak() async {
+    List<DayHistoryModel> data = decodedData();
+    log('data :::::::::::::::::: ${jsonEncode(data)}');
+    streak = 0;
+    DateTime? pastDate;
+
+    for (var element in data) {
+      DateTime currentDate = element.endTime!;
+      if (pastDate != null) {
+        int difference = pastDate.difference(currentDate).inDays;
+        if (difference > 1) {
+          break;
+        }
+      }
+      if (element.status == 'Completed') {
+        streak++;
+      } else {
+        break;
+      }
+      pastDate = currentDate;
+    }
+    await preferences.putInt(SharedPreference.lastStreakCount, streak);
+    notifyListeners();
+  }
+
+  List<DayHistoryModel> decodedData() {
     String encodedTempData = jsonEncode(allDayHistoryModel);
     final decodedData = List<DayHistoryModel>.from(json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)));
     decodedData.removeWhere((element) => element.status == "" || element.status == "Started");
@@ -587,27 +607,7 @@ class MonthProvider extends ChangeNotifier {
       String dayKey = entry.endTime.toString().substring(0, 10);
       return latestByDay[dayKey]!['id'] != entry.id;
     });
-
-    streak = 0;
-    DateTime? pastDate;
-
-    for (var element in decodedData) {
-      DateTime currentDate = element.endTime!;
-      if (pastDate != null) {
-        int difference = pastDate.difference(currentDate).inDays;
-        if (difference == 1) {
-          break;
-        }
-      }
-      if (element.status == 'Completed') {
-        streak++;
-      } else {
-        break;
-      }
-      pastDate = currentDate;
-    }
-    await preferences.putInt(SharedPreference.lastStreakCount, streak);
-    notifyListeners();
+    return decodedData;
   }
 
   /// LOCAL DATA =============================++++++++++++++++++++++++++++++++++
@@ -701,7 +701,6 @@ class MonthProvider extends ChangeNotifier {
       tableName: DatabaseHelper.dayStatus,
       monthId: monthDataModel?.id ?? "",
     );
-    log('data :::::::::::::::::: $data');
     if (data.isNotEmpty) {
       allDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data)).map((x) => DayHistoryModel.fromJson(x)));
     } else {
@@ -747,11 +746,23 @@ class MonthProvider extends ChangeNotifier {
 
   fetchAllRemovedExerciseLocalData() async {
     final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.removedExerciseHistory);
-    log('data :::::::::::::::::: ${jsonEncode(data)}');
     if (data.isNotEmpty) {
       allRemovedExercise = List<RemovedExerciseModel>.from(json.decode(jsonEncode(data)).map((x) => RemovedExerciseModel.fromJson(x)));
     } else {
       allRemovedExercise = [];
+    }
+    notifyListeners();
+  }
+
+  List<MonthResponseModel> monthLocalDataModel = [];
+
+  fetchMonthLocalData() async {
+    final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.monthHistory);
+    log('data :::::::11::::::::::: ${jsonEncode(data)}');
+    if (data.isNotEmpty) {
+      monthLocalDataModel = List<MonthResponseModel>.from(json.decode(jsonEncode(data)).map((x) => MonthResponseModel.fromJson(x)));
+    } else {
+      monthLocalDataModel = [];
     }
     notifyListeners();
   }

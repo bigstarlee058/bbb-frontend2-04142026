@@ -1050,8 +1050,6 @@ class UserDataProvider extends ChangeNotifier {
     userName = responseData["name"];
     userEmail = responseData["email"];
     userData = responseData;
-    print('responseData==========>>>>>$responseData');
-    log('getUserDataFromJson userData :::::::::::::::::: $userData');
 
     // dayHistory = responseData["dayHistory"];
     // exerciseHistory = responseData["workoutsHistory"];
@@ -1149,7 +1147,7 @@ class UserDataProvider extends ChangeNotifier {
       userManager.saveExerciseHistory(exerciseHistory);
       notifyListeners();
     } catch (e) {
-      customPrintR("execption when warmup marked $e");
+      customPrintR("exception when warmup marked $e");
     }
   }
 
