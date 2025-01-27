@@ -223,6 +223,21 @@ class DatabaseHelper {
     return null;
   }
 
+  Future<List<Map<String, dynamic>>> getDataByAnyWithSplitField({
+    required String tableName,
+    required String fieldName,
+    required String split,
+    required String id,
+  }) async {
+    Database db = await database;
+    List<Map<String, dynamic>> results = await db.query(
+      tableName,
+      where: '$fieldName = ? AND split = ?',
+      whereArgs: [id, split],
+    );
+    return results;
+  }
+
   Future<int> updateData({required String tableName, required Map<String, dynamic> data, required String id}) async {
     Database db = await database;
     return await db.update(tableName, data, where: 'dataId = ?', whereArgs: [id]);

@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/ExerciseView/widgets/add_notes.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/extra_set_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/new/Month/database/month_database.dart';
 import 'package:bbb/pages/new/Month/widgets/4_1_new_exercise_card.dart';
 import 'package:bbb/pages/new/Month/widgets/new_equipment_section.dart';
-import 'package:bbb/pages/new/Month/database/month_database.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -17,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../middleware/notification_service.dart';
 import '../../../providers/weekly_graph_provider.dart';
 import '../../../values/clip_path.dart';
@@ -650,59 +652,66 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                     color: Colors.black12,
                                   ),
                                   const SizedBox(height: 30),
-                                  Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                    return monthProvider.exerciseHistoryDetails?.status == "Skipped"
-                                        ? const SizedBox()
-                                        : Padding(
-                                            padding: const EdgeInsets.only(top: 10),
-                                            child: ButtonWidget(
-                                              text: monthProvider.isPumpDay && monthProvider.isCircuit ? "Finish" : "Finish & Next",
-                                              textColor: Colors.white,
-                                              onPress: () async {
-                                                int count = 0;
-                                                await _saveExerciseData(
-                                                  status: "Completed",
-                                                  id: monthProvider.isPumpDay && monthProvider.isCircuit
-                                                      ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                                      : monthProvider.exerciseDetailModel!.sId.toString(),
-                                                  type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise",
-                                                );
+                                  Consumer<MonthProvider>(
+                                    builder: (context, monthProvider, child) {
+                                      return monthProvider.exerciseHistoryDetails?.status == "Skipped"
+                                          ? const SizedBox()
+                                          : Padding(
+                                              padding: const EdgeInsets.only(top: 10),
+                                              child: ButtonWidget(
+                                                text: monthProvider.isPumpDay && monthProvider.isCircuit ? "Finish" : "Finish & Next",
+                                                textColor: Colors.white,
+                                                onPress: () async {
+                                                  int count = 0;
+                                                  await _saveExerciseData(
+                                                    status: "Completed",
+                                                    id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                                        ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
+                                                        : monthProvider.exerciseDetailModel!.sId.toString(),
+                                                    type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise",
+                                                  );
 
-                                                if (monthProvider.isPumpDay && monthProvider.isCircuit) {
-                                                  Navigator.pop(context);
-                                                } else {
-                                                  for (var element in monthProvider.exerciseHistoryModel) {
-                                                    if (element.status.toString() == "Completed") {
-                                                      count++;
-                                                    }
-                                                  }
-                                                  if (monthProvider.dayDataModel?.exercises?.length != count &&
-                                                      monthProvider.dayDataModel?.exercises?.length != monthProvider.selectedExIndex + 1) {
+                                                  if (monthProvider.isPumpDay && monthProvider.isCircuit) {
                                                     Navigator.pop(context);
-                                                    int skipIndex = monthProvider.selectedExIndex + 1;
-                                                    for (int i = skipIndex; i < monthProvider.dayDataModel!.exercises!.length; i++) {
-                                                      var elementI = monthProvider.dayDataModel!.exercises![i];
-                                                      String dataId =
-                                                          "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-                                                      bool val = monthProvider.exerciseHistoryModel
-                                                          .any((element) => element.dataId == dataId && element.status == "Completed");
-                                                      if (val == false) {
-                                                        monthProvider.setSelectedExercise(elementI, i);
-                                                        monthProvider.updateWarmUp(false);
-                                                        await Navigator.pushNamed(context, '/exercise');
-                                                        break;
+                                                  } else {
+                                                    for (var element in monthProvider.exerciseHistoryModel) {
+                                                      if (element.status.toString() == "Completed") {
+                                                        count++;
                                                       }
                                                     }
-                                                  } else {
-                                                    Navigator.pop(context);
+
+                                                    if (monthProvider.dayDataModel?.exercises?.length != count &&
+                                                        monthProvider.dayDataModel?.exercises?.length !=
+                                                            monthProvider.selectedExIndex + 1) {
+                                                      Navigator.pop(context);
+
+                                                      await Future.delayed(const Duration(milliseconds: 100));
+
+                                                      int skipIndex = monthProvider.selectedExIndex + 1;
+                                                      for (int i = skipIndex; i < monthProvider.dayDataModel!.exercises!.length; i++) {
+                                                        var elementI = monthProvider.dayDataModel!.exercises![i];
+                                                        String dataId =
+                                                            "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+                                                        bool val = monthProvider.exerciseHistoryModel
+                                                            .any((element) => element.dataId == dataId && element.status == "Completed");
+                                                        if (val == false) {
+                                                          monthProvider.setSelectedExercise(elementI, i);
+                                                          monthProvider.updateWarmUp(false);
+                                                          await Navigator.pushNamed(context, '/exercise');
+                                                          break;
+                                                        }
+                                                      }
+                                                    } else {
+                                                      Navigator.pop(context);
+                                                    }
                                                   }
-                                                }
-                                              },
-                                              color: AppColors.primaryColor,
-                                              isLoading: false,
-                                            ),
-                                          );
-                                  }),
+                                                },
+                                                color: AppColors.primaryColor,
+                                                isLoading: false,
+                                              ),
+                                            );
+                                    },
+                                  ),
                                   const SizedBox(height: 10),
                                   Consumer<MonthProvider>(builder: (context, monthProvider, child) {
                                     return ButtonWidget(
@@ -834,6 +843,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
   }
 
   Future<void> _saveExerciseData({required String status, required String id, required String type}) async {
+    await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchCircuitModelLocalData();
 
     if (monthProvider!.isPumpDay && monthProvider!.isCircuit) {
@@ -895,6 +905,23 @@ class _NewExercisePageState extends State<NewExercisePage> {
       }
     }
 
+    double totalWeight = 0;
+
+    if (status == "Completed") {
+      totalWeight = 0;
+      monthProvider?.historyDataModel.forEach(
+        (element) {
+          final weight = double.parse(element.weight.toString());
+          final reps = double.parse(element.reps.toString());
+          final effort = double.parse(element.effort.toString().replaceAll("+", ""));
+          final cal = weight * (reps + effort);
+          totalWeight += cal;
+        },
+      );
+    }
+
+    log('totalWeight :::::::::::::::::: $totalWeight');
+
     await monthProvider?.fetchCircuitModelLocalData();
 
     String dataId =
@@ -909,10 +936,15 @@ class _NewExercisePageState extends State<NewExercisePage> {
       "split": monthProvider?.splitType,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
-      "type": type
+      "type": type,
+      "totalWeight": totalWeight.toString(),
     };
 
-    final data1 = {"status": status, "type": type};
+    final data1 = {
+      "status": status,
+      "type": type,
+      "totalWeight": totalWeight.toString(),
+    };
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
@@ -923,9 +955,10 @@ class _NewExercisePageState extends State<NewExercisePage> {
     } else {
       DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
-    log(':::::::::::::::::: DATA ADDED OR UPDATED');
     await monthProvider?.fetchExerciseStatusLocalData();
-    monthProvider?.fetchExerciseHistoryLocalData();
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
+
+    await monthProvider?.updateDayData();
+    monthProvider?.getLiftedWeightGraphData();
   }
 }

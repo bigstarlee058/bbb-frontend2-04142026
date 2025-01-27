@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:bbb/pages/new/Month/3_new_today_page.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
@@ -58,6 +61,11 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                 data = monthProvider.circuitModel[indexW];
               }
 
+              String dayDtaId =
+                  "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
+              log('dayDtaId :::::::::::::::::: $dayDtaId');
+              log(' monthProvider.dayHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider.dayHistoryModel)}');
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -85,17 +93,23 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                 width: ScreenUtil.verticalScale(4),
                                 margin: const EdgeInsets.only(left: 10),
                                 decoration: BoxDecoration(
-                                  color: data == null
-                                      ? Colors.transparent
-                                      : ((data.lastRound ?? 1) - 1) > index
-                                          ? AppColors.primaryColor
-                                          : Colors.transparent,
-                                  border: Border.all(
-                                      color: data == null
-                                          ? AppColors.primaryColor
+                                  color: monthProvider.dayHistoryModel.any((element) =>
+                                          element.dataId == dayDtaId && element.status == "Completed" || element.status == "Skipped")
+                                      ? AppColors.primaryColor
+                                      : data == null
+                                          ? Colors.transparent
                                           : ((data.lastRound ?? 1) - 1) > index
-                                              ? Colors.transparent
-                                              : AppColors.primaryColor),
+                                              ? AppColors.primaryColor
+                                              : Colors.transparent,
+                                  border: Border.all(
+                                      color: monthProvider.dayHistoryModel.any((element) =>
+                                              element.dataId == dayDtaId && element.status == "Completed" || element.status == "Skipped")
+                                          ? AppColors.primaryColor
+                                          : data == null
+                                              ? AppColors.primaryColor
+                                              : ((data.lastRound ?? 1) - 1) > index
+                                                  ? Colors.transparent
+                                                  : AppColors.primaryColor),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Center(
@@ -108,7 +122,10 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                             color: AppColors.primaryColor,
                                           ),
                                         )
-                                      : ((data.lastRound ?? 1) - 1) > index
+                                      : (((data.lastRound ?? 1) - 1) > index) ||
+                                              monthProvider.dayHistoryModel.any((element) =>
+                                                  element.dataId == dayDtaId && element.status == "Completed" ||
+                                                  element.status == "Skipped")
                                           ? Icon(
                                               Icons.check,
                                               color: Colors.white,
@@ -250,7 +267,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                                   : null,
                                           openSwapModal: () {},
                                           exercise: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex],
-                                          exerciseData: exercise.exerciseId!,
+                                          exerciseData: exercise.exerciseId ?? "",
                                           name: exercise.name ?? "Exercise ${exerciseIndex + 1}",
                                           onRemove: () {},
                                           enabled: true,

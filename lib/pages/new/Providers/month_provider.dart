@@ -17,6 +17,7 @@ import 'package:bbb/pages/new/Month/MonthResponseModel/rest_day_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/pages/new/Month/database/month_database.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -316,17 +317,22 @@ class MonthProvider extends ChangeNotifier {
     String split = preferences.getString(SharedPreference.split) ?? "";
 
     final rawTempData = preferences.getString("$split-$monthId");
-
-    final rawTempData1 = preferences.getString("REST-$monthId");
     if (rawTempData!.isNotEmpty) {
       monthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
       weeksDataList = monthDataModel!.weeks!;
     }
 
+    await getRestDayData();
+
+    notifyListeners();
+  }
+
+  getRestDayData() {
+    String monthId = preferences.getString(SharedPreference.monthId) ?? "";
+    final rawTempData1 = preferences.getString("REST-$monthId");
     if (rawTempData1!.isNotEmpty) {
       restDayModel = List<RestDayModel>.from(json.decode(rawTempData1).map((x) => RestDayModel.fromJson(x)));
     }
-
     notifyListeners();
   }
 
@@ -478,6 +484,41 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// DAY COMPLETED SCREEN =============================++++++++++++++++++++++++++++++++++
+  double totalWeight = 0;
+  String totalTime = "";
+  List<DayHistoryModel> dayCompletedData = [];
+  dayCompletedOnInit() async {
+    totalTime = "";
+    totalWeight = 0;
+    await fetchAllDayStatusLocalData().then(
+      (value) {
+        dayCompletedData = decodedData();
+
+        Duration totalWorkoutDuration = const Duration(milliseconds: 200);
+        for (var element in allDayHistoryModel) {
+          if (element.endTime != null) {
+            if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
+                element.status == "Completed") {
+              Duration duration = element.endTime!.difference(element.startTime!);
+              totalWorkoutDuration += duration;
+              totalWeight += double.parse(element.totalWeight ?? "0");
+            }
+          }
+        }
+
+        totalTime = formatDuration(totalWorkoutDuration);
+      },
+    );
+    notifyListeners();
+  }
+
+  String formatDuration(Duration duration) {
+    int hours = duration.inHours;
+    int minutes = duration.inMinutes % 60;
+    return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
+  }
+
   /// TIMER LOGIC =============================++++++++++++++++++++++++++++++++++
 
   String timerAddress = "";
@@ -528,7 +569,7 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setShowTimerIndex(int index, int subIndex, int exerciseIndex) async {
+  Future<void> setShowTimerIndex(int index, int subIndex, int exerciseIndex) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (index != -1 && subIndex != -1 && exerciseIndex != -1) {
       await prefs.setString("timerRunningAddress", "$index-$subIndex-$exerciseIndex");
@@ -541,12 +582,9 @@ class MonthProvider extends ChangeNotifier {
       timePassed = "";
     }
     notifyListeners();
-
-    // showTimerIndex = index;
-    // notifyListeners();
   }
 
-  void savePassedTime(String timePassed1, int totalTime, BuildContext context) async {
+  Future<void> savePassedTime(String timePassed1, int totalTime, BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (timerAddress != '') {
       timePassed = timePassed1;
@@ -614,7 +652,7 @@ class MonthProvider extends ChangeNotifier {
 
   HistoryDataModel? expandedDataHistory;
 
-  fetchExerciseSingleSetLocalData(dataId) async {
+  Future<void> fetchExerciseSingleSetLocalData(dataId) async {
     final data = await DatabaseHelper().getDataById(tableName: DatabaseHelper.exerciseHistory, id: dataId);
     if (data != null) {
       expandedDataHistory = HistoryDataModel.fromJson(data);
@@ -642,9 +680,22 @@ class MonthProvider extends ChangeNotifier {
     }
   }
 
+  List<HistoryDataModel> exerciseWiseHistoryDataModel = [];
+
+  fetchExerciseWiseHistoryLocalData() async {
+    exerciseWiseHistoryDataModel = [];
+    final data = await DatabaseHelper().getDataByAnyWithSplitField(
+        tableName: DatabaseHelper.exerciseHistory, id: "${exerciseDetailModel?.sId}", fieldName: 'exerciseId', split: splitType!);
+
+    if (data.isNotEmpty) {
+      exerciseWiseHistoryDataModel = List<HistoryDataModel>.from(json.decode(jsonEncode(data)).map((x) => HistoryDataModel.fromJson(x)));
+      return exerciseWiseHistoryDataModel;
+    }
+  }
+
   List<ExerciseHistoryModel> exerciseHistoryModel = [];
 
-  fetchExerciseStatusLocalData() async {
+  Future<void> fetchExerciseStatusLocalData() async {
     final data = await DatabaseHelper().getFilteredWithMWDData(
       split: splitType!,
       tableName: DatabaseHelper.exerciseStatus,
@@ -663,7 +714,7 @@ class MonthProvider extends ChangeNotifier {
 
   ExerciseHistoryModel? exerciseHistoryDetails;
 
-  fetchExerciseSingleExerciseLocalData(dataId) async {
+  Future<void> fetchExerciseSingleExerciseLocalData(dataId) async {
     exerciseHistoryDetails = null;
     final data = await DatabaseHelper().getDataById(tableName: DatabaseHelper.exerciseStatus, id: dataId);
     if (data != null) {
@@ -676,7 +727,7 @@ class MonthProvider extends ChangeNotifier {
 
   List<DayHistoryModel> dayHistoryModel = [];
 
-  fetchDayStatusLocalData() async {
+  Future<void> fetchDayStatusLocalData() async {
     dayHistoryModel = [];
     final data = await DatabaseHelper().getFilteredWithMWData(
       split: splitType!,
@@ -694,7 +745,7 @@ class MonthProvider extends ChangeNotifier {
 
   List<DayHistoryModel> allDayHistoryModel = [];
 
-  fetchAllDayStatusLocalData() async {
+  Future<void> fetchAllDayStatusLocalData() async {
     allDayHistoryModel = [];
     final data = await DatabaseHelper().getFilteredWithMData(
       split: splitType!,
@@ -731,7 +782,7 @@ class MonthProvider extends ChangeNotifier {
 
   List<CircuitModel> circuitModel = [];
 
-  fetchCircuitModelLocalData() async {
+  Future<void> fetchCircuitModelLocalData() async {
     circuitModel = [];
     final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.circuitManager);
     if (data.isNotEmpty) {
@@ -744,7 +795,7 @@ class MonthProvider extends ChangeNotifier {
 
   List<RemovedExerciseModel> allRemovedExercise = [];
 
-  fetchAllRemovedExerciseLocalData() async {
+  Future<void> fetchAllRemovedExerciseLocalData() async {
     final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.removedExerciseHistory);
     if (data.isNotEmpty) {
       allRemovedExercise = List<RemovedExerciseModel>.from(json.decode(jsonEncode(data)).map((x) => RemovedExerciseModel.fromJson(x)));
@@ -756,9 +807,9 @@ class MonthProvider extends ChangeNotifier {
 
   List<MonthResponseModel> monthLocalDataModel = [];
 
-  fetchMonthLocalData() async {
+  Future<void> fetchMonthLocalData() async {
     final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.monthHistory);
-    log('data :::::::11::::::::::: ${jsonEncode(data)}');
+
     if (data.isNotEmpty) {
       monthLocalDataModel = List<MonthResponseModel>.from(json.decode(jsonEncode(data)).map((x) => MonthResponseModel.fromJson(x)));
     } else {
@@ -766,4 +817,144 @@ class MonthProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  /// CHART
+
+  List<Map<String, dynamic>> graphHistory = [];
+  double maximumValueOfWeight = 0;
+  double maximumValueOfTotalEx = 0;
+  double maximumValueOfTotalTime = 0;
+  double maximumValueOfTotalTimeInterval = 8;
+
+  Map<String, Map<String, dynamic>> filterChartData() {
+    maximumValueOfWeight = 0;
+    maximumValueOfTotalEx = 0;
+    maximumValueOfTotalTime = 0;
+    maximumValueOfTotalTimeInterval = 8;
+    const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
+    DateTime today = DateTime.now().toUtc();
+    DateTime sixDaysAgo = today.subtract(const Duration(days: 6));
+    List<DayHistoryModel> filteredData = allDayHistoryModel.where((entry) {
+      DateTime entryDate = entry.date!;
+      return entryDate.isAfter(sixDaysAgo) && entryDate.isBefore(today.add(const Duration(days: 1)));
+    }).toList();
+    Map<String, Map<String, dynamic>> combinedData = {};
+    for (var element in filteredData) {
+      DateTime dateDateTime = element.date!;
+      String date = dateDateTime.toIso8601String().split('T')[0];
+      double totalWeight = double.parse(element.totalWeight!);
+      int completedExercise = int.parse(element.completedExercise!);
+      int workoutTimeInSeconds = element.endTime!.difference(element.startTime!).inSeconds;
+
+      String day = weekdays[dateDateTime.weekday] ?? "";
+      if (combinedData.containsKey(date)) {
+        combinedData[date]!['totalWeight'] += totalWeight;
+        combinedData[date]!['completedExercise'] += completedExercise;
+        combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
+      } else {
+        combinedData[date] = {
+          'date': date,
+          'totalWeight': totalWeight,
+          'day': day,
+          'completedExercise': completedExercise,
+          'workoutTime': workoutTimeInSeconds,
+        };
+      }
+    }
+
+    combinedData.forEach((key, value) {
+      if (double.parse(value["totalWeight"].toString()) > maximumValueOfWeight) {
+        maximumValueOfWeight = double.parse(value["totalWeight"].toString());
+      }
+      if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
+        maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
+      }
+      if (double.parse(value["workoutTime"].toString().split(":").first) > maximumValueOfTotalTime) {
+        maximumValueOfTotalTime = double.parse(value["workoutTime"].toString().split(":").first);
+      }
+    });
+    int hours = maximumValueOfTotalTime ~/ 3600;
+    int minutes = (maximumValueOfTotalTime % 3600) ~/ 60;
+    String workoutTime = "$hours:$minutes H";
+    maximumValueOfWeight += 1000;
+    maximumValueOfTotalEx += 6;
+    maximumValueOfTotalTime += 2;
+    maximumValueOfTotalTimeInterval = double.parse(((hours > 8) ? (hours + 5) : hours).toString());
+    notifyListeners();
+    return combinedData;
+  }
+
+  /// WEIGHT GRAPH
+
+  List<Map<String, dynamic>> liftedWeightEachDay = [];
+
+  void getLiftedWeightGraphData() {
+    liftedWeightEachDay = [];
+    graphHistory = [];
+    Map<String, Map<String, dynamic>> combinedData = filterChartData();
+
+    if (combinedData.isNotEmpty) {
+      combinedData.forEach(
+        (key, value) {
+          liftedWeightEachDay.add({
+            "day": value['day'],
+            "totalCompletedExercise": value['completedExercise'],
+            "totalTime": value['workoutTime'],
+            "totalWeight": value['totalWeight'],
+            "date": key,
+          });
+        },
+      );
+    }
+    graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
+    notifyListeners();
+  }
+
+  List<Map<String, dynamic>> processLiftedWeightGraphData(List<Map<String, dynamic>> data) {
+    List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    DateTime today = DateTime.now();
+    String todayDayName = DateFormat('EEE').format(today);
+    for (String day in allDays) {
+      if (!data.any((entry) => entry['day'] == day)) {
+        data.add({
+          "day": day,
+          "totalCompletedExercise": 0,
+          "totalTime": 0,
+          "totalWeight": 0,
+        });
+      }
+    }
+    log('data :::::::::::::::::: ${data}');
+    Map<String, List<double>> dayToWeight = {
+      for (var entry in data)
+        entry["day"]: [
+          double.parse(entry["totalCompletedExercise"].toString()),
+          double.parse(entry["totalTime"].toString()),
+          double.parse(entry["totalWeight"].toString()),
+        ],
+    };
+
+    int todayIndex = allDays.indexOf(todayDayName);
+    List<String> reorderedDays = [...allDays.sublist(todayIndex + 1), ...allDays.sublist(0, todayIndex + 1)];
+
+    final list = reorderedDays.map((day) {
+      List<double> dataList = dayToWeight[day]!;
+
+      return {
+        "day": day,
+        "totalCompletedExercise": _BarData(AppColors.primaryColor, dataList[0], 0.0),
+        "totalTime": _BarData(AppColors.primaryColor, dataList[1], 0.0),
+        "totalWeight": _BarData(AppColors.primaryColor, dataList[2], 0.0),
+      };
+    }).toList();
+
+    return list;
+  }
+}
+
+class _BarData {
+  const _BarData(this.color, this.value, this.shadowValue);
+  final Color color;
+  final double value;
+  final double shadowValue;
 }

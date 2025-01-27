@@ -57,7 +57,6 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
   bool ischecked = false;
   bool _isExpanded = false;
   bool thisWeek = false;
-  int totalExercises = 0;
   List<String> dayTitles = [];
 
   @override
@@ -306,6 +305,11 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
                                   onTap: monthProvider!.weekStatuses[mainIndex!] == WeekType.futureWeek
                                       ? null
                                       : () async {
+                                          bool val = monthProvider!.allDayHistoryModel.any(
+                                            (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                          );
+                                          monthProvider?.changeIsPumpDay(val);
+
                                           monthProvider?.overviewCurrentWeek = widget.weekIndex + 1;
                                           monthProvider?.overviewCurrentDay = index + 1;
                                           monthProvider?.dayDataModel = dayData;

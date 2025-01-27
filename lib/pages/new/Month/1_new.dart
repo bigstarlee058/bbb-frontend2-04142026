@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/components/select_dropdown1.dart';
 import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
-import 'package:bbb/pages/new/Month/Database/month_prefrence.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/new/Month/widgets/1_1_new_track_card.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
@@ -18,8 +15,6 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import 'Database/month_database.dart';
 
 class New extends StatefulWidget {
   const New({super.key});

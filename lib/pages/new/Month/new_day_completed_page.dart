@@ -1,11 +1,6 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/new/Month/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
-import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -24,63 +19,51 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
   MonthProvider? monthProvider;
 
   DateTime today = DateTime.now();
-  List<String> formattedDates = [];
-  List<DayHistoryModel> data = [];
-  late int totalWeight = 0;
-  late String time = "";
-
+  // List<DayHistoryModel> data = [];
+  // double totalWeight = 0;
+  // String time = "";
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    onInit();
+    monthProvider?.dayCompletedOnInit();
     super.initState();
   }
 
-  onInit() async {
-    formattedDates = [];
-    await monthProvider?.fetchAllDayStatusLocalData();
-    data = monthProvider!.decodedData();
-    DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
-    List<DateTime> dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
-    formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
-
-    Duration totalWorkoutDuration = Duration.zero;
-
-    final dayHistoryModel = monthProvider?.allDayHistoryModel.where((element) =>
-        (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now())) &&
-        element.status == "Completed");
-
-    if (dayHistoryModel != null) {
-      for (var element in dayHistoryModel) {
-        if (formattedDates.contains(DateFormat('yyyy-MM-dd').format(element.endTime!)) && element.status == "Completed") {
-          Duration duration = element.endTime!.difference(element.startTime!);
-          totalWorkoutDuration += duration;
-        }
-      }
-    }
-
-    time = formatDuration(totalWorkoutDuration);
-    log('time :::::::::::::::::: $time');
-
-    setState(() {});
-  }
-
-  String formatDuration(Duration duration) {
-    int hours = duration.inHours;
-    int minutes = duration.inMinutes % 60;
-    return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
-  }
+  // onInit() async {
+  //   time = "";
+  //   totalWeight = 0;
+  //   await monthProvider?.fetchAllDayStatusLocalData().then(
+  //     (value) {
+  //       Duration totalWorkoutDuration = Duration.zero;
+  //       monthProvider?.allDayHistoryModel.forEach(
+  //         (element) {
+  //           if (element.endTime != null) {
+  //             if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
+  //                 element.status == "Completed") {
+  //               Duration duration = element.endTime!.difference(element.startTime!);
+  //               totalWorkoutDuration += duration;
+  //               totalWeight += double.parse(element.totalWeight ?? "0");
+  //             }
+  //           }
+  //         },
+  //       );
+  //
+  //       time = formatDuration(totalWorkoutDuration);
+  //     },
+  //   );
+  // }
+  //
+  // String formatDuration(Duration duration) {
+  //   int hours = duration.inHours;
+  //   int minutes = duration.inMinutes % 60;
+  //   return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final mainPageProvider = context.watch<MainPageProvider>();
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => onInit(),
-      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -237,18 +220,21 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                       margin: EdgeInsets.only(top: media.height / 19),
                       child: Column(
                         children: [
-                          Builder(
-                            builder: (context) {
+                          Consumer<MonthProvider>(
+                            builder: (context, value, child) {
+                              DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
+                              List<DateTime> dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
+                              List<String> formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
                               return Container(
                                 margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
                                 child: IconRow(
                                   icons: List.generate(
                                     formattedDates.length,
-                                    (index) => data.any(
+                                    (index) => value.dayCompletedData.any(
                                       (element) =>
                                           DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
                                           element.status == "Completed" &&
-                                          element.split == monthProvider?.splitType,
+                                          element.split == value.splitType,
                                     )
                                         ? IconDataWithDot(
                                             icon: Icons.check,
@@ -343,7 +329,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                     children: [
                                       Container(
                                         padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.verticalScale(3.9),
+                                          horizontal: ScreenUtil.verticalScale(4.1),
                                           vertical: ScreenUtil.verticalScale(2),
                                         ),
                                         decoration: BoxDecoration(
@@ -368,15 +354,17 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                               style: TextStyle(color: Colors.black54),
                                             ),
                                             const SizedBox(height: 10),
-                                            Text(
-                                              time,
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: Color(0xFFDD1166),
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
+                                            Consumer<MonthProvider>(builder: (context, value, child) {
+                                              return Text(
+                                                value.totalTime,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  color: Color(0xFFDD1166),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              );
+                                            }),
                                           ],
                                         ),
                                       ),
@@ -404,21 +392,23 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                             ),
                                           ],
                                         ),
-                                        child: const Column(
+                                        child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            const Text(
                                               'Weight Lifted',
                                               style: TextStyle(
                                                 color: Colors.black54,
                                               ),
                                             ),
-                                            SizedBox(height: 10),
-                                            Text(
-                                              // '${exerciseHistoryProvider.history[exerciseHistoryProvider.today]['totalWeightLifted']} Lbs',
-                                              '0',
-                                              style: TextStyle(color: Color(0xFFDD1166), fontSize: 20, fontWeight: FontWeight.w500),
-                                            ),
+                                            const SizedBox(height: 10),
+                                            Consumer<MonthProvider>(builder: (context, value, child) {
+                                              return Text(
+                                                '${value.totalWeight.toStringAsFixed(0)} Lbs',
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
+                                              );
+                                            }),
                                           ],
                                         ),
                                       ),

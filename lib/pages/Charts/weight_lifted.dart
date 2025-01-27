@@ -1,9 +1,6 @@
-
-
 import 'dart:math' as math;
 
-import 'package:bbb/providers/exercise_history_provider.dart';
-import 'package:bbb/providers/weekly_graph_provider.dart';
+import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -11,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class WeightLiftedGraph extends StatefulWidget {
-
   const WeightLiftedGraph({super.key});
 
   @override
@@ -20,11 +16,11 @@ class WeightLiftedGraph extends StatefulWidget {
 
 class _BarChartSample7State extends State<WeightLiftedGraph> {
   BarChartGroupData generateBarGroup(
-      int x,
-      Color color,
-      double value,
-      double shadowValue,
-      ) {
+    int x,
+    Color color,
+    double value,
+    double shadowValue,
+  ) {
     ScreenUtil.init(context);
     return BarChartGroupData(
       x: x,
@@ -45,14 +41,21 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
 
   int touchedGroupIndex = -1;
 
-  late ExerciseHistoryProvider exerciseHistoryProvider;
+  late MonthProvider monthProvider;
+
+  @override
+  void initState() {
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider.getLiftedWeightGraphData());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    exerciseHistoryProvider = Provider.of<ExerciseHistoryProvider>(context,listen: true);
-    return AspectRatio(
-      aspectRatio: 1.4,
-      child: BarChart(
+    return Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+      return AspectRatio(
+        aspectRatio: 1.4,
+        child: BarChart(
           BarChartData(
             alignment: BarChartAlignment.spaceEvenly,
             borderData: FlBorderData(
@@ -71,8 +74,8 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  interval: 1000,
-                  reservedSize: 32, // Space for titles
+                  interval: monthProvider.maximumValueOfWeight > 10000 ? (monthProvider.maximumValueOfWeight / 10) : 1000,
+                  reservedSize: 32,
                   getTitlesWidget: getLeftTitles, // Use this method to generate Y-axis titles
                 ),
               ),
@@ -88,7 +91,7 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
             ),
             gridData: FlGridData(
               verticalInterval: 0.125,
-              horizontalInterval: 2000,
+              horizontalInterval: monthProvider.maximumValueOfWeight > 10000 ? monthProvider.maximumValueOfWeight / 5 : 2000,
               show: true,
               getDrawingHorizontalLine: (value) => FlLine(
                 color: Colors.black.withOpacity(0.1),
@@ -99,9 +102,9 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 strokeWidth: 1,
               ),
             ),
-            barGroups: exerciseHistoryProvider.graphHistory.asMap().entries.map((e) {
+            barGroups: monthProvider.graphHistory.asMap().entries.map((e) {
               final index = e.key;
-              final data = e.value['totalWeightLifted'];
+              final data = e.value['totalWeight'];
               return generateBarGroup(
                 index,
                 data.color,
@@ -109,22 +112,22 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 data.shadowValue,
               );
             }).toList(),
-            maxY: 10000, // Set max Y value (for scaling purposes)
-            minY: 0,  // Set min Y value
+            maxY: monthProvider.maximumValueOfWeight > 10000 ? monthProvider.maximumValueOfWeight : 10000,
+            minY: 0,
             barTouchData: BarTouchData(
               enabled: true,
               handleBuiltInTouches: false,
               touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (group) => Colors.transparent,
-                tooltipMargin: 0,
+                getTooltipColor: (group1) => Colors.transparent,
+                // tooltipMargin: 0,
                 getTooltipItem: (
-                    BarChartGroupData group,
-                    int groupIndex,
-                    BarChartRodData rod,
-                    int rodIndex,
-                    ) {
+                  BarChartGroupData group,
+                  int groupIndex,
+                  BarChartRodData rod,
+                  int rodIndex,
+                ) {
                   return BarTooltipItem(
-                    "${rod.toY.toString()}",
+                    rod.toY.toString(),
                     TextStyle(
                       fontWeight: FontWeight.bold,
                       color: rod.color,
@@ -140,9 +143,7 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 },
               ),
               touchCallback: (event, response) {
-                if (event.isInterestedForInteractions &&
-                    response != null &&
-                    response.spot != null) {
+                if (event.isInterestedForInteractions && response != null && response.spot != null) {
                   setState(() {
                     touchedGroupIndex = response.spot!.touchedBarGroupIndex;
                   });
@@ -153,14 +154,14 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 }
               },
             ),
-          )
-
-      ),
-    );
+          ),
+        ),
+      );
+    });
   }
 
   Widget getTitles(double value, TitleMeta meta) {
-    List titles = exerciseHistoryProvider.graphHistory.asMap().entries.map((e) {
+    List titles = monthProvider.graphHistory.asMap().entries.map((e) {
       return e.value['day'];
     }).toList();
 
@@ -190,7 +191,7 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
         text = Text(titles[5], style: style);
         break;
       case 6:
-        text =  Text(
+        text = Text(
           titles[6],
           style: const TextStyle(
             color: AppColors.primaryColor,
@@ -211,47 +212,22 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
   }
 
   Widget getLeftTitles(double value, TitleMeta meta) {
-    // List the Y-axis labels (0, 1, 2, ...)
     const style = TextStyle(
       color: Colors.grey,
       fontWeight: FontWeight.w500,
       fontSize: 12,
     );
+    String roundedValue = "";
 
-    // We assume your Y-axis ranges from 0 to 15 (as set in maxY and minY)
-    // So we generate titles for every integer between 0 and 15
-    String title;
-    if (value == 0) {
-      title = "0";
-    } else if (value == 1000) {
-      title = "1k";
-    } else if (value == 2000) {
-      title = "2k";
-    } else if (value == 3000) {
-      title = "3k";
-    } else if (value == 4000) {
-      title = "4k";
-    } else if (value == 5000) {
-      title = "5k";
-    } else if (value == 6000) {
-      title = "6k";
-    } else if (value == 7000) {
-      title = "7k";
-    } else if (value == 8000) {
-      title = "8k";
-    }else if (value == 9000) {
-      title = "9k";
-    }else if (value == 1000) {
-      title = "10k";
-    }  else {
-      title = "";
+    if (value < 1000) {
+      roundedValue = value.toStringAsFixed(0);
+    } else {
+      int val = (value / 1000).round();
+      roundedValue = '${val.toString()}k';
     }
-
-    return Text(title, style: style);
+    return Text(roundedValue == "0k" ? "0" : roundedValue, style: style);
   }
 }
-
-
 
 class _IconWidget extends ImplicitlyAnimatedWidget {
   const _IconWidget({
@@ -262,8 +238,7 @@ class _IconWidget extends ImplicitlyAnimatedWidget {
   final bool isSelected;
 
   @override
-  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() =>
-      _IconWidgetState();
+  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() => _IconWidgetState();
 }
 
 class _IconWidgetState extends AnimatedWidgetBaseState<_IconWidget> {
@@ -289,12 +264,10 @@ class _IconWidgetState extends AnimatedWidgetBaseState<_IconWidget> {
     _rotationTween = visitor(
       _rotationTween,
       widget.isSelected ? 1.0 : 0.0,
-          (dynamic value) => Tween<double>(
+      (dynamic value) => Tween<double>(
         begin: value as double,
         end: widget.isSelected ? 1.0 : 0.0,
       ),
     ) as Tween<double>?;
   }
 }
-
-

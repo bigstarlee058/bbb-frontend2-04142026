@@ -3,8 +3,8 @@ import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/new/Month/widgets/new_time_progress.dart';
 import 'package:bbb/pages/new/Month/database/month_database.dart';
+import 'package:bbb/pages/new/Month/widgets/new_time_progress.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -245,6 +245,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       "load": load.toString(),
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
+      "date": "${DateTime.now().toUtc()}",
     };
 
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -264,7 +265,6 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     setState(() {});
     log(':::::::::::::::::: DATA ADDED OR UPDATED');
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
-
     await monthProvider?.fetchExerciseHistoryLocalData();
   }
 
@@ -327,7 +327,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                           const SizedBox(width: 20),
                           if (!_isExpanded)
                             Text(
-                              '${widget.weight} lbs       ${widget.reps} reps',
+                              '$weight lbs       $reps reps',
                               style: GoogleFonts.plusJakartaSans(
                                 color: Colors.black38,
                                 fontSize: 13,

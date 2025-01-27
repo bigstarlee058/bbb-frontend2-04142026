@@ -6,8 +6,8 @@ import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/removed_exercise_model.dart';
-import 'package:bbb/pages/new/Month/widgets/new_circuits_view.dart';
 import 'package:bbb/pages/new/Month/database/month_database.dart';
+import 'package:bbb/pages/new/Month/widgets/new_circuits_view.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -1190,6 +1190,19 @@ class _NewTodayPageState extends State<NewTodayPage> {
   }
 
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
+    await monthProvider?.fetchExerciseStatusLocalData();
+
+    double totalWeight = 0;
+    int exCount = 0;
+
+    for (int i = 0; i < monthProvider!.exerciseHistoryModel.length; i++) {
+      var element = monthProvider!.exerciseHistoryModel[i];
+      if (element.status == "Completed") {
+        exCount++;
+        totalWeight += double.parse(element.totalWeight!);
+      }
+    }
+
     if (monthProvider!.isPumpDay) {
       if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
         final data = monthProvider!.pumpDayModel!.circuits!;
@@ -1200,6 +1213,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
               var elementZ = elementI.circuitExercises?[z];
               String dataId =
                   "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
               if (val == false) {
@@ -1210,6 +1224,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
         }
       }
     }
+
     if (exercises.isNotEmpty) {
       final data = exercises;
 
@@ -1226,6 +1241,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
         }
       }
     }
+
     if (monthProvider!.isPumpDay ? monthProvider?.pumpDayModel?.warmups != null : monthProvider!.dayDataModel!.warmups != null) {
       final data = monthProvider!.isPumpDay ? monthProvider?.pumpDayModel?.warmups : monthProvider!.dayDataModel!.warmups;
       for (int i = 0; i < data!.length; i++) {
@@ -1244,19 +1260,24 @@ class _NewTodayPageState extends State<NewTodayPage> {
     String dataId =
         "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
+    ///
+
     final data1 = {
       "status": status1,
       "type": type,
       "endTime": (status == "Completed" || status == "Skipped") ? "${DateTime.now().toUtc()}" : "",
+      "totalWeight": totalWeight.toString(),
+      "completedExercise": exCount.toString(),
     };
 
     DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
 
+    monthProvider?.fetchExerciseStatusLocalData();
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.updateDayData();
-    monthProvider?.fetchExerciseHistoryLocalData();
-    monthProvider?.fetchExerciseStatusLocalData();
+    monthProvider?.manageStreak();
+    monthProvider?.getLiftedWeightGraphData();
   }
 }
 

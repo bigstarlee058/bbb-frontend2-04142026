@@ -167,8 +167,6 @@ class UserDataProvider extends ChangeNotifier {
 
     // Print grouped items
     for (var group in groupedItems) {
-      log('group :::::::::::::::::: $group');
-
       streaksDataCalender.add(group.first);
     }
     for (var group in groupedItems) {

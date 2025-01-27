@@ -18,7 +18,6 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
   @override
   Widget build(BuildContext context) {
     final streak = context.watch<MonthProvider>();
-    log('streak :::::::::::::::::: ${streak.streak}');
     return Row(
       children: [
         GestureDetector(

@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/new/Month/database/month_database.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -52,6 +53,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     monthProvider?.setInitialPumpDayValues();
     currentDayTitle = data;
     await monthProvider?.checkForPumpDay(currentDayTitle);
+    await monthProvider?.getRestDayData();
 
     String dataId =
         "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
@@ -886,27 +888,31 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "endTime": status == "" ? "" : "${DateTime.now().toUtc()}",
     };
 
+    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => DayHistoryModel(),
+    );
+
     final data1 = {
       "status": status,
       "type": type,
+      "startTime": status == "" ? "" : matchingElement?.startTime.toString() ?? "${DateTime.now().toUtc()}",
       "endTime": status == "" ? "" : "${DateTime.now().toUtc()}",
     };
 
-    if (monthProvider!.dayHistoryModel.isNotEmpty) {
-      if (monthProvider!.dayHistoryModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
-      } else {
-        DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
-      }
+    if (matchingElement?.id != null) {
+      DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
       DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
+
     await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchExerciseStatusLocalData();
     await monthProvider?.updateDayData();
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
     monthProvider?.manageStreak();
+    monthProvider?.getLiftedWeightGraphData();
   }
 
   Future<void> _saveDayData({required String status, required String type}) async {
@@ -927,25 +933,29 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "endTime": (status == "Completed") ? "${DateTime.now().toUtc()}" : "",
     };
 
+    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => DayHistoryModel(),
+    );
+
     final data1 = {
       "status": status,
       "type": type,
+      "startTime": status == "" ? "" : matchingElement?.startTime ?? "${DateTime.now().toUtc()}",
       "endTime": (status == "Completed") ? "${DateTime.now().toUtc()}" : "",
     };
 
-    if (monthProvider!.dayHistoryModel.isNotEmpty) {
-      if (monthProvider!.dayHistoryModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
-      } else {
-        DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
-      }
+    if (matchingElement?.id != null) {
+      DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
       DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
+
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.updateDayData();
     monthProvider?.manageStreak();
+    monthProvider?.getLiftedWeightGraphData();
   }
 }
 

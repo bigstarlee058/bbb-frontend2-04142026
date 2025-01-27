@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bbb/components/athletes_list_widget.dart';
@@ -49,6 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   late WeeklyGraphProvider weeklyGraphProvider;
   late ExerciseHistoryProvider exerciseHistoryProvider;
+  late MonthProvider monthProvider;
 
   List<String> title = [];
 
@@ -87,6 +87,7 @@ class _DashboardPageState extends State<DashboardPage> {
     pumpDayProvider = Provider.of<PumpDayProvider>(context, listen: false);
     weeklyGraphProvider.getWeeklyProgress();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     exerciseHistoryProvider.getExercise();
 
@@ -95,6 +96,7 @@ class _DashboardPageState extends State<DashboardPage> {
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
     requestNotificationPermission();
+
     super.initState();
   }
 
@@ -193,7 +195,6 @@ class _DashboardPageState extends State<DashboardPage> {
           context);
 
       if (userData!.currentWeekDayTitle.isNotEmpty == false) {
-        debugPrint("current week title is mepty ${userData?.currentWeekDayTitle}");
         for (var element in cardDataArr) {
           if (userData!.selectedDaySplit == "3") {
             if (element.formats.contains("3")) {
@@ -229,7 +230,6 @@ class _DashboardPageState extends State<DashboardPage> {
         userData?.notifyListeners();
         setState(() {});
       } else if (userData?.compareDaySplit != userData?.selectedDaySplit) {
-        debugPrint("selectedday split is not same ${userData?.currentWeekDayTitle}");
         for (var element in cardDataArr) {
           if (userData!.selectedDaySplit == "3") {
             if (element.formats.contains("3")) {
@@ -316,14 +316,15 @@ class _DashboardPageState extends State<DashboardPage> {
       },
     );
 
-    debugPrint("this is widget build context");
-    debugPrint("this is widget build context ${userData?.currentWeekDayTitle}");
     if (dataProvider == null || userData == null) {
       return const Center(child: CircularProgressIndicator());
     }
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => monthProvider.getLiftedWeightGraphData(),
+        ),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
@@ -649,7 +650,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                           child: Consumer<MonthProvider>(
                             builder: (context, value, child) {
-                              if (value.currentWeek == 0 || value.monthDataModel!.weeks!.isEmpty) return const SizedBox();
+                              if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
                               final val1 = (value.currentWeek - 1) * 7;
                               final val2 = value.allDayHistoryModel.where((element) =>
                                   element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
@@ -818,7 +819,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                                 onSelected: (v) {
                                   setState(() {
-                                    print('!!!===== $v');
                                     selectedChart = v;
                                   });
                                 },
@@ -855,9 +855,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         featureChallengeData.id != ""
 
                             ///Please recheck this multiple
-                            ? Container(
-                                child: JoinChallengeWidget(featureChallenge: featureChallengeData),
-                              )
+                            ? JoinChallengeWidget(featureChallenge: featureChallengeData)
                             : Container(),
 
                         /// New Method
@@ -884,9 +882,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                               ),
                               Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                                return (dataProvider.athletesData.length ?? 0) > 0
+                                return dataProvider.athletesData.isNotEmpty
                                     ? CarouselSlider.builder(
-                                        itemCount: dataProvider.athletesData.length ?? 0,
+                                        itemCount: dataProvider.athletesData.length,
                                         options: CarouselOptions(
                                           height: ScreenUtil.verticalScale(38),
                                           viewportFraction: 0.65,
@@ -924,7 +922,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
 
                         Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                          return (dataProvider.collectionsData.length ?? 0) > 0
+                          return (dataProvider.collectionsData.isNotEmpty)
                               ? Container(
                                   width: media.width,
                                   margin: EdgeInsets.only(
@@ -997,9 +995,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                               ),
                               Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                                return (dataProvider.staffsData.length ?? 0) > 0
+                                return (dataProvider.staffsData.isNotEmpty)
                                     ? CarouselSlider.builder(
-                                        itemCount: dataProvider.staffsData.length ?? 0,
+                                        itemCount: dataProvider.staffsData.length,
                                         options: CarouselOptions(
                                           height: ScreenUtil.verticalScale(38),
                                           viewportFraction: 0.65,
