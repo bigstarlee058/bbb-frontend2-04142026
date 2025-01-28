@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,26 +21,17 @@ class PumpDayProvider extends ChangeNotifier {
     if (temp != null) {
       pumpDayHistory = jsonDecode(temp);
     }
-    // [{previous_title: Rest Day 1, month: 1, week: 2, day: 2, current_title: PumpDay 1, pumpDayId: }]
 
-    var isPumpDayData = checkForPumpDay(
-        userData!.currentMonth,
-        userData!.currentWeek,
-        userData!.currentDay,
-        userData!.selectedDaySplit);
+    var isPumpDayData = checkForPumpDay(userData!.currentMonth, userData!.currentWeek, userData!.currentDay, userData!.selectedDaySplit);
     isPumpDay = isPumpDayData != null;
 
-    log('pumpDayHistory==========>>>>>${isPumpDay}');
     notifyListeners();
   }
 
   checkForPumpDay(int month, int week, int day, String split) {
     var matched = pumpDayHistory.where(
       (element) {
-        return element['month'] == month &&
-            element['week'] == week &&
-            element['day'] == day &&
-            element['day_split'] == split;
+        return element['month'] == month && element['week'] == week && element['day'] == day && element['day_split'] == split;
       },
     );
     if (matched.toList().isNotEmpty) {
@@ -54,9 +44,7 @@ class PumpDayProvider extends ChangeNotifier {
   checkForPumpDayBalance(int month, int week, String split) async {
     var matched = pumpDayHistory.where(
       (element) {
-        return element['month'] == month &&
-            element['week'] == week &&
-            element['day_split'] == split;
+        return element['month'] == month && element['week'] == week && element['day_split'] == split;
       },
     );
     return matched.toList().length;

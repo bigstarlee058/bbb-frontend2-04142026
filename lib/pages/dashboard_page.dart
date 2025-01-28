@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/components/athletes_list_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/collection_grid.dart';
@@ -9,7 +7,9 @@ import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/day.dart';
+import 'package:bbb/pages/Charts/exercise_completed.dart';
 import 'package:bbb/pages/Charts/time_spent.dart';
+import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -29,8 +29,6 @@ import 'package:provider/provider.dart';
 
 import '../providers/pump_day_provider.dart';
 import '../providers/weekly_graph_provider.dart';
-import 'Charts/exercise_completed.dart';
-import 'Charts/weight_lifted.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -80,7 +78,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    // _controller = PageController(viewportFraction: 0.7, initialPage: 0);
+
     weeklyGraphProvider = Provider.of<WeeklyGraphProvider>(context, listen: false);
     exerciseHistoryProvider = Provider.of<ExerciseHistoryProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
@@ -90,7 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     exerciseHistoryProvider.getExercise();
-
+    monthProvider.getLiftedWeightGraphData();
     loadUserInfo();
     loadStaffsData();
     loadFeaturedChallengeData();
@@ -140,7 +138,6 @@ class _DashboardPageState extends State<DashboardPage> {
   void setDateTime() {
     try {
       if (dataProvider?.workout.startDate is! String) {
-        log("CALLED====> ");
         return;
       }
       debugPrint("this is setDataTime");
@@ -322,9 +319,6 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => monthProvider.getLiftedWeightGraphData(),
-        ),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),

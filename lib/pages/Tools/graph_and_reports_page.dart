@@ -1,21 +1,18 @@
-import 'package:bbb/components/bar_chart_widget.dart';
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/comparison_chart.dart';
-import 'package:bbb/components/rep_line_chart.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
 import 'package:bbb/pages/Charts/time_spent.dart';
 import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/exercise_history_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/providers/weekly_graph_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 // import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:bbb/components/back_arrow_widget.dart';
-import 'package:bbb/providers/user_data_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/screen_util.dart';
@@ -33,7 +30,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   DataProvider? dataProvider;
   List<ExerciseLibrary> _filteredExercises = [];
 
-
   late WeeklyGraphProvider weeklyGraphProvider;
   late ExerciseHistoryProvider exerciseHistoryProvider;
 
@@ -44,8 +40,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
   @override
   void initState() {
-    weeklyGraphProvider = Provider.of<WeeklyGraphProvider>(context,listen: false);
-    exerciseHistoryProvider = Provider.of<ExerciseHistoryProvider>(context,listen: false);
+    weeklyGraphProvider = Provider.of<WeeklyGraphProvider>(context, listen: false);
+    exerciseHistoryProvider = Provider.of<ExerciseHistoryProvider>(context, listen: false);
     super.initState();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     dataProvider?.fetchAdminData().then((_) {
@@ -60,9 +56,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
   void _filterItems(String query) {
     setState(() {
-      filteredItems = items
-          .where((item) => item.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      filteredItems = items.where((item) => item.toLowerCase().contains(query.toLowerCase())).toList();
       isDropdownOpen = query.isNotEmpty && filteredItems.isNotEmpty;
     });
   }
@@ -112,8 +106,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft:
-                            Radius.circular(ScreenUtil.horizontalScale(15)),
+                        topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
                       ),
                     ),
                     child: Column(
@@ -145,21 +138,14 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                 ),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton(
-                                    items: [
-                                      "Week 1",
-                                      "Week 2",
-                                      "Week 3",
-                                      "Week 4"
-                                    ]
+                                    items: ["Week 1", "Week 2", "Week 3", "Week 4"]
                                         .map((name) => DropdownMenuItem(
                                               value: name,
                                               child: Text(
                                                 name,
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xA09F9F9F),
-                                                  fontSize: ScreenUtil
-                                                      .horizontalScale(
+                                                  color: const Color(0xA09F9F9F),
+                                                  fontSize: ScreenUtil.horizontalScale(
                                                     3,
                                                   ),
                                                 ),
@@ -214,27 +200,18 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                 height: ScreenUtil.verticalScale(4),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                      ScreenUtil.verticalScale(2)),
+                                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
                                 ),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton(
-                                    items: [
-                                      "Week 1",
-                                      "Week 2",
-                                      "Week 3",
-                                      "Week 4"
-                                    ]
+                                    items: ["Week 1", "Week 2", "Week 3", "Week 4"]
                                         .map((name) => DropdownMenuItem(
                                               value: name,
                                               child: Text(
                                                 name,
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xA09F9F9F),
-                                                  fontSize:
-                                                      ScreenUtil.verticalScale(
-                                                          1.5),
+                                                  color: const Color(0xA09F9F9F),
+                                                  fontSize: ScreenUtil.verticalScale(1.5),
                                                 ),
                                               ),
                                             ))
@@ -248,10 +225,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                     hint: Text(
                                       "Week 1",
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: const Color(0xA09F9F9F),
-                                          fontSize:
-                                              ScreenUtil.verticalScale(2)),
+                                      style: TextStyle(color: const Color(0xA09F9F9F), fontSize: ScreenUtil.verticalScale(2)),
                                     ),
                                   ),
                                 ),
@@ -268,8 +242,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                             child: const WeightLiftedGraph()),
                         const SizedBox(height: 40),
                         Container(
-                          margin: EdgeInsets.only(
-                              left: ScreenUtil.horizontalScale(8)),
+                          margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8)),
                           width: media.width,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,8 +268,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                         ),
                         const SizedBox(height: 40),
                         Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(8)),
+                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
                           child: IntrinsicHeight(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -324,26 +296,20 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       ],
                                     ),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           'Total Weight Lifted',
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize:
-                                                  ScreenUtil.horizontalScale(
-                                                      3.6)),
+                                          style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.horizontalScale(3.6)),
                                         ),
                                         const SizedBox(height: 10),
                                         Text(
                                           '${exerciseHistoryProvider.totalLiftedWeight} lbs',
                                           style: TextStyle(
                                             color: const Color(0xFFDD1166),
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(5),
+                                            fontSize: ScreenUtil.horizontalScale(5),
                                           ),
                                         ),
                                       ],
@@ -376,8 +342,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       ],
                                     ),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
@@ -385,23 +350,19 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: Colors.black54,
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(3.6),
+                                            fontSize: ScreenUtil.horizontalScale(3.6),
                                           ),
                                         ),
                                         const SizedBox(height: 10),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             Text(
                                               '${weeklyGraphProvider.totalCompletedExercises}',
                                               style: TextStyle(
                                                 color: const Color(0xFFDD1166),
-                                                fontSize:
-                                                    ScreenUtil.horizontalScale(5),
+                                                fontSize: ScreenUtil.horizontalScale(5),
                                               ),
                                             ),
                                           ],
@@ -419,8 +380,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                         ),
                         Container(
                           width: media.width,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(8)),
+                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
                           child: Column(
                             children: [
                               ButtonWidget(
@@ -471,29 +431,19 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                 Container(
                                   margin: const EdgeInsets.only(right: 10),
                                   child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(
-                                          onPress: () =>
-                                              {Navigator.pop(context)}),
+                                      BackArrowWidget(onPress: () => {Navigator.pop(context)}),
                                       Container(
-                                        margin: EdgeInsets.only(
-                                            left: ScreenUtil.horizontalScale(8),
-                                            top: ScreenUtil.horizontalScale(8)),
-                                        child: Consumer<UserDataProvider>(
-                                            builder:
-                                                (context, userData, child) {
+                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
+                                        child: Consumer<UserDataProvider>(builder: (context, userData, child) {
                                           return Text(
                                             // 'Hi, Nick',
                                             'Hi ${userData.userName}',
                                             style: TextStyle(
                                               color: Colors.white,
-                                              fontSize:
-                                                  ScreenUtil.horizontalScale(
-                                                      5.5),
+                                              fontSize: ScreenUtil.horizontalScale(5.5),
                                             ),
                                           );
                                         }),
@@ -503,12 +453,9 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.symmetric(
-                                      horizontal:
-                                          ScreenUtil.horizontalScale(7)),
+                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       Column(children: [
                                         const SizedBox(height: 4),
@@ -518,9 +465,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                             "Here's some fun graphs for you",
                                             style: TextStyle(
                                               color: Colors.white,
-                                              fontSize:
-                                                  ScreenUtil.horizontalScale(
-                                                      4.5),
+                                              fontSize: ScreenUtil.horizontalScale(4.5),
                                             ),
                                             textAlign: TextAlign.center,
                                           ),
@@ -531,15 +476,12 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       ]),
                                       Container(
                                         padding: EdgeInsets.symmetric(
-                                          horizontal:
-                                              ScreenUtil.horizontalScale(3),
-                                          vertical:
-                                              ScreenUtil.horizontalScale(1),
+                                          horizontal: ScreenUtil.horizontalScale(3),
+                                          vertical: ScreenUtil.horizontalScale(1),
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                              ScreenUtil.verticalScale(4)),
+                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
                                           boxShadow: const [
                                             BoxShadow(
                                               color: Colors.black12,
@@ -560,25 +502,17 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                               Column(
                                                 children: [
                                                   ListView(
-                                                    shrinkWrap:
-                                                        true, // Allows ListView to take only the space it needs
-                                                    physics:
-                                                        AlwaysScrollableScrollPhysics(), // Disable scrolling if needed
-                                                    children: filteredItems
-                                                        .map((item) {
+                                                    shrinkWrap: true, // Allows ListView to take only the space it needs
+                                                    physics: AlwaysScrollableScrollPhysics(), // Disable scrolling if needed
+                                                    children: filteredItems.map((item) {
                                                       return ListTile(
                                                         title: Text(
                                                           item,
-                                                          style: TextStyle(
-                                                              fontSize:
-                                                                  16), // Adjust font size as needed
-                                                          maxLines:
-                                                              3, // Limit to 3 lines; adjust as needed
-                                                          overflow: TextOverflow
-                                                              .ellipsis, // Show ellipsis if text is too long
+                                                          style: TextStyle(fontSize: 16), // Adjust font size as needed
+                                                          maxLines: 3, // Limit to 3 lines; adjust as needed
+                                                          overflow: TextOverflow.ellipsis, // Show ellipsis if text is too long
                                                         ),
-                                                        onTap: () =>
-                                                            _selectItem(item),
+                                                        onTap: () => _selectItem(item),
                                                       );
                                                     }).toList(),
                                                   ),
@@ -637,8 +571,7 @@ class SearchExerciseField extends StatelessWidget {
     );
   }
 
-  const SearchExerciseField(
-      {super.key, required this.onChanged, required this.controller});
+  const SearchExerciseField({super.key, required this.onChanged, required this.controller});
 
   @override
   Widget build(BuildContext context) {

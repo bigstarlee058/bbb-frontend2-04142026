@@ -941,7 +941,11 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     final data1 = {
       "status": status,
       "type": type,
-      "startTime": status == "" ? "" : matchingElement?.startTime ?? "${DateTime.now().toUtc()}",
+      "startTime": status == ""
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
       "endTime": (status == "Completed") ? "${DateTime.now().toUtc()}" : "",
     };
 

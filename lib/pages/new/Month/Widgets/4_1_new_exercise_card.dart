@@ -36,6 +36,7 @@ class NewExerciseCard extends StatefulWidget {
     required this.color,
     required this.extraDataModel,
     required this.isCompleted,
+    required this.makeRefresh,
   });
 
   final Color color;
@@ -55,6 +56,7 @@ class NewExerciseCard extends StatefulWidget {
   final int index;
   final int subIndex;
   final bool isTimerRunning;
+  final VoidCallback makeRefresh;
 
   @override
   State<NewExerciseCard> createState() => _NewExerciseCardState();
@@ -278,15 +280,20 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    context.select((MonthProvider value) => value.currentExpandedItem);
+    context.select((MonthProvider value) => value.timerAddress);
 
     _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
 
     if (monthProvider!.timerAddress.isNotEmpty) {
-      _showTimer = monthProvider!.timerAddress == "$index-$subIndex-${monthProvider!.selectedExIndex}";
+      _showTimer = monthProvider!.timerAddress ==
+          "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
       if (_showTimer) {
         monthProvider!.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
       }
     }
+
+    // closeLastOpenedCard();
 
     return SingleChildScrollView(
       child: Column(
@@ -387,7 +394,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                 initiallyExpanded: _isExpanded,
                 onExpansionChanged: (bool expanded) {
                   monthProvider?.updateExpandedItem(expanded ? "$index:$subIndex" : "");
-                  monthProvider?.setShowTimerIndex(-1, -1, -1);
+                  // monthProvider?.setShowTimerIndex(-1, -1, -1);
 
                   setState(() {
                     _isExpanded = expanded;
@@ -653,4 +660,21 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       ),
     );
   }
+
+  // void closeLastOpenedCard() {
+  //   String currentExpandedItem = preferences.getString(SharedPreference.currentExpandedItem) ?? "0:0";
+  //   String timerAddress = preferences.getString(SharedPreference.timerAddress) ?? "";
+  //
+  //   final value = context.select((MonthProvider value) => value.currentExpandedItem);
+  //   final value1 = context.select((MonthProvider value) => value.timerAddress);
+  //
+  //   _isExpanded = "$index:$subIndex" == value;
+  //
+  //   if (value1.isNotEmpty) {
+  //     _showTimer = value1 == "$index-$subIndex-${monthProvider!.selectedExIndex}";
+  //     if (_showTimer) {
+  //       monthProvider!.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
+  //     }
+  //   }
+  // }
 }

@@ -181,15 +181,14 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
 
   @override
   Widget build(BuildContext context) {
-    final data = context.select<MonthProvider, String>((monthProvider) => monthProvider.currentExpandedItem);
-
-    if (previousData != data) {
-      previousData = data;
-      if (widget.isTimerRunning) {
-        monthProvider.setShowTimerIndex(-1, -1, -1);
-        widget.onClose();
-      }
-    }
+    // final data = context.select<MonthProvider, String>((monthProvider) => monthProvider.currentExpandedItem);
+    // if (previousData != data) {
+    //   previousData = data;
+    //   if (widget.isTimerRunning) {
+    //     monthProvider.setShowTimerIndex(-1, -1, -1);
+    //     widget.onClose();
+    //   }
+    // }
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),

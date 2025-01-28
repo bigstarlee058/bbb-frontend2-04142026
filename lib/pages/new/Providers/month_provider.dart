@@ -253,6 +253,7 @@ class MonthProvider extends ChangeNotifier {
         endTime = monthDataModel?.endDate ?? DateTime.now();
         await fetchMonthLocalData();
         await fetchAllDayStatusLocalData();
+        await getLiftedWeightGraphData();
         manageStreak();
         int dayDelta = today.difference(startTime!).inDays;
         week = (dayDelta ~/ 7) + 1;
@@ -485,39 +486,39 @@ class MonthProvider extends ChangeNotifier {
   }
 
   /// DAY COMPLETED SCREEN =============================++++++++++++++++++++++++++++++++++
-  double totalWeight = 0;
-  String totalTime = "";
-  List<DayHistoryModel> dayCompletedData = [];
-  dayCompletedOnInit() async {
-    totalTime = "";
-    totalWeight = 0;
-    await fetchAllDayStatusLocalData().then(
-      (value) {
-        dayCompletedData = decodedData();
-
-        Duration totalWorkoutDuration = const Duration(milliseconds: 200);
-        for (var element in allDayHistoryModel) {
-          if (element.endTime != null) {
-            if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
-                element.status == "Completed") {
-              Duration duration = element.endTime!.difference(element.startTime!);
-              totalWorkoutDuration += duration;
-              totalWeight += double.parse(element.totalWeight ?? "0");
-            }
-          }
-        }
-
-        totalTime = formatDuration(totalWorkoutDuration);
-      },
-    );
-    notifyListeners();
-  }
-
-  String formatDuration(Duration duration) {
-    int hours = duration.inHours;
-    int minutes = duration.inMinutes % 60;
-    return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
-  }
+  // double totalWeight = 0;
+  // String totalTime = "";
+  // List<DayHistoryModel> dayCompletedData = [];
+  // dayCompletedOnInit() async {
+  //   totalTime = "";
+  //   totalWeight = 0;
+  //   notifyListeners();
+  //   await fetchAllDayStatusLocalData().then(
+  //     (value) {
+  //       Duration totalWorkoutDuration = const Duration(milliseconds: 200);
+  //       for (var element in allDayHistoryModel) {
+  //         if (element.endTime != null) {
+  //           if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
+  //               element.status == "Completed") {
+  //             Duration duration = element.endTime!.difference(element.startTime!);
+  //             totalWorkoutDuration += duration;
+  //             totalWeight += double.parse(element.totalWeight ?? "0");
+  //           }
+  //         }
+  //       }
+  //       dayCompletedData = decodedData();
+  //       totalTime = formatDuration(totalWorkoutDuration);
+  //       notifyListeners();
+  //     },
+  //   );
+  //   notifyListeners();
+  // }
+  //
+  // String formatDuration(Duration duration) {
+  //   int hours = duration.inHours;
+  //   int minutes = duration.inMinutes % 60;
+  //   return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
+  // }
 
   /// TIMER LOGIC =============================++++++++++++++++++++++++++++++++++
 
@@ -525,8 +526,9 @@ class MonthProvider extends ChangeNotifier {
   String timePassed = "";
   String currentExpandedItem = "0:0";
 
-  updateExpandedItem(String value) {
+  updateExpandedItem(String value) async {
     currentExpandedItem = value;
+
     notifyListeners();
   }
 
@@ -554,9 +556,10 @@ class MonthProvider extends ChangeNotifier {
   }
 
   fetchTimerAddress() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    SharedPreferences pf = await SharedPreferences.getInstance();
     await getPassedTime();
-    timerAddress = preferences.getString("timerRunningAddress") ?? "";
+
+    timerAddress = pf.getString("timerRunningAddress") ?? "";
 
     if (timerAddress.isNotEmpty) {
       var data = timerAddress.split("-");
@@ -566,6 +569,7 @@ class MonthProvider extends ChangeNotifier {
         updateExpandedItem("0:0");
       }
     }
+
     notifyListeners();
   }
 
@@ -573,7 +577,7 @@ class MonthProvider extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (index != -1 && subIndex != -1 && exerciseIndex != -1) {
       await prefs.setString("timerRunningAddress", "$index-$subIndex-$exerciseIndex");
-      timerAddress = "$index-$subIndex-$exerciseIndex";
+      timerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
     } else {
       NotificationService.clearNotification();
       await prefs.setString("timerRunningAddress", "");
@@ -581,6 +585,7 @@ class MonthProvider extends ChangeNotifier {
       timerAddress = "";
       timePassed = "";
     }
+
     notifyListeners();
   }
 
@@ -809,7 +814,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchMonthLocalData() async {
     final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.monthHistory);
-
     if (data.isNotEmpty) {
       monthLocalDataModel = List<MonthResponseModel>.from(json.decode(jsonEncode(data)).map((x) => MonthResponseModel.fromJson(x)));
     } else {
@@ -824,41 +828,43 @@ class MonthProvider extends ChangeNotifier {
   double maximumValueOfWeight = 0;
   double maximumValueOfTotalEx = 0;
   double maximumValueOfTotalTime = 0;
-  double maximumValueOfTotalTimeInterval = 8;
 
   Map<String, Map<String, dynamic>> filterChartData() {
     maximumValueOfWeight = 0;
     maximumValueOfTotalEx = 0;
     maximumValueOfTotalTime = 0;
-    maximumValueOfTotalTimeInterval = 8;
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
     DateTime today = DateTime.now().toUtc();
     DateTime sixDaysAgo = today.subtract(const Duration(days: 6));
+
     List<DayHistoryModel> filteredData = allDayHistoryModel.where((entry) {
       DateTime entryDate = entry.date!;
       return entryDate.isAfter(sixDaysAgo) && entryDate.isBefore(today.add(const Duration(days: 1)));
     }).toList();
     Map<String, Map<String, dynamic>> combinedData = {};
     for (var element in filteredData) {
-      DateTime dateDateTime = element.date!;
-      String date = dateDateTime.toIso8601String().split('T')[0];
-      double totalWeight = double.parse(element.totalWeight!);
-      int completedExercise = int.parse(element.completedExercise!);
-      int workoutTimeInSeconds = element.endTime!.difference(element.startTime!).inSeconds;
+      if (element.status == "Completed") {
+        DateTime dateDateTime = element.date!;
+        String date = dateDateTime.toIso8601String().split('T')[0];
+        double totalWeight = double.parse(element.totalWeight ?? "0");
+        int completedExercise = int.parse(element.completedExercise ?? "0");
 
-      String day = weekdays[dateDateTime.weekday] ?? "";
-      if (combinedData.containsKey(date)) {
-        combinedData[date]!['totalWeight'] += totalWeight;
-        combinedData[date]!['completedExercise'] += completedExercise;
-        combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
-      } else {
-        combinedData[date] = {
-          'date': date,
-          'totalWeight': totalWeight,
-          'day': day,
-          'completedExercise': completedExercise,
-          'workoutTime': workoutTimeInSeconds,
-        };
+        int workoutTimeInSeconds = element.endTime!.difference(element.startTime!).inSeconds;
+
+        String day = weekdays[dateDateTime.weekday] ?? "";
+        if (combinedData.containsKey(date)) {
+          combinedData[date]!['totalWeight'] += totalWeight;
+          combinedData[date]!['completedExercise'] += completedExercise;
+          combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
+        } else {
+          combinedData[date] = {
+            'date': date,
+            'totalWeight': totalWeight,
+            'day': day,
+            'completedExercise': completedExercise,
+            'workoutTime': workoutTimeInSeconds,
+          };
+        }
       }
     }
 
@@ -869,17 +875,20 @@ class MonthProvider extends ChangeNotifier {
       if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
         maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
       }
-      if (double.parse(value["workoutTime"].toString().split(":").first) > maximumValueOfTotalTime) {
-        maximumValueOfTotalTime = double.parse(value["workoutTime"].toString().split(":").first);
+
+      final timeInSeconds = double.parse(value["workoutTime"].toString());
+
+      int hours = timeInSeconds ~/ 3600;
+
+      if (double.parse(value["workoutTime"].toString()) > maximumValueOfTotalTime) {
+        maximumValueOfTotalTime = double.parse(hours.toString());
       }
     });
-    int hours = maximumValueOfTotalTime ~/ 3600;
-    int minutes = (maximumValueOfTotalTime % 3600) ~/ 60;
-    String workoutTime = "$hours:$minutes H";
+
     maximumValueOfWeight += 1000;
     maximumValueOfTotalEx += 6;
     maximumValueOfTotalTime += 2;
-    maximumValueOfTotalTimeInterval = double.parse(((hours > 8) ? (hours + 5) : hours).toString());
+
     notifyListeners();
     return combinedData;
   }
@@ -887,10 +896,12 @@ class MonthProvider extends ChangeNotifier {
   /// WEIGHT GRAPH
 
   List<Map<String, dynamic>> liftedWeightEachDay = [];
+  bool isChartLoading = false;
 
-  void getLiftedWeightGraphData() {
+  Future<void> getLiftedWeightGraphData() async {
     liftedWeightEachDay = [];
     graphHistory = [];
+
     Map<String, Map<String, dynamic>> combinedData = filterChartData();
 
     if (combinedData.isNotEmpty) {
@@ -907,6 +918,7 @@ class MonthProvider extends ChangeNotifier {
       );
     }
     graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
+
     notifyListeners();
   }
 
@@ -914,6 +926,7 @@ class MonthProvider extends ChangeNotifier {
     List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     DateTime today = DateTime.now();
     String todayDayName = DateFormat('EEE').format(today);
+
     for (String day in allDays) {
       if (!data.any((entry) => entry['day'] == day)) {
         data.add({
@@ -924,7 +937,7 @@ class MonthProvider extends ChangeNotifier {
         });
       }
     }
-    log('data :::::::::::::::::: ${data}');
+
     Map<String, List<double>> dayToWeight = {
       for (var entry in data)
         entry["day"]: [
@@ -947,7 +960,6 @@ class MonthProvider extends ChangeNotifier {
         "totalWeight": _BarData(AppColors.primaryColor, dataList[2], 0.0),
       };
     }).toList();
-
     return list;
   }
 }

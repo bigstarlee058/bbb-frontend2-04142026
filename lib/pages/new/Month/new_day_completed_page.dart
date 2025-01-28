@@ -1,5 +1,6 @@
 import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/pages/new/Month/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -19,45 +20,59 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
   MonthProvider? monthProvider;
 
   DateTime today = DateTime.now();
-  // List<DayHistoryModel> data = [];
-  // double totalWeight = 0;
-  // String time = "";
+  List<DayHistoryModel> data = [];
+  double totalWeight = 0;
+  String time = "";
+
+  bool loader = true;
+
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    monthProvider?.dayCompletedOnInit();
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) async => await monthProvider?.fetchAllDayStatusLocalData().then((value) => onInit()));
     super.initState();
   }
 
-  // onInit() async {
-  //   time = "";
-  //   totalWeight = 0;
-  //   await monthProvider?.fetchAllDayStatusLocalData().then(
-  //     (value) {
-  //       Duration totalWorkoutDuration = Duration.zero;
-  //       monthProvider?.allDayHistoryModel.forEach(
-  //         (element) {
-  //           if (element.endTime != null) {
-  //             if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
-  //                 element.status == "Completed") {
-  //               Duration duration = element.endTime!.difference(element.startTime!);
-  //               totalWorkoutDuration += duration;
-  //               totalWeight += double.parse(element.totalWeight ?? "0");
-  //             }
-  //           }
-  //         },
-  //       );
-  //
-  //       time = formatDuration(totalWorkoutDuration);
-  //     },
-  //   );
-  // }
-  //
-  // String formatDuration(Duration duration) {
-  //   int hours = duration.inHours;
-  //   int minutes = duration.inMinutes % 60;
-  //   return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
-  // }
+  List<DateTime> dateList = [];
+  List<String> formattedDates = [];
+
+  onInit() async {
+    time = "";
+    totalWeight = 0;
+
+    data = monthProvider!.decodedData();
+    DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
+    dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
+    formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
+
+    Duration totalWorkoutDuration = Duration.zero;
+    monthProvider?.allDayHistoryModel.forEach(
+      (element) {
+        if (element.endTime != null) {
+          if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
+              element.status == "Completed") {
+            Duration duration = element.endTime!.difference(element.startTime!);
+            totalWorkoutDuration += duration;
+            totalWeight += double.parse(element.totalWeight ?? "0");
+          }
+        }
+      },
+    );
+    time = formatDuration(totalWorkoutDuration);
+    await Future.delayed(const Duration(milliseconds: 1000));
+    if (loader != false) {
+      loader = false;
+      setState(() {});
+    }
+  }
+
+  String formatDuration(Duration duration) {
+    int hours = duration.inHours;
+    int minutes = duration.inMinutes % 60;
+    return '$hours Hour${hours < 1 ? "s" : ""}\n$minutes Minute${minutes < 1 ? "s" : ""}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,25 +121,24 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                         },
                                         child: Row(
                                           children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black12,
-                                                shape: BoxShape.circle,
-                                                border: Border.all(color: Colors.white),
-                                              ),
-                                              child: Builder(builder: (context) {
-                                                final streak = context.watch<MonthProvider>();
-                                                return Text(
-                                                  streak.streak.toString(),
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: ScreenUtil.verticalScale(0.8),
-                                                  ),
-                                                );
-                                              }),
-                                            ),
+                                            // Container(
+                                            //   alignment: Alignment.center,
+                                            //   padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                                            //   decoration: BoxDecoration(
+                                            //     color: Colors.black12,
+                                            //     shape: BoxShape.circle,
+                                            //     border: Border.all(color: Colors.white),
+                                            //   ),
+                                            //   child: Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                            //     return Text(
+                                            //       monthProvider.streak.toString(),
+                                            //       style: TextStyle(
+                                            //         color: Colors.white,
+                                            //         fontSize: ScreenUtil.verticalScale(0.8),
+                                            //       ),
+                                            //     );
+                                            //   }),
+                                            // ),
                                             Icon(
                                               Icons.local_fire_department_outlined,
                                               color: Colors.white,
@@ -220,40 +234,34 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                       margin: EdgeInsets.only(top: media.height / 19),
                       child: Column(
                         children: [
-                          Consumer<MonthProvider>(
-                            builder: (context, value, child) {
-                              DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
-                              List<DateTime> dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
-                              List<String> formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
-                              return Container(
-                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
-                                child: IconRow(
-                                  icons: List.generate(
-                                    formattedDates.length,
-                                    (index) => value.dayCompletedData.any(
-                                      (element) =>
-                                          DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
-                                          element.status == "Completed" &&
-                                          element.split == value.splitType,
-                                    )
-                                        ? IconDataWithDot(
-                                            icon: Icons.check,
-                                            iconColor: Colors.white,
-                                            backgroundColor: AppColors.primaryColor,
-                                            showDot: true,
-                                            dotColor: Colors.transparent,
-                                          )
-                                        : IconDataWithDot(
-                                            icon: Icons.close,
-                                            iconColor: Colors.white,
-                                            backgroundColor: Colors.blue,
-                                            showDot: true,
-                                            dotColor: Colors.transparent,
-                                          ),
-                                  ),
-                                ),
-                              );
-                            },
+                          Container(
+                            height: 50,
+                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
+                            child: IconRow(
+                              icons: List.generate(
+                                formattedDates.length,
+                                (index) => data.any(
+                                  (element) =>
+                                      DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
+                                      element.status == "Completed" &&
+                                      element.split == monthProvider!.splitType,
+                                )
+                                    ? IconDataWithDot(
+                                        icon: Icons.check,
+                                        iconColor: Colors.white,
+                                        backgroundColor: AppColors.primaryColor,
+                                        showDot: true,
+                                        dotColor: Colors.transparent,
+                                      )
+                                    : IconDataWithDot(
+                                        icon: Icons.close,
+                                        iconColor: Colors.white,
+                                        backgroundColor: Colors.blue,
+                                        showDot: true,
+                                        dotColor: Colors.transparent,
+                                      ),
+                              ),
+                            ),
                           ),
                           SizedBox(height: ScreenUtil.horizontalScale(6)),
                           Text(
@@ -354,17 +362,15 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                               style: TextStyle(color: Colors.black54),
                                             ),
                                             const SizedBox(height: 10),
-                                            Consumer<MonthProvider>(builder: (context, value, child) {
-                                              return Text(
-                                                value.totalTime,
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Color(0xFFDD1166),
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              );
-                                            }),
+                                            Text(
+                                              time,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Color(0xFFDD1166),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -393,7 +399,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                           ],
                                         ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             const Text(
                                               'Weight Lifted',
@@ -402,13 +408,11 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                               ),
                                             ),
                                             const SizedBox(height: 10),
-                                            Consumer<MonthProvider>(builder: (context, value, child) {
-                                              return Text(
-                                                '${value.totalWeight.toStringAsFixed(0)} Lbs',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
-                                              );
-                                            }),
+                                            Text(
+                                              '${totalWeight.toStringAsFixed(0)} Lbs',
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
+                                            ),
                                           ],
                                         ),
                                       ),

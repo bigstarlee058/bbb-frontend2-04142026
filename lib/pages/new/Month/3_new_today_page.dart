@@ -412,13 +412,13 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                               value.dayHistoryDetails?.status == "Completed" || value.dayHistoryDetails?.status == "Skipped"
                                                   ? null
                                                   : () async {
-                                                      Navigator.pushNamed(context, '/dayCompleted');
-                                                      _saveDayData(
+                                                      await _saveDayData(
                                                           status: "Skipped",
                                                           type: monthProvider!.isPumpDay
                                                               ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
                                                               : "Workout Day",
                                                           status1: "Completed");
+                                                      Navigator.pushNamed(context, '/dayCompleted');
                                                     },
                                           color: AppColors.primaryColor,
                                           isLoading: false,
@@ -432,13 +432,13 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                                 text: "Skip the workout",
                                                 textColor: Colors.white,
                                                 onPress: () async {
-                                                  Navigator.pushNamed(context, '/home');
-                                                  _saveDayData(
+                                                  await _saveDayData(
                                                       status: "Skipped",
                                                       type: monthProvider!.isPumpDay
                                                           ? "Pump Day- ${monthProvider?.pumpDayModel?.id}"
                                                           : "Workout Day",
                                                       status1: "Skipped");
+                                                  Navigator.pushNamed(context, '/home');
                                                 },
                                                 color: AppColors.skipDayColor,
                                                 isLoading: false,
@@ -1272,10 +1272,11 @@ class _NewTodayPageState extends State<NewTodayPage> {
 
     DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
 
+    await monthProvider?.updateDayData();
     monthProvider?.fetchExerciseStatusLocalData();
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
-    await monthProvider?.updateDayData();
+
     monthProvider?.manageStreak();
     monthProvider?.getLiftedWeightGraphData();
   }

@@ -45,9 +45,8 @@ class DayHistoryModel {
         dayId: json["dayId"],
         date: json["date"] == null || json["date"] == "" ? null : DateTime.parse(json["date"]),
         status: json["status"],
-        startTime:
-            json["startTime"] == null || json["startTime"] == "" || json["startTime"] == "null" ? null : DateTime.parse(json["startTime"]),
-        endTime: json["endTime"] == null || json["endTime"] == "" || json["endTime"] == "null" ? null : DateTime.parse(json["endTime"]),
+        startTime: json["startTime"] == null || json["startTime"] == "" ? null : DateTime.parse(json["startTime"]),
+        endTime: json["endTime"] == null || json["endTime"] == "" ? null : DateTime.parse(json["endTime"]),
         type: json["type"],
         completedExercise: json["completedExercise"],
         totalWeight: json["totalWeight"],

@@ -570,11 +570,17 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                             return val1;
                                           }
 
-                                          bool isTimerRunning = monthProvider!.timerAddress == "$index-$countIndex-$exerciseIndex";
+                                          // String timerAddress = preferences.getString(SharedPreference.timerAddress) ?? "";
+
+                                          bool isTimerRunning = monthProvider!.timerAddress ==
+                                              "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
 
                                           return Padding(
                                             padding: const EdgeInsets.only(bottom: 20),
                                             child: NewExerciseCard(
+                                              makeRefresh: () {
+                                                setState(() {});
+                                              },
                                               isCompleted: isCompleted(),
                                               extraDataModel: extraItem,
                                               color: extraItem.type == 3
