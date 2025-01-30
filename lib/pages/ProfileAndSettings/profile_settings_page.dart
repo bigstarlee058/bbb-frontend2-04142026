@@ -51,8 +51,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       String fileName = basename(image.path);
 
       try {
-        Reference storageRef =
-            FirebaseStorage.instance.ref().child('profile_images/$fileName');
+        Reference storageRef = FirebaseStorage.instance.ref().child('profile_images/$fileName');
         await storageRef.putFile(file);
         String downloadUrl = await storageRef.getDownloadURL();
 
@@ -125,18 +124,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 1.5,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
                               children: [
                                 Container(
-                                  margin: const EdgeInsets.only(
-                                      right: 10, bottom: 0),
+                                  margin: const EdgeInsets.only(right: 10, bottom: 0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         padding: EdgeInsets.only(
@@ -151,75 +148,41 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   onTap: _pickAndUploadImage,
                                   child: Container(
                                     margin: EdgeInsets.symmetric(
-                                      horizontal:
-                                          ScreenUtil.horizontalScale(10),
+                                      horizontal: ScreenUtil.horizontalScale(10),
                                     ),
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Consumer<UserDataProvider>(
                                           builder: (context, userData, child) =>
-                                              userData.userData['detail'] !=
-                                                          null &&
-                                                      userData.userData[
-                                                                  'detail']
-                                                              ['avatarUrl'] !=
-                                                          ""
+                                              userData.userData['detail'] != null && userData.userData['detail']['avatarUrl'] != ""
                                                   ? Container(
-                                                      height: ScreenUtil
-                                                          .horizontalScale(25),
-                                                      width: ScreenUtil
-                                                          .horizontalScale(25),
+                                                      height: ScreenUtil.horizontalScale(25),
+                                                      width: ScreenUtil.horizontalScale(25),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey
-                                                            .withOpacity(.9),
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                          Radius.circular(
-                                                              ScreenUtil
-                                                                  .horizontalScale(
-                                                                      12.5)),
+                                                        color: Colors.grey.withOpacity(.9),
+                                                        borderRadius: BorderRadius.all(
+                                                          Radius.circular(ScreenUtil.horizontalScale(12.5)),
                                                         ),
                                                       ),
                                                       child: ClipRRect(
-                                                          borderRadius: BorderRadius
-                                                              .circular(ScreenUtil
-                                                                  .horizontalScale(
-                                                                      12.5)),
+                                                          borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
                                                           child: Image.network(
-                                                            userData.userData[
-                                                                        'detail'][
-                                                                        'avatarUrl']
-                                                                    .startsWith(
-                                                                        'https://storage.cloud.google.com/')
-                                                                ? userData
-                                                                    .userData[
-                                                                        'detail']
-                                                                        [
-                                                                        'avatarUrl']
-                                                                    .replaceFirst(
-                                                                        'https://storage.cloud.google.com/',
-                                                                        'https://storage.googleapis.com/')
-                                                                : userData.userData[
-                                                                        'detail']
-                                                                    [
-                                                                    'avatarUrl'],
+                                                            userData.userData['detail']['avatarUrl']
+                                                                    .startsWith('https://storage.cloud.google.com/')
+                                                                ? userData.userData['detail']['avatarUrl'].replaceFirst(
+                                                                    'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                                                : userData.userData['detail']['avatarUrl'],
                                                             fit: BoxFit.cover,
                                                           )),
                                                     )
                                                   : userData.userName != ""
                                                       ? Text(
-                                                          userData.userName[
-                                                              0], // First character of the name
+                                                          userData.userName[0], // First character of the name
                                                           style: TextStyle(
-                                                            fontSize: ScreenUtil
-                                                                .horizontalScale(
-                                                                    12),
-                                                            color: Colors
-                                                                .white, // Adjust size as needed
-                                                            fontWeight:
-                                                                FontWeight.bold,
+                                                            fontSize: ScreenUtil.horizontalScale(12),
+                                                            color: Colors.white, // Adjust size as needed
+                                                            fontWeight: FontWeight.bold,
                                                           ),
                                                         )
                                                       : const SizedBox(),
@@ -228,21 +191,18 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           height: ScreenUtil.horizontalScale(5),
                                         ),
                                         Consumer<UserDataProvider>(
-                                          builder: (context, userData, child) =>
-                                              userData.userName != ""
-                                                  ? Text(
-                                                      // 'Hi, Nick',
-                                                      '${userData.userName}',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: ScreenUtil
-                                                            .horizontalScale(8),
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        height: 1,
-                                                      ),
-                                                    )
-                                                  : const SizedBox(),
+                                          builder: (context, userData, child) => userData.userName != ""
+                                              ? Text(
+                                                  // 'Hi, Nick',
+                                                  '${userData.userName}',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: ScreenUtil.horizontalScale(8),
+                                                    fontWeight: FontWeight.bold,
+                                                    height: 1,
+                                                  ),
+                                                )
+                                              : const SizedBox(),
                                         ),
                                         SizedBox(
                                           height: ScreenUtil.horizontalScale(2),
@@ -251,8 +211,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           "Here's your profile",
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(5.5),
+                                            fontSize: ScreenUtil.horizontalScale(5.5),
                                           ),
                                         ),
                                       ],
@@ -309,36 +268,24 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               SizedBox(
                                 height: ScreenUtil.verticalScale(2),
                               ),
-                              settingsButton(
-                                  'Re-watch the tutorial',
-                                  Icons.play_circle_outline,
-                                  () => Navigator.pushNamed(
-                                      context, '/watchtutorial',
-                                      arguments: {"buttontext": "Back"})),
+                              settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
+                                  () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
-                              settingsButton(
-                                  'My Profile',
-                                  Icons.person,
-                                  () => Navigator.pushNamed(
-                                      context, '/myprofile')),
+                              settingsButton('My Profile', Icons.person, () => Navigator.pushNamed(context, '/myprofile')),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
-                              settingsButton(
-                                  'Settings', Icons.settings, () => {}),
+                              settingsButton('Settings', Icons.settings, () => {}),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
-                              settingsButton('Subscription', Icons.refresh,
-                                  () async {
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
+                              settingsButton('Subscription', Icons.refresh, () async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
                                 String? token = prefs.getString('authToken');
 
-                                Uri url = Uri.parse(
-                                    'https://bbbdev1.wpenginepowered.com/?token=$token');
+                                Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/?token=$token');
 
                                 if (await canLaunchUrl(url)) {
                                   await launchUrl(url);
@@ -349,11 +296,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
-                              settingsButton(
-                                  'Language',
-                                  Icons.chat_bubble_outline,
-                                  () => Navigator.pushNamed(
-                                      context, '/languageScreen')),
+                              settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
@@ -366,8 +309,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
-                              settingsButton(
-                                  'Legal', Icons.description, () => {}),
+                              settingsButton('Legal', Icons.description, () => {}),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),

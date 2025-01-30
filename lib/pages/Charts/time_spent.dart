@@ -1,7 +1,6 @@
-import 'dart:developer';
 import 'dart:math' as math;
 
-import 'package:bbb/pages/new/Providers/month_provider.dart';
+import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -46,7 +45,6 @@ class _BarChartSample7State extends State<TimeSpentGraph> {
   Widget build(BuildContext context) {
     return Consumer<MonthProvider>(
       builder: (context, monthProvider, child) {
-        log('monthProvider.maximumValueOfTotalTime :::::::::::::::::: ${monthProvider.maximumValueOfTotalTime}');
         return AspectRatio(
           aspectRatio: 1.4,
           child: BarChart(BarChartData(
@@ -84,7 +82,7 @@ class _BarChartSample7State extends State<TimeSpentGraph> {
             ),
             gridData: FlGridData(
               verticalInterval: 0.125,
-              horizontalInterval: monthProvider.maximumValueOfTotalTime > 8 ? (monthProvider.maximumValueOfTotalTime / 10) * 2 : 2,
+              horizontalInterval: monthProvider.maximumValueOfTotalTime > 8 ? monthProvider.maximumValueOfTotalTime / 10 : 1,
               show: true,
               getDrawingHorizontalLine: (value) => FlLine(
                 color: Colors.black.withOpacity(0.1),

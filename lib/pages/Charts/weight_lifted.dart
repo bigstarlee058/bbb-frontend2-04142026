@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:bbb/pages/new/Providers/month_provider.dart';
+import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -66,7 +66,7 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: monthProvider.maximumValueOfWeight > 10000 ? (monthProvider.maximumValueOfWeight / 10) : 1000,
+                    interval: monthProvider.maximumValueOfWeight > 8000 ? (monthProvider.maximumValueOfWeight / 8) : 1000,
                     reservedSize: 32,
                     getTitlesWidget: getLeftTitles, // Use this method to generate Y-axis titles
                   ),
@@ -83,7 +83,7 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
               ),
               gridData: FlGridData(
                 verticalInterval: 0.125,
-                horizontalInterval: monthProvider.maximumValueOfWeight > 10000 ? monthProvider.maximumValueOfWeight / 5 : 2000,
+                horizontalInterval: monthProvider.maximumValueOfWeight > 8000 ? (monthProvider.maximumValueOfWeight / 8) : 1000,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
                   color: Colors.black.withOpacity(0.1),
@@ -104,7 +104,7 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                   data.shadowValue,
                 );
               }).toList(),
-              maxY: monthProvider.maximumValueOfWeight > 10000 ? monthProvider.maximumValueOfWeight : 10000,
+              maxY: monthProvider.maximumValueOfWeight > 8000 ? monthProvider.maximumValueOfWeight : 8000,
               minY: 0,
               barTouchData: BarTouchData(
                 enabled: true,

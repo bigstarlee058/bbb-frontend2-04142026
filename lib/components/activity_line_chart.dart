@@ -1,9 +1,6 @@
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../providers/exercise_history_provider.dart';
 
 class ActivityLineChart extends StatefulWidget {
   const ActivityLineChart({super.key});
@@ -15,35 +12,15 @@ class ActivityLineChart extends StatefulWidget {
 class _ActivityLineChartState extends State<ActivityLineChart> {
   List<int> showingTooltipOnSpots = [4];
 
-  late ExerciseHistoryProvider exerciseHistoryProvider;
-
-  @override
-  void initState() {
-    exerciseHistoryProvider = Provider.of(context,listen: false);
-
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-
-
     var media = MediaQuery.of(context).size;
-    // final tooltipsOnBar = lineBarsData1[0];
+
     return SizedBox(
         height: media.width * 0.41,
         width: double.maxFinite,
         child: LineChart(
           LineChartData(
-            // showingTooltipIndicators: showingTooltipOnSpots.map((index) {
-            //   return ShowingTooltipIndicators([
-            //     LineBarSpot(
-            //       tooltipsOnBar,
-            //       lineBarsData1.indexOf(tooltipsOnBar),
-            //       tooltipsOnBar.spots[index],
-            //     ),
-            //   ]);
-            // }).toList(),
             lineTouchData: LineTouchData(
               enabled: true,
               handleBuiltInTouches: false,
@@ -59,15 +36,13 @@ class _ActivityLineChartState extends State<ActivityLineChart> {
                   });
                 }
               },
-              mouseCursorResolver:
-                  (FlTouchEvent event, LineTouchResponse? response) {
+              mouseCursorResolver: (FlTouchEvent event, LineTouchResponse? response) {
                 if (response == null || response.lineBarSpots == null) {
                   return SystemMouseCursors.basic;
                 }
                 return SystemMouseCursors.click;
               },
-              getTouchedSpotIndicator:
-                  (LineChartBarData barData, List<int> spotIndexes) {
+              getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
                 return spotIndexes.map((index) {
                   return TouchedSpotIndicatorData(
                     const FlLine(
@@ -75,8 +50,7 @@ class _ActivityLineChartState extends State<ActivityLineChart> {
                     ),
                     FlDotData(
                       show: true,
-                      getDotPainter: (spot, percent, barData, index) =>
-                          FlDotCirclePainter(
+                      getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
                         radius: 3,
                         color: Colors.white,
                         strokeWidth: 1,
@@ -156,8 +130,7 @@ class _ActivityLineChartState extends State<ActivityLineChart> {
         isStrokeCapRound: true,
         dotData: FlDotData(
           show: true,
-          checkToShowDot: (spot, barData) =>
-              spot.x == barData.spots[barData.spots.length - 3].x,
+          checkToShowDot: (spot, barData) => spot.x == barData.spots[barData.spots.length - 3].x,
           getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
             radius: 6,
             color: Colors.white,

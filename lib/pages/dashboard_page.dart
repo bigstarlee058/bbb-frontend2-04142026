@@ -5,30 +5,21 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/models/challenges.dart';
-import 'package:bbb/models/collections.dart';
-import 'package:bbb/models/day.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
 import 'package:bbb/pages/Charts/time_spent.dart';
 import 'package:bbb/pages/Charts/weight_lifted.dart';
-import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/new/Providers/month_provider.dart';
+import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/exercise_history_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
-import 'package:bbb/storage/userdata_manager.dart';
-import 'package:bbb/utils/convert_util.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/pump_day_provider.dart';
-import '../providers/weekly_graph_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -39,80 +30,32 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final today = DateTime.now();
-
-  // final PageController _pageController = PageController();
-
-  UserDataManager userManager = UserDataManager();
-
-  late WeeklyGraphProvider weeklyGraphProvider;
-  late ExerciseHistoryProvider exerciseHistoryProvider;
-  late MonthProvider monthProvider;
-
+  // UserDataManager userManager = UserDataManager();
   List<String> title = [];
-
   int focusedIndexStuff = 0;
   UserDataProvider? userData;
   DataProvider? dataProvider;
-  List<String> months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
   late MainPageProvider mainPageProvider;
-
   String selectedChart = "Exercises Completed";
-
-  // PageController _controller = PageController();
-  // int _activeIndex = 0;
-
-  // List<Widget> athletes = [];
-
-  // List<Widget> staffs = [];
-
   Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
-
-  final List<Collections> collections = [];
-
-  late PumpDayProvider pumpDayProvider;
-  late final String restDayId;
-  bool isPumpDay = false;
-  var isPumpDayData;
 
   @override
   void initState() {
     super.initState();
-
-    weeklyGraphProvider = Provider.of<WeeklyGraphProvider>(context, listen: false);
-    exerciseHistoryProvider = Provider.of<ExerciseHistoryProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    pumpDayProvider = Provider.of<PumpDayProvider>(context, listen: false);
-    weeklyGraphProvider.getWeeklyProgress();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    monthProvider = Provider.of<MonthProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
-    exerciseHistoryProvider.getExercise();
-    monthProvider.getLiftedWeightGraphData();
     loadUserInfo();
     loadStaffsData();
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
     requestNotificationPermission();
-
     super.initState();
   }
 
   Future<void> requestNotificationPermission() async {
     if (await Permission.notification.isDenied) {
       await Permission.notification.request();
-    }
-  }
-
-  void loadUserInfo() async {
-    await userData?.loadUserInfo();
-    await userData!.getStreaksData(dataProvider!.workout.startDate);
-    if (dataProvider?.workout.startDate != null) {
-      if (mounted) {
-        setDateTime();
-      }
-    } else {
-      debugPrint("Start date is null after fetching workouts.");
     }
   }
 
@@ -131,188 +74,16 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  void loadUserInfo() async {
+    await userData?.loadUserInfo();
+  }
+
   void loadFeaturedCollectionData() async {
     await dataProvider?.fetchFeaturedColllections();
   }
 
-  void setDateTime() {
-    try {
-      if (dataProvider?.workout.startDate is! String) {
-        return;
-      }
-      debugPrint("this is setDataTime");
-      DateTime startTime = DateTime.parse(dataProvider!.workout.startDate);
-      int dayDelta = today.difference(startTime).inDays;
-      userData?.currentWeek = (dayDelta ~/ 7) + 1;
-      userData?.currentDay = dayDelta % 7 + 1;
-      userData?.currentMonth = dataProvider!.workout.index;
-
-      if (dataProvider?.workout.weeks == null || dataProvider!.workout.weeks.isEmpty) {
-        debugPrint("Workout weeks data is empty.");
-        return;
-      }
-
-      List<Day> cardDataArr = List<Day>.from(dataProvider!.workout.weeks[(dayDelta ~/ 7)].days);
-      if (userData?.selectedDaySplit == null) {
-        debugPrint("No selectedDaySplit specified.");
-        return;
-      }
-
-      List<Day> tempCardDataArr = [];
-      List<Day> restDataArr = [];
-      List<int> workoutIndices = userData!.selectedDaySplit == "3"
-          ? [0, 2, 4]
-          : userData!.selectedDaySplit == "4"
-              ? [0, 1, 3, 4]
-              : [0, 1, 2, 3, 4];
-
-      for (var day in cardDataArr) {
-        if (day.formats.contains(userData!.selectedDaySplit)) {
-          tempCardDataArr.add(day);
-        } else if (restDataArr.isEmpty) {
-          restDataArr.add(day);
-        }
-      }
-
-      if (tempCardDataArr.isEmpty && restDataArr.isNotEmpty) {
-        tempCardDataArr.addAll(restDataArr);
-      }
-
-      cardDataArr = updateTempCardDataArrFor(
-          userData!.selectedDaySplit == "3"
-              ? "5"
-              : userData!.selectedDaySplit == "4"
-                  ? "5"
-                  : userData!.selectedDaySplit == "5"
-                      ? "3"
-                      : "0",
-          tempCardDataArr,
-          workoutIndices,
-          restDataArr,
-          context);
-
-      if (userData!.currentWeekDayTitle.isNotEmpty == false) {
-        for (var element in cardDataArr) {
-          if (userData!.selectedDaySplit == "3") {
-            if (element.formats.contains("3")) {
-              title.add("Day ${element.typeId} ${element.title}");
-            }
-          } else if (userData!.selectedDaySplit == "4") {
-            if (element.formats.contains("4")) {
-              title.add("Day ${element.typeId} ${element.title}");
-            }
-          } else {
-            if (userData!.selectedDaySplit == "5") {
-              title.add("Day ${element.typeId} ${element.title}");
-            }
-          }
-        }
-
-        if (userData!.selectedDaySplit == "3") {
-          title.insert(1, "Rest Day 1");
-          title.insert(3, "Rest Day 2");
-          title.insert(5, "Rest Day 3");
-          title.insert(6, "Rest Day 4");
-        } else if (userData!.selectedDaySplit == "4") {
-          title.insert(2, "Rest Day 1");
-          title.insert(5, "Rest Day 2");
-          title.insert(6, "Rest Day 3");
-        } else {
-          title.insert(5, "Rest Day 1");
-          title.insert(6, "Rest Day 2");
-        }
-
-        userData!.setCurrentDayTitle(title[userData!.nextDayIndex - 1]);
-        userData!.saveDayTitles(title);
-        userData?.notifyListeners();
-        setState(() {});
-      } else if (userData?.compareDaySplit != userData?.selectedDaySplit) {
-        for (var element in cardDataArr) {
-          if (userData!.selectedDaySplit == "3") {
-            if (element.formats.contains("3")) {
-              title.add("Day ${element.typeId} ${element.title}");
-            }
-          } else if (userData!.selectedDaySplit == "4") {
-            if (element.formats.contains("4")) {
-              title.add("Day ${element.typeId} ${element.title}");
-            }
-          } else {
-            if (userData!.selectedDaySplit == "5") {
-              title.add("Day ${element.typeId} ${element.title}");
-            }
-          }
-        }
-
-        if (userData!.selectedDaySplit == "3") {
-          title.insert(1, "Rest Day 1");
-          title.insert(3, "Rest Day 2");
-          title.insert(5, "Rest Day 3");
-          title.insert(6, "Rest Day 4");
-        } else if (userData!.selectedDaySplit == "4") {
-          title.insert(2, "Rest Day 1");
-          title.insert(5, "Rest Day 2");
-          title.insert(6, "Rest Day 3");
-        } else {
-          title.insert(5, "Rest Day 1");
-          title.insert(6, "Rest Day 2");
-        }
-
-        userData!.setCurrentDayTitle(title[userData!.nextDayIndex - 1]);
-        userData!.saveDayTitles(title);
-        userData?.notifyListeners();
-        setState(() {});
-      }
-
-      dataProvider!.selectWeekBasedOnSplit = cardDataArr;
-      isPumpDayData = pumpDayProvider.checkForPumpDay(
-          userData!.currentMonth, userData!.currentWeek, userData!.nextDayIndex, userData!.selectedDaySplit);
-      isPumpDay = isPumpDayData != null;
-      for (int j = 0; j < 7; j++) {
-        bool isDayFinished = false;
-
-        for (var day in userData!.dayHistory) {
-          if ('${day['monthIndex']} ${day['weekIndex']} ${day['daySplit']} ${day['dayIndex']} ${day['state']}' ==
-                  '${userData?.currentMonth} ${userData!.currentWeek} ${userData?.selectedDaySplit} ${j + 1} ${AppConstants.STATE_FINISHED}' ||
-              '${day['monthIndex']} ${day['weekIndex']} ${day['daySplit']} ${day['dayIndex']} ${day['state']}' ==
-                  '${userData?.currentMonth} ${userData!.currentWeek} ${userData?.selectedDaySplit} ${j + 1} ${AppConstants.STATE_SKIPPED}') {
-            isDayFinished = true;
-            break;
-          }
-        }
-        if (!isDayFinished) {
-          userData?.nextDayIndex = j + 1;
-          userData?.currentDayObj = cardDataArr[j + 1];
-          debugPrint("this is setDataTime1 ${j + 1}");
-          debugPrint("this is setDataTime2 ${userData?.currentDay}");
-          // userData?.currentWeek = widget.weekIndex + 1;
-          // userData?.currentDay = index + 1;
-          // userData?.currentDayObj = wObj;
-          userData?.isRestDay = !(cardDataArr[j + 1].formats.contains(userData!.selectedDaySplit));
-          restDayId = dataProvider!.workout.weeks[userData!.currentWeek - 1].restdayId;
-          userData?.fetchRestDay(restDayId);
-          userData?.notifyListeners();
-          break;
-        }
-      }
-
-      dataProvider?.dataLoaded = true;
-    } catch (e) {
-      dataProvider?.dataLoaded = false;
-    }
-
-    pumpDayProvider.getPumpDayHistory(context);
-  }
-
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        if (mounted) {
-          setDateTime();
-        }
-      },
-    );
-
     if (dataProvider == null || userData == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -866,7 +637,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     top: ScreenUtil.verticalScale(0),
                                     bottom: 20),
                                 child: Text(
-                                  "Athlete Spotlight",
+                                  "Member Spotlight",
                                   style: TextStyle(
                                     color: AppColors.primaryColor,
                                     fontSize: ScreenUtil.verticalScale(2.3),
@@ -988,41 +759,43 @@ class _DashboardPageState extends State<DashboardPage> {
                                   textAlign: TextAlign.start,
                                 ),
                               ),
-                              Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                                return (dataProvider.staffsData.isNotEmpty)
-                                    ? CarouselSlider.builder(
-                                        itemCount: dataProvider.staffsData.length,
-                                        options: CarouselOptions(
-                                          height: ScreenUtil.verticalScale(38),
-                                          viewportFraction: 0.65,
-                                          enlargeCenterPage: true,
-                                          enlargeFactor: 0.4,
-                                          enableInfiniteScroll: true,
-                                          autoPlay: false,
-                                          onPageChanged: (index, reason) {},
-                                          scrollDirection: Axis.horizontal,
-                                        ),
-                                        itemBuilder: (context, index, realIndex) {
-                                          return Center(
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                // Navigator.pushNamed(context, '/meetOurStaff');
-                                              },
-                                              child: AnimatedContainer(
-                                                margin: const EdgeInsets.symmetric(horizontal: 5),
-                                                duration: const Duration(milliseconds: 300),
-                                                child: StaffListWidget(
-                                                  height: ScreenUtil.verticalScale(38),
-                                                  width: ScreenUtil.horizontalScale(60),
-                                                  oneStaff: dataProvider.staffsData[index],
+                              Consumer<DataProvider>(
+                                builder: (context, dataProvider, child) {
+                                  return (dataProvider.staffsData.isNotEmpty)
+                                      ? CarouselSlider.builder(
+                                          itemCount: dataProvider.staffsData.length,
+                                          options: CarouselOptions(
+                                            height: ScreenUtil.verticalScale(38),
+                                            viewportFraction: 0.65,
+                                            enlargeCenterPage: true,
+                                            enlargeFactor: 0.4,
+                                            enableInfiniteScroll: true,
+                                            autoPlay: false,
+                                            onPageChanged: (index, reason) {},
+                                            scrollDirection: Axis.horizontal,
+                                          ),
+                                          itemBuilder: (context, index, realIndex) {
+                                            return Center(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  // Navigator.pushNamed(context, '/meetOurStaff');
+                                                },
+                                                child: AnimatedContainer(
+                                                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                                                  duration: const Duration(milliseconds: 300),
+                                                  child: StaffListWidget(
+                                                    height: ScreenUtil.verticalScale(38),
+                                                    width: ScreenUtil.horizontalScale(60),
+                                                    oneStaff: dataProvider.staffsData[index],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                      )
-                                    : const SizedBox();
-                              }),
+                                            );
+                                          },
+                                        )
+                                      : const SizedBox();
+                                },
+                              ),
 
                               /// Old
 

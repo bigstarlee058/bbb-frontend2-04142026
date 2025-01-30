@@ -37,12 +37,7 @@ class StaffListWidget extends StatelessWidget {
             ),
             Text(
               oneStaff?.title ?? 'Erica Stone',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: ScreenUtil.horizontalScale(5),
-                fontWeight: FontWeight.bold,
-                height: 1.35
-              ),
+              style: TextStyle(color: Colors.white, fontSize: ScreenUtil.horizontalScale(5), fontWeight: FontWeight.bold, height: 1.35),
             ),
             Text(
               oneStaff?.location ?? 'Miami FL',

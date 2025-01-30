@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:bbb/pages/NewMonthView/1_new_month_view.dart';
+import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
 import 'package:bbb/pages/dashboard_page.dart';
-import 'package:bbb/pages/new/Month/1_new.dart';
-import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -15,11 +14,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:vimeo_player_flutter/vimeo_player_flutter.dart';
-// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:vimeo_video_player/vimeo_video_player.dart';
 
-// import '../providers/data_provider.dart';
 import '../components/streak_calendar.dart';
 import '../providers/main_page_provider.dart';
 import '../providers/user_data_provider.dart';
@@ -80,7 +76,7 @@ class _MainPageState extends State<MainPage> {
 
     _pages = [
       const DashboardPage(),
-      const New(),
+      const NewMonthView(),
       // const MonthlyViewPage(),
       const ToolsPage(),
       const ProfileSettingsPage(),

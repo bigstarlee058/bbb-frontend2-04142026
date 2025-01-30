@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fda79f2a-562b-4806-9ddf-4d3b91527bdd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/Charts/report_time_spent.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.dart_tool/package_config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/../.flutter-plugins-dependencies" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/components/athletes_list_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/athletes_list_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/components/staff_list_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/staff_list_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/components/streak_calendar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/streak_calendar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/components/timer_with_progress.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/timer_with_progress.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/components/warmup_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/warmup_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/components/weekly_track_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/weekly_track_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/Charts/time_spent.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Charts/time_spent.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/Charts/weight_lifted.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Charts/weight_lifted.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/exercise_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/exercise_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/add_notes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/add_notes.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/back_off_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/back_off_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/custom_video_controls.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/custom_video_controls.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/equipment_section.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/equipment_section.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/normal_set_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/normal_set_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/circuits_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/circuits_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_completed_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_completed_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_overview_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_overview_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/monthly_view_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/monthly_view_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/today_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/today_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/myprofile_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/myprofile_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/Tools/graph_and_reports_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/graph_and_reports_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/calendar_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/calendar_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/dashboard_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/dashboard_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/1_new.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/1_new.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/3_new_today_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/3_new_today_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/4_new_excerise_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/4_new_excerise_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/Widgets/4_1_new_exercise_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/Widgets/4_1_new_exercise_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/new_day_completed_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/new_day_completed_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Providers/month_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Providers/month_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/providers/data_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/data_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/providers/exercise_history_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/exercise_history_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/providers/pump_day_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/pump_day_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/providers/user_data_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/user_data_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/providers/weekly_graph_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/weekly_graph_provider.dart" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=RZ8M926RWHV)]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="GenerateSignedApkSettings">
+    <option name="KEY_STORE_PATH" value="$PROJECT_DIR$/../../../JKS/keystore.jks" />
+    <option name="KEY_ALIAS" value="URestaurant" />
+    <option name="REMEMBER_PASSWORDS" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="2sLLt5vgCDQWEpCoFr6MZYEYiXI" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "BundleExportedModule": "android.app",
+    "ExportBundle.BundlePathForandroid.app": "/Users/user/Desktop/bbb/bbb-frontend/android/app",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/user/Desktop/bbb/bbb-frontend/android",
+    "show.migrate.to.gradle.popup": "false"
+  },
+  "keyToStringList": {
+    "ExportApk.BuildVariants": [
+      "release"
+    ],
+    "kotlin-gradle-user-dirs": [
+      "/Users/user/.gradle"
+    ]
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
+      <module name="android.app.main" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="CLEAR_APP_STORAGE" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Hybrid>
+      <Java>
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Java>
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SwiftWorkspaceSettings">
+    <option name="detectedToolchain" value="true" />
+    <option name="toolchainPathValue" value="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fda79f2a-562b-4806-9ddf-4d3b91527bdd" name="Changes" comment="" />
+      <created>1738230119911</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1738230119911</updated>
+    </task>
+    <servers />
+  </component>
+</project>

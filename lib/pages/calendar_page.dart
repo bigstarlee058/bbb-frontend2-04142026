@@ -1,13 +1,11 @@
-import 'package:bbb/models/month.dart';
-import 'package:bbb/pages/new/Providers/month_provider.dart';
+import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/pages/calender.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
-import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bbb/pages/calender.dart';
-import 'package:bbb/providers/user_data_provider.dart';
 // import 'package:bbb/components/weekly_track_card.dart';
 // import 'package:bbb/pages/MonthlyView/monthly_view_page.dart';
 
@@ -21,7 +19,7 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   DataProvider? dataProvider;
   UserDataProvider? userData;
-  late Month thisMonthWorkout;
+  // late Month thisMonthWorkout;
   // List<dynamic> monthlyWorkOutSchedule = [];
   int currentMonth = 0;
 
@@ -39,28 +37,28 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   void initState() {
-    userData = Provider.of<UserDataProvider>(
-      context,
-      listen: false,
-    );
+    // userData = Provider.of<UserDataProvider>(
+    //   context,
+    //   listen: false,
+    // );
     // dataProvider = Provider.of<DataProvider>(
     //   context,
     //   listen: false,
     // );
     // monthlyWorkOutSchedule = dataProvider!.monthlyWorkOutSchedule;
-    loadUserInfo();
+    // loadUserInfo();
     // loadMonths();
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void loadUserInfo() async {
-    userData?.loadUserInfo();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
+  //
+  // void loadUserInfo() async {
+  //   userData?.loadUserInfo();
+  // }
 
   // void loadMonths() async {
   //   await dataProvider?.fetchMonthWorkouts(3);
@@ -70,11 +68,11 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    DataProvider? dataProvider = Provider.of<DataProvider>(
-      context,
-      listen: false,
-    );
-    thisMonthWorkout = dataProvider.workout;
+    // DataProvider? dataProvider = Provider.of<DataProvider>(
+    //   context,
+    //   listen: false,
+    // );
+    // thisMonthWorkout = dataProvider.workout;
 
     ScreenUtil.init(context);
 
@@ -101,7 +99,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 1.8,
                           width: media.width,
                           child: SafeArea(

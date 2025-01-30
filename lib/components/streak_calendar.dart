@@ -2,19 +2,15 @@ import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/models/month.dart';
-import 'package:bbb/pages/new/Month/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/new/Providers/month_provider.dart';
+import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/pages/calender.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bbb/pages/calender.dart';
-import 'package:bbb/providers/user_data_provider.dart';
-
-import '../providers/main_page_provider.dart';
 
 class StreakCalendarPage extends StatefulWidget {
   const StreakCalendarPage({super.key});
@@ -25,8 +21,8 @@ class StreakCalendarPage extends StatefulWidget {
 
 class _StreakCalendarPageState extends State<StreakCalendarPage> {
   DataProvider? dataProvider;
-  UserDataProvider? userData;
-  late Month thisMonthWorkout;
+  // UserDataProvider? userData;
+  // late Month thisMonthWorkout;
 // List<dynamic> monthlyWorkOutSchedule = [];
   int currentMonth = 0;
 
@@ -44,10 +40,10 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
 
   @override
   void initState() {
-    userData = Provider.of<UserDataProvider>(
-      context,
-      listen: false,
-    );
+    // userData = Provider.of<UserDataProvider>(
+    //   context,
+    //   listen: false,
+    // );
     loadUserInfo();
     super.initState();
   }
@@ -58,19 +54,19 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
   }
 
   void loadUserInfo() async {
-    userData?.loadUserInfo();
+    // userData?.loadUserInfo();
   }
 
   @override
   Widget build(BuildContext context) {
     log('4. Buttons position on sign in screen');
     var media = MediaQuery.of(context).size;
-    final mainPageProvider = context.watch<MainPageProvider>();
-    DataProvider? dataProvider = Provider.of<DataProvider>(
-      context,
-      listen: false,
-    );
-    thisMonthWorkout = dataProvider.workout;
+    // final mainPageProvider = context.watch<MainPageProvider>();
+    // DataProvider? dataProvider = Provider.of<DataProvider>(
+    //   context,
+    //   listen: false,
+    // );
+    // thisMonthWorkout = dataProvider.workout;
 
     ScreenUtil.init(context);
 
@@ -127,7 +123,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                 ),
                               ),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             Text(
                               "Streaks",
                               style: TextStyle(
@@ -156,12 +152,12 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                           margin: EdgeInsets.symmetric(
                             horizontal: ScreenUtil.horizontalScale(12),
                           ),
-                          height: media.height * 0.15,
+                          height: media.height * 0.28,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               const SizedBox(
-                                height: 18,
+                                height: 22,
                               ),
                               Text(
                                 'Your current Streak',
@@ -174,6 +170,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               ),
                               Builder(builder: (context) {
                                 final streak = context.watch<MonthProvider>().streak;
+                                log('streak :::::::::::::::::: $streak');
                                 return Text(
                                   '$streak',
                                   style: TextStyle(

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -7,14 +6,18 @@ import 'package:bbb/components/streak_calendar.dart';
 import 'package:bbb/firebase_options.dart';
 import 'package:bbb/pages/ChallengeView/joined_challeng_page.dart';
 import 'package:bbb/pages/CollectionView/collection_detail_page.dart';
+import 'package:bbb/pages/NewMonthView/2_new_month_overview.dart';
+import 'package:bbb/pages/NewMonthView/3_new_today_page.dart';
+import 'package:bbb/pages/NewMonthView/4_new_excerise_page.dart';
+import 'package:bbb/pages/NewMonthView/new_day_completed_page.dart';
 import 'package:bbb/pages/Notification/notifications_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/language_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/myprofile_page.dart';
+import 'package:bbb/pages/Tools/GraphsReports/graph_and_reports_page.dart';
 import 'package:bbb/pages/Tools/bonus_library_page.dart';
 import 'package:bbb/pages/Tools/equipment_library_page.dart';
 import 'package:bbb/pages/Tools/exercise_history.dart';
 import 'package:bbb/pages/Tools/exercise_library_page.dart';
-import 'package:bbb/pages/Tools/graph_and_reports_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
 import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
@@ -24,20 +27,15 @@ import 'package:bbb/pages/join_the_challenge.dart';
 import 'package:bbb/pages/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/pages/meet_our_staff.dart';
-import 'package:bbb/pages/new/Month/4_new_excerise_page.dart';
-import 'package:bbb/pages/new/Providers/month_provider.dart';
 import 'package:bbb/pages/on_boarding_page.dart';
 import 'package:bbb/pages/register_page.dart';
 import 'package:bbb/pages/reset_password_page.dart';
 import 'package:bbb/pages/streak_page.dart';
 import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/exercise_history_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
-import 'package:bbb/providers/pump_day_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
-import 'package:bbb/providers/weekly_graph_provider.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,11 +47,9 @@ import 'package:provider/provider.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'pages/new/Month/2_new_month_overview.dart';
-import 'pages/new/Month/3_new_today_page.dart';
-import 'pages/new/Month/Database/month_prefrence.dart';
-import 'pages/new/Month/new_day_completed_page.dart';
-import 'pages/new/Month/database/month_database.dart';
+import 'pages/NewMonthView/Database/month_database.dart';
+import 'pages/NewMonthView/Database/month_prefrence.dart';
+import 'pages/NewMonthView/Providers/month_provider.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -93,7 +89,7 @@ void main() async {
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (context) => MyApp(),
+      builder: (context) => const MyApp(),
     ),
   );
 }
@@ -103,15 +99,15 @@ Future<void> _configureLocalTimeZone() async {
     return;
   }
   tz.initializeTimeZones();
-  final String? timeZoneName = await FlutterTimezone.getLocalTimezone();
-  tz.setLocalLocation(tz.getLocation(timeZoneName!));
+  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -128,18 +124,6 @@ class _MyAppState extends State<MyApp> {
 
   final locationProvider = ChangeNotifierProvider<LocationProvider>(
     create: (context) => LocationProvider(),
-  );
-
-  final pumpDayProvider = ChangeNotifierProvider<PumpDayProvider>(
-    create: (context) => PumpDayProvider(),
-  );
-
-  final weeklyGraphProvider = ChangeNotifierProvider<WeeklyGraphProvider>(
-    create: (context) => WeeklyGraphProvider(),
-  );
-
-  final exerciseHistoryProvider = ChangeNotifierProvider<ExerciseHistoryProvider>(
-    create: (context) => ExerciseHistoryProvider(),
   );
 
   final mainPageProvider = ChangeNotifierProvider<MainPageProvider>(
@@ -187,17 +171,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     c = context;
     return MultiProvider(
-      providers: [
-        dataProvider,
-        userDataProvider,
-        locationProvider,
-        pumpDayProvider,
-        weeklyGraphProvider,
-        exerciseHistoryProvider,
-        mainPageProvider,
-        programInfoProvider,
-        monthProvider
-      ],
+      providers: [dataProvider, userDataProvider, locationProvider, mainPageProvider, programInfoProvider, monthProvider],
       child: MaterialApp(
         locale: !kReleaseMode ? DevicePreview.locale(context) : null,
         builder: !kReleaseMode ? DevicePreview.appBuilder : null,

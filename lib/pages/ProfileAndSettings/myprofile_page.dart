@@ -167,7 +167,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(onPress: () => {Navigator.pop(context)}),
-                                      CommonStreakWithNotification()
+                                      const CommonStreakWithNotification()
                                     ],
                                   ),
                                 ),
@@ -366,7 +366,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         isLoading == true
                             ? Padding(
                                 padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(4)),
-                                child: Center(
+                                child: const Center(
                                     child: CircularProgressIndicator(
                                   color: AppColors.primaryColor,
                                 )),
@@ -418,7 +418,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             flex: 2,
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
@@ -485,7 +485,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             flex: 2,
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,

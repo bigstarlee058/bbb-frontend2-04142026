@@ -1,25 +1,15 @@
-
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/models/challenges.dart';
-import 'package:bbb/models/day.dart';
-import 'package:bbb/models/week.dart';
-import 'package:bbb/pages/MonthlyView/day_completed_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
-import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'video_intro_page.dart';
-
 class JoinTheChallengePage extends StatefulWidget {
-  const JoinTheChallengePage({Key? key}) : super(key: key);
+  const JoinTheChallengePage({super.key});
 
   @override
   State<JoinTheChallengePage> createState() => _JoinTheChallengePageState();
@@ -39,12 +29,7 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
 
   String userId = '';
 
-  Challenges featureChallengeData = Challenges(
-    id: '',
-    title: '',
-    description: '',
-    photo: ''
-  );
+  Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
 
   @override
   void initState() {
@@ -65,15 +50,15 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
     setState(() {
       userId = userData!.userId;
       featureChallengeData = dataProvider!.featureChallengeData;
-    });    
+    });
   }
 
   Future<void> _joinChallenge() async {
     if (userId.isNotEmpty && featureChallengeData.id.isNotEmpty) {
-       bool status = await DataProvider().joinChallenge(userId, featureChallengeData.id);
-       if(status) {
+      bool status = await DataProvider().joinChallenge(userId, featureChallengeData.id);
+      if (status) {
         Navigator.pushNamed(context, '/joinedChallenge');
-       }
+      }
     } else {
       print("Error: User ID is null");
     }
@@ -101,12 +86,11 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: featureChallengeData.photo.isNotEmpty
-                                ? NetworkImage(featureChallengeData.photo.startsWith('https://storage.cloud.google.com/')
-                                    ? featureChallengeData.photo.replaceFirst(
-                                        'https://storage.cloud.google.com/',
-                                        'https://storage.googleapis.com/')
-                                    : featureChallengeData.photo)
-                                : const AssetImage('assets/img/back.jpg'),
+                                  ? NetworkImage(featureChallengeData.photo.startsWith('https://storage.cloud.google.com/')
+                                      ? featureChallengeData.photo
+                                          .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                      : featureChallengeData.photo)
+                                  : const AssetImage('assets/img/back.jpg'),
                               fit: BoxFit.cover,
                               opacity: 1,
                             ),
@@ -131,15 +115,13 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                                 Container(
                                   margin: const EdgeInsets.only(right: 10),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Stack(
                                         children: [
                                           Container(
                                             margin: EdgeInsets.only(
-                                              left:
-                                                  ScreenUtil.horizontalScale(4),
+                                              left: ScreenUtil.horizontalScale(4),
                                             ),
                                             decoration: const BoxDecoration(
                                               color: //(isThisWeek && isCompleted)?
@@ -148,48 +130,37 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                                               shape: BoxShape.circle,
                                             ),
                                             child: SizedBox(
-                                              width: ScreenUtil.horizontalScale(
-                                                  10), // Size of the circle
-                                              height:
-                                                  ScreenUtil.horizontalScale(
-                                                      10),
+                                              width: ScreenUtil.horizontalScale(10), // Size of the circle
+                                              height: ScreenUtil.horizontalScale(10),
                                               child: IconButton(
-                                                padding: EdgeInsets
-                                                    .zero, // Removes the default padding
+                                                padding: EdgeInsets.zero, // Removes the default padding
                                                 icon: const Icon(
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
                                                 ),
-                                                onPressed: () =>
-                                                    Navigator.pop(context),
-                                                iconSize: ScreenUtil.verticalScale(
-                                                    4), // Icon size remains the same
+                                                onPressed: () => Navigator.pop(context),
+                                                iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-
                                     ],
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal:
-                                          ScreenUtil.horizontalScale(7)),
+                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(1.5),
                                       ),
-                                      SizedBox(
-                                          height: ScreenUtil.verticalScale(4)),
+                                      SizedBox(height: ScreenUtil.verticalScale(4)),
                                     ],
                                   ),
                                 ),
                                 SizedBox(height: ScreenUtil.verticalScale(2.5)),
-
                               ],
                             ),
                           ),
@@ -236,8 +207,7 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                         children: [
                           // const IconRowWithDot(),
                           Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.horizontalScale(10)),
+                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -250,24 +220,17 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                                   ),
                                 ),
                                 Container(
-                                  margin: const EdgeInsets.only(
-                                      top: 10.0,
-                                      bottom:
-                                          10.0), // Added bottom margin for spacing
-                                  alignment: Alignment
-                                      .centerLeft, // Center-align the header text
+                                  margin: const EdgeInsets.only(top: 10.0, bottom: 10.0), // Added bottom margin for spacing
+                                  alignment: Alignment.centerLeft, // Center-align the header text
                                   child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        0.0), // Add padding for better layout
+                                    padding: const EdgeInsets.all(0.0), // Add padding for better layout
                                     child: Text(
                                       featureChallengeData.description.isNotEmpty ? featureChallengeData.description : '',
                                       style: const TextStyle(
-                                        fontSize:
-                                            16, // Customize font size for better readability
+                                        fontSize: 16, // Customize font size for better readability
                                         color: Colors.grey,
                                       ),
-                                      textAlign: TextAlign
-                                          .left, // Center align the description
+                                      textAlign: TextAlign.left, // Center align the description
                                     ),
                                   ),
                                 ),
@@ -293,11 +256,9 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
             height: ScreenUtil.verticalScale(10),
           ),
           Container(
-              margin: EdgeInsets.symmetric(
-                  horizontal: ScreenUtil.horizontalScale(10)),
+              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
               child: ButtonWidget(
-                text:
-                "Join the Challenge",
+                text: "Join the Challenge",
                 // (userData!.currentDayObj.formats
                 //     .contains(userData?.selectedDaySplit))
                 //     ? (isThisWeek && !isCompleted && !isSkipped
@@ -309,31 +270,29 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                 //     ? "Completed"
                 //     : "Skipped"),
                 textColor: Colors.white,
-                onPress:(){_joinChallenge();},
+                onPress: () {
+                  _joinChallenge();
+                },
 
                 color: AppColors.primaryColor,
                 isLoading: false,
               )
-            // ButtonWidget(
-            //   text: (userData!.currentDayObj.formats.contains(userData?.selectedDaySplit))
-            //       ? "Start the workout"
-            //       : "Mark Rest Day Complete",
-            //   textColor: Colors.grey,
-            //   onPress: () {
-            //   },
-            //   color: const Color.fromARGB(90, 214, 211, 211),
-            //   isLoading: false,
-            // ),
-          ),
-
+              // ButtonWidget(
+              //   text: (userData!.currentDayObj.formats.contains(userData?.selectedDaySplit))
+              //       ? "Start the workout"
+              //       : "Mark Rest Day Complete",
+              //   textColor: Colors.grey,
+              //   onPress: () {
+              //   },
+              //   color: const Color.fromARGB(90, 214, 211, 211),
+              //   isLoading: false,
+              // ),
+              ),
           SizedBox(
             height: ScreenUtil.verticalScale(10),
           ),
         ],
       ),
-
-
-
     );
   }
 }

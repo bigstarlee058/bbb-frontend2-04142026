@@ -27,7 +27,7 @@ class AthletesListWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Athlete',
+              'Member',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: ScreenUtil.horizontalScale(3.6),
@@ -35,12 +35,7 @@ class AthletesListWidget extends StatelessWidget {
             ),
             Text(
               oneAthlete?.title ?? 'Erica Stone',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: ScreenUtil.horizontalScale(5),
-                fontWeight: FontWeight.bold,
-                height: 1.35
-              ),
+              style: TextStyle(color: Colors.white, fontSize: ScreenUtil.horizontalScale(5), fontWeight: FontWeight.bold, height: 1.35),
             ),
             Text(
               oneAthlete?.location ?? 'Miami FL',
