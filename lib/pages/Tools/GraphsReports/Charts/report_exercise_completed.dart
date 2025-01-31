@@ -214,7 +214,8 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
         break;
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      // axisSide: meta.axisSide,
+      meta: meta,
       space: 9,
       child: text,
     );

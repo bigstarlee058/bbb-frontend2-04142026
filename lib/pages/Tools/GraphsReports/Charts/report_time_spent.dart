@@ -214,7 +214,8 @@ class _ReportTimeSpentGraphState extends State<ReportTimeSpentGraph> {
         break;
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      // axisSide: meta.axisSide,
+      meta: meta,
       space: 9,
       child: text,
     );

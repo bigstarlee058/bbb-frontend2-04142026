@@ -198,7 +198,8 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
         break;
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      // axisSide: meta.axisSide,
+      meta: meta,
       space: 9,
       child: text,
     );

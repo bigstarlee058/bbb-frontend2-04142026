@@ -1,5 +1,3 @@
-
-
 import 'dart:math' as math;
 
 import 'package:bbb/utils/screen_util.dart';
@@ -74,10 +72,7 @@ class _BarChartSample7State extends State<BarChartWidget> {
             show: true,
             leftTitles: const AxisTitles(),
             bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 36,
-                  getTitlesWidget: getTitles),
+              sideTitles: SideTitles(showTitles: true, reservedSize: 36, getTitlesWidget: getTitles),
             ),
             rightTitles: const AxisTitles(),
             topTitles: const AxisTitles(),
@@ -136,9 +131,7 @@ class _BarChartSample7State extends State<BarChartWidget> {
               },
             ),
             touchCallback: (event, response) {
-              if (event.isInterestedForInteractions &&
-                  response != null &&
-                  response.spot != null) {
+              if (event.isInterestedForInteractions && response != null && response.spot != null) {
                 setState(() {
                   touchedGroupIndex = response.spot!.touchedBarGroupIndex;
                 });
@@ -155,7 +148,6 @@ class _BarChartSample7State extends State<BarChartWidget> {
   }
 
   Widget getTitles(double value, TitleMeta meta) {
-
     List<String> daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
     DateTime today = DateTime.now();
@@ -169,7 +161,6 @@ class _BarChartSample7State extends State<BarChartWidget> {
     for (int i = 1; i <= 7; i++) {
       reverseDays.add(daysOfWeek[(currentDayIndex + i) % 7]);
     }
-
 
     var style = const TextStyle(
       color: Colors.grey,
@@ -198,7 +189,7 @@ class _BarChartSample7State extends State<BarChartWidget> {
         text = Text(reverseDays[5], style: style);
         break;
       case 6:
-        text =  Text(
+        text = Text(
           reverseDays[6],
           style: const TextStyle(
             color: AppColors.primaryColor,
@@ -212,10 +203,10 @@ class _BarChartSample7State extends State<BarChartWidget> {
         break;
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 9,
-      child: text,
-    );
+        // axisSide: meta.axisSide,
+        space: 9,
+        meta: meta,
+        child: text);
   }
 }
 
@@ -235,8 +226,7 @@ class _IconWidget extends ImplicitlyAnimatedWidget {
   final bool isSelected;
 
   @override
-  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() =>
-      _IconWidgetState();
+  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() => _IconWidgetState();
 }
 
 class _IconWidgetState extends AnimatedWidgetBaseState<_IconWidget> {
@@ -269,5 +259,3 @@ class _IconWidgetState extends AnimatedWidgetBaseState<_IconWidget> {
     ) as Tween<double>?;
   }
 }
-
-

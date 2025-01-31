@@ -144,11 +144,15 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initDeepLinkListener() async {
     // Initialize AppLinks and handle the deep link in the callback
-    _appLinks = AppLinks(
-      onAppLink: (Uri uri, String? stringUri) {
-        _handleDeepLink(uri.toString());
-      },
-    );
+    // _appLinks = AppLinks(
+    //   onAppLink: (Uri uri, String? stringUri) {
+    //     _handleDeepLink(uri.toString());
+    //   },
+    // );
+    _appLinks = AppLinks();
+    _appLinks.uriLinkStream.listen((Uri uri) {
+      _handleDeepLink(uri.toString());
+    });
   }
 
   void _handleDeepLink(String? deepLink) {

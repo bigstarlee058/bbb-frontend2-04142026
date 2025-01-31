@@ -74,28 +74,51 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: filterViewList(),
+      child: FilterViewList(),
     );
   }
 
-  Widget filterViewList() {
+  Widget FilterViewList() {
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          ExpansionTileGroup(
-            toggleType: ToggleType.expandOnlyCurrent,
-            spaceBetweenItem: 15,
-            onExpansionItemChanged: (idx, isExpand) => {curExpandedIdx = idx},
-            children: [
-              filterViewItem(_isExpanded, weekDataModel?.title ?? ""),
-            ],
-          ),
-        ],
-      ),
+      child: Column(children: [
+        ExpansionTileGroup(
+          toggleType: ToggleType.expandOnlyCurrent,
+          spaceBetweenItem: 15,
+          children: [
+            filterViewItem(
+              _isExpanded,
+              widget.title,
+              onExpansionChanged: (bool isExpanded) {
+                setState(() {
+                  _isExpanded = isExpanded;
+                  curExpandedIdx = isExpanded ? 0 : -1;
+                });
+              },
+            ),
+          ],
+        ),
+      ]),
     );
   }
 
-  ExpansionTileItem filterViewItem(bool initExpanded, String title) {
+  // Widget filterViewList() {
+  //   return SingleChildScrollView(
+  //     child: Column(
+  //       children: [
+  //         ExpansionTileGroup(
+  //           toggleType: ToggleType.expandOnlyCurrent,
+  //           spaceBetweenItem: 15,
+  //           onExpansionItemChanged: (idx, isExpand) => {curExpandedIdx = idx},
+  //           children: [
+  //             filterViewItem(_isExpanded, weekDataModel?.title ?? ""),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  ExpansionTileItem filterViewItem(bool initExpanded, String title, {required Null Function(bool isExpanded) onExpansionChanged}) {
     ScreenUtil.init(context);
     return ExpansionTileItem(
       tilePadding: EdgeInsets.symmetric(

@@ -50,9 +50,10 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    vimeoVideoPlayer = const VimeoVideoPlayer(
-      url: 'https://player.vimeo.com/video/953289606',
-      autoPlay: true,
+    vimeoVideoPlayer = VimeoVideoPlayer(
+      // url: 'https://player.vimeo.com/video/953289606',
+      // autoPlay: true,
+      videoId: "953289606",
     );
 
     if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {

@@ -194,7 +194,7 @@ class Files {
   int? height;
   String? link;
   String? createdTime;
-  int? fps;
+  double? fps;
   int? size;
   dynamic md5;
   String? publicName;
@@ -218,12 +218,12 @@ class Files {
     quality = json['quality'];
     rendition = json['rendition'];
     type = json['type'];
-    width = json['width'];
-    height = json['height'];
+    width = json["width"];
+    height = json["height"];
     link = json['link'];
     createdTime = json['created_time'];
-    fps = json['fps'];
-    size = json['size'];
+    fps = double.parse(json['fps'].toString());
+    size = int.parse(json['size'].toString());
     md5 = json['md5'];
     publicName = json['public_name'];
     sizeShort = json['size_short'];

@@ -45,15 +45,13 @@ class _RepLineChartState extends State<RepLineChart> {
                   });
                 }
               },
-              mouseCursorResolver:
-                  (FlTouchEvent event, LineTouchResponse? response) {
+              mouseCursorResolver: (FlTouchEvent event, LineTouchResponse? response) {
                 if (response == null || response.lineBarSpots == null) {
                   return SystemMouseCursors.basic;
                 }
                 return SystemMouseCursors.click;
               },
-              getTouchedSpotIndicator:
-                  (LineChartBarData barData, List<int> spotIndexes) {
+              getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
                 return spotIndexes.map((index) {
                   return TouchedSpotIndicatorData(
                     const FlLine(
@@ -61,8 +59,7 @@ class _RepLineChartState extends State<RepLineChart> {
                     ),
                     FlDotData(
                       show: true,
-                      getDotPainter: (spot, percent, barData, index) =>
-                          FlDotCirclePainter(
+                      getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
                         radius: 3,
                         color: Colors.white,
                         strokeWidth: 1,
@@ -140,8 +137,7 @@ class _RepLineChartState extends State<RepLineChart> {
         isStrokeCapRound: true,
         dotData: FlDotData(
           show: true,
-          checkToShowDot: (spot, barData) =>
-              spot.x == barData.spots[barData.spots.length - 3].x,
+          checkToShowDot: (spot, barData) => spot.x == barData.spots[barData.spots.length - 3].x,
           getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
             radius: 6,
             color: Colors.white,
@@ -231,7 +227,8 @@ class _RepLineChartState extends State<RepLineChart> {
     }
 
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      // axisSide: meta.axisSide,
+      meta: meta,
       space: 10,
       child: text,
     );
