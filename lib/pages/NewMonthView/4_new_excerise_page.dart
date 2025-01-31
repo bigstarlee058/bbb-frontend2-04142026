@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
@@ -118,7 +117,6 @@ class _NewExercisePageState extends State<NewExercisePage> {
 
   Future<void> initializeVideo(String url) async {
     try {
-      log('url :::::::::::::::::: $url');
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
       await _videoPlayerController.initialize();
 
@@ -559,7 +557,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                         final val = monthProvider!.historyDataModel.where((element) => element.dataId == ctId);
                                         bool val1 = false;
                                         if (val.isNotEmpty) {
-                                          val1 = val.first.status == "Completed";
+                                          val1 = val.first.status == Status.completed;
                                         }
                                         return val1;
                                       }
@@ -633,7 +631,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                               const SizedBox(height: 30),
                               Consumer<MonthProvider>(
                                 builder: (context, monthProvider, child) {
-                                  return monthProvider.exerciseHistoryDetails?.status == "Skipped"
+                                  return monthProvider.exerciseHistoryDetails?.status == Status.skipped
                                       ? const SizedBox()
                                       : Padding(
                                           padding: const EdgeInsets.only(top: 10),
@@ -643,7 +641,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                             onPress: () async {
                                               int count = 0;
                                               await _saveExerciseData(
-                                                status: "Completed",
+                                                status: Status.completed,
                                                 id: monthProvider.isPumpDay && monthProvider.isCircuit
                                                     ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
                                                     : monthProvider.exerciseDetailModel!.sId.toString(),
@@ -654,7 +652,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                                 Navigator.pop(context);
                                               } else {
                                                 for (var element in monthProvider.exerciseHistoryModel) {
-                                                  if (element.status.toString() == "Completed") {
+                                                  if (element.status.toString() == Status.completed) {
                                                     count++;
                                                   }
                                                 }
@@ -671,7 +669,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                                     String dataId =
                                                         "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
                                                     bool val = monthProvider.exerciseHistoryModel
-                                                        .any((element) => element.dataId == dataId && element.status == "Completed");
+                                                        .any((element) => element.dataId == dataId && element.status == Status.completed);
                                                     if (val == false) {
                                                       monthProvider.setSelectedExercise(elementI, i);
                                                       monthProvider.updateWarmUp(false);
@@ -693,12 +691,12 @@ class _NewExercisePageState extends State<NewExercisePage> {
                               const SizedBox(height: 10),
                               Consumer<MonthProvider>(builder: (context, monthProvider, child) {
                                 return ButtonWidget(
-                                  text: monthProvider.exerciseHistoryDetails?.status == "Skipped" ? "Unskip?" : "Skip the exercise",
+                                  text: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip the exercise",
                                   textColor: const Color(0xFFFFFFFF),
                                   color: AppColors.skipDayColor,
                                   onPress: () async {
                                     await _saveExerciseData(
-                                      status: monthProvider.exerciseHistoryDetails?.status == "Skipped" ? "" : "Skipped",
+                                      status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
                                       id: monthProvider.isPumpDay && monthProvider.isCircuit
                                           ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
                                           : monthProvider.exerciseDetailModel!.sId.toString(),
@@ -706,7 +704,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                           ? "Circuit - ${monthProvider.circuitIndex}"
                                           : "Exercise",
                                     );
-                                    if (monthProvider.exerciseHistoryDetails?.status != "Skipped") {
+                                    if (monthProvider.exerciseHistoryDetails?.status != Status.skipped) {
                                       Navigator.pop(context);
                                     }
                                   },
@@ -741,7 +739,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                     textColor: Colors.white,
                     onPress: () async {
                       await _saveExerciseData(
-                        status: "Completed",
+                        status: Status.completed,
                         id: monthProvider!.warmUpModel!.id.toString(),
                         type: "Warmup",
                       );
@@ -886,7 +884,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
 
     double totalWeight = 0;
 
-    if (status == "Completed") {
+    if (status == Status.completed) {
       totalWeight = 0;
       monthProvider?.historyDataModel.forEach(
         (element) {
@@ -898,8 +896,6 @@ class _NewExercisePageState extends State<NewExercisePage> {
         },
       );
     }
-
-    log('totalWeight :::::::::::::::::: $totalWeight');
 
     await monthProvider?.fetchCircuitModelLocalData();
 

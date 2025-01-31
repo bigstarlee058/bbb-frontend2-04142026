@@ -1,18 +1,5 @@
 import 'dart:convert';
 
-// enum DayType { workOutDay, restDay, pumpDay }
-//
-// enum Type { skipped, completed, started, notStarted }
-//
-// enum SplitType { split3, split4, split5 }
-
-// class Type {
-//   static const String skipped = "skipped";
-//   static const String completed = "completed";
-//   static const String started = "started";
-//   static const String notStarted = "notStarted";
-// }
-
 class SplitType {
   static const String split3 = "split3";
   static const String split4 = "split4";

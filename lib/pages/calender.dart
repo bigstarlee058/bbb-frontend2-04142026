@@ -216,9 +216,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     for (var day in data) {
       final workoutDate = day.endTime!;
       if ((workoutDate.day == date.day && workoutDate.month == date.month && workoutDate.year == date.year)) {
-        if (day.status == "Completed") {
+        if (day.status == Status.completed) {
           return _buildCustomDayCircle(date, AppColors.primaryColor);
-        } else if (day.status == "Skipped") {
+        } else if (day.status == Status.skipped) {
           return _buildCustomDayCircle(date, Colors.blue);
         }
       }

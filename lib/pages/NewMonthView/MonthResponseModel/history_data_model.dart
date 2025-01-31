@@ -58,7 +58,7 @@ class HistoryDataModel {
         load: json["load"],
         type: json["type"],
         effort: json["effort"],
-        date: json["date"],
+        date: json["date"] ?? "",
         index: json["index"],
         subIndex: json["subIndex"],
         status: json["status"],

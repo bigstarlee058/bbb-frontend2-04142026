@@ -1,8 +1,5 @@
-import 'dart:developer';
-
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -28,14 +25,14 @@ class NotificationService {
     );
 
     await flutterLocalNotificationsPlugin
-        .zonedSchedule(id, 'Scheduled notification title $id', 'Scheduled notification body',
+        .zonedSchedule(id, 'Target rest reached! $id', 'Return to the app to continue you exercise',
             tz.TZDateTime.now(tz.local).add(Duration(seconds: second)), const NotificationDetails(android: androidDetails),
             androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
             payload: payload.toString(),
             uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime)
         .catchError(
       (error) {
-        print('error==========>>>>>${error}');
+        print('error==========>>>>>$error');
       },
     );
   }

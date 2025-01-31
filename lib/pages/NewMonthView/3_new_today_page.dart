@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -37,6 +36,8 @@ class _NewTodayPageState extends State<NewTodayPage> {
   List<ExerciseDataModel> exercises = [];
   List<RemovedExerciseModel> removedExercise = [];
   int totalWarmups = 0;
+  bool isCurrentDayCompleted = false;
+  bool isCurrentDaySkipped = false;
 
   @override
   void initState() {
@@ -50,6 +51,8 @@ class _NewTodayPageState extends State<NewTodayPage> {
     day = dayDelta % 7;
     monthProvider?.fetchExerciseStatusLocalData();
     fetchRemovedExerciseLocalData();
+    isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
+    isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped;
     super.initState();
   }
 
@@ -283,9 +286,9 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                             child: WorkoutCard(
                                               isCircuit: false,
                                               isCompleted: monthProvider!.exerciseHistoryModel
-                                                  .any((element) => element.dataId == dataId && element.status == "Completed"),
+                                                  .any((element) => element.dataId == dataId && element.status == Status.completed),
                                               isSkipped: monthProvider!.exerciseHistoryModel
-                                                      .any((element) => element.dataId == dataId && element.status == "Skipped") ||
+                                                      .any((element) => element.dataId == dataId && element.status == Status.skipped) ||
                                                   isExist,
                                               exerciseIndex: i,
                                               onPress: () => onPressed(i, dataId),
@@ -298,11 +301,13 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                               exerciseData: exercises[i].id!,
                                               name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
                                               onRemove: () => removeExercise(exercises[i].exerciseId!),
-                                              enabled: monthProvider!.exerciseHistoryModel
-                                                          .any((element) => element.dataId == dataId && element.status == "Completed") ||
-                                                      isExist
+                                              enabled: isCurrentDayCompleted || isCurrentDaySkipped
                                                   ? false
-                                                  : true,
+                                                  : monthProvider!.exerciseHistoryModel.any((element) =>
+                                                              element.dataId == dataId && element.status == Status.completed) ||
+                                                          isExist
+                                                      ? false
+                                                      : true,
                                             ),
                                           ),
                                           SizedBox(
@@ -318,8 +323,8 @@ class _NewTodayPageState extends State<NewTodayPage> {
                           ),
                           SizedBox(height: ScreenUtil.verticalScale(2)),
                           monthProvider?.dayHistoryDetails == null ||
-                                  (monthProvider?.dayHistoryDetails?.status == "Skipped" ||
-                                          monthProvider?.dayHistoryDetails?.status == "Completed") &&
+                                  (monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+                                          monthProvider?.dayHistoryDetails?.status == Status.completed) &&
                                       monthProvider!.isPastWeek
                               ? const SizedBox()
                               : Padding(
@@ -368,13 +373,13 @@ class _NewTodayPageState extends State<NewTodayPage> {
                           ),
                           const SizedBox(height: 36),
                           monthProvider?.dayHistoryDetails == null ||
-                                  (monthProvider?.dayHistoryDetails?.status == "Skipped" ||
-                                          monthProvider?.dayHistoryDetails?.status == "Completed") &&
+                                  (monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+                                          monthProvider?.dayHistoryDetails?.status == Status.completed) &&
                                       monthProvider!.isPastWeek
                               ? Container(
                                   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                   child: ButtonWidget(
-                                    text: monthProvider?.dayHistoryDetails?.status == "Completed" ? "Completed" : "Skipped",
+                                    text: monthProvider?.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
                                     textColor: Colors.white,
                                     onPress: null,
                                     color: AppColors.primaryColor,
@@ -387,30 +392,31 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                       Container(
                                         margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                         child: ButtonWidget(
-                                          text: value.dayHistoryDetails?.status == "Completed"
+                                          text: value.dayHistoryDetails?.status == Status.completed
                                               ? "Completed"
-                                              : value.dayHistoryDetails?.status == "Skipped"
+                                              : value.dayHistoryDetails?.status == Status.skipped
                                                   ? "Skipped"
                                                   : "Finish the workout",
                                           textColor: Colors.white,
-                                          onPress:
-                                              value.dayHistoryDetails?.status == "Completed" || value.dayHistoryDetails?.status == "Skipped"
-                                                  ? null
-                                                  : () async {
-                                                      await _saveDayData(
-                                                          status: "Skipped",
-                                                          type: monthProvider!.isPumpDay
-                                                              ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                                              : "Workout Day",
-                                                          status1: "Completed");
-                                                      Navigator.pushNamed(context, '/dayCompleted');
-                                                    },
+                                          onPress: value.dayHistoryDetails?.status == Status.completed ||
+                                                  value.dayHistoryDetails?.status == Status.skipped
+                                              ? null
+                                              : () async {
+                                                  await _saveDayData(
+                                                      status: Status.skipped,
+                                                      type: monthProvider!.isPumpDay
+                                                          ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                                          : "Workout Day",
+                                                      status1: Status.completed);
+                                                  Navigator.pushNamed(context, '/dayCompleted');
+                                                },
                                           color: AppColors.primaryColor,
                                           isLoading: false,
                                         ),
                                       ),
                                       const SizedBox(height: 14),
-                                      value.dayHistoryDetails?.status != "Skipped" && value.dayHistoryDetails?.status != "Completed"
+                                      value.dayHistoryDetails?.status != Status.skipped &&
+                                              value.dayHistoryDetails?.status != Status.completed
                                           ? Container(
                                               margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                               child: ButtonWidget(
@@ -418,11 +424,11 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                                 textColor: Colors.white,
                                                 onPress: () async {
                                                   await _saveDayData(
-                                                      status: "Skipped",
+                                                      status: Status.skipped,
                                                       type: monthProvider!.isPumpDay
                                                           ? "Pump Day- ${monthProvider?.pumpDayModel?.id}"
                                                           : "Workout Day",
-                                                      status1: "Skipped");
+                                                      status1: Status.skipped);
                                                   Navigator.pushNamed(context, '/home');
                                                 },
                                                 color: AppColors.skipDayColor,
@@ -507,7 +513,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
                     ),
                     child: Container(
                       decoration: monthProvider.exerciseHistoryModel
-                              .any((element) => element.dataId == warmUpDataId && element.status == "Completed")
+                              .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
                           ? BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
@@ -524,7 +530,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
                               ),
                             )
                           : (monthProvider.exerciseHistoryModel
-                                      .any((element) => element.dataId == warmUpDataId && element.status == "Skipped") ||
+                                      .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
                                   isExist)
                               ? BoxDecoration(
                                   gradient: LinearGradient(
@@ -549,11 +555,13 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                   ),
                                 ),
                       child: Icon(
-                        monthProvider.exerciseHistoryModel.any((element) => element.dataId == warmUpDataId && element.status == "Completed")
+                        monthProvider.exerciseHistoryModel
+                                .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
                             ? Icons.check
                             : Icons.close,
                         color: (monthProvider.exerciseHistoryModel.any((element) =>
-                                    element.dataId == warmUpDataId && (element.status == "Completed" || element.status == "Skipped")) ||
+                                    element.dataId == warmUpDataId &&
+                                    (element.status == Status.completed || element.status == Status.skipped)) ||
                                 isExist)
                             ? Colors.white
                             : Colors.transparent,
@@ -651,17 +659,18 @@ class _NewTodayPageState extends State<NewTodayPage> {
                       (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
 
                   return ButtonWidget(
-                    text:
-                        monthProvider.exerciseHistoryModel.any((element) => element.dataId == warmUpDataId && element.status == "Completed")
-                            ? "Completed"
-                            : monthProvider.exerciseHistoryModel
-                                        .any((element) => element.dataId == warmUpDataId && element.status == "Skipped") ||
-                                    isExist
-                                ? "Skipped"
-                                : "Start the warm-up",
+                    text: monthProvider.exerciseHistoryModel
+                            .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+                        ? "Completed"
+                        : monthProvider.exerciseHistoryModel
+                                    .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+                                isExist
+                            ? "Skipped"
+                            : "Start the warm-up",
                     textColor: Colors.white,
                     onPress: monthProvider.exerciseHistoryModel.any((element) =>
-                                element.dataId == warmUpDataId && (element.status == "Completed" || element.status == "Skipped")) ||
+                                element.dataId == warmUpDataId &&
+                                (element.status == Status.completed || element.status == Status.skipped)) ||
                             isExist
                         ? null
                         : () async {
@@ -1171,7 +1180,6 @@ class _NewTodayPageState extends State<NewTodayPage> {
     } else {
       DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
-    log(':::::::::::::::::: DATA ADDED OR UPDATED');
   }
 
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
@@ -1182,7 +1190,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
 
     for (int i = 0; i < monthProvider!.exerciseHistoryModel.length; i++) {
       var element = monthProvider!.exerciseHistoryModel[i];
-      if (element.status == "Completed") {
+      if (element.status == Status.completed) {
         exCount++;
         totalWeight += double.parse(element.totalWeight!);
       }
@@ -1200,7 +1208,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
                   "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
 
               bool? val = monthProvider?.exerciseHistoryModel
-                  .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+                  .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
               if (val == false) {
                 await _saveExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
               }
@@ -1220,7 +1228,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
             "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
 
         bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+            .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
         if (val == false) {
           await _saveExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
         }
@@ -1235,7 +1243,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
         String dataId =
             "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
         bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+            .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
         if (val == false) {
           await _saveExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
         }
@@ -1250,7 +1258,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
     final data1 = {
       "status": status1,
       "type": type,
-      "endTime": (status == "Completed" || status == "Skipped") ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed || status == Status.skipped) ? "${DateTime.now().toUtc()}" : "",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),
     };

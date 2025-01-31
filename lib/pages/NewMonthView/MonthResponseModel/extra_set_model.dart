@@ -43,7 +43,7 @@ class ExtraSetModel {
         load: json["load"],
         type: json["type"],
         extraId: json["extraId"],
-        date: json["date"],
+        date: json["date"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {

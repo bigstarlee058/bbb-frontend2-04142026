@@ -21,6 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+import 'NewMonthView/MonthResponseModel/day_history_model.dart';
+
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
@@ -221,6 +223,22 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].days![dayIndex]
                                                 : DayDataModel();
 
+                                        bool isRestDay =
+                                            "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                                .toString()
+                                                .contains("Rest Day");
+
+                                        int nextWorkOutIndex = monthData
+                                                .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
+                                                .toString()
+                                                .contains("Workout")
+                                            ? int.parse(monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
+                                                    .toString()
+                                                    .replaceAll("Day ", "")
+                                                    .replaceAll(" Workout", "")) -
+                                                1
+                                            : 0;
+
                                         return Container(
                                           margin: EdgeInsets.symmetric(
                                             horizontal: ScreenUtil.horizontalScale(8),
@@ -244,31 +262,38 @@ class _DashboardPageState extends State<DashboardPage> {
                                               SizedBox(
                                                 child: Column(
                                                   children: [
-                                                    Text(
-                                                      monthData.allDayHistoryModel.any(
+                                                    Builder(builder: (context) {
+                                                      DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
                                                         (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                      )
-                                                          ? "Pump Day"
-                                                          : (monthData.monthDataModel?.weeks?[monthData.week! - 1].dayList?[index ?? 0]) ??
-                                                              "",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: ScreenUtil.verticalScale(3),
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    )
+                                                        orElse: () => DayHistoryModel(),
+                                                      );
+                                                      return Text(
+                                                        matchingElement.id != null
+                                                            ? matchingElement.title ?? "Pump Day"
+                                                            : !isRestDay
+                                                                ? monthData.monthDataModel!.weeks![monthData.week! - 1]
+                                                                    .days![nextWorkOutIndex].title
+                                                                : (monthData
+                                                                    .monthDataModel?.weeks?[monthData.week! - 1].dayList?[index ?? 0]),
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: ScreenUtil.verticalScale(3),
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      );
+                                                    })
                                                   ],
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
                                               Container(
-                                                decoration: status == "Completed"
+                                                decoration: status == Status.completed
                                                     ? BoxDecoration(
                                                         color: Colors.white,
                                                         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3.2)))
                                                     : const BoxDecoration(),
-                                                child: status == "Completed"
+                                                child: status == Status.completed
                                                     ? const ButtonWidget(
                                                         text: "Completed",
                                                         textColor: Colors.white,
@@ -277,10 +302,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                                         isLoading: false,
                                                       )
                                                     : ButtonWidget(
-                                                        text: status == "Started" ? 'Continue Workout' : 'Start Workout',
+                                                        text: status == Status.started ? 'Continue Workout' : 'Start Workout',
                                                         textColor: AppColors.primaryColor,
-                                                        color: status == "Completed" || status == "Skipped" ? Colors.white70 : Colors.white,
-                                                        onPress: status == "Completed" || status == "Skipped"
+                                                        color: status == Status.completed || status == Status.skipped
+                                                            ? Colors.white70
+                                                            : Colors.white,
+                                                        onPress: status == Status.completed || status == Status.skipped
                                                             ? null
                                                             : () async {
                                                                 monthData.overviewCurrentWeek = monthData.week ?? 1;
@@ -421,7 +448,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
                                   element.split == value.splitType &&
                                   element.monthId == value.monthDataModel?.id &&
-                                  (element.status == "Completed" || element.status == "Skipped"));
+                                  (element.status == Status.completed || element.status == Status.skipped));
 
                               final count = val2.length + val1;
 

@@ -38,22 +38,25 @@ class DayHistoryModel {
     this.totalWeight,
   });
 
-  factory DayHistoryModel.fromJson(Map<String, dynamic> json) => DayHistoryModel(
-        id: json["id"],
-        dataId: json["dataId"],
-        split: json["split"],
-        monthId: json["monthId"],
-        title: json["title"],
-        weekId: json["weekId"],
-        dayId: json["dayId"],
-        date: json["date"] == null || json["date"] == "" ? null : DateTime.parse(json["date"]),
-        status: json["status"],
-        startTime: json["startTime"] == null || json["startTime"] == "" ? null : DateTime.parse(json["startTime"]),
-        endTime: json["endTime"] == null || json["endTime"] == "" ? null : DateTime.parse(json["endTime"]),
-        type: json["type"],
-        completedExercise: json["completedExercise"],
-        totalWeight: json["totalWeight"],
-      );
+  factory DayHistoryModel.fromJson(Map<String, dynamic> json) {
+    return DayHistoryModel(
+      id: json["id"],
+      dataId: json["dataId"],
+      split: json["split"],
+      monthId: json["monthId"],
+      title: json["title"],
+      weekId: json["weekId"],
+      dayId: json["dayId"],
+      date: json["date"] == null || json["date"] == "" || json["date"] == "null" ? null : DateTime.parse(json["date"]),
+      status: json["status"],
+      startTime:
+          json["startTime"] == null || json["startTime"] == "" || json["startTime"] == "null" ? null : DateTime.parse(json["startTime"]),
+      endTime: json["endTime"] == null || json["endTime"] == "" || json["endTime"] == "null" ? null : DateTime.parse(json["endTime"]),
+      type: json["type"],
+      completedExercise: json["completedExercise"],
+      totalWeight: json["totalWeight"],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

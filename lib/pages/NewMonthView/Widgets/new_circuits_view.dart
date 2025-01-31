@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:bbb/pages/NewMonthView/3_new_today_page.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
@@ -63,8 +60,6 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
 
               String dayDtaId =
                   "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
-              log('dayDtaId :::::::::::::::::: $dayDtaId');
-              log(' monthProvider.dayHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider.dayHistoryModel)}');
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +89,8 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                 margin: const EdgeInsets.only(left: 10),
                                 decoration: BoxDecoration(
                                   color: monthProvider.dayHistoryModel.any((element) =>
-                                          element.dataId == dayDtaId && element.status == "Completed" || element.status == "Skipped")
+                                          element.dataId == dayDtaId && element.status == Status.completed ||
+                                          element.status == Status.skipped)
                                       ? AppColors.primaryColor
                                       : data == null
                                           ? Colors.transparent
@@ -103,7 +99,8 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                               : Colors.transparent,
                                   border: Border.all(
                                       color: monthProvider.dayHistoryModel.any((element) =>
-                                              element.dataId == dayDtaId && element.status == "Completed" || element.status == "Skipped")
+                                              element.dataId == dayDtaId && element.status == Status.completed ||
+                                              element.status == Status.skipped)
                                           ? AppColors.primaryColor
                                           : data == null
                                               ? AppColors.primaryColor
@@ -124,8 +121,8 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                         )
                                       : (((data.lastRound ?? 1) - 1) > index) ||
                                               monthProvider.dayHistoryModel.any((element) =>
-                                                  element.dataId == dayDtaId && element.status == "Completed" ||
-                                                  element.status == "Skipped")
+                                                  element.dataId == dayDtaId && element.status == Status.completed ||
+                                                  element.status == Status.skipped)
                                           ? Icon(
                                               Icons.check,
                                               color: Colors.white,
@@ -231,9 +228,9 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                           roundIndex: roundIndex,
                                           isCircuit: true,
                                           isCompleted: monthProvider.exerciseHistoryModel
-                                              .any((element) => element.dataId == dataId && element.status == "Completed"),
+                                              .any((element) => element.dataId == dataId && element.status == Status.completed),
                                           isSkipped: monthProvider.exerciseHistoryModel
-                                                  .any((element) => element.dataId == dataId && element.status == "Skipped") ||
+                                                  .any((element) => element.dataId == dataId && element.status == Status.skipped) ||
                                               isExist,
                                           exerciseIndex: exerciseIndex,
                                           onPress: indexW == -1

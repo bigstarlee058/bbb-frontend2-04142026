@@ -52,7 +52,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
       (element) {
         if (element.endTime != null) {
           if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
-              element.status == "Completed") {
+              element.status == Status.completed) {
             int duration = element.endTime!.difference(element.startTime!).inSeconds;
             totalWorkoutDuration += duration;
             totalWeight += double.parse(element.totalWeight ?? "0");
@@ -244,7 +244,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                                 (index) => data.any(
                                   (element) =>
                                       DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
-                                      element.status == "Completed" &&
+                                      element.status == Status.completed &&
                                       element.split == monthProvider!.splitType,
                                 )
                                     ? IconDataWithDot(
@@ -487,10 +487,7 @@ class BulletPoint extends StatelessWidget {
             constraints: BoxConstraints(maxWidth: media.width / 1.4),
             child: Text(
               text,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ),
         ],

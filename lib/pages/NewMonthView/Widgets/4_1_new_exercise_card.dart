@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/ExerciseView/widgets/notes_slideout.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
@@ -13,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import 'notes_slideout.dart';
 
 class NewExerciseCard extends StatefulWidget {
   const NewExerciseCard({
@@ -217,7 +217,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       "index": widget.index,
       "subIndex": widget.subIndex,
       "date": "${DateTime.now().toUtc()}",
-      "status": _restDuration == 0 ? "Completed" : ""
+      "status": _restDuration == 0 ? Status.completed : Status.empty
     };
 
     final data1 = {
@@ -229,7 +229,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
       "date": "${DateTime.now().toUtc()}",
-      "status": _restDuration == 0 ? "Completed" : ""
+      "status": _restDuration == 0 ? Status.completed : Status.empty
     };
     await monthProvider?.fetchExerciseHistoryLocalData();
     if (monthProvider!.historyDataModel.isNotEmpty) {
@@ -242,7 +242,6 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
     monthProvider?.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
-    log('_restDuration :::::::::::::::::: $_restDuration');
     if (_restDuration != 0) {
       _showTimer = true;
     }

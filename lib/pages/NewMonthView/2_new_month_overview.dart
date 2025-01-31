@@ -93,7 +93,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                   Consumer<MonthProvider>(builder: (context, monthProvider, child) {
                     return Stack(
                       children: [
-                        monthProvider.dayHistoryDetails?.status == "Completed"
+                        monthProvider.dayHistoryDetails?.status == Status.completed
                             ? Container(
                                 height: media.height / 2.35,
                                 width: media.width,
@@ -130,7 +130,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                   ),
                                 ),
                               ),
-                        monthProvider.dayHistoryDetails?.status == "Completed"
+                        monthProvider.dayHistoryDetails?.status == Status.completed
                             ? Container(
                                 height: media.height / 1.8,
                                 width: media.width,
@@ -508,18 +508,19 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                     Color buttonColor = AppColors.primaryColor;
 
                     if (currentDayTitle.contains("Rest Day") && monthProvider.isPastWeek) {
-                      buttonText = monthProvider.dayHistoryDetails?.status == "Completed" ? "Completed" : "Skipped";
+                      buttonText = monthProvider.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped";
                       onPress = null;
                     } else if (monthProvider.isPastWeek ||
                         (monthProvider.isPumpDay &&
-                            (monthProvider.dayHistoryDetails?.status == "Completed" ||
-                                monthProvider.dayHistoryDetails?.status == "Skipped"))) {
+                            (monthProvider.dayHistoryDetails?.status == Status.completed ||
+                                monthProvider.dayHistoryDetails?.status == Status.skipped))) {
                       buttonText = "View the workout";
                       onPress = () {
                         Navigator.pushNamed(context, '/today');
                       };
                     } else if (currentDayTitle.contains("Rest Day") && (monthProvider.isPumpDay || monthProvider.isPumpDayAvailable)) {
-                      if (monthProvider.dayHistoryDetails?.status == "Skipped" || monthProvider.dayHistoryDetails?.status == "Completed") {
+                      if (monthProvider.dayHistoryDetails?.status == Status.skipped ||
+                          monthProvider.dayHistoryDetails?.status == Status.completed) {
                         return const SizedBox();
                       } else {
                         return Row(
@@ -581,26 +582,26 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                 onTap: () async {
                                   if (monthProvider.selectedButtonTitle == "Mark Complete") {
                                     Navigator.pushNamed(context, '/dayCompleted');
-                                    _saveDayData(status: 'Completed', type: 'Rest Day');
+                                    _saveDayData(status: Status.completed, type: 'Rest Day');
                                   } else if (monthProvider.selectedButtonTitle == "Swap To Pump Day") {
                                     monthProvider.changeIsPumpDay(true);
                                     monthProvider.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
 
                                     _saveDayData(
                                       type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
-                                      status: "",
+                                      status: Status.empty,
                                       title: monthProvider.pumpDayModel?.title,
                                     );
                                   } else if (monthProvider.selectedButtonTitle == "Start Workout") {
                                     await _saveDayData(
                                       type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
-                                      status: "Started",
+                                      status: Status.started,
                                       title: monthProvider.pumpDayModel?.title,
                                     );
                                     Navigator.pushNamed(context, '/today');
                                   } else if (monthProvider.selectedButtonTitle == "Swap To Rest Day") {
                                     monthProvider.changeValue(["Mark Complete", "Swap To Pump Day"], "Mark Complete");
-                                    await _saveDayData(type: "Rest Day", status: "");
+                                    await _saveDayData(type: "Rest Day", status: Status.empty);
                                     monthProvider.checkPumpDayAvail();
                                   }
                                 },
@@ -646,21 +647,22 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                     } else {
                       buttonText = currentDayTitle.contains("Rest Day")
                           ? "Mark Complete"
-                          : monthProvider.dayHistoryDetails?.status == "Started" || monthProvider.dayHistoryDetails?.status == "Completed"
+                          : monthProvider.dayHistoryDetails?.status == Status.started ||
+                                  monthProvider.dayHistoryDetails?.status == Status.completed
                               ? "View the workout"
-                              : monthProvider.dayHistoryDetails?.status == "Skipped"
+                              : monthProvider.dayHistoryDetails?.status == Status.skipped
                                   ? "Skipped. View here"
                                   : "Start the workout";
 
                       onPress = () async {
                         if (currentDayTitle.contains("Rest Day")) {
                           Navigator.pushNamed(context, '/dayCompleted');
-                          _saveDayData(status: 'Completed', type: 'Rest Day');
+                          _saveDayData(status: Status.completed, type: 'Rest Day');
                         } else {
-                          if (monthProvider.dayHistoryDetails?.status != "Skipped" &&
-                              monthProvider.dayHistoryDetails?.status != "Completed") {
+                          if (monthProvider.dayHistoryDetails?.status != Status.skipped &&
+                              monthProvider.dayHistoryDetails?.status != Status.completed) {
                             monthProvider.changeIsPumpDay(false);
-                            await _saveDayData(status: 'Started', type: 'Workout Day');
+                            await _saveDayData(status: Status.started, type: 'Workout Day');
                           }
                           Navigator.pushNamed(context, '/today');
                         }
@@ -689,7 +691,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                     }
 
                     if (currentDayTitle.contains("Rest Day") &&
-                        monthProvider.dayHistoryDetails?.status == "Completed" &&
+                        monthProvider.dayHistoryDetails?.status == Status.completed &&
                         !monthProvider.isPumpDay) {
                       return Container(
                         color: Colors.white,
@@ -704,11 +706,11 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                       );
                     }
 
-                    if (monthProvider.dayHistoryDetails?.status != "Completed") {
-                      String buttonText = monthProvider.dayHistoryDetails?.status == "Skipped" ? "Unskip?" : "Skip Day";
+                    if (monthProvider.dayHistoryDetails?.status != Status.completed) {
+                      String buttonText = monthProvider.dayHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip Day";
                       onPress() async {
-                        bool isSkipped = monthProvider.dayHistoryDetails?.status == "Skipped";
-                        String newStatus = isSkipped ? '' : 'Skipped';
+                        bool isSkipped = monthProvider.dayHistoryDetails?.status == Status.skipped;
+                        String newStatus = isSkipped ? '' : Status.skipped;
                         String type = monthProvider.isPumpDay
                             ? "Pump Day - ${monthProvider.pumpDayModel?.id}"
                             : currentDayTitle.contains("Rest Day")
@@ -794,7 +796,8 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
               var elementZ = elementI.circuitExercises?[z];
               String dataId =
                   "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
-              bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
+              bool? val =
+                  monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
               if (val == true) {
                 await _unskipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
               }
@@ -809,7 +812,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
         var elementI = data[i];
         String dataId =
             "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
         if (val == true) {
           await _unskipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
         }
@@ -821,7 +824,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
         var elementI = data[i];
         String dataId =
             "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
-        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == "Skipped");
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
         if (val == true) {
           await _unskipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
         }
@@ -841,7 +844,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
               String dataId =
                   "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
               bool? val = monthProvider?.exerciseHistoryModel
-                  .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+                  .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
               if (val == false) {
                 await _skipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
               }
@@ -857,7 +860,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
         String dataId =
             "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
         bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+            .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
         if (val == false) {
           await _skipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
         }
@@ -870,7 +873,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
         String dataId =
             "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
         bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == "Completed" || element.status == "Skipped"));
+            .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
         if (val == false) {
           await _skipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
         }
@@ -880,7 +883,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
 
   Future<void> _skipUnskipDayData({required String status, required String type}) async {
     if (type != "Rest Day" || monthProvider!.isPumpDay) {
-      if (status == "Skipped") {
+      if (status == Status.skipped) {
         await skipped(status);
       } else {
         await unSkipped(status);
@@ -899,8 +902,8 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type,
-      "startTime": status == "" ? "" : "${DateTime.now().toUtc()}",
-      "endTime": status == "" ? "" : "${DateTime.now().toUtc()}",
+      "startTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+      "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
     };
 
     DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
@@ -911,8 +914,12 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     final data1 = {
       "status": status,
       "type": type,
-      "startTime": status == "" ? "" : matchingElement?.startTime.toString() ?? "${DateTime.now().toUtc()}",
-      "endTime": status == "" ? "" : "${DateTime.now().toUtc()}",
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
     };
 
     if (matchingElement?.id != null) {
@@ -944,8 +951,8 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type,
-      "startTime": (status == "Started" || status == "Completed") ? "${DateTime.now().toUtc()}" : "",
-      "endTime": (status == "Completed") ? "${DateTime.now().toUtc()}" : "",
+      "startTime": (status == Status.started || status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
     };
 
     DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
@@ -957,12 +964,12 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "title": title,
       "status": status,
       "type": type,
-      "startTime": status == ""
+      "startTime": status == Status.empty
           ? ""
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == "Completed") ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
     };
 
     if (matchingElement?.id != null) {

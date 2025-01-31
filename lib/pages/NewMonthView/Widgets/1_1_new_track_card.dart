@@ -275,12 +275,12 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
                                   builder: (context, value, child) {
                                     return (value.weekStatuses[mainIndex!] == WeekType.pastWeek && value.allDayHistoryModel.isEmpty) ||
                                             value.allDayHistoryModel
-                                                .any((element) => element.status == "Skipped" && element.dataId == dataId)
+                                                .any((element) => element.status == Status.skipped && element.dataId == dataId)
                                         ? skipped()
                                         : value.weekStatuses[mainIndex!] == WeekType.futureWeek
                                             ? future()
                                             : value.allDayHistoryModel
-                                                    .any((element) => element.status == "Completed" && element.dataId == dataId)
+                                                    .any((element) => element.status == Status.completed && element.dataId == dataId)
                                                 ? completed()
                                                 : value.weekStatuses[mainIndex!] == WeekType.currentWeek
                                                     ? value.todayTitleId == (value.monthDataModel!.weeks![mainIndex!].idList?[index])

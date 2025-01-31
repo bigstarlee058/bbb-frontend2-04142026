@@ -27,6 +27,13 @@ import '../../../values/app_constants.dart';
 
 enum WeekType { pastWeek, currentWeek, futureWeek }
 
+class Status {
+  static const String empty = "";
+  static const String started = "Started";
+  static const String skipped = "Skipped";
+  static const String completed = "Completed";
+}
+
 class MonthProvider extends ChangeNotifier {
   late MainPageProvider mainPageProvider;
 
@@ -186,7 +193,7 @@ class MonthProvider extends ChangeNotifier {
       bool? value = allDayHistoryModel.any((ele1) =>
           "${ele1.split}-${ele1.monthId}-${ele1.weekId}-$element" == ele1.dataId &&
           ele1.weekId == monthDataModel!.weeks?[week! - 1].id &&
-          (ele1.status == "Completed" || ele1.status == "Skipped"));
+          (ele1.status == Status.completed || ele1.status == Status.skipped));
       if (value == false) {
         todayTitleId = element;
         await preferences.putString(SharedPreference.todayTitleId, todayTitleId);
@@ -239,7 +246,6 @@ class MonthProvider extends ChangeNotifier {
 
       weekStatuses.add(weekType);
     }
-    log('All Week Statuses: $weekStatuses');
     notifyListeners();
   }
 
@@ -453,7 +459,6 @@ class MonthProvider extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        log('response.body==========>>>>>${response.body}');
         getExerciseFromJson(jsonDecode(response.body));
         notifyListeners();
       } else {
@@ -590,7 +595,7 @@ class MonthProvider extends ChangeNotifier {
           break;
         }
       }
-      if (element.status == 'Completed') {
+      if (element.status == Status.completed) {
         streak++;
       } else {
         break;
@@ -604,7 +609,7 @@ class MonthProvider extends ChangeNotifier {
   List<DayHistoryModel> decodedData() {
     String encodedTempData = jsonEncode(allDayHistoryModel);
     final decodedData = List<DayHistoryModel>.from(json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)));
-    decodedData.removeWhere((element) => element.status == "" || element.status == "Started");
+    decodedData.removeWhere((element) => element.status == Status.empty || element.status == Status.started);
     decodedData.sort((a, b) => b.endTime!.compareTo(a.endTime!));
     Map<String, Map<String, dynamic>> latestByDay = {};
     for (var entry in decodedData) {
@@ -807,7 +812,7 @@ class MonthProvider extends ChangeNotifier {
     DateTime sixDaysAgo = today.subtract(const Duration(days: 6));
 
     List<DayHistoryModel> filteredData = allDayHistoryModel.where((entry) {
-      if (entry.status != "Completed") {
+      if (entry.status != Status.completed) {
         return false;
       }
       DateTime entryDate = entry.endTime!;
@@ -815,7 +820,7 @@ class MonthProvider extends ChangeNotifier {
     }).toList();
     Map<String, Map<String, dynamic>> combinedData = {};
     for (var element in filteredData) {
-      if (element.status == "Completed") {
+      if (element.status == Status.completed) {
         DateTime dateDateTime = element.date!;
         String date = dateDateTime.toIso8601String().split('T')[0];
         double totalWeight = double.parse(element.totalWeight ?? "0");
@@ -970,7 +975,7 @@ class MonthProvider extends ChangeNotifier {
     DateTime endDate = DateTime.parse(week['endDate']);
 
     List<DayHistoryModel> filteredData = allDayHistoryModel.where((data) {
-      if (data.status != "Completed") {
+      if (data.status != Status.completed) {
         return false;
       }
       DateTime entryDate = data.endTime!;
@@ -980,7 +985,7 @@ class MonthProvider extends ChangeNotifier {
     Map<String, Map<String, dynamic>> combinedData = {};
 
     for (var element in filteredData) {
-      if (element.status == "Completed") {
+      if (element.status == Status.completed) {
         DateTime dateDateTime = element.date!;
         String date = dateDateTime.toIso8601String().split('T')[0];
         int completedExercise = int.parse(element.completedExercise ?? "0");
@@ -1066,7 +1071,7 @@ class MonthProvider extends ChangeNotifier {
     DateTime endDate = DateTime.parse(week['endDate']);
 
     List<DayHistoryModel> filteredData = allDayHistoryModel.where((data) {
-      if (data.status != "Completed") {
+      if (data.status != Status.completed) {
         return false;
       }
       DateTime entryDate = data.endTime!;
@@ -1076,7 +1081,7 @@ class MonthProvider extends ChangeNotifier {
     Map<String, Map<String, dynamic>> combinedData = {};
 
     for (var element in filteredData) {
-      if (element.status == "Completed") {
+      if (element.status == Status.completed) {
         DateTime dateDateTime = element.date!;
         String date = dateDateTime.toIso8601String().split('T')[0];
         double totalWeight = double.parse(element.totalWeight ?? "0");
@@ -1159,7 +1164,7 @@ class MonthProvider extends ChangeNotifier {
     DateTime endDate = DateTime.parse(week['endDate']);
 
     List<DayHistoryModel> filteredData = allDayHistoryModel.where((data) {
-      if (data.status != "Completed") {
+      if (data.status != Status.completed) {
         return false;
       }
       DateTime entryDate = data.endTime!;
@@ -1169,7 +1174,7 @@ class MonthProvider extends ChangeNotifier {
     Map<String, Map<String, dynamic>> combinedData = {};
 
     for (var element in filteredData) {
-      if (element.status == "Completed") {
+      if (element.status == Status.completed) {
         DateTime dateDateTime = element.date!;
         String date = dateDateTime.toIso8601String().split('T')[0];
 

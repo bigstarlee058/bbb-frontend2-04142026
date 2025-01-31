@@ -40,7 +40,7 @@ class ExerciseHistoryModel {
         weekId: json["weekId"],
         dayId: json["dayId"],
         type: json["type"],
-        date: json["date"] == null || json["date"].isEmpty ? null : DateTime.parse(json["date"]),
+        date: json["date"] == null || json["date"].isEmpty || json["date"] == "null" ? null : DateTime.parse(json["date"]),
         status: json["status"],
         split: json["split"],
         totalWeight: json["totalWeight"],

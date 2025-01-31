@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
@@ -71,9 +70,8 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
         animationCompleted = true;
         widget.onComplete();
 
-        DatabaseHelper()
-            .updateSingleValue(tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: "Completed");
-        log("STATUS UPDATED");
+        DatabaseHelper().updateSingleValue(
+            tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
       }
     });
 
@@ -136,7 +134,6 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
-        log('resumed :::::::::::::::::: ');
         NotificationService.clearNotification();
         await monthProvider.getPassedTime();
         if (monthProvider.timePassed != "") {
@@ -146,33 +143,26 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
           }
           if (int.parse(monthProvider.timePassed) > totalTime) {
             DatabaseHelper().updateSingleValue(
-                tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: "Completed");
-            log("STATUS UPDATED");
+                tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
           }
         }
         setState(() {});
-        log("resumed ::::::::::::::::::");
         break;
       case AppLifecycleState.inactive:
-        log('inactive ::::::::::::::::::');
         timerSavePassedTime(widget, context);
         break;
       case AppLifecycleState.paused:
-        log('paused ::::::::::::::::::');
         timerSavePassedTime(widget, context);
         break;
       case AppLifecycleState.detached:
-        log('detached ::::::::::::::::::');
         break;
       case AppLifecycleState.hidden:
-        log('hidden :::::::::::::::::: }');
         break;
     }
   }
 
   @override
   void dispose() {
-    log("CALLED DISPOSE");
     timerSavePassedTime(widget, context);
     controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
