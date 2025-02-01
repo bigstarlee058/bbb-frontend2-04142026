@@ -53,6 +53,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                   "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$exId";
 
               int? indexW = monthProvider.circuitModel.indexWhere((element) => element.dataId == dataId1);
+
               CircuitModel? data = CircuitModel();
               if (indexW != -1) {
                 data = monthProvider.circuitModel[indexW];

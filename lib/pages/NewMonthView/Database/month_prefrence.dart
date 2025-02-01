@@ -9,6 +9,10 @@ class SharedPreference {
   static const String split = "SPLIT-TYPE";
   static const String todayTitleId = "TODAY-TITLE-ID";
   static const String lastStreakCount = "STREAK-COUNT";
+  static const String lastTimerAddress = "LAST-TIMER-ADDRESS";
+  static const String lastTimerPassed = "LAST-TIMER-PASSED";
+  static const String lastExitTime = "LAST-EXIT-TIME";
+  static const String isPause = "IS-PAUSE";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();

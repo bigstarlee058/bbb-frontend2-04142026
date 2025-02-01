@@ -57,7 +57,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
   }
 
   void fetchWarmupData() {
-    final warmups = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups : monthProvider!.dayDataModel!.warmups;
+    final warmups = monthProvider!.isPumpDay ? monthProvider?.pumpDayModel?.warmups : monthProvider?.dayDataModel?.warmups;
     if (warmups != null && warmups.isNotEmpty) {
       monthProvider?.fetchWarmUp(warmups[0].warmupId!);
     }

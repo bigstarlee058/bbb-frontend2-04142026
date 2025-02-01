@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
@@ -97,7 +98,8 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     load = widget.load;
     index = widget.index;
     subIndex = widget.subIndex;
-    monthProvider!.fetchTimerAddress();
+
+    monthProvider!.newFetchTimerAddress();
 
     setData();
   }
@@ -189,14 +191,14 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
         _showTimer = false;
-        monthProvider?.setShowTimerIndex(-1, -1, -1);
+        monthProvider?.newSetShowTimerIndex(-1, -1, -1);
       });
     });
   }
 
   Future<void> _saveData() async {
-    monthProvider?.timerAddress = "";
-    monthProvider?.timePassed = "";
+    monthProvider?.newTimerAddress = "";
+    monthProvider?.newTimePassed = "";
     reps = int.tryParse(_repsController.text) ?? 0;
     weight = int.tryParse(_weightController.text) ?? 0;
     final body = {
@@ -241,10 +243,16 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     } else {
       DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
-    monthProvider?.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
+
+    monthProvider?.newSetShowTimerIndex(
+      widget.index,
+      widget.subIndex,
+      widget.exercise,
+    );
     if (_restDuration != 0) {
       _showTimer = true;
     }
+
     setCompleted = _restDuration == 0 ? true : false;
     setState(() {});
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
@@ -261,16 +269,23 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    context.select((MonthProvider value) => value.currentExpandedItem);
-    context.select((MonthProvider value) => value.timerAddress);
-    _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
-    if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0) {
-      _showTimer = monthProvider!.timerAddress ==
+    context.select((MonthProvider value) => value.newCurrentExpandedItem);
+    context.select((MonthProvider value) => value.newTimerAddress);
+
+    _isExpanded = "$index:$subIndex" == monthProvider!.newCurrentExpandedItem;
+
+    if (monthProvider!.newTimerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.newTimerAddress != "") {
+      log("CALLED FIRST");
+      _showTimer = monthProvider!.newTimerAddress ==
           "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
+
       if (_showTimer) {
-        monthProvider!.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
+        monthProvider!.newSetShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
       }
+    } else {
+      _showTimer = false;
     }
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -295,7 +310,9 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: ScreenUtil.horizontalScale(4)),
                   child: GestureDetector(
                     onTap: () {
-                      monthProvider?.updateExpandedItem(!_isExpanded ? "${widget.index}:${widget.subIndex}" : "");
+                      _showTimer = false;
+                      monthProvider?.newSetShowTimerIndex(-1, -1, -1);
+                      monthProvider?.newUpdateExpandedItem(!_isExpanded ? "${widget.index}:${widget.subIndex}" : "");
                       setState(() {
                         _isExpanded = !_isExpanded;
                       });
@@ -390,7 +407,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                     color: Colors.white,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.03),
+                                        color: Colors.black.withValues(alpha: 0.03),
                                         spreadRadius: 2,
                                         blurRadius: 5,
                                         offset: const Offset(0, 3),
@@ -467,7 +484,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                     color: Colors.white,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.03),
+                                        color: Colors.black.withValues(alpha: 0.03),
                                         spreadRadius: 2,
                                         blurRadius: 5,
                                         offset: const Offset(0, 3),
@@ -583,7 +600,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                         ),
                         const SizedBox(height: 30),
                         ButtonWidget(
-                          text: "Save & start rest timer",
+                          text: _restDuration != 0 ? "Save & start rest timer" : "Save",
                           textColor: Colors.white,
                           onPress: _saveData,
                           color: AppColors.primaryColor,
@@ -602,7 +619,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
             NewTimerWithProgressBar(
               dataId: dataId,
               isTimerRunning: widget.isTimerRunning,
-              currentTime: monthProvider!.timePassed,
+              currentTime: monthProvider!.newTimePassed,
               initialDuration: _restDuration,
               onClose: _handleCloseTimer,
               onComplete: _handleTimerComplete,

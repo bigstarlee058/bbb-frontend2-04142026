@@ -562,7 +562,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                         return val1;
                                       }
 
-                                      bool isTimerRunning = monthProvider!.timerAddress ==
+                                      bool isTimerRunning = monthProvider!.newTimerAddress ==
                                           "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
 
                                       return Padding(
@@ -606,22 +606,24 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                   );
                                 },
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20, bottom: 40),
-                                child: ButtonWidget(
-                                  onPress: () {
-                                    final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
-                                    if (data!.isNotEmpty) {
-                                      _addExtraSet(data.first);
-                                    }
-                                    setState(() {});
-                                  },
-                                  isLoading: false,
-                                  color: Colors.grey,
-                                  textColor: Colors.white,
-                                  text: "Add Set",
-                                ),
-                              ),
+                              setCount != 0
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 20, bottom: 40),
+                                      child: ButtonWidget(
+                                        onPress: () {
+                                          final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
+                                          if (data!.isNotEmpty) {
+                                            _addExtraSet(data.first);
+                                          }
+                                          setState(() {});
+                                        },
+                                        isLoading: false,
+                                        color: Colors.grey,
+                                        textColor: Colors.white,
+                                        text: "Add Set",
+                                      ),
+                                    )
+                                  : SizedBox(),
                               Container(
                                 height: 0.5,
                                 margin: const EdgeInsets.symmetric(horizontal: 40),
