@@ -542,7 +542,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                         SizedBox(
                                           width: media.width * 0.4,
                                           child: Text(
-                                            "Here's some fun graphs for you",
+                                            "Here are some fun graphs for you",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: ScreenUtil.horizontalScale(4.5),

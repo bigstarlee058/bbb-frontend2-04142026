@@ -1,11 +1,13 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/rep_line_chart.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RecalculatePage extends StatefulWidget {
   const RecalculatePage({super.key});
@@ -15,6 +17,12 @@ class RecalculatePage extends StatefulWidget {
 }
 
 class _RecalculatePageState extends State<RecalculatePage> {
+  late MainPageProvider mainPageProvider;
+    @override
+  void initState() {
+    super.initState();
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+  }
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -331,7 +339,9 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                         text: 'Start Workout',
                                         textColor: Colors.white,
                                         color: AppColors.primaryColor,
-                                        onPress: () {},
+                                        onPress: () {
+                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                        },
                                         isLoading: false,
                                       ),
                                     ],

@@ -496,77 +496,89 @@ class MonthProvider extends ChangeNotifier {
 
   /// TIMER LOGIC =============================++++++++++++++++++++++++++++++++++
 
-  String timerAddress = "";
-  String timePassed = "";
-  String currentExpandedItem = "0:0";
+  String newTimerAddress = "";
+  String newTimePassed = "";
+  String newCurrentExpandedItem = "0:0";
 
-  updateExpandedItem(String value) async {
-    currentExpandedItem = value;
-
+  newUpdateExpandedItem(String value) async {
+    newCurrentExpandedItem = value;
     notifyListeners();
   }
 
-  Future<String> getPassedTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    timePassed = prefs.getString("passedTime") ?? "0";
+  newGetPassedTime() {
+    String time = preferences.getString(SharedPreference.lastTimerPassed) ?? "0";
+    String lastTime = preferences.getString(SharedPreference.lastExitTime) ?? "";
+    String pause = preferences.getString(SharedPreference.isPause) ?? "false";
 
-    DateTime data = DateTime.parse(prefs.getString("timeWhenExitScreen") ?? DateTime.now().toString());
+    log('time :::::::::::::::::: ${time}');
+    log('lastTime :::::::::::::::::: $lastTime');
+
+    newTimePassed = time;
+    DateTime data = DateTime.parse(lastTime.isEmpty ? DateTime.now().toString() : lastTime);
     var difference = DateTime.now().difference(data);
-    bool val = prefs.getBool("isPause") ?? false;
-    if (timePassed != "") {
-      if (val) {
-        int totalTimePassed = int.parse(timePassed);
-        timePassed = totalTimePassed.toString();
+    if (newTimePassed != "") {
+      if (pause == "true") {
+        int totalTimePassed = int.parse(newTimePassed);
+        newTimePassed = totalTimePassed.toString();
+
+        log("pause == true");
       } else {
-        int totalTimePassed = int.parse(timePassed) + difference.inSeconds;
-        timePassed = totalTimePassed.toString();
+        int totalTimePassed = int.parse(newTimePassed) + difference.inSeconds;
+        newTimePassed = totalTimePassed.toString();
+        log("pause == false");
       }
     }
-
-    notifyListeners();
-
-    return timePassed;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => notifyListeners());
   }
 
-  fetchTimerAddress() async {
-    SharedPreferences pf = await SharedPreferences.getInstance();
-    await getPassedTime();
-
-    timerAddress = pf.getString("timerRunningAddress") ?? "";
-
-    if (timerAddress.isNotEmpty) {
-      var data = timerAddress.split("-");
+  Future<void> newFetchTimerAddress() async {
+    String address = preferences.getString(SharedPreference.lastTimerAddress) ?? "";
+    await newGetPassedTime();
+    newTimerAddress = address;
+    log('newTimerAddress :::::::::::::::::: $newTimerAddress');
+    if (newTimerAddress.isNotEmpty) {
+      var data = newTimerAddress.split("-");
       if (data.isNotEmpty && data[0] != "-1") {
-        updateExpandedItem("${data[0]}:${data[1]}");
+        newUpdateExpandedItem("${data[0]}:${data[1]}");
       } else {
-        updateExpandedItem("0:0");
+        newUpdateExpandedItem("0:0");
       }
     }
-
     notifyListeners();
   }
 
-  Future<void> setShowTimerIndex(int index, int subIndex, int exerciseIndex) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  Future<void> newSetShowTimerIndex(int index, int subIndex, int exerciseIndex) async {
     if (index != -1 && subIndex != -1 && exerciseIndex != -1) {
-      await prefs.setString("timerRunningAddress", "$index-$subIndex-$exerciseIndex");
-      timerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
+      log("TIMER STARTED AT: $index-$subIndex-$exerciseIndex");
+
+      await preferences.putString(
+          SharedPreference.lastTimerAddress, "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay");
+      newTimerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
     } else {
       NotificationService.clearNotification();
-      await prefs.setString("timerRunningAddress", "");
-      prefs.setString("passedTime", "");
-      timerAddress = "";
-      timePassed = "";
+      clearValues();
     }
-
     notifyListeners();
   }
 
-  Future<void> savePassedTime(String timePassed1, int totalTime, BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (timerAddress != '') {
-      timePassed = timePassed1;
-      int newTime = totalTime - int.parse(timePassed);
+  clearValues() async {
+    NotificationService.clearNotification();
+    await preferences.putString(SharedPreference.lastTimerAddress, "");
+    await preferences.putString(SharedPreference.lastTimerPassed, "");
+    await preferences.putString(SharedPreference.lastExitTime, "");
+    newTimerAddress = "";
+    newTimePassed = "";
+    log("CLEAREDDDD");
+    notifyListeners();
+  }
+
+  Future<void> newSavePassedTime(String timePassed1, int totalTime, BuildContext context) async {
+    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
+    await preferences.putString(SharedPreference.lastExitTime, DateTime.now().toString());
+
+    if (newTimerAddress != '') {
+      newTimerAddress = timePassed1;
+      int newTime = totalTime - int.parse(newTimerAddress);
       if (newTime.isNegative || newTime == 0) {
       } else {
         NotificationService.zonedScheduleNotification(
@@ -574,9 +586,6 @@ class MonthProvider extends ChangeNotifier {
       }
     }
     notifyListeners();
-
-    await prefs.setString("passedTime", timePassed);
-    await prefs.setString("timeWhenExitScreen", DateTime.now().toString());
   }
 
   /// STREAK COUNT =============================++++++++++++++++++++++++++++++++++

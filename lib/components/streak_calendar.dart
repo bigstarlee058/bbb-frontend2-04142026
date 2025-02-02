@@ -96,7 +96,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
                               margin: EdgeInsets.only(
@@ -123,14 +122,17 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                 ),
                               ),
                             ),
-                            const Spacer(),
-                            Text(
-                              "Streaks",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: ScreenUtil.verticalScale(3),
-                                fontWeight: FontWeight.bold,
-                                height: 1,
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "Streaks",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: ScreenUtil.verticalScale(3),
+                                    fontWeight: FontWeight.bold,
+                                    height: 1,
+                                  ),
+                                ),
                               ),
                             ),
                             Container(
@@ -141,10 +143,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                 width: ScreenUtil.horizontalScale(10), // Size of the circle
                                 height: ScreenUtil.horizontalScale(10),
                               ),
-                            ),
-                            const CommonStreakWithNotification(),
-                            SizedBox(
-                              width: ScreenUtil.verticalScale(1.15),
                             ),
                           ],
                         ),
