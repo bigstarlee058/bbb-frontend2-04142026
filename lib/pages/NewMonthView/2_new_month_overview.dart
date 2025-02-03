@@ -137,8 +137,8 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      Colors.grey.withOpacity(.5),
-                                      Colors.black.withOpacity(1),
+                                      Colors.grey.withValues(alpha: .5),
+                                      Colors.black.withValues(alpha: 1),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
@@ -161,7 +161,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                                   decoration: const BoxDecoration(
                                                     color: Color(0XFFd18a9b),
                                                     // color: (isThisWeek && isCompleted)
-                                                    //     ? Colors.grey.withOpacity(.99)
+                                                    //     ? Colors.grey.withValues(alpha: .99)
                                                     //     : const Color(0XFFd18a9b),
                                                     shape: BoxShape.circle,
                                                   ),
@@ -266,8 +266,8 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      AppColors.primaryColor.withOpacity(0.7),
-                                      AppColors.primaryColor.withOpacity(0.7),
+                                      AppColors.primaryColor.withValues(alpha: 0.7),
+                                      AppColors.primaryColor.withValues(alpha: 0.7),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,

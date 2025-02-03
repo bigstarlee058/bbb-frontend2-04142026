@@ -74,49 +74,34 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: FilterViewList(),
+      child: monthProvider!.weekStatuses.isEmpty ? SizedBox() : filterViewList(),
     );
   }
 
-  Widget FilterViewList() {
+  Widget filterViewList() {
     return SingleChildScrollView(
-      child: Column(children: [
-        ExpansionTileGroup(
-          toggleType: ToggleType.expandOnlyCurrent,
-          spaceBetweenItem: 15,
-          children: [
-            filterViewItem(
-              _isExpanded,
-              widget.title,
-              onExpansionChanged: (bool isExpanded) {
-                setState(() {
-                  _isExpanded = isExpanded;
-                  curExpandedIdx = isExpanded ? 0 : -1;
-                });
-              },
-            ),
-          ],
-        ),
-      ]),
+      child: Column(
+        children: [
+          ExpansionTileGroup(
+            toggleType: ToggleType.expandOnlyCurrent,
+            spaceBetweenItem: 15,
+            children: [
+              filterViewItem(
+                _isExpanded,
+                widget.title,
+                onExpansionChanged: (bool isExpanded) {
+                  setState(() {
+                    _isExpanded = isExpanded;
+                    curExpandedIdx = isExpanded ? 0 : -1;
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
-
-  // Widget filterViewList() {
-  //   return SingleChildScrollView(
-  //     child: Column(
-  //       children: [
-  //         ExpansionTileGroup(
-  //           toggleType: ToggleType.expandOnlyCurrent,
-  //           spaceBetweenItem: 15,
-  //           onExpansionItemChanged: (idx, isExpand) => {curExpandedIdx = idx},
-  //           children: [
-  //             filterViewItem(_isExpanded, weekDataModel?.title ?? ""),
-  //           ],
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   ExpansionTileItem filterViewItem(bool initExpanded, String title, {required Null Function(bool isExpanded) onExpansionChanged}) {
     ScreenUtil.init(context);
@@ -287,7 +272,7 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
                                   DottedDashedLine(
                                     height: 15,
                                     width: 0,
-                                    dashColor: Colors.grey.withOpacity(0.5),
+                                    dashColor: Colors.grey.withValues(alpha: 0.5),
                                     axis: Axis.vertical,
                                   )
                                 else
@@ -316,7 +301,7 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
                                   DottedDashedLine(
                                     height: 15,
                                     width: 0,
-                                    dashColor: Colors.grey.withOpacity(0.5),
+                                    dashColor: Colors.grey.withValues(alpha: 0.5),
                                     axis: Axis.vertical,
                                   )
                                 else
@@ -458,7 +443,7 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
         height: ScreenUtil.verticalScale(3.4),
         width: ScreenUtil.verticalScale(3.4),
         decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.15),
+          color: Colors.grey.withValues(alpha: 0.15),
           shape: BoxShape.circle,
         ),
       ),
@@ -518,7 +503,7 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
         height: ScreenUtil.verticalScale(3.4),
         width: ScreenUtil.verticalScale(3.4),
         decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.15),
+          color: Colors.grey.withValues(alpha: 0.15),
           shape: BoxShape.circle,
         ),
         child: const Center(child: Icon(Icons.hourglass_top, color: Colors.black38, size: 20)),

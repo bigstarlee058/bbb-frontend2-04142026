@@ -578,7 +578,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                               : extraItem.type == 2
                                                   ? AppColors.backOffSetColor
                                                   : AppColors.warmupColor,
-                                          isTimerRunning: isTimerRunning,
+                                          // isTimerRunning: isTimerRunning,
                                           exerciseName: exerciseName,
                                           title: extraItem.type == 1
                                               ? "Warmup Set"
@@ -606,22 +606,24 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                   );
                                 },
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20, bottom: 40),
-                                child: ButtonWidget(
-                                  onPress: () {
-                                    final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
-                                    if (data!.isNotEmpty) {
-                                      _addExtraSet(data.first);
-                                    }
-                                    setState(() {});
-                                  },
-                                  isLoading: false,
-                                  color: Colors.grey,
-                                  textColor: Colors.white,
-                                  text: "Add Set",
-                                ),
-                              ),
+                              setCount != 0
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 20, bottom: 40),
+                                      child: ButtonWidget(
+                                        onPress: () {
+                                          final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
+                                          if (data!.isNotEmpty) {
+                                            _addExtraSet(data.first);
+                                          }
+                                          setState(() {});
+                                        },
+                                        isLoading: false,
+                                        color: Colors.grey,
+                                        textColor: Colors.white,
+                                        text: "Add Set",
+                                      ),
+                                    )
+                                  : SizedBox(),
                               Container(
                                 height: 0.5,
                                 margin: const EdgeInsets.symmetric(horizontal: 40),
@@ -636,7 +638,11 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                       : Padding(
                                           padding: const EdgeInsets.only(top: 10),
                                           child: ButtonWidget(
-                                            text: monthProvider.isPumpDay && monthProvider.isCircuit ? "Finish" : "Finish & Next",
+                                            text: monthProvider.exerciseHistoryDetails?.status == Status.completed
+                                                ? "Save"
+                                                : monthProvider.isPumpDay && monthProvider.isCircuit
+                                                    ? "Finish"
+                                                    : "Finish & Next",
                                             textColor: Colors.white,
                                             onPress: () async {
                                               int count = 0;

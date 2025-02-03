@@ -102,8 +102,8 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                AppColors.primaryColor.withOpacity(0.0),
-                                AppColors.primaryColor.withOpacity(0.0),
+                                AppColors.primaryColor.withValues(alpha: 0.0),
+                                AppColors.primaryColor.withValues(alpha: 0.0),
                               ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,

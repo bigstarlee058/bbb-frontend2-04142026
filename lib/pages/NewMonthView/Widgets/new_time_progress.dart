@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
+import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
 import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NewTimerWithProgressBar extends StatefulWidget {
   final int initialDuration;
@@ -14,7 +14,7 @@ class NewTimerWithProgressBar extends StatefulWidget {
   final VoidCallback onComplete;
   final String currentTime;
   final String dataId;
-  final bool isTimerRunning;
+  // final bool isTimerRunning;
 
   const NewTimerWithProgressBar({
     super.key,
@@ -22,7 +22,7 @@ class NewTimerWithProgressBar extends StatefulWidget {
     required this.onClose,
     required this.onComplete,
     required this.currentTime,
-    required this.isTimerRunning,
+    // required this.isTimerRunning,
     required this.dataId,
   });
 
@@ -60,10 +60,7 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
 
     previousData = monthProvider.currentExpandedItem;
 
-    controller = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: totalTime),
-    );
+    controller = AnimationController(vsync: this, duration: Duration(seconds: totalTime));
 
     controller.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
@@ -78,16 +75,10 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
     startTimer();
   }
 
-  timerSavePassedTime(widget, context) {
-    monthProvider.savePassedTime(widget.isTimerRunning ? currentTime.toString() : "0", widget.initialDuration, context);
-  }
-
   void startTimer() async {
     await monthProvider.getPassedTime();
     if (monthProvider.timePassed != "") {
-      if (widget.isTimerRunning) {
-        currentTime = int.parse(monthProvider.timePassed);
-      }
+      currentTime = int.parse(monthProvider.timePassed);
     }
     timerTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!isPaused) {
@@ -117,14 +108,12 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
       isPaused = false;
       if (!animationCompleted) {
         controller.forward();
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setBool("isPause", false);
+        await preferences.putString(SharedPreference.isPause, "false");
       }
     } else {
       isPaused = true;
       controller.stop();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool("isPause", true);
+      await preferences.putString(SharedPreference.isPause, "true");
     }
     setState(() {});
   }
@@ -138,9 +127,9 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
         await monthProvider.getPassedTime();
         if (monthProvider.timePassed != "") {
           currentTime = 0;
-          if (widget.isTimerRunning) {
-            currentTime = int.parse(monthProvider.timePassed);
-          }
+
+          currentTime = int.parse(monthProvider.timePassed);
+
           if (int.parse(monthProvider.timePassed) > totalTime) {
             DatabaseHelper().updateSingleValue(
                 tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
@@ -149,10 +138,10 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
         setState(() {});
         break;
       case AppLifecycleState.inactive:
-        timerSavePassedTime(widget, context);
+        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context);
         break;
       case AppLifecycleState.paused:
-        timerSavePassedTime(widget, context);
+        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context);
         break;
       case AppLifecycleState.detached:
         break;
@@ -163,7 +152,7 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
 
   @override
   void dispose() {
-    timerSavePassedTime(widget, context);
+    monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context);
     controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     timerTimer?.cancel();
@@ -172,15 +161,6 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
 
   @override
   Widget build(BuildContext context) {
-    // final data = context.select<MonthProvider, String>((monthProvider) => monthProvider.currentExpandedItem);
-    // if (previousData != data) {
-    //   previousData = data;
-    //   if (widget.isTimerRunning) {
-    //     monthProvider.setShowTimerIndex(-1, -1, -1);
-    //     widget.onClose();
-    //   }
-    // }
-
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       decoration: BoxDecoration(
@@ -231,8 +211,9 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
               size: 18,
               color: Colors.white,
             ),
-            onPressed: () {
-              monthProvider.setShowTimerIndex(-1, -1, -1);
+            onPressed: () async {
+              currentTime = 0;
+              setState(() {});
               widget.onClose();
             },
           ),

@@ -196,7 +196,9 @@ class MonthProvider extends ChangeNotifier {
           (ele1.status == Status.completed || ele1.status == Status.skipped));
       if (value == false) {
         todayTitleId = element;
+
         await preferences.putString(SharedPreference.todayTitleId, todayTitleId);
+
         notifyListeners();
         break;
       }
@@ -263,7 +265,8 @@ class MonthProvider extends ChangeNotifier {
         await fetchAllDayStatusLocalData();
         await getLiftedWeightGraphData();
         manageStreak();
-        int dayDelta = today.difference(startTime!).inDays;
+        int dayDelta =
+            DateTime(today.year, today.month, today.day).difference(DateTime(startTime!.year, startTime!.month, startTime!.day)).inDays;
         week = (dayDelta ~/ 7) + 1;
         currentWeek = week!;
         day = dayDelta % 7 + 1;
@@ -355,6 +358,7 @@ class MonthProvider extends ChangeNotifier {
     }
 
     await preferences.putString(SharedPreference.split, "split${value.isEmpty ? "3" : value}");
+
     notifyListeners();
   }
 
@@ -502,38 +506,34 @@ class MonthProvider extends ChangeNotifier {
 
   updateExpandedItem(String value) async {
     currentExpandedItem = value;
-
     notifyListeners();
   }
 
-  Future<String> getPassedTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    timePassed = prefs.getString("passedTime") ?? "0";
+  getPassedTime() {
+    String time = preferences.getString(SharedPreference.lastTimerPassed) ?? "0";
+    String lastTime = preferences.getString(SharedPreference.lastExitTime) ?? "";
+    String pause = preferences.getString(SharedPreference.isPause) ?? "false";
 
-    DateTime data = DateTime.parse(prefs.getString("timeWhenExitScreen") ?? DateTime.now().toString());
+    timePassed = time;
+    DateTime data = DateTime.parse(lastTime.isEmpty ? DateTime.now().toString() : lastTime);
     var difference = DateTime.now().difference(data);
-    bool val = prefs.getBool("isPause") ?? false;
     if (timePassed != "") {
-      if (val) {
+      if (pause == "true") {
         int totalTimePassed = int.parse(timePassed);
         timePassed = totalTimePassed.toString();
+        log("pause == true");
       } else {
         int totalTimePassed = int.parse(timePassed) + difference.inSeconds;
         timePassed = totalTimePassed.toString();
       }
     }
-
-    notifyListeners();
-
-    return timePassed;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => notifyListeners());
   }
 
-  fetchTimerAddress() async {
-    SharedPreferences pf = await SharedPreferences.getInstance();
+  Future<void> fetchTimerAddress() async {
+    String address = preferences.getString(SharedPreference.lastTimerAddress) ?? "";
     await getPassedTime();
-
-    timerAddress = pf.getString("timerRunningAddress") ?? "";
-
+    timerAddress = address;
     if (timerAddress.isNotEmpty) {
       var data = timerAddress.split("-");
       if (data.isNotEmpty && data[0] != "-1") {
@@ -542,28 +542,52 @@ class MonthProvider extends ChangeNotifier {
         updateExpandedItem("0:0");
       }
     }
-
     notifyListeners();
   }
 
-  Future<void> setShowTimerIndex(int index, int subIndex, int exerciseIndex) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  Future<void> setShowTimerIndex(int index, int subIndex, int exerciseIndex, {bool removeVal = false}) async {
     if (index != -1 && subIndex != -1 && exerciseIndex != -1) {
-      await prefs.setString("timerRunningAddress", "$index-$subIndex-$exerciseIndex");
+      String value = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
+      await preferences.putString(SharedPreference.lastTimerAddress, value);
+      final pf = await SharedPreferences.getInstance();
+      await pf.setString(SharedPreference.lastTimerAddress, value);
+      if (removeVal) {
+        await preferences.putString(SharedPreference.lastTimerPassed, "");
+        await preferences.putString(SharedPreference.lastExitTime, "");
+        final pf = await SharedPreferences.getInstance();
+        await pf.setString(SharedPreference.lastTimerPassed, "");
+        await pf.setString(SharedPreference.lastExitTime, "");
+      }
       timerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
     } else {
+      log("CLEAR VALUES");
+      clearValues();
       NotificationService.clearNotification();
-      await prefs.setString("timerRunningAddress", "");
-      prefs.setString("passedTime", "");
-      timerAddress = "";
-      timePassed = "";
     }
+    notifyListeners();
+  }
 
+  clearValues() async {
+    NotificationService.clearNotification();
+    await preferences.putString(SharedPreference.lastTimerAddress, "");
+    await preferences.putString(SharedPreference.lastTimerPassed, "");
+    await preferences.putString(SharedPreference.lastExitTime, "");
+    final pf = await SharedPreferences.getInstance();
+    await pf.setString(SharedPreference.lastTimerAddress, "");
+    await pf.setString(SharedPreference.lastTimerPassed, "");
+    await pf.setString(SharedPreference.lastExitTime, "");
+    timerAddress = "";
+    timePassed = "";
     notifyListeners();
   }
 
   Future<void> savePassedTime(String timePassed1, int totalTime, BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
+    await preferences.putString(SharedPreference.lastExitTime, DateTime.now().toString());
+    final pf = await SharedPreferences.getInstance();
+    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
+    await pf.setString(SharedPreference.lastExitTime, DateTime.now().toString());
+
     if (timerAddress != '') {
       timePassed = timePassed1;
       int newTime = totalTime - int.parse(timePassed);
@@ -574,9 +598,6 @@ class MonthProvider extends ChangeNotifier {
       }
     }
     notifyListeners();
-
-    await prefs.setString("passedTime", timePassed);
-    await prefs.setString("timeWhenExitScreen", DateTime.now().toString());
   }
 
   /// STREAK COUNT =============================++++++++++++++++++++++++++++++++++
@@ -631,7 +652,7 @@ class MonthProvider extends ChangeNotifier {
   HistoryDataModel? expandedDataHistory;
 
   Future<void> fetchExerciseSingleSetLocalData(dataId) async {
-    final data = await DatabaseHelper().getDataById(tableName: DatabaseHelper.exerciseHistory, id: dataId);
+    final data = await DatabaseHelper().getDataByDataId(tableName: DatabaseHelper.exerciseHistory, id: dataId);
     if (data != null) {
       expandedDataHistory = HistoryDataModel.fromJson(data);
     } else {
@@ -694,7 +715,7 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchExerciseSingleExerciseLocalData(dataId) async {
     exerciseHistoryDetails = null;
-    final data = await DatabaseHelper().getDataById(tableName: DatabaseHelper.exerciseStatus, id: dataId);
+    final data = await DatabaseHelper().getDataByDataId(tableName: DatabaseHelper.exerciseStatus, id: dataId);
     if (data != null) {
       exerciseHistoryDetails = ExerciseHistoryModel.fromJson(data);
     } else {
@@ -749,7 +770,7 @@ class MonthProvider extends ChangeNotifier {
     String dataId =
         "$splitType-${monthDataModel?.id}-${weekDataModel?.id ?? monthDataModel?.weeks?[(overviewCurrentWeek) - 1].id}-${monthDataModel?.weeks?[(overviewCurrentWeek) - 1].idList?[overviewCurrentDay - 1] ?? ""}";
 
-    final data = await DatabaseHelper().getDataById(tableName: DatabaseHelper.dayStatus, id: dataId);
+    final data = await DatabaseHelper().getDataByDataId(tableName: DatabaseHelper.dayStatus, id: dataId);
     if (data != null) {
       dayHistoryDetails = DayHistoryModel.fromJson(data);
     } else {

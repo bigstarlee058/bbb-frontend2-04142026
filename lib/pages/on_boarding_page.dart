@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/models/welcome_content_model.dart';
 import 'package:bbb/pages/login_page.dart';
@@ -14,8 +12,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
-import 'package:vimeo_player_flutter/vimeo_player_flutter.dart';
-import 'package:vimeo_video_player/vimeo_video_player.dart';
 
 class OnBoardingPage extends StatefulWidget {
   const OnBoardingPage({super.key});
@@ -35,15 +31,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     super.initState();
     loadWelcomeContent();
     _checkLoginStatus();
-    _videoController =
-        VideoPlayerController.asset('assets/videos/welcome_new.mp4')
-          ..initialize().then((_) {
-            setState(() {
-              _isVideoInitialized = true;
-              _videoController.setLooping(true);
-              _videoController.play();
-            });
-          });
+    _videoController = VideoPlayerController.asset('assets/videos/welcome_new.mp4')
+      ..initialize().then((_) {
+        setState(() {
+          _isVideoInitialized = true;
+          _videoController.setLooping(true);
+          _videoController.play();
+        });
+      });
   }
 
   late WelcomeContentModel welcomeContentModel;
@@ -73,15 +68,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       final descriptionResponse = await http.get(
-        Uri.parse(
-            '${AppConstants.serverUrl}/api/screens/get_screens'), // replace with actual endpoint
+        Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'), // replace with actual endpoint
       );
 
       if (descriptionResponse.statusCode == 200) {
-        welcomeContentModel =
-            welcomeContentModelFromJson(descriptionResponse.body);
+        welcomeContentModel = welcomeContentModelFromJson(descriptionResponse.body);
 
-        prefs.setString("login_image",welcomeContentModel.imgUrl);
+        prefs.setString("login_image", welcomeContentModel.imgUrl);
         // bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
       } else {
         showBottomAlert(context, 'Failed to load description');
@@ -117,12 +110,10 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         if (await canLaunchUrl(url)) {
           await launchUrl(
             url,
-            mode: LaunchMode
-                .externalApplication, // Ensures the URL opens in a browser
+            mode: LaunchMode.externalApplication, // Ensures the URL opens in a browser
           );
         } else {
-          debugPrint(
-              'Cannot launch the URL, not supported or no suitable app found.');
+          debugPrint('Cannot launch the URL, not supported or no suitable app found.');
         }
       } catch (e) {
         debugPrint('Error launching URL: $e');
@@ -130,7 +121,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     }
 
     void onPressLogin() {
-      if(!isLoading){
+      if (!isLoading) {
         Navigator.pushNamed(
           context,
           AppRoutes.loginScreen,
@@ -143,11 +134,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       body: Stack(
         children: [
           _isVideoInitialized
-          ? SizedBox.expand(child: VideoPlayer(_videoController))
-          : SizedBox(
-              width: ScreenUtil.horizontalScale(100),
-              child: Image.asset("assets/img/welcome_placeholder.png")
-            ),
+              ? SizedBox.expand(child: VideoPlayer(_videoController))
+              : SizedBox(width: ScreenUtil.horizontalScale(100), child: Image.asset("assets/img/welcome_placeholder.png")),
           Align(
             alignment: Alignment.bottomCenter,
             child: Column(
@@ -158,10 +146,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   width: media.width,
                   height: media.height / 6,
                   decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/img/bbb-logo.png'),
-                        fit: BoxFit.fitHeight,
-                        opacity: 1),
+                    image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
                   ),
                 ),
                 SizedBox(
@@ -186,8 +171,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil.verticalScale(4.4)),
+                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
                     child: Column(
                       children: [
                         SizedBox(
@@ -225,8 +209,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                               style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero,
                                   minimumSize: const Size(65, 30),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   alignment: Alignment.center),
                               child: const Text(
                                 'Sign up',
@@ -296,15 +279,12 @@ class _TextSliderState extends State<TextSlider> {
           ? Container(
               height: 8, //ScreenUtil.horizontalScale(5),
               width: 8,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: AppColors.primaryColor),
+              decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.primaryColor),
             )
           : Container(
               height: ScreenUtil.horizontalScale(5),
               width: 8,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primaryColor.withOpacity(.2)),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primaryColor.withValues(alpha: .2)),
             ),
     );
   }

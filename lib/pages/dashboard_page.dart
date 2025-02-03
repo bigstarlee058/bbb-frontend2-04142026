@@ -92,6 +92,13 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+        // floatingActionButton: Consumer<MonthProvider>(
+        //   builder: (context, data, child) {
+        //     return FloatingActionButton(
+        //       onPressed: () => data.onInit(),
+        //     );
+        //   },
+        // ),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
@@ -443,15 +450,15 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: Consumer<MonthProvider>(
                             builder: (context, value, child) {
                               if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
-                              final val1 = (value.currentWeek - 1) * 7;
-                              final val2 = value.allDayHistoryModel.where((element) =>
-                                  element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
-                                  element.split == value.splitType &&
-                                  element.monthId == value.monthDataModel?.id &&
-                                  (element.status == Status.completed || element.status == Status.skipped));
-
-                              final count = val2.length + val1;
-
+                              // final val1 = (value.currentWeek - 1) * 7;
+                              final count = value.allDayHistoryModel
+                                  .where((element) =>
+                                      element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
+                                      element.split == value.splitType &&
+                                      element.monthId == value.monthDataModel?.id &&
+                                      element.status == Status.completed)
+                                  .length;
+                              // final count = val2.length + val1;
                               return Column(
                                 children: [
                                   const SizedBox(height: 10),
@@ -570,7 +577,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               PopupMenuButton<String>(
                                 color: const Color.fromARGB(255, 252, 252, 252),
                                 elevation: 10,
-                                shadowColor: Colors.black.withOpacity(0.2),
+                                shadowColor: Colors.black.withValues(alpha: 0.2),
                                 itemBuilder: (context) {
                                   return [
                                     "Exercises Completed",

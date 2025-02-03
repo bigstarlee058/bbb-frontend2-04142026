@@ -52,10 +52,10 @@ class _BarChartSample7State extends State<ExerciseCompletedGraph> {
               show: true,
               border: Border.symmetric(
                 horizontal: BorderSide(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                 ),
                 vertical: BorderSide(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -84,11 +84,11 @@ class _BarChartSample7State extends State<ExerciseCompletedGraph> {
               horizontalInterval: monthProvider.maximumValueOfTotalEx > 32 ? monthProvider.maximumValueOfTotalEx / 10 : 2,
               show: true,
               getDrawingHorizontalLine: (value) => FlLine(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 strokeWidth: 1,
               ),
               getDrawingVerticalLine: (value) => FlLine(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 strokeWidth: 1,
               ),
             ),
@@ -153,10 +153,10 @@ class _BarChartSample7State extends State<ExerciseCompletedGraph> {
               //     show: true,
               //     border: Border.symmetric(
               //       horizontal: BorderSide(
-              //         color: Colors.black.withOpacity(0.1),
+              //         color: Colors.black.withValues(alpha: 0.1),
               //       ),
               //       vertical: BorderSide(
-              //         color: Colors.black.withOpacity(0.1),
+              //         color: Colors.black.withValues(alpha: 0.1),
               //       ),
               //     ),
               //   ),
@@ -177,11 +177,11 @@ class _BarChartSample7State extends State<ExerciseCompletedGraph> {
               //     horizontalInterval: 5,
               //     show: true,
               //     getDrawingHorizontalLine: (value) => FlLine(
-              //       color: Colors.black.withOpacity(0.1),
+              //       color: Colors.black.withValues(alpha: 0.1),
               //       strokeWidth: 1,
               //     ),
               //     getDrawingVerticalLine: (value) => FlLine(
-              //       color: Colors.black.withOpacity(0.1),
+              //       color: Colors.black.withValues(alpha: 0.1),
               //       strokeWidth: 1,
               //     ),
               //   ),

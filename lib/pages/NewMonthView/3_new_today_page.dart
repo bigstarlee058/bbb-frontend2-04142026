@@ -46,7 +46,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
     exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
     totalWarmups = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
     DateTime startTime = monthProvider?.startTime ?? DateTime.now();
-    int dayDelta = today.difference(startTime).inDays;
+    int dayDelta = DateTime(today.year, today.month, today.day).difference(DateTime(startTime.year, startTime.month, startTime.day)).inDays;
     week = (dayDelta ~/ 7);
     day = dayDelta % 7;
     monthProvider?.fetchExerciseStatusLocalData();
@@ -57,7 +57,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
   }
 
   void fetchWarmupData() {
-    final warmups = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups : monthProvider!.dayDataModel!.warmups;
+    final warmups = monthProvider!.isPumpDay ? monthProvider?.pumpDayModel?.warmups : monthProvider?.dayDataModel?.warmups;
     if (warmups != null && warmups.isNotEmpty) {
       monthProvider?.fetchWarmUp(warmups[0].warmupId!);
     }
@@ -303,11 +303,11 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                               onRemove: () => removeExercise(exercises[i].exerciseId!),
                                               enabled: isCurrentDayCompleted || isCurrentDaySkipped
                                                   ? false
-                                                  : monthProvider!.exerciseHistoryModel.any((element) =>
+                                                  /*: monthProvider!.exerciseHistoryModel.any((element) =>
                                                               element.dataId == dataId && element.status == Status.completed) ||
                                                           isExist
-                                                      ? false
-                                                      : true,
+                                                      ? false*/
+                                                  : true,
                                             ),
                                           ),
                                           SizedBox(
@@ -350,7 +350,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
                           //       gradient: LinearGradient(
                           //         colors: [
                           //           const Color(0xFF9B3651),
-                          //           const Color(0xFFDB4671).withOpacity(0.79),
+                          //           const Color(0xFFDB4671).withValues(alpha: 0.79),
                           //         ],
                           //         begin: Alignment.bottomLeft,
                           //         end: Alignment.bottomRight,
@@ -517,8 +517,8 @@ class _NewTodayPageState extends State<NewTodayPage> {
                           ? BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  const Color(0xFFAADDAA).withOpacity(0.8),
-                                  const Color(0xFFAADDAA).withOpacity(0.8),
+                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
                                 ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -535,8 +535,8 @@ class _NewTodayPageState extends State<NewTodayPage> {
                               ? BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      AppColors.secondColor.withOpacity(0.8),
-                                      AppColors.secondColor.withOpacity(0.8),
+                                      AppColors.secondColor.withValues(alpha: 0.8),
+                                      AppColors.secondColor.withValues(alpha: 0.8),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
@@ -1432,7 +1432,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 15,
               offset: const Offset(0, 5),
@@ -1484,8 +1484,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                             ? BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    const Color(0xFFAADDAA).withOpacity(0.8),
-                                    const Color(0xFFAADDAA).withOpacity(0.8),
+                                    const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                    const Color(0xFFAADDAA).withValues(alpha: 0.8),
                                   ],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -1499,8 +1499,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 ? BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        AppColors.secondColor.withOpacity(0.8),
-                                        AppColors.secondColor.withOpacity(0.8),
+                                        AppColors.secondColor.withValues(alpha: 0.8),
+                                        AppColors.secondColor.withValues(alpha: 0.8),
                                       ],
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
@@ -1550,7 +1550,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                               padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
                               child: SvgPicture.asset(
                                 "assets/icons/trend.svg",
-                                color: Colors.grey,
+                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
                                 width: 20,
                               ),
                             ),

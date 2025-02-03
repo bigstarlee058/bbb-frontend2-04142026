@@ -50,10 +50,8 @@ class _StreakPageState extends State<StreakPage> {
       dynamicStreakArr = last7Days;
     });
 
-    final List<DateTime> parseAllStreakDates =
-        streakHistory.map((date) => _utcToZoneTime(date)).toList();
-    final List<String> currentWeekStreaks =
-        parseAllStreakDates.map((date) => fullDayFormat.format(date)).toList();
+    final List<DateTime> parseAllStreakDates = streakHistory.map((date) => _utcToZoneTime(date)).toList();
+    final List<String> currentWeekStreaks = parseAllStreakDates.map((date) => fullDayFormat.format(date)).toList();
 
     setState(() {
       streakDays = currentWeekStreaks;
@@ -169,8 +167,7 @@ class _StreakPageState extends State<StreakPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: dynamicStreakArr.map((day) {
                       final isChecked = streakDays.contains(day['id']);
-                      final isToday =
-                          DateFormat.EEEE().format(DateTime.now()) == day['id'];
+                      final isToday = DateFormat.EEEE().format(DateTime.now()) == day['id'];
                       return Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: ScreenUtil.horizontalScale(1.2),
@@ -205,8 +202,7 @@ class _StreakPageState extends State<StreakPage> {
                 ],
               ),
               Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: ScreenUtil.horizontalScale(5)),
+                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
                 child: ButtonWidget(
                   text: 'CONTINUE',
                   textColor: Colors.white,
@@ -239,9 +235,7 @@ class _StreakPageState extends State<StreakPage> {
           width: ScreenUtil.horizontalScale(10),
           height: ScreenUtil.horizontalScale(10),
           decoration: BoxDecoration(
-            color: isChecked
-                ? AppColors.primaryColor
-                : Colors.blueAccent.withOpacity(0.7),
+            color: isChecked ? AppColors.primaryColor : Colors.blueAccent.withValues(alpha: 0.7),
             shape: BoxShape.circle,
           ),
           child: Center(

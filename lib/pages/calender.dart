@@ -45,7 +45,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             child: Text(
               'Mark a day a complete every day to keep the perfect flame streak going.',
               style: TextStyle(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 fontSize: ScreenUtil.verticalScale(2.2),
                 fontWeight: FontWeight.normal,
                 height: 1.2,
@@ -125,7 +125,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             child: Card(
               color: Colors.grey.shade50,
               elevation: 4,
-              shadowColor: Colors.black.withOpacity(0.4),
+              shadowColor: Colors.black.withValues(alpha: 0.4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),

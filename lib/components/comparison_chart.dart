@@ -23,15 +23,13 @@ class _ComparisonChartState extends State<ComparisonChart> {
             lineTouchData: LineTouchData(
               enabled: true,
               handleBuiltInTouches: false,
-              mouseCursorResolver:
-                  (FlTouchEvent event, LineTouchResponse? response) {
+              mouseCursorResolver: (FlTouchEvent event, LineTouchResponse? response) {
                 if (response == null || response.lineBarSpots == null) {
                   return SystemMouseCursors.basic;
                 }
                 return SystemMouseCursors.click;
               },
-              getTouchedSpotIndicator:
-                  (LineChartBarData barData, List<int> spotIndexes) {
+              getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
                 return spotIndexes.map((index) {
                   return TouchedSpotIndicatorData(
                     const FlLine(
@@ -39,8 +37,7 @@ class _ComparisonChartState extends State<ComparisonChart> {
                     ),
                     FlDotData(
                       show: true,
-                      getDotPainter: (spot, percent, barData, index) =>
-                          FlDotCirclePainter(
+                      getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
                         radius: 3,
                         color: Colors.white,
                         strokeWidth: 1,
@@ -87,13 +84,13 @@ class _ComparisonChartState extends State<ComparisonChart> {
               drawVerticalLine: true,
               getDrawingHorizontalLine: (value) {
                 return FlLine(
-                  color: Colors.grey.withOpacity(0.15),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   strokeWidth: 2,
                 );
               },
               getDrawingVerticalLine: (value) {
                 return FlLine(
-                  color: Colors.grey.withOpacity(0.15),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   strokeWidth: 2,
                 );
               },
@@ -101,20 +98,15 @@ class _ComparisonChartState extends State<ComparisonChart> {
             borderData: FlBorderData(
               show: true,
               border: Border.all(
-                color: Colors.grey.withOpacity(0.15),
+                color: Colors.grey.withValues(alpha: 0.15),
               ),
             ),
           ),
         ));
   }
 
-  List<LineChartBarData> get lineBarsData1 => [
-        lineChartBarData1_1,
-        lineChartBarData1_2,
-        lineChartBarData1_3,
-        lineChartBarData1_4,
-        lineChartBarData1_5
-      ];
+  List<LineChartBarData> get lineBarsData1 =>
+      [lineChartBarData1_1, lineChartBarData1_2, lineChartBarData1_3, lineChartBarData1_4, lineChartBarData1_5];
 
   LineChartBarData get lineChartBarData1_1 => LineChartBarData(
         isCurved: true,
