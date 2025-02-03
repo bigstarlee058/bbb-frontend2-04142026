@@ -203,7 +203,7 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/1-home.svg',
-                        color: value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey,
+                        colorFilter: ColorFilter.mode(value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -216,7 +216,7 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/2-calendar.svg',
-                        color: value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey,
+                        colorFilter: ColorFilter.mode(value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -229,7 +229,7 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/3-statistics.svg',
-                        color: value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey,
+                        colorFilter: ColorFilter.mode(value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -242,7 +242,7 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/4-account.svg',
-                        color: value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey,
+                        colorFilter: ColorFilter.mode(value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(9),
                         height: ScreenUtil.horizontalScale(9),
                       ),

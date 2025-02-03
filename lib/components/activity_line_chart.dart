@@ -95,13 +95,13 @@ class _ActivityLineChartState extends State<ActivityLineChart> {
               verticalInterval: 1,
               getDrawingHorizontalLine: (value) {
                 return FlLine(
-                  color: Colors.grey.withOpacity(0.15),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   strokeWidth: 2,
                 );
               },
               getDrawingVerticalLine: (value) {
                 return FlLine(
-                  color: Colors.grey.withOpacity(0.15),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   strokeWidth: 2,
                 );
               },
@@ -109,7 +109,7 @@ class _ActivityLineChartState extends State<ActivityLineChart> {
             borderData: FlBorderData(
               show: true,
               border: Border.all(
-                color: Colors.grey.withOpacity(0.15),
+                color: Colors.grey.withValues(alpha: 0.15),
               ),
             ),
           ),
@@ -135,14 +135,14 @@ class _ActivityLineChartState extends State<ActivityLineChart> {
             radius: 6,
             color: Colors.white,
             strokeWidth: 6,
-            strokeColor: const Color(0xFFD40F54).withOpacity(0.6),
+            strokeColor: const Color(0xFFD40F54).withValues(alpha: 0.6),
           ),
         ),
         belowBarData: BarAreaData(
           show: true,
           gradient: LinearGradient(colors: [
-            const Color(0xFFD40F54).withOpacity(0.05),
-            Colors.white.withOpacity(0.4),
+            const Color(0xFFD40F54).withValues(alpha: 0.05),
+            Colors.white.withValues(alpha: 0.4),
           ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
           spotsLine: BarAreaSpotsLine(
             show: true,
@@ -152,8 +152,8 @@ class _ActivityLineChartState extends State<ActivityLineChart> {
               strokeWidth: 24,
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFFD40F54).withOpacity(1),
-                  Colors.white.withOpacity(0.5),
+                  const Color(0xFFD40F54).withValues(alpha: 1),
+                  Colors.white.withValues(alpha: 0.5),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,

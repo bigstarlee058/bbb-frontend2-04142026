@@ -17,6 +17,7 @@ import 'package:bbb/pages/Tools/GraphsReports/graph_and_reports_page.dart';
 import 'package:bbb/pages/Tools/bonus_library_page.dart';
 import 'package:bbb/pages/Tools/equipment_library_page.dart';
 import 'package:bbb/pages/Tools/exercise_history.dart';
+import 'package:bbb/pages/Tools/exercise_library_detail_page.dart';
 import 'package:bbb/pages/Tools/exercise_library_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
@@ -195,6 +196,7 @@ class _MyAppState extends State<MyApp> {
           AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
           AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),
           AppRoutes.exerciseHistory: (context) => const ExerciseHistoryPage(),
+          AppRoutes.exerciseLibraryDetailScreen: (context) => const ExerciseLibraryDetailPage(),
           AppRoutes.exerciseLibraryScreen: (context) => const ExerciseLibraryPage(),
           AppRoutes.equipmentLibraryScreen: (context) => const EquipmentLibraryPage(),
           AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),

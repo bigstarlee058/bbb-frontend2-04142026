@@ -1,3 +1,4 @@
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -6,14 +7,12 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:bbb/components/back_arrow_widget.dart';
 
 class NutritionCalculatorPage extends StatefulWidget {
   const NutritionCalculatorPage({super.key});
 
   @override
-  State<NutritionCalculatorPage> createState() =>
-      _NutritionCalculatorPageState();
+  State<NutritionCalculatorPage> createState() => _NutritionCalculatorPageState();
 }
 
 class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
@@ -80,22 +79,16 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                 Container(
                                   margin: const EdgeInsets.only(right: 10),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(
-                                          onPress: () =>
-                                              {Navigator.pop(context)}),
+                                      BackArrowWidget(onPress: () => {Navigator.pop(context)}),
                                       Container(
-                                        margin: EdgeInsets.only(
-                                            left: ScreenUtil.horizontalScale(8),
-                                            top: ScreenUtil.horizontalScale(8)),
+                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
                                         child: Text(
                                           'Hi, Nick',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(5.5),
+                                            fontSize: ScreenUtil.horizontalScale(5.5),
                                           ),
                                         ),
                                       ),
@@ -111,8 +104,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                   height: media.height * 0.2,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
                                         width: ScreenUtil.horizontalScale(50),
@@ -120,8 +112,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                           "Let's calculate your nutritional requirements",
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize:
-                                                ScreenUtil.verticalScale(1.8),
+                                            fontSize: ScreenUtil.verticalScale(1.8),
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
@@ -180,8 +171,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                               vertical: ScreenUtil.horizontalScale(3),
                             ),
                             child: Padding(
-                              padding:
-                                  EdgeInsets.all(ScreenUtil.verticalScale(3)),
+                              padding: EdgeInsets.all(ScreenUtil.verticalScale(3)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
@@ -193,21 +183,18 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.primaryColor,
-                                          fontSize:
-                                              ScreenUtil.horizontalScale(5),
+                                          fontSize: ScreenUtil.horizontalScale(5),
                                         ),
                                       ),
                                       const SizedBox(width: 50),
                                       Expanded(
                                         child: Container(
                                           padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                ScreenUtil.horizontalScale(1),
+                                            horizontal: ScreenUtil.horizontalScale(1),
                                           ),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                                ScreenUtil.verticalScale(5)),
+                                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                                             boxShadow: const [
                                               BoxShadow(
                                                 color: Color(0x20888888),
@@ -227,26 +214,19 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                             decoration: InputDecoration(
                                               fillColor: Colors.white,
                                               enabledBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
+                                                borderRadius: BorderRadius.circular(
                                                   ScreenUtil.verticalScale(5),
                                                 ),
-                                                borderSide: const BorderSide(
-                                                    color: Colors.white,
-                                                    width: 2.0), // White border
+                                                borderSide: const BorderSide(color: Colors.white, width: 2.0), // White border
                                               ),
                                               focusedBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
+                                                borderRadius: BorderRadius.circular(
                                                   ScreenUtil.verticalScale(5),
                                                 ),
-                                                borderSide: const BorderSide(
-                                                    color: Colors.white,
-                                                    width: 2.0), // White border
+                                                borderSide: const BorderSide(color: Colors.white, width: 2.0), // White border
                                               ),
                                               border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
+                                                borderRadius: BorderRadius.circular(
                                                   ScreenUtil.verticalScale(5),
                                                 ),
                                                 borderSide: const BorderSide(
@@ -256,8 +236,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                               ),
                                               suffixIcon: Icon(
                                                 Icons.keyboard_arrow_down,
-                                                size:
-                                                    ScreenUtil.verticalScale(4),
+                                                size: ScreenUtil.verticalScale(4),
                                                 color: Colors.grey[400],
                                               ),
                                             ),
@@ -274,21 +253,16 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.primaryColor,
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(5),
+                                            fontSize: ScreenUtil.horizontalScale(5),
                                           )),
                                       const SizedBox(width: 25),
                                       Expanded(
                                           child: Container(
                                         padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                ScreenUtil.horizontalScale(3),
-                                            vertical:
-                                                ScreenUtil.verticalScale(0.1)),
+                                            horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                              ScreenUtil.verticalScale(5)),
+                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                                           boxShadow: const [
                                             BoxShadow(
                                               color: Color(0x20888888),
@@ -303,17 +277,13 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                         ),
                                         child: DropdownButton<String>(
                                           value: _selectedEquipment,
-                                          dropdownColor: const Color.fromARGB(
-                                              255, 252, 252, 252),
-                                          icon: const Icon(Icons
-                                              .keyboard_arrow_down_outlined),
+                                          dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                                          icon: const Icon(Icons.keyboard_arrow_down_outlined),
                                           iconSize: ScreenUtil.verticalScale(4),
                                           iconEnabledColor: Colors.grey[400],
                                           elevation: 12,
                                           isExpanded: true,
-                                          style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16),
+                                          style: const TextStyle(color: Colors.black, fontSize: 16),
                                           underline: Container(),
                                           onChanged: (String? newValue) {
                                             setState(() {
@@ -323,8 +293,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                           items: <String>[
                                             '121lbs',
                                             '200lbs',
-                                          ].map<DropdownMenuItem<String>>(
-                                              (String value) {
+                                          ].map<DropdownMenuItem<String>>((String value) {
                                             return DropdownMenuItem<String>(
                                               value: value,
                                               child: Row(
@@ -332,8 +301,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                                   const SizedBox(width: 10),
                                                   Text(
                                                     value,
-                                                    style: const TextStyle(
-                                                        color: Colors.black54),
+                                                    style: const TextStyle(color: Colors.black54),
                                                   ),
                                                 ],
                                               ),
@@ -351,17 +319,13 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.primaryColor,
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(5),
+                                            fontSize: ScreenUtil.horizontalScale(5),
                                           )),
                                       const SizedBox(width: 22),
                                       Expanded(
                                           child: Container(
                                         padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                ScreenUtil.horizontalScale(3),
-                                            vertical:
-                                                ScreenUtil.verticalScale(0.1)),
+                                            horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius: BorderRadius.circular(
@@ -381,17 +345,13 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                         ),
                                         child: DropdownButton<String>(
                                           value: _selectedGender,
-                                          dropdownColor: const Color.fromARGB(
-                                              255, 252, 252, 252),
-                                          icon: const Icon(Icons
-                                              .keyboard_arrow_down_outlined),
+                                          dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                                          icon: const Icon(Icons.keyboard_arrow_down_outlined),
                                           iconSize: ScreenUtil.verticalScale(4),
                                           iconEnabledColor: Colors.grey[400],
                                           elevation: 12,
                                           isExpanded: true,
-                                          style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16),
+                                          style: const TextStyle(color: Colors.black, fontSize: 16),
                                           underline: Container(),
                                           onChanged: (String? newValue) {
                                             setState(() {
@@ -401,8 +361,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                           items: <String>[
                                             'Female',
                                             'Male',
-                                          ].map<DropdownMenuItem<String>>(
-                                              (String value) {
+                                          ].map<DropdownMenuItem<String>>((String value) {
                                             return DropdownMenuItem<String>(
                                               value: value,
                                               child: Row(
@@ -410,8 +369,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                                   const SizedBox(width: 10),
                                                   Text(
                                                     value,
-                                                    style: const TextStyle(
-                                                        color: Colors.black54),
+                                                    style: const TextStyle(color: Colors.black54),
                                                   ),
                                                 ],
                                               ),
@@ -421,16 +379,14 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                       )),
                                     ],
                                   ),
-                                  SizedBox(
-                                      height: ScreenUtil.horizontalScale(7)),
+                                  SizedBox(height: ScreenUtil.horizontalScale(7)),
                                   DottedDashedLine(
                                     height: 0,
                                     width: media.width,
-                                    dashColor: Colors.grey.withOpacity(0.3),
+                                    dashColor: Colors.grey.withValues(alpha: 0.3),
                                     axis: Axis.horizontal,
                                   ),
-                                  SizedBox(
-                                      height: ScreenUtil.horizontalScale(6)),
+                                  SizedBox(height: ScreenUtil.horizontalScale(6)),
                                   Text(
                                     'Activity Level',
                                     style: TextStyle(
@@ -442,8 +398,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                   Column(
                                     children: <Widget>[
                                       _buildActivityLevelTile(
-                                        title:
-                                            'Inactive: Never or rarely include physical activity in your day.',
+                                        title: 'Inactive: Never or rarely include physical activity in your day.',
                                         value: 'Inactive',
                                       ),
                                       _buildActivityLevelTile(
@@ -457,8 +412,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                         value: 'Active',
                                       ),
                                       _buildActivityLevelTile(
-                                        title:
-                                            'Very active: Include large amounts of moderate or vigorous activity in your day.',
+                                        title: 'Very active: Include large amounts of moderate or vigorous activity in your day.',
                                         value: 'Very active',
                                       ),
                                     ],
@@ -469,7 +423,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                   DottedDashedLine(
                                     height: 0,
                                     width: media.width,
-                                    dashColor: Colors.grey.withOpacity(0.3),
+                                    dashColor: Colors.grey.withValues(alpha: 0.3),
                                     axis: Axis.horizontal,
                                   ),
                                   SizedBox(
@@ -507,8 +461,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
     );
   }
 
-  Widget _buildActivityLevelTile(
-      {required String title, required String value}) {
+  Widget _buildActivityLevelTile({required String title, required String value}) {
     return Container(
       margin: const EdgeInsets.symmetric(
         vertical: 8,
@@ -548,16 +501,15 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                         text: '${value.split(':')[0]}: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                         ),
                       ),
                       TextSpan(
-                        text:
-                            title.replaceFirst('${value.split(':')[0]}: ', ''),
+                        text: title.replaceFirst('${value.split(':')[0]}: ', ''),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: ScreenUtil.horizontalScale(3.2),
-                          color: Colors.black.withOpacity(0.4),
+                          color: Colors.black.withValues(alpha: 0.4),
                         ),
                       ),
                     ],

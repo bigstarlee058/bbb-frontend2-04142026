@@ -230,9 +230,18 @@ class DatabaseHelper {
     return results;
   }
 
-  Future<Map<String, dynamic>?> getDataById({required String tableName, required String id}) async {
+  Future<Map<String, dynamic>?> getDataByDataId({required String tableName, required String id}) async {
     Database db = await database;
     List<Map<String, dynamic>> results = await db.query(tableName, where: 'dataId = ?', whereArgs: [id]);
+    if (results.isNotEmpty) {
+      return results.first;
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> getDataByd({required String tableName, required String id}) async {
+    Database db = await database;
+    List<Map<String, dynamic>> results = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
     if (results.isNotEmpty) {
       return results.first;
     }
@@ -263,15 +272,26 @@ class DatabaseHelper {
     required String tableName,
     required String columnName,
     required dynamic newValue,
-    required String id,
+    required dynamic id,
+    String idField = "dataId",
   }) async {
     Database db = await database;
     return await db.update(
       tableName,
       {columnName: newValue},
-      where: 'dataId = ?',
+      where: '$idField = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<bool> checkIfIdExists({required String tableName, required String matchField, dynamic id}) async {
+    Database db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      tableName,
+      where: '$matchField = ?',
+      whereArgs: [id],
+    );
+    return result.isNotEmpty;
   }
 
   Future<void> deleteAllData(String tableName) async {

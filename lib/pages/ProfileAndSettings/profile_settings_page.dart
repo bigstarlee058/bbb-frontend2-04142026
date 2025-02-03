@@ -160,7 +160,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                       height: ScreenUtil.horizontalScale(25),
                                                       width: ScreenUtil.horizontalScale(25),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey.withOpacity(.9),
+                                                        color: Colors.grey.withValues(alpha: .9),
                                                         borderRadius: BorderRadius.all(
                                                           Radius.circular(ScreenUtil.horizontalScale(12.5)),
                                                         ),
@@ -348,7 +348,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF000000).withOpacity(0.05),
+              color: const Color(0xFF000000).withValues(alpha: 0.05),
               spreadRadius: 1,
               blurRadius: 3,
               offset: const Offset(0, 1),

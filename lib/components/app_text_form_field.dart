@@ -45,7 +45,7 @@ class AppTextFormField extends StatelessWidget {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 3,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -78,8 +78,7 @@ class AppTextFormField extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.never,
             filled: true,
             fillColor: Colors.white,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+            contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
               borderRadius: BorderRadius.circular(30),

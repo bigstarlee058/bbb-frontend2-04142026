@@ -54,10 +54,10 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 show: true,
                 border: Border.symmetric(
                   horizontal: BorderSide(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                   ),
                   vertical: BorderSide(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -86,11 +86,11 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 horizontalInterval: monthProvider.maximumValueOfWeight > 8000 ? (monthProvider.maximumValueOfWeight / 8) : 1000,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   strokeWidth: 1,
                 ),
                 getDrawingVerticalLine: (value) => FlLine(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   strokeWidth: 1,
                 ),
               ),

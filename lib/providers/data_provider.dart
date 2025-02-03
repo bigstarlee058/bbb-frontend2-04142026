@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/models/category.dart';
@@ -20,6 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/exercise_model.dart';
+
 class DataProvider extends ChangeNotifier {
   List<ExerciseLibrary> adminExercises = [];
   List<CategoryTitle> adminCategory = [];
@@ -40,6 +43,18 @@ class DataProvider extends ChangeNotifier {
   bool workoutCheckpointState = false;
 
   Collections collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+  Exercise currentExerciseObj = Exercise(
+      id: "",
+      title: "",
+      vimeoId: "",
+      thumbnail: "",
+      description: "",
+      guide: "",
+      relatedExercises: [],
+      categories: [],
+      usedEquipments: [],
+      files: []);
+  late List<Exercise> currentRelatedExercises = [];
 
   Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
   Tutorials tutorialData = Tutorials(id: "", title: "", description: "", photo: "", files: []);
@@ -529,5 +544,85 @@ class DataProvider extends ChangeNotifier {
     } catch (e) {
       throw Exception('Failed to load staff data');
     }
+  }
+
+  Future fetchCurrentEx(String id, String called) async {
+    try {
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$id');
+
+      url = Uri.http(url.authority, url.path);
+      String? userIdToken = await getAuthToken();
+
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        getExerciseFromJson(jsonDecode(response.body));
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load exercise info');
+      }
+    } catch (e) {
+      log("fetchCurrentEx ERROR $e ");
+    }
+  }
+
+  void getExerciseFromJson(responseData) {
+    if (responseData != null) {
+      currentRelatedExercises.clear();
+      List<Equipment> equipments = [];
+
+      if (responseData["relatedExercises"] != null && responseData["relatedExercises"].length > 0) {
+        for (var singleItem in responseData["relatedExercises"]) {
+          Exercise newExercise = Exercise(
+              id: singleItem["id"] ?? "",
+              title: singleItem["title"] ?? "",
+              vimeoId: singleItem["vimeoId"] ?? "",
+              thumbnail: singleItem["thumbnail"] ?? "",
+              description: singleItem["description"] ?? "",
+              guide: singleItem["guide"] ?? "",
+              relatedExercises: singleItem["relatedExercises"] ?? [],
+              categories: singleItem["categories"] ?? [],
+              usedEquipments: singleItem["usedEquipments"] ?? [],
+              files: singleItem['files'] ?? []);
+
+          currentRelatedExercises.add(newExercise);
+        }
+      }
+
+      if (responseData["usedEquipments"] != null && responseData["usedEquipments"].length > 0) {
+        for (var singleItem in responseData["usedEquipments"]) {
+          Equipment newEquipment = Equipment(
+            id: singleItem["id"] ?? "",
+            title: singleItem["title"] ?? "",
+            thumbnail: singleItem["thumbnail"] ?? "",
+            description: singleItem["description"] ?? "",
+            link: singleItem["link"] ?? "",
+            createdAt: singleItem["createdAt"] ?? "",
+          );
+          equipments.add(newEquipment);
+        }
+      }
+
+      Exercise exerciseObj = Exercise(
+          id: responseData["id"] ?? "",
+          title: responseData["title"] ?? "",
+          vimeoId: responseData["vimeoId"] ?? "",
+          thumbnail: responseData["thumbnail"] ?? "",
+          description: responseData["description"] ?? "",
+          guide: responseData["guide"] ?? "",
+          relatedExercises: currentRelatedExercises,
+          categories: responseData["categories"] ?? [],
+          usedEquipments: equipments,
+          files: responseData['files'] ?? []);
+
+      currentExerciseObj = exerciseObj;
+    }
+
+    notifyListeners();
   }
 }
