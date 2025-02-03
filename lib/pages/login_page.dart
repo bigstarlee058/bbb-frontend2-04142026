@@ -82,8 +82,7 @@ class _LoginPageState extends State<LoginPage> {
         );
         mainPageProvider.changeTab(0);
       } catch (e) {
-        debugPrint(
-            "----TESTING BOTTOM INDEX IS 0 ----Error in indexing login_page");
+        debugPrint("----TESTING BOTTOM INDEX IS 0 ----Error in indexing login_page");
       }
     }
   }
@@ -103,8 +102,7 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse(
-          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -125,8 +123,7 @@ class _LoginPageState extends State<LoginPage> {
 
         // Fetch additional data for the welcome modal
         final descriptionResponse = await http.get(
-          Uri.parse(
-              '${AppConstants.serverUrl}/api/screens/get_screens'), // replace with actual endpoint
+          Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'), // replace with actual endpoint
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -143,8 +140,7 @@ class _LoginPageState extends State<LoginPage> {
               builder: (context) => MainPage(
                 showWelcomeModal: !hasSeenWelcome,
                 welcomeDescription: descriptionData['description'] ?? "",
-                welcomeImageUrl:
-                    descriptionData['vimeoId'], // pass fetched description
+                welcomeImageUrl: descriptionData['vimeoId'], // pass fetched description
               ),
             ),
           );
@@ -186,11 +182,8 @@ class _LoginPageState extends State<LoginPage> {
                     image: DecorationImage(
                       image: image.isNotEmpty
                           ? NetworkImage(
-                              image.startsWith(
-                                      'https://storage.cloud.google.com/')
-                                  ? image.replaceFirst(
-                                      'https://storage.cloud.google.com/',
-                                      'https://storage.googleapis.com/')
+                              image.startsWith('https://storage.cloud.google.com/')
+                                  ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                   : image,
                             )
                           : const AssetImage('assets/img/card.png'),
@@ -209,15 +202,11 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       Center(
                         child: Container(
-                          margin: EdgeInsets.only(
-                              top: ScreenUtil.horizontalScale(15)),
+                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(15)),
                           height: media.height / 7,
                           width: media.width,
                           decoration: const BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('assets/img/bbb-logo.png'),
-                                fit: BoxFit.fitHeight,
-                                opacity: 1),
+                            image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
                           ),
                         ),
                       ),
@@ -251,8 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.verticalScale(4.4)),
+                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
                         child: Column(
                           children: [
                             SizedBox(
@@ -326,9 +314,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   icon: Icon(
-                                    isObscure
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
+                                    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                     color: const Color(0XFFd9d9d9),
                                   ),
                                 ),
@@ -353,15 +339,13 @@ class _LoginPageState extends State<LoginPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (ctx) =>
-                                              const ResetPasswordScreen(),
+                                          builder: (ctx) => const ResetPasswordScreen(),
                                         ),
                                       );
                                     },
                                 ),
                                 const TextSpan(
-                                  style: TextStyle(
-                                      fontSize: 15, color: Color(0xFF848484)),
+                                  style: TextStyle(fontSize: 15, color: Color(0xFF848484)),
                                   text: " password?",
                                 ),
                               ],
@@ -411,7 +395,7 @@ void showBottomAlert(BuildContext context, String msg) {
         child: Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Center(

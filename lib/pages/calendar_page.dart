@@ -199,7 +199,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                 //               color: currentMonth > 0
                                 //                   ? Colors.white
                                 //                   : Colors.grey
-                                //                       .withOpacity(0.7),
+                                //                       .withValues(alpha: 0.7),
                                 //               borderRadius: BorderRadius.all(
                                 //                 Radius.circular(
                                 //                   ScreenUtil.verticalScale(3),
@@ -255,7 +255,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                 //                       monthOverView.length - 1
                                 //                   ? Colors.white
                                 //                   : Colors.grey
-                                //                       .withOpacity(0.7),
+                                //                       .withValues(alpha: 0.7),
                                 //               borderRadius: BorderRadius.all(
                                 //                 Radius.circular(
                                 //                   ScreenUtil.verticalScale(3),

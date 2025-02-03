@@ -453,7 +453,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                   log('finalData.length :::::::::::::::::: ${finalData.length}');
                   return Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(.1),
+                      color: Colors.grey.withValues(alpha: .1),
                     ),
                     child: Column(
                       children: [

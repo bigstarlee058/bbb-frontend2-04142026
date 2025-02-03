@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
+import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/pages/NewMonthView/Widgets/new_time_progress.dart';
@@ -31,7 +32,7 @@ class NewExerciseCard extends StatefulWidget {
     required this.index,
     required this.subIndex,
     required this.exerciseName,
-    required this.isTimerRunning,
+    // required this.isTimerRunning,
     required this.color,
     required this.extraDataModel,
     required this.isCompleted,
@@ -54,7 +55,7 @@ class NewExerciseCard extends StatefulWidget {
   final int load;
   final int index;
   final int subIndex;
-  final bool isTimerRunning;
+  // final bool isTimerRunning;
   final VoidCallback makeRefresh;
 
   @override
@@ -105,6 +106,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
   }
 
   setData() async {
+    await preferences.putString(SharedPreference.isPause, "false");
     dataId =
         "${monthProvider?.splitType}-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
 
@@ -187,13 +189,10 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     });
   }
 
-  void _handleCloseTimer() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setState(() {
-        _showTimer = false;
-        monthProvider?.newSetShowTimerIndex(-1, -1, -1);
-      });
-    });
+  Future<void> _handleCloseTimer() async {
+    _showTimer = false;
+    await monthProvider?.setShowTimerIndex(-1, -1, -1);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
   }
 
   Future<void> _saveData() async {
@@ -244,11 +243,8 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
-    monthProvider?.newSetShowTimerIndex(
-      widget.index,
-      widget.subIndex,
-      widget.exercise,
-    );
+    monthProvider?.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise, removeVal: true);
+
     if (_restDuration != 0) {
       _showTimer = true;
     }
@@ -269,14 +265,11 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    context.select((MonthProvider value) => value.newCurrentExpandedItem);
-    context.select((MonthProvider value) => value.newTimerAddress);
-
-    _isExpanded = "$index:$subIndex" == monthProvider!.newCurrentExpandedItem;
-
-    if (monthProvider!.newTimerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.newTimerAddress != "") {
-      log("CALLED FIRST");
-      _showTimer = monthProvider!.newTimerAddress ==
+    context.select((MonthProvider value) => value.currentExpandedItem);
+    context.select((MonthProvider value) => value.timerAddress);
+    _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
+    if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.timerAddress != "") {
+      _showTimer = monthProvider!.timerAddress ==
           "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
 
       if (_showTimer) {
@@ -309,10 +302,11 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: ScreenUtil.horizontalScale(4)),
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       _showTimer = false;
-                      monthProvider?.newSetShowTimerIndex(-1, -1, -1);
-                      monthProvider?.newUpdateExpandedItem(!_isExpanded ? "${widget.index}:${widget.subIndex}" : "");
+                      await monthProvider?.setShowTimerIndex(-1, -1, -1);
+                      await monthProvider?.updateExpandedItem(!_isExpanded ? "${widget.index}:${widget.subIndex}" : "");
+
                       setState(() {
                         _isExpanded = !_isExpanded;
                       });
@@ -618,8 +612,8 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
           if (_showTimer && _restDuration != 0) ...[
             NewTimerWithProgressBar(
               dataId: dataId,
-              isTimerRunning: widget.isTimerRunning,
-              currentTime: monthProvider!.newTimePassed,
+              // isTimerRunning: widget.isTimerRunning,
+              currentTime: monthProvider!.timePassed,
               initialDuration: _restDuration,
               onClose: _handleCloseTimer,
               onComplete: _handleTimerComplete,

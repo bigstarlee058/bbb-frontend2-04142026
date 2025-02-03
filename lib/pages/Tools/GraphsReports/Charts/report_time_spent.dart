@@ -61,10 +61,10 @@ class _ReportTimeSpentGraphState extends State<ReportTimeSpentGraph> {
                 show: true,
                 border: Border.symmetric(
                   horizontal: BorderSide(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                   ),
                   vertical: BorderSide(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -93,11 +93,11 @@ class _ReportTimeSpentGraphState extends State<ReportTimeSpentGraph> {
                 horizontalInterval: monthProvider.reportMaximumValueOfTotalTime > 8 ? monthProvider.reportMaximumValueOfTotalTime / 10 : 1,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   strokeWidth: 1,
                 ),
                 getDrawingVerticalLine: (value) => FlLine(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   strokeWidth: 1,
                 ),
               ),

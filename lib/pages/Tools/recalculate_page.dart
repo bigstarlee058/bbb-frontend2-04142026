@@ -59,23 +59,25 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                 Container(
                                   margin: const EdgeInsets.only(right: 10),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         margin: EdgeInsets.only(
-                                          left:ScreenUtil.horizontalScale(4),
+                                          left: ScreenUtil.horizontalScale(4),
                                         ),
                                         decoration: const BoxDecoration(
-                                          color:Color(0XFFd18a9b),
+                                          color: Color(0XFFd18a9b),
                                           shape: BoxShape.circle,
                                         ),
                                         child: SizedBox(
                                           width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                          height:ScreenUtil.horizontalScale(10),
+                                          height: ScreenUtil.horizontalScale(10),
                                           child: IconButton(
                                             padding: EdgeInsets.zero, // Removes the default padding
-                                            icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white,),
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_left,
+                                              color: Colors.white,
+                                            ),
                                             onPressed: () => Navigator.pop(context),
                                             iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                           ),
@@ -198,13 +200,12 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                   DottedDashedLine(
                                     height: 0,
                                     width: media.width,
-                                    dashColor: Colors.grey.withOpacity(0.5),
+                                    dashColor: Colors.grey.withValues(alpha: 0.5),
                                     axis: Axis.horizontal,
                                   ),
                                   SizedBox(height: ScreenUtil.horizontalScale(8.2)),
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(horizontal: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
                                     child: Text(
                                       'See how your daily calorie change at different activity levels',
                                       style: TextStyle(
@@ -216,8 +217,7 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                   ),
                                   SizedBox(height: ScreenUtil.horizontalScale(9)),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
                                         children: [
@@ -241,7 +241,7 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                   DottedDashedLine(
                                     height: 0,
                                     width: media.width,
-                                    dashColor: Colors.grey.withOpacity(0.5),
+                                    dashColor: Colors.grey.withValues(alpha: 0.5),
                                     axis: Axis.horizontal,
                                   ),
                                   const SizedBox(
@@ -253,8 +253,7 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                       horizontal: 5,
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         const Text(
                                           "Needs over time",
@@ -266,30 +265,20 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                         ),
                                         Container(
                                           height: 30,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8),
+                                          padding: const EdgeInsets.symmetric(horizontal: 8),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(15),
+                                            borderRadius: BorderRadius.circular(15),
                                           ),
                                           child: DropdownButtonHideUnderline(
                                             child: DropdownButton(
-                                              items: [
-                                                "Month 1",
-                                                "Month 2",
-                                                "Month 3",
-                                                "Month 4"
-                                              ]
-                                                  .map((name) =>
-                                                      DropdownMenuItem(
+                                              items: ["Month 1", "Month 2", "Month 3", "Month 4"]
+                                                  .map((name) => DropdownMenuItem(
                                                         value: name,
                                                         child: Text(
                                                           name,
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Color(
-                                                                0xA09F9F9F),
+                                                          style: const TextStyle(
+                                                            color: Color(0xA09F9F9F),
                                                             fontSize: 14,
                                                           ),
                                                         ),
@@ -304,9 +293,7 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                               hint: const Text(
                                                 "Month",
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    color: Color(0xA09F9F9F),
-                                                    fontSize: 15),
+                                                style: TextStyle(color: Color(0xA09F9F9F), fontSize: 15),
                                               ),
                                             ),
                                           ),
@@ -324,7 +311,6 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                         textColor: const Color(0x40000000),
                                         color: const Color(0xC0FFFFFF),
                                         onPress: () {
-
                                           Navigator.pushNamed(
                                             context,
                                             "/home",

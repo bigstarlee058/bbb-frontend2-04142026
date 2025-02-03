@@ -578,7 +578,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                               : extraItem.type == 2
                                                   ? AppColors.backOffSetColor
                                                   : AppColors.warmupColor,
-                                          isTimerRunning: isTimerRunning,
+                                          // isTimerRunning: isTimerRunning,
                                           exerciseName: exerciseName,
                                           title: extraItem.type == 1
                                               ? "Warmup Set"
@@ -638,7 +638,11 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                       : Padding(
                                           padding: const EdgeInsets.only(top: 10),
                                           child: ButtonWidget(
-                                            text: monthProvider.isPumpDay && monthProvider.isCircuit ? "Finish" : "Finish & Next",
+                                            text: monthProvider.exerciseHistoryDetails?.status == Status.completed
+                                                ? "Save"
+                                                : monthProvider.isPumpDay && monthProvider.isCircuit
+                                                    ? "Finish"
+                                                    : "Finish & Next",
                                             textColor: Colors.white,
                                             onPress: () async {
                                               int count = 0;

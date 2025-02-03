@@ -38,7 +38,7 @@ class _SelectDropdown1State extends State<SelectDropdown1> {
 
     return Material(
       elevation: 10, // Shadow depth
-      shadowColor: Colors.black.withOpacity(0.2),
+      shadowColor: Colors.black.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)), // Rounded corners
       ),

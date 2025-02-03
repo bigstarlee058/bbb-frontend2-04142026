@@ -1,20 +1,21 @@
+import 'dart:convert';
+
 import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/utils/screen_util.dart';
 // import 'package:bbb/pages/email_verification_page.dart';
 // import 'package:bbb/pages/main_page.dart';
 // import 'package:bbb/pages/reset_password_page.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
-import 'package:bbb/utils/screen_util.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // import 'package:google_fonts/google_fonts.dart';
 // import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -43,8 +44,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     if (emailAddress.isNotEmpty) {
       if (AppConstants.emailRegex.hasMatch(emailAddress)) {
         var response = await http.post(
-          Uri.parse(
-              'https://bbbdev1.wpenginepowered.com/wp-json/custom/v1/send-password-reset'),
+          Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/custom/v1/send-password-reset'),
           headers: <String, String>{
             'Content-Type': 'application/json',
           },
@@ -60,8 +60,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             builder: (BuildContext context) {
               return const AppAlertDialog(
                 title: "Success",
-                description:
-                    "Please check your email inbox for the password reset email.",
+                description: "Please check your email inbox for the password reset email.",
               );
             },
           );
@@ -123,10 +122,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   width: media.width,
                   height: media.height / 2.25,
                   decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/img/back.jpg'),
-                        fit: BoxFit.cover,
-                        opacity: 1),
+                    image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                     borderRadius: BorderRadius.only(
                       bottomRight: Radius.circular(70),
                     ),
@@ -134,15 +130,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
                 SafeArea(
                   child: Container(
-                    margin:
-                        EdgeInsets.only(top: ScreenUtil.horizontalScale(25)),
+                    margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(25)),
                     width: media.width,
                     height: media.height / 7,
                     decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/img/bbb-logo.png'),
-                          fit: BoxFit.fitHeight,
-                          opacity: 1),
+                      image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
                     ),
                   ),
                 ),
@@ -155,10 +147,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 width: media.width,
                 height: media.height / 1.8,
                 decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/img/back.jpg'),
-                      fit: BoxFit.cover,
-                      opacity: 1),
+                  image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                   borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(70),
                   ),
@@ -267,7 +256,7 @@ void showBottomAlert(BuildContext context, String msg) {
         child: Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Center(

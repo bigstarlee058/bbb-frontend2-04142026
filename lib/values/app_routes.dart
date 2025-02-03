@@ -3,6 +3,7 @@ class AppRoutes {
   static const String loginScreen = '/login';
   static const String registerScreen = '/register';
   static const String mainScreen = '/home';
+
   static const String emailVerificationScreen = '/emailVerification';
   static const String passwordresetScreen = '/passwordreset';
   static const String exerciseLibraryScreen = '/exerciseLibrary';
@@ -13,8 +14,10 @@ class AppRoutes {
   static const String nutritionCalculatorScreen = '/nutritionCalculator';
   static const String dayOverviewScreen = '/dayOverview';
   static const String todayScreen = '/today';
+  static const String exerciseLibraryDetailScreen = '/exerciseLibraryDetail';
+
   static const String dayCompletedScreen = '/dayCompleted';
-    static const String exerciseScreen = '/exercise';
+  static const String exerciseScreen = '/exercise';
   static const String streakScreen = '/streak';
   static const String recalculateScreen = '/recalculate';
   static const String calendarScreen = '/calendar';
