@@ -244,7 +244,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
                                                       monthProvider.updateWarmUp(false);
-                                                      Navigator.pushNamed(context, '/exercise');
+                                                      Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
 
                                                       monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
                                                     }
@@ -258,7 +258,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
                                                       monthProvider.updateWarmUp(false);
-                                                      Navigator.pushNamed(context, '/exercise');
+                                                      Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
 
                                                       monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
                                                     }

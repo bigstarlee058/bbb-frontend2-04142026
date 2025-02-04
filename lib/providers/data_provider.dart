@@ -62,6 +62,7 @@ class DataProvider extends ChangeNotifier {
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('authToken');
+    // log('authToken :::::::::::::::::: $authToken');
     return authToken;
   }
 

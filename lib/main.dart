@@ -53,6 +53,7 @@ import 'pages/NewMonthView/Database/month_prefrence.dart';
 import 'pages/NewMonthView/Providers/month_provider.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
@@ -73,17 +74,13 @@ void main() async {
   const androidInitializationSetting = AndroidInitializationSettings('@mipmap/ic_launcher');
   const iosInitializationSetting = DarwinInitializationSettings();
   const initSettings = InitializationSettings(android: androidInitializationSetting, iOS: iosInitializationSetting);
+
   await flutterLocalNotificationsPlugin.initialize(
     initSettings,
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
-    onDidReceiveNotificationResponse: (details) {
-      // var data = jsonDecode(details.payload!);
-      // log('details :::::::::::::::::: ${details.payload}');
-      // Navigator.pushNamed(c!, '/exercise', arguments: [
-      //   data['name'] as String,
-      //   '1',
-      //   data['id'].toString(),
-      // ]);
+    onDidReceiveNotificationResponse: (details) async {
+      await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
+      navigatorKey.currentState?.pushNamed('/exercise');
     },
   );
 
@@ -178,6 +175,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [dataProvider, userDataProvider, locationProvider, mainPageProvider, programInfoProvider, monthProvider],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         locale: !kReleaseMode ? DevicePreview.locale(context) : null,
         builder: !kReleaseMode ? DevicePreview.appBuilder : null,
         title: 'Flutter Demo',
@@ -185,13 +183,8 @@ class _MyAppState extends State<MyApp> {
         initialRoute: AppRoutes.onBoardingScreen,
         routes: {
           AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
-          AppRoutes.mainScreen: (context) => const MainPage(
-                welcomeDescription: '',
-                welcomeImageUrl: '',
-              ),
-          AppRoutes.loginScreen: (context) => const LoginPage(
-                image: '',
-              ),
+          AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+          AppRoutes.loginScreen: (context) => const LoginPage(image: ''),
           AppRoutes.registerScreen: (context) => const RegisterPage(),
           AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
           AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),

@@ -593,8 +593,20 @@ class MonthProvider extends ChangeNotifier {
       int newTime = totalTime - int.parse(timePassed);
       if (newTime.isNegative || newTime == 0) {
       } else {
-        NotificationService.zonedScheduleNotification(
-            newTime, selectedExIndex, {'name': selectedExercise?.name.toString(), 'id': selectedExIndex, 'context': context});
+        final payLoad = {
+          'name': selectedExercise?.name.toString(),
+          'exercise_id': selectedExercise?.exerciseId ?? "",
+          'exercise_index': selectedExIndex,
+          'month_id': monthDataModel?.id,
+          'week_id': weekDataModel?.id,
+          'day_id': dayDataModel?.id,
+          'week_index': overviewCurrentWeek,
+          'day_index': overviewCurrentDay,
+          'is_pumpday': isPumpDay,
+          'is_circuit': isCircuit,
+          'circuit_index': isCircuit ? circuitIndex : "0"
+        };
+        NotificationService.zonedScheduleNotification(newTime, selectedExIndex, payLoad);
       }
     }
     notifyListeners();

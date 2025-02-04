@@ -68,7 +68,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
     monthProvider?.updateCircuit("", 0);
     monthProvider?.setSelectedExercise(exercises[exerciseIndex], exerciseIndex);
     monthProvider?.updateWarmUp(false);
-    Navigator.pushNamed(context, '/exercise');
+    Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
   }
 
@@ -675,7 +675,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
                         ? null
                         : () async {
                             monthProvider.updateWarmUp(true);
-                            Navigator.pushNamed(context, '/exercise');
+                            Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
                           },
                     color: AppColors.primaryColor,
                     isLoading: false,

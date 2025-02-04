@@ -3,9 +3,11 @@ import 'dart:convert';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
+import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/extra_set_model.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/NewMonthView/MonthResponseModel/payload_model.dart';
 import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/pages/NewMonthView/Widgets/4_1_new_exercise_card.dart';
 import 'package:bbb/pages/NewMonthView/Widgets/4_2_add_notes.dart';
@@ -45,29 +47,92 @@ class _NewExercisePageState extends State<NewExercisePage> {
   ChewieController? _chewieController;
   Size? videoSize;
 
+  String? argument;
+
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    fetchExercise();
-    NotificationService.clearNotification();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      argument = ModalRoute.of(context)?.settings.arguments as String?;
+      if (argument != "Exercise") {
+        await fromNotification();
+      } else {
+        fetchExercise();
+        NotificationService.clearNotification();
+      }
+    });
 
     super.initState();
   }
 
+  fromNotification() async {
+    await monthProvider?.onInit();
+    String rawTempData = preferences.getString(SharedPreference.payload) ?? "";
+    PayloadModel payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
+
+    monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
+    int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
+      return element == monthProvider?.todayTitleId;
+    });
+    final dayIndex = int.parse((monthProvider!.weekDataModel!.dayList?[index ?? 0]
+                .toString()
+                .replaceAll("Workout", "")
+                .replaceAll("Rest", "")
+                .replaceAll("Day", "")
+                .replaceAll(" ", "") ??
+            "0")) -
+        1;
+    DayDataModel dayData = "${monthProvider!.weekDataModel?.dayList![index ?? 0] ?? ""}".toString().contains("Workout")
+        ? monthProvider!.weekDataModel!.days![dayIndex]
+        : DayDataModel();
+    monthProvider!.dayDataModel = dayData;
+    monthProvider!.isPumpDay = payloadModel.isPumpday!;
+    monthProvider!.isCircuit = payloadModel.isCircuit!;
+    monthProvider!.circuitIndex = payloadModel.circuitIndex!;
+    monthProvider!.week = payloadModel.weekIndex;
+    monthProvider!.currentWeek = payloadModel.weekIndex!;
+    monthProvider!.overviewCurrentDay = payloadModel.dayIndex!;
+    monthProvider!.overviewCurrentWeek = payloadModel.weekIndex!;
+    monthProvider!.selectedExIndex = payloadModel.exerciseIndex!;
+
+    if (monthProvider!.isPumpDay) {
+      final data = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1].dayList![payloadModel.dayIndex! - 1];
+      String dataId =
+          "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+      await monthProvider?.checkForPumpDay(data);
+      if (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type!.contains("Pump Day"))) {
+        monthProvider?.changeIsPumpDay(true);
+        monthProvider?.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
+      }
+      monthProvider!.selectedExercise = monthProvider!.pumpDayModel!.exercises![payloadModel.exerciseIndex!];
+    } else {
+      monthProvider!.selectedExercise = dayData.exercises![payloadModel.exerciseIndex!];
+    }
+
+    fetchExercise(
+      exerciseIndex: payloadModel.exerciseIndex!,
+      isPumpDay: payloadModel.isPumpday!,
+      isCircuit: payloadModel.isCircuit!,
+      exerciseId: payloadModel.exerciseId!,
+      circuitIndex: payloadModel.circuitIndex!,
+    );
+
+    NotificationService.clearNotification();
+  }
+
   List values = [];
   Timer? _hideControlsTimer;
-  void fetchExercise() async {
+
+  void fetchExercise({String? exerciseId, int? exerciseIndex, bool? isPumpDay, bool? isCircuit, String? circuitIndex}) async {
     if (monthProvider?.isWarmup == false) {
       setState(() {
         loading = true;
       });
 
-      await monthProvider?.fetchCurrentExercise(
-        monthProvider!.selectedExercise!.exerciseId.toString(),
-      );
+      await monthProvider?.fetchCurrentExercise(exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
 
       isExercise = 1;
-      exerciseIndex = monthProvider!.selectedExIndex;
+      exerciseIndex = exerciseIndex ?? monthProvider!.selectedExIndex;
 
       if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
         initializeVideo(monthProvider!.exerciseDetailModel!.files!.first.link!);
@@ -91,8 +156,8 @@ class _NewExercisePageState extends State<NewExercisePage> {
     await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchExerciseStatusLocalData();
 
-    String exId = monthProvider!.isPumpDay && monthProvider!.isCircuit
-        ? "${monthProvider?.exerciseDetailModel!.sId.toString()}-${monthProvider?.circuitIndex}"
+    String exId = (isPumpDay ?? monthProvider!.isPumpDay) && (isCircuit ?? monthProvider!.isCircuit)
+        ? "${monthProvider?.exerciseDetailModel!.sId.toString()}-${(circuitIndex ?? monthProvider?.circuitIndex)}"
         : monthProvider!.exerciseDetailModel!.sId.toString();
 
     String dataId =
@@ -204,8 +269,11 @@ class _NewExercisePageState extends State<NewExercisePage> {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-
+    // log('ModalRoute.of(context)?.settings.arguments :::::::::::::::::: ${ModalRoute.of(context)?.settings.arguments}');
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => fromNotification(),
+      ),
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: loading
@@ -599,7 +667,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                           repsInReverse: 100,
                                           load: int.parse(extraItem.load == null ? "0" : extraItem.load.toString()),
                                           type: int.parse(extraItem.type.toString()),
-                                          restDuration: int.parse(extraItem.rest.toString()),
+                                          restDuration: 10 ?? int.parse(extraItem.rest.toString()),
                                         ),
                                       );
                                     },
@@ -679,7 +747,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                                     if (val == false) {
                                                       monthProvider.setSelectedExercise(elementI, i);
                                                       monthProvider.updateWarmUp(false);
-                                                      await Navigator.pushNamed(context, '/exercise');
+                                                      await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
                                                       break;
                                                     }
                                                   }

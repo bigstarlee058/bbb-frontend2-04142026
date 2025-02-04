@@ -13,6 +13,7 @@ class SharedPreference {
   static const String lastTimerPassed = "LAST-TIMER-PASSED";
   static const String lastExitTime = "LAST-EXIT-TIME";
   static const String isPause = "IS-PAUSE";
+  static const String payload = "PAYLOAD";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();
