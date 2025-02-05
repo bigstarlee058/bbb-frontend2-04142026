@@ -1,5 +1,6 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/models/welcome_content_model.dart';
+import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
 import 'package:bbb/pages/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -41,22 +42,34 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       });
   }
 
+  isFromNotification() async {
+    int? status = preferences.getInt(SharedPreference.fromNotification);
+    if (status == 1) {
+      await Navigator.pushNamed(context, '/exercise');
+      await preferences.putInt(SharedPreference.fromNotification, 0);
+      await preferences.clearValue(SharedPreference.fromNotification);
+    }
+  }
+
   late WelcomeContentModel welcomeContentModel;
 
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
     if (isLoggedIn) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => const MainPage(
-                  welcomeDescription: '',
-                  welcomeImageUrl: '',
-                )),
+          builder: (context) => const MainPage(
+            welcomeDescription: '',
+            welcomeImageUrl: '',
+          ),
+        ),
       );
+      await isFromNotification();
     }
+    await preferences.putInt(SharedPreference.fromNotification, 0);
+    await preferences.clearValue(SharedPreference.fromNotification);
   }
 
   void loadWelcomeContent() async {

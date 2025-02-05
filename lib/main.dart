@@ -80,14 +80,23 @@ void main() async {
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     onDidReceiveNotificationResponse: (details) async {
       await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
+      await preferences.putInt(SharedPreference.fromNotification, 1);
       navigatorKey.currentState?.pushNamed('/exercise');
     },
   );
 
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+    final String? payload = notificationAppLaunchDetails!.notificationResponse?.payload;
+    await preferences.putString(SharedPreference.payload, payload ?? "{}");
+    await preferences.putInt(SharedPreference.fromNotification, 1);
+  }
+
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (context) => const MyApp(),
+      builder: (context) => MyApp(),
     ),
   );
 }

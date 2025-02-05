@@ -437,11 +437,107 @@ class MonthProvider extends ChangeNotifier {
 
   List<RelatedExercises> relatedExercises = [];
   List<UsedEquipments> usedEquipments = [];
+  List<ExerciseDetailModel> allExerciseDetailsList = [];
+  List<List<ExerciseDetailModel>> circuitsExerciseDetailsList = [];
 
   int selectedExIndex = 0;
 
   ExerciseDetailModel? exerciseDetailModel;
   ExerciseDataModel? selectedExercise;
+  int totalEx = 0;
+
+  getAllExerciseData() async {
+    String? userIdToken = await getAuthToken();
+    relatedExercises = [];
+    allExerciseDetailsList = [];
+    circuitsExerciseDetailsList = [];
+    totalEx = 0;
+    if (isPumpDay) {
+      pumpDayModel?.exercises?.forEach(
+        (element) async {
+          List<RelatedExercises> tempRelatedExercise = [];
+          ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel();
+          Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${element.exerciseId}');
+          url = Uri.http(url.authority, url.path);
+          final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+          if (response.statusCode == 200) {
+            final responseData = jsonDecode(response.body);
+            if (responseData != null) {
+              exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+              allExerciseDetailsList.add(exerciseDetailModelData);
+              if (exerciseDetailModelData.relatedExercises != null) {
+                tempRelatedExercise.addAll(exerciseDetailModelData.relatedExercises!);
+                relatedExercises.addAll(tempRelatedExercise);
+              }
+            }
+            notifyListeners();
+          } else {
+            throw Exception('Failed to load exercise info');
+          }
+        },
+      );
+
+      for (var i = 0; i < (pumpDayModel?.circuits?.length ?? 0); i++) {
+        var circuit = pumpDayModel!.circuits![i];
+        List<ExerciseDetailModel> tempData = [];
+
+        for (var j = 0; j < (circuit.circuitExercises?.length ?? 0); j++) {
+          totalEx += 1;
+          var element = circuit.circuitExercises![j];
+
+          ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel();
+          Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${element.exerciseId}');
+          url = Uri.http(url.authority, url.path);
+          try {
+            final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+            if (response.statusCode == 200) {
+              final responseData = jsonDecode(response.body);
+              if (responseData != null) {
+                exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+                tempData.add(exerciseDetailModelData);
+              }
+              notifyListeners();
+            } else {
+              throw Exception('Failed to load exercise info');
+            }
+          } catch (e) {
+            log("Error fetching exercise details: $e");
+          }
+        }
+
+        circuitsExerciseDetailsList.add(tempData);
+
+        log('circuitsExerciseDetailsList :::::::::::::::::: $circuitsExerciseDetailsList');
+      }
+    } else {
+      dayDataModel?.exercises?.forEach(
+        (element) async {
+          List<RelatedExercises> tempRelatedExercise = [];
+          ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel();
+          Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${element.exerciseId}');
+          url = Uri.http(url.authority, url.path);
+          final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+          if (response.statusCode == 200) {
+            final responseData = jsonDecode(response.body);
+            if (responseData != null) {
+              exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+              allExerciseDetailsList.add(exerciseDetailModelData);
+
+              if (exerciseDetailModelData.relatedExercises != null) {
+                tempRelatedExercise.addAll(exerciseDetailModelData.relatedExercises!);
+                relatedExercises.addAll(tempRelatedExercise);
+              }
+            }
+            notifyListeners();
+          } else {
+            throw Exception('Failed to load exercise info');
+          }
+        },
+      );
+    }
+
+    notifyListeners();
+  }
 
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -475,11 +571,9 @@ class MonthProvider extends ChangeNotifier {
 
   void getExerciseFromJson(responseData) {
     usedEquipments = [];
-    relatedExercises = [];
     if (responseData != null) {
       exerciseDetailModel = ExerciseDetailModel.fromJson(responseData);
       usedEquipments.addAll(exerciseDetailModel!.usedEquipments!);
-      relatedExercises.addAll(exerciseDetailModel!.relatedExercises!);
       notifyListeners();
     }
     notifyListeners();
@@ -547,10 +641,11 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> setShowTimerIndex(int index, int subIndex, int exerciseIndex, {bool removeVal = false}) async {
     if (index != -1 && subIndex != -1 && exerciseIndex != -1) {
-      String value = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
-      await preferences.putString(SharedPreference.lastTimerAddress, value);
+      timerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
+      log('value :::::::::::::::::: $timerAddress');
+      await preferences.putString(SharedPreference.lastTimerAddress, timerAddress);
       final pf = await SharedPreferences.getInstance();
-      await pf.setString(SharedPreference.lastTimerAddress, value);
+      await pf.setString(SharedPreference.lastTimerAddress, timerAddress);
       if (removeVal) {
         await preferences.putString(SharedPreference.lastTimerPassed, "");
         await preferences.putString(SharedPreference.lastExitTime, "");
@@ -558,7 +653,6 @@ class MonthProvider extends ChangeNotifier {
         await pf.setString(SharedPreference.lastTimerPassed, "");
         await pf.setString(SharedPreference.lastExitTime, "");
       }
-      timerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
     } else {
       log("CLEAR VALUES");
       clearValues();
@@ -568,6 +662,8 @@ class MonthProvider extends ChangeNotifier {
   }
 
   clearValues() async {
+    timerAddress = "";
+    timePassed = "";
     NotificationService.clearNotification();
     await preferences.putString(SharedPreference.lastTimerAddress, "");
     await preferences.putString(SharedPreference.lastTimerPassed, "");
@@ -576,18 +672,11 @@ class MonthProvider extends ChangeNotifier {
     await pf.setString(SharedPreference.lastTimerAddress, "");
     await pf.setString(SharedPreference.lastTimerPassed, "");
     await pf.setString(SharedPreference.lastExitTime, "");
-    timerAddress = "";
-    timePassed = "";
+
     notifyListeners();
   }
 
   Future<void> savePassedTime(String timePassed1, int totalTime, BuildContext context) async {
-    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
-    await preferences.putString(SharedPreference.lastExitTime, DateTime.now().toString());
-    final pf = await SharedPreferences.getInstance();
-    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
-    await pf.setString(SharedPreference.lastExitTime, DateTime.now().toString());
-
     if (timerAddress != '') {
       timePassed = timePassed1;
       int newTime = totalTime - int.parse(timePassed);
@@ -609,6 +698,11 @@ class MonthProvider extends ChangeNotifier {
         NotificationService.zonedScheduleNotification(newTime, selectedExIndex, payLoad);
       }
     }
+    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
+    await preferences.putString(SharedPreference.lastExitTime, DateTime.now().toString());
+    final pf = await SharedPreferences.getInstance();
+    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
+    await pf.setString(SharedPreference.lastExitTime, DateTime.now().toString());
     notifyListeners();
   }
 

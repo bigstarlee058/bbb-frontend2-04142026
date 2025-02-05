@@ -226,6 +226,9 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                         }
 
                                         return WorkoutCard(
+                                          exIndex: exerciseIndex,
+                                          circuitIndex: circuitsIndex,
+                                          totalExercise: monthProvider.totalEx,
                                           roundIndex: roundIndex,
                                           isCircuit: true,
                                           isCompleted: monthProvider.exerciseHistoryModel

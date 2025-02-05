@@ -14,6 +14,7 @@ class SharedPreference {
   static const String lastExitTime = "LAST-EXIT-TIME";
   static const String isPause = "IS-PAUSE";
   static const String payload = "PAYLOAD";
+  static const String fromNotification = "FROM-NOTIFICATION";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();
@@ -33,5 +34,9 @@ class SharedPreference {
 
   int? getInt(String key, {int defValue = 0}) {
     return _preferences == null ? defValue : _preferences!.getInt(key) ?? defValue;
+  }
+
+  clearValue(String key) {
+    return _preferences!.remove(key);
   }
 }

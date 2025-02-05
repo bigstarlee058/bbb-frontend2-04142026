@@ -53,6 +53,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
     fetchRemovedExerciseLocalData();
     isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
     isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped;
+    monthProvider?.getAllExerciseData();
     super.initState();
   }
 
@@ -284,6 +285,10 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                           Padding(
                                             padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                             child: WorkoutCard(
+                                              totalExercise: (exercises.length -
+                                                  removedExercise
+                                                      .where((element) => element.exerciseId == exercises[i].exerciseId!)
+                                                      .length),
                                               isCircuit: false,
                                               isCompleted: monthProvider!.exerciseHistoryModel
                                                   .any((element) => element.dataId == dataId && element.status == Status.completed),
@@ -330,40 +335,16 @@ class _NewTodayPageState extends State<NewTodayPage> {
                               : Padding(
                                   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                   child: ButtonWidget(
-                                    onPress: () {},
+                                    onPress: () {
+                                      // await userData?.fetchAllExercise();
+                                      // showRelatedExerciseDialog(0, 0, true);
+                                    },
                                     isLoading: false,
                                     color: Colors.grey,
                                     textColor: Colors.white,
                                     text: "Add Exercise",
                                   ),
                                 ),
-                          // GestureDetector(
-                          //   onTap: () async {
-                          //     await userData?.fetchAllExercise();
-                          //     showRelatedExerciseDialog(0, 0, true);
-                          //   },
-                          //   child: Container(
-                          //     padding: EdgeInsets.all(
-                          //       ScreenUtil.verticalScale(2),
-                          //     ),
-                          //     decoration: BoxDecoration(
-                          //       gradient: LinearGradient(
-                          //         colors: [
-                          //           const Color(0xFF9B3651),
-                          //           const Color(0xFFDB4671).withValues(alpha: 0.79),
-                          //         ],
-                          //         begin: Alignment.bottomLeft,
-                          //         end: Alignment.bottomRight,
-                          //       ),
-                          //       shape: BoxShape.circle,
-                          //     ),
-                          //     child: Icon(
-                          //       Icons.add,
-                          //       color: Colors.white,
-                          //       size: ScreenUtil.verticalScale(3.5),
-                          //     ),
-                          //   ),
-                          // ),
                           const SizedBox(height: 36),
                           Container(
                             height: 1,
@@ -1316,20 +1297,24 @@ class SearchEquipmentField extends StatelessWidget {
 }
 
 class WorkoutCard extends StatefulWidget {
-  const WorkoutCard(
-      {super.key,
-      required this.isCompleted,
-      required this.isSkipped,
-      required this.exerciseIndex,
-      this.onPress,
-      required this.openSwapModal,
-      required this.name,
-      required this.exercise,
-      required this.onRemove,
-      required this.enabled,
-      required this.exerciseData,
-      required this.isCircuit,
-      this.roundIndex});
+  const WorkoutCard({
+    super.key,
+    required this.isCompleted,
+    required this.isSkipped,
+    required this.exerciseIndex,
+    this.onPress,
+    required this.openSwapModal,
+    required this.name,
+    required this.exercise,
+    required this.onRemove,
+    required this.enabled,
+    required this.exerciseData,
+    required this.isCircuit,
+    this.roundIndex,
+    required this.totalExercise,
+    this.circuitIndex,
+    this.exIndex,
+  });
 
   final bool isSkipped;
   final bool isCompleted;
@@ -1343,6 +1328,9 @@ class WorkoutCard extends StatefulWidget {
   final bool isCircuit;
   final String exerciseData;
   final int? roundIndex;
+  final int totalExercise;
+  final int? circuitIndex;
+  final int? exIndex;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
@@ -1467,106 +1455,113 @@ class _WorkoutCardState extends State<WorkoutCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    appImage(
-                      height: media.width / 4,
-                      width: media.width / 4,
-                      networkImageUrl: gImageUrl,
-                      errorImageUrl: 'assets/img/warm-up-placeholder.png',
-                      fit: BoxFit.contain,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                        bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                      ),
-                      child: Container(
-                        decoration: widget.isCompleted
-                            ? BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                    const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                ),
-                              )
-                            : widget.isSkipped
-                                ? BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        AppColors.secondColor.withValues(alpha: 0.8),
-                                        AppColors.secondColor.withValues(alpha: 0.8),
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                    ),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                      bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                    ),
-                                  )
-                                : BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                      bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                    ),
-                                  ),
-                        child: Icon(
-                          widget.isCompleted ? Icons.check : Icons.close,
-                          color: widget.isCompleted || widget.isSkipped ? Colors.white : Colors.transparent,
-                          size: 30,
+                Consumer<MonthProvider>(builder: (context, value, child) {
+                  return Row(
+                    children: [
+                      appShimmerImage(
+                        height: media.width / 4,
+                        width: media.width / 4,
+                        networkImageUrl: widget.isCircuit
+                            ? (value.circuitsExerciseDetailsList.isNotEmpty)
+                                ? value.circuitsExerciseDetailsList[widget.circuitIndex!][widget.exerciseIndex].thumbnail ?? ""
+                                : ""
+                            : (value.allExerciseDetailsList.isNotEmpty && value.allExerciseDetailsList.length == widget.totalExercise)
+                                ? value.allExerciseDetailsList[widget.exerciseIndex].thumbnail ?? ""
+                                : "",
+                        fit: BoxFit.contain,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
                         ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: media.width / 2.5,
-                          child: Text(
-                            widget.name,
-                            style: TextStyle(
-                              color: AppColors.primaryColor,
-                              fontSize: widget.isCircuit ? ScreenUtil.horizontalScale(3) : ScreenUtil.horizontalScale(3.8),
-                              fontWeight: FontWeight.bold,
-                              height: 1.2,
-                            ),
+                        child: Container(
+                          decoration: widget.isCompleted
+                              ? BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                      const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                  ),
+                                )
+                              : widget.isSkipped
+                                  ? BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColors.secondColor.withValues(alpha: 0.8),
+                                          AppColors.secondColor.withValues(alpha: 0.8),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                        bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                      ),
+                                    )
+                                  : BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                        bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                      ),
+                                    ),
+                          child: Icon(
+                            widget.isCompleted ? Icons.check : Icons.close,
+                            color: widget.isCompleted || widget.isSkipped ? Colors.white : Colors.transparent,
+                            size: 30,
                           ),
                         ),
-                        SizedBox(
-                          height: ScreenUtil.verticalScale(1.5),
-                        ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
-                              child: SvgPicture.asset(
-                                "assets/icons/trend.svg",
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                                width: 20,
-                              ),
-                            ),
-                            Text(
-                              "$totalSets sets",
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: media.width / 2.5,
+                            child: Text(
+                              widget.name,
                               style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),
+                                color: AppColors.primaryColor,
+                                fontSize: widget.isCircuit ? ScreenUtil.horizontalScale(3) : ScreenUtil.horizontalScale(3.8),
+                                fontWeight: FontWeight.bold,
+                                height: 1.2,
                               ),
                             ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                ),
+                          ),
+                          SizedBox(
+                            height: ScreenUtil.verticalScale(1.5),
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
+                                child: SvgPicture.asset(
+                                  "assets/icons/trend.svg",
+                                  colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                  width: 20,
+                                ),
+                              ),
+                              Text(
+                                "$totalSets sets",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  );
+                }),
                 if (widget.enabled) ...[
                   GestureDetector(
                     onTap: widget.enabled ? widget.onPress : null,

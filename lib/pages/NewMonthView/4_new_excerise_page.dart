@@ -55,6 +55,8 @@ class _NewExercisePageState extends State<NewExercisePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       argument = ModalRoute.of(context)?.settings.arguments as String?;
       if (argument != "Exercise") {
+        NotificationService.clearNotification();
+
         await fromNotification();
       } else {
         fetchExercise();
@@ -66,6 +68,9 @@ class _NewExercisePageState extends State<NewExercisePage> {
   }
 
   fromNotification() async {
+    setState(() {
+      loading = true;
+    });
     await monthProvider?.onInit();
     String rawTempData = preferences.getString(SharedPreference.payload) ?? "";
     PayloadModel payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
@@ -96,6 +101,8 @@ class _NewExercisePageState extends State<NewExercisePage> {
     monthProvider!.selectedExIndex = payloadModel.exerciseIndex!;
 
     if (monthProvider!.isPumpDay) {
+      await monthProvider?.fetchDayStatusLocalData();
+
       final data = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1].dayList![payloadModel.dayIndex! - 1];
       String dataId =
           "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
@@ -164,7 +171,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
         "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
 
     fetchExtraSetLocalData(dataId);
-
+    monthProvider?.notifyListeners();
     setState(() {});
   }
 
@@ -269,11 +276,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    // log('ModalRoute.of(context)?.settings.arguments :::::::::::::::::: ${ModalRoute.of(context)?.settings.arguments}');
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => fromNotification(),
-      ),
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: loading
@@ -303,13 +306,15 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                   child: Column(
                                     children: [
                                       (isExercise == 1
-                                              ? monthProvider!.exerciseDetailModel!.files!.isNotEmpty &&
+                                              ? (monthProvider?.exerciseDetailModel?.files?.isNotEmpty ?? false) &&
                                                   !videoNotInitialized &&
                                                   videoSize != null
-                                              : monthProvider!.warmUpModel!.files!.isNotEmpty && !videoNotInitialized && videoSize != null)
+                                              : (monthProvider?.warmUpModel?.files?.isNotEmpty ?? false) &&
+                                                  !videoNotInitialized &&
+                                                  videoSize != null)
                                           ? SizedBox(
-                                              height: videoSize!.height,
-                                              width: videoSize!.width,
+                                              height: videoSize?.height,
+                                              width: videoSize?.width,
                                               child: Chewie(
                                                 controller: _chewieController!,
                                               ),
@@ -430,7 +435,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                               bottom: media.height * 0.09,
                               left: 10,
                               right: 10,
-                              child: !videoNotInitialized && _chewieController!.videoPlayerController.value.isInitialized == true
+                              child: !videoNotInitialized && _chewieController?.videoPlayerController.value.isInitialized == true
                                   ? Container(
                                       margin: EdgeInsets.only(bottom: media.height * 0.06, left: 20, right: 20),
                                       child: Row(
@@ -667,7 +672,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                           repsInReverse: 100,
                                           load: int.parse(extraItem.load == null ? "0" : extraItem.load.toString()),
                                           type: int.parse(extraItem.type.toString()),
-                                          restDuration: 10 ?? int.parse(extraItem.rest.toString()),
+                                          restDuration: int.parse(extraItem.rest.toString()),
                                         ),
                                       );
                                     },
@@ -832,35 +837,36 @@ class _NewExercisePageState extends State<NewExercisePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-            child: Align(
-          alignment: Alignment.topLeft,
-          child: isExercise == 1
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(254, 233, 232, 1.0),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                  child: Text(
-                    (monthProvider!.selectedExercise!.guide == "" || monthProvider!.selectedExercise!.guide == null
-                        ? "Exercise GuideLines will be displayed here."
-                        : monthProvider!.selectedExercise!.guide.toString()),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: isExercise == 1
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(254, 233, 232, 1.0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                    child: Text(
+                      (monthProvider!.selectedExercise!.guide == "" || monthProvider!.selectedExercise!.guide == null
+                          ? "Exercise GuideLines will be displayed here."
+                          : monthProvider!.selectedExercise!.guide.toString()),
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  )
+                : Text(
+                    (((monthProvider?.warmUpModel?.description ?? "") == "")
+                        ? "Warm-Up GuideLines will be displayed here."
+                        : ((monthProvider?.warmUpModel?.description ?? "").toString())),
                     style: const TextStyle(
                       color: Colors.black,
                     ),
                     textAlign: TextAlign.left,
                   ),
-                )
-              : Text(
-                  (monthProvider!.warmUpModel!.description == ""
-                      ? "Warm-Up GuideLines will be displayed here."
-                      : monthProvider!.warmUpModel!.description.toString()),
-                  style: const TextStyle(
-                    color: Colors.black,
-                  ),
-                  textAlign: TextAlign.left,
-                ),
-        )),
+          ),
+        ),
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
@@ -241,13 +242,14 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
-    monthProvider?.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise, removeVal: true);
-
+    monthProvider?.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex, removeVal: true);
     if (_restDuration != 0) {
       _showTimer = true;
     }
 
     setCompleted = _restDuration == 0 ? true : false;
+    log(':::::::::::::::::: ${"$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}"}');
+
     setState(() {});
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -266,11 +268,12 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     context.select((MonthProvider value) => value.currentExpandedItem);
     context.select((MonthProvider value) => value.timerAddress);
     _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
+
     if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.timerAddress != "") {
       _showTimer = monthProvider!.timerAddress ==
           "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
       if (_showTimer) {
-        monthProvider!.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
+        monthProvider!.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex);
       }
     } else {
       _showTimer = false;
