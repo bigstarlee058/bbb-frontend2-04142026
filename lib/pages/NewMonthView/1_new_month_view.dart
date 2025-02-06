@@ -311,85 +311,92 @@ class _NewMonthViewState extends State<NewMonthView> {
                           height: 20,
                         ),
                         Consumer<MonthProvider>(
-                          builder: (context, value, child) => value.isFilterLoading
-                              ? const SizedBox()
-                              : value.weeksDataList.isNotEmpty
-                                  ? Container(
-                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          for (int i = 0; i < value.weeksDataList.length; i++) ...[
-                                            NewWeeklyTrackCard(
-                                                index: i,
-                                                monthProvider: value,
-                                                pumpDayIds: value.weeksDataList[i].pumpDayIds!,
-                                                title: value.weeksDataList[i].title == "" ? "Week ${i + 1}" : value.weeksDataList[i].title!,
-                                                thisWeek: ((i + 1) == value.week),
-                                                restDayId: value.weeksDataList[i].restdayId!,
-                                                weekIndex: i,
-                                                isOpened: false,
-                                                isCompleted: false,
-                                                startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
-                                                cardData: value.weeksDataList[i],
-                                                daySplit: value.splitType!,
-                                                expandedVal: (i + 1) == value.week ? true : false,
-                                                completedWeek: i + 1),
-                                            const SizedBox(
-                                              height: 15,
-                                            ),
+                          builder: (context, value, child) {
+                            String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+                            return value.isFilterLoading
+                                ? const SizedBox()
+                                : value.weeksDataList.isNotEmpty
+                                    ? Container(
+                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            for (int i = 0; i < value.weeksDataList.length; i++) ...[
+                                              NewWeeklyTrackCard(
+                                                  index: i,
+                                                  monthProvider: value,
+                                                  pumpDayIds: value.weeksDataList[i].pumpDayIds!,
+                                                  title:
+                                                      value.weeksDataList[i].title == "" ? "Week ${i + 1}" : value.weeksDataList[i].title!,
+                                                  thisWeek: ((i + 1) == value.week),
+                                                  restDayId: value.weeksDataList[i].restdayId!,
+                                                  weekIndex: i,
+                                                  isOpened: false,
+                                                  isCompleted: false,
+                                                  startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
+                                                  cardData: value.weeksDataList[i],
+                                                  daySplit: split,
+                                                  expandedVal: (i + 1) == value.week ? true : false,
+                                                  completedWeek: i + 1),
+                                              const SizedBox(
+                                                height: 15,
+                                              ),
+                                            ],
                                           ],
-                                        ],
-                                      ),
-                                    )
-                                  : const Center(
-                                      child: Text("No workout data available"),
-                                    ),
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Text("No workout data available"),
+                                      );
+                          },
                         ),
                         const SizedBox(height: 15),
                         Container(
                           margin: EdgeInsets.symmetric(
                             horizontal: ScreenUtil.horizontalScale(5),
                           ),
-                          child: ButtonWidget(
-                            text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
-                            textColor: Colors.white,
-                            onPress: monthProvider!.todayTitleId.isEmpty
-                                ? null
-                                : () async {
-                                    int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList?.indexWhere(
-                                      (element) {
-                                        return element == monthProvider!.todayTitleId;
-                                      },
-                                    );
+                          child: Consumer<MonthProvider>(
+                            builder: (context, value, child) => ButtonWidget(
+                              text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
+                              textColor: Colors.white,
+                              onPress: monthProvider!.todayTitleId.isEmpty
+                                  ? null
+                                  : () async {
+                                      int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList?.indexWhere(
+                                        (element) {
+                                          return element == monthProvider!.todayTitleId;
+                                        },
+                                      );
 
-                                    final dayIndex = int.parse((monthProvider!
-                                                .monthDataModel?.weeks![(monthProvider!.week ?? 1) - 1].dayList?[index ?? 0]
-                                                .toString()
-                                                .replaceAll("Workout", "")
-                                                .replaceAll("Rest", "")
-                                                .replaceAll("Day", "")
-                                                .replaceAll(" ", "") ??
-                                            "0")) -
-                                        1;
+                                      final dayIndex = int.parse((monthProvider!
+                                                  .monthDataModel?.weeks![(monthProvider!.week ?? 1) - 1].dayList?[index ?? 0]
+                                                  .toString()
+                                                  .replaceAll("Workout", "")
+                                                  .replaceAll("Rest", "")
+                                                  .replaceAll("Day", "")
+                                                  .replaceAll(" ", "") ??
+                                              "0")) -
+                                          1;
 
-                                    DayDataModel dayData =
-                                        "${monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                .toString()
-                                                .contains("Workout")
-                                            ? monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1].days![dayIndex]
-                                            : DayDataModel();
-                                    monthProvider!.overviewCurrentWeek = monthProvider!.week ?? 1;
-                                    monthProvider!.overviewCurrentDay = ((index ?? 1) + 1);
-                                    monthProvider!.dayDataModel = dayData;
-                                    monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
-                                    monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
-                                    monthProvider?.updateIsPastWeek(
-                                        monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
-                                    Navigator.pushNamed(context, '/dayOverview');
-                                  },
-                            color: AppColors.primaryColor,
-                            isLoading: false,
+                                      DayDataModel dayData =
+                                          "${monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                                  .toString()
+                                                  .contains("Workout")
+                                              ? monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1].days![dayIndex]
+                                              : DayDataModel();
+                                      monthProvider!.overviewCurrentWeek = monthProvider!.week ?? 1;
+                                      monthProvider!.overviewCurrentDay = ((index ?? 1) + 1);
+                                      monthProvider!.dayDataModel = dayData;
+                                      monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
+                                      monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
+                                      monthProvider?.updateIsPastWeek(
+                                          monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
+                                      Navigator.pushNamed(context, '/dayOverview');
+                                    },
+                              color: AppColors.primaryColor,
+                              isLoading: false,
+                            ),
                           ),
                         ),
                       ],

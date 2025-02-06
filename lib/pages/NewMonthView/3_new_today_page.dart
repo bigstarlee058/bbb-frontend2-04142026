@@ -4,6 +4,7 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
+import 'package:bbb/pages/NewMonthView/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/removed_exercise_model.dart';
 import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
@@ -13,11 +14,14 @@ import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewTodayPage extends StatefulWidget {
   const NewTodayPage({super.key});
@@ -29,9 +33,7 @@ class NewTodayPage extends StatefulWidget {
 class _NewTodayPageState extends State<NewTodayPage> {
   final today = DateTime.now();
   MonthProvider? monthProvider;
-
-  late int week;
-  late int day;
+  String searchQuery = "";
 
   List<ExerciseDataModel> exercises = [];
   List<RemovedExerciseModel> removedExercise = [];
@@ -45,15 +47,13 @@ class _NewTodayPageState extends State<NewTodayPage> {
     fetchWarmupData();
     exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
     totalWarmups = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
-    DateTime startTime = monthProvider?.startTime ?? DateTime.now();
-    int dayDelta = DateTime(today.year, today.month, today.day).difference(DateTime(startTime.year, startTime.month, startTime.day)).inDays;
-    week = (dayDelta ~/ 7);
-    day = dayDelta % 7;
     monthProvider?.fetchExerciseStatusLocalData();
     fetchRemovedExerciseLocalData();
     isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
     isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped;
     monthProvider?.getAllExerciseData();
+    monthProvider?.fetchAllExercise();
+
     super.initState();
   }
 
@@ -74,8 +74,11 @@ class _NewTodayPageState extends State<NewTodayPage> {
   }
 
   fetchRemovedExerciseLocalData() async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
     final data = await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.removedExerciseHistory, where: 'dataId', id: dataId);
     if (data.isNotEmpty) {
       removedExercise = List<RemovedExerciseModel>.from(json.decode(jsonEncode(data)).map((x) => RemovedExerciseModel.fromJson(x)));
@@ -87,20 +90,14 @@ class _NewTodayPageState extends State<NewTodayPage> {
   }
 
   Future<void> removeExercise(String exerciseId) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
     final data = {"exerciseId": exerciseId, "dataId": dataId};
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.removedExerciseHistory);
     await fetchRemovedExerciseLocalData();
-  }
-
-  Future fetchAllFilterEx(String searchQuery) async {
-    if (searchQuery.isEmpty) {
-      // allFilterExercises = allExercises;
-    } else {
-      // allFilterExercises = allExercises.where((exercise) => exercise.title.toLowerCase().contains(searchQuery.toLowerCase())).toList();
-    }
-    setState(() {});
   }
 
   @override
@@ -273,9 +270,14 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                       if (removedExercise.any((element) => element.exerciseId == exercises[i].exerciseId!)) {
                                         return const SizedBox();
                                       }
+                                      String split = monthProvider
+                                              ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                              .toString()
+                                              .split(" ")[1] ??
+                                          "";
 
                                       String dataId =
-                                          "${monthProvider!.splitType}-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
+                                          "$split-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
 
                                       bool isExist = (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
                                           monthProvider!.isPastWeek;
@@ -285,10 +287,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                           Padding(
                                             padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                             child: WorkoutCard(
-                                              totalExercise: (exercises.length -
-                                                  removedExercise
-                                                      .where((element) => element.exerciseId == exercises[i].exerciseId!)
-                                                      .length),
+                                              exerciseId: exercises[i].exerciseId!,
                                               isCircuit: false,
                                               isCompleted: monthProvider!.exerciseHistoryModel
                                                   .any((element) => element.dataId == dataId && element.status == Status.completed),
@@ -297,7 +296,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                                   isExist,
                                               exerciseIndex: i,
                                               onPress: () => onPressed(i, dataId),
-                                              openSwapModal: () {
+                                              openSwapModal: () async {
                                                 // await userData.fetchCurrentEx(exercises[i].id!, "today page 1464");
                                                 // await userData.fetchAllExercise();
                                                 // showRelatedExerciseDialog(i, exercises[i], false);
@@ -335,9 +334,12 @@ class _NewTodayPageState extends State<NewTodayPage> {
                               : Padding(
                                   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                   child: ButtonWidget(
-                                    onPress: () {
-                                      // await userData?.fetchAllExercise();
-                                      // showRelatedExerciseDialog(0, 0, true);
+                                    onPress: () async {
+                                      await monthProvider?.fetchAllExercise().then(
+                                        (value) async {
+                                          await showRelatedExerciseDialog(0, 0, true);
+                                        },
+                                      );
                                     },
                                     isLoading: false,
                                     color: Colors.grey,
@@ -464,8 +466,11 @@ class _NewTodayPageState extends State<NewTodayPage> {
               height: 20,
             ),
             Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+              String split =
+                  monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
               String warmUpDataId =
-                  "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
+                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
 
               bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
 
@@ -634,8 +639,12 @@ class _NewTodayPageState extends State<NewTodayPage> {
               ),
               child: Consumer<MonthProvider>(
                 builder: (context, monthProvider, child) {
+                  String split =
+                      monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ??
+                          "";
+
                   String warmUpDataId =
-                      "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
+                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
                   bool isExist =
                       (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
 
@@ -672,468 +681,463 @@ class _NewTodayPageState extends State<NewTodayPage> {
 
   /// ADD EXERCISE SECTION
 
-  // Future<void> showRelatedExerciseDialog(int selectedIndex, dynamic exercise, bool addModal) {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       var media = MediaQuery.of(context).size;
-  //       int? selectExerciseSwapIndex;
-  //       bool showFindMore = false;
-  //
-  //       // Pagination variables
-  //       int itemsPerPage = 5;
-  //       int currentPageRelated = 0;
-  //       int currentPageAll = 0;
-  //
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           List<Widget> buildExerciseList(List exercises, int currentPage, bool isAll) {
-  //             int startIndex = currentPage * itemsPerPage + (!isAll ? 0 : userData!.currentRelatedExercises.length);
-  //             int endIndex = (startIndex + itemsPerPage) > exercises.length + (!isAll ? 0 : userData!.currentRelatedExercises.length)
-  //                 ? exercises.length + (!isAll ? 0 : userData!.currentRelatedExercises.length)
-  //                 : startIndex + itemsPerPage;
-  //
-  //             return [
-  //               for (int i = startIndex; i < endIndex; i++) ...[
-  //                 GestureDetector(
-  //                   onTap: () {
-  //                     setState(() {
-  //                       selectExerciseSwapIndex = i;
-  //                     });
-  //                   },
-  //                   child: Row(
-  //                     children: [
-  //                       SizedBox(width: ScreenUtil.horizontalScale(5)),
-  //                       Expanded(
-  //                         child: Row(
-  //                           children: [
-  //                             Container(
-  //                               width: ScreenUtil.horizontalScale(10),
-  //                               height: ScreenUtil.horizontalScale(10),
-  //                               decoration: BoxDecoration(
-  //                                 image: const DecorationImage(
-  //                                   image: AssetImage('assets/img/card.png'),
-  //                                   fit: BoxFit.cover,
-  //                                 ),
-  //                                 borderRadius: BorderRadius.all(
-  //                                   Radius.circular(ScreenUtil.horizontalScale(1)),
-  //                                 ),
-  //                               ),
-  //                             ),
-  //                             SizedBox(width: ScreenUtil.horizontalScale(2)),
-  //                             Flexible(
-  //                                 child: Text(
-  //                               exercises[i - (!isAll ? 0 : userData!.currentRelatedExercises.length)].title,
-  //                               style: TextStyle(
-  //                                 color: Colors.black,
-  //                                 fontSize: ScreenUtil.verticalScale(2),
-  //                               ),
-  //                             )),
-  //                             SizedBox(width: ScreenUtil.horizontalScale(2)),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                       Container(
-  //                         padding: EdgeInsets.all(
-  //                           ScreenUtil.verticalScale(1),
-  //                         ),
-  //                         decoration: BoxDecoration(
-  //                           shape: BoxShape.circle,
-  //                           border: Border.all(
-  //                             color: AppColors.primaryColor,
-  //                             width: 2,
-  //                           ),
-  //                           color: selectExerciseSwapIndex == i ? AppColors.primaryColor : Colors.white,
-  //                         ),
-  //                         child: selectExerciseSwapIndex == i
-  //                             ? Icon(
-  //                                 Icons.check,
-  //                                 size: ScreenUtil.verticalScale(2),
-  //                                 color: Colors.white,
-  //                               )
-  //                             : Icon(
-  //                                 null,
-  //                                 size: ScreenUtil.verticalScale(2),
-  //                               ),
-  //                       ),
-  //                       SizedBox(width: ScreenUtil.horizontalScale(5)),
-  //                     ],
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 10),
-  //               ],
-  //             ];
-  //           }
-  //
-  //           Widget buildPaginationControls(int currentPage, int totalItems, Function(int) onPageChange) {
-  //             int totalPages = (totalItems / itemsPerPage).ceil();
-  //             return Padding(
-  //               padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)), // Add horizontal padding here
-  //               child: Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   IconButton(
-  //                     onPressed: currentPage > 0 ? () => onPageChange(0) : null,
-  //                     icon: const Icon(Icons.first_page),
-  //                   ),
-  //                   IconButton(
-  //                     onPressed: currentPage > 0 ? () => onPageChange(currentPage - 1) : null,
-  //                     icon: const Icon(Icons.arrow_back),
-  //                   ),
-  //                   Text('Page ${currentPage + 1} of $totalPages'),
-  //                   IconButton(
-  //                     onPressed: (currentPage + 1) < totalPages ? () => onPageChange(currentPage + 1) : null,
-  //                     icon: const Icon(Icons.arrow_forward),
-  //                   ),
-  //                   IconButton(
-  //                     onPressed: (currentPage + 1) < totalPages ? () => onPageChange(totalPages - 1) : null,
-  //                     icon: const Icon(Icons.last_page),
-  //                   ),
-  //                 ],
-  //               ),
-  //             );
-  //           }
-  //
-  //           return Dialog(
-  //             backgroundColor: Colors.white,
-  //             insetPadding: const EdgeInsets.all(0),
-  //             child: SizedBox(
-  //               width: ScreenUtil.horizontalScale(96),
-  //               child: ConstrainedBox(
-  //                 constraints: BoxConstraints(
-  //                   maxHeight: ScreenUtil.verticalScale(65),
-  //                 ),
-  //                 child: SingleChildScrollView(
-  //                   child: Column(
-  //                     mainAxisSize: MainAxisSize.min,
-  //                     children: [
-  //                       if (!addModal) ...[
-  //                         Container(
-  //                           width: media.width,
-  //                           padding: const EdgeInsets.all(24),
-  //                           child: Align(
-  //                             alignment: Alignment.center,
-  //                             child: Text(
-  //                               'Select Related Exercise',
-  //                               style: TextStyle(
-  //                                 fontSize: ScreenUtil.horizontalScale(5.5),
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: AppColors.primaryColor,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                         Consumer<UserDataProvider>(
-  //                           builder: (context, userData, child) => userData.currentRelatedExercises.isNotEmpty
-  //                               ? Column(
-  //                                   children: [
-  //                                     ConstrainedBox(
-  //                                       constraints: BoxConstraints(
-  //                                         maxHeight: ScreenUtil.verticalScale(60),
-  //                                       ),
-  //                                       child: SingleChildScrollView(
-  //                                         child: Padding(
-  //                                           padding: const EdgeInsets.all(8.0),
-  //                                           child: Column(
-  //                                             children: buildExerciseList(userData.currentRelatedExercises, currentPageRelated, false),
-  //                                           ),
-  //                                         ),
-  //                                       ),
-  //                                     ),
-  //                                   ],
-  //                                 )
-  //                               : const SizedBox(),
-  //                         ),
-  //                         Container(
-  //                           width: media.width,
-  //                           padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
-  //                           child: Align(
-  //                             alignment: Alignment.center,
-  //                             child: Text(
-  //                               'Or select from the list:',
-  //                               style: TextStyle(
-  //                                 fontSize: ScreenUtil.horizontalScale(5.5),
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: AppColors.primaryColor,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                         SearchEquipmentField(
-  //                           onChanged: (query) {
-  //                             setState(() {
-  //                               _searchQuery = query; // Update the search query
-  //                               currentPageAll = 0;
-  //                               fetchAllFilterEx(query); // Reset pagination when searching
-  //                             });
-  //                           },
-  //                         ),
-  //                         Consumer<UserDataProvider>(
-  //                           builder: (context, userData, child) => userData.allFilterExercises.isNotEmpty
-  //                               ? Column(
-  //                                   children: [
-  //                                     ConstrainedBox(
-  //                                       constraints: BoxConstraints(
-  //                                         maxHeight: ScreenUtil.verticalScale(60),
-  //                                       ),
-  //                                       child: SingleChildScrollView(
-  //                                         child: Padding(
-  //                                           padding: const EdgeInsets.all(8.0),
-  //                                           child: Column(
-  //                                             children: buildExerciseList(userData.allFilterExercises, currentPageAll, true),
-  //                                           ),
-  //                                         ),
-  //                                       ),
-  //                                     ),
-  //                                     // Pagination controls for all exercises
-  //                                     buildPaginationControls(
-  //                                       currentPageAll,
-  //                                       userData.allFilterExercises.length,
-  //                                       (page) {
-  //                                         setState(() {
-  //                                           currentPageAll = page;
-  //                                         });
-  //                                       },
-  //                                     ),
-  //                                   ],
-  //                                 )
-  //                               : const SizedBox(),
-  //                         ),
-  //                       ] else ...[
-  //                         Container(
-  //                           width: media.width,
-  //                           padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
-  //                           child: Align(
-  //                             alignment: Alignment.center,
-  //                             child: Text(
-  //                               'Select from the list:',
-  //                               style: TextStyle(
-  //                                 fontSize: ScreenUtil.horizontalScale(5.5),
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: AppColors.primaryColor,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                         SearchEquipmentField(
-  //                           onChanged: (query) {
-  //                             setState(() {
-  //                               _searchQuery = query; // Update the search query
-  //                               currentPageAll = 0;
-  //                               fetchAllFilterEx(query); // Reset pagination when searching
-  //                             });
-  //                           },
-  //                         ),
-  //                         Consumer<UserDataProvider>(
-  //                           builder: (context, userData, child) => userData.allFilterExercises.isNotEmpty
-  //                               ? Column(
-  //                                   children: [
-  //                                     ConstrainedBox(
-  //                                       constraints: BoxConstraints(
-  //                                         maxHeight: ScreenUtil.verticalScale(60),
-  //                                       ),
-  //                                       child: SingleChildScrollView(
-  //                                         child: Padding(
-  //                                           padding: const EdgeInsets.all(8.0),
-  //                                           child: Column(
-  //                                             children: buildExerciseList(userData.allFilterExercises, currentPageAll, false),
-  //                                           ),
-  //                                         ),
-  //                                       ),
-  //                                     ),
-  //                                     // Pagination controls for all exercises
-  //                                     buildPaginationControls(
-  //                                       currentPageAll,
-  //                                       userData.allFilterExercises.length,
-  //                                       (page) {
-  //                                         setState(() {
-  //                                           currentPageAll = page;
-  //                                         });
-  //                                       },
-  //                                     ),
-  //                                   ],
-  //                                 )
-  //                               : const SizedBox(),
-  //                         ),
-  //                       ],
-  //                       // ignore: dead_code
-  //                       if (showFindMore) ...[
-  //                         const SizedBox(height: 10),
-  //                         Padding(
-  //                           padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-  //                           child: Row(
-  //                             mainAxisAlignment: MainAxisAlignment.start,
-  //                             children: [
-  //                               const Icon(Icons.search, color: Colors.black), // Non-clickable icon
-  //                               const SizedBox(width: 8), // Space between icon & text field
-  //                               Expanded(
-  //                                 child: TextField(
-  //                                   decoration: const InputDecoration(
-  //                                     hintText: 'Type to find more...',
-  //                                     hintStyle: TextStyle(color: Colors.grey),
-  //                                     border: OutlineInputBorder(),
-  //                                   ),
-  //                                   onSubmitted: (value) {
-  //                                     setState(() {
-  //                                       // Logic to load more items or search
-  //                                     });
-  //                                   },
-  //                                 ),
-  //                               ),
-  //                             ],
-  //                           ),
-  //                         ),
-  //                         const SizedBox(height: 10),
-  //                       ],
-  //                       Padding(
-  //                         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-  //                         child: Row(
-  //                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                           children: [
-  //                             ElevatedButton(
-  //                               onPressed: () {
-  //                                 Navigator.pop(context);
-  //                               },
-  //                               style: ElevatedButton.styleFrom(
-  //                                 foregroundColor: Colors.black,
-  //                                 backgroundColor: const Color(0xFFDDDDDD),
-  //                                 shadowColor: Colors.grey,
-  //                                 padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-  //                                 textStyle: const TextStyle(
-  //                                   fontSize: 16,
-  //                                 ),
-  //                               ),
-  //                               child: const Text('Cancel'),
-  //                             ),
-  //                             ElevatedButton(
-  //                               onPressed: selectExerciseSwapIndex != null &&
-  //                                       !((!addModal &&
-  //                                               selectExerciseSwapIndex! < userData!.currentRelatedExercises.length &&
-  //                                               userData!.currentDayObj.exercises.any((exerciseData) =>
-  //                                                   exerciseData.id == userData!.currentRelatedExercises[selectExerciseSwapIndex!].id)) ||
-  //                                           (!addModal &&
-  //                                               selectExerciseSwapIndex! >= userData!.currentRelatedExercises.length &&
-  //                                               userData!.currentDayObj.exercises.any((exerciseData) =>
-  //                                                   exerciseData.id ==
-  //                                                   userData!
-  //                                                       .allFilterExercises[
-  //                                                           selectExerciseSwapIndex! - userData!.currentRelatedExercises.length]
-  //                                                       .id)) ||
-  //                                           (addModal &&
-  //                                               userData!.currentDayObj.exercises.any((exerciseData) =>
-  //                                                   exerciseData.id == userData!.allFilterExercises[selectExerciseSwapIndex!].id)))
-  //                                   ? () {
-  //                                       // Your logic for swap or add
-  //                                       if (!addModal) {
-  //                                         if (selectExerciseSwapIndex! < userData!.currentRelatedExercises.length) {
-  //                                           dataProvider?.swapExerciseById(
-  //                                               userData!.currentWeek,
-  //                                               userData!.currentDay,
-  //                                               selectedIndex,
-  //                                               exercise.id,
-  //                                               userData!.currentRelatedExercises[selectExerciseSwapIndex!].title,
-  //                                               userData!.currentRelatedExercises[selectExerciseSwapIndex!].id);
-  //                                         } else {
-  //                                           dataProvider?.swapExerciseById(
-  //                                               userData!.currentWeek,
-  //                                               userData!.currentDay,
-  //                                               selectedIndex,
-  //                                               exercise.id,
-  //                                               userData!
-  //                                                   .allFilterExercises[
-  //                                                       selectExerciseSwapIndex! - userData!.currentRelatedExercises.length!]
-  //                                                   .title,
-  //                                               userData!
-  //                                                   .allFilterExercises[
-  //                                                       selectExerciseSwapIndex! - userData!.currentRelatedExercises.length!]
-  //                                                   .id);
-  //                                         }
-  //
-  //                                         userData?.removeExerciseDataById(selectedIndex);
-  //                                       } else {
-  //                                         // Add logic
-  //                                         if (exercises.isNotEmpty) {
-  //                                           DayExercise newDayExercise = DayExercise(
-  //                                               id: userData?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-  //                                               id_: "",
-  //                                               typeId: exercises[0].typeId ?? 1,
-  //                                               name: userData?.allFilterExercises[selectExerciseSwapIndex!].title ??
-  //                                                   "Exercise ${exercises.length + 1}",
-  //                                               guide: exercises[0].guide ?? "",
-  //                                               sets: exercises[0].sets ?? 0,
-  //                                               reps: exercises[0].reps ?? 0,
-  //                                               rest: exercises[0].rest ?? 0,
-  //                                               weight: exercises[0].weight ?? 0,
-  //                                               // weight: "",
-  //                                               duration: exercises[0].duration ?? "",
-  //                                               formats: exercises[0].formats ?? [],
-  //                                               extra: exercises[0].extra ?? []);
-  //
-  //                                           debugPrint(selectExerciseSwapIndex.toString());
-  //
-  //                                           debugPrint(userData?.allFilterExercises[selectExerciseSwapIndex!].id);
-  //
-  //                                           dataProvider?.addExerciseById(userData!.currentWeek, userData!.currentDay, newDayExercise);
-  //                                         } else {
-  //                                           DayExercise newDayExercise = DayExercise(
-  //                                               id: userData?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-  //                                               id_: "",
-  //                                               typeId: userData!.currentDay,
-  //                                               name: userData?.allFilterExercises[selectExerciseSwapIndex!].title ??
-  //                                                   "Exercise ${exercises.length + 1}",
-  //                                               guide: "",
-  //                                               sets: 5,
-  //                                               reps: 10,
-  //                                               rest: 3,
-  //                                               weight: 30,
-  //                                               // weight: "",
-  //                                               duration: "15",
-  //                                               formats: ["A", "B", "C"],
-  //                                               extra: []
-  //
-  //                                               ///
-  //                                               );
-  //
-  //                                           debugPrint(userData?.allFilterExercises[selectExerciseSwapIndex!].id);
-  //
-  //                                           dataProvider?.addExerciseById(userData!.currentWeek, userData!.currentDay, newDayExercise);
-  //                                         }
-  //                                       }
-  //                                       setCurrentDayObj();
-  //                                       Navigator.pop(context);
-  //                                     }
-  //                                   : null,
-  //                               style: ElevatedButton.styleFrom(
-  //                                 foregroundColor: Colors.white,
-  //                                 backgroundColor: AppColors.primaryColor,
-  //                                 shadowColor: Colors.grey,
-  //                                 padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-  //                                 textStyle: const TextStyle(
-  //                                   fontSize: 16,
-  //                                 ),
-  //                               ),
-  //                               child: const Text('Confirm'),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
+  Future<void> showRelatedExerciseDialog(int selectedIndex, dynamic exercise, bool addModal) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        var media = MediaQuery.of(context).size;
+        int? selectExerciseSwapIndex;
+        int itemsPerPage = 5;
+        int currentPageRelated = 0;
+        int currentPageAll = 0;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            List<Widget> buildExerciseList(List exercises, int currentPage, bool isAll) {
+              int startIndex = currentPage * itemsPerPage + (!isAll ? 0 : monthProvider!.relatedExercises.length);
+              int endIndex = (startIndex + itemsPerPage) > exercises.length + (!isAll ? 0 : monthProvider!.relatedExercises.length)
+                  ? exercises.length + (!isAll ? 0 : monthProvider!.relatedExercises.length)
+                  : startIndex + itemsPerPage;
+
+              return [
+                for (int i = startIndex; i < endIndex; i++) ...[
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectExerciseSwapIndex = i;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        SizedBox(width: ScreenUtil.horizontalScale(5)),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: ScreenUtil.horizontalScale(10),
+                                height: ScreenUtil.horizontalScale(10),
+                                decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                    image: AssetImage('assets/img/card.png'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(ScreenUtil.horizontalScale(1)),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: ScreenUtil.horizontalScale(2)),
+                              Flexible(
+                                  child: Text(
+                                exercises[i - (!isAll ? 0 : monthProvider!.relatedExercises.length)].title,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: ScreenUtil.verticalScale(2),
+                                ),
+                              )),
+                              SizedBox(width: ScreenUtil.horizontalScale(2)),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(
+                            ScreenUtil.verticalScale(1),
+                          ),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primaryColor,
+                              width: 2,
+                            ),
+                            color: selectExerciseSwapIndex == i ? AppColors.primaryColor : Colors.white,
+                          ),
+                          child: selectExerciseSwapIndex == i
+                              ? Icon(
+                                  Icons.check,
+                                  size: ScreenUtil.verticalScale(2),
+                                  color: Colors.white,
+                                )
+                              : Icon(
+                                  null,
+                                  size: ScreenUtil.verticalScale(2),
+                                ),
+                        ),
+                        SizedBox(width: ScreenUtil.horizontalScale(5)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ];
+            }
+
+            Widget buildPaginationControls(int currentPage, int totalItems, Function(int) onPageChange) {
+              int totalPages = (totalItems / itemsPerPage).ceil();
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)), // Add horizontal padding here
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: currentPage > 0 ? () => onPageChange(0) : null,
+                      icon: const Icon(Icons.first_page),
+                    ),
+                    IconButton(
+                      onPressed: currentPage > 0 ? () => onPageChange(currentPage - 1) : null,
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                    Text('Page ${currentPage + 1} of $totalPages'),
+                    IconButton(
+                      onPressed: (currentPage + 1) < totalPages ? () => onPageChange(currentPage + 1) : null,
+                      icon: const Icon(Icons.arrow_forward),
+                    ),
+                    IconButton(
+                      onPressed: (currentPage + 1) < totalPages ? () => onPageChange(totalPages - 1) : null,
+                      icon: const Icon(Icons.last_page),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Dialog(
+              backgroundColor: Colors.white,
+              insetPadding: const EdgeInsets.all(0),
+              child: SizedBox(
+                width: ScreenUtil.horizontalScale(96),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: ScreenUtil.verticalScale(65),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!addModal) ...[
+                          Container(
+                            width: media.width,
+                            padding: const EdgeInsets.all(24),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Select Related Exercise',
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.horizontalScale(5.5),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          monthProvider!.relatedExercises.isNotEmpty
+                              ? Column(
+                                  children: [
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight: ScreenUtil.verticalScale(60),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: buildExerciseList(monthProvider!.relatedExercises, currentPageRelated, false),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox(),
+                          Container(
+                            width: media.width,
+                            padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Or select from the list:',
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.horizontalScale(5.5),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SearchEquipmentField(
+                            onChanged: (query) {
+                              setState(() {
+                                searchQuery = query;
+                                currentPageAll = 0;
+                                monthProvider?.fetchAllFilterEx(query);
+                              });
+                            },
+                          ),
+                          monthProvider!.allFilterExercises.isNotEmpty
+                              ? Column(
+                                  children: [
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight: ScreenUtil.verticalScale(60),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll, true),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // Pagination controls for all exercises
+                                    buildPaginationControls(
+                                      currentPageAll,
+                                      monthProvider!.allFilterExercises.length,
+                                      (page) {
+                                        setState(() {
+                                          currentPageAll = page;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox(),
+                        ] else ...[
+                          Container(
+                            width: media.width,
+                            padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Select from the list:',
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.horizontalScale(5.5),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SearchEquipmentField(
+                            onChanged: (query) {
+                              setState(() {
+                                searchQuery = query;
+                                currentPageAll = 0;
+                                monthProvider?.fetchAllFilterEx(query);
+                              });
+                            },
+                          ),
+                          monthProvider!.allFilterExercises.isNotEmpty
+                              ? Column(
+                                  children: [
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight: ScreenUtil.verticalScale(60),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll, false),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // Pagination controls for all exercises
+                                    buildPaginationControls(
+                                      currentPageAll,
+                                      monthProvider!.allFilterExercises.length,
+                                      (page) {
+                                        setState(() {
+                                          currentPageAll = page;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox(),
+                        ],
+                        // ignore: dead_code
+                        // if (showFindMore) ...[
+                        //   const SizedBox(height: 10),
+                        //   Padding(
+                        //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                        //     child: Row(
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: [
+                        //         const Icon(Icons.search, color: Colors.black), // Non-clickable icon
+                        //         const SizedBox(width: 8), // Space between icon & text field
+                        //         Expanded(
+                        //           child: TextField(
+                        //             decoration: const InputDecoration(
+                        //               hintText: 'Type to find more...',
+                        //               hintStyle: TextStyle(color: Colors.grey),
+                        //               border: OutlineInputBorder(),
+                        //             ),
+                        //             onSubmitted: (value) {
+                        //               setState(() {
+                        //                 // Logic to load more items or search
+                        //               });
+                        //             },
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        //   const SizedBox(height: 10),
+                        // ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.black,
+                                  backgroundColor: const Color(0xFFDDDDDD),
+                                  shadowColor: Colors.grey,
+                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
+                                  textStyle: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                child: const Text('Cancel'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {},
+                                // onPressed: selectExerciseSwapIndex != null &&
+                                //         !((!addModal &&
+                                //                 selectExerciseSwapIndex! < userData!.currentRelatedExercises.length &&
+                                //                 userData!.currentDayObj.exercises.any((exerciseData) =>
+                                //                     exerciseData.id == userData!.currentRelatedExercises[selectExerciseSwapIndex!].id)) ||
+                                //             (!addModal &&
+                                //                 selectExerciseSwapIndex! >= userData!.currentRelatedExercises.length &&
+                                //                 userData!.currentDayObj.exercises.any((exerciseData) =>
+                                //                     exerciseData.id ==
+                                //                     userData!
+                                //                         .allFilterExercises[
+                                //                             selectExerciseSwapIndex! - userData!.currentRelatedExercises.length]
+                                //                         .id)) ||
+                                //             (addModal &&
+                                //                 userData!.currentDayObj.exercises.any((exerciseData) =>
+                                //                     exerciseData.id == userData!.allFilterExercises[selectExerciseSwapIndex!].id)))
+                                //     ? () {
+                                //         // Your logic for swap or add
+                                //         if (!addModal) {
+                                //           if (selectExerciseSwapIndex! < userData!.currentRelatedExercises.length) {
+                                //             dataProvider?.swapExerciseById(
+                                //                 userData!.currentWeek,
+                                //                 userData!.currentDay,
+                                //                 selectedIndex,
+                                //                 exercise.id,
+                                //                 userData!.currentRelatedExercises[selectExerciseSwapIndex!].title,
+                                //                 userData!.currentRelatedExercises[selectExerciseSwapIndex!].id);
+                                //           } else {
+                                //             dataProvider?.swapExerciseById(
+                                //                 userData!.currentWeek,
+                                //                 userData!.currentDay,
+                                //                 selectedIndex,
+                                //                 exercise.id,
+                                //                 userData!
+                                //                     .allFilterExercises[
+                                //                         selectExerciseSwapIndex! - userData!.currentRelatedExercises.length!]
+                                //                     .title,
+                                //                 userData!
+                                //                     .allFilterExercises[
+                                //                         selectExerciseSwapIndex! - userData!.currentRelatedExercises.length!]
+                                //                     .id);
+                                //           }
+                                //
+                                //           userData?.removeExerciseDataById(selectedIndex);
+                                //         } else {
+                                //           // Add logic
+                                //           if (exercises.isNotEmpty) {
+                                //             DayExercise newDayExercise = DayExercise(
+                                //                 id: userData?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                //                 id_: "",
+                                //                 typeId: exercises[0].typeId ?? 1,
+                                //                 name: userData?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                //                     "Exercise ${exercises.length + 1}",
+                                //                 guide: exercises[0].guide ?? "",
+                                //                 sets: exercises[0].sets ?? 0,
+                                //                 reps: exercises[0].reps ?? 0,
+                                //                 rest: exercises[0].rest ?? 0,
+                                //                 weight: exercises[0].weight ?? 0,
+                                //                 // weight: "",
+                                //                 duration: exercises[0].duration ?? "",
+                                //                 formats: exercises[0].formats ?? [],
+                                //                 extra: exercises[0].extra ?? []);
+                                //
+                                //             debugPrint(selectExerciseSwapIndex.toString());
+                                //
+                                //             debugPrint(userData?.allFilterExercises[selectExerciseSwapIndex!].id);
+                                //
+                                //             dataProvider?.addExerciseById(userData!.currentWeek, userData!.currentDay, newDayExercise);
+                                //           } else {
+                                //             DayExercise newDayExercise = DayExercise(
+                                //                 id: userData?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                //                 id_: "",
+                                //                 typeId: userData!.currentDay,
+                                //                 name: userData?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                //                     "Exercise ${exercises.length + 1}",
+                                //                 guide: "",
+                                //                 sets: 5,
+                                //                 reps: 10,
+                                //                 rest: 3,
+                                //                 weight: 30,
+                                //                 // weight: "",
+                                //                 duration: "15",
+                                //                 formats: ["A", "B", "C"],
+                                //                 extra: []
+                                //
+                                //                 ///
+                                //                 );
+                                //
+                                //             debugPrint(userData?.allFilterExercises[selectExerciseSwapIndex!].id);
+                                //
+                                //             dataProvider?.addExerciseById(userData!.currentWeek, userData!.currentDay, newDayExercise);
+                                //           }
+                                //         }
+                                //         setCurrentDayObj();
+                                //         Navigator.pop(context);
+                                //       }
+                                //     : null,
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: AppColors.primaryColor,
+                                  shadowColor: Colors.grey,
+                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
+                                  textStyle: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                child: const Text('Confirm'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   /// SAVE DATA INTO SQL
 
   Future<void> _saveExerciseData({required String status, required String id, required String type}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
 
     final data = {
       "dataId": dataId,
@@ -1141,7 +1145,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "split": monthProvider?.splitType,
+      "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type
@@ -1166,6 +1170,9 @@ class _NewTodayPageState extends State<NewTodayPage> {
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
     await monthProvider?.fetchExerciseStatusLocalData();
 
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     double totalWeight = 0;
     int exCount = 0;
 
@@ -1185,8 +1192,9 @@ class _NewTodayPageState extends State<NewTodayPage> {
           for (int j = 0; j < elementI.round!; j++) {
             for (int z = 0; z < elementI.circuitExercises!.length; z++) {
               var elementZ = elementI.circuitExercises?[z];
+
               String dataId =
-                  "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
 
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
@@ -1206,7 +1214,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
         var elementI = data[i];
 
         String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
 
         bool? val = monthProvider?.exerciseHistoryModel
             .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
@@ -1222,7 +1230,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
         var elementI = data[i];
 
         String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
         bool? val = monthProvider?.exerciseHistoryModel
             .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
         if (val == false) {
@@ -1232,7 +1240,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
     }
 
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
     ///
 
@@ -1311,9 +1319,7 @@ class WorkoutCard extends StatefulWidget {
     required this.exerciseData,
     required this.isCircuit,
     this.roundIndex,
-    required this.totalExercise,
-    this.circuitIndex,
-    this.exIndex,
+    required this.exerciseId,
   });
 
   final bool isSkipped;
@@ -1327,22 +1333,20 @@ class WorkoutCard extends StatefulWidget {
   final bool enabled;
   final bool isCircuit;
   final String exerciseData;
+  final String exerciseId;
   final int? roundIndex;
-  final int totalExercise;
-  final int? circuitIndex;
-  final int? exIndex;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
 }
 
 class _WorkoutCardState extends State<WorkoutCard> {
-  final today = DateTime.now();
   String gImageUrl = "";
 
   @override
   void initState() {
     super.initState();
+    fetchImage();
     getTotalSets();
   }
 
@@ -1353,6 +1357,27 @@ class _WorkoutCardState extends State<WorkoutCard> {
       for (var element in widget.exercise.extra!) {
         totalSets += int.parse(element.sets.toString());
       }
+    }
+  }
+
+  Future<String?> getAuthToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? authToken = prefs.getString('authToken');
+    return authToken;
+  }
+
+  fetchImage() async {
+    String? userIdToken = await getAuthToken();
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${widget.exerciseId}');
+    url = Uri.http(url.authority, url.path);
+    final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData != null) {
+        ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+        gImageUrl = exerciseDetailModelData.thumbnail ?? "placeholder";
+      }
+      setState(() {});
     }
   }
 
@@ -1400,7 +1425,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       child: Row(
                         children: [
                           SlidableAction(
-                            onPressed: (context) => widget.openSwapModal,
+                            onPressed: (context) {
+                              widget.openSwapModal;
+                            },
                             icon: Icons.swap_horiz,
                             backgroundColor: Colors.blue,
                             foregroundColor: Colors.white,
@@ -1461,13 +1488,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       appShimmerImage(
                         height: media.width / 4,
                         width: media.width / 4,
-                        networkImageUrl: widget.isCircuit
-                            ? (value.circuitsExerciseDetailsList.isNotEmpty)
-                                ? value.circuitsExerciseDetailsList[widget.circuitIndex!][widget.exerciseIndex].thumbnail ?? ""
-                                : ""
-                            : (value.allExerciseDetailsList.isNotEmpty && value.allExerciseDetailsList.length == widget.totalExercise)
-                                ? value.allExerciseDetailsList[widget.exerciseIndex].thumbnail ?? ""
-                                : "",
+                        networkImageUrl: gImageUrl,
                         fit: BoxFit.contain,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(ScreenUtil.verticalScale(12)),

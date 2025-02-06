@@ -125,14 +125,18 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
           ),
           SizedBox(width: ScreenUtil.verticalScale(3)),
           if (!_isExpanded)
-            Text(
-              '${monthProvider?.splitType.toString().replaceAll("split", "")} workouts',
-              style: GoogleFonts.plusJakartaSans(
-                color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : Colors.black38,
-                fontSize: ScreenUtil.verticalScale(1.5),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Builder(builder: (context) {
+              String split = monthProvider?.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
+
+              return Text(
+                '${split.toString().replaceAll("split", "")} workouts',
+                style: GoogleFonts.plusJakartaSans(
+                  color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : Colors.black38,
+                  fontSize: ScreenUtil.verticalScale(1.5),
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            }),
         ],
       ),
       backgroundColor: const Color(0xFF0D0D0D),
@@ -241,8 +245,11 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
 
                         int? exerciseCount = 0;
                         if (exerciseDetails != null && monthProvider!.allRemovedExercise.isNotEmpty) {
+                          String split = monthProvider?.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
+
                           String dataId1 =
-                              "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.monthDataModel?.weeks?[mainIndex!].id}-${monthProvider?.monthDataModel?.weeks?[mainIndex!].idList![index]}";
+                              "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.monthDataModel?.weeks?[mainIndex!].id}-${monthProvider?.monthDataModel?.weeks?[mainIndex!].idList![index]}";
+
                           List<String> matchingExerciseIds = monthProvider!.allRemovedExercise
                               .where((entry) => entry.dataId == dataId1)
                               .map((entry) => entry.exerciseId!)
@@ -256,8 +263,10 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
                           exerciseCount = exerciseDetails?.length;
                         }
 
+                        String split = monthProvider?.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
+
                         String dataId =
-                            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.monthDataModel!.weeks![mainIndex!].id}-${weekDataModel!.idList![index]}";
+                            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.monthDataModel!.weeks![mainIndex!].id}-${weekDataModel!.idList![index]}";
 
                         int nextWorkOutIndex = weekDataModel!.dayList![index].toString().contains("Workout")
                             ? int.parse(weekDataModel!.dayList![index].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
@@ -281,13 +290,13 @@ class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
                                   ),
                                 Consumer<MonthProvider>(
                                   builder: (context, value, child) {
-                                    return (value.weekStatuses[mainIndex!] == WeekType.pastWeek && value.allDayHistoryModel.isEmpty) ||
-                                            value.allDayHistoryModel
+                                    return (value.weekStatuses[mainIndex!] == WeekType.pastWeek && value.allSplitDayHistoryModel.isEmpty) ||
+                                            value.allSplitDayHistoryModel
                                                 .any((element) => element.status == Status.skipped && element.dataId == dataId)
                                         ? skipped()
                                         : value.weekStatuses[mainIndex!] == WeekType.futureWeek
                                             ? future()
-                                            : value.allDayHistoryModel
+                                            : value.allSplitDayHistoryModel
                                                     .any((element) => element.status == Status.completed && element.dataId == dataId)
                                                 ? completed()
                                                 : value.weekStatuses[mainIndex!] == WeekType.currentWeek

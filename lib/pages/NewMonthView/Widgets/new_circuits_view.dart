@@ -48,9 +48,11 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
             shrinkWrap: true,
             itemBuilder: (context, circuitsIndex) {
               String exId = monthProvider.pumpDayModel?.circuits?[circuitsIndex].id ?? "";
+              String split =
+                  monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
               String dataId1 =
-                  "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$exId";
+                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$exId";
 
               int? indexW = monthProvider.circuitModel.indexWhere((element) => element.dataId == dataId1);
 
@@ -60,7 +62,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
               }
 
               String dayDtaId =
-                  "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
+                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +202,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                     String tempIndex = "$circuitsIndex:$roundIndex";
 
                                     String dataId =
-                                        "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${exercise.exerciseId}-$tempIndex";
+                                        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${exercise.exerciseId}-$tempIndex";
 
                                     bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
                                         monthProvider.isPastWeek;
@@ -214,9 +216,14 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                               : 0),
                                       child: Builder(builder: (context) {
                                         String exId = monthProvider.pumpDayModel?.circuits?[circuitsIndex].id ?? "";
+                                        String split = monthProvider
+                                                .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
 
                                         String dataId1 =
-                                            "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$exId";
+                                            "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$exId";
 
                                         int indexW = monthProvider.circuitModel.indexWhere((element) => element.dataId == dataId1);
 
@@ -226,9 +233,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                         }
 
                                         return WorkoutCard(
-                                          exIndex: exerciseIndex,
-                                          circuitIndex: circuitsIndex,
-                                          totalExercise: monthProvider.totalEx,
+                                          exerciseId: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId!,
                                           roundIndex: roundIndex,
                                           isCircuit: true,
                                           isCompleted: monthProvider.exerciseHistoryModel
@@ -243,7 +248,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                                       monthProvider.updateIsCircuit(true);
                                                       monthProvider.updateCircuit("$circuitsIndex:$roundIndex", circuitsIndex);
                                                       String dataId =
-                                                          "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
+                                                          "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
                                                       monthProvider.updateWarmUp(false);
@@ -257,7 +262,7 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                                       monthProvider.updateIsCircuit(true);
                                                       monthProvider.updateCircuit("$circuitsIndex:$roundIndex", circuitsIndex);
                                                       String dataId =
-                                                          "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
+                                                          "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
                                                       monthProvider.updateWarmUp(false);

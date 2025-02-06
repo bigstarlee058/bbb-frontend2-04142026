@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
@@ -104,8 +105,11 @@ class _NewExercisePageState extends State<NewExercisePage> {
       await monthProvider?.fetchDayStatusLocalData();
 
       final data = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1].dayList![payloadModel.dayIndex! - 1];
+      String split =
+          monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
       String dataId =
-          "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+          "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
       await monthProvider?.checkForPumpDay(data);
       if (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type!.contains("Pump Day"))) {
         monthProvider?.changeIsPumpDay(true);
@@ -166,12 +170,16 @@ class _NewExercisePageState extends State<NewExercisePage> {
     String exId = (isPumpDay ?? monthProvider!.isPumpDay) && (isCircuit ?? monthProvider!.isCircuit)
         ? "${monthProvider?.exerciseDetailModel!.sId.toString()}-${(circuitIndex ?? monthProvider?.circuitIndex)}"
         : monthProvider!.exerciseDetailModel!.sId.toString();
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
 
     fetchExtraSetLocalData(dataId);
-    monthProvider?.notifyListeners();
+
+    await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
+
     setState(() {});
   }
 
@@ -623,8 +631,14 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                     padding: EdgeInsets.zero,
                                     physics: const NeverScrollableScrollPhysics(),
                                     itemBuilder: (context, countIndex) {
+                                      String split = monthProvider
+                                              ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                              .toString()
+                                              .split(" ")[1] ??
+                                          "";
+
                                       String ctId =
-                                          "${monthProvider?.splitType}-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$countIndex-${monthProvider?.circuitIndex}";
+                                          "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$countIndex-${monthProvider?.circuitIndex}";
 
                                       bool isCompleted() {
                                         final val = monthProvider!.historyDataModel.where((element) => element.dataId == ctId);
@@ -720,12 +734,11 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                             onPress: () async {
                                               int count = 0;
                                               await _saveExerciseData(
-                                                status: Status.completed,
-                                                id: monthProvider.isPumpDay && monthProvider.isCircuit
-                                                    ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                                    : monthProvider.exerciseDetailModel!.sId.toString(),
-                                                type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise",
-                                              );
+                                                  status: Status.completed,
+                                                  id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                                      ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
+                                                      : monthProvider.exerciseDetailModel!.sId.toString(),
+                                                  type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise");
 
                                               if (monthProvider.isPumpDay && monthProvider.isCircuit) {
                                                 Navigator.pop(context);
@@ -735,6 +748,11 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                                     count++;
                                                   }
                                                 }
+                                                String split = monthProvider
+                                                        .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                        .toString()
+                                                        .split(" ")[1] ??
+                                                    "";
 
                                                 if (monthProvider.dayDataModel?.exercises?.length != count &&
                                                     monthProvider.dayDataModel?.exercises?.length != monthProvider.selectedExIndex + 1) {
@@ -746,7 +764,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                                   for (int i = skipIndex; i < monthProvider.dayDataModel!.exercises!.length; i++) {
                                                     var elementI = monthProvider.dayDataModel!.exercises![i];
                                                     String dataId =
-                                                        "${monthProvider.splitType}-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+                                                        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
                                                     bool val = monthProvider.exerciseHistoryModel
                                                         .any((element) => element.dataId == dataId && element.status == Status.completed);
                                                     if (val == false) {
@@ -774,6 +792,10 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                   textColor: const Color(0xFFFFFFFF),
                                   color: AppColors.skipDayColor,
                                   onPress: () async {
+                                    if (monthProvider.exerciseHistoryDetails?.status != Status.skipped) {
+                                      Navigator.pop(context);
+                                    }
+
                                     await _saveExerciseData(
                                       status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
                                       id: monthProvider.isPumpDay && monthProvider.isCircuit
@@ -783,9 +805,6 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                           ? "Circuit - ${monthProvider.circuitIndex}"
                                           : "Exercise",
                                     );
-                                    if (monthProvider.exerciseHistoryDetails?.status != Status.skipped) {
-                                      Navigator.pop(context);
-                                    }
                                   },
                                   isLoading: false,
                                 );
@@ -879,9 +898,11 @@ class _NewExercisePageState extends State<NewExercisePage> {
     String exId = monthProvider!.isPumpDay && monthProvider!.isCircuit
         ? "${monthProvider?.exerciseDetailModel!.sId.toString()}-${monthProvider?.circuitIndex}"
         : monthProvider!.exerciseDetailModel!.sId.toString();
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
 
     final data = {
       "sets": 1,
@@ -903,11 +924,14 @@ class _NewExercisePageState extends State<NewExercisePage> {
     await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchCircuitModelLocalData();
 
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     if (monthProvider!.isPumpDay && monthProvider!.isCircuit) {
       String exId = monthProvider?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].id ?? "";
 
       String dataId1 =
-          "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
+          "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
 
       final data2 = {
         "dataId": dataId1,
@@ -980,7 +1004,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
     await monthProvider?.fetchCircuitModelLocalData();
 
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
 
     final data = {
       "dataId": dataId,
@@ -988,7 +1012,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "split": monthProvider?.splitType,
+      "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type,
@@ -1001,6 +1025,8 @@ class _NewExercisePageState extends State<NewExercisePage> {
       "totalWeight": totalWeight.toString(),
     };
 
+    log('data :::cxc::::::::::::::: ${data}');
+
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
         DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
@@ -1010,10 +1036,16 @@ class _NewExercisePageState extends State<NewExercisePage> {
     } else {
       DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
+
     await monthProvider?.fetchExerciseStatusLocalData();
+    await monthProvider?.fetchExerciseHistoryLocalData();
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
 
     await monthProvider?.updateDayData();
     monthProvider?.getLiftedWeightGraphData();
+
+    if (status == Status.completed && type == "Exercise") {
+      monthProvider?.exerciseCompletedApi();
+    }
   }
 }

@@ -230,6 +230,21 @@ class DatabaseHelper {
     return results;
   }
 
+  Future<List<Map<String, dynamic>>> getFilteredData({
+    required String tableName,
+    required String monthId,
+  }) async {
+    Database db = await database;
+
+    List<Map<String, dynamic>> results = await db.query(
+      tableName,
+      where: 'monthId = ?',
+      whereArgs: [monthId],
+    );
+
+    return results;
+  }
+
   Future<Map<String, dynamic>?> getDataByDataId({required String tableName, required String id}) async {
     Database db = await database;
     List<Map<String, dynamic>> results = await db.query(tableName, where: 'dataId = ?', whereArgs: [id]);

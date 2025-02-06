@@ -92,13 +92,6 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-        // floatingActionButton: Consumer<MonthProvider>(
-        //   builder: (context, data, child) {
-        //     return FloatingActionButton(
-        //       onPressed: () => data.onInit(),
-        //     );
-        //   },
-        // ),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
@@ -203,11 +196,16 @@ class _DashboardPageState extends State<DashboardPage> {
                                         return const SizedBox();
                                       }
                                       if (monthData.todayTitleId.isNotEmpty) {
-                                        int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.indexWhere(
-                                          (element) => element == monthData.todayTitleId,
-                                        );
+                                        int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList
+                                            ?.indexWhere((element) => element == monthData.todayTitleId);
+
+                                        String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
+
                                         String dataId =
-                                            "${monthData.splitType}-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
+                                            "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
 
                                         final data = monthData.allDayHistoryModel.where((element) => element.dataId == dataId);
                                         String status = "";
@@ -334,8 +332,13 @@ class _DashboardPageState extends State<DashboardPage> {
                                           ),
                                         );
                                       } else {
+                                        String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
+
                                         String dataId =
-                                            "${monthData.splitType}-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
+                                            "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
                                         return Container(
                                           margin: EdgeInsets.symmetric(
                                             horizontal: ScreenUtil.horizontalScale(8),
@@ -451,10 +454,14 @@ class _DashboardPageState extends State<DashboardPage> {
                             builder: (context, value, child) {
                               if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
                               // final val1 = (value.currentWeek - 1) * 7;
+
+                              String split =
+                                  value.monthDataModel?.weeks?[(value.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
+
                               final count = value.allDayHistoryModel
                                   .where((element) =>
                                       element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
-                                      element.split == value.splitType &&
+                                      element.split == split &&
                                       element.monthId == value.monthDataModel?.id &&
                                       element.status == Status.completed)
                                   .length;

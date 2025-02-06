@@ -5,7 +5,6 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/pages/calender.dart';
-import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -20,53 +19,9 @@ class StreakCalendarPage extends StatefulWidget {
 }
 
 class _StreakCalendarPageState extends State<StreakCalendarPage> {
-  DataProvider? dataProvider;
-  // UserDataProvider? userData;
-  // late Month thisMonthWorkout;
-// List<dynamic> monthlyWorkOutSchedule = [];
-  int currentMonth = 0;
-
-  List monthOverView = [
-    {"month": 'January', "year": "2024"},
-    {"month": 'February', "year": "2024"},
-    {"month": 'March', "year": "2024"},
-    {"month": 'April', "year": "2024"},
-    {"month": 'May', "year": "2024"},
-    {"month": 'June', "year": "2024"},
-    {"month": 'July1', "year": "2024"},
-    {"month": 'July2', "year": "2024"},
-    {"month": 'August', "year": "2024"},
-  ];
-
-  @override
-  void initState() {
-    // userData = Provider.of<UserDataProvider>(
-    //   context,
-    //   listen: false,
-    // );
-    loadUserInfo();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void loadUserInfo() async {
-    // userData?.loadUserInfo();
-  }
-
   @override
   Widget build(BuildContext context) {
-    log('4. Buttons position on sign in screen');
     var media = MediaQuery.of(context).size;
-    // final mainPageProvider = context.watch<MainPageProvider>();
-    // DataProvider? dataProvider = Provider.of<DataProvider>(
-    //   context,
-    //   listen: false,
-    // );
-    // thisMonthWorkout = dataProvider.workout;
 
     ScreenUtil.init(context);
 

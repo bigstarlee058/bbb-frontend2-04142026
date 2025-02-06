@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
@@ -32,7 +31,6 @@ class NewExerciseCard extends StatefulWidget {
     required this.index,
     required this.subIndex,
     required this.exerciseName,
-    // required this.isTimerRunning,
     required this.color,
     required this.extraDataModel,
     required this.isCompleted,
@@ -55,7 +53,6 @@ class NewExerciseCard extends StatefulWidget {
   final int load;
   final int index;
   final int subIndex;
-  // final bool isTimerRunning;
   final VoidCallback makeRefresh;
 
   @override
@@ -106,8 +103,11 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
 
   setData() async {
     await preferences.putString(SharedPreference.isPause, "false");
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     dataId =
-        "${monthProvider?.splitType}-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
+        "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
 
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
     final expandedDataHistory = monthProvider?.expandedDataHistory;
@@ -199,9 +199,13 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     monthProvider?.timePassed = "";
     reps = int.tryParse(_repsController.text) ?? 0;
     weight = int.tryParse(_weightController.text) ?? 0;
+
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     final body = {
       "dataId": dataId,
-      "split": monthProvider?.splitType,
+      "split": split,
       "exerciseId": monthProvider?.exerciseDetailModel?.sId.toString(),
       "extraId": widget.extraDataModel.id.toString(),
       "monthId": monthProvider?.monthDataModel?.id,
@@ -248,7 +252,6 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     }
 
     setCompleted = _restDuration == 0 ? true : false;
-    log(':::::::::::::::::: ${"$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}"}');
 
     setState(() {});
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);

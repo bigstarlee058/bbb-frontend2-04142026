@@ -56,14 +56,27 @@ Widget appShimmerImage(
       );
     },
     errorWidget: (context, url, error) {
-      return Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-          borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
-          image: DecorationImage(image: AssetImage("assets/img/warm-up-placeholder.png"), fit: fit),
-        ),
-      );
+      return networkImageUrl == ""
+          ? Shimmer.fromColors(
+              baseColor: AppColors.primaryColor.withValues(alpha: 0.9),
+              highlightColor: AppColors.primaryColor.withValues(alpha: 0.7),
+              child: Container(
+                height: height,
+                width: width,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
+                  borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+                ),
+              ),
+            )
+          : Container(
+              height: height,
+              width: width,
+              decoration: BoxDecoration(
+                borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+                image: DecorationImage(image: AssetImage("assets/img/warm-up-placeholder.png"), fit: fit),
+              ),
+            );
     },
     imageBuilder: (context, imageProvider) => Container(
       height: height,
@@ -72,6 +85,7 @@ Widget appShimmerImage(
         borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
         image: DecorationImage(image: imageProvider, fit: fit),
       ),
+      child: child,
     ),
   );
 }
