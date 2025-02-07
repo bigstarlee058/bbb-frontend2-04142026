@@ -11,8 +11,15 @@ import 'package:provider/provider.dart';
 
 class NewCircuitsView extends StatefulWidget {
   final List<PumpCircuit> circuit;
+  final bool isDayCompleted;
+  final bool isDaySkipped;
 
-  const NewCircuitsView({super.key, required this.circuit});
+  const NewCircuitsView({
+    super.key,
+    required this.circuit,
+    required this.isDayCompleted,
+    required this.isDaySkipped,
+  });
 
   @override
   State<NewCircuitsView> createState() => _NewCircuitsViewState();
@@ -233,6 +240,8 @@ class _NewCircuitsViewState extends State<NewCircuitsView> {
                                         }
 
                                         return WorkoutCard(
+                                          isDayCompleted: widget.isDayCompleted,
+                                          isDaySkipped: widget.isDaySkipped,
                                           exerciseId: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId!,
                                           roundIndex: roundIndex,
                                           isCircuit: true,

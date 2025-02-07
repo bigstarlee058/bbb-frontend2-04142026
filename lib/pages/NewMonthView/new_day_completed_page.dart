@@ -44,7 +44,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
     time = "";
     totalWeight = 0;
 
-    data = monthProvider!.decodedData();
+    data = monthProvider!.decodedDataAll();
     DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
     dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
     formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
@@ -246,38 +246,26 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                           Container(
                             height: 50,
                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
-                            child: Builder(builder: (context) {
-                              String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                      .toString()
-                                      .split(" ")[1] ??
-                                  "";
-
-                              return IconRow(
-                                icons: List.generate(
-                                  formattedDates.length,
-                                  (index) => data.any(
-                                    (element) =>
+                            child: IconRow(
+                              icons: List.generate(
+                                formattedDates.length,
+                                (index) => data.any((element) =>
                                         DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
-                                        element.status == Status.completed &&
-                                        element.split == split,
-                                  )
-                                      ? IconDataWithDot(
-                                          icon: Icons.check,
-                                          iconColor: Colors.white,
-                                          backgroundColor: AppColors.primaryColor,
-                                          showDot: true,
-                                          dotColor: Colors.transparent,
-                                        )
-                                      : IconDataWithDot(
-                                          icon: Icons.close,
-                                          iconColor: Colors.white,
-                                          backgroundColor: Colors.blue,
-                                          showDot: true,
-                                          dotColor: Colors.transparent,
-                                        ),
-                                ),
-                              );
-                            }),
+                                        element.status == Status.completed)
+                                    ? IconDataWithDot(
+                                        icon: Icons.check,
+                                        iconColor: Colors.white,
+                                        backgroundColor: AppColors.primaryColor,
+                                        showDot: true,
+                                        dotColor: Colors.transparent)
+                                    : IconDataWithDot(
+                                        icon: Icons.close,
+                                        iconColor: Colors.white,
+                                        backgroundColor: Colors.blue,
+                                        showDot: true,
+                                        dotColor: Colors.transparent),
+                              ),
+                            ),
                           ),
                           SizedBox(height: ScreenUtil.horizontalScale(6)),
                           Text(

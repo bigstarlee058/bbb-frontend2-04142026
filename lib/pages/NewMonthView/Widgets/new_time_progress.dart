@@ -67,7 +67,7 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
         animationCompleted = true;
         widget.onComplete();
 
-        DatabaseHelper().updateSingleValue(
+        await DatabaseHelper().updateSingleValue(
             tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
       }
     });
@@ -131,7 +131,7 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
           currentTime = int.parse(monthProvider.timePassed);
 
           if (int.parse(monthProvider.timePassed) > totalTime) {
-            DatabaseHelper().updateSingleValue(
+            await DatabaseHelper().updateSingleValue(
                 tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
           }
         }

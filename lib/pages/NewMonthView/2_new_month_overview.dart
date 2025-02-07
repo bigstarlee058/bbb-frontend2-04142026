@@ -788,12 +788,12 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
+        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
-        DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+        await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
   }
 
@@ -807,7 +807,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "status": status,
       "type": type,
     };
-    DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
+    await DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
   }
 
   Future<void> unSkipped(String status) async {
@@ -957,9 +957,9 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     };
 
     if (matchingElement?.id != null) {
-      DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -1010,9 +1010,9 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     };
 
     if (matchingElement?.id != null) {
-      DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
     await monthProvider?.fetchDayStatusLocalData();

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
@@ -125,7 +123,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               ),
                               Builder(builder: (context) {
                                 final streak = context.watch<MonthProvider>().streak;
-                                log('streak :::::::::::::::::: $streak');
                                 return Text(
                                   '$streak',
                                   style: TextStyle(

@@ -269,28 +269,44 @@ class MonthProvider extends ChangeNotifier {
   MonthDataModel? pastMonthDataModel;
   List<String> lastSplit = [];
 
+  List<DayHistoryModel> newStreakData = [];
+  List<String> newLastSplit = [];
+
   void findSplitTypeList() {
     lastSplit = [];
+    newLastSplit = [];
+    newStreakData = [];
+
     allSplitDayHistoryModel.sort((a, b) {
       return (b.endTime ?? b.startTime ?? b.date!).compareTo(a.endTime ?? a.startTime ?? a.date!);
     });
+
     weekStatusesString.removeWhere((element) => element != "P");
-    for (var i = 0; i < weekStatusesString.length; i++) {
+    for (var i = 0; i < weekStatusesString.length + 1; i++) {
       final data = allSplitDayHistoryModel.where((element) {
         return element.weekId == monthDataModel!.weeks![i].id;
       }).toList();
       if (data.isNotEmpty) {
-        data.sort((a, b) => ((b.endTime ?? b.startTime ?? b.date!)).compareTo((a.endTime ?? a.startTime ?? a.date!)));
-        lastSplit.add(data.first.split ?? "");
+        if (weekStatusesString.length > i) {
+          data.sort((a, b) => ((b.endTime ?? b.startTime ?? b.date!)).compareTo((a.endTime ?? a.startTime ?? a.date!)));
+          lastSplit.add(data.first.split ?? "");
 
-        String split = data.first.split ?? "";
-        final rawTempData = preferences.getString("$split-${monthDataModel?.id}");
+          String split = data.first.split ?? "";
+          final rawTempData = preferences.getString("$split-${monthDataModel?.id}");
 
-        if (rawTempData!.isNotEmpty) {
-          pastMonthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
-          WeekDataModel weekDataModel = pastMonthDataModel!.weeks![i];
-          monthDataModel!.weeks![i] = weekDataModel;
+          if (rawTempData!.isNotEmpty) {
+            pastMonthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
+            WeekDataModel weekDataModel = pastMonthDataModel!.weeks![i];
+            monthDataModel!.weeks![i] = weekDataModel;
+          }
         }
+        newStreakData.addAll(allSplitDayHistoryModel
+            .where((element) =>
+                monthDataModel!.weeks![i].id == element.weekId &&
+                monthDataModel?.id == element.monthId &&
+                element.split == (data.first.split ?? "") &&
+                element.status == Status.completed)
+            .toList());
       }
     }
   }
@@ -841,58 +857,58 @@ class MonthProvider extends ChangeNotifier {
     totalFormat2Set = historyDataModel.where((element) => element.type == "2").length;
     totalFormat3Set = historyDataModel.where((element) => element.type == "3").length;
 
-    // bool a = (!(totalFormat1Set == 0 && totalFormat1Weight == 0 && totalFormat1Reps == 0 && totalFormat1Rest == 0));
-    // bool b = (!(totalFormat2Set == 0 && totalFormat2Weight == 0 && totalFormat2Reps == 0 && totalFormat2Rest == 0));
-    // bool c = (!(totalFormat3Set == 0 && totalFormat3Weight == 0 && totalFormat3Reps == 0 && totalFormat3Rest == 0));
+    bool a = (!(totalFormat1Set == 0 && totalFormat1Weight == 0 && totalFormat1Reps == 0 && totalFormat1Rest == 0));
+    bool b = (!(totalFormat2Set == 0 && totalFormat2Weight == 0 && totalFormat2Reps == 0 && totalFormat2Rest == 0));
+    bool c = (!(totalFormat3Set == 0 && totalFormat3Weight == 0 && totalFormat3Reps == 0 && totalFormat3Rest == 0));
 
-    // final body = {
-    //   "monthIndex": "${monthDataModel?.index}",
-    //   "weekIndex": "${weekDataModel?.index}",
-    //   "dayId": "${weekDataModel?.days?[overviewCurrentDay - 1].id}",
-    //   "day": DateFormat("MM/dd/yyyy").format(DateTime.now()),
-    //   "exerciseId": "${exerciseDetailModel?.sId}",
-    //   "exercises": [
-    //     if (a)
-    //       {
-    //         "sets": "$totalFormat1Set",
-    //         "weight": "$totalFormat1Weight",
-    //         "resp": "$totalFormat1Reps",
-    //         "rest": "$totalFormat1Rest",
-    //         "type": "1",
-    //       },
-    //     if (b)
-    //       {
-    //         "sets": "$totalFormat2Set",
-    //         "weight": "$totalFormat2Weight",
-    //         "resp": "$totalFormat2Reps",
-    //         "rest": "$totalFormat2Rest",
-    //         "type": "2",
-    //       },
-    //     if (c)
-    //       {
-    //         "sets": "$totalFormat3Set",
-    //         "weight": "$totalFormat3Weight",
-    //         "resp": "$totalFormat3Reps",
-    //         "rest": "$totalFormat3Rest",
-    //         "type": "3",
-    //       }
-    //   ]
-    // };
-    //
-    // if (a || b || c) {
-    //   Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/exercise_done');
-    //   String? userIdToken = await getAuthToken();
-    //   final response = await http.post(url,
-    //       headers: <String, String>{
-    //         'Content-Type': 'application/json; charset=UTF-8',
-    //         'AUTH_TOKEN': userIdToken ?? "",
-    //       },
-    //       body: jsonEncode(body));
-    //   if (response.statusCode == 200) {
-    //   } else {
-    //     throw Exception('Failed to load exercise info');
-    //   }
-    // }
+    final body = {
+      "monthIndex": "${monthDataModel?.index}",
+      "weekIndex": "${weekDataModel?.index}",
+      "dayId": "${weekDataModel?.days?[overviewCurrentDay - 1].id}",
+      "day": DateFormat("MM/dd/yyyy").format(DateTime.now()),
+      "exerciseId": "${exerciseDetailModel?.sId}",
+      "exercises": [
+        if (a)
+          {
+            "sets": "$totalFormat1Set",
+            "weight": "$totalFormat1Weight",
+            "resp": "$totalFormat1Reps",
+            "rest": "$totalFormat1Rest",
+            "type": "1",
+          },
+        if (b)
+          {
+            "sets": "$totalFormat2Set",
+            "weight": "$totalFormat2Weight",
+            "resp": "$totalFormat2Reps",
+            "rest": "$totalFormat2Rest",
+            "type": "2",
+          },
+        if (c)
+          {
+            "sets": "$totalFormat3Set",
+            "weight": "$totalFormat3Weight",
+            "resp": "$totalFormat3Reps",
+            "rest": "$totalFormat3Rest",
+            "type": "3",
+          }
+      ]
+    };
+
+    if (a || b || c) {
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/exercise_done');
+      String? userIdToken = await getAuthToken();
+      final response = await http.post(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'AUTH_TOKEN': userIdToken ?? "",
+          },
+          body: jsonEncode(body));
+      if (response.statusCode == 200) {
+      } else {
+        throw Exception('Failed to load exercise info');
+      }
+    }
   }
 
   /// STREAK COUNT =============================++++++++++++++++++++++++++++++++++
@@ -1004,7 +1020,6 @@ class MonthProvider extends ChangeNotifier {
 
   fetchExerciseHistoryLocalData() async {
     String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
-    log('split ::::::::xcxcx:::::::::: ${split}');
 
     historyDataModel = [];
     final data = await DatabaseHelper().getFilteredWithExerciseData(
@@ -1048,8 +1063,6 @@ class MonthProvider extends ChangeNotifier {
       dayId: weekDataModel?.idList![overviewCurrentDay - 1] ?? "",
       weekId: weekDataModel?.id ?? "",
     );
-
-    log('data :::::::::::::::::: ${jsonEncode(data)}');
 
     if (data.isNotEmpty) {
       exerciseHistoryModel = List<ExerciseHistoryModel>.from(json.decode(jsonEncode(data)).map((x) => ExerciseHistoryModel.fromJson(x)));

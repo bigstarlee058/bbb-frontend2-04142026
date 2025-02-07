@@ -453,19 +453,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: Consumer<MonthProvider>(
                             builder: (context, value, child) {
                               if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
-                              // final val1 = (value.currentWeek - 1) * 7;
-
-                              String split =
-                                  value.monthDataModel?.weeks?[(value.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
-
-                              final count = value.allDayHistoryModel
-                                  .where((element) =>
-                                      element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
-                                      element.split == split &&
-                                      element.monthId == value.monthDataModel?.id &&
-                                      element.status == Status.completed)
-                                  .length;
-                              // final count = val2.length + val1;
+                              final count = value.newStreakData.length;
                               return Column(
                                 children: [
                                   const SizedBox(height: 10),

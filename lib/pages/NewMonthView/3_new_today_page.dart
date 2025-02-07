@@ -261,7 +261,10 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                 ),
                                 SizedBox(height: media.height * 0.025),
                                 monthProvider!.isPumpDay
-                                    ? NewCircuitsView(circuit: monthProvider!.pumpDayModel!.circuits!)
+                                    ? NewCircuitsView(
+                                        circuit: monthProvider!.pumpDayModel!.circuits!,
+                                        isDayCompleted: isCurrentDayCompleted,
+                                        isDaySkipped: isCurrentDaySkipped)
                                     : const SizedBox(),
                                 Column(
                                   children: List.generate(
@@ -287,6 +290,8 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                           Padding(
                                             padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                             child: WorkoutCard(
+                                              isDayCompleted: isCurrentDayCompleted,
+                                              isDaySkipped: isCurrentDaySkipped,
                                               exerciseId: exercises[i].exerciseId!,
                                               isCircuit: false,
                                               isCompleted: monthProvider!.exerciseHistoryModel
@@ -305,13 +310,14 @@ class _NewTodayPageState extends State<NewTodayPage> {
                                               exerciseData: exercises[i].id!,
                                               name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
                                               onRemove: () => removeExercise(exercises[i].exerciseId!),
-                                              enabled: isCurrentDayCompleted || isCurrentDaySkipped
+                                              enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
                                                   ? false
-                                                  /*: monthProvider!.exerciseHistoryModel.any((element) =>
+                                                  : monthProvider!.exerciseHistoryModel.any((element) =>
                                                               element.dataId == dataId && element.status == Status.completed) ||
                                                           isExist
-                                                      ? false*/
-                                                  : true,
+                                                      ? false
+                                                      :*/
+                                                  true,
                                             ),
                                           ),
                                           SizedBox(
@@ -327,9 +333,9 @@ class _NewTodayPageState extends State<NewTodayPage> {
                           ),
                           SizedBox(height: ScreenUtil.verticalScale(2)),
                           monthProvider?.dayHistoryDetails == null ||
-                                  (monthProvider?.dayHistoryDetails?.status == Status.skipped ||
-                                          monthProvider?.dayHistoryDetails?.status == Status.completed) &&
-                                      monthProvider!.isPastWeek
+                                  isCurrentDayCompleted ||
+                                  isCurrentDaySkipped ||
+                                  monthProvider!.isPastWeek
                               ? const SizedBox()
                               : Padding(
                                   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
@@ -456,15 +462,9 @@ class _NewTodayPageState extends State<NewTodayPage> {
           children: [
             Text(
               'Warm-Up',
-              style: TextStyle(
-                fontSize: ScreenUtil.horizontalScale(6),
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryColor,
-              ),
+              style: TextStyle(fontSize: ScreenUtil.horizontalScale(6), fontWeight: FontWeight.bold, color: AppColors.primaryColor),
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             Consumer<MonthProvider>(builder: (context, monthProvider, child) {
               String split =
                   monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
@@ -477,38 +477,24 @@ class _NewTodayPageState extends State<NewTodayPage> {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
+                  appShimmerImage(
+                    networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
+                        ? monthProvider.warmUpModel?.thumbnail ??
+                            "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                        : monthProvider.warmUpModel?.thumbnail ?? "",
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(ScreenUtil.verticalScale(1)),
+                    ),
                     height: media.width / 3.7,
                     width: media.width / 3.7,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: monthProvider.warmUpModel?.thumbnail != ''
-                            ? NetworkImage(
-                                "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
-                                    ? "${monthProvider.warmUpModel?.thumbnail}"
-                                        .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                    : "${monthProvider.warmUpModel?.thumbnail}",
-                              )
-                            : const AssetImage('assets/img/warm-up-placeholder.png'),
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(
-                          ScreenUtil.verticalScale(1),
-                        ),
-                      ),
-                    ),
                     child: Container(
                       decoration: monthProvider.exerciseHistoryModel
                               .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
                           ? BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
+                              gradient: LinearGradient(colors: [
+                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                              ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(
                                   ScreenUtil.verticalScale(1),
@@ -1158,12 +1144,12 @@ class _NewTodayPageState extends State<NewTodayPage> {
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
+        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
-        DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+        await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
   }
 
@@ -1252,7 +1238,7 @@ class _NewTodayPageState extends State<NewTodayPage> {
       "completedExercise": exCount.toString(),
     };
 
-    DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+    await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
 
     await monthProvider?.updateDayData();
     monthProvider?.fetchExerciseStatusLocalData();
@@ -1320,6 +1306,8 @@ class WorkoutCard extends StatefulWidget {
     required this.isCircuit,
     this.roundIndex,
     required this.exerciseId,
+    required this.isDayCompleted,
+    required this.isDaySkipped,
   });
 
   final bool isSkipped;
@@ -1334,6 +1322,8 @@ class WorkoutCard extends StatefulWidget {
   final bool isCircuit;
   final String exerciseData;
   final String exerciseId;
+  final bool isDayCompleted;
+  final bool isDaySkipped;
   final int? roundIndex;
 
   @override
@@ -1386,7 +1376,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     var media = MediaQuery.of(context).size;
 
     return Slidable(
-      enabled: widget.isCircuit ? false : true,
+      enabled: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted ? false : true,
       endActionPane: widget.isCircuit
           ? null
           : widget.enabled

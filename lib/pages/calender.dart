@@ -141,7 +141,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   Widget? _buildDayState(DateTime date) {
     DateTime? oldestStartDate =
         monthProvider?.monthLocalDataModel.map((e) => DateTime.parse(e.monthStartDate!)).reduce((a, b) => a.isBefore(b) ? a : b);
-    List<DayHistoryModel> data = monthProvider!.decodedData();
+    List<DayHistoryModel> data = monthProvider!.decodedDataAll();
     bool isCurrentDay = date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day;
 
     if (data.isEmpty) {

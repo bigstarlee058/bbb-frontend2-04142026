@@ -35,6 +35,7 @@ class NewExerciseCard extends StatefulWidget {
     required this.extraDataModel,
     required this.isCompleted,
     required this.makeRefresh,
+    required this.isEditable,
   });
 
   final Color color;
@@ -54,6 +55,7 @@ class NewExerciseCard extends StatefulWidget {
   final int index;
   final int subIndex;
   final VoidCallback makeRefresh;
+  final bool isEditable;
 
   @override
   State<NewExerciseCard> createState() => _NewExerciseCardState();
@@ -238,12 +240,12 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     await monthProvider?.fetchExerciseHistoryLocalData();
     if (monthProvider!.historyDataModel.isNotEmpty) {
       if (monthProvider!.historyDataModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
+        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
       } else {
-        DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+        await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
       }
     } else {
-      DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+      await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
     monthProvider?.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex, removeVal: true);
@@ -375,19 +377,21 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            const Text(
-                              'LOAD :',
-                              style: TextStyle(color: Colors.black54, fontSize: 13),
-                            ),
-                            Text(
-                              ' $load%',
-                              style: const TextStyle(color: Colors.black54, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
+                        if (load != 0 && widget.type == 3) ...[
+                          Row(
+                            children: [
+                              const Text(
+                                'LOAD :',
+                                style: TextStyle(color: Colors.black54, fontSize: 13),
+                              ),
+                              Text(
+                                ' $load%',
+                                style: const TextStyle(color: Colors.black54, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -420,7 +424,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                       IconButton(
                                         icon: const Icon(Icons.remove),
                                         color: AppColors.primaryColor,
-                                        onPressed: decrementWeight,
+                                        onPressed: widget.isEditable ? decrementWeight : null,
                                       ),
                                       SizedBox(
                                         width: 25,
@@ -428,6 +432,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                           controller: _weightController,
                                           keyboardType: const TextInputType.numberWithOptions(decimal: false),
                                           textAlign: TextAlign.center,
+                                          readOnly: widget.isEditable ? false : true,
                                           decoration: const InputDecoration(
                                             border: InputBorder.none,
                                           ),
@@ -457,7 +462,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                       IconButton(
                                         icon: const Icon(Icons.add),
                                         color: AppColors.primaryColor,
-                                        onPressed: incrementWeight,
+                                        onPressed: widget.isEditable ? incrementWeight : null,
                                       ),
                                     ],
                                   ),
@@ -493,7 +498,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                       IconButton(
                                         icon: const Icon(Icons.remove),
                                         color: AppColors.primaryColor,
-                                        onPressed: decrementReps,
+                                        onPressed: widget.isEditable ? decrementReps : null,
                                       ),
                                       SizedBox(
                                         width: 25,
@@ -501,6 +506,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                           controller: _repsController,
                                           keyboardType: const TextInputType.numberWithOptions(decimal: false),
                                           textAlign: TextAlign.center,
+                                          readOnly: widget.isEditable ? false : true,
                                           decoration: const InputDecoration(
                                             border: InputBorder.none,
                                           ),
@@ -530,7 +536,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                       IconButton(
                                         icon: const Icon(Icons.add),
                                         color: AppColors.primaryColor,
-                                        onPressed: incrementReps,
+                                        onPressed: widget.isEditable ? incrementReps : null,
                                       ),
                                     ],
                                   ),
@@ -576,7 +582,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                               label: Text(effortValue[index]),
                               selected: effort == index,
                               onSelected: (bool selected) {
-                                selectEffort(selected ? index : 100);
+                                widget.isEditable ? selectEffort(selected ? index : 100) : null;
                               },
                               padding: EdgeInsets.symmetric(
                                 horizontal: ScreenUtil.horizontalScale(2),
@@ -596,13 +602,22 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                           }),
                         ),
                         const SizedBox(height: 30),
-                        ButtonWidget(
-                          text: _restDuration != 0 ? "Save & start rest timer" : "Save",
-                          textColor: Colors.white,
-                          onPress: _saveData,
-                          color: AppColors.primaryColor,
-                          isLoading: false,
-                        ),
+                        if (widget.isEditable)
+                          ButtonWidget(
+                            text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                            textColor: Colors.white,
+                            onPress: _saveData,
+                            color: AppColors.primaryColor,
+                            isLoading: false,
+                          )
+                        else
+                          ButtonWidget(
+                            text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                            textColor: Colors.white,
+                            onPress: null,
+                            color: AppColors.primaryColor,
+                            isLoading: false,
+                          ),
                         SizedBox(
                           height: ScreenUtil.verticalScale(2),
                         ),

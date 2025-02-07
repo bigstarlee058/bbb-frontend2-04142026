@@ -133,23 +133,23 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
-                    height: 150, // You can adjust this height
-                    child: Scrollbar(
-                      thumbVisibility: true,
-                      thickness: 8,
-                      radius: const Radius.circular(10),
-                      child: ListView.builder(
-                        itemCount: dataList.length,
-                        itemBuilder: (context, index) {
-                          final note = dataList[index];
-                          return _buildNoteRow(DateFormat("dd-MM-yyyy").format(note.date!.toLocal()), note.note!);
-                        },
-                      ),
-                    )),
+                  height: 150, // You can adjust this height
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    thickness: 8,
+                    radius: const Radius.circular(10),
+                    child: ListView.builder(
+                      itemCount: dataList.length,
+                      itemBuilder: (context, index) {
+                        final note = dataList[index];
+                        return _buildNoteRow(DateFormat("dd-MM-yyyy").format(note.date!.toLocal()), note.note!);
+                      },
+                    ),
+                  ),
+                ),
               ],
             ),
     );
-    return const SizedBox();
   }
 
   Widget _buildNoteRow(String date, String content) {
@@ -173,24 +173,29 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
     );
   }
 
-  addNewNote() {
-    String id = monthProvider!.isPumpDay && monthProvider!.isCircuit
-        ? "${monthProvider!.exerciseDetailModel!.sId.toString()}-${monthProvider!.circuitIndex}"
-        : monthProvider!.exerciseDetailModel!.sId.toString();
+  addNewNote() async {
+    String id = monthProvider!.isWarmup
+        ? monthProvider?.warmUpModel?.id ?? ""
+        : monthProvider!.isPumpDay && monthProvider!.isCircuit
+            ? "${monthProvider!.exerciseDetailModel!.sId.toString()}-${monthProvider!.circuitIndex}"
+            : monthProvider!.exerciseDetailModel!.sId.toString();
     final data = {
       "exerciseId": id.toString(),
       "date": "${DateTime.now().toUtc()}",
       "note": _noteController.text.trim(),
     };
-    DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseNotes);
+    await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseNotes);
 
     getNotesData();
   }
 
   getNotesData() async {
-    String id = monthProvider!.isPumpDay && monthProvider!.isCircuit
-        ? "${monthProvider!.exerciseDetailModel!.sId.toString()}-${monthProvider!.circuitIndex}"
-        : monthProvider!.exerciseDetailModel!.sId.toString();
+    String id = monthProvider!.isWarmup
+        ? monthProvider?.warmUpModel?.id ?? ""
+        : monthProvider!.isPumpDay && monthProvider!.isCircuit
+            ? "${monthProvider!.exerciseDetailModel!.sId.toString()}-${monthProvider!.circuitIndex}"
+            : monthProvider!.exerciseDetailModel!.sId.toString();
+
     final data = await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.exerciseNotes, id: id, where: "exerciseId");
     if (data.isNotEmpty) {
       dataList = List<ExerciseNotesModel>.from(json.decode(jsonEncode(data)).map((x) => ExerciseNotesModel.fromJson(x)));
