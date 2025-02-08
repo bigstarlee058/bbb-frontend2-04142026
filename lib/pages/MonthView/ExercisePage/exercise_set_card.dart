@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
-import 'package:bbb/pages/NewMonthView/Widgets/new_time_progress.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/MonthView/ExercisePage/time_progress.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +15,8 @@ import 'package:provider/provider.dart';
 
 import 'notes_slideout.dart';
 
-class NewExerciseCard extends StatefulWidget {
-  const NewExerciseCard({
+class ExerciseSetCard extends StatefulWidget {
+  const ExerciseSetCard({
     super.key,
     required this.title,
     required this.isOpened,
@@ -58,10 +58,10 @@ class NewExerciseCard extends StatefulWidget {
   final bool isEditable;
 
   @override
-  State<NewExerciseCard> createState() => _NewExerciseCardState();
+  State<ExerciseSetCard> createState() => _ExerciseSetCardState();
 }
 
-class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAliveClientMixin {
+class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
   MonthProvider? monthProvider;
@@ -628,7 +628,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
             ),
           ),
           if (_showTimer && _restDuration != 0) ...[
-            NewTimerWithProgressBar(
+            TimerWithProgressBar(
               dataId: dataId,
               // isTimerRunning: widget.isTimerRunning,
               currentTime: monthProvider!.timePassed,

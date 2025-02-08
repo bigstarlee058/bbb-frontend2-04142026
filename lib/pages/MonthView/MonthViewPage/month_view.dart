@@ -2,12 +2,12 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/components/select_dropdown1.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
-import 'package:bbb/pages/NewMonthView/Widgets/1_1_new_track_card.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
 import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -16,14 +16,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class NewMonthView extends StatefulWidget {
-  const NewMonthView({super.key});
+class MonthView extends StatefulWidget {
+  const MonthView({super.key});
 
   @override
-  State<NewMonthView> createState() => _NewMonthViewState();
+  State<MonthView> createState() => _MonthViewState();
 }
 
-class _NewMonthViewState extends State<NewMonthView> {
+class _MonthViewState extends State<MonthView> {
   MonthProvider? monthProvider;
 
   @override
@@ -323,7 +323,7 @@ class _NewMonthViewState extends State<NewMonthView> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             for (int i = 0; i < value.weeksDataList.length; i++) ...[
-                                              NewWeeklyTrackCard(
+                                              WeeklyTrackCard(
                                                   index: i,
                                                   monthProvider: value,
                                                   pumpDayIds: value.weeksDataList[i].pumpDayIds!,

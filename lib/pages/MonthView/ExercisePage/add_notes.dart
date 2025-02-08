@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/exercise_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/models/MonthResponseModel/exercise_model.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';

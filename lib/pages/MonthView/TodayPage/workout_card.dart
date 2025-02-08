@@ -1,0 +1,324 @@
+import 'dart:convert';
+
+import 'package:bbb/components/common_network_image.dart';
+import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_constants.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class WorkoutCard extends StatefulWidget {
+  const WorkoutCard({
+    super.key,
+    required this.isCompleted,
+    required this.isSkipped,
+    required this.exerciseIndex,
+    this.onPress,
+    required this.openSwapModal,
+    required this.name,
+    required this.exercise,
+    required this.onRemove,
+    required this.enabled,
+    required this.exerciseData,
+    required this.isCircuit,
+    this.roundIndex,
+    required this.exerciseId,
+    required this.isDayCompleted,
+    required this.isDaySkipped,
+  });
+
+  final bool isSkipped;
+  final bool isCompleted;
+  final int exerciseIndex;
+  final void Function()? onPress;
+  final void Function()? openSwapModal;
+  final String name;
+  final ExerciseDataModel exercise;
+  final VoidCallback onRemove;
+  final bool enabled;
+  final bool isCircuit;
+  final String exerciseData;
+  final String exerciseId;
+  final bool isDayCompleted;
+  final bool isDaySkipped;
+  final int? roundIndex;
+
+  @override
+  State<WorkoutCard> createState() => _WorkoutCardState();
+}
+
+class _WorkoutCardState extends State<WorkoutCard> {
+  String gImageUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    fetchImage();
+    getTotalSets();
+  }
+
+  num totalSets = 0;
+
+  void getTotalSets() {
+    if (widget.exercise.extra!.isNotEmpty) {
+      for (var element in widget.exercise.extra!) {
+        totalSets += int.parse(element.sets.toString());
+      }
+    }
+  }
+
+  Future<String?> getAuthToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? authToken = prefs.getString('authToken');
+    return authToken;
+  }
+
+  fetchImage() async {
+    String? userIdToken = await getAuthToken();
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${widget.exerciseId}');
+    url = Uri.http(url.authority, url.path);
+    final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData != null) {
+        ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+        gImageUrl = exerciseDetailModelData.thumbnail ?? "placeholder";
+      }
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+
+    return Slidable(
+      enabled: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted ? false : true,
+      endActionPane: widget.isCircuit
+          ? null
+          : widget.enabled
+              ? ActionPane(
+                  extentRatio: 0.35,
+                  motion: const ScrollMotion(),
+                  children: [
+                    SizedBox(
+                      width: ScreenUtil.horizontalScale(5),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil.verticalScale(4),
+                      width: ScreenUtil.verticalScale(4),
+                      child: Row(
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              // dataProvider?.removeExerciseById(userData!.currentWeek, userData!.currentDay, widget.exercise.id!);
+                              widget.onRemove();
+                            },
+                            icon: Icons.close,
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.all(0),
+                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: ScreenUtil.horizontalScale(5),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil.verticalScale(4),
+                      width: ScreenUtil.verticalScale(4),
+                      child: Row(
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              widget.openSwapModal;
+                            },
+                            icon: Icons.swap_horiz,
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.all(0),
+                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : null,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(ScreenUtil.verticalScale(12)),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              spreadRadius: 1,
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: ElevatedButton(
+          onPressed: widget.enabled ? widget.onPress : null,
+          style: ElevatedButton.styleFrom(
+              disabledBackgroundColor: const Color(0xFFF3F3F3),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(ScreenUtil.verticalScale(12)),
+                ),
+                side: const BorderSide(
+                  color: Color(0x12000000),
+                  width: 0.5,
+                ),
+              ),
+              padding: EdgeInsets.zero),
+          child: Container(
+            width: media.width,
+            padding: EdgeInsets.only(right: ScreenUtil.verticalScale(2)),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(ScreenUtil.verticalScale(12)),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Consumer<MonthProvider>(builder: (context, value, child) {
+                  return Row(
+                    children: [
+                      appShimmerImage(
+                        height: media.width / 4,
+                        width: media.width / 4,
+                        networkImageUrl: gImageUrl,
+                        fit: BoxFit.contain,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                        ),
+                        child: Container(
+                          decoration: widget.isCompleted
+                              ? BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                      const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                  ),
+                                )
+                              : widget.isSkipped
+                                  ? BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColors.secondColor.withValues(alpha: 0.8),
+                                          AppColors.secondColor.withValues(alpha: 0.8),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                        bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                      ),
+                                    )
+                                  : BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                        bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                      ),
+                                    ),
+                          child: Icon(
+                            widget.isCompleted ? Icons.check : Icons.close,
+                            color: widget.isCompleted || widget.isSkipped ? Colors.white : Colors.transparent,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: media.width / 2.5,
+                            child: Text(
+                              widget.name,
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: widget.isCircuit ? ScreenUtil.horizontalScale(3) : ScreenUtil.horizontalScale(3.8),
+                                fontWeight: FontWeight.bold,
+                                height: 1.2,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: ScreenUtil.verticalScale(1.5),
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
+                                child: SvgPicture.asset(
+                                  "assets/icons/trend.svg",
+                                  colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                  width: 20,
+                                ),
+                              ),
+                              Text(
+                                "$totalSets sets",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  );
+                }),
+                if (widget.enabled) ...[
+                  GestureDetector(
+                    onTap: widget.enabled ? widget.onPress : null,
+                    child: Container(
+                      padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                        size: ScreenUtil.verticalScale(3),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

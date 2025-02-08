@@ -1,9 +1,9 @@
 import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -11,14 +11,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class NewDayCompletedPage extends StatefulWidget {
-  const NewDayCompletedPage({super.key});
+class DayCompletedPage extends StatefulWidget {
+  const DayCompletedPage({super.key});
 
   @override
-  State<NewDayCompletedPage> createState() => _NewDayCompletedPageState();
+  State<DayCompletedPage> createState() => _DayCompletedPageState();
 }
 
-class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
+class _DayCompletedPageState extends State<DayCompletedPage> {
   MonthProvider? monthProvider;
   MainPageProvider? mainPageProvider;
   DateTime today = DateTime.now();

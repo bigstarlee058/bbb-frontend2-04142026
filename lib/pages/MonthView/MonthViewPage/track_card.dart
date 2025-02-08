@@ -1,6 +1,6 @@
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class NewWeeklyTrackCard extends StatefulWidget {
-  const NewWeeklyTrackCard({
+class WeeklyTrackCard extends StatefulWidget {
+  const WeeklyTrackCard({
     super.key,
     required this.index,
     this.monthProvider,
@@ -44,10 +44,10 @@ class NewWeeklyTrackCard extends StatefulWidget {
   final List<String> pumpDayIds;
 
   @override
-  State<NewWeeklyTrackCard> createState() => _WeeklyTrackCardState();
+  State<WeeklyTrackCard> createState() => _WeeklyTrackCardState();
 }
 
-class _WeeklyTrackCardState extends State<NewWeeklyTrackCard> {
+class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
   List<String> moreOptions = ["None", "Recommended", "Last Visited"];
 
   MonthProvider? monthProvider;

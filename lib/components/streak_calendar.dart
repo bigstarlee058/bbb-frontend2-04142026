@@ -1,8 +1,8 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/calender.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -200,51 +200,51 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                           vertical: 25.0, //
                           horizontal: ScreenUtil.horizontalScale(10),
                         ),
-                        child: Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                          return ButtonWidget(
-                            text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
-                            textColor: Colors.white,
-                            onPress: monthProvider.todayTitleId.isEmpty
-                                ? null
-                                : () {
-                                    int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
-                                      (element) {
-                                        return element == monthProvider.todayTitleId;
-                                      },
-                                    );
-                                    final dayIndex = int.parse((monthProvider
-                                                .monthDataModel?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
-                                                .toString()
-                                                .replaceAll("Workout", "")
-                                                .replaceAll("Rest", "")
-                                                .replaceAll("Day", "")
-                                                .replaceAll(" ", "") ??
-                                            "0")) -
-                                        1;
-                                    DayDataModel dayData =
-                                        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                .toString()
-                                                .contains("Workout")
-                                            ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
-                                            : DayDataModel();
-                                    monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;
-                                    monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
-                                    monthProvider.dayDataModel = dayData;
-                                    monthProvider.alternateEquipmentType = monthProvider.equipmentType;
-                                    monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
-                                    monthProvider
-                                        .updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
-                                    Navigator.pop(context);
-                                    Navigator.pushNamed(context, '/dayOverview');
-                                  },
-                            color: AppColors.primaryColor,
-                            isLoading: false,
-                          );
-                        }),
+                        child: Consumer<MonthProvider>(
+                          builder: (context, monthProvider, child) {
+                            return ButtonWidget(
+                              text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
+                              textColor: Colors.white,
+                              onPress: monthProvider.todayTitleId.isEmpty
+                                  ? null
+                                  : () {
+                                      int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
+                                        (element) {
+                                          return element == monthProvider.todayTitleId;
+                                        },
+                                      );
+                                      final dayIndex = int.parse((monthProvider
+                                                  .monthDataModel?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
+                                                  .toString()
+                                                  .replaceAll("Workout", "")
+                                                  .replaceAll("Rest", "")
+                                                  .replaceAll("Day", "")
+                                                  .replaceAll(" ", "") ??
+                                              "0")) -
+                                          1;
+                                      DayDataModel dayData =
+                                          "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                                  .toString()
+                                                  .contains("Workout")
+                                              ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
+                                              : DayDataModel();
+                                      monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;
+                                      monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
+                                      monthProvider.dayDataModel = dayData;
+                                      monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+                                      monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
+                                      monthProvider
+                                          .updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
+                                      Navigator.pop(context);
+                                      Navigator.pushNamed(context, '/dayOverview');
+                                    },
+                              color: AppColors.primaryColor,
+                              isLoading: false,
+                            );
+                          },
+                        ),
                       ),
-                      SizedBox(
-                        height: ScreenUtil.verticalScale(10),
-                      )
+                      SizedBox(height: ScreenUtil.verticalScale(10))
                     ],
                   ),
                 ),

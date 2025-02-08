@@ -2,35 +2,34 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/circuit_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/extra_set_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/payload_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
-import 'package:bbb/pages/NewMonthView/Widgets/4_1_new_exercise_card.dart';
-import 'package:bbb/pages/NewMonthView/Widgets/4_2_add_notes.dart';
-import 'package:bbb/pages/NewMonthView/Widgets/new_equipment_section.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/middleware/notification_service.dart';
+import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
+import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/models/MonthResponseModel/payload_model.dart';
+import 'package:bbb/pages/MonthView/ExercisePage/add_notes.dart';
+import 'package:bbb/pages/MonthView/ExercisePage/exercise_set_card.dart';
+import 'package:bbb/pages/MonthView/TodayPage/equipment_section.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/clip_path.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../middleware/notification_service.dart';
-import '../../../values/clip_path.dart';
-
-class NewExercisePage extends StatefulWidget {
-  const NewExercisePage({super.key});
+class ExercisePage extends StatefulWidget {
+  const ExercisePage({super.key});
 
   @override
-  State<NewExercisePage> createState() => _NewExercisePageState();
+  State<ExercisePage> createState() => _ExercisePageState();
 }
 
-class _NewExercisePageState extends State<NewExercisePage> {
+class _ExercisePageState extends State<ExercisePage> {
   MonthProvider? monthProvider;
   bool loading = false;
   bool videoNotInitialized = false;
@@ -675,7 +674,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
 
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 20),
-                                        child: NewExerciseCard(
+                                        child: ExerciseSetCard(
                                           isEditable: isEditable,
                                           makeRefresh: () {
                                             setState(() {});
@@ -842,7 +841,7 @@ class _NewExercisePageState extends State<NewExercisePage> {
                                   );
                                 }),
                               ],
-                              const NewEquipmentSection(),
+                              const EquipmentSection(),
                             ],
                           )
                         else
@@ -976,14 +975,12 @@ class _NewExercisePageState extends State<NewExercisePage> {
       };
 
       if (monthProvider!.circuitModel.isNotEmpty) {
-        CircuitModel? matchingElement = monthProvider?.circuitModel.firstWhere(
-          (element) => element.dataId == dataId1,
-          orElse: () => CircuitModel(),
-        );
+        CircuitModel? matchingElement =
+            monthProvider?.circuitModel.firstWhere((element) => element.dataId == dataId1, orElse: () => CircuitModel());
 
         if (matchingElement?.id != null) {
           if (!matchingElement!.exerciseCountList!.contains(monthProvider!.exerciseDetailModel!.sId.toString())) {
-            final data3;
+            Map<String, dynamic> data3;
 
             if (monthProvider?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].circuitExercises?.length == 1) {
               data3 = {

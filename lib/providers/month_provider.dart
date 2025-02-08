@@ -2,21 +2,21 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/notification_service.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/all_exercise_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/circuit_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/excersie_detail_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/exercise_history_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/history_data_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/month_response_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/pump_day_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/removed_exercise_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/rest_day_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/warm_up_model.dart';
+import 'package:bbb/models/MonthResponseModel/all_exercise_model.dart';
+import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
+import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
+import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/models/MonthResponseModel/pump_day_model.dart';
+import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
+import 'package:bbb/models/MonthResponseModel/rest_day_model.dart';
+import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,7 +24,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../values/app_constants.dart';
+import '../values/app_constants.dart';
 
 enum WeekType { pastWeek, currentWeek, futureWeek }
 
@@ -320,11 +320,11 @@ class MonthProvider extends ChangeNotifier {
       (value) async {
         startTime = monthDataModel?.startDate ?? DateTime.now();
         endTime = monthDataModel?.endDate ?? DateTime.now();
+
         filter();
         int dayDelta =
             DateTime(today.year, today.month, today.day).difference(DateTime(startTime!.year, startTime!.month, startTime!.day)).inDays;
         week = (dayDelta ~/ 7) + 1;
-        currentWeek = week!;
         day = dayDelta % 7 + 1;
         currentWeek = week!;
 
@@ -610,7 +610,6 @@ class MonthProvider extends ChangeNotifier {
     };
 
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get');
-    log('url :::::::::::::::::: $url');
     url = Uri.http(url.authority, url.path, queryParams);
     String? userIdToken = await getAuthToken();
 
@@ -704,8 +703,6 @@ class MonthProvider extends ChangeNotifier {
     selectedExIndex = index;
     notifyListeners();
   }
-
-  ///  EXERCISE NOTES =============================++++++++++++++++++++++++++++++++++
 
   /// TIMER LOGIC =============================++++++++++++++++++++++++++++++++++
 
@@ -1660,7 +1657,11 @@ class MonthProvider extends ChangeNotifier {
 }
 
 class _BarData {
-  const _BarData(this.color, this.value, this.shadowValue);
+  const _BarData(
+    this.color,
+    this.value,
+    this.shadowValue,
+  );
   final Color color;
   final double value;
   final double shadowValue;

@@ -1,11 +1,11 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -15,14 +15,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class NewDayOverviewPage extends StatefulWidget {
-  const NewDayOverviewPage({super.key});
+class DayOverviewPage extends StatefulWidget {
+  const DayOverviewPage({super.key});
 
   @override
-  State<NewDayOverviewPage> createState() => _DayOverviewPageState();
+  State<DayOverviewPage> createState() => _DayOverviewPageState();
 }
 
-class _DayOverviewPageState extends State<NewDayOverviewPage> {
+class _DayOverviewPageState extends State<DayOverviewPage> {
   MonthProvider? monthProvider;
   late MainPageProvider mainPageProvider;
   UserDataProvider? userData;

@@ -1,20 +1,20 @@
-import 'package:bbb/pages/NewMonthView/3_new_today_page.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/circuit_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/pump_day_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/models/MonthResponseModel/pump_day_model.dart';
+import 'package:bbb/pages/MonthView/TodayPage/workout_card.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
 import 'package:provider/provider.dart';
 
-class NewCircuitsView extends StatefulWidget {
+class CircuitsView extends StatefulWidget {
   final List<PumpCircuit> circuit;
   final bool isDayCompleted;
   final bool isDaySkipped;
 
-  const NewCircuitsView({
+  const CircuitsView({
     super.key,
     required this.circuit,
     required this.isDayCompleted,
@@ -22,10 +22,10 @@ class NewCircuitsView extends StatefulWidget {
   });
 
   @override
-  State<NewCircuitsView> createState() => _NewCircuitsViewState();
+  State<CircuitsView> createState() => _CircuitsViewState();
 }
 
-class _NewCircuitsViewState extends State<NewCircuitsView> {
+class _CircuitsViewState extends State<CircuitsView> {
   MonthProvider? monthProvider;
   @override
   void initState() {

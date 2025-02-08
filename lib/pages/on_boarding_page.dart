@@ -1,6 +1,6 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/welcome_content_model.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
 import 'package:bbb/pages/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/utils/screen_util.dart';
