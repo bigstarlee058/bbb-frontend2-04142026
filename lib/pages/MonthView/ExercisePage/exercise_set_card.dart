@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
-import 'package:bbb/pages/NewMonthView/Widgets/new_time_progress.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +14,8 @@ import 'package:provider/provider.dart';
 
 import 'notes_slideout.dart';
 
-class NewExerciseCard extends StatefulWidget {
-  const NewExerciseCard({
+class ExerciseSetCard extends StatefulWidget {
+  const ExerciseSetCard({
     super.key,
     required this.title,
     required this.isOpened,
@@ -32,11 +30,11 @@ class NewExerciseCard extends StatefulWidget {
     required this.index,
     required this.subIndex,
     required this.exerciseName,
-    // required this.isTimerRunning,
     required this.color,
     required this.extraDataModel,
     required this.isCompleted,
     required this.makeRefresh,
+    required this.isEditable,
   });
 
   final Color color;
@@ -55,19 +53,19 @@ class NewExerciseCard extends StatefulWidget {
   final int load;
   final int index;
   final int subIndex;
-  // final bool isTimerRunning;
   final VoidCallback makeRefresh;
+  final bool isEditable;
 
   @override
-  State<NewExerciseCard> createState() => _NewExerciseCardState();
+  State<ExerciseSetCard> createState() => _ExerciseSetCardState();
 }
 
-class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAliveClientMixin {
+class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
   MonthProvider? monthProvider;
   bool _isExpanded = false;
-  bool _timerCompleted = false;
+  bool timerCompleted = false;
   bool _showTimer = false;
   bool setCompleted = false;
 
@@ -99,16 +97,18 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     load = widget.load;
     index = widget.index;
     subIndex = widget.subIndex;
-
-    monthProvider!.newFetchTimerAddress();
+    monthProvider!.fetchTimerAddress();
 
     setData();
   }
 
   setData() async {
     await preferences.putString(SharedPreference.isPause, "false");
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     dataId =
-        "${monthProvider?.splitType}-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
+        "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
 
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
     final expandedDataHistory = monthProvider?.expandedDataHistory;
@@ -131,13 +131,15 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
   }
 
-  void _handleTimerComplete() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setState(() {
-        _timerCompleted = true;
-      });
-    });
-  }
+  /// TEMP COMMENT !!! DONT DELETE THIS
+
+  // void _handleTimerComplete() {
+  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+  //     setState(() {
+  //       timerCompleted = true;
+  //     });
+  //   });
+  // }
 
   void incrementWeight() {
     setState(() {
@@ -170,7 +172,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
   void incrementReps() {
     setState(() {
       int reps1 = int.tryParse(_repsController.text) ?? 0;
-      reps = reps1 + 5;
+      reps = reps1 + 1;
       _repsController.text = '$reps';
     });
   }
@@ -178,7 +180,7 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
   void decrementReps() {
     setState(() {
       int reps1 = int.tryParse(_repsController.text) ?? 0;
-      reps = (reps1 > 5) ? reps1 - 5 : 0;
+      reps = (reps1 > 5) ? reps1 - 1 : 0;
       _repsController.text = '$reps';
     });
   }
@@ -189,20 +191,26 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     });
   }
 
-  Future<void> _handleCloseTimer() async {
-    _showTimer = false;
-    await monthProvider?.setShowTimerIndex(-1, -1, -1);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
-  }
+  /// TEMP COMMENT !!! DONT DELETE THIS
+
+  // Future<void> _handleCloseTimer() async {
+  //   _showTimer = false;
+  //   await monthProvider?.setShowTimerIndex(-1, -1, -1);
+  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+  // }
 
   Future<void> _saveData() async {
-    monthProvider?.newTimerAddress = "";
-    monthProvider?.newTimePassed = "";
+    monthProvider?.timerAddress = "";
+    monthProvider?.timePassed = "";
     reps = int.tryParse(_repsController.text) ?? 0;
     weight = int.tryParse(_weightController.text) ?? 0;
+
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     final body = {
       "dataId": dataId,
-      "split": monthProvider?.splitType,
+      "split": split,
       "exerciseId": monthProvider?.exerciseDetailModel?.sId.toString(),
       "extraId": widget.extraDataModel.id.toString(),
       "monthId": monthProvider?.monthDataModel?.id,
@@ -218,7 +226,8 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       "index": widget.index,
       "subIndex": widget.subIndex,
       "date": "${DateTime.now().toUtc()}",
-      "status": _restDuration == 0 ? Status.completed : Status.empty
+      // "status": _restDuration == 0 ? Status.completed : Status.empty
+      "status": Status.completed
     };
 
     final data1 = {
@@ -230,26 +239,29 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
       "date": "${DateTime.now().toUtc()}",
-      "status": _restDuration == 0 ? Status.completed : Status.empty
+      // "status": _restDuration == 0 ? Status.completed : Status.empty
+      "status": Status.completed
     };
     await monthProvider?.fetchExerciseHistoryLocalData();
     if (monthProvider!.historyDataModel.isNotEmpty) {
       if (monthProvider!.historyDataModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
+        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
       } else {
-        DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+        await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
       }
     } else {
-      DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+      await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
-    monthProvider?.setShowTimerIndex(widget.index, widget.subIndex, widget.exercise, removeVal: true);
+    monthProvider?.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex, removeVal: true);
+    // if (_restDuration != 0) {
+    //   _showTimer = true;
+    // }
+    // setCompleted = _restDuration == 0 ? true : false;
 
-    if (_restDuration != 0) {
-      _showTimer = true;
-    }
+    _showTimer = false;
+    setCompleted = true;
 
-    setCompleted = _restDuration == 0 ? true : false;
     setState(() {});
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -268,12 +280,12 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
     context.select((MonthProvider value) => value.currentExpandedItem);
     context.select((MonthProvider value) => value.timerAddress);
     _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
+
     if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.timerAddress != "") {
       _showTimer = monthProvider!.timerAddress ==
           "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
-
       if (_showTimer) {
-        monthProvider!.newSetShowTimerIndex(widget.index, widget.subIndex, widget.exercise);
+        monthProvider!.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex);
       }
     } else {
       _showTimer = false;
@@ -331,7 +343,8 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                               ),
                               const SizedBox(width: 20),
                               Text(
-                                _isExpanded ? "" : '$weight lbs       $reps reps',
+                                // _isExpanded ? "" : '$weight lbs       $reps reps',
+                                _isExpanded ? "" : '$reps reps',
                                 style: GoogleFonts.plusJakartaSans(
                                   color: _isExpanded ? Colors.transparent : Colors.black38,
                                   fontSize: 13,
@@ -341,14 +354,14 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                             ],
                           ),
                         ),
-                        if (_timerCompleted || setCompleted)
+                        if (timerCompleted || setCompleted)
                           Container(
                             padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
                             margin: const EdgeInsets.only(right: 10),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.primaryColor, width: 3),
-                              color: AppColors.primaryColor,
+                              border: Border.all(color: Colors.green, width: 3),
+                              color: Colors.green,
                             ),
                             child: Icon(Icons.check, size: ScreenUtil.verticalScale(2.2), color: Colors.white),
                           ),
@@ -372,19 +385,23 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            const Text(
-                              'LOAD :',
-                              style: TextStyle(color: Colors.black54, fontSize: 13),
-                            ),
-                            Text(
-                              ' $load%',
-                              style: const TextStyle(color: Colors.black54, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
+                        if (load == 0 && widget.type == 3)
+                          SizedBox()
+                        else ...[
+                          Row(
+                            children: [
+                              const Text(
+                                'LOAD :',
+                                style: TextStyle(color: Colors.black54, fontSize: 13),
+                              ),
+                              Text(
+                                ' $load%',
+                                style: const TextStyle(color: Colors.black54, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -414,17 +431,21 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                   ),
                                   child: Row(
                                     children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove),
-                                        color: AppColors.primaryColor,
-                                        onPressed: decrementWeight,
+                                      SizedBox(
+                                        width: 38,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.remove),
+                                          color: AppColors.primaryColor,
+                                          onPressed: widget.isEditable ? decrementWeight : null,
+                                        ),
                                       ),
                                       SizedBox(
-                                        width: 25,
+                                        width: 35,
                                         child: TextField(
                                           controller: _weightController,
                                           keyboardType: const TextInputType.numberWithOptions(decimal: false),
                                           textAlign: TextAlign.center,
+                                          readOnly: widget.isEditable ? false : true,
                                           decoration: const InputDecoration(
                                             border: InputBorder.none,
                                           ),
@@ -451,10 +472,13 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                           ],
                                         ),
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.add),
-                                        color: AppColors.primaryColor,
-                                        onPressed: incrementWeight,
+                                      SizedBox(
+                                        width: 38,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.add),
+                                          color: AppColors.primaryColor,
+                                          onPressed: widget.isEditable ? incrementWeight : null,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -487,17 +511,23 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                   ),
                                   child: Row(
                                     children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove),
-                                        color: AppColors.primaryColor,
-                                        onPressed: decrementReps,
+                                      SizedBox(
+                                        width: 38,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.remove),
+                                          color: AppColors.primaryColor,
+                                          onPressed: widget.isEditable ? decrementReps : null,
+                                        ),
                                       ),
                                       SizedBox(
-                                        width: 25,
-                                        child: TextField(
+                                        width: 35,
+                                        child: TextFormField(
                                           controller: _repsController,
-                                          keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: false, signed: true),
+                                          textInputAction: TextInputAction.done,
                                           textAlign: TextAlign.center,
+                                          // readOnly: widget.isEditable ? false : true,
+                                          readOnly: true,
                                           decoration: const InputDecoration(
                                             border: InputBorder.none,
                                           ),
@@ -524,10 +554,13 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                                           ],
                                         ),
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.add),
-                                        color: AppColors.primaryColor,
-                                        onPressed: incrementReps,
+                                      SizedBox(
+                                        width: 38,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.add),
+                                          color: AppColors.primaryColor,
+                                          onPressed: widget.isEditable ? incrementReps : null,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -537,69 +570,86 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
                           ],
                         ),
                         const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'REPS IN RESERVE',
-                              style: TextStyle(color: Colors.black54, fontSize: 13),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  backgroundColor: Colors.white,
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (BuildContext context) {
-                                    return const NotesSlideout();
-                                  },
-                                );
-                              },
-                              child: const Text(
-                                "WHAT'S RIR?",
-                                style: TextStyle(
-                                  color: AppColors.skipDayColor,
-                                  fontSize: 13,
-                                ),
+                        widget.type == 1
+                            ? SizedBox()
+                            : Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'REPS IN RESERVE',
+                                        style: TextStyle(color: Colors.black54, fontSize: 13),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                            backgroundColor: Colors.white,
+                                            context: context,
+                                            isScrollControlled: true,
+                                            builder: (BuildContext context) {
+                                              return const NotesSlideout();
+                                            },
+                                          );
+                                        },
+                                        child: const Text(
+                                          "WHAT'S RIR?",
+                                          style: TextStyle(
+                                            color: AppColors.skipDayColor,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: List.generate(5, (index) {
+                                      return ChoiceChip(
+                                        label: Text(effortValue[index]),
+                                        selected: effort == index,
+                                        onSelected: (bool selected) {
+                                          widget.isEditable ? selectEffort(selected ? index : 100) : null;
+                                        },
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil.horizontalScale(2),
+                                          vertical: ScreenUtil.verticalScale(2),
+                                        ),
+                                        shape: const RoundedRectangleBorder(
+                                          side: BorderSide(color: Colors.white),
+                                        ),
+                                        backgroundColor: Colors.white,
+                                        selectedColor: AppColors.primaryColor,
+                                        labelStyle: TextStyle(
+                                          color: effort == index ? Colors.white : Colors.black,
+                                        ),
+                                        checkmarkColor: Colors.white,
+                                        showCheckmark: true,
+                                      );
+                                    }),
+                                  ),
+                                  const SizedBox(height: 30),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: List.generate(5, (index) {
-                            return ChoiceChip(
-                              label: Text(effortValue[index]),
-                              selected: effort == index,
-                              onSelected: (bool selected) {
-                                selectEffort(selected ? index : 100);
-                              },
-                              padding: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.horizontalScale(2),
-                                vertical: ScreenUtil.verticalScale(2),
-                              ),
-                              shape: const RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.white,
-                              selectedColor: AppColors.primaryColor,
-                              labelStyle: TextStyle(
-                                color: effort == index ? Colors.white : Colors.black,
-                              ),
-                              checkmarkColor: Colors.white,
-                              showCheckmark: true,
-                            );
-                          }),
-                        ),
-                        const SizedBox(height: 30),
-                        ButtonWidget(
-                          text: _restDuration != 0 ? "Save & start rest timer" : "Save",
-                          textColor: Colors.white,
-                          onPress: _saveData,
-                          color: AppColors.primaryColor,
-                          isLoading: false,
-                        ),
+                        if (widget.isEditable)
+                          ButtonWidget(
+                            // text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                            text: "Save",
+                            textColor: Colors.white,
+                            onPress: _saveData,
+                            color: AppColors.primaryColor,
+                            isLoading: false,
+                          )
+                        else
+                          ButtonWidget(
+                            // text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                            text: "Save",
+                            textColor: Colors.white,
+                            onPress: null,
+                            color: AppColors.primaryColor,
+                            isLoading: false,
+                          ),
                         SizedBox(
                           height: ScreenUtil.verticalScale(2),
                         ),
@@ -609,16 +659,19 @@ class _NewExerciseCardState extends State<NewExerciseCard> with AutomaticKeepAli
               ],
             ),
           ),
-          if (_showTimer && _restDuration != 0) ...[
-            NewTimerWithProgressBar(
-              dataId: dataId,
-              // isTimerRunning: widget.isTimerRunning,
-              currentTime: monthProvider!.timePassed,
-              initialDuration: _restDuration,
-              onClose: _handleCloseTimer,
-              onComplete: _handleTimerComplete,
-            ),
-          ],
+
+          /// TEMP COMMENT !!! DONT DELETE THIS
+
+          // if (_showTimer && _restDuration != 0) ...[
+          //   TimerWithProgressBar(
+          //     dataId: dataId,
+          //     // isTimerRunning: widget.isTimerRunning,
+          //     currentTime: monthProvider!.timePassed,
+          //     initialDuration: _restDuration,
+          //     onClose: _handleCloseTimer,
+          //     onComplete: _handleTimerComplete,
+          //   ),
+          // ],
         ],
       ),
     );

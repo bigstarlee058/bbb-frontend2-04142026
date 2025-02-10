@@ -1,7 +1,9 @@
 import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -9,16 +11,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class NewDayCompletedPage extends StatefulWidget {
-  const NewDayCompletedPage({super.key});
+class DayCompletedPage extends StatefulWidget {
+  const DayCompletedPage({super.key});
 
   @override
-  State<NewDayCompletedPage> createState() => _NewDayCompletedPageState();
+  State<DayCompletedPage> createState() => _DayCompletedPageState();
 }
 
-class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
+class _DayCompletedPageState extends State<DayCompletedPage> {
   MonthProvider? monthProvider;
-
+  MainPageProvider? mainPageProvider;
   DateTime today = DateTime.now();
   List<DayHistoryModel> data = [];
   double totalWeight = 0;
@@ -29,7 +31,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) async => await monthProvider?.fetchAllDayStatusLocalData().then((value) => onInit()));
     super.initState();
@@ -42,7 +44,7 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
     time = "";
     totalWeight = 0;
 
-    data = monthProvider!.decodedData();
+    data = monthProvider!.decodedDataAll();
     DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
     dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
     formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
@@ -51,9 +53,15 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
     monthProvider?.allDayHistoryModel.forEach(
       (element) {
         if (element.endTime != null) {
-          if (DateFormat('yyyy-MM-dd').format(element.endTime!) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
+          final startTime = element.startTime!;
+          final endTime = element.endTime!;
+
+          DateTime localStartTime = startTime.toLocal();
+          DateTime localEndTime = endTime.toLocal();
+
+          if (DateFormat('yyyy-MM-dd').format(localEndTime) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
               element.status == Status.completed) {
-            int duration = element.endTime!.difference(element.startTime!).inSeconds;
+            int duration = localEndTime.difference(localStartTime).inSeconds;
             totalWorkoutDuration += duration;
             totalWeight += double.parse(element.totalWeight ?? "0");
           }
@@ -241,26 +249,21 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                             child: IconRow(
                               icons: List.generate(
                                 formattedDates.length,
-                                (index) => data.any(
-                                  (element) =>
-                                      DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
-                                      element.status == Status.completed &&
-                                      element.split == monthProvider!.splitType,
-                                )
+                                (index) => data.any((element) =>
+                                        DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
+                                        element.status == Status.completed)
                                     ? IconDataWithDot(
                                         icon: Icons.check,
                                         iconColor: Colors.white,
                                         backgroundColor: AppColors.primaryColor,
                                         showDot: true,
-                                        dotColor: Colors.transparent,
-                                      )
+                                        dotColor: Colors.transparent)
                                     : IconDataWithDot(
                                         icon: Icons.close,
                                         iconColor: Colors.white,
                                         backgroundColor: Colors.blue,
                                         showDot: true,
-                                        dotColor: Colors.transparent,
-                                      ),
+                                        dotColor: Colors.transparent),
                               ),
                             ),
                           ),
@@ -440,16 +443,49 @@ class _NewDayCompletedPageState extends State<NewDayCompletedPage> {
                           const SizedBox(height: 16),
                           Container(
                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                            child: ButtonWidget(
-                              text: "Next Workout",
-                              textColor: Colors.white,
-                              onPress: () {
-                                // mainPageProvider.changeTab(1);
-                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                              },
-                              color: AppColors.primaryColor,
-                              isLoading: false,
-                            ),
+                            child: Consumer<MonthProvider>(builder: (context, monthData, child) {
+                              return ButtonWidget(
+                                text: "Next Workout",
+                                textColor: Colors.white,
+                                onPress: () {
+                                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                  mainPageProvider?.changeTab(1);
+
+                                  if (monthData.todayTitleId.isNotEmpty) {
+                                    int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.indexWhere(
+                                      (element) => element == monthData.todayTitleId,
+                                    );
+
+                                    final dayIndex = int.parse((monthData
+                                                .monthDataModel?.weeks![(monthData.week ?? 1) - 1].dayList?[index ?? 0]
+                                                .toString()
+                                                .replaceAll("Workout", "")
+                                                .replaceAll("Rest", "")
+                                                .replaceAll("Day", "")
+                                                .replaceAll(" ", "") ??
+                                            "0")) -
+                                        1;
+
+                                    DayDataModel dayData =
+                                        "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                                .toString()
+                                                .contains("Workout")
+                                            ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].days![dayIndex]
+                                            : DayDataModel();
+
+                                    monthData.overviewCurrentWeek = monthData.week ?? 1;
+                                    monthData.overviewCurrentDay = ((index ?? 1) + 1);
+                                    monthData.dayDataModel = dayData;
+                                    monthData.alternateEquipmentType = monthData.equipmentType;
+                                    monthData.weekDataModel = monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
+                                    monthData.updateIsPastWeek(monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
+                                    Navigator.pushNamed(context, '/dayOverview');
+                                  }
+                                },
+                                color: AppColors.primaryColor,
+                                isLoading: false,
+                              );
+                            }),
                           ),
                           const SizedBox(
                             height: 50,

@@ -12,6 +12,7 @@ class UserDataProvider extends ChangeNotifier {
   String userId = "";
   String userName = "";
   String userEmail = "";
+  bool previousPage = false;
   var userData;
 
   Future<String?> getAuthToken() async {

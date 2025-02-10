@@ -24,7 +24,6 @@ class ProfileSettingsPage extends StatefulWidget {
 }
 
 class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
-  String? _imageUrl;
   UserDataProvider? userData;
 
   @override
@@ -53,14 +52,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       try {
         Reference storageRef = FirebaseStorage.instance.ref().child('profile_images/$fileName');
         await storageRef.putFile(file);
-        String downloadUrl = await storageRef.getDownloadURL();
 
         // Update the state with the image URL
-        setState(() {
-          _imageUrl = downloadUrl;
-        });
+        setState(() {});
       } catch (e) {
-        print("Error uploading image: $e");
+        log("Error uploading image: $e");
       }
     }
   }
@@ -71,7 +67,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     // Add your logout logic here
     /// clean specific items only
     //await prefs.clear(); // Clears all data
-    print('All shared preference data cleared');
+    log('All shared preference data cleared');
 
     // Navigator.popUntil(context, ModalRoute.withName(AppRoutes.onBoardingScreen));
 
@@ -86,6 +82,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   }
 
   openUrl(String url) async {
+    log('url :::::::::::::::::: $url');
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {
@@ -194,7 +191,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           builder: (context, userData, child) => userData.userName != ""
                                               ? Text(
                                                   // 'Hi, Nick',
-                                                  '${userData.userName}',
+                                                  userData.userName,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: ScreenUtil.horizontalScale(8),

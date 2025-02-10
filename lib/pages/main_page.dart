@@ -1,13 +1,14 @@
 import 'dart:async';
 
-import 'package:bbb/pages/NewMonthView/1_new_month_view.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
 import 'package:bbb/pages/dashboard_page.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/pages/MonthView/TodayPage/today_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -77,12 +78,11 @@ class _MainPageState extends State<MainPage> {
 
     _pages = [
       const DashboardPage(),
-      const NewMonthView(),
-      // const MonthlyViewPage(),
+      const MonthView(),
       const ToolsPage(),
       const ProfileSettingsPage(),
-      // StreakPage()
       const StreakCalendarPage(),
+      const TodayPage(),
     ];
   }
 

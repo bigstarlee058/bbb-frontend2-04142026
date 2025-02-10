@@ -2,12 +2,12 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/components/select_dropdown1.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
-import 'package:bbb/pages/NewMonthView/Widgets/1_1_new_track_card.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
 import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -16,14 +16,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class NewMonthView extends StatefulWidget {
-  const NewMonthView({super.key});
+class MonthView extends StatefulWidget {
+  const MonthView({super.key});
 
   @override
-  State<NewMonthView> createState() => _NewMonthViewState();
+  State<MonthView> createState() => _MonthViewState();
 }
 
-class _NewMonthViewState extends State<NewMonthView> {
+class _MonthViewState extends State<MonthView> {
   MonthProvider? monthProvider;
 
   @override
@@ -36,7 +36,6 @@ class _NewMonthViewState extends State<NewMonthView> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
@@ -103,9 +102,9 @@ class _NewMonthViewState extends State<NewMonthView> {
                                 Container(
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(8),
-                                    vertical: ScreenUtil.verticalScale(2),
+                                    vertical: ScreenUtil.verticalScale(1.9),
                                   ),
-                                  height: media.height * 0.23,
+                                  height: media.height * 0.22,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -144,7 +143,7 @@ class _NewMonthViewState extends State<NewMonthView> {
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(3),
+                                                fontSize: ScreenUtil.horizontalScale(6),
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -154,7 +153,7 @@ class _NewMonthViewState extends State<NewMonthView> {
                                       // const SizedBox(height: 10),
                                       Container(
                                         margin: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(10),
+                                          horizontal: ScreenUtil.horizontalScale(9),
                                         ),
                                         child: ButtonWidget(
                                           text: "Watch Video Intro",
@@ -183,7 +182,7 @@ class _NewMonthViewState extends State<NewMonthView> {
                         Container(
                           alignment: Alignment.center,
                           margin: EdgeInsets.symmetric(
-                            vertical: ScreenUtil.verticalScale(33.5),
+                            vertical: ScreenUtil.verticalScale(33),
                           ),
                           child: InkWell(
                             onTap: () {
@@ -311,85 +310,92 @@ class _NewMonthViewState extends State<NewMonthView> {
                           height: 20,
                         ),
                         Consumer<MonthProvider>(
-                          builder: (context, value, child) => value.isFilterLoading
-                              ? const SizedBox()
-                              : value.weeksDataList.isNotEmpty
-                                  ? Container(
-                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          for (int i = 0; i < value.weeksDataList.length; i++) ...[
-                                            NewWeeklyTrackCard(
-                                                index: i,
-                                                monthProvider: value,
-                                                pumpDayIds: value.weeksDataList[i].pumpDayIds!,
-                                                title: value.weeksDataList[i].title == "" ? "Week ${i + 1}" : value.weeksDataList[i].title!,
-                                                thisWeek: ((i + 1) == value.week),
-                                                restDayId: value.weeksDataList[i].restdayId!,
-                                                weekIndex: i,
-                                                isOpened: false,
-                                                isCompleted: false,
-                                                startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
-                                                cardData: value.weeksDataList[i],
-                                                daySplit: value.splitType!,
-                                                expandedVal: (i + 1) == value.week ? true : false,
-                                                completedWeek: i + 1),
-                                            const SizedBox(
-                                              height: 15,
-                                            ),
+                          builder: (context, value, child) {
+                            String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+                            return value.isFilterLoading
+                                ? const SizedBox()
+                                : value.weeksDataList.isNotEmpty
+                                    ? Container(
+                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            for (int i = 0; i < value.weeksDataList.length; i++) ...[
+                                              WeeklyTrackCard(
+                                                  index: i,
+                                                  monthProvider: value,
+                                                  pumpDayIds: value.weeksDataList[i].pumpDayIds!,
+                                                  title:
+                                                      value.weeksDataList[i].title == "" ? "Week ${i + 1}" : value.weeksDataList[i].title!,
+                                                  thisWeek: ((i + 1) == value.week),
+                                                  restDayId: value.weeksDataList[i].restdayId!,
+                                                  weekIndex: i,
+                                                  isOpened: false,
+                                                  isCompleted: false,
+                                                  startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
+                                                  cardData: value.weeksDataList[i],
+                                                  daySplit: split,
+                                                  expandedVal: (i + 1) == value.week ? true : false,
+                                                  completedWeek: i + 1),
+                                              const SizedBox(
+                                                height: 15,
+                                              ),
+                                            ],
                                           ],
-                                        ],
-                                      ),
-                                    )
-                                  : const Center(
-                                      child: Text("No workout data available"),
-                                    ),
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Text("No workout data available"),
+                                      );
+                          },
                         ),
                         const SizedBox(height: 15),
                         Container(
                           margin: EdgeInsets.symmetric(
                             horizontal: ScreenUtil.horizontalScale(5),
                           ),
-                          child: ButtonWidget(
-                            text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
-                            textColor: Colors.white,
-                            onPress: monthProvider!.todayTitleId.isEmpty
-                                ? null
-                                : () async {
-                                    int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList?.indexWhere(
-                                      (element) {
-                                        return element == monthProvider!.todayTitleId;
-                                      },
-                                    );
+                          child: Consumer<MonthProvider>(
+                            builder: (context, value, child) => ButtonWidget(
+                              text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
+                              textColor: Colors.white,
+                              onPress: monthProvider!.todayTitleId.isEmpty
+                                  ? null
+                                  : () async {
+                                      int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList?.indexWhere(
+                                        (element) {
+                                          return element == monthProvider!.todayTitleId;
+                                        },
+                                      );
 
-                                    final dayIndex = int.parse((monthProvider!
-                                                .monthDataModel?.weeks![(monthProvider!.week ?? 1) - 1].dayList?[index ?? 0]
-                                                .toString()
-                                                .replaceAll("Workout", "")
-                                                .replaceAll("Rest", "")
-                                                .replaceAll("Day", "")
-                                                .replaceAll(" ", "") ??
-                                            "0")) -
-                                        1;
+                                      final dayIndex = int.parse((monthProvider!
+                                                  .monthDataModel?.weeks![(monthProvider!.week ?? 1) - 1].dayList?[index ?? 0]
+                                                  .toString()
+                                                  .replaceAll("Workout", "")
+                                                  .replaceAll("Rest", "")
+                                                  .replaceAll("Day", "")
+                                                  .replaceAll(" ", "") ??
+                                              "0")) -
+                                          1;
 
-                                    DayDataModel dayData =
-                                        "${monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                .toString()
-                                                .contains("Workout")
-                                            ? monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1].days![dayIndex]
-                                            : DayDataModel();
-                                    monthProvider!.overviewCurrentWeek = monthProvider!.week ?? 1;
-                                    monthProvider!.overviewCurrentDay = ((index ?? 1) + 1);
-                                    monthProvider!.dayDataModel = dayData;
-                                    monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
-                                    monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
-                                    monthProvider?.updateIsPastWeek(
-                                        monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
-                                    Navigator.pushNamed(context, '/dayOverview');
-                                  },
-                            color: AppColors.primaryColor,
-                            isLoading: false,
+                                      DayDataModel dayData =
+                                          "${monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                                  .toString()
+                                                  .contains("Workout")
+                                              ? monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1].days![dayIndex]
+                                              : DayDataModel();
+                                      monthProvider!.overviewCurrentWeek = monthProvider!.week ?? 1;
+                                      monthProvider!.overviewCurrentDay = ((index ?? 1) + 1);
+                                      monthProvider!.dayDataModel = dayData;
+                                      monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
+                                      monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
+                                      monthProvider?.updateIsPastWeek(
+                                          monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
+                                      Navigator.pushNamed(context, '/dayOverview');
+                                    },
+                              color: AppColors.primaryColor,
+                              isLoading: false,
+                            ),
                           ),
                         ),
                       ],

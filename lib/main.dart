@@ -1,15 +1,15 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:bbb/components/streak_calendar.dart';
 import 'package:bbb/firebase_options.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/ChallengeView/joined_challeng_page.dart';
 import 'package:bbb/pages/CollectionView/collection_detail_page.dart';
-import 'package:bbb/pages/NewMonthView/2_new_month_overview.dart';
-import 'package:bbb/pages/NewMonthView/3_new_today_page.dart';
-import 'package:bbb/pages/NewMonthView/4_new_excerise_page.dart';
-import 'package:bbb/pages/NewMonthView/new_day_completed_page.dart';
+import 'package:bbb/pages/MonthView/DayCompletedPage/day_completed_page.dart';
+import 'package:bbb/pages/MonthView/DayOverviewPage/day_overview.dart';
+import 'package:bbb/pages/MonthView/ExercisePage/excerise_page.dart';
+import 'package:bbb/pages/MonthView/TodayPage/today_page.dart';
 import 'package:bbb/pages/Notification/notifications_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/language_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/myprofile_page.dart';
@@ -48,16 +48,14 @@ import 'package:provider/provider.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'pages/NewMonthView/Database/month_database.dart';
-import 'pages/NewMonthView/Database/month_prefrence.dart';
-import 'pages/NewMonthView/Providers/month_provider.dart';
+import 'localstorage/month_database.dart';
+import 'providers/month_provider.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
-  log('notificationResponse :::::::::::::::::: ${notificationResponse.payload}');
-}
+void notificationTapBackground(NotificationResponse notificationResponse) {}
 
 BuildContext? c;
 void main() async {
@@ -73,24 +71,29 @@ void main() async {
   const androidInitializationSetting = AndroidInitializationSettings('@mipmap/ic_launcher');
   const iosInitializationSetting = DarwinInitializationSettings();
   const initSettings = InitializationSettings(android: androidInitializationSetting, iOS: iosInitializationSetting);
+
   await flutterLocalNotificationsPlugin.initialize(
     initSettings,
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
-    onDidReceiveNotificationResponse: (details) {
-      // var data = jsonDecode(details.payload!);
-      // log('details :::::::::::::::::: ${details.payload}');
-      // Navigator.pushNamed(c!, '/exercise', arguments: [
-      //   data['name'] as String,
-      //   '1',
-      //   data['id'].toString(),
-      // ]);
+    onDidReceiveNotificationResponse: (details) async {
+      await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
+      await preferences.putInt(SharedPreference.fromNotification, 1);
+      navigatorKey.currentState?.pushNamed('/exercise');
     },
   );
+
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+    final String? payload = notificationAppLaunchDetails!.notificationResponse?.payload;
+    await preferences.putString(SharedPreference.payload, payload ?? "{}");
+    await preferences.putInt(SharedPreference.fromNotification, 1);
+  }
 
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (context) => const MyApp(),
+      builder: (context) => MyApp(),
     ),
   );
 }
@@ -178,6 +181,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [dataProvider, userDataProvider, locationProvider, mainPageProvider, programInfoProvider, monthProvider],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         locale: !kReleaseMode ? DevicePreview.locale(context) : null,
         builder: !kReleaseMode ? DevicePreview.appBuilder : null,
         title: 'Flutter Demo',
@@ -185,13 +189,8 @@ class _MyAppState extends State<MyApp> {
         initialRoute: AppRoutes.onBoardingScreen,
         routes: {
           AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
-          AppRoutes.mainScreen: (context) => const MainPage(
-                welcomeDescription: '',
-                welcomeImageUrl: '',
-              ),
-          AppRoutes.loginScreen: (context) => const LoginPage(
-                image: '',
-              ),
+          AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+          AppRoutes.loginScreen: (context) => const LoginPage(image: ''),
           AppRoutes.registerScreen: (context) => const RegisterPage(),
           AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
           AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),
@@ -202,10 +201,10 @@ class _MyAppState extends State<MyApp> {
           AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
           AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(),
           AppRoutes.emailVerificationScreen: (context) => const EmailVerificationScreen(),
-          AppRoutes.dayOverviewScreen: (context) => const NewDayOverviewPage(),
-          AppRoutes.todayScreen: (context) => const NewTodayPage(),
-          AppRoutes.dayCompletedScreen: (context) => const NewDayCompletedPage(),
-          AppRoutes.exerciseScreen: (context) => const NewExercisePage(),
+          AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
+          AppRoutes.todayScreen: (context) => const TodayPage(),
+          AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),
+          AppRoutes.exerciseScreen: (context) => const ExercisePage(),
           AppRoutes.recalculateScreen: (context) => const RecalculatePage(),
           AppRoutes.streakScreen: (context) => const StreakPage(),
           AppRoutes.calendarScreen: (context) => const CalendarPage(),
