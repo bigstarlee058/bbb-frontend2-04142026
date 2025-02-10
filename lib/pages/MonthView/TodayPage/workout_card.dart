@@ -60,7 +60,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   @override
   void initState() {
     super.initState();
-    fetchImage();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => fetchImage());
     getTotalSets();
   }
 
@@ -69,7 +69,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
   void getTotalSets() {
     if (widget.exercise.extra!.isNotEmpty) {
       for (var element in widget.exercise.extra!) {
-        totalSets += int.parse(element.sets.toString());
+        if (element.type != 1) {
+          totalSets += int.parse(element.sets.toString());
+        }
       }
     }
   }
@@ -91,7 +93,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
         ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
         gImageUrl = exerciseDetailModelData.thumbnail ?? "placeholder";
       }
-      setState(() {});
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {});
+      });
     }
   }
 

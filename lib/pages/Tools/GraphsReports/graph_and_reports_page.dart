@@ -4,7 +4,6 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
-import 'package:bbb/pages/Tools/GraphsReports/Charts/report_time_spent.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -243,66 +242,66 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
                         /// TIME SPENT
 
-                        SizedBox(height: ScreenUtil.horizontalScale(4)),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: ScreenUtil.verticalScale(1.5),
-                            horizontal: ScreenUtil.horizontalScale(8),
-                          ),
-                          width: media.width,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Time Spent',
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: ScreenUtil.horizontalScale(5),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Container(
-                                height: ScreenUtil.verticalScale(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
-                                ),
-                                child: Consumer<MonthProvider>(
-                                  builder: (context, monthProvider, child) {
-                                    return DropdownButtonHideUnderline(
-                                      child: DropdownButton(
-                                        value: monthProvider.reportTimeSpent,
-                                        items: ["Week 1", "Week 2", "Week 3", "Week 4"]
-                                            .map((name) => DropdownMenuItem(
-                                                  value: name,
-                                                  child: Text(
-                                                    name,
-                                                    style: TextStyle(
-                                                      color: const Color(0xA09F9F9F),
-                                                      fontSize: ScreenUtil.verticalScale(1.5),
-                                                    ),
-                                                  ),
-                                                ))
-                                            .toList(),
-                                        onChanged: monthProvider.changeWeekTimeSpent,
-                                        icon: const Icon(
-                                          Icons.expand_more,
-                                          color: Color(0xA09F9F9F),
-                                          size: 25,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: ScreenUtil.horizontalScale(2)),
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                          child: const ReportTimeSpentGraph(),
-                        ),
+                        // SizedBox(height: ScreenUtil.horizontalScale(4)),
+                        // Container(
+                        //   margin: EdgeInsets.symmetric(
+                        //     vertical: ScreenUtil.verticalScale(1.5),
+                        //     horizontal: ScreenUtil.horizontalScale(8),
+                        //   ),
+                        //   width: media.width,
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //     children: [
+                        //       Text(
+                        //         'Time Spent',
+                        //         style: TextStyle(
+                        //           color: AppColors.primaryColor,
+                        //           fontSize: ScreenUtil.horizontalScale(5),
+                        //           fontWeight: FontWeight.bold,
+                        //         ),
+                        //       ),
+                        //       Container(
+                        //         height: ScreenUtil.verticalScale(4),
+                        //         decoration: BoxDecoration(
+                        //           color: Colors.white,
+                        //           borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
+                        //         ),
+                        //         child: Consumer<MonthProvider>(
+                        //           builder: (context, monthProvider, child) {
+                        //             return DropdownButtonHideUnderline(
+                        //               child: DropdownButton(
+                        //                 value: monthProvider.reportTimeSpent,
+                        //                 items: ["Week 1", "Week 2", "Week 3", "Week 4"]
+                        //                     .map((name) => DropdownMenuItem(
+                        //                           value: name,
+                        //                           child: Text(
+                        //                             name,
+                        //                             style: TextStyle(
+                        //                               color: const Color(0xA09F9F9F),
+                        //                               fontSize: ScreenUtil.verticalScale(1.5),
+                        //                             ),
+                        //                           ),
+                        //                         ))
+                        //                     .toList(),
+                        //                 onChanged: monthProvider.changeWeekTimeSpent,
+                        //                 icon: const Icon(
+                        //                   Icons.expand_more,
+                        //                   color: Color(0xA09F9F9F),
+                        //                   size: 25,
+                        //                 ),
+                        //               ),
+                        //             );
+                        //           },
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // SizedBox(height: ScreenUtil.horizontalScale(2)),
+                        // Container(
+                        //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                        //   child: const ReportTimeSpentGraph()
+                        // ),
 
                         /// BOTTOM CONTAINERS
 
@@ -423,7 +422,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                           child: Column(
                             children: [
                               ButtonWidget(
-                                text: "Back To Tools",
+                                text: "Go Back",
                                 textColor: const Color(0x30000000),
                                 onPress: () {
                                   Navigator.pop(context);
@@ -434,7 +433,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                               const SizedBox(
                                 height: 10,
                               ),
-
                               Consumer<MonthProvider>(builder: (context, monthProvider, child) {
                                 return ButtonWidget(
                                   text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Continue Workout",
@@ -477,16 +475,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                   isLoading: false,
                                 );
                               })
-
-                              // ButtonWidget(
-                              //   text: 'Continue Workout',
-                              //   textColor: Colors.white,
-                              //   color: AppColors.primaryColor,
-                              //   onPress: () {
-                              //     Navigator.pop(context);
-                              //   },
-                              //   isLoading: false,
-                              // ),
                             ],
                           ),
                         ),

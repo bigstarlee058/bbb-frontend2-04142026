@@ -8,7 +8,6 @@ import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
-import 'package:bbb/pages/Charts/time_spent.dart';
 import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -292,6 +291,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                               ),
                                               const SizedBox(height: 10),
                                               Container(
+                                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
                                                 decoration: status == Status.completed
                                                     ? BoxDecoration(
                                                         color: Colors.white,
@@ -575,7 +575,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 itemBuilder: (context) {
                                   return [
                                     "Exercises Completed",
-                                    "Time Spent",
+                                    // "Time Spent",
                                     "Weight Lifted",
                                   ].map((str) {
                                     return PopupMenuItem(
@@ -628,7 +628,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               ? const ExerciseCompletedGraph()
                               : selectedChart == "Weight Lifted"
                                   ? const WeightLiftedGraph()
-                                  : const TimeSpentGraph(),
+                                  // : const TimeSpentGraph(),
+                                  : const SizedBox(),
                         ),
                         const SizedBox(height: 15),
                         Container(

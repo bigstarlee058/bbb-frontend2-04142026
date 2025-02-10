@@ -4,6 +4,7 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
 import 'package:bbb/pages/MonthView/TodayPage/circuits_view.dart';
@@ -39,17 +40,36 @@ class _TodayPageState extends State<TodayPage> {
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    fetchWarmupData();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async => await fetchExtraAddedExercise().then(
+        (value) {
+          fetchWarmupData();
+          monthProvider?.fetchExerciseStatusLocalData();
+          fetchRemovedExerciseLocalData();
+          isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
+          isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped;
+          monthProvider?.getAllExerciseData();
+          monthProvider?.fetchAllExercise();
+        },
+      ),
+    );
+    super.initState();
+  }
+
+  Future<void> fetchExtraAddedExercise() async {
     exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
     totalWarmups = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
-    monthProvider?.fetchExerciseStatusLocalData();
-    fetchRemovedExerciseLocalData();
-    isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-    isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped;
-    monthProvider?.getAllExerciseData();
-    monthProvider?.fetchAllExercise();
-
-    super.initState();
+    await monthProvider?.fetchExtraAddedExerciseData().then(
+      (value) {
+        if (monthProvider!.addedExerciseList.isNotEmpty) {
+          for (var element in monthProvider!.addedExerciseList) {
+            exercises.removeWhere((ele) => element.exerciseId == ele.exerciseId);
+          }
+          exercises.addAll(monthProvider!.addedExerciseList.map((e) => e.exerciseJson!));
+        }
+      },
+    );
+    setState(() {});
   }
 
   void fetchWarmupData() {
@@ -87,12 +107,22 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> removeExercise(String exerciseId) async {
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
     final data = {"exerciseId": exerciseId, "dataId": dataId};
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.removedExerciseHistory);
     await fetchRemovedExerciseLocalData();
+
+    if (monthProvider!.addedExerciseList.isNotEmpty) {
+      ExtraExerciseModel data =
+          monthProvider!.addedExerciseList.firstWhere((element) => element.exerciseId == exerciseId, orElse: () => ExtraExerciseModel());
+      if (data.id != null) {
+        await DatabaseHelper().deleteSingleData(tableName: DatabaseHelper.extraExerciseHistory, id: data.dataId ?? "");
+        await monthProvider?.fetchExtraAddedExerciseData();
+      }
+    }
+    exercises.removeWhere((element) => element.exerciseId == exerciseId);
+    setState(() {});
   }
 
   @override
@@ -781,6 +811,10 @@ class _TodayPageState extends State<TodayPage> {
               );
             }
 
+            monthProvider!.allFilterExercises.removeWhere((element) =>
+                monthProvider!.addedExerciseList.any((ele) => ele.exerciseId == element.id) ||
+                exercises.any((ele) => ele.exerciseId == element.id));
+
             return Dialog(
               backgroundColor: Colors.white,
               insetPadding: const EdgeInsets.all(0),
@@ -820,8 +854,16 @@ class _TodayPageState extends State<TodayPage> {
                                       child: SingleChildScrollView(
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: buildExerciseList(monthProvider!.relatedExercises, currentPageRelated, false),
+                                          child: Builder(
+                                            builder: (context) {
+                                              final seenIds = <String>{};
+                                              final filteredList = monthProvider!.relatedExercises.where((item) {
+                                                return seenIds.add(item.sId!);
+                                              }).toList();
+                                              return Column(
+                                                children: buildExerciseList(filteredList, currentPageRelated, false),
+                                              );
+                                            },
                                           ),
                                         ),
                                       ),
@@ -937,35 +979,6 @@ class _TodayPageState extends State<TodayPage> {
                                 )
                               : const SizedBox(),
                         ],
-                        // ignore: dead_code
-                        // if (showFindMore) ...[
-                        //   const SizedBox(height: 10),
-                        //   Padding(
-                        //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                        //     child: Row(
-                        //       mainAxisAlignment: MainAxisAlignment.start,
-                        //       children: [
-                        //         const Icon(Icons.search, color: Colors.black), // Non-clickable icon
-                        //         const SizedBox(width: 8), // Space between icon & text field
-                        //         Expanded(
-                        //           child: TextField(
-                        //             decoration: const InputDecoration(
-                        //               hintText: 'Type to find more...',
-                        //               hintStyle: TextStyle(color: Colors.grey),
-                        //               border: OutlineInputBorder(),
-                        //             ),
-                        //             onSubmitted: (value) {
-                        //               setState(() {
-                        //                 // Logic to load more items or search
-                        //               });
-                        //             },
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        //   const SizedBox(height: 10),
-                        // ],
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                           child: Row(
@@ -987,7 +1000,66 @@ class _TodayPageState extends State<TodayPage> {
                                 child: const Text('Cancel'),
                               ),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  if (!addModal) {
+                                  } else {
+                                    ExerciseDataModel newDayExercise = ExerciseDataModel();
+                                    if (exercises.isNotEmpty) {
+                                      newDayExercise = ExerciseDataModel(
+                                        id: "",
+                                        exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                        typeId: exercises[0].typeId ?? 1,
+                                        name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                            "Exercise ${exercises.length + 1}",
+                                        guide: exercises[0].guide ?? "",
+                                        sets: exercises[0].sets ?? 0,
+                                        reps: exercises[0].reps ?? 0,
+                                        rest: exercises[0].rest ?? 0,
+                                        weight: exercises[0].weight ?? 0,
+                                        formats: exercises[0].formats ?? [],
+                                        extra: exercises[0].extra ?? [],
+                                      );
+                                    } else {
+                                      newDayExercise = ExerciseDataModel(
+                                        id: "",
+                                        exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                        typeId: 1,
+                                        name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                            "Exercise ${exercises.length + 1}",
+                                        guide: "",
+                                        sets: 5,
+                                        reps: 10,
+                                        rest: 3,
+                                        weight: 30,
+                                        formats: ["A", "B", "C"],
+                                      );
+                                    }
+
+                                    String split = monthProvider
+                                            ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                            .toString()
+                                            .split(" ")[1] ??
+                                        "";
+
+                                    Map<String, dynamic> data = {
+                                      "dataId":
+                                          "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}",
+                                      "split": split,
+                                      "monthId": monthProvider?.monthDataModel?.id,
+                                      "weekId": monthProvider?.weekDataModel?.id,
+                                      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+                                      "date": "${DateTime.now().toUtc()}",
+                                      "exerciseId": monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id,
+                                      "exerciseJson": jsonEncode(newDayExercise)
+                                    };
+                                    exercises.add(newDayExercise);
+                                    await DatabaseHelper().insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
+                                    await monthProvider?.fetchExtraAddedExerciseData();
+                                    setState(() {});
+                                    await Future.delayed(Duration(milliseconds: 100));
+                                    Navigator.pop(context);
+                                  }
+                                },
                                 // onPressed: selectExerciseSwapIndex != null &&
                                 //         !((!addModal &&
                                 //                 selectExerciseSwapIndex! < userData!.currentRelatedExercises.length &&

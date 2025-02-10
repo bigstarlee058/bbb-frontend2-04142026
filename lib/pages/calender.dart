@@ -152,16 +152,20 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
     }
 
-    for (var day in data) {
-      final workoutDate = day.endTime!;
+    final futureDay = DateTime.now().add(Duration(days: 1));
 
-      DateTime localTime = workoutDate.toLocal();
+    if (date.isAfter(futureDay)) {
+      for (var day in data) {
+        final workoutDate = day.endTime!;
 
-      if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
-        if (day.status == Status.completed) {
-          return _buildCustomDayCircle(date, AppColors.primaryColor);
-        } else if (day.status == Status.skipped) {
-          return _buildCustomDayCircle(date, Colors.blue);
+        DateTime localTime = workoutDate.toLocal();
+
+        if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+          if (day.status == Status.completed) {
+            return _buildCustomDayCircle(date, AppColors.primaryColor);
+          } else if (day.status == Status.skipped) {
+            return _buildCustomDayCircle(date, Colors.blue);
+          }
         }
       }
     }

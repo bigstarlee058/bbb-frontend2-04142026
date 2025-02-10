@@ -10,6 +10,7 @@ import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -337,8 +338,6 @@ class MonthProvider extends ChangeNotifier {
         fetchToday();
       },
     );
-
-    notifyListeners();
   }
 
   Future<void> fetchWarmUp(String warmUpId) async {
@@ -536,6 +535,7 @@ class MonthProvider extends ChangeNotifier {
                 relatedExercises.addAll(tempRelatedExercise);
               }
             }
+
             notifyListeners();
           } else {
             throw Exception('Failed to load exercise info');
@@ -584,7 +584,6 @@ class MonthProvider extends ChangeNotifier {
             if (responseData != null) {
               exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
               allExerciseDetailsList.add(exerciseDetailModelData);
-
               if (exerciseDetailModelData.relatedExercises != null) {
                 tempRelatedExercise.addAll(exerciseDetailModelData.relatedExercises!);
                 relatedExercises.addAll(tempRelatedExercise);
@@ -1172,6 +1171,27 @@ class MonthProvider extends ChangeNotifier {
       allRemovedExercise = List<RemovedExerciseModel>.from(json.decode(jsonEncode(data)).map((x) => RemovedExerciseModel.fromJson(x)));
     } else {
       allRemovedExercise = [];
+    }
+    notifyListeners();
+  }
+
+  List<ExtraExerciseModel> addedExerciseList = [];
+
+  Future<void> fetchExtraAddedExerciseData() async {
+    addedExerciseList = [];
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    final data = await DatabaseHelper().getFilteredWithMWDData(
+        tableName: DatabaseHelper.extraExerciseHistory,
+        monthId: monthDataModel?.id ?? "",
+        split: split,
+        weekId: weekDataModel?.id ?? "",
+        dayId: weekDataModel?.idList![overviewCurrentDay - 1]);
+
+    if (data.isNotEmpty) {
+      addedExerciseList = List<ExtraExerciseModel>.from(data.map((x) => ExtraExerciseModel.fromJson(x)));
+    } else {
+      addedExerciseList = [];
     }
     notifyListeners();
   }
