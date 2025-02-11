@@ -461,7 +461,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        '${28 - count} days tracked',
+                                        '${28 - count} days remaining',
                                         style: TextStyle(
                                           color: Colors.grey,
                                           fontSize: ScreenUtil.verticalScale(1.5),
