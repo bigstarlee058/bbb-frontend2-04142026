@@ -152,14 +152,12 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
     }
 
-    final futureDay = DateTime.now().add(Duration(days: 1));
+    DateTime futureDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).add(Duration(days: 1));
 
-    if (date.isAfter(futureDay)) {
+    if (date.isBefore(futureDay)) {
       for (var day in data) {
         final workoutDate = day.endTime!;
-
         DateTime localTime = workoutDate.toLocal();
-
         if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
           if (day.status == Status.completed) {
             return _buildCustomDayCircle(date, AppColors.primaryColor);
@@ -171,7 +169,18 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     }
 
     if (isCurrentDay) {
-      return _buildCurrentWorkoutDay(date);
+      for (var day in data) {
+        final workoutDate = day.endTime!;
+        DateTime localTime = workoutDate.toLocal();
+        if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+          if (day.status == Status.completed) {
+            return _buildCustomDayCircle(date, AppColors.primaryColor);
+          } else if (day.status == Status.skipped) {
+            return _buildCustomDayCircle(date, Colors.blue);
+          }
+        }
+        return _buildCurrentWorkoutDay(date);
+      }
     }
 
     if (oldestStartDate!.isBefore(date) && DateTime.now().isAfter(date)) {

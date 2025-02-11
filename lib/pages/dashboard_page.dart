@@ -716,57 +716,74 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                         ),
 
-                        Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                          return (dataProvider.collectionsData.isNotEmpty)
-                              ? Container(
-                                  width: media.width,
-                                  margin: EdgeInsets.only(
-                                    left: ScreenUtil.horizontalScale(5),
-                                    right: ScreenUtil.horizontalScale(5),
-                                    top: ScreenUtil.verticalScale(8),
-                                    bottom: ScreenUtil.verticalScale(4),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width: media.width,
-                                        margin: EdgeInsets.only(bottom: 20, left: ScreenUtil.horizontalScale(1)),
-                                        child: Text(
-                                          "Featured Collections",
-                                          style: TextStyle(
-                                            color: AppColors.primaryColor,
-                                            fontSize: ScreenUtil.verticalScale(2.4),
-                                            fontWeight: FontWeight.w800,
+                        Consumer<DataProvider>(
+                          builder: (context, dataProvider, child) {
+                            return (dataProvider.collectionsData.isNotEmpty)
+                                ? Container(
+                                    width: media.width,
+                                    margin: EdgeInsets.only(
+                                      top: ScreenUtil.verticalScale(8),
+                                      bottom: ScreenUtil.verticalScale(4),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), bottom: 20),
+                                          width: media.width,
+                                          child: Text(
+                                            "Featured Collections",
+                                            style: TextStyle(
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.verticalScale(2.4),
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                            textAlign: TextAlign.start,
                                           ),
-                                          textAlign: TextAlign.start,
                                         ),
-                                      ),
-                                      for (int index = 0; index < (dataProvider.collectionsData.length / 2).ceil(); index++)
-                                        Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Expanded(child: CollectionGrid(collection: dataProvider.collectionsData[index * 2])),
-                                                Expanded(
-                                                  child: (index * 2 + 1 < dataProvider.collectionsData.length)
-                                                      ? CollectionGrid(
-                                                          collection: dataProvider.collectionsData[index * 2 + 1],
-                                                        )
-                                                      : Container(),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 14, // Adds spacing after each row
-                                            ),
-                                          ],
-                                        )
-                                    ],
-                                  ),
-                                )
-                              : const SizedBox();
-                        }),
+                                        CarouselSlider.builder(
+                                          itemCount: dataProvider.staffsData.length,
+                                          options: CarouselOptions(
+                                            height: ScreenUtil.verticalScale(38),
+                                            viewportFraction: 0.65,
+                                            enlargeCenterPage: true,
+                                            enlargeFactor: 0.4,
+                                            enableInfiniteScroll: true,
+                                            autoPlay: false,
+                                            onPageChanged: (index, reason) {},
+                                            scrollDirection: Axis.horizontal,
+                                          ),
+                                          itemBuilder: (context, index, realIndex) {
+                                            return CollectionGrid(collection: dataProvider.collectionsData[index]);
+                                          },
+                                        ),
+                                        // for (int index = 0; index < (dataProvider.collectionsData.length / 2).ceil(); index++)
+                                        //   Column(
+                                        //     children: [
+                                        //       Row(
+                                        //         mainAxisAlignment: MainAxisAlignment.start,
+                                        //         children: [
+                                        //           Expanded(child: CollectionGrid(collection: dataProvider.collectionsData[index * 2])),
+                                        //           Expanded(
+                                        //             child: (index * 2 + 1 < dataProvider.collectionsData.length)
+                                        //                 ? CollectionGrid(
+                                        //                     collection: dataProvider.collectionsData[index * 2 + 1],
+                                        //                   )
+                                        //                 : Container(),
+                                        //           ),
+                                        //         ],
+                                        //       ),
+                                        //       const SizedBox(
+                                        //         height: 14, // Adds spacing after each row
+                                        //       ),
+                                        //     ],
+                                        //   )
+                                      ],
+                                    ),
+                                  )
+                                : const SizedBox();
+                          },
+                        ),
 
                         SizedBox(
                           width: media.width,

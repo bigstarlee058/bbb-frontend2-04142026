@@ -309,6 +309,7 @@ class _ExercisePageState extends State<ExercisePage> {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
@@ -758,9 +759,11 @@ class _ExercisePageState extends State<ExercisePage> {
                                             child: ButtonWidget(
                                               text: monthProvider.exerciseHistoryDetails?.status == Status.completed
                                                   ? "Save"
-                                                  : monthProvider.isPumpDay && monthProvider.isCircuit
+                                                  : monthProvider.isLastExercise
                                                       ? "Finish"
-                                                      : "Finish & Next",
+                                                      : monthProvider.isPumpDay && monthProvider.isCircuit
+                                                          ? "Finish"
+                                                          : "Finish & Next",
                                               textColor: Colors.white,
                                               onPress: () async {
                                                 int count = 0;
@@ -801,6 +804,12 @@ class _ExercisePageState extends State<ExercisePage> {
                                                       if (val == false) {
                                                         monthProvider.setSelectedExercise(elementI, i);
                                                         monthProvider.updateWarmUp(false);
+
+                                                        bool isLast = i ==
+                                                            monthProvider.dayDataModel!.exercises?.indexWhere((element) =>
+                                                                element.exerciseId ==
+                                                                monthProvider.dayDataModel!.exercises?.last.exerciseId);
+                                                        monthProvider.updateIsLastExercise(isLast);
                                                         await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
                                                         break;
                                                       }
