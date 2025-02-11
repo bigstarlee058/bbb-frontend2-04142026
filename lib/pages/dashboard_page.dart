@@ -317,6 +317,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                 monthData.overviewCurrentWeek = monthData.week ?? 1;
                                                                 monthData.overviewCurrentDay = ((index ?? 1) + 1);
                                                                 monthData.dayDataModel = dayData;
+                                                                userData?.previousPage = true;
                                                                 monthData.alternateEquipmentType = monthData.equipmentType;
                                                                 monthData.weekDataModel =
                                                                     monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
@@ -460,7 +461,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        '$count/28 days tracked',
+                                        '${28 - count} days remaining',
                                         style: TextStyle(
                                           color: Colors.grey,
                                           fontSize: ScreenUtil.verticalScale(1.5),

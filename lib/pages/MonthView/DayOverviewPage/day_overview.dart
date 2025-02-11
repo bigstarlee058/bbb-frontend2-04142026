@@ -177,10 +177,15 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
-                                                        // userData?.previousPage == 1
-                                                        //     ? mainPageProvider.changeTab(0)
-                                                        //     : mainPageProvider.changeTab(1);
-                                                        Navigator.pop(context);
+                                                        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                                        userData?.previousPage == true
+                                                            ? mainPageProvider.changeTab(0)
+                                                            : mainPageProvider.changeTab(1);
+                                                        userData?.previousPage = false;
+                                                        // Navigator.pop(context);
+                                                        // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                                        // mainPageProvider.changeTab(1);
+                                                        debugPrint("this is dayoverviewpage");
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
                                                     ),
@@ -307,10 +312,13 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
-                                                        // userData?.previousPage == 1
-                                                        //     ? mainPageProvider.changeTab(0)
-                                                        //     : mainPageProvider.changeTab(1);
-                                                        Navigator.pop(context);
+                                                        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                                        userData?.previousPage == true
+                                                            ? mainPageProvider.changeTab(0)
+                                                            : mainPageProvider.changeTab(1);
+                                                        userData?.previousPage = false;
+                                                        // userData?.previousPage = false;
+                                                        debugPrint("this is dayoverviewpage");
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
                                                     ),
@@ -536,7 +544,10 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                 monthProvider.dayHistoryDetails?.status == Status.skipped))) {
                       buttonText = "View the workout";
                       onPress = () {
-                        Navigator.pushNamed(context, '/today');
+                        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                        mainPageProvider.changeTab(5);  
+                        // Navigator.pop(context);
+                                              
                       };
                     } else if (currentDayTitle.contains("Rest Day") && (monthProvider.isPumpDay || monthProvider.isPumpDayAvailable)) {
                       if (monthProvider.dayHistoryDetails?.status == Status.skipped ||
@@ -618,7 +629,9 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                       status: Status.started,
                                       title: monthProvider.pumpDayModel?.title,
                                     );
-                                    Navigator.pushNamed(context, '/today');
+                                    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                    mainPageProvider.changeTab(5);
+                                    // Navigator.pop(context);
                                   } else if (monthProvider.selectedButtonTitle == "Swap To Rest Day") {
                                     monthProvider.changeValue(["Mark Complete", "Swap To Pump Day"], "Mark Complete");
                                     await _saveDayData(type: "Rest Day", status: Status.empty);
@@ -684,7 +697,10 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                             monthProvider.changeIsPumpDay(false);
                             await _saveDayData(status: Status.started, type: 'Workout Day');
                           }
-                          Navigator.pushNamed(context, '/today');
+                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                          mainPageProvider.changeTab(5);
+                          // Navigator.pop(context);
+                          // Navigator.pushNamed(context, '/today');
                         }
                       };
                     }

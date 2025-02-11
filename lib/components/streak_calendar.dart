@@ -1,5 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/components/common_streak_with_notification.dart';
+// import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/calender.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -76,14 +76,18 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                 ),
                               ),
                             ),
-                            const Spacer(),
-                            Text(
-                              "Streaks",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: ScreenUtil.verticalScale(3),
-                                fontWeight: FontWeight.bold,
-                                height: 1,
+                            // const Spacer(),
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "Streaks",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: ScreenUtil.verticalScale(3),
+                                    fontWeight: FontWeight.bold,
+                                    height: 1,
+                                  ),
+                                ),
                               ),
                             ),
                             Container(
@@ -95,10 +99,10 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                 height: ScreenUtil.horizontalScale(10),
                               ),
                             ),
-                            const CommonStreakWithNotification(),
-                            SizedBox(
-                              width: ScreenUtil.verticalScale(1.15),
-                            ),
+                            // const CommonStreakWithNotification(),
+                            // SizedBox(
+                            //   width: ScreenUtil.verticalScale(1.15),
+                            // ),
                           ],
                         ),
                         Container(

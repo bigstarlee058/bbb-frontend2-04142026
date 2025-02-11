@@ -102,9 +102,9 @@ class _MonthViewState extends State<MonthView> {
                                 Container(
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(8),
-                                    vertical: ScreenUtil.verticalScale(2),
+                                    vertical: ScreenUtil.verticalScale(1.9),
                                   ),
-                                  height: media.height * 0.23,
+                                  height: media.height * 0.22,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -143,7 +143,7 @@ class _MonthViewState extends State<MonthView> {
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(3),
+                                                fontSize: ScreenUtil.horizontalScale(6),
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -153,7 +153,7 @@ class _MonthViewState extends State<MonthView> {
                                       // const SizedBox(height: 10),
                                       Container(
                                         margin: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(10),
+                                          horizontal: ScreenUtil.horizontalScale(9),
                                         ),
                                         child: ButtonWidget(
                                           text: "Watch Video Intro",
@@ -182,7 +182,7 @@ class _MonthViewState extends State<MonthView> {
                         Container(
                           alignment: Alignment.center,
                           margin: EdgeInsets.symmetric(
-                            vertical: ScreenUtil.verticalScale(33.5),
+                            vertical: ScreenUtil.verticalScale(33),
                           ),
                           child: InkWell(
                             onTap: () {

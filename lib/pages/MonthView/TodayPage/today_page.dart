@@ -189,7 +189,7 @@ class _TodayPageState extends State<TodayPage> {
                                             ),
                                             child: Center(
                                               child: GestureDetector(
-                                                onTap: () => Navigator.pop(context),
+                                                onTap: () => Navigator.pushNamed(context, '/dayOverview'),
                                                 child: Icon(
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
@@ -454,7 +454,7 @@ class _TodayPageState extends State<TodayPage> {
                                   ),
                                 ),
                           const SizedBox(
-                            height: 50,
+                            height: 90,
                           ),
                         ],
                       ),
