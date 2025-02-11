@@ -181,10 +181,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
                         SizedBox(height: ScreenUtil.horizontalScale(4)),
                         Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: ScreenUtil.verticalScale(1.5),
-                            horizontal: ScreenUtil.horizontalScale(8),
-                          ),
+                          margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
