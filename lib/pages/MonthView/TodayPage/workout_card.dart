@@ -288,7 +288,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 ),
                               ),
                               Text(
-                                "$totalSets sets",
+                                "$totalSets working set${totalSets > 1 ? "s" : ""}",
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),

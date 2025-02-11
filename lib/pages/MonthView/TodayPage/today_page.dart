@@ -17,6 +17,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class TodayPage extends StatefulWidget {
@@ -36,6 +37,7 @@ class _TodayPageState extends State<TodayPage> {
   int totalWarmups = 0;
   bool isCurrentDayCompleted = false;
   bool isCurrentDaySkipped = false;
+  String currentDayTitle = '';
 
   @override
   void initState() {
@@ -43,6 +45,17 @@ class _TodayPageState extends State<TodayPage> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async => await fetchExtraAddedExercise().then(
         (value) {
+          int nextWorkOutIndex =
+              monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1].toString().contains("Workout")
+                  ? int.parse(monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1]
+                          .toString()
+                          .replaceAll("Day ", "")
+                          .replaceAll(" Workout", "")) -
+                      1
+                  : 0;
+          currentDayTitle = monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1].toString().contains("Workout")
+              ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+              : monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1];
           fetchWarmupData();
           monthProvider?.fetchExerciseStatusLocalData();
           fetchRemovedExerciseLocalData();
@@ -79,11 +92,12 @@ class _TodayPageState extends State<TodayPage> {
     }
   }
 
-  Future<void> onPressed(int exerciseIndex, String dataId) async {
+  Future<void> onPressed(int exerciseIndex, String dataId, bool isLast) async {
     monthProvider?.updateIsCircuit(false);
     monthProvider?.updateCircuit("", 0);
     monthProvider?.setSelectedExercise(exercises[exerciseIndex], exerciseIndex);
     monthProvider?.updateWarmUp(false);
+    monthProvider?.updateIsLastExercise(isLast);
     Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
   }
@@ -164,54 +178,103 @@ class _TodayPageState extends State<TodayPage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 3,
+                          height: media.height / 2,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
                               children: [
                                 Container(
-                                  width: ScreenUtil.horizontalScale(100),
-                                  padding: const EdgeInsets.only(right: 10),
+                                  margin: const EdgeInsets.only(right: 10),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
+                                      Stack(
                                         children: [
                                           Container(
-                                            width: ScreenUtil.horizontalScale(10),
-                                            height: ScreenUtil.horizontalScale(10),
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 12,
+                                            margin: EdgeInsets.only(
+                                              left: ScreenUtil.horizontalScale(4),
                                             ),
                                             decoration: const BoxDecoration(
                                               color: Color(0XFFd18a9b),
                                               shape: BoxShape.circle,
                                             ),
-                                            child: Center(
-                                              child: GestureDetector(
-                                                onTap: () => Navigator.pop(context),
-                                                child: Icon(
+                                            child: SizedBox(
+                                              width: ScreenUtil.horizontalScale(10),
+                                              height: ScreenUtil.horizontalScale(10),
+                                              child: IconButton(
+                                                padding: EdgeInsets.zero,
+                                                icon: const Icon(
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
-                                                  size: ScreenUtil.verticalScale(4),
                                                 ),
+                                                onPressed: () {
+                                                  // userData?.previousPage == 1
+                                                  //     ? mainPageProvider.changeTab(0)
+                                                  //     : mainPageProvider.changeTab(1);
+                                                  Navigator.pop(context);
+                                                },
+                                                iconSize: ScreenUtil.verticalScale(4),
                                               ),
                                             ),
-                                          )
+                                          ),
                                         ],
                                       ),
-                                      Text(
-                                        'Day ${monthProvider!.overviewCurrentDay}, Option ${monthProvider!.alternateEquipmentType}',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(5.8),
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(),
+                                      const CommonStreakWithNotification()
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: ScreenUtil.verticalScale(3)),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        DateFormat('MMM, yyyy').format(DateTime.now()),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil.verticalScale(2),
+                                        ),
+                                      ),
+                                      monthProvider?.currentWeek != 0
+                                          ? Text(
+                                              "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: ScreenUtil.verticalScale(2),
+                                              ),
+                                            )
+                                          : const SizedBox(),
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(0.5),
+                                      ),
+                                      Text(
+                                        "${monthProvider!.alternateEquipmentType} :: ${monthProvider!.alternateEquipmentType == "A" ? "Fully equipped gym" : monthProvider?.alternateEquipmentType == "B" ? "Home gym" : "Dumbbells and bands"}",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil.verticalScale(2),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(0.5),
+                                      ),
+                                      Consumer<MonthProvider>(
+                                        builder: (context, monthProvider, child) {
+                                          return Text(
+                                            monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              height: 1.1,
+                                              fontSize: ScreenUtil.verticalScale(3.8),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: ScreenUtil.verticalScale(2.5)),
                                 Container(
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(10),
@@ -234,8 +297,79 @@ class _TodayPageState extends State<TodayPage> {
                             ),
                           ),
                         ),
+                        // SizedBox(
+                        //   height: media.height / 2,
+                        //   width: media.width,
+                        //   child: SafeArea(
+                        //     child: Column(
+                        //       children: [
+                        //         Container(
+                        //           width: ScreenUtil.horizontalScale(100),
+                        //           padding: const EdgeInsets.only(right: 10),
+                        //           child: Row(
+                        //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //             children: [
+                        //               Row(
+                        //                 children: [
+                        //                   Container(
+                        //                     width: ScreenUtil.horizontalScale(10),
+                        //                     height: ScreenUtil.horizontalScale(10),
+                        //                     margin: const EdgeInsets.symmetric(
+                        //                       horizontal: 12,
+                        //                     ),
+                        //                     decoration: const BoxDecoration(
+                        //                       color: Color(0XFFd18a9b),
+                        //                       shape: BoxShape.circle,
+                        //                     ),
+                        //                     child: Center(
+                        //                       child: GestureDetector(
+                        //                         onTap: () => Navigator.pop(context),
+                        //                         child: Icon(
+                        //                           Icons.keyboard_arrow_left,
+                        //                           color: Colors.white,
+                        //                           size: ScreenUtil.verticalScale(4),
+                        //                         ),
+                        //                       ),
+                        //                     ),
+                        //                   )
+                        //                 ],
+                        //               ),
+                        //               Text(
+                        //                 'Day ${monthProvider!.overviewCurrentDay}, Option ${monthProvider!.alternateEquipmentType}',
+                        //                 style: TextStyle(
+                        //                   color: Colors.white,
+                        //                   fontSize: ScreenUtil.horizontalScale(5.8),
+                        //                 ),
+                        //               ),
+                        //               const CommonStreakWithNotification(),
+                        //             ],
+                        //           ),
+                        //         ),
+                        //         SizedBox(height: ScreenUtil.verticalScale(3)),
+                        //         Container(
+                        //           margin: EdgeInsets.symmetric(
+                        //             horizontal: ScreenUtil.horizontalScale(10),
+                        //           ),
+                        //           child: ButtonWidget(
+                        //             text: "Watch Video Intro",
+                        //             color: const Color(0xEEFFFFFF),
+                        //             onPress: () {
+                        //               Navigator.of(context).push(
+                        //                 FadePageRoute(
+                        //                   page: const VideoIntroWidget(vimeoId: '953289606'),
+                        //                 ),
+                        //               );
+                        //             },
+                        //             textColor: AppColors.primaryColor,
+                        //             isLoading: false,
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                         SizedBox(
-                          height: media.height / 3.99,
+                          height: media.height / 2.64,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -256,7 +390,7 @@ class _TodayPageState extends State<TodayPage> {
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: media.height / 4),
+                  margin: EdgeInsets.only(top: media.height / 2.65),
                   child: Container(
                     width: media.width,
                     decoration: BoxDecoration(
@@ -325,7 +459,13 @@ class _TodayPageState extends State<TodayPage> {
                                                       .any((element) => element.dataId == dataId && element.status == Status.skipped) ||
                                                   isExist,
                                               exerciseIndex: i,
-                                              onPress: () => onPressed(i, dataId),
+                                              onPress: () {
+                                                onPressed(
+                                                    i,
+                                                    dataId,
+                                                    i ==
+                                                        exercises.indexWhere((element) => element.exerciseId == exercises.last.exerciseId));
+                                              },
                                               openSwapModal: () async {
                                                 // await userData.fetchCurrentEx(exercises[i].id!, "today page 1464");
                                                 // await userData.fetchAllExercise();
@@ -676,6 +816,7 @@ class _TodayPageState extends State<TodayPage> {
                         ? null
                         : () async {
                             monthProvider.updateWarmUp(true);
+                            monthProvider.updateIsLastExercise(false);
                             Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
                           },
                     color: AppColors.primaryColor,

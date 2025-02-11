@@ -350,27 +350,96 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                                            child: Builder(builder: (context) {
-                                              DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel.firstWhere(
-                                                (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                orElse: () => DayHistoryModel(),
-                                              );
-                                              return Text(
-                                                matchingElement.id != null
-                                                    ? matchingElement.title ?? "Pump Day"
-                                                    : !isRestDay
-                                                        ? weekDataModel!.days![nextWorkOutIndex].title
-                                                        : weekDataModel!.dayList![index],
-                                                style: TextStyle(
-                                                  color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek
-                                                      ? Colors.white
-                                                      : AppColors.primaryColor,
-                                                  fontSize: ScreenUtil.verticalScale(2),
-                                                  fontWeight: FontWeight.bold,
-                                                  height: 1,
-                                                ),
-                                              );
-                                            }),
+                                            child: Builder(
+                                              builder: (context) {
+                                                DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel.firstWhere(
+                                                  (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                                  orElse: () => DayHistoryModel(),
+                                                );
+                                                return /*isRestDay && monthProvider!.weekStatuses[mainIndex!] == WeekType.currentWeek
+                                                    ? Row(
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              monthProvider?.changeIsPumpDay(true);
+                                                            },
+                                                            child: Container(
+                                                              width: 90,
+                                                              padding: EdgeInsets.symmetric(
+                                                                vertical: ScreenUtil.verticalScale(0.9),
+                                                              ),
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(7), color: AppColors.primaryColor),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  "Pump Day",
+                                                                  style: TextStyle(
+                                                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: EdgeInsets.symmetric(
+                                                              horizontal: ScreenUtil.verticalScale(1),
+                                                            ),
+                                                            child: Text(
+                                                              "Or",
+                                                              style: TextStyle(
+                                                                fontSize: ScreenUtil.verticalScale(1.4),
+                                                                fontWeight: FontWeight.w400,
+                                                                color: Colors.grey,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              monthProvider?.changeIsPumpDay(true);
+                                                            },
+                                                            child: Container(
+                                                              width: 90,
+                                                              padding: EdgeInsets.symmetric(
+                                                                vertical: ScreenUtil.verticalScale(0.9),
+                                                              ),
+                                                              decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.circular(7),
+                                                                color: Colors.blue,
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  "Rest Day",
+                                                                  style: TextStyle(
+                                                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    :*/
+                                                    Text(
+                                                  matchingElement.id != null
+                                                      ? matchingElement.title ?? "Pump Day"
+                                                      : !isRestDay
+                                                          ? weekDataModel!.days![nextWorkOutIndex].title
+                                                          : weekDataModel!.dayList![index],
+                                                  style: TextStyle(
+                                                    color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek
+                                                        ? Colors.white
+                                                        : AppColors.primaryColor,
+                                                    fontSize: ScreenUtil.verticalScale(2),
+                                                    fontWeight: FontWeight.bold,
+                                                    height: 1,
+                                                  ),
+                                                );
+                                              },
+                                            ),
                                           ),
                                           const SizedBox(height: 8),
                                           if (!isRestDay) ...[
