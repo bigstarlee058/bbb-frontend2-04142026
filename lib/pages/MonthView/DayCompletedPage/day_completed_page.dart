@@ -433,8 +433,9 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               text: "Back to Dashboard",
                               textColor: const Color(0x40000000),
                               onPress: () {
-                                // mainPageProvider.changeTab(0);
                                 Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                mainPageProvider?.changeTab(0);
+                                // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                               },
                               color: const Color(0xC0FFFFFF),
                               isLoading: false,
