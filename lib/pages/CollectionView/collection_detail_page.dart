@@ -2,13 +2,12 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
-import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CollectionDetailPage extends StatefulWidget {
@@ -34,8 +33,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
       listen: false,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final collection =
-          ModalRoute.of(context)!.settings.arguments as Collections;
+      final collection = ModalRoute.of(context)!.settings.arguments as Collections;
       loadCollectionData(collection);
     });
     super.initState();
@@ -59,7 +57,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
         onTap: () {
           _launchURL(link); // Launch the external URL when tapped
         },
-        child: Container(          
+        child: Container(
           decoration: const BoxDecoration(
               // color: Color(0xFF000000),
               ),
@@ -68,40 +66,38 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
               Container(
                 width: ScreenUtil.horizontalScale(100),
                 height: ScreenUtil.verticalScale(11),
-                margin: const EdgeInsets.symmetric(
-                    vertical: 15), // Padding around the background
+                margin: const EdgeInsets.symmetric(vertical: 15), // Padding around the background
                 decoration: BoxDecoration(
                   color: AppColors.primaryColor,
                   borderRadius: BorderRadius.all(
                     Radius.circular(ScreenUtil.verticalScale(7)),
                   ),
                 ),
-                child: const SizedBox
-                    .expand(), // Ensure the background takes up all available space
+                child: const SizedBox.expand(), // Ensure the background takes up all available space
               ),
               Positioned(
                 left: 20,
                 top: 10,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: imageurl.isNotEmpty
-                  ? Image.network(imageurl.startsWith('https://storage.cloud.google.com/')
-                    ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                    : imageurl,
-                    width: ScreenUtil.verticalScale(11) + 10,
-                    height: ScreenUtil.verticalScale(11) + 10,
-                    fit: BoxFit.cover,)
-                  : Image.asset(
-                    'assets/img/warm-up-placeholder.png',
-                    width: ScreenUtil.verticalScale(11) + 10,
-                    height: ScreenUtil.verticalScale(11) + 10,
-                    fit: BoxFit.cover,
-                  )
-                ),
+                    borderRadius: BorderRadius.circular(15),
+                    child: imageurl.isNotEmpty
+                        ? Image.network(
+                            imageurl.startsWith('https://storage.cloud.google.com/')
+                                ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                : imageurl,
+                            width: ScreenUtil.verticalScale(11) + 10,
+                            height: ScreenUtil.verticalScale(11) + 10,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset(
+                            'assets/img/warm-up-placeholder.png',
+                            width: ScreenUtil.verticalScale(11) + 10,
+                            height: ScreenUtil.verticalScale(11) + 10,
+                            fit: BoxFit.cover,
+                          )),
               ),
               Positioned(
-                left: ScreenUtil.verticalScale(11) +
-                    45, // Adjust position based on image size and padding
+                left: ScreenUtil.verticalScale(11) + 45, // Adjust position based on image size and padding
                 top: ScreenUtil.verticalScale(3.5) + 5, // Adjust as needed
                 child: SizedBox(
                   width: media.width / 2.5,
@@ -157,18 +153,19 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: collectionData!.photo.isNotEmpty
-                              ? NetworkImage(
-                                  collectionData.photo.startsWith('https://storage.cloud.google.com/')
-                                      ? collectionData.photo.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                      : collectionData.photo,
-                                )
-                              :  const AssetImage('assets/img/back.jpg'),
+                                  ? NetworkImage(
+                                      collectionData.photo.startsWith('https://storage.cloud.google.com/')
+                                          ? collectionData.photo
+                                              .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                          : collectionData.photo,
+                                    )
+                                  : const AssetImage('assets/img/back.jpg'),
                               fit: BoxFit.cover,
                               opacity: 1,
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 2,
                           width: media.width,
                           child: SafeArea(
@@ -181,18 +178,21 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                     children: [
                                       Container(
                                         margin: EdgeInsets.only(
-                                          left:ScreenUtil.horizontalScale(4),
+                                          left: ScreenUtil.horizontalScale(4),
                                         ),
                                         decoration: const BoxDecoration(
-                                          color:Color(0XFFd18a9b),
+                                          color: Color(0XFFd18a9b),
                                           shape: BoxShape.circle,
                                         ),
                                         child: SizedBox(
                                           width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                          height:ScreenUtil.horizontalScale(10),
+                                          height: ScreenUtil.horizontalScale(10),
                                           child: IconButton(
                                             padding: EdgeInsets.zero, // Removes the default padding
-                                            icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white,),
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_left,
+                                              color: Colors.white,
+                                            ),
                                             onPressed: () => Navigator.pop(context),
                                             iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                           ),
@@ -258,62 +258,59 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                     ),
                   ],
                 ),
-                
-
                 Consumer<DataProvider>(builder: (context, dataProvider, child) {
                   final List<Equipment> equipments = dataProvider.oneCollection.equipments
-                    .map<Equipment>((e) => Equipment.fromJson(e)) // or `e as Equipment`
-                    .toList();
+                      .map<Equipment>((e) => Equipment.fromJson(e)) // or `e as Equipment`
+                      .toList();
                   return equipments.isNotEmpty
-                    ? Container(
-                      margin: EdgeInsets.only(top: media.height / 2.8),
-                      child: Container(
-                        width: media.width,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                      ? Container(
+                          margin: EdgeInsets.only(top: media.height / 2.8),
+                          child: Container(
+                            width: media.width,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                              ),
+                            ),
+                            child: Container(
+                              margin: EdgeInsets.only(top: media.height / 19, right: 20, left: 20),
+                              child: Column(
+                                children: equipments.map((equipment) {
+                                  return Column(
+                                    children: [
+                                      const SizedBox(height: 14),
+                                      equipmentCard(
+                                        equipment.title,
+                                        equipment.thumbnail,
+                                        equipment.description,
+                                        equipment.link,
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ),
                           ),
-                        ),
-                        child: Container(
-                          margin: EdgeInsets.only(top: media.height / 19, right: 20, left:20),
-                          child: Column(
-                            children: equipments.map((equipment) {
-                              return Column(
-                                children: [
-                                  const SizedBox(height: 14),
-                                  equipmentCard(
-                                    equipment.title,
-                                    equipment.thumbnail,
-                                    equipment.description,
-                                    equipment.link,
-                                  ),
-                                ],
-                              );
-                            }).toList(),
+                        )
+                      : Container(
+                          margin: EdgeInsets.only(top: media.height / 2.8),
+                          child: Container(
+                            width: media.width,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                              ),
+                            ),
+                            child: Container(
+                                margin: EdgeInsets.only(top: media.height / 19, right: 20, left: 20),
+                                child: const SizedBox(
+                                  height: 100,
+                                )),
                           ),
-                        ),
-                      ),
-                    )
-                    : Container(
-                      margin: EdgeInsets.only(top: media.height / 2.8),
-                      child: Container(
-                        width: media.width,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
-                          ),
-                        ),
-                        child: Container(
-                          margin: EdgeInsets.only(top: media.height / 19, right: 20, left:20),
-                          child: const SizedBox(
-                            height: 100,
-                          )
-                        ),
-                      ),
-                    );
-                }),                
+                        );
+                }),
               ],
             ),
           ],

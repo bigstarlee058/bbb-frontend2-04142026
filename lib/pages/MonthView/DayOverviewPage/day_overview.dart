@@ -97,7 +97,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       children: [
                         monthProvider.dayHistoryDetails?.status == Status.completed
                             ? Container(
-                                height: media.height / 2.35,
+                                height: media.height / 2,
                                 width: media.width,
                                 decoration: const BoxDecoration(
                                   image: DecorationImage(
@@ -122,7 +122,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                 ),
                               )
                             : Container(
-                                height: media.height / 2.35,
+                                height: media.height / 2,
                                 width: media.width,
                                 decoration: const BoxDecoration(
                                   image: DecorationImage(
@@ -271,19 +271,9 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                   ),
                                 ),
                               )
-                            : Container(
-                                height: media.height / 1.8,
+                            : SizedBox(
+                                height: media.height / 2,
                                 width: media.width,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppColors.primaryColor.withValues(alpha: 0.7),
-                                      AppColors.primaryColor.withValues(alpha: 0.7),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                                ),
                                 child: SafeArea(
                                   child: Column(
                                     children: [
@@ -554,6 +544,33 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                           monthProvider.dayHistoryDetails?.status == Status.completed) {
                         return const SizedBox();
                       } else {
+                        // buttonText = monthProvider.dayHistoryDetails?.status == Status.started ||
+                        //         monthProvider.dayHistoryDetails?.status == Status.completed
+                        //     ? "View the workout"
+                        //     : monthProvider.dayHistoryDetails?.status == Status.skipped
+                        //         ? "Skipped. View here"
+                        //         : "Start the workout";
+                        //
+                        // onPress = () async {
+                        //   await _saveDayData(
+                        //     type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+                        //     status: Status.started,
+                        //     title: monthProvider.pumpDayModel?.title,
+                        //   );
+                        //   Navigator.pushNamed(context, '/today');
+                        // };
+                        //
+                        // return Padding(
+                        //   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                        //   child: ButtonWidget(
+                        //     text: buttonText,
+                        //     textColor: Colors.white,
+                        //     onPress: onPress,
+                        //     color: buttonColor,
+                        //     isLoading: false,
+                        //   ),
+                        // );
+
                         return Row(
                           children: [
                             Expanded(

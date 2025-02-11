@@ -10,6 +10,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
 
 import 'notes_slideout.dart';
@@ -77,6 +78,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   int load = 0;
   int index = 0;
   int subIndex = 0;
+  final FocusNode _nodeText1 = FocusNode();
 
   late TextEditingController _weightController;
   late TextEditingController _repsController;
@@ -274,6 +276,36 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     super.dispose();
   }
 
+  KeyboardActionsConfig _buildConfig(BuildContext context) {
+    return KeyboardActionsConfig(
+      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
+      keyboardBarColor: Colors.white,
+      nextFocus: true,
+      actions: [
+        KeyboardActionsItem(
+          focusNode: _nodeText1,
+          displayArrows: false,
+          toolbarButtons: [
+            (node) {
+              return GestureDetector(
+                onTap: () => node.unfocus(),
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
+                  child: Text(
+                    "Done",
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              );
+            }
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -395,7 +427,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                 style: TextStyle(color: Colors.black54, fontSize: 13),
                               ),
                               Text(
-                                ' $load%',
+                                ' $load% ${widget.type == 1 ? "of the working load" : ""}',
                                 style: const TextStyle(color: Colors.black54, fontSize: 14),
                               ),
                             ],
@@ -441,35 +473,44 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                       ),
                                       SizedBox(
                                         width: 35,
-                                        child: TextField(
-                                          controller: _weightController,
-                                          keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                                          textAlign: TextAlign.center,
-                                          readOnly: widget.isEditable ? false : true,
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                          ),
-                                          onChanged: (value) {
-                                            if (value.isEmpty) {
-                                              _weightController.text = "0";
-                                              setState(() {});
-                                            }
-                                          },
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.digitsOnly,
-                                            TextInputFormatter.withFunction(
-                                              (oldValue, newValue) {
-                                                String newText = newValue.text;
-                                                if (newText.isNotEmpty) {
-                                                  newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                                                }
-                                                return TextEditingValue(
-                                                  text: newText,
-                                                  selection: TextSelection.collapsed(offset: newText.length),
-                                                );
-                                              },
+                                        child: KeyboardActions(
+                                          autoScroll: false,
+                                          config: _buildConfig(context),
+                                          child: TextField(
+                                            controller: _weightController,
+                                            keyboardType: TextInputType.number,
+                                            onSubmitted: (value) {
+                                              FocusScope.of(context).unfocus();
+                                            },
+                                            textInputAction: TextInputAction.done,
+                                            textAlign: TextAlign.center,
+                                            focusNode: _nodeText1,
+                                            readOnly: widget.isEditable ? false : true,
+                                            decoration: const InputDecoration(
+                                              border: InputBorder.none,
                                             ),
-                                          ],
+                                            onChanged: (value) {
+                                              if (value.isEmpty) {
+                                                _weightController.text = "0";
+                                                setState(() {});
+                                              }
+                                            },
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.digitsOnly,
+                                              TextInputFormatter.withFunction(
+                                                (oldValue, newValue) {
+                                                  String newText = newValue.text;
+                                                  if (newText.isNotEmpty) {
+                                                    newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                                                  }
+                                                  return TextEditingValue(
+                                                    text: newText,
+                                                    selection: TextSelection.collapsed(offset: newText.length),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       SizedBox(

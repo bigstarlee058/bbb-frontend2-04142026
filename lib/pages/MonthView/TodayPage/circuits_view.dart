@@ -108,15 +108,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                               ? AppColors.primaryColor
                                               : Colors.transparent,
                                   border: Border.all(
-                                      color: monthProvider.dayHistoryModel.any((element) =>
-                                              element.dataId == dayDtaId && element.status == Status.completed ||
-                                              element.status == Status.skipped)
-                                          ? AppColors.primaryColor
-                                          : data == null
-                                              ? AppColors.primaryColor
-                                              : ((data.lastRound ?? 1) - 1) > index
-                                                  ? Colors.transparent
-                                                  : AppColors.primaryColor),
+                                      color:
+                                          widget.circuit[circuitsIndex].selectedDot != index ? Colors.transparent : AppColors.primaryColor),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Center(
@@ -261,6 +254,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
                                                       monthProvider.updateWarmUp(false);
+                                                      monthProvider.updateIsLastExercise(false);
+
                                                       Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
 
                                                       monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
@@ -275,6 +270,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
                                                       monthProvider.updateWarmUp(false);
+                                                      monthProvider.updateIsLastExercise(false);
+
                                                       Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
 
                                                       monthProvider.fetchExerciseSingleExerciseLocalData(dataId);

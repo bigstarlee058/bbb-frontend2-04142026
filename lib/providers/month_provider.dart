@@ -55,6 +55,7 @@ class MonthProvider extends ChangeNotifier {
   bool isPumpDayAvailable = false;
   bool isPastWeek = false;
   bool isCircuit = false;
+  bool isLastExercise = false;
 
   DateTime selectedWeekDate = DateTime.now();
 
@@ -132,6 +133,11 @@ class MonthProvider extends ChangeNotifier {
   updateCircuit(String val, int index) {
     circuitIndex = val;
     circuitsIndex = index;
+    notifyListeners();
+  }
+
+  updateIsLastExercise(bool val) {
+    isLastExercise = val;
     notifyListeners();
   }
 
@@ -890,7 +896,6 @@ class MonthProvider extends ChangeNotifier {
           }
       ]
     };
-
     if (a || b || c) {
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/exercise_done');
       String? userIdToken = await getAuthToken();
