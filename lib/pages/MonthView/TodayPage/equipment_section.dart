@@ -1,4 +1,4 @@
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,14 +6,14 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../utils/screen_util.dart';
 import '../../../../values/app_colors.dart';
 
-class NewEquipmentSection extends StatefulWidget {
-  const NewEquipmentSection({super.key});
+class EquipmentSection extends StatefulWidget {
+  const EquipmentSection({super.key});
 
   @override
-  State<NewEquipmentSection> createState() => _NewEquipmentSectionState();
+  State<EquipmentSection> createState() => _EquipmentSectionState();
 }
 
-class _NewEquipmentSectionState extends State<NewEquipmentSection> {
+class _EquipmentSectionState extends State<EquipmentSection> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;

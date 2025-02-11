@@ -2,20 +2,22 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/notification_service.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/circuit_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/excersie_detail_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/exercise_history_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/history_data_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/month_response_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/pump_day_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/removed_exercise_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/rest_day_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/warm_up_model.dart';
+import 'package:bbb/models/MonthResponseModel/all_exercise_model.dart';
+import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
+import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
+import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
+import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/models/MonthResponseModel/pump_day_model.dart';
+import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
+import 'package:bbb/models/MonthResponseModel/rest_day_model.dart';
+import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,7 +25,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../values/app_constants.dart';
+import '../values/app_constants.dart';
 
 enum WeekType { pastWeek, currentWeek, futureWeek }
 
@@ -42,6 +44,8 @@ class MonthProvider extends ChangeNotifier {
   PumpDayModel? pumpDayModel;
 
   List<WeekType> weekStatuses = [];
+  List<String> weekStatusesString = [];
+  List<String> splitTypeList = [];
   List<RestDayModel> restDayModel = [];
 
   String selectedButtonTitle = "Mark Complete";
@@ -108,7 +112,9 @@ class MonthProvider extends ChangeNotifier {
     if (title.contains("Rest Day")) {
       final dataList = dayHistoryModel.where((element) => element.type!.contains("Pump Day"));
       if (dataList.isNotEmpty) {
-        String dataId = "$splitType-${monthDataModel?.id}-${weekDataModel?.id}-${weekDataModel?.idList![overviewCurrentDay - 1]}";
+        String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+        String dataId = "$split-${monthDataModel?.id}-${weekDataModel?.id}-${weekDataModel?.idList![overviewCurrentDay - 1]}";
         for (var element in dataList) {
           if (element.dataId == dataId) {
             changeIsPumpDay(true);
@@ -159,7 +165,10 @@ class MonthProvider extends ChangeNotifier {
   int overviewCurrentDay = 0;
   int overviewCurrentWeek = 0;
 
+  List<String> splitList = [];
+
   String? splitType;
+
   String equipmentType = "A";
   String alternateEquipmentType = "A";
 
@@ -224,6 +233,7 @@ class MonthProvider extends ChangeNotifier {
 
   void findWeekStatuses() {
     weekStatuses = [];
+    weekStatusesString = [];
     final fixedStartDate = DateTime(startTime!.year, startTime!.month, startTime!.day);
     final fixedEndDate = DateTime(endTime!.year, endTime!.month, endTime!.day);
     const totalWeeks = 4;
@@ -236,19 +246,70 @@ class MonthProvider extends ChangeNotifier {
 
       final currentDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
       WeekType? weekType;
+      String week;
       if (currentDate.isBefore(weekStartForSelected)) {
         weekType = WeekType.futureWeek;
+        week = "F";
       } else if (currentDate.isAfter(weekEndForSelected)) {
         weekType = WeekType.pastWeek;
+        week = "P";
       } else if (currentDate.isAfter(fixedEndDate)) {
         weekType = WeekType.pastWeek;
+        week = "P";
       } else {
         weekType = WeekType.currentWeek;
+        week = "C";
       }
-
       weekStatuses.add(weekType);
+      weekStatusesString.add(week);
     }
+    findSplitTypeList();
     notifyListeners();
+  }
+
+  MonthDataModel? pastMonthDataModel;
+  List<String> lastSplit = [];
+
+  List<DayHistoryModel> newStreakData = [];
+  List<String> newLastSplit = [];
+
+  void findSplitTypeList() {
+    lastSplit = [];
+    newLastSplit = [];
+    newStreakData = [];
+
+    allSplitDayHistoryModel.sort((a, b) {
+      return (b.endTime ?? b.startTime ?? b.date!).compareTo(a.endTime ?? a.startTime ?? a.date!);
+    });
+
+    weekStatusesString.removeWhere((element) => element != "P");
+    for (var i = 0; i < weekStatusesString.length + 1; i++) {
+      final data = allSplitDayHistoryModel.where((element) {
+        return element.weekId == monthDataModel!.weeks![i].id;
+      }).toList();
+      if (data.isNotEmpty) {
+        if (weekStatusesString.length > i) {
+          data.sort((a, b) => ((b.endTime ?? b.startTime ?? b.date!)).compareTo((a.endTime ?? a.startTime ?? a.date!)));
+          lastSplit.add(data.first.split ?? "");
+
+          String split = data.first.split ?? "";
+          final rawTempData = preferences.getString("$split-${monthDataModel?.id}");
+
+          if (rawTempData!.isNotEmpty) {
+            pastMonthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
+            WeekDataModel weekDataModel = pastMonthDataModel!.weeks![i];
+            monthDataModel!.weeks![i] = weekDataModel;
+          }
+        }
+        newStreakData.addAll(allSplitDayHistoryModel
+            .where((element) =>
+                monthDataModel!.weeks![i].id == element.weekId &&
+                monthDataModel?.id == element.monthId &&
+                element.split == (data.first.split ?? "") &&
+                element.status == Status.completed)
+            .toList());
+      }
+    }
   }
 
   Future<void> onInit() async {
@@ -258,24 +319,25 @@ class MonthProvider extends ChangeNotifier {
     await fetchAllRemovedExerciseLocalData();
     await getSplitData().then(
       (value) async {
-        filter();
         startTime = monthDataModel?.startDate ?? DateTime.now();
         endTime = monthDataModel?.endDate ?? DateTime.now();
+
+        filter();
+        int dayDelta =
+            DateTime(today.year, today.month, today.day).difference(DateTime(startTime!.year, startTime!.month, startTime!.day)).inDays;
+        week = (dayDelta ~/ 7) + 1;
+        day = dayDelta % 7 + 1;
+        currentWeek = week!;
+
         await fetchMonthLocalData();
         await fetchAllDayStatusLocalData();
         await getLiftedWeightGraphData();
         manageStreak();
-        int dayDelta =
-            DateTime(today.year, today.month, today.day).difference(DateTime(startTime!.year, startTime!.month, startTime!.day)).inDays;
-        week = (dayDelta ~/ 7) + 1;
-        currentWeek = week!;
-        day = dayDelta % 7 + 1;
+
         findWeekStatuses();
         fetchToday();
       },
     );
-
-    notifyListeners();
   }
 
   Future<void> fetchWarmUp(String warmUpId) async {
@@ -333,6 +395,8 @@ class MonthProvider extends ChangeNotifier {
       monthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
       weeksDataList = monthDataModel!.weeks!;
     }
+
+    findSplitTypeList();
 
     await getRestDayData();
 
@@ -437,11 +501,152 @@ class MonthProvider extends ChangeNotifier {
 
   List<RelatedExercises> relatedExercises = [];
   List<UsedEquipments> usedEquipments = [];
+  List<ExerciseDetailModel> allExerciseDetailsList = [];
+  List<List<ExerciseDetailModel>> circuitsExerciseDetailsList = [];
+
+  List<Exercise> allFilterExercises = [];
+  List<Exercise> allExercises = [];
 
   int selectedExIndex = 0;
 
   ExerciseDetailModel? exerciseDetailModel;
   ExerciseDataModel? selectedExercise;
+
+  getAllExerciseData() async {
+    String? userIdToken = await getAuthToken();
+    relatedExercises = [];
+    allExerciseDetailsList = [];
+    circuitsExerciseDetailsList = [];
+    if (isPumpDay) {
+      pumpDayModel?.exercises?.forEach(
+        (element) async {
+          List<RelatedExercises> tempRelatedExercise = [];
+          ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel();
+          Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${element.exerciseId}');
+          url = Uri.http(url.authority, url.path);
+          final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+          if (response.statusCode == 200) {
+            final responseData = jsonDecode(response.body);
+            if (responseData != null) {
+              exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+              allExerciseDetailsList.add(exerciseDetailModelData);
+              if (exerciseDetailModelData.relatedExercises != null) {
+                tempRelatedExercise.addAll(exerciseDetailModelData.relatedExercises!);
+                relatedExercises.addAll(tempRelatedExercise);
+              }
+            }
+
+            notifyListeners();
+          } else {
+            throw Exception('Failed to load exercise info');
+          }
+        },
+      );
+
+      for (var i = 0; i < (pumpDayModel?.circuits?.length ?? 0); i++) {
+        var circuit = pumpDayModel!.circuits![i];
+        List<ExerciseDetailModel> tempData = [];
+
+        for (var j = 0; j < (circuit.circuitExercises?.length ?? 0); j++) {
+          var element = circuit.circuitExercises![j];
+
+          ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel();
+          Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${element.exerciseId}');
+          url = Uri.http(url.authority, url.path);
+          try {
+            final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+            if (response.statusCode == 200) {
+              final responseData = jsonDecode(response.body);
+              if (responseData != null) {
+                exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+                tempData.add(exerciseDetailModelData);
+              }
+              notifyListeners();
+            } else {
+              throw Exception('Failed to load exercise info');
+            }
+          } catch (e) {
+            log("Error fetching exercise details: $e");
+          }
+        }
+        circuitsExerciseDetailsList.add(tempData);
+      }
+    } else {
+      dayDataModel?.exercises?.forEach(
+        (element) async {
+          List<RelatedExercises> tempRelatedExercise = [];
+          ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel();
+          Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${element.exerciseId}');
+          url = Uri.http(url.authority, url.path);
+          final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+          if (response.statusCode == 200) {
+            final responseData = jsonDecode(response.body);
+            if (responseData != null) {
+              exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+              allExerciseDetailsList.add(exerciseDetailModelData);
+              if (exerciseDetailModelData.relatedExercises != null) {
+                tempRelatedExercise.addAll(exerciseDetailModelData.relatedExercises!);
+                relatedExercises.addAll(tempRelatedExercise);
+              }
+            }
+            notifyListeners();
+          } else {
+            throw Exception('Failed to load exercise info');
+          }
+        },
+      );
+    }
+
+    notifyListeners();
+  }
+
+  Future fetchAllExercise() async {
+    final Map<String, String> queryParams = {
+      'page': '1',
+      'perPage': '10',
+      'search': '',
+      'sortBy': '',
+    };
+
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get');
+    url = Uri.http(url.authority, url.path, queryParams);
+    String? userIdToken = await getAuthToken();
+
+    final response = await http.get(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'AUTH_TOKEN': userIdToken ?? "",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      getExercisesFromJson(jsonDecode(response.body));
+      notifyListeners();
+    } else {
+      throw Exception('Failed to load exercise info');
+    }
+  }
+
+  Future fetchAllFilterEx(String searchQuery) async {
+    if (searchQuery.isEmpty) {
+      allFilterExercises = allExercises;
+    } else {
+      allFilterExercises = allExercises.where((exercise) => exercise.title!.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+    }
+    notifyListeners();
+  }
+
+  void getExercisesFromJson(responseData) {
+    allExercises.clear();
+    allFilterExercises.clear();
+
+    AllExerciseModel allExerciseModel = AllExerciseModel.fromJson(responseData);
+    allExercises = allExerciseModel.exercises!;
+    allFilterExercises = allExerciseModel.exercises!;
+
+    notifyListeners();
+  }
 
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -454,7 +659,11 @@ class MonthProvider extends ChangeNotifier {
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$id');
 
       url = Uri.http(url.authority, url.path);
+      log('url :::::::::::::::::: $url');
       String? userIdToken = await getAuthToken();
+
+      log('userIdToken :::::::::::::::::: $userIdToken');
+
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -475,11 +684,9 @@ class MonthProvider extends ChangeNotifier {
 
   void getExerciseFromJson(responseData) {
     usedEquipments = [];
-    relatedExercises = [];
     if (responseData != null) {
       exerciseDetailModel = ExerciseDetailModel.fromJson(responseData);
       usedEquipments.addAll(exerciseDetailModel!.usedEquipments!);
-      relatedExercises.addAll(exerciseDetailModel!.relatedExercises!);
       notifyListeners();
     }
     notifyListeners();
@@ -495,8 +702,6 @@ class MonthProvider extends ChangeNotifier {
     selectedExIndex = index;
     notifyListeners();
   }
-
-  ///  EXERCISE NOTES =============================++++++++++++++++++++++++++++++++++
 
   /// TIMER LOGIC =============================++++++++++++++++++++++++++++++++++
 
@@ -541,16 +746,18 @@ class MonthProvider extends ChangeNotifier {
       } else {
         updateExpandedItem("0:0");
       }
+    } else {
+      updateExpandedItem("0:0");
     }
     notifyListeners();
   }
 
   Future<void> setShowTimerIndex(int index, int subIndex, int exerciseIndex, {bool removeVal = false}) async {
     if (index != -1 && subIndex != -1 && exerciseIndex != -1) {
-      String value = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
-      await preferences.putString(SharedPreference.lastTimerAddress, value);
+      timerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
+      await preferences.putString(SharedPreference.lastTimerAddress, timerAddress);
       final pf = await SharedPreferences.getInstance();
-      await pf.setString(SharedPreference.lastTimerAddress, value);
+      await pf.setString(SharedPreference.lastTimerAddress, timerAddress);
       if (removeVal) {
         await preferences.putString(SharedPreference.lastTimerPassed, "");
         await preferences.putString(SharedPreference.lastExitTime, "");
@@ -558,7 +765,6 @@ class MonthProvider extends ChangeNotifier {
         await pf.setString(SharedPreference.lastTimerPassed, "");
         await pf.setString(SharedPreference.lastExitTime, "");
       }
-      timerAddress = "$index-$subIndex-$exerciseIndex-$overviewCurrentWeek-$overviewCurrentDay";
     } else {
       log("CLEAR VALUES");
       clearValues();
@@ -568,6 +774,8 @@ class MonthProvider extends ChangeNotifier {
   }
 
   clearValues() async {
+    timerAddress = "";
+    timePassed = "";
     NotificationService.clearNotification();
     await preferences.putString(SharedPreference.lastTimerAddress, "");
     await preferences.putString(SharedPreference.lastTimerPassed, "");
@@ -576,42 +784,143 @@ class MonthProvider extends ChangeNotifier {
     await pf.setString(SharedPreference.lastTimerAddress, "");
     await pf.setString(SharedPreference.lastTimerPassed, "");
     await pf.setString(SharedPreference.lastExitTime, "");
-    timerAddress = "";
-    timePassed = "";
+
     notifyListeners();
   }
 
   Future<void> savePassedTime(String timePassed1, int totalTime, BuildContext context) async {
-    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
-    await preferences.putString(SharedPreference.lastExitTime, DateTime.now().toString());
-    final pf = await SharedPreferences.getInstance();
-    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
-    await pf.setString(SharedPreference.lastExitTime, DateTime.now().toString());
-
     if (timerAddress != '') {
       timePassed = timePassed1;
       int newTime = totalTime - int.parse(timePassed);
       if (newTime.isNegative || newTime == 0) {
       } else {
-        NotificationService.zonedScheduleNotification(
-            newTime, selectedExIndex, {'name': selectedExercise?.name.toString(), 'id': selectedExIndex, 'context': context});
+        final payLoad = {
+          'name': selectedExercise?.name.toString(),
+          'exercise_id': selectedExercise?.exerciseId ?? "",
+          'exercise_index': selectedExIndex,
+          'month_id': monthDataModel?.id,
+          'week_id': weekDataModel?.id,
+          'day_id': dayDataModel?.id,
+          'week_index': overviewCurrentWeek,
+          'day_index': overviewCurrentDay,
+          'is_pumpday': isPumpDay,
+          'is_circuit': isCircuit,
+          'circuit_index': isCircuit ? circuitIndex : "0"
+        };
+        NotificationService.zonedScheduleNotification(newTime, selectedExIndex, payLoad);
       }
     }
+    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
+    await preferences.putString(SharedPreference.lastExitTime, DateTime.now().toString());
+    final pf = await SharedPreferences.getInstance();
+    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
+    await pf.setString(SharedPreference.lastExitTime, DateTime.now().toString());
     notifyListeners();
+  }
+
+  Future<void> exerciseCompletedApi() async {
+    int totalFormat1Set = 0;
+    int totalFormat1Weight = 0;
+    int totalFormat1Reps = 0;
+    int totalFormat1Rest = 0;
+
+    int totalFormat2Set = 0;
+    int totalFormat2Weight = 0;
+    int totalFormat2Reps = 0;
+    int totalFormat2Rest = 0;
+
+    int totalFormat3Set = 0;
+    int totalFormat3Weight = 0;
+    int totalFormat3Reps = 0;
+    int totalFormat3Rest = 0;
+
+    for (var element in historyDataModel) {
+      if (element.type == "1") {
+        totalFormat1Weight += int.parse(element.weight ?? "0");
+        totalFormat1Reps += int.parse(element.reps ?? "0");
+      }
+      if (element.type == "2") {
+        totalFormat2Weight += int.parse(element.weight ?? "0");
+        totalFormat2Reps += int.parse(element.reps ?? "0");
+      }
+      if (element.type == "3") {
+        totalFormat3Weight += int.parse(element.weight ?? "0");
+        totalFormat3Reps += int.parse(element.reps ?? "0");
+      }
+    }
+
+    totalFormat1Set = historyDataModel.where((element) => element.type == "1").length;
+    totalFormat2Set = historyDataModel.where((element) => element.type == "2").length;
+    totalFormat3Set = historyDataModel.where((element) => element.type == "3").length;
+
+    bool a = (!(totalFormat1Set == 0 && totalFormat1Weight == 0 && totalFormat1Reps == 0 && totalFormat1Rest == 0));
+    bool b = (!(totalFormat2Set == 0 && totalFormat2Weight == 0 && totalFormat2Reps == 0 && totalFormat2Rest == 0));
+    bool c = (!(totalFormat3Set == 0 && totalFormat3Weight == 0 && totalFormat3Reps == 0 && totalFormat3Rest == 0));
+
+    final body = {
+      "monthIndex": "${monthDataModel?.index}",
+      "weekIndex": "${weekDataModel?.index}",
+      "dayId": "${weekDataModel?.days?[overviewCurrentDay - 1].id}",
+      "day": DateFormat("MM/dd/yyyy").format(DateTime.now()),
+      "exerciseId": "${exerciseDetailModel?.sId}",
+      "exercises": [
+        if (a)
+          {
+            "sets": "$totalFormat1Set",
+            "weight": "$totalFormat1Weight",
+            "resp": "$totalFormat1Reps",
+            "rest": "$totalFormat1Rest",
+            "type": "1",
+          },
+        if (b)
+          {
+            "sets": "$totalFormat2Set",
+            "weight": "$totalFormat2Weight",
+            "resp": "$totalFormat2Reps",
+            "rest": "$totalFormat2Rest",
+            "type": "2",
+          },
+        if (c)
+          {
+            "sets": "$totalFormat3Set",
+            "weight": "$totalFormat3Weight",
+            "resp": "$totalFormat3Reps",
+            "rest": "$totalFormat3Rest",
+            "type": "3",
+          }
+      ]
+    };
+
+    if (a || b || c) {
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/exercise_done');
+      String? userIdToken = await getAuthToken();
+      final response = await http.post(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'AUTH_TOKEN': userIdToken ?? "",
+          },
+          body: jsonEncode(body));
+      if (response.statusCode == 200) {
+      } else {
+        throw Exception('Failed to load exercise info');
+      }
+    }
   }
 
   /// STREAK COUNT =============================++++++++++++++++++++++++++++++++++
 
   manageStreak() async {
-    List<DayHistoryModel> data = decodedData();
+    List<DayHistoryModel> data = decodedDataAll();
 
     streak = 0;
     DateTime? pastDate;
 
     for (var element in data) {
       DateTime currentDate = element.endTime!;
+      DateTime localTime = currentDate.toLocal();
+
       if (pastDate != null) {
-        int difference = pastDate.difference(currentDate).inDays;
+        int difference = pastDate.difference(localTime).inDays;
         if (difference > 1) {
           break;
         }
@@ -621,7 +930,7 @@ class MonthProvider extends ChangeNotifier {
       } else {
         break;
       }
-      pastDate = currentDate;
+      pastDate = localTime;
     }
     await preferences.putInt(SharedPreference.lastStreakCount, streak);
     notifyListeners();
@@ -631,17 +940,59 @@ class MonthProvider extends ChangeNotifier {
     String encodedTempData = jsonEncode(allDayHistoryModel);
     final decodedData = List<DayHistoryModel>.from(json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)));
     decodedData.removeWhere((element) => element.status == Status.empty || element.status == Status.started);
-    decodedData.sort((a, b) => b.endTime!.compareTo(a.endTime!));
+    decodedData.sort((a, b) {
+      DateTime aDate = a.endTime!;
+      DateTime localTimeADate = aDate.toLocal();
+      DateTime bDate = b.endTime!;
+      DateTime localTimeBDate = bDate.toLocal();
+      return localTimeBDate.compareTo(localTimeADate);
+    });
     Map<String, Map<String, dynamic>> latestByDay = {};
     for (var entry in decodedData) {
-      String dayKey = entry.endTime.toString().substring(0, 10);
-      DateTime dateTime = entry.endTime!;
+      DateTime currentDate = entry.endTime!;
+      DateTime localTime = currentDate.toLocal();
+
+      String dayKey = localTime.toString().substring(0, 10);
+      DateTime dateTime = localTime;
       if (!latestByDay.containsKey(dayKey) || DateTime.parse(latestByDay[dayKey]!['date']).isBefore(dateTime)) {
         latestByDay[dayKey] = entry.toJson();
       }
     }
     decodedData.removeWhere((entry) {
-      String dayKey = entry.endTime.toString().substring(0, 10);
+      DateTime currentDate = entry.endTime!;
+      DateTime localTime = currentDate.toLocal();
+      String dayKey = localTime.toString().substring(0, 10);
+      return latestByDay[dayKey]!['id'] != entry.id;
+    });
+    return decodedData;
+  }
+
+  List<DayHistoryModel> decodedDataAll() {
+    String encodedTempData = jsonEncode(allSplitDayHistoryModel);
+    final decodedData = List<DayHistoryModel>.from(json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)));
+    decodedData.removeWhere((element) => element.status == Status.empty || element.status == Status.started);
+    decodedData.sort((a, b) {
+      DateTime aDate = a.endTime!;
+      DateTime localTimeADate = aDate.toLocal();
+      DateTime bDate = b.endTime!;
+      DateTime localTimeBDate = bDate.toLocal();
+      return localTimeBDate.compareTo(localTimeADate);
+    });
+    Map<String, Map<String, dynamic>> latestByDay = {};
+    for (var entry in decodedData) {
+      DateTime currentDate = entry.endTime!;
+      DateTime localTime = currentDate.toLocal();
+
+      String dayKey = localTime.toString().substring(0, 10);
+      DateTime dateTime = localTime;
+      if (!latestByDay.containsKey(dayKey) || DateTime.parse(latestByDay[dayKey]!['date']).isBefore(dateTime)) {
+        latestByDay[dayKey] = entry.toJson();
+      }
+    }
+    decodedData.removeWhere((entry) {
+      DateTime currentDate = entry.endTime!;
+      DateTime localTime = currentDate.toLocal();
+      String dayKey = localTime.toString().substring(0, 10);
       return latestByDay[dayKey]!['id'] != entry.id;
     });
     return decodedData;
@@ -664,9 +1015,11 @@ class MonthProvider extends ChangeNotifier {
   List<HistoryDataModel> historyDataModel = [];
 
   fetchExerciseHistoryLocalData() async {
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     historyDataModel = [];
     final data = await DatabaseHelper().getFilteredWithExerciseData(
-      split: splitType!,
+      split: split,
       tableName: DatabaseHelper.exerciseHistory,
       exerciseId: "${exerciseDetailModel?.sId}",
       monthId: monthDataModel?.id ?? "",
@@ -682,9 +1035,11 @@ class MonthProvider extends ChangeNotifier {
   List<HistoryDataModel> exerciseWiseHistoryDataModel = [];
 
   fetchExerciseWiseHistoryLocalData() async {
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     exerciseWiseHistoryDataModel = [];
     final data = await DatabaseHelper().getDataByAnyWithSplitField(
-        tableName: DatabaseHelper.exerciseHistory, id: "${exerciseDetailModel?.sId}", fieldName: 'exerciseId', split: splitType!);
+        tableName: DatabaseHelper.exerciseHistory, id: "${exerciseDetailModel?.sId}", fieldName: 'exerciseId', split: split);
 
     if (data.isNotEmpty) {
       exerciseWiseHistoryDataModel = List<HistoryDataModel>.from(json.decode(jsonEncode(data)).map((x) => HistoryDataModel.fromJson(x)));
@@ -695,8 +1050,10 @@ class MonthProvider extends ChangeNotifier {
   List<ExerciseHistoryModel> exerciseHistoryModel = [];
 
   Future<void> fetchExerciseStatusLocalData() async {
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     final data = await DatabaseHelper().getFilteredWithMWDData(
-      split: splitType!,
+      split: split,
       tableName: DatabaseHelper.exerciseStatus,
       monthId: monthDataModel?.id ?? "",
       dayId: weekDataModel?.idList![overviewCurrentDay - 1] ?? "",
@@ -727,9 +1084,11 @@ class MonthProvider extends ChangeNotifier {
   List<DayHistoryModel> dayHistoryModel = [];
 
   Future<void> fetchDayStatusLocalData() async {
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     dayHistoryModel = [];
     final data = await DatabaseHelper().getFilteredWithMWData(
-      split: splitType!,
+      split: split,
       tableName: DatabaseHelper.dayStatus,
       monthId: monthDataModel?.id ?? "",
       weekId: weekDataModel?.id ?? "",
@@ -743,11 +1102,15 @@ class MonthProvider extends ChangeNotifier {
   }
 
   List<DayHistoryModel> allDayHistoryModel = [];
+  List<DayHistoryModel> allSplitDayHistoryModel = [];
 
   Future<void> fetchAllDayStatusLocalData() async {
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     allDayHistoryModel = [];
+    allSplitDayHistoryModel = [];
     final data = await DatabaseHelper().getFilteredWithMData(
-      split: splitType!,
+      split: split,
       tableName: DatabaseHelper.dayStatus,
       monthId: monthDataModel?.id ?? "",
     );
@@ -755,6 +1118,13 @@ class MonthProvider extends ChangeNotifier {
       allDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data)).map((x) => DayHistoryModel.fromJson(x)));
     } else {
       allDayHistoryModel = [];
+    }
+
+    final data1 = await DatabaseHelper().getFilteredData(tableName: DatabaseHelper.dayStatus, monthId: monthDataModel?.id ?? "");
+    if (data1.isNotEmpty) {
+      allSplitDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data1)).map((x) => DayHistoryModel.fromJson(x)));
+    } else {
+      allSplitDayHistoryModel = [];
     }
     notifyListeners();
   }
@@ -765,10 +1135,11 @@ class MonthProvider extends ChangeNotifier {
     if (overviewCurrentDay == 0) {
       return null;
     }
+    String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     dayHistoryDetails = null;
     String dataId =
-        "$splitType-${monthDataModel?.id}-${weekDataModel?.id ?? monthDataModel?.weeks?[(overviewCurrentWeek) - 1].id}-${monthDataModel?.weeks?[(overviewCurrentWeek) - 1].idList?[overviewCurrentDay - 1] ?? ""}";
+        "$split-${monthDataModel?.id}-${weekDataModel?.id ?? monthDataModel?.weeks?[(overviewCurrentWeek) - 1].id}-${monthDataModel?.weeks?[(overviewCurrentWeek) - 1].idList?[overviewCurrentDay - 1] ?? ""}";
 
     final data = await DatabaseHelper().getDataByDataId(tableName: DatabaseHelper.dayStatus, id: dataId);
     if (data != null) {
@@ -800,6 +1171,27 @@ class MonthProvider extends ChangeNotifier {
       allRemovedExercise = List<RemovedExerciseModel>.from(json.decode(jsonEncode(data)).map((x) => RemovedExerciseModel.fromJson(x)));
     } else {
       allRemovedExercise = [];
+    }
+    notifyListeners();
+  }
+
+  List<ExtraExerciseModel> addedExerciseList = [];
+
+  Future<void> fetchExtraAddedExerciseData() async {
+    addedExerciseList = [];
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    final data = await DatabaseHelper().getFilteredWithMWDData(
+        tableName: DatabaseHelper.extraExerciseHistory,
+        monthId: monthDataModel?.id ?? "",
+        split: split,
+        weekId: weekDataModel?.id ?? "",
+        dayId: weekDataModel?.idList![overviewCurrentDay - 1]);
+
+    if (data.isNotEmpty) {
+      addedExerciseList = List<ExtraExerciseModel>.from(data.map((x) => ExtraExerciseModel.fromJson(x)));
+    } else {
+      addedExerciseList = [];
     }
     notifyListeners();
   }
@@ -837,19 +1229,27 @@ class MonthProvider extends ChangeNotifier {
         return false;
       }
       DateTime entryDate = entry.endTime!;
-      return entryDate.isAfter(sixDaysAgo) && entryDate.isBefore(today.add(const Duration(days: 1)));
+      DateTime localTime = entryDate.toLocal();
+      return localTime.isAfter(sixDaysAgo) && localTime.isBefore(today.add(const Duration(days: 1)));
     }).toList();
     Map<String, Map<String, dynamic>> combinedData = {};
     for (var element in filteredData) {
       if (element.status == Status.completed) {
         DateTime dateDateTime = element.date!;
-        String date = dateDateTime.toIso8601String().split('T')[0];
+        DateTime localTime = dateDateTime.toLocal();
+
+        DateTime aDate = element.startTime!;
+        DateTime localTimeADate = aDate.toLocal();
+        DateTime bDate = element.endTime!;
+        DateTime localTimeBDate = bDate.toLocal();
+
+        String date = localTime.toIso8601String().split('T')[0];
         double totalWeight = double.parse(element.totalWeight ?? "0");
         int completedExercise = int.parse(element.completedExercise ?? "0");
 
-        int workoutTimeInSeconds = element.endTime!.difference(element.startTime!).inSeconds;
+        int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
 
-        String day = weekdays[dateDateTime.weekday] ?? "";
+        String day = weekdays[localTime.weekday] ?? "";
         if (combinedData.containsKey(date)) {
           combinedData[date]!['totalWeight'] += totalWeight;
           combinedData[date]!['completedExercise'] += completedExercise;
@@ -1095,8 +1495,11 @@ class MonthProvider extends ChangeNotifier {
       if (data.status != Status.completed) {
         return false;
       }
+
       DateTime entryDate = data.endTime!;
-      return entryDate.isAfter(startDate) && entryDate.isBefore(endDate);
+
+      DateTime localTime = entryDate.toLocal();
+      return localTime.isAfter(startDate) && localTime.isBefore(endDate);
     }).toList();
 
     Map<String, Map<String, dynamic>> combinedData = {};
@@ -1188,8 +1591,12 @@ class MonthProvider extends ChangeNotifier {
       if (data.status != Status.completed) {
         return false;
       }
+
       DateTime entryDate = data.endTime!;
-      return entryDate.isAfter(startDate) && entryDate.isBefore(endDate);
+
+      DateTime localTime = entryDate.toLocal();
+
+      return localTime.isAfter(startDate) && localTime.isBefore(endDate);
     }).toList();
 
     Map<String, Map<String, dynamic>> combinedData = {};
@@ -1199,7 +1606,12 @@ class MonthProvider extends ChangeNotifier {
         DateTime dateDateTime = element.date!;
         String date = dateDateTime.toIso8601String().split('T')[0];
 
-        int workoutTimeInSeconds = element.endTime!.difference(element.startTime!).inSeconds;
+        DateTime aDate = element.startTime!;
+        DateTime localTimeADate = aDate.toLocal();
+        DateTime bDate = element.endTime!;
+        DateTime localTimeBDate = bDate.toLocal();
+
+        int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
 
         String day = weekdays[dateDateTime.weekday] ?? "";
         if (combinedData.containsKey(date)) {
@@ -1265,7 +1677,11 @@ class MonthProvider extends ChangeNotifier {
 }
 
 class _BarData {
-  const _BarData(this.color, this.value, this.shadowValue);
+  const _BarData(
+    this.color,
+    this.value,
+    this.shadowValue,
+  );
   final Color color;
   final double value;
   final double shadowValue;

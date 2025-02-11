@@ -1,12 +1,14 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class NutritionCalculatorPage extends StatefulWidget {
   const NutritionCalculatorPage({super.key});
@@ -70,7 +72,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 2.5,
                           width: media.width,
                           child: SafeArea(
@@ -84,13 +86,15 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                       BackArrowWidget(onPress: () => {Navigator.pop(context)}),
                                       Container(
                                         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
-                                        child: Text(
-                                          'Hi, Nick',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: ScreenUtil.horizontalScale(5.5),
-                                          ),
-                                        ),
+                                        child: Consumer<UserDataProvider>(builder: (context, userData, child) {
+                                          return Text(
+                                            'Hi ${userData.userName}',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.horizontalScale(5.5),
+                                            ),
+                                          );
+                                        }),
                                       ),
                                       const CommonStreakWithNotification()
                                     ],
@@ -217,13 +221,13 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                                 borderRadius: BorderRadius.circular(
                                                   ScreenUtil.verticalScale(5),
                                                 ),
-                                                borderSide: const BorderSide(color: Colors.white, width: 2.0), // White border
+                                                borderSide: const BorderSide(color: Colors.white, width: 2.0),
                                               ),
                                               focusedBorder: OutlineInputBorder(
                                                 borderRadius: BorderRadius.circular(
                                                   ScreenUtil.verticalScale(5),
                                                 ),
-                                                borderSide: const BorderSide(color: Colors.white, width: 2.0), // White border
+                                                borderSide: const BorderSide(color: Colors.white, width: 2.0),
                                               ),
                                               border: OutlineInputBorder(
                                                 borderRadius: BorderRadius.circular(
@@ -249,150 +253,149 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text('Your Weight',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryColor,
-                                            fontSize: ScreenUtil.horizontalScale(5),
-                                          )),
+                                      Text(
+                                        'Your Weight',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryColor,
+                                          fontSize: ScreenUtil.horizontalScale(5),
+                                        ),
+                                      ),
                                       const SizedBox(width: 25),
                                       Expanded(
-                                          child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Color(0x20888888),
-                                              spreadRadius: 3,
-                                              blurRadius: 10,
-                                              offset: Offset(
-                                                0,
-                                                1,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Color(0x20888888),
+                                                spreadRadius: 3,
+                                                blurRadius: 10,
+                                                offset: Offset(0, 1),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
+                                          child: DropdownButton<String>(
+                                            value: _selectedEquipment,
+                                            dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                                            icon: const Icon(Icons.keyboard_arrow_down_outlined),
+                                            iconSize: ScreenUtil.verticalScale(4),
+                                            iconEnabledColor: Colors.grey[400],
+                                            elevation: 12,
+                                            isExpanded: true,
+                                            style: const TextStyle(color: Colors.black, fontSize: 16),
+                                            underline: Container(),
+                                            onChanged: (String? newValue) {
+                                              setState(() {
+                                                _selectedEquipment = newValue!;
+                                              });
+                                            },
+                                            items: <String>[
+                                              '121lbs',
+                                              '200lbs',
+                                            ].map<DropdownMenuItem<String>>((String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Row(
+                                                  children: [
+                                                    const SizedBox(width: 10),
+                                                    Text(
+                                                      value,
+                                                      style: const TextStyle(color: Colors.black54),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
                                         ),
-                                        child: DropdownButton<String>(
-                                          value: _selectedEquipment,
-                                          dropdownColor: const Color.fromARGB(255, 252, 252, 252),
-                                          icon: const Icon(Icons.keyboard_arrow_down_outlined),
-                                          iconSize: ScreenUtil.verticalScale(4),
-                                          iconEnabledColor: Colors.grey[400],
-                                          elevation: 12,
-                                          isExpanded: true,
-                                          style: const TextStyle(color: Colors.black, fontSize: 16),
-                                          underline: Container(),
-                                          onChanged: (String? newValue) {
-                                            setState(() {
-                                              _selectedEquipment = newValue!;
-                                            });
-                                          },
-                                          items: <String>[
-                                            '121lbs',
-                                            '200lbs',
-                                          ].map<DropdownMenuItem<String>>((String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Row(
-                                                children: [
-                                                  const SizedBox(width: 10),
-                                                  Text(
-                                                    value,
-                                                    style: const TextStyle(color: Colors.black54),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      )),
+                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 16.0),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text('Your Gender',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryColor,
-                                            fontSize: ScreenUtil.horizontalScale(5),
-                                          )),
+                                      Text(
+                                        'Your Gender',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryColor,
+                                          fontSize: ScreenUtil.horizontalScale(5),
+                                        ),
+                                      ),
                                       const SizedBox(width: 22),
                                       Expanded(
-                                          child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            ScreenUtil.verticalScale(5),
-                                          ),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Color(0x20888888),
-                                              spreadRadius: 3,
-                                              blurRadius: 10,
-                                              offset: Offset(
-                                                0,
-                                                1,
-                                              ),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              ScreenUtil.verticalScale(5),
                                             ),
-                                          ],
-                                        ),
-                                        child: DropdownButton<String>(
-                                          value: _selectedGender,
-                                          dropdownColor: const Color.fromARGB(255, 252, 252, 252),
-                                          icon: const Icon(Icons.keyboard_arrow_down_outlined),
-                                          iconSize: ScreenUtil.verticalScale(4),
-                                          iconEnabledColor: Colors.grey[400],
-                                          elevation: 12,
-                                          isExpanded: true,
-                                          style: const TextStyle(color: Colors.black, fontSize: 16),
-                                          underline: Container(),
-                                          onChanged: (String? newValue) {
-                                            setState(() {
-                                              _selectedGender = newValue!;
-                                            });
-                                          },
-                                          items: <String>[
-                                            'Female',
-                                            'Male',
-                                          ].map<DropdownMenuItem<String>>((String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Row(
-                                                children: [
-                                                  const SizedBox(width: 10),
-                                                  Text(
-                                                    value,
-                                                    style: const TextStyle(color: Colors.black54),
-                                                  ),
-                                                ],
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Color(0x20888888),
+                                                spreadRadius: 3,
+                                                blurRadius: 10,
+                                                offset: Offset(0, 1),
                                               ),
-                                            );
-                                          }).toList(),
+                                            ],
+                                          ),
+                                          child: DropdownButton<String>(
+                                            value: _selectedGender,
+                                            dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                                            icon: const Icon(Icons.keyboard_arrow_down_outlined),
+                                            iconSize: ScreenUtil.verticalScale(4),
+                                            iconEnabledColor: Colors.grey[400],
+                                            elevation: 12,
+                                            isExpanded: true,
+                                            style: const TextStyle(color: Colors.black, fontSize: 16),
+                                            underline: Container(),
+                                            onChanged: (String? newValue) {
+                                              setState(() {
+                                                _selectedGender = newValue!;
+                                              });
+                                            },
+                                            items: <String>[
+                                              'Female',
+                                              'Male',
+                                            ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Row(
+                                                    children: [
+                                                      const SizedBox(width: 10),
+                                                      Text(
+                                                        value,
+                                                        style: const TextStyle(color: Colors.black54),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            ).toList(),
+                                          ),
                                         ),
-                                      )),
+                                      ),
                                     ],
                                   ),
                                   SizedBox(height: ScreenUtil.horizontalScale(7)),
                                   DottedDashedLine(
-                                    height: 0,
-                                    width: media.width,
-                                    dashColor: Colors.grey.withValues(alpha: 0.3),
-                                    axis: Axis.horizontal,
-                                  ),
+                                      height: 0, width: media.width, dashColor: Colors.grey.withValues(alpha: 0.3), axis: Axis.horizontal),
                                   SizedBox(height: ScreenUtil.horizontalScale(6)),
                                   Text(
                                     'Activity Level',
                                     style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: ScreenUtil.horizontalScale(5),
-                                        color: AppColors.primaryColor),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: ScreenUtil.horizontalScale(5),
+                                      color: AppColors.primaryColor,
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
                                   Column(
@@ -421,34 +424,27 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                     height: ScreenUtil.horizontalScale(7),
                                   ),
                                   DottedDashedLine(
-                                    height: 0,
-                                    width: media.width,
-                                    dashColor: Colors.grey.withValues(alpha: 0.3),
-                                    axis: Axis.horizontal,
-                                  ),
+                                      height: 0, width: media.width, dashColor: Colors.grey.withValues(alpha: 0.3), axis: Axis.horizontal),
                                   SizedBox(
                                     height: ScreenUtil.horizontalScale(7),
                                   ),
                                   ButtonWidget(
-                                    text: 'Calculate',
-                                    textColor: Colors.white,
-                                    color: AppColors.primaryColor,
-                                    onPress: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/recalculate',
-                                      );
-                                    },
-                                    isLoading: false,
-                                  ),
+                                      text: 'Calculate',
+                                      textColor: Colors.white,
+                                      color: AppColors.primaryColor,
+                                      onPress: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/recalculate',
+                                        );
+                                      },
+                                      isLoading: false),
                                 ],
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 50,
-                        )
+                        const SizedBox(height: 50)
                       ],
                     ),
                   ),
@@ -535,13 +531,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
         border: Border.all(color: AppColors.primaryColor, width: 2.0),
         color: isSelected ? AppColors.primaryColor : Colors.white,
       ),
-      child: isSelected
-          ? const Icon(
-              Icons.check,
-              size: 16.0,
-              color: Colors.white,
-            )
-          : null,
+      child: isSelected ? const Icon(Icons.check, size: 16.0, color: Colors.white) : null,
     );
   }
 }

@@ -4,14 +4,14 @@ import 'package:bbb/components/collection_grid.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/staff_list_widget.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
-import 'package:bbb/pages/Charts/time_spent.dart';
 import 'package:bbb/pages/Charts/weight_lifted.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -20,8 +20,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-
-import 'NewMonthView/MonthResponseModel/day_history_model.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -92,13 +90,6 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-        // floatingActionButton: Consumer<MonthProvider>(
-        //   builder: (context, data, child) {
-        //     return FloatingActionButton(
-        //       onPressed: () => data.onInit(),
-        //     );
-        //   },
-        // ),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
@@ -203,11 +194,16 @@ class _DashboardPageState extends State<DashboardPage> {
                                         return const SizedBox();
                                       }
                                       if (monthData.todayTitleId.isNotEmpty) {
-                                        int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.indexWhere(
-                                          (element) => element == monthData.todayTitleId,
-                                        );
+                                        int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList
+                                            ?.indexWhere((element) => element == monthData.todayTitleId);
+
+                                        String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
+
                                         String dataId =
-                                            "${monthData.splitType}-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
+                                            "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
 
                                         final data = monthData.allDayHistoryModel.where((element) => element.dataId == dataId);
                                         String status = "";
@@ -295,6 +291,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                               ),
                                               const SizedBox(height: 10),
                                               Container(
+                                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
                                                 decoration: status == Status.completed
                                                     ? BoxDecoration(
                                                         color: Colors.white,
@@ -334,8 +331,13 @@ class _DashboardPageState extends State<DashboardPage> {
                                           ),
                                         );
                                       } else {
+                                        String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
+
                                         String dataId =
-                                            "${monthData.splitType}-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
+                                            "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
                                         return Container(
                                           margin: EdgeInsets.symmetric(
                                             horizontal: ScreenUtil.horizontalScale(8),
@@ -450,15 +452,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: Consumer<MonthProvider>(
                             builder: (context, value, child) {
                               if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
-                              // final val1 = (value.currentWeek - 1) * 7;
-                              final count = value.allDayHistoryModel
-                                  .where((element) =>
-                                      element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
-                                      element.split == value.splitType &&
-                                      element.monthId == value.monthDataModel?.id &&
-                                      element.status == Status.completed)
-                                  .length;
-                              // final count = val2.length + val1;
+                              final count = value.newStreakData.length;
                               return Column(
                                 children: [
                                   const SizedBox(height: 10),
@@ -581,7 +575,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 itemBuilder: (context) {
                                   return [
                                     "Exercises Completed",
-                                    "Time Spent",
+                                    // "Time Spent",
                                     "Weight Lifted",
                                   ].map((str) {
                                     return PopupMenuItem(
@@ -634,7 +628,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               ? const ExerciseCompletedGraph()
                               : selectedChart == "Weight Lifted"
                                   ? const WeightLiftedGraph()
-                                  : const TimeSpentGraph(),
+                                  // : const TimeSpentGraph(),
+                                  : const SizedBox(),
                         ),
                         const SizedBox(height: 15),
                         Container(

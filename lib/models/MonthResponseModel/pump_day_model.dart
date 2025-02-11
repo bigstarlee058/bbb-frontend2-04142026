@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
 
 PumpDayModel pumpDayModelFromJson(String str) => PumpDayModel.fromJson(json.decode(str));
 

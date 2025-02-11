@@ -134,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
           bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
 
           // Navigate to MainPage, passing the welcome data if modal should be shown
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => MainPage(
@@ -143,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                 welcomeImageUrl: descriptionData['vimeoId'], // pass fetched description
               ),
             ),
+            (route) => false,
           );
         } else {
           // Handle error if fetching description fails

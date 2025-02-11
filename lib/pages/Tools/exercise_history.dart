@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/history_data_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';

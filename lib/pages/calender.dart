@@ -1,6 +1,6 @@
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -79,47 +79,11 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
   }
 
-  // void _onLeftArrowTap() {
-  //   setState(() {
-  //     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
-  //   });
-  // }
-  //
-  // void _onRightArrowTap() {
-  //   setState(() {
-  //     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
-  //   });
-  // }
-  //
-  // String _getFormattedDate() {
-  //   return DateFormat.yMMMM().format(_focusedDay);
-  // }
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Padding(
-          //   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12)),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       IconButton(
-          //         icon: const Icon(Icons.arrow_back_ios, size: 20, color: AppColors.primaryColor),
-          //         onPressed: _onLeftArrowTap,
-          //       ),
-          //       Text(
-          //         _getFormattedDate(),
-          //         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
-          //       ),
-          //       IconButton(
-          //         icon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
-          //         onPressed: _onRightArrowTap,
-          //       ),
-          //     ],
-          //   ),
-          // ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
             child: Card(
@@ -141,20 +105,6 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                     selectedDayPredicate: (day) {
                       return isSameDay(_selectedDay, day);
                     },
-                    // onDaySelected: (selectedDay, focusedDay) {
-                    //   setState(() {
-                    //     _selectedDay = selectedDay;
-                    //   });
-                    // },
-                    // onPageChanged: (focusedDay) {
-                    //   setState(() {
-                    //     _focusedDay = focusedDay;
-                    //   });
-                    // },
-                    // calendarFormat: CalendarFormat.month,
-                    // availableCalendarFormats: const {
-                    //   CalendarFormat.month: 'Month',
-                    // },
                     headerStyle: HeaderStyle(
                       headerPadding: const EdgeInsets.only(bottom: 10),
                       formatButtonVisible: false,
@@ -165,23 +115,12 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                       titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
                     ),
                     calendarStyle: const CalendarStyle(
-                      // selectedDecoration: BoxDecoration(
-                      //   color: Colors.blue,
-                      //   shape: BoxShape.circle,
-                      // ),
-                      // todayDecoration: BoxDecoration(
-                      //   color: Colors.orange,
-                      //   shape: BoxShape.circle,
-                      // ),
                       defaultTextStyle: TextStyle(fontSize: 12.0),
                       weekendTextStyle: TextStyle(fontSize: 12.0),
                       outsideTextStyle: TextStyle(fontSize: 10.0),
                     ),
                     calendarBuilders: CalendarBuilders(
                       todayBuilder: (context, day, focusedDay) => _buildDayState(day),
-                      // disabledBuilder: (context, date, _) {
-                      //   return _buildDayState(date);
-                      // },
                       outsideBuilder: (context, date, _) {
                         return _buildDayState(date);
                       },
@@ -202,7 +141,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   Widget? _buildDayState(DateTime date) {
     DateTime? oldestStartDate =
         monthProvider?.monthLocalDataModel.map((e) => DateTime.parse(e.monthStartDate!)).reduce((a, b) => a.isBefore(b) ? a : b);
-    List<DayHistoryModel> data = monthProvider!.decodedData();
+    List<DayHistoryModel> data = monthProvider!.decodedDataAll();
     bool isCurrentDay = date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day;
 
     if (data.isEmpty) {
@@ -213,13 +152,20 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
     }
 
-    for (var day in data) {
-      final workoutDate = day.endTime!;
-      if ((workoutDate.day == date.day && workoutDate.month == date.month && workoutDate.year == date.year)) {
-        if (day.status == Status.completed) {
-          return _buildCustomDayCircle(date, AppColors.primaryColor);
-        } else if (day.status == Status.skipped) {
-          return _buildCustomDayCircle(date, Colors.blue);
+    final futureDay = DateTime.now().add(Duration(days: 1));
+
+    if (date.isAfter(futureDay)) {
+      for (var day in data) {
+        final workoutDate = day.endTime!;
+
+        DateTime localTime = workoutDate.toLocal();
+
+        if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+          if (day.status == Status.completed) {
+            return _buildCustomDayCircle(date, AppColors.primaryColor);
+          } else if (day.status == Status.skipped) {
+            return _buildCustomDayCircle(date, Colors.blue);
+          }
         }
       }
     }

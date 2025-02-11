@@ -1,14 +1,14 @@
 import 'dart:async';
 
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/notification_service.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class NewTimerWithProgressBar extends StatefulWidget {
+class TimerWithProgressBar extends StatefulWidget {
   final int initialDuration;
   final VoidCallback onClose;
   final VoidCallback onComplete;
@@ -16,7 +16,7 @@ class NewTimerWithProgressBar extends StatefulWidget {
   final String dataId;
   // final bool isTimerRunning;
 
-  const NewTimerWithProgressBar({
+  const TimerWithProgressBar({
     super.key,
     required this.initialDuration,
     required this.onClose,
@@ -27,10 +27,10 @@ class NewTimerWithProgressBar extends StatefulWidget {
   });
 
   @override
-  State<NewTimerWithProgressBar> createState() => _NewTimerWithProgressBarState();
+  State<TimerWithProgressBar> createState() => _TimerWithProgressBarState();
 }
 
-class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _TimerWithProgressBarState extends State<TimerWithProgressBar> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late MonthProvider monthProvider;
 
   @override
@@ -67,7 +67,7 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
         animationCompleted = true;
         widget.onComplete();
 
-        DatabaseHelper().updateSingleValue(
+        await DatabaseHelper().updateSingleValue(
             tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
       }
     });
@@ -131,7 +131,7 @@ class _NewTimerWithProgressBarState extends State<NewTimerWithProgressBar> with 
           currentTime = int.parse(monthProvider.timePassed);
 
           if (int.parse(monthProvider.timePassed) > totalTime) {
-            DatabaseHelper().updateSingleValue(
+            await DatabaseHelper().updateSingleValue(
                 tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
           }
         }

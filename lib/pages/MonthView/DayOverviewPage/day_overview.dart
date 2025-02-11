@@ -1,11 +1,11 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -15,14 +15,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class NewDayOverviewPage extends StatefulWidget {
-  const NewDayOverviewPage({super.key});
+class DayOverviewPage extends StatefulWidget {
+  const DayOverviewPage({super.key});
 
   @override
-  State<NewDayOverviewPage> createState() => _DayOverviewPageState();
+  State<DayOverviewPage> createState() => _DayOverviewPageState();
 }
 
-class _DayOverviewPageState extends State<NewDayOverviewPage> {
+class _DayOverviewPageState extends State<DayOverviewPage> {
   MonthProvider? monthProvider;
   late MainPageProvider mainPageProvider;
   UserDataProvider? userData;
@@ -60,9 +60,11 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     await monthProvider?.checkForPumpDay(data);
 
     await monthProvider?.getRestDayData();
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
     if (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type!.contains("Pump Day"))) {
       monthProvider?.changeIsPumpDay(true);
       monthProvider?.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
@@ -238,11 +240,15 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                           horizontal: ScreenUtil.horizontalScale(10),
                                         ),
                                         child: Builder(builder: (context) {
+                                          String split = monthProvider
+                                                  .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                  .toString()
+                                                  .split(" ")[1] ??
+                                              "";
                                           return ButtonWidget(
                                             text: (monthProvider.dayDataModel != null &&
                                                     monthProvider.dayDataModel!.formats != null &&
-                                                    monthProvider.dayDataModel!.formats!
-                                                        .contains(monthProvider.splitType.toString().replaceAll("split", "")))
+                                                    monthProvider.dayDataModel!.formats!.contains(split.toString().replaceAll("split", "")))
                                                 ? "Watch Video"
                                                 : "Watch Video Intro",
                                             color: const Color(0xEEFFFFFF),
@@ -361,11 +367,15 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                           horizontal: ScreenUtil.horizontalScale(10),
                                         ),
                                         child: Builder(builder: (context) {
+                                          String split = monthProvider
+                                                  .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                  .toString()
+                                                  .split(" ")[1] ??
+                                              "";
                                           return ButtonWidget(
                                             text: (monthProvider.dayDataModel != null &&
                                                     monthProvider.dayDataModel!.formats != null &&
-                                                    monthProvider.dayDataModel!.formats!
-                                                        .contains(monthProvider.splitType.toString().replaceAll("split", "")))
+                                                    monthProvider.dayDataModel!.formats!.contains(split.toString().replaceAll("split", "")))
                                                 ? "Watch Video"
                                                 : "Watch Video Intro",
                                             color: const Color(0xEEFFFFFF),
@@ -437,9 +447,13 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                                   ),
                                   Consumer<MonthProvider>(
                                     builder: (context, monthProvider, child) {
+                                      String split = monthProvider
+                                              .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                              .toString()
+                                              .split(" ")[1] ??
+                                          "";
                                       return monthProvider.dayDataModel!.formats != null &&
-                                              monthProvider.dayDataModel!.formats!
-                                                  .contains(monthProvider.splitType.toString().replaceAll("split", "")) &&
+                                              monthProvider.dayDataModel!.formats!.contains(split.toString().replaceAll("split", "")) &&
                                               !monthProvider.isPumpDay
                                           ? BulletPoint(text: monthProvider.dayDataModel!.description!)
                                           : monthProvider.isPumpDay
@@ -477,29 +491,35 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
                     horizontal: ScreenUtil.horizontalScale(10),
                     vertical: ScreenUtil.verticalScale(2),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (monthProvider?.dayDataModel!.formats != null &&
-                          monthProvider!.dayDataModel!.formats!.contains(monthProvider!.splitType.toString().replaceAll("split", ""))) ...[
-                        Container(
-                          margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
-                          child: Text(
-                            'Choose equipment availability',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
+                  child: Builder(builder: (context) {
+                    String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                            .toString()
+                            .split(" ")[1] ??
+                        "";
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (monthProvider?.dayDataModel!.formats != null &&
+                            monthProvider!.dayDataModel!.formats!.contains(split.toString().replaceAll("split", ""))) ...[
+                          Container(
+                            margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
+                            child: Text(
+                              'Choose equipment availability',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        SelectDropdown(
-                          onChange: (String newValue) {
-                            monthProvider?.alternateEquipmentType = newValue;
-                            monthProvider?.innerFilter();
-                          },
-                        ),
-                      ]
-                    ],
-                  ),
+                          const SizedBox(height: 10),
+                          SelectDropdown(
+                            onChange: (String newValue) {
+                              monthProvider?.alternateEquipmentType = newValue;
+                              monthProvider?.innerFilter();
+                            },
+                          ),
+                        ]
+                      ],
+                    );
+                  }),
                 ),
                 Consumer<MonthProvider>(
                   builder: (context, monthProvider, child) {
@@ -743,8 +763,10 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
   }
 
   Future<void> _skipExerciseData({required String status, required String id, required String type}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
 
     final data = {
       "dataId": dataId,
@@ -752,7 +774,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "split": monthProvider?.splitType,
+      "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type
@@ -766,26 +788,32 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
-        DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
+        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
-        DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+        await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
   }
 
   Future<void> _unskipExerciseData({required String status, required String id, required String type}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
     final data = {
       "status": status,
       "type": type,
     };
-    DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
+    await DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
   }
 
   Future<void> unSkipped(String status) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     if (monthProvider!.isPumpDay) {
       if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
         final data = monthProvider!.pumpDayModel!.circuits!;
@@ -795,7 +823,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
             for (int z = 0; z < elementI.circuitExercises!.length; z++) {
               var elementZ = elementI.circuitExercises?[z];
               String dataId =
-                  "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
               bool? val =
                   monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
               if (val == true) {
@@ -811,7 +839,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       for (int i = 0; i < data!.length; i++) {
         var elementI = data[i];
         String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
         bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
         if (val == true) {
           await _unskipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
@@ -823,7 +851,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       for (int i = 0; i < data!.length; i++) {
         var elementI = data[i];
         String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
         bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
         if (val == true) {
           await _unskipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
@@ -833,6 +861,9 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
   }
 
   Future<void> skipped(String status) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     if (monthProvider!.isPumpDay) {
       if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
         final data = monthProvider!.pumpDayModel!.circuits!;
@@ -842,7 +873,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
             for (int z = 0; z < elementI.circuitExercises!.length; z++) {
               var elementZ = elementI.circuitExercises?[z];
               String dataId =
-                  "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
               if (val == false) {
@@ -858,7 +889,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       for (int i = 0; i < data!.length; i++) {
         var elementI = data[i];
         String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
         bool? val = monthProvider?.exerciseHistoryModel
             .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
         if (val == false) {
@@ -871,7 +902,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       for (int i = 0; i < data!.length; i++) {
         var elementI = data[i];
         String dataId =
-            "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
         bool? val = monthProvider?.exerciseHistoryModel
             .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
         if (val == false) {
@@ -882,6 +913,9 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
   }
 
   Future<void> _skipUnskipDayData({required String status, required String type}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     if (type != "Rest Day" || monthProvider!.isPumpDay) {
       if (status == Status.skipped) {
         await skipped(status);
@@ -891,14 +925,14 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     }
 
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
     final data = {
       "dataId": dataId,
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "split": monthProvider?.splitType,
+      "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type,
@@ -923,9 +957,9 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     };
 
     if (matchingElement?.id != null) {
-      DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -938,8 +972,11 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
   }
 
   Future<void> _saveDayData({required String status, required String type, String? title}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
     String dataId =
-        "${monthProvider?.splitType}-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
     final data = {
       "title": title ?? "",
@@ -947,7 +984,7 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "split": monthProvider?.splitType,
+      "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type,
@@ -973,9 +1010,9 @@ class _DayOverviewPageState extends State<NewDayOverviewPage> {
     };
 
     if (matchingElement?.id != null) {
-      DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
-      DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
     await monthProvider?.fetchDayStatusLocalData();

@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/models/category.dart';
 import 'package:bbb/models/challenges.dart';
@@ -10,11 +14,7 @@ import 'package:bbb/models/equipmenttitle.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/models/staffs.dart';
 import 'package:bbb/models/tutorials.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_database.dart';
-import 'package:bbb/pages/NewMonthView/Database/month_prefrence.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/month_response_model.dart';
-import 'package:bbb/pages/NewMonthView/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +62,7 @@ class DataProvider extends ChangeNotifier {
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('authToken');
+    // log('authToken :::::::::::::::::: $authToken');
     return authToken;
   }
 

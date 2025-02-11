@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:bbb/pages/NewMonthView/Providers/month_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
