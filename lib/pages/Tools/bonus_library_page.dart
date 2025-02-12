@@ -1,4 +1,5 @@
 import 'package:bbb/models/bonuses.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -25,12 +26,13 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
   String _selectedSortBy = 'A-Z'; // Default sorting
 
   List<Bonuses> _filteredBonuses = [];
+  late MainPageProvider mainPageProvider;
 
   @override
   void initState() {
     super.initState();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider?.fetchAdminBonusesData().then((_) {
       setState(() {
         // Calculate the number of pages based on the fetched bonuses
@@ -122,7 +124,12 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(onPress: () => {Navigator.pop(context)}),
+                                      BackArrowWidget(
+                                          onPress: () {
+                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                            mainPageProvider.changeTab(2);
+                                          },
+                                        ),
                                       Text(
                                         'Bonuses',
                                         style: TextStyle(
@@ -130,7 +137,7 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                                           fontSize: ScreenUtil.horizontalScale(5.5),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/bonusLibrary')
                                     ],
                                   ),
                                 ),

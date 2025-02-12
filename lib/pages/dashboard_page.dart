@@ -213,7 +213,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       right: ScreenUtil.horizontalScale(0),
                                                       top: ScreenUtil.verticalScale(0),
                                                     ),
-                                                    child: const CommonStreakWithNotification(),
+                                                    child: const CommonStreakWithNotification(routeString: "dashboard"),
                                                   )
                                                 ],
                                               ),
@@ -797,7 +797,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                             onPageChanged: (index, reason) {},
                                             scrollDirection: Axis.horizontal,
                                           ),
-                                          itemBuilder: (context, index, realIndex) {
+                                          itemBuilder: (context, index, realIndex) {                                            
                                             return CollectionGrid(collection: dataProvider.collectionsData[index]);
                                           },
                                         ),

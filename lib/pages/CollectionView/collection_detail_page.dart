@@ -2,6 +2,7 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -20,9 +21,11 @@ class CollectionDetailPage extends StatefulWidget {
 class _CollectionDetailPageState extends State<CollectionDetailPage> {
   DataProvider? dataProvider;
   UserDataProvider? userData;
+  late MainPageProvider mainPageProvider;
 
   @override
   void initState() {
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(
       context,
       listen: false,
@@ -73,7 +76,34 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                     Radius.circular(ScreenUtil.verticalScale(7)),
                   ),
                 ),
-                child: const SizedBox.expand(), // Ensure the background takes up all available space
+                child: Padding( // Adds left padding
+                  padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(29), right: ScreenUtil.horizontalScale(10)), // Adjust padding as needed
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center, // Centers content vertically
+                    crossAxisAlignment: CrossAxisAlignment.start, // Aligns text to the left
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil.verticalScale(2),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: ScreenUtil.verticalScale(1)), // Spacing between title and description
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil.verticalScale(2),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2, // Limits to one line
+                        overflow: TextOverflow.ellipsis, // Adds "..." if text is too long
+                      ),
+                    ],
+                  ),
+                ),
               ),
               Positioned(
                 left: 20,
@@ -95,34 +125,6 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                             height: ScreenUtil.verticalScale(11) + 10,
                             fit: BoxFit.cover,
                           )),
-              ),
-              Positioned(
-                left: ScreenUtil.verticalScale(11) + 45, // Adjust position based on image size and padding
-                top: ScreenUtil.verticalScale(3.5) + 5, // Adjust as needed
-                child: SizedBox(
-                  width: media.width / 2.5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ScreenUtil.verticalScale(2),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ScreenUtil.verticalScale(2),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
@@ -193,7 +195,11 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                               Icons.keyboard_arrow_left,
                                               color: Colors.white,
                                             ),
-                                            onPressed: () => Navigator.pop(context),
+                                            onPressed: () {
+                                              dataProvider?.collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              mainPageProvider.changeTab(0);
+                                            },
                                             iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                           ),
                                         ),
@@ -205,7 +211,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                           fontSize: ScreenUtil.verticalScale(3),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/collectionDetail')
                                     ],
                                   ),
                                 ),
@@ -258,10 +264,10 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                     ),
                   ],
                 ),
-                Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                  final List<Equipment> equipments = dataProvider.oneCollection.equipments
+                Consumer<DataProvider>(builder: (context, dataProvider, child) {                  
+                  final List<Equipment> equipments = dataProvider.collectionData.equipments
                       .map<Equipment>((e) => Equipment.fromJson(e)) // or `e as Equipment`
-                      .toList();
+                      .toList();                  
                   return equipments.isNotEmpty
                       ? Container(
                           margin: EdgeInsets.only(top: media.height / 2.8),
@@ -277,6 +283,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               margin: EdgeInsets.only(top: media.height / 19, right: 20, left: 20),
                               child: Column(
                                 children: equipments.map((equipment) {
+                                  debugPrint("this is collection view ${equipment.link}");
                                   return Column(
                                     children: [
                                       const SizedBox(height: 14),

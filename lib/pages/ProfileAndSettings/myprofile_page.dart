@@ -5,6 +5,7 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/profile_image_handler.dart';
 import 'package:bbb/providers/location_provider.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -46,9 +47,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
   final List<String> goalsOptions = ['Muscle Growth', 'Weight Gain', 'Strength & Performance'];
   final List<String> heightOptions = ['5\'0"', '5\'5"', '6\'0"', '6\'5"']; // Example heights
   late LocationProvider locationProvider; // Example locations
+  late MainPageProvider mainPageProvider;
 
   @override
   void initState() {
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     locationProvider = Provider.of<LocationProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     _fetchUserData();
@@ -166,8 +169,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(onPress: () => {Navigator.pop(context)}),
-                                      const CommonStreakWithNotification()
+                                      BackArrowWidget(
+                                             onPress: () {
+                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              mainPageProvider.changeTab(3);
+                                            },
+                                      ),
+                                      const CommonStreakWithNotification(routeString: '/myprofile')
                                     ],
                                   ),
                                 ),

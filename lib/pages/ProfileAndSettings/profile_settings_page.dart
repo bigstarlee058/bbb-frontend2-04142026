@@ -137,7 +137,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           top: ScreenUtil.verticalScale(1),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: "setting")
                                     ],
                                   ),
                                 ),

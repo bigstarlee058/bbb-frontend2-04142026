@@ -79,7 +79,7 @@ class _ToolsPageState extends State<ToolsPage> {
                                           ],
                                         ),
                                       ),
-                                      const CommonStreakWithNotification(),
+                                      const CommonStreakWithNotification(routeString: "tool"),
                                     ],
                                   ),
                                 ),

@@ -61,7 +61,7 @@ class MonthProvider extends ChangeNotifier {
 
   String todayTitleId = "";
   String circuitIndex = "";
-
+  String routeString = "dashboard";
   int circuitsIndex = 0;
   int streak = 0;
 

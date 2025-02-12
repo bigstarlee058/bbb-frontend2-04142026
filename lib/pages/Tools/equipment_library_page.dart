@@ -1,4 +1,5 @@
 import 'package:bbb/models/equipment.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -25,13 +26,14 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
   String _selectedSortBy = 'A-Z'; // Default sorting
   List<String> _selectedEquipmentIds = [];
   List<String> _selectedCategoryIds = [];
-
+  late MainPageProvider mainPageProvider;
   List<Equipment> _filteredEquipments = [];
 
   @override
   void initState() {
     super.initState();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider?.fetchAdminEquipmentsData().then((_) {
       setState(() {
         // Calculate the number of pages based on the fetched equipments
@@ -129,8 +131,11 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(
-                                          onPress: () =>
-                                              {Navigator.pop(context)}),
+                                          onPress: () {
+                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                            mainPageProvider.changeTab(2);
+                                          },
+                                      ),
                                       Text(
                                         'Apparel & Equipment',
                                         style: TextStyle(
@@ -139,7 +144,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                               ScreenUtil.horizontalScale(5.5),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/equipmentLibrary')
                                     ],
                                   ),
                                 ),

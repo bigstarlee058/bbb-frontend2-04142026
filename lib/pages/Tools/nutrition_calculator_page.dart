@@ -1,6 +1,7 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -23,6 +24,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
   String _selectedGender = 'Female';
   String _selectedActivityLevel = 'Active';
   String _selectedEquipment = '121lbs';
+  late MainPageProvider mainPageProvider;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -41,6 +43,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
   @override
   void initState() {
     super.initState();
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     _weightController.text = '121 lbs';
     _ageController.text = '09/21/1998';
   }
@@ -83,7 +86,12 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(onPress: () => {Navigator.pop(context)}),
+                                      BackArrowWidget(
+                                          onPress: () {
+                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                            mainPageProvider.changeTab(2);
+                                          },
+                                        ),
                                       Container(
                                         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
                                         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
@@ -96,7 +104,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                           );
                                         }),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/nutritionCalculator')
                                     ],
                                   ),
                                 ),

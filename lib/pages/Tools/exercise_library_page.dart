@@ -1,4 +1,5 @@
 import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -28,12 +29,14 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
   String _selectedSortBy = 'A-Z'; // Default sorting
   List<String> _selectedEquipmentIds = [];
   List<String> _selectedCategoryIds = [];
+  late MainPageProvider mainPageProvider;
 
   List<ExerciseLibrary> _filteredExercises = [];
 
   @override
   void initState() {
     super.initState();
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     dataProvider?.fetchAdminData().then((_) {
       setState(() {
@@ -132,7 +135,12 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(onPress: () => {Navigator.pop(context)}),
+                                      BackArrowWidget(
+                                          onPress: () {
+                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                            mainPageProvider.changeTab(2);
+                                          },
+                                        ),
                                       Text(
                                         'Exercise Library',
                                         style: TextStyle(
@@ -140,7 +148,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                           fontSize: ScreenUtil.horizontalScale(5.5),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/exerciseLibrary')
                                     ],
                                   ),
                                 ),
