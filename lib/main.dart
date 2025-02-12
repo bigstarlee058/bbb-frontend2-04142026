@@ -21,6 +21,7 @@ import 'package:bbb/pages/Tools/exercise_library_detail_page.dart';
 import 'package:bbb/pages/Tools/exercise_library_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
+import 'package:bbb/pages/WatchTutorial/app_tutorial.dart';
 import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
 import 'package:bbb/pages/calendar_page.dart';
 import 'package:bbb/pages/email_verification_page.dart';
@@ -189,7 +190,7 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: navigatorKey,
         locale: !kReleaseMode ? DevicePreview.locale(context) : null,
         builder: !kReleaseMode ? DevicePreview.appBuilder : null,
-        title: 'Flutter Demo',
+        title: 'Booty by Bret',
         debugShowCheckedModeBanner: false,
         initialRoute: AppRoutes.onBoardingScreen,
         routes: {
@@ -222,6 +223,7 @@ class _MyAppState extends State<MyApp> {
           AppRoutes.meetOurStaff: (context) => const MeetOurStaff(),
           AppRoutes.joinedChallengeScreen: (context) => const JoinedChallengePage(),
           AppRoutes.collectionDetailScreen: (context) => const CollectionDetailPage(),
+          AppRoutes.appTutorialScreen: (context) => const AppTutorial(),
         },
       ),
     );

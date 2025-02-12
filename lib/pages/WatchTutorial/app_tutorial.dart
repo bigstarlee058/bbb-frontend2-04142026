@@ -10,14 +10,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
-class WatchTutorial extends StatefulWidget {
-  const WatchTutorial({super.key});
+class AppTutorial extends StatefulWidget {
+  const AppTutorial({super.key});
 
   @override
-  _WatchTutorialState createState() => _WatchTutorialState();
+  _AppTutorialState createState() => _AppTutorialState();
 }
 
-class _WatchTutorialState extends State<WatchTutorial> {
+class _AppTutorialState extends State<AppTutorial> {
   bool loading = false;
   bool videoNotInitialized = false;
   String tutorialDesc = "";
@@ -141,7 +141,6 @@ class _WatchTutorialState extends State<WatchTutorial> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: loading
@@ -283,20 +282,21 @@ class _WatchTutorialState extends State<WatchTutorial> {
                   ),
                   SizedBox(height: ScreenUtil.verticalScale(2)),
                   Container(
-                      margin: EdgeInsets.only(
-                          left: ScreenUtil.horizontalScale(5),
-                          right: ScreenUtil.horizontalScale(5),
-                          top: 15.0,
-                          bottom: 10.0), // Added bottom margin for spacing
-                      alignment: Alignment.topLeft, // Center-align the header text
-                      child: Padding(
-                          padding: EdgeInsets.all(0.0), // Add padding for better layout
-                          child: Text(tutorialDesc,
-                              textAlign: TextAlign.start,
-                              style: const TextStyle(
-                                fontSize: 20, // Customize font size for better readability
-                                color: Colors.black,
-                              )))),
+                    margin:
+                        EdgeInsets.only(left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), top: 15.0, bottom: 10.0),
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: EdgeInsets.all(0.0),
+                      child: Text(
+                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: ScreenUtil.verticalScale(2)),
                   // Button at the bottom
                   Container(
@@ -305,35 +305,14 @@ class _WatchTutorialState extends State<WatchTutorial> {
                       left: ScreenUtil.horizontalScale(10),
                       right: ScreenUtil.horizontalScale(10),
                     ),
-                    child: Column(
-                      children: [
-                        ButtonWidget(
-                          text: "Watch the App Tutorial",
-                          textColor: Colors.white,
-                          onPress: () {
-                            Navigator.pushNamed(context, '/appTutorialScreen');
-                          },
-                          color: AppColors.primaryColor,
-                          isLoading: false,
-                        ),
-                        const SizedBox(height: 16),
-                        ButtonWidget(
-                          text: args["buttontext"],
-                          textColor: Colors.white,
-                          onPress: () {
-                            Navigator.pop(context);
-                          },
-                          color: AppColors.primaryColor,
-                          isLoading: false,
-                        ),
-
-                        // TextButton(
-                        //     onPressed: () => Navigator.pop(context),
-                        //     child: Text(
-                        //       "Back",
-                        //       style: TextStyle(fontSize: 16,color: AppColors.primaryColor),
-                        //     ))
-                      ],
+                    child: ButtonWidget(
+                      text: "Close",
+                      textColor: Colors.white,
+                      onPress: () {
+                        Navigator.pop(context);
+                      },
+                      color: AppColors.primaryColor,
+                      isLoading: false,
                     ),
                   ),
                 ],

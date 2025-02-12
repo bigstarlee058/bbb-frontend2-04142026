@@ -305,11 +305,17 @@ class _ExercisePageState extends State<ExercisePage> {
     setState(() {});
   }
 
+  int warmUpIndex = 0;
+  int backOffIndex = 0;
+  int workingIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-
+    warmUpIndex = 0;
+    backOffIndex = 0;
+    workingIndex = 0;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
@@ -673,6 +679,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                       bool isTimerRunning = monthProvider!.timerAddress ==
                                           "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
 
+                                      if (extraItem.type == 1) warmUpIndex++;
+                                      if (extraItem.type == 2) backOffIndex++;
+                                      if (extraItem.type == 3) workingIndex++;
+
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 20),
                                         child: ExerciseSetCard(
@@ -700,7 +710,18 @@ class _ExercisePageState extends State<ExercisePage> {
                                                   ? true
                                                   : false,
                                           index: index,
-                                          subIndex: countIndex,
+                                          subIndex: List.generate(
+                                            extraItem.type == 1
+                                                ? monthProvider!.selectedWarmUpSetTotal
+                                                : extraItem.type == 2
+                                                    ? monthProvider!.selectedBackOffSetTotal
+                                                    : monthProvider!.selectedWorkingSetTotal,
+                                            (index) => index,
+                                          )[extraItem.type == 1
+                                              ? warmUpIndex - 1
+                                              : extraItem.type == 2
+                                                  ? backOffIndex - 1
+                                                  : workingIndex - 1],
                                           exercise: exerciseIndex,
                                           set: int.parse(extraItem.sets.toString()),
                                           weight: int.parse(extraItem.weight.toString()),
@@ -720,11 +741,14 @@ class _ExercisePageState extends State<ExercisePage> {
                                   ? Padding(
                                       padding: const EdgeInsets.only(bottom: 40),
                                       child: ButtonWidget(
-                                        onPress: () {
+                                        onPress: () async {
                                           final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
                                           if (data!.isNotEmpty) {
+                                            monthProvider?.addSetCountInWorkingSet();
                                             _addExtraSet(data.first);
+                                            await Future.delayed(Duration(milliseconds: 200));
                                           }
+
                                           setState(() {});
                                         },
                                         isLoading: false,

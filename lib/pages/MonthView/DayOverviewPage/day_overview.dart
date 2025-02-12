@@ -308,7 +308,6 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                             : mainPageProvider.changeTab(1);
                                                         userData?.previousPage = false;
                                                         // userData?.previousPage = false;
-                                                        debugPrint("this is dayoverviewpage");
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
                                                     ),
@@ -535,9 +534,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       buttonText = "View the workout";
                       onPress = () {
                         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                        mainPageProvider.changeTab(5);  
+                        mainPageProvider.changeTab(5);
                         // Navigator.pop(context);
-                                              
                       };
                     } else if (currentDayTitle.contains("Rest Day") && (monthProvider.isPumpDay || monthProvider.isPumpDayAvailable)) {
                       if (monthProvider.dayHistoryDetails?.status == Status.skipped ||
