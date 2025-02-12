@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:bbb/components/common_network_image.dart';
+import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
+import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -32,12 +34,13 @@ class WorkoutCard extends StatefulWidget {
     required this.exerciseId,
     required this.isDayCompleted,
     required this.isDaySkipped,
+    required this.dataId,
   });
 
   final bool isSkipped;
   final bool isCompleted;
   final int exerciseIndex;
-  final void Function()? onPress;
+  final void Function(Function())? onPress;
   final void Function()? openSwapModal;
   final String name;
   final ExerciseDataModel exercise;
@@ -45,6 +48,7 @@ class WorkoutCard extends StatefulWidget {
   final bool enabled;
   final bool isCircuit;
   final String exerciseData;
+  final String dataId;
   final String exerciseId;
   final bool isDayCompleted;
   final bool isDaySkipped;
@@ -65,15 +69,36 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   num totalSets = 0;
+  int warmUpSetTotal = 0;
+  int workingSetTotal = 0;
+  int backOffSetTotal = 0;
 
-  void getTotalSets() {
+  Future<void> getTotalSets() async {
+    await fetchExtraSetLocalData();
+    totalSets = 0;
+    warmUpSetTotal = 0;
+    workingSetTotal = 0;
+    backOffSetTotal = 0;
+    setState(() {});
     if (widget.exercise.extra!.isNotEmpty) {
       for (var element in widget.exercise.extra!) {
         if (element.type != 1) {
           totalSets += int.parse(element.sets.toString());
         }
+        if (element.type == 1) warmUpSetTotal += int.parse(element.sets.toString());
+        if (element.type == 2) backOffSetTotal += int.parse(element.sets.toString());
+        if (element.type == 3) workingSetTotal += int.parse(element.sets.toString());
       }
     }
+    for (var element in extraSetModel) {
+      if (element.type != 1) {
+        totalSets += int.parse(element.sets.toString());
+      }
+      if (element.type == 1) warmUpSetTotal += int.parse(element.sets.toString());
+      if (element.type == 2) backOffSetTotal += int.parse(element.sets.toString());
+      if (element.type == 3) workingSetTotal += int.parse(element.sets.toString());
+    }
+    setState(() {});
   }
 
   Future<String?> getAuthToken() async {
@@ -93,10 +118,23 @@ class _WorkoutCardState extends State<WorkoutCard> {
         ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
         gImageUrl = exerciseDetailModelData.thumbnail ?? "placeholder";
       }
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        setState(() {});
-      });
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          setState(() {});
+        });
+      }
     }
+  }
+
+  List<ExtraSetModel> extraSetModel = [];
+  fetchExtraSetLocalData() async {
+    final data = await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.extraSetHistory, where: 'dataId', id: widget.dataId);
+    if (data.isNotEmpty) {
+      extraSetModel = List<ExtraSetModel>.from(json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
+    } else {
+      extraSetModel = [];
+    }
+    setState(() {});
   }
 
   @override
@@ -173,7 +211,16 @@ class _WorkoutCardState extends State<WorkoutCard> {
           ],
         ),
         child: ElevatedButton(
-          onPressed: widget.enabled ? widget.onPress : null,
+          onPressed: widget.enabled
+              ? () async {
+                  await getTotalSets();
+                  final provider = Provider.of<MonthProvider>(context, listen: false);
+                  widget.onPress!(
+                    () async => await getTotalSets(),
+                  );
+                  provider.updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal);
+                }
+              : null,
           style: ElevatedButton.styleFrom(
               disabledBackgroundColor: const Color(0xFFF3F3F3),
               backgroundColor: Colors.white,
@@ -303,7 +350,16 @@ class _WorkoutCardState extends State<WorkoutCard> {
                 }),
                 if (widget.enabled) ...[
                   GestureDetector(
-                    onTap: widget.enabled ? widget.onPress : null,
+                    onTap: widget.enabled
+                        ? () async {
+                            await getTotalSets();
+                            final provider = Provider.of<MonthProvider>(context, listen: false);
+                            widget.onPress!(
+                              () async => await getTotalSets(),
+                            );
+                            provider.updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal);
+                          }
+                        : null,
                     child: Container(
                       padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
                       decoration: const BoxDecoration(

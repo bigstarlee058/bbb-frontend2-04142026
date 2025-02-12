@@ -518,6 +518,22 @@ class MonthProvider extends ChangeNotifier {
   ExerciseDetailModel? exerciseDetailModel;
   ExerciseDataModel? selectedExercise;
 
+  int selectedWarmUpSetTotal = 0;
+  int selectedBackOffSetTotal = 0;
+  int selectedWorkingSetTotal = 0;
+
+  updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal) {
+    selectedWarmUpSetTotal = warmUpSetTotal;
+    selectedBackOffSetTotal = backOffSetTotal;
+    selectedWorkingSetTotal = workingSetTotal;
+    notifyListeners();
+  }
+
+  addSetCountInWorkingSet() {
+    selectedWorkingSetTotal++;
+    notifyListeners();
+  }
+
   getAllExerciseData() async {
     String? userIdToken = await getAuthToken();
     relatedExercises = [];

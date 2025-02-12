@@ -17,7 +17,6 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class TodayPage extends StatefulWidget {
@@ -98,7 +97,7 @@ class _TodayPageState extends State<TodayPage> {
     monthProvider?.setSelectedExercise(exercises[exerciseIndex], exerciseIndex);
     monthProvider?.updateWarmUp(false);
     monthProvider?.updateIsLastExercise(isLast);
-    Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+    await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
   }
 
@@ -114,8 +113,10 @@ class _TodayPageState extends State<TodayPage> {
     } else {
       removedExercise = [];
     }
-    setState(() {});
     monthProvider?.fetchAllRemovedExerciseLocalData();
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+    }
   }
 
   Future<void> removeExercise(String exerciseId) async {
@@ -136,7 +137,9 @@ class _TodayPageState extends State<TodayPage> {
       }
     }
     exercises.removeWhere((element) => element.exerciseId == exerciseId);
-    setState(() {});
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+    }
   }
 
   @override
@@ -220,54 +223,95 @@ class _TodayPageState extends State<TodayPage> {
                                     ],
                                   ),
                                 ),
+                                // Padding(
+                                //   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                //   child: Column(
+                                //     mainAxisAlignment: MainAxisAlignment.center,
+                                //     children: [
+                                //       Text(
+                                //         DateFormat('MMM, yyyy').format(DateTime.now()),
+                                //         style: TextStyle(
+                                //           color: Colors.white,
+                                //           fontSize: ScreenUtil.verticalScale(2),
+                                //         ),
+                                //       ),
+                                //       monthProvider?.currentWeek != 0
+                                //           ? Text(
+                                //               "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
+                                //               style: TextStyle(
+                                //                 color: Colors.white,
+                                //                 fontSize: ScreenUtil.verticalScale(2),
+                                //               ),
+                                //             )
+                                //           : const SizedBox(),
+                                //       SizedBox(
+                                //         height: ScreenUtil.verticalScale(0.5),
+                                //       ),
+                                //       Text(
+                                //         "${monthProvider!.alternateEquipmentType} :: ${monthProvider!.alternateEquipmentType == "A" ? "Fully equipped gym" : monthProvider?.alternateEquipmentType == "B" ? "Home gym" : "Dumbbells and bands"}",
+                                //         style: TextStyle(
+                                //           color: Colors.white,
+                                //           fontSize: ScreenUtil.verticalScale(2),
+                                //         ),
+                                //       ),
+                                //       SizedBox(
+                                //         height: ScreenUtil.verticalScale(0.5),
+                                //       ),
+                                //       Consumer<MonthProvider>(
+                                //         builder: (context, monthProvider, child) {
+                                //           return Text(
+                                //             monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
+                                //             textAlign: TextAlign.center,
+                                //             style: TextStyle(
+                                //               color: Colors.white,
+                                //               height: 1.1,
+                                //               fontSize: ScreenUtil.verticalScale(3.8),
+                                //               fontWeight: FontWeight.bold,
+                                //             ),
+                                //           );
+                                //         },
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        DateFormat('MMM, yyyy').format(DateTime.now()),
+                                        "Option ${monthProvider!.alternateEquipmentType}:",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: ScreenUtil.verticalScale(2),
                                         ),
-                                      ),
-                                      monthProvider?.currentWeek != 0
-                                          ? Text(
-                                              "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2),
-                                              ),
-                                            )
-                                          : const SizedBox(),
-                                      SizedBox(
-                                        height: ScreenUtil.verticalScale(0.5),
                                       ),
                                       Text(
-                                        "${monthProvider!.alternateEquipmentType} :: ${monthProvider!.alternateEquipmentType == "A" ? "Fully equipped gym" : monthProvider?.alternateEquipmentType == "B" ? "Home gym" : "Dumbbells and bands"}",
+                                        monthProvider!.alternateEquipmentType == "A"
+                                            ? "Fully equipped gym"
+                                            : monthProvider?.alternateEquipmentType == "B"
+                                                ? "Home gym"
+                                                : "Dumbbells and bands",
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(2),
+                                          fontSize: ScreenUtil.verticalScale(2.3),
                                         ),
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(0.5),
                                       ),
-                                      Consumer<MonthProvider>(
-                                        builder: (context, monthProvider, child) {
-                                          return Text(
-                                            monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              height: 1.1,
-                                              fontSize: ScreenUtil.verticalScale(3.8),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                      Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                        return Text(
+                                          monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            height: 1.1,
+                                            fontSize: ScreenUtil.verticalScale(4),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                      }),
                                     ],
                                   ),
                                 ),
@@ -294,77 +338,6 @@ class _TodayPageState extends State<TodayPage> {
                             ),
                           ),
                         ),
-                        // SizedBox(
-                        //   height: media.height / 2,
-                        //   width: media.width,
-                        //   child: SafeArea(
-                        //     child: Column(
-                        //       children: [
-                        //         Container(
-                        //           width: ScreenUtil.horizontalScale(100),
-                        //           padding: const EdgeInsets.only(right: 10),
-                        //           child: Row(
-                        //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //             children: [
-                        //               Row(
-                        //                 children: [
-                        //                   Container(
-                        //                     width: ScreenUtil.horizontalScale(10),
-                        //                     height: ScreenUtil.horizontalScale(10),
-                        //                     margin: const EdgeInsets.symmetric(
-                        //                       horizontal: 12,
-                        //                     ),
-                        //                     decoration: const BoxDecoration(
-                        //                       color: Color(0XFFd18a9b),
-                        //                       shape: BoxShape.circle,
-                        //                     ),
-                        //                     child: Center(
-                        //                       child: GestureDetector(
-                        //                         onTap: () => Navigator.pop(context),
-                        //                         child: Icon(
-                        //                           Icons.keyboard_arrow_left,
-                        //                           color: Colors.white,
-                        //                           size: ScreenUtil.verticalScale(4),
-                        //                         ),
-                        //                       ),
-                        //                     ),
-                        //                   )
-                        //                 ],
-                        //               ),
-                        //               Text(
-                        //                 'Day ${monthProvider!.overviewCurrentDay}, Option ${monthProvider!.alternateEquipmentType}',
-                        //                 style: TextStyle(
-                        //                   color: Colors.white,
-                        //                   fontSize: ScreenUtil.horizontalScale(5.8),
-                        //                 ),
-                        //               ),
-                        //               const CommonStreakWithNotification(),
-                        //             ],
-                        //           ),
-                        //         ),
-                        //         SizedBox(height: ScreenUtil.verticalScale(3)),
-                        //         Container(
-                        //           margin: EdgeInsets.symmetric(
-                        //             horizontal: ScreenUtil.horizontalScale(10),
-                        //           ),
-                        //           child: ButtonWidget(
-                        //             text: "Watch Video Intro",
-                        //             color: const Color(0xEEFFFFFF),
-                        //             onPress: () {
-                        //               Navigator.of(context).push(
-                        //                 FadePageRoute(
-                        //                   page: const VideoIntroWidget(vimeoId: '953289606'),
-                        //                 ),
-                        //               );
-                        //             },
-                        //             textColor: AppColors.primaryColor,
-                        //             isLoading: false,
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
                         SizedBox(
                           height: media.height / 2.64,
                           width: media.width,
@@ -387,214 +360,221 @@ class _TodayPageState extends State<TodayPage> {
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: media.height / 2.65),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.horizontalScale(16)),
-                      ),
+                  width: media.width,
+                  margin: EdgeInsets.only(
+                    top: media.height / 2.65,
+                    bottom: ScreenUtil.verticalScale(2),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
                     ),
-                    child: Container(
-                      margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(8)),
-                      child: Column(
-                        children: [
-                          totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
-                          Container(
-                            width: media.width,
-                            margin: EdgeInsets.only(left: ScreenUtil.verticalScale(3)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Today's workout",
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil.horizontalScale(5.5),
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryColor,
-                                  ),
+                  ),
+                  child: Container(
+                    margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(8)),
+                    child: Column(
+                      children: [
+                        totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
+                        Container(
+                          width: media.width,
+                          margin: EdgeInsets.only(left: ScreenUtil.verticalScale(3)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Today's workout",
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.horizontalScale(5.5),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
                                 ),
-                                SizedBox(height: media.height * 0.025),
-                                monthProvider!.isPumpDay
-                                    ? CircuitsView(
-                                        circuit: monthProvider!.pumpDayModel!.circuits!,
-                                        isDayCompleted: isCurrentDayCompleted,
-                                        isDaySkipped: isCurrentDaySkipped)
-                                    : const SizedBox(),
-                                Column(
-                                  children: List.generate(
-                                    exercises.length,
-                                    (i) {
-                                      if (removedExercise.any((element) => element.exerciseId == exercises[i].exerciseId!)) {
-                                        return const SizedBox();
-                                      }
-                                      String split = monthProvider
-                                              ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                              .toString()
-                                              .split(" ")[1] ??
-                                          "";
+                              ),
+                              SizedBox(height: media.height * 0.025),
+                              monthProvider!.isPumpDay
+                                  ? CircuitsView(
+                                      circuit: monthProvider!.pumpDayModel!.circuits!,
+                                      isDayCompleted: isCurrentDayCompleted,
+                                      isDaySkipped: isCurrentDaySkipped)
+                                  : const SizedBox(),
+                              Column(
+                                children: List.generate(
+                                  exercises.length,
+                                  (i) {
+                                    if (removedExercise.any((element) => element.exerciseId == exercises[i].exerciseId!)) {
+                                      return const SizedBox();
+                                    }
+                                    String split = monthProvider
+                                            ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                            .toString()
+                                            .split(" ")[1] ??
+                                        "";
 
-                                      String dataId =
-                                          "$split-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
+                                    String dataId =
+                                        "$split-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
 
-                                      bool isExist = (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
-                                          monthProvider!.isPastWeek;
+                                    bool isExist = (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
+                                        monthProvider!.isPastWeek;
 
-                                      return Column(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
-                                            child: WorkoutCard(
-                                              isDayCompleted: isCurrentDayCompleted,
-                                              isDaySkipped: isCurrentDaySkipped,
-                                              exerciseId: exercises[i].exerciseId!,
-                                              isCircuit: false,
-                                              isCompleted: monthProvider!.exerciseHistoryModel
-                                                  .any((element) => element.dataId == dataId && element.status == Status.completed),
-                                              isSkipped: monthProvider!.exerciseHistoryModel
-                                                      .any((element) => element.dataId == dataId && element.status == Status.skipped) ||
-                                                  isExist,
-                                              exerciseIndex: i,
-                                              onPress: () {
-                                                onPressed(
-                                                    i,
-                                                    dataId,
-                                                    i ==
-                                                        exercises.indexWhere((element) => element.exerciseId == exercises.last.exerciseId));
-                                              },
-                                              openSwapModal: () async {
-                                                // await userData.fetchCurrentEx(exercises[i].id!, "today page 1464");
-                                                // await userData.fetchAllExercise();
-                                                // showRelatedExerciseDialog(i, exercises[i], false);
-                                              },
-                                              exercise: exercises[i],
-                                              exerciseData: exercises[i].id!,
-                                              name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
-                                              onRemove: () => removeExercise(exercises[i].exerciseId!),
-                                              enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
-                                                  ? false
-                                                  : monthProvider!.exerciseHistoryModel.any((element) =>
-                                                              element.dataId == dataId && element.status == Status.completed) ||
-                                                          isExist
-                                                      ? false
-                                                      :*/
-                                                  true,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: ScreenUtil.verticalScale(3),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: ScreenUtil.verticalScale(2)),
-                          monthProvider?.dayHistoryDetails == null ||
-                                  isCurrentDayCompleted ||
-                                  isCurrentDaySkipped ||
-                                  monthProvider!.isPastWeek
-                              ? const SizedBox()
-                              : Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                  child: ButtonWidget(
-                                    onPress: () async {
-                                      await monthProvider?.fetchAllExercise().then(
-                                        (value) async {
-                                          await showRelatedExerciseDialog(0, 0, true);
-                                        },
-                                      );
-                                    },
-                                    isLoading: false,
-                                    color: Colors.grey,
-                                    textColor: Colors.white,
-                                    text: "Add Exercise",
-                                  ),
-                                ),
-                          const SizedBox(height: 36),
-                          Container(
-                            height: 1,
-                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                            width: media.width * 0.75,
-                            color: Colors.black12,
-                          ),
-                          const SizedBox(height: 36),
-                          monthProvider?.dayHistoryDetails == null ||
-                                  (monthProvider?.dayHistoryDetails?.status == Status.skipped ||
-                                          monthProvider?.dayHistoryDetails?.status == Status.completed) &&
-                                      monthProvider!.isPastWeek
-                              ? Container(
-                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                  child: ButtonWidget(
-                                    text: monthProvider?.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
-                                    textColor: Colors.white,
-                                    onPress: null,
-                                    color: AppColors.primaryColor,
-                                    isLoading: false,
-                                  ),
-                                )
-                              : Consumer<MonthProvider>(
-                                  builder: (context, value, child) => Column(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                        child: ButtonWidget(
-                                          text: value.dayHistoryDetails?.status == Status.completed
-                                              ? "Completed"
-                                              : value.dayHistoryDetails?.status == Status.skipped
-                                                  ? "Skipped"
-                                                  : "Finish the workout",
-                                          textColor: Colors.white,
-                                          onPress: value.dayHistoryDetails?.status == Status.completed ||
-                                                  value.dayHistoryDetails?.status == Status.skipped
-                                              ? null
-                                              : () async {
-                                                  await _saveDayData(
-                                                      status: Status.skipped,
-                                                      type: monthProvider!.isPumpDay
-                                                          ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                                          : "Workout Day",
-                                                      status1: Status.completed);
-                                                  Navigator.pushNamed(context, '/dayCompleted');
+                                    return Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
+                                          child: WorkoutCard(
+                                            dataId: dataId,
+                                            isDayCompleted: isCurrentDayCompleted,
+                                            isDaySkipped: isCurrentDaySkipped,
+                                            exerciseId: exercises[i].exerciseId!,
+                                            isCircuit: false,
+                                            isCompleted: monthProvider!.exerciseHistoryModel
+                                                .any((element) => element.dataId == dataId && element.status == Status.completed),
+                                            isSkipped: monthProvider!.exerciseHistoryModel
+                                                    .any((element) => element.dataId == dataId && element.status == Status.skipped) ||
+                                                isExist,
+                                            exerciseIndex: i,
+                                            onPress: (Function()? function) async {
+                                              await onPressed(
+                                                      i,
+                                                      dataId,
+                                                      i ==
+                                                          exercises
+                                                              .indexWhere((element) => element.exerciseId == exercises.last.exerciseId))
+                                                  .then(
+                                                (value) {
+                                                  function!();
                                                 },
-                                          color: AppColors.primaryColor,
-                                          isLoading: false,
+                                              );
+                                            },
+                                            openSwapModal: () async {
+                                              // await userData.fetchCurrentEx(exercises[i].id!, "today page 1464");
+                                              // await userData.fetchAllExercise();
+                                              // showRelatedExerciseDialog(i, exercises[i], false);
+                                            },
+                                            exercise: exercises[i],
+                                            exerciseData: exercises[i].id!,
+                                            name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
+                                            onRemove: () => removeExercise(exercises[i].exerciseId!),
+                                            enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
+                                                ? false
+                                                : monthProvider!.exerciseHistoryModel.any((element) =>
+                                                            element.dataId == dataId && element.status == Status.completed) ||
+                                                        isExist
+                                                    ? false
+                                                    :*/
+                                                true,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 14),
-                                      value.dayHistoryDetails?.status != Status.skipped &&
-                                              value.dayHistoryDetails?.status != Status.completed
-                                          ? Container(
-                                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                              child: ButtonWidget(
-                                                text: "Skip the workout",
-                                                textColor: Colors.white,
-                                                onPress: () async {
-                                                  await _saveDayData(
-                                                      status: Status.skipped,
-                                                      type: monthProvider!.isPumpDay
-                                                          ? "Pump Day- ${monthProvider?.pumpDayModel?.id}"
-                                                          : "Workout Day",
-                                                      status1: Status.skipped);
-                                                  Navigator.pushNamed(context, '/home');
-                                                },
-                                                color: AppColors.skipDayColor,
-                                                isLoading: false,
-                                              ),
-                                            )
-                                          : const SizedBox(),
-                                    ],
-                                  ),
+                                        SizedBox(
+                                          height: ScreenUtil.verticalScale(3),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 ),
-                          const SizedBox(
-                            height: 90,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(height: ScreenUtil.verticalScale(2)),
+                        monthProvider?.dayHistoryDetails == null ||
+                                isCurrentDayCompleted ||
+                                isCurrentDaySkipped ||
+                                monthProvider!.isPastWeek
+                            ? const SizedBox()
+                            : Padding(
+                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                child: ButtonWidget(
+                                  onPress: () async {
+                                    await monthProvider?.fetchAllExercise().then(
+                                      (value) async {
+                                        await showRelatedExerciseDialog(0, 0, true);
+                                      },
+                                    );
+                                  },
+                                  isLoading: false,
+                                  color: Colors.grey,
+                                  textColor: Colors.white,
+                                  text: "Add Exercise",
+                                ),
+                              ),
+                        const SizedBox(height: 36),
+                        Container(
+                          height: 1,
+                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                          width: media.width * 0.75,
+                          color: Colors.black12,
+                        ),
+                        const SizedBox(height: 36),
+                        monthProvider?.dayHistoryDetails == null ||
+                                (monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+                                        monthProvider?.dayHistoryDetails?.status == Status.completed) &&
+                                    monthProvider!.isPastWeek
+                            ? Container(
+                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                child: ButtonWidget(
+                                  text: monthProvider?.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
+                                  textColor: Colors.white,
+                                  onPress: null,
+                                  color: AppColors.primaryColor,
+                                  isLoading: false,
+                                ),
+                              )
+                            : Consumer<MonthProvider>(
+                                builder: (context, value, child) => Column(
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                      child: ButtonWidget(
+                                        text: value.dayHistoryDetails?.status == Status.completed
+                                            ? "Completed"
+                                            : value.dayHistoryDetails?.status == Status.skipped
+                                                ? "Skipped"
+                                                : "Finish the workout",
+                                        textColor: Colors.white,
+                                        onPress: value.dayHistoryDetails?.status == Status.completed ||
+                                                value.dayHistoryDetails?.status == Status.skipped
+                                            ? null
+                                            : () async {
+                                                await _saveDayData(
+                                                    status: Status.skipped,
+                                                    type: monthProvider!.isPumpDay
+                                                        ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                                        : "Workout Day",
+                                                    status1: Status.completed);
+                                                Navigator.pushNamed(context, '/dayCompleted');
+                                              },
+                                        color: AppColors.primaryColor,
+                                        isLoading: false,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    value.dayHistoryDetails?.status != Status.skipped && value.dayHistoryDetails?.status != Status.completed
+                                        ? Container(
+                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                            child: ButtonWidget(
+                                              text: "Skip the workout",
+                                              textColor: Colors.white,
+                                              onPress: () async {
+                                                await _saveDayData(
+                                                    status: Status.skipped,
+                                                    type: monthProvider!.isPumpDay
+                                                        ? "Pump Day- ${monthProvider?.pumpDayModel?.id}"
+                                                        : "Workout Day",
+                                                    status1: Status.skipped);
+                                                Navigator.pushNamed(context, '/home');
+                                              },
+                                              color: AppColors.skipDayColor,
+                                              isLoading: false,
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                  ],
+                                ),
+                              ),
+                        const SizedBox(
+                          height: 90,
+                        ),
+                      ],
                     ),
                   ),
                 ),

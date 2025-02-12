@@ -17,6 +17,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -30,19 +31,28 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final today = DateTime.now();
+  late ScrollController _scrollController;
+  double _opacity = 1.0;
   // UserDataManager userManager = UserDataManager();
   List<String> title = [];
   int focusedIndexStuff = 0;
   UserDataProvider? userData;
   DataProvider? dataProvider;
   late MainPageProvider mainPageProvider;
+  late MonthProvider monthProvider;
   String selectedChart = "Exercises Completed";
   Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
 
   @override
   void initState() {
     super.initState();
+    onInit();
+    super.initState();
+  }
+
+  Future<void> onInit() async {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     loadUserInfo();
@@ -50,7 +60,17 @@ class _DashboardPageState extends State<DashboardPage> {
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
     requestNotificationPermission();
-    super.initState();
+
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      double offset = _scrollController.offset;
+      double newOpacity = (40 - offset) / 40;
+      newOpacity = newOpacity.clamp(0.0, 1.0);
+
+      setState(() {
+        _opacity = newOpacity;
+      });
+    });
   }
 
   Future<void> requestNotificationPermission() async {
@@ -83,6 +103,35 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeFetchData() async {
+    if (dataProvider != null) {
+      await dataProvider?.fetchMonthWorkouts(3);
+    } else {
+      debugPrint("dataProvider is null");
+    }
+  }
+
+  bool loader = false;
+  Future<void> onRefresh() async {
+    loader = true;
+    setState(() {});
+    await onInit().then(
+      (value) {
+        WidgetsBinding.instance.addPostFrameCallback(
+          (timeStamp) async => await _initializeFetchData().then((value) async => await monthProvider.onInit()),
+        );
+      },
+    );
+    loader = false;
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (dataProvider == null || userData == null) {
       return const Center(child: CircularProgressIndicator());
@@ -90,8 +139,11 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
+      backgroundColor: Colors.white,
+      body: CustomMaterialIndicator(
+        onRefresh: onRefresh,
+        child: SingleChildScrollView(
+          controller: _scrollController,
           physics: const ClampingScrollPhysics(),
           child: Column(
             children: [
@@ -118,74 +170,57 @@ class _DashboardPageState extends State<DashboardPage> {
                             child: SafeArea(
                               child: Column(
                                 children: [
-                                  Container(
-                                    margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: ScreenUtil.horizontalScale(8),
-                                            top: ScreenUtil.verticalScale(0),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Consumer<UserDataProvider>(
-                                                  builder: (context, userData, child) => userData.userName != ""
-                                                      ? Text(
-                                                          // 'Hi Nick'
-                                                          'Hi ${userData.userName}',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: ScreenUtil.verticalScale(2.9),
-                                                            height: 2,
-                                                          ),
-                                                        )
-                                                      : const SizedBox()),
-                                            ],
-                                          ),
-                                        ),
-
-                                        ///
-                                        Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                  Opacity(
+                                    opacity: _opacity,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: ScreenUtil.horizontalScale(8),
+                                              top: ScreenUtil.verticalScale(0),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                // Padding(
-                                                //   padding: EdgeInsets.only(
-                                                //     left: ScreenUtil.horizontalScale(0),
-                                                //     right: ScreenUtil.horizontalScale(2),
-                                                //     top: ScreenUtil.verticalScale(1.5),
-                                                //   ),  // No padding on the left, moves the icon to the far left
-                                                //   child: GestureDetector(
-                                                //     onTap: () {
-                                                //       Navigator.pushNamed(context, '/calendar');
-                                                //     },
-                                                //     child: Icon(
-                                                //       Icons.calendar_month,
-                                                //       color: Colors.white,
-                                                //       size: ScreenUtil.verticalScale(3),
-                                                //     ),
-                                                //   ),
-                                                // ),
-
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                    left: ScreenUtil.horizontalScale(0),
-                                                    right: ScreenUtil.horizontalScale(0),
-                                                    top: ScreenUtil.verticalScale(0),
-                                                  ),
-                                                  child: const CommonStreakWithNotification(routeString: "dashboard"),
-                                                )
+                                                Consumer<UserDataProvider>(
+                                                    builder: (context, userData, child) => userData.userName != ""
+                                                        ? Text(
+                                                            // 'Hi Nick'
+                                                            'Hi ${userData.userName}',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.verticalScale(2.9),
+                                                              height: 2,
+                                                            ),
+                                                          )
+                                                        : const SizedBox()),
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                      ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                      left: ScreenUtil.horizontalScale(0),
+                                                      right: ScreenUtil.horizontalScale(0),
+                                                      top: ScreenUtil.verticalScale(0),
+                                                    ),
+                                                    child: const CommonStreakWithNotification(routeString: "dashboard"),
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   Consumer<MonthProvider>(
@@ -453,7 +488,16 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: Consumer<MonthProvider>(
                             builder: (context, value, child) {
                               if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
-                              final count = value.newStreakData.length;
+
+                              final val1 = (value.currentWeek - 1) * 7;
+                              final val2 = value.allDayHistoryModel.where((element) =>
+                                  element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
+                                  element.split == value.splitType &&
+                                  element.monthId == value.monthDataModel?.id &&
+                                  (element.status == "Completed" || element.status == "Skipped"));
+
+                              final count = val2.length + val1;
+
                               return Column(
                                 children: [
                                   const SizedBox(height: 10),
@@ -862,6 +906,8 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

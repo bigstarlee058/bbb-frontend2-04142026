@@ -141,16 +141,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                     ],
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: _pickAndUploadImage,
-                                  child: Container(
-                                    margin: EdgeInsets.symmetric(
-                                      horizontal: ScreenUtil.horizontalScale(10),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Consumer<UserDataProvider>(
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(10),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: _pickAndUploadImage,
+                                        child: Consumer<UserDataProvider>(
                                           builder: (context, userData, child) =>
                                               userData.userData['detail'] != null && userData.userData['detail']['avatarUrl'] != ""
                                                   ? Container(
@@ -184,35 +184,35 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                         )
                                                       : const SizedBox(),
                                         ),
-                                        SizedBox(
-                                          height: ScreenUtil.horizontalScale(5),
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(5),
+                                      ),
+                                      Consumer<UserDataProvider>(
+                                        builder: (context, userData, child) => userData.userName != ""
+                                            ? Text(
+                                                // 'Hi, Nick',
+                                                userData.userName,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.horizontalScale(8),
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1,
+                                                ),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(2),
+                                      ),
+                                      Text(
+                                        "Here's your profile",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil.horizontalScale(5.5),
                                         ),
-                                        Consumer<UserDataProvider>(
-                                          builder: (context, userData, child) => userData.userName != ""
-                                              ? Text(
-                                                  // 'Hi, Nick',
-                                                  userData.userName,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: ScreenUtil.horizontalScale(8),
-                                                    fontWeight: FontWeight.bold,
-                                                    height: 1,
-                                                  ),
-                                                )
-                                              : const SizedBox(),
-                                        ),
-                                        SizedBox(
-                                          height: ScreenUtil.horizontalScale(2),
-                                        ),
-                                        Text(
-                                          "Here's your profile",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: ScreenUtil.horizontalScale(5.5),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
