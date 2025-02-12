@@ -187,10 +187,12 @@ class DataProvider extends ChangeNotifier {
         },
       );
       if (response.statusCode == 200) {
-        var data = json.decode(response.body);
+        var data = json.decode(response.body);    
+        debugPrint("this is fetchone ${data}");    
         collectionData = Collections.fromJson(data);
         notifyListeners(); // Notify listeners to update the UI
       } else {
+        collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
         throw Exception('Failed to load staff data');
       }
     } catch (e) {
