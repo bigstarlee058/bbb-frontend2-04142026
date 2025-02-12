@@ -208,10 +208,7 @@ class _TodayPageState extends State<TodayPage> {
                                                   color: Colors.white,
                                                 ),
                                                 onPressed: () {
-                                                  // userData?.previousPage == 1
-                                                  //     ? mainPageProvider.changeTab(0)
-                                                  //     : mainPageProvider.changeTab(1);
-                                                  Navigator.pop(context);
+                                                  Navigator.pushNamed(context, '/dayOverview');
                                                 },
                                                 iconSize: ScreenUtil.verticalScale(4),
                                               ),
@@ -219,7 +216,7 @@ class _TodayPageState extends State<TodayPage> {
                                           ),
                                         ],
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: "today")
                                     ],
                                   ),
                                 ),

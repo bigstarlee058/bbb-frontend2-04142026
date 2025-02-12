@@ -4,6 +4,7 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/icon_row_with_dot.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 // import 'package:bbb/storage/userdata_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -24,6 +25,7 @@ class JoinedChallengePage extends StatefulWidget {
 class _JoinedChallengePageState extends State<JoinedChallengePage> {
   DataProvider? dataProvider;
   UserDataProvider? userData;
+  late MainPageProvider mainPageProvider;
   late int totalWeight = 0;
 
   Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
@@ -34,7 +36,7 @@ class _JoinedChallengePageState extends State<JoinedChallengePage> {
       context,
       listen: false,
     );
-
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(
       context,
       listen: false,
@@ -110,12 +112,15 @@ class _JoinedChallengePageState extends State<JoinedChallengePage> {
                                           child: IconButton(
                                             padding: EdgeInsets.zero, // Removes the default padding
                                             icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white,),
-                                            onPressed: () => Navigator.pop(context),
+                                            onPressed: () {
+                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              mainPageProvider.changeTab(0);
+                                            },
                                             iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                           ),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/joinedChallenge')
                                     ],
                                   ),
                                 ),

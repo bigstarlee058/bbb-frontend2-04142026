@@ -1,16 +1,26 @@
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CommonStreakWithNotification extends StatefulWidget {
-  const CommonStreakWithNotification({super.key});
-
+  const CommonStreakWithNotification({super.key, required this.routeString});
+  final String routeString;
   @override
   State<CommonStreakWithNotification> createState() => _CommonStreakWithNotificationState();
 }
 
 class _CommonStreakWithNotificationState extends State<CommonStreakWithNotification> {
+  MonthProvider? monthProvider;
+  late MainPageProvider mainPageProvider;
+
+  @override
+  void initState() {
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);    
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     final streak = context.watch<MonthProvider>();
@@ -18,7 +28,9 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
       children: [
         GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, '/streak-calendar');
+            monthProvider?.routeString = widget.routeString;
+            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+            mainPageProvider.changeTab(4);
           },
           child: Row(
             children: [

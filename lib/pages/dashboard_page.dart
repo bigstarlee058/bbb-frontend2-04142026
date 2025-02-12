@@ -179,7 +179,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     right: ScreenUtil.horizontalScale(0),
                                                     top: ScreenUtil.verticalScale(0),
                                                   ),
-                                                  child: const CommonStreakWithNotification(),
+                                                  child: const CommonStreakWithNotification(routeString: "dashboard"),
                                                 )
                                               ],
                                             ),

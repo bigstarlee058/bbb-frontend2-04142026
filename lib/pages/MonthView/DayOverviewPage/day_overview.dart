@@ -193,7 +193,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                 ),
                                               ],
                                             ),
-                                            const CommonStreakWithNotification()
+                                            const CommonStreakWithNotification(routeString: '/dayOverview')
                                           ],
                                         ),
                                       ),
@@ -316,7 +316,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                 ),
                                               ],
                                             ),
-                                            const CommonStreakWithNotification()
+                                            const CommonStreakWithNotification(routeString: '/dayOverview')
                                           ],
                                         ),
                                       ),

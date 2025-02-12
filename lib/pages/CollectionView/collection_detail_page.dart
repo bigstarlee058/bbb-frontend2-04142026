@@ -2,6 +2,7 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -20,9 +21,11 @@ class CollectionDetailPage extends StatefulWidget {
 class _CollectionDetailPageState extends State<CollectionDetailPage> {
   DataProvider? dataProvider;
   UserDataProvider? userData;
+  late MainPageProvider mainPageProvider;
 
   @override
   void initState() {
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(
       context,
       listen: false,
@@ -193,7 +196,10 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                               Icons.keyboard_arrow_left,
                                               color: Colors.white,
                                             ),
-                                            onPressed: () => Navigator.pop(context),
+                                            onPressed: () {
+                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              mainPageProvider.changeTab(0);
+                                            },
                                             iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                           ),
                                         ),
@@ -205,7 +211,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                           fontSize: ScreenUtil.verticalScale(3),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/collectionDetail')
                                     ],
                                   ),
                                 ),

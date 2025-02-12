@@ -1,7 +1,9 @@
 import 'package:bbb/components/button_widget.dart';
 // import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
 import 'package:bbb/pages/calender.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -17,6 +19,16 @@ class StreakCalendarPage extends StatefulWidget {
 }
 
 class _StreakCalendarPageState extends State<StreakCalendarPage> {
+  MonthProvider? monthProvider;
+  late MainPageProvider mainPageProvider;
+
+  @override
+  void initState() {
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    debugPrint("this is streak page ${monthProvider?.routeString}");
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -69,8 +81,31 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                     color: Colors.white,
                                   ),
                                   onPressed: () {
-                                    Navigator.pop(context);
-                                    // mainPageProvider.changeTab(mainPageProvider.selectedPage);
+                                    if (monthProvider?.routeString == "dashboard") {
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(0);
+                                    } else if(monthProvider?.routeString == "today") {
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(5);
+                                    } else if(monthProvider?.routeString == "month") {
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(1);
+                                    } else if (monthProvider?.routeString == "setting") {
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(3);
+                                    } else if (monthProvider?.routeString == "tool") {
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(2);
+                                    } else if(monthProvider?.routeString == "program") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const ProgramInfoView(),
+                                          ),
+                                        );
+                                    } else {
+                                      Navigator.pushNamed(context, monthProvider!.routeString);
+                                    }
                                   },
                                   iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                 ),
@@ -141,7 +176,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                           ),
                         ),
                         SizedBox(
-                          height: ScreenUtil.verticalScale(10),
+                          height: ScreenUtil.verticalScale(1),
                         ),
                       ],
                     ),
@@ -155,7 +190,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
             child: Column(
               children: [
                 SizedBox(
-                  height: media.height / 3.80,
+                  height: media.height / 3.70,
                   width: media.width,
                   child: Align(
                     alignment: Alignment.bottomRight,

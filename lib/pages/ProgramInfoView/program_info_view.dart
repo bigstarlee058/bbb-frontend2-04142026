@@ -1,4 +1,5 @@
 import 'package:bbb/models/program_info_model.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,8 @@ class ProgramInfoView extends StatefulWidget {
 
 class _ProgramInfoViewState extends State<ProgramInfoView> {
   final Map<int, bool> _expandedStates = {0: true};
+  late MainPageProvider mainPageProvider;
+    
 
   List<Map<String, dynamic>> data = [
     {"title": "Training Guidelines", "description": ""},
@@ -30,6 +33,7 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
 
   @override
   void initState() {
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     provider = context.read<ProgramInfoProvider>();
     provider.getProgramInfo(context);
     super.initState();
@@ -91,14 +95,14 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
-                                              Navigator.pop(context);
-                                              // Add navigation logic here
+                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              mainPageProvider.changeTab(1);
                                             },
                                             iconSize: ScreenUtil.verticalScale(4),
                                           ),
                                         ),
                                       ),
-                                      CommonStreakWithNotification()
+                                      CommonStreakWithNotification(routeString: "program")
                                     ],
                                   ),
                                 ),

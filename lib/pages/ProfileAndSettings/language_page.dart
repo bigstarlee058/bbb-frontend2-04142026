@@ -1,10 +1,12 @@
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:provider/provider.dart';
 
 class LanguagePage extends StatefulWidget {
   const LanguagePage({super.key});
@@ -15,7 +17,7 @@ class LanguagePage extends StatefulWidget {
 
 class _LanguagePageState extends State<LanguagePage> {
   String selectedLanguage = 'English'; // Default selected language
-
+  late MainPageProvider mainPageProvider;
   // List of languages with their flags  // due to
   final List<Map<String, String>> languages = [
     {'name': 'English', 'flag': '\u{1F1FA}\u{1F1F8}'},
@@ -24,6 +26,7 @@ class _LanguagePageState extends State<LanguagePage> {
 
   @override
   void initState() {
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     super.initState();
   }
 
@@ -69,9 +72,12 @@ class _LanguagePageState extends State<LanguagePage> {
                                     MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(
-                                          onPress: () =>
-                                          {Navigator.pop(context)}),
-                                      CommonStreakWithNotification()
+                                            onPress: () {
+                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              mainPageProvider.changeTab(3);
+                                            },
+                                          ),
+                                      CommonStreakWithNotification(routeString: '/languageScreen')
                                     ],
                                   ),
                                 ),

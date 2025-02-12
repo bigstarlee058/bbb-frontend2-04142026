@@ -95,7 +95,7 @@ class _MonthViewState extends State<MonthView> {
                                           ),
                                         ),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: "month")
                                     ],
                                   ),
                                 ),

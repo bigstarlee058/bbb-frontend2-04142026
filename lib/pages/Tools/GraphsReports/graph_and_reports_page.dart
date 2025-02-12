@@ -6,6 +6,7 @@ import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -26,6 +27,7 @@ class GraphAndReportsPage extends StatefulWidget {
 class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   DataProvider? dataProvider;
   List<ExerciseLibrary> _filteredExercises = [];
+  late MainPageProvider mainPageProvider;
 
   final TextEditingController _controller = TextEditingController();
   List<String> items = [];
@@ -37,6 +39,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   @override
   void initState() {
     super.initState();
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider?.fetchAdminData().then((_) {
@@ -499,7 +502,12 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(onPress: () => {Navigator.pop(context)}),
+                                      BackArrowWidget(
+                                            onPress: () {
+                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              mainPageProvider.changeTab(2);
+                                            },
+                                        ),
                                       Container(
                                         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
                                         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
@@ -513,7 +521,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                           );
                                         }),
                                       ),
-                                      const CommonStreakWithNotification()
+                                      const CommonStreakWithNotification(routeString: '/graphAndReports')
                                     ],
                                   ),
                                 ),
