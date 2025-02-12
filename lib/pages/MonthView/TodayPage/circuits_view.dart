@@ -80,7 +80,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Circuits ${circuitsIndex + 1} : ${widget.circuit[circuitsIndex].round} Rounds",
+                          "Circuit ${circuitsIndex + 1}: ${widget.circuit[circuitsIndex].round} Rounds",
                           style: TextStyle(
                             fontSize: ScreenUtil.horizontalScale(3),
                             fontWeight: FontWeight.bold,
@@ -233,6 +233,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         }
 
                                         return WorkoutCard(
+                                          dataId: dataId,
                                           isDayCompleted: widget.isDayCompleted,
                                           isDaySkipped: widget.isDaySkipped,
                                           exerciseId: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId!,
@@ -246,7 +247,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                                           exerciseIndex: exerciseIndex,
                                           onPress: indexW == -1
                                               ? roundIndex == 0
-                                                  ? () {
+                                                  ? (Function()? function) async {
                                                       monthProvider.updateIsCircuit(true);
                                                       monthProvider.updateCircuit("$circuitsIndex:$roundIndex", circuitsIndex);
                                                       String dataId =
@@ -256,13 +257,17 @@ class _CircuitsViewState extends State<CircuitsView> {
                                                       monthProvider.updateWarmUp(false);
                                                       monthProvider.updateIsLastExercise(false);
 
-                                                      Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                                                      await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
+                                                        (value) {
+                                                          function!();
+                                                        },
+                                                      );
 
                                                       monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
                                                     }
                                                   : null
                                               : ((data.lastRound ?? 1) - 1) >= widget.circuit[circuitsIndex].selectedDot!
-                                                  ? () {
+                                                  ? (Function()? function) async {
                                                       monthProvider.updateIsCircuit(true);
                                                       monthProvider.updateCircuit("$circuitsIndex:$roundIndex", circuitsIndex);
                                                       String dataId =
@@ -272,7 +277,11 @@ class _CircuitsViewState extends State<CircuitsView> {
                                                       monthProvider.updateWarmUp(false);
                                                       monthProvider.updateIsLastExercise(false);
 
-                                                      Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                                                      await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
+                                                        (value) {
+                                                          function!();
+                                                        },
+                                                      );
 
                                                       monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
                                                     }
