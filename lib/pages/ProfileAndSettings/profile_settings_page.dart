@@ -82,7 +82,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   }
 
   openUrl(String url) async {
-    log('url :::::::::::::::::: $url');
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {

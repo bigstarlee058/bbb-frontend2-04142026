@@ -36,6 +36,7 @@ class _CircuitsViewState extends State<CircuitsView> {
 
   initData() async {
     await monthProvider?.fetchCircuitModelLocalData();
+    await monthProvider?.fetchExerciseStatusLocalData();
   }
 
   int completedRound = 0;
@@ -99,8 +100,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                 margin: const EdgeInsets.only(left: 10),
                                 decoration: BoxDecoration(
                                   color: monthProvider.dayHistoryModel.any((element) =>
-                                          element.dataId == dayDtaId && element.status == Status.completed ||
-                                          element.status == Status.skipped)
+                                          element.dataId == dayDtaId &&
+                                          (element.status == Status.completed || element.status == Status.skipped))
                                       ? AppColors.primaryColor
                                       : data == null
                                           ? Colors.transparent
@@ -124,8 +125,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         )
                                       : (((data.lastRound ?? 1) - 1) > index) ||
                                               monthProvider.dayHistoryModel.any((element) =>
-                                                  element.dataId == dayDtaId && element.status == Status.completed ||
-                                                  element.status == Status.skipped)
+                                                  element.dataId == dayDtaId &&
+                                                  (element.status == Status.completed || element.status == Status.skipped))
                                           ? Icon(
                                               Icons.check,
                                               color: Colors.white,
@@ -206,7 +207,6 @@ class _CircuitsViewState extends State<CircuitsView> {
 
                                     bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
                                         monthProvider.isPastWeek;
-
                                     return Padding(
                                       padding: EdgeInsets.only(
                                           left: 20,
@@ -231,7 +231,6 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         if (indexW != -1) {
                                           data = monthProvider.circuitModel[indexW];
                                         }
-
                                         return WorkoutCard(
                                           dataId: dataId,
                                           isDayCompleted: widget.isDayCompleted,

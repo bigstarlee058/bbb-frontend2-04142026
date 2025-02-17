@@ -18,19 +18,21 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
   @override
   void initState() {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    monthProvider = Provider.of<MonthProvider>(context, listen: false);    
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     final streak = context.watch<MonthProvider>();
     return Row(
       children: [
         GestureDetector(
-          onTap: () {
-            monthProvider?.routeString = widget.routeString;
-            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-            mainPageProvider.changeTab(4);
+          onTap: () async {
+            Navigator.pushNamed(context, '/streak-calendar');
+            // monthProvider?.routeString = widget.routeString;
+            // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+            // mainPageProvider.changeTab(4);
           },
           child: Row(
             children: [

@@ -79,7 +79,11 @@ class _WorkoutCardState extends State<WorkoutCard> {
     warmUpSetTotal = 0;
     workingSetTotal = 0;
     backOffSetTotal = 0;
-    setState(() {});
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {});
+      });
+    }
     if (widget.exercise.extra!.isNotEmpty) {
       for (var element in widget.exercise.extra!) {
         if (element.type != 1) {
@@ -98,7 +102,11 @@ class _WorkoutCardState extends State<WorkoutCard> {
       if (element.type == 2) backOffSetTotal += int.parse(element.sets.toString());
       if (element.type == 3) workingSetTotal += int.parse(element.sets.toString());
     }
-    setState(() {});
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {});
+      });
+    }
   }
 
   Future<String?> getAuthToken() async {
@@ -134,7 +142,11 @@ class _WorkoutCardState extends State<WorkoutCard> {
     } else {
       extraSetModel = [];
     }
-    setState(() {});
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {});
+      });
+    }
   }
 
   @override
@@ -159,10 +171,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       child: Row(
                         children: [
                           SlidableAction(
-                            onPressed: (context) {
-                              // dataProvider?.removeExerciseById(userData!.currentWeek, userData!.currentDay, widget.exercise.id!);
-                              widget.onRemove();
-                            },
+                            onPressed: (context) => widget.onRemove(),
                             icon: Icons.close,
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
@@ -181,9 +190,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       child: Row(
                         children: [
                           SlidableAction(
-                            onPressed: (context) {
-                              widget.openSwapModal;
-                            },
+                            onPressed: (context) => widget.openSwapModal!(),
                             icon: Icons.swap_horiz,
                             backgroundColor: Colors.blue,
                             foregroundColor: Colors.white,

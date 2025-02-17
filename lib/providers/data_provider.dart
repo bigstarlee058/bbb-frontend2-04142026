@@ -62,7 +62,6 @@ class DataProvider extends ChangeNotifier {
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('authToken');
-    // log('authToken :::::::::::::::::: $authToken');
     return authToken;
   }
 
@@ -187,8 +186,8 @@ class DataProvider extends ChangeNotifier {
         },
       );
       if (response.statusCode == 200) {
-        var data = json.decode(response.body);    
-        debugPrint("this is fetchone ${data}");    
+        var data = json.decode(response.body);
+        debugPrint("this is fetchone ${data}");
         collectionData = Collections.fromJson(data);
         notifyListeners(); // Notify listeners to update the UI
       } else {

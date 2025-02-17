@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/models/city_model.dart';
 import 'package:bbb/models/country_model.dart';
@@ -57,8 +56,6 @@ class LocationProvider extends ChangeNotifier {
     Uri url = Uri.parse('https://www.universal-tutorial.com/api/getaccesstoken');
     final response = await http.get(url, headers: header);
 
-    log('response :::::::::::::::::: ${{response.body}}');
-
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
       token = data['auth_token'];
@@ -78,8 +75,6 @@ class LocationProvider extends ChangeNotifier {
     Uri url = Uri.parse('https://www.universal-tutorial.com/api/countries/');
     final response = await http.get(url, headers: header);
 
-    log('response :::::::getCounties::::::::::: ${response.body}');
-
     if (response.statusCode == 200) {
       country = countryFromJson(response.body);
       notifyListeners();
@@ -96,8 +91,6 @@ class LocationProvider extends ChangeNotifier {
     Uri url = Uri.parse('https://www.universal-tutorial.com/api/states/$countryName');
     final response = await http.get(url, headers: header);
 
-    log('response :::::::response::::::::::: ${response.body}');
-
     if (response.statusCode == 200) {
       states = model.stateFromJson(response.body);
       notifyListeners();
@@ -113,8 +106,6 @@ class LocationProvider extends ChangeNotifier {
     };
     Uri url = Uri.parse('https://www.universal-tutorial.com/api/cities/$cityName');
     final response = await http.get(url, headers: header);
-
-    log('response :::::::getCity::::::::::: ${response.body}');
 
     if (response.statusCode == 200) {
       cities = cityFromJson(response.body);

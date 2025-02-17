@@ -130,6 +130,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     }
     setCompleted = widget.isCompleted;
     await monthProvider?.fetchExerciseHistoryLocalData();
+    if (!context.mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
   }
 
