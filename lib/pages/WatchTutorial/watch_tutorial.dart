@@ -317,22 +317,22 @@ class _WatchTutorialState extends State<WatchTutorial> {
                           isLoading: false,
                         ),
                         const SizedBox(height: 16),
-                        ButtonWidget(
-                          text: args["buttontext"],
-                          textColor: Colors.white,
-                          onPress: () {
-                            Navigator.pop(context);
-                          },
-                          color: AppColors.primaryColor,
-                          isLoading: false,
-                        ),
+                        // ButtonWidget(
+                        //   text: args["buttontext"],
+                        //   textColor: Colors.white,
+                        //   onPress: () {
+                        //     Navigator.pop(context);
+                        //   },
+                        //   color: AppColors.primaryColor,
+                        //   isLoading: false,
+                        // ),
 
-                        // TextButton(
-                        //     onPressed: () => Navigator.pop(context),
-                        //     child: Text(
-                        //       "Back",
-                        //       style: TextStyle(fontSize: 16,color: AppColors.primaryColor),
-                        //     ))
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              "Back",
+                              style: TextStyle(fontSize: 16, color: AppColors.primaryColor),
+                            ))
                       ],
                     ),
                   ),

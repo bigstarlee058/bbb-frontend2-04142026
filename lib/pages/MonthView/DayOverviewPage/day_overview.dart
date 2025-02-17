@@ -41,13 +41,14 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
   }
 
   Future<void> initData() async {
-    final weekIndex = monthProvider!.overviewCurrentWeek;
+    // final weekIndex = monthProvider!.overviewCurrentWeek;
     final dayIndex = monthProvider!.overviewCurrentDay;
-    final data = monthProvider!.monthDataModel!.weeks![weekIndex - 1].dayList![dayIndex - 1];
+    // final data = monthProvider!.monthDataModel!.weeks![weekIndex - 1].dayList![dayIndex - 1];
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchExerciseStatusLocalData();
-    monthProvider?.setInitialPumpDayValues();
+
+    // monthProvider?.setInitialPumpDayValues();
 
     int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
         ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
@@ -57,18 +58,22 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
         ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
         : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
 
-    await monthProvider?.checkForPumpDay(data);
+    // await monthProvider?.checkForPumpDay(data);
 
     await monthProvider?.getRestDayData();
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
-    String dataId =
-        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
-    if (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type!.contains("Pump Day"))) {
-      monthProvider?.changeIsPumpDay(true);
-      monthProvider?.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
-    }
+    // String split =
+    //     monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    // String dataId =
+    //     "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+
+    // if (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type!.contains("Pump Day"))) {
+    //   monthProvider?.changeIsPumpDay(true);
+    //   monthProvider?.pumpDayModel = monthProvider?.pumpDays[
+    //       int.parse(monthProvider!.monthDataModel!.weeks![monthProvider!.week! - 1].dayList![dayIndex - 1].toString().split(" ").last) - 1];
+    // monthProvider?.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
+    // }
     isInit = false;
     setState(() {});
   }
@@ -177,15 +182,14 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
-                                                        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                                        userData?.previousPage == true
-                                                            ? mainPageProvider.changeTab(0)
-                                                            : mainPageProvider.changeTab(1);
-                                                        userData?.previousPage = false;
-                                                        // Navigator.pop(context);
+                                                        // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                                        // userData?.previousPage == true
+                                                        //     ? mainPageProvider.changeTab(0)
+                                                        //     : mainPageProvider.changeTab(1);
+                                                        // userData?.previousPage = false;
+                                                        Navigator.pop(context);
                                                         // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                                         // mainPageProvider.changeTab(1);
-                                                        debugPrint("this is dayoverviewpage");
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
                                                     ),
@@ -302,12 +306,13 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
-                                                        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                                        userData?.previousPage == true
-                                                            ? mainPageProvider.changeTab(0)
-                                                            : mainPageProvider.changeTab(1);
-                                                        userData?.previousPage = false;
+                                                        // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                                        // userData?.previousPage == true
+                                                        //     ? mainPageProvider.changeTab(0)
+                                                        //     : mainPageProvider.changeTab(1);
                                                         // userData?.previousPage = false;
+                                                        // userData?.previousPage = false;
+                                                        Navigator.pop(context);
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
                                                     ),
@@ -457,9 +462,9 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                               ? BulletPoint(
                                                   text: (context.watch<MonthProvider>().pumpDayModel?.description ?? ""),
                                                 )
-                                              : monthProvider.restDayModel[monthProvider.overviewCurrentWeek].description!.isNotEmpty
+                                              : monthProvider.restDayModel[monthProvider.overviewCurrentWeek - 1].description!.isNotEmpty
                                                   ? BulletPoint(
-                                                      text: monthProvider.restDayModel[monthProvider.overviewCurrentWeek].description!,
+                                                      text: monthProvider.restDayModel[monthProvider.overviewCurrentWeek - 1].description!,
                                                     )
                                                   : const SizedBox();
                                     },
@@ -527,172 +532,204 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                     if (currentDayTitle.contains("Rest Day") && monthProvider.isPastWeek) {
                       buttonText = monthProvider.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped";
                       onPress = null;
+                    } else if (monthProvider.isPumpDay &&
+                        !monthProvider.isPastWeek &&
+                        monthProvider.dayHistoryDetails?.status == Status.skipped) {
+                      buttonText = "Skipped. View here";
+                      onPress = () {
+                        // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                        // mainPageProvider.changeTab(5);
+                        // Navigator.pop(context);
+                        Navigator.pushNamed(context, '/today');
+                      };
                     } else if (monthProvider.isPastWeek ||
                         (monthProvider.isPumpDay &&
                             (monthProvider.dayHistoryDetails?.status == Status.completed ||
                                 monthProvider.dayHistoryDetails?.status == Status.skipped))) {
                       buttonText = "View the workout";
                       onPress = () {
-                        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                        mainPageProvider.changeTab(5);
+                        // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                        // mainPageProvider.changeTab(5);
                         // Navigator.pop(context);
+                        Navigator.pushNamed(context, '/today');
                       };
-                    } else if (currentDayTitle.contains("Rest Day") && (monthProvider.isPumpDay || monthProvider.isPumpDayAvailable)) {
+                    } else if (currentDayTitle.contains("Rest Day") && (monthProvider.isPumpDay)) {
                       if (monthProvider.dayHistoryDetails?.status == Status.skipped ||
                           monthProvider.dayHistoryDetails?.status == Status.completed) {
                         return const SizedBox();
                       } else {
-                        // buttonText = monthProvider.dayHistoryDetails?.status == Status.started ||
-                        //         monthProvider.dayHistoryDetails?.status == Status.completed
-                        //     ? "View the workout"
-                        //     : monthProvider.dayHistoryDetails?.status == Status.skipped
-                        //         ? "Skipped. View here"
-                        //         : "Start the workout";
-                        //
-                        // onPress = () async {
-                        //   await _saveDayData(
-                        //     type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
-                        //     status: Status.started,
-                        //     title: monthProvider.pumpDayModel?.title,
-                        //   );
-                        //   Navigator.pushNamed(context, '/today');
-                        // };
-                        //
-                        // return Padding(
-                        //   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
-                        //   child: ButtonWidget(
-                        //     text: buttonText,
-                        //     textColor: Colors.white,
-                        //     onPress: onPress,
-                        //     color: buttonColor,
-                        //     isLoading: false,
-                        //   ),
-                        // );
+                        buttonText = !monthProvider.isPumpDay
+                            ? "Mark Complete"
+                            : monthProvider.dayHistoryDetails?.status == Status.started ||
+                                    monthProvider.dayHistoryDetails?.status == Status.completed
+                                ? "View the workout"
+                                : monthProvider.dayHistoryDetails?.status == Status.skipped
+                                    ? "Skipped. View here"
+                                    : "Start the workout";
 
-                        return Row(
-                          children: [
-                            Expanded(
-                              flex: 4,
-                              child: Container(
-                                height: media.height * 0.075,
-                                margin: EdgeInsets.only(
-                                  bottom: ScreenUtil.verticalScale(2),
-                                  left: ScreenUtil.horizontalScale(10),
-                                  top: ScreenUtil.verticalScale(2),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: const Color(0xFFD2CBCB)),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(ScreenUtil.verticalScale(4)),
-                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(4)),
-                                  ),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x20888888),
-                                      spreadRadius: 2,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: DropdownButton<String>(
-                                    value: monthProvider.selectedButtonTitle,
-                                    icon: const Icon(Icons.keyboard_arrow_down_outlined),
-                                    iconSize: ScreenUtil.verticalScale(4),
-                                    iconEnabledColor: Colors.grey[400],
-                                    elevation: 16,
-                                    style: TextStyle(
-                                      color: const Color(0xBB888888),
-                                      fontSize: ScreenUtil.verticalScale(1.8),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    underline: Container(),
-                                    onChanged: (String? newValue) {
-                                      monthProvider.changeSelectedButtonTitle(newValue ?? "");
-                                    },
-                                    items: monthProvider.buttonTitle.map<DropdownMenuItem<String>>((String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  if (monthProvider.selectedButtonTitle == "Mark Complete") {
-                                    Navigator.pushNamed(context, '/dayCompleted');
-                                    _saveDayData(status: Status.completed, type: 'Rest Day');
-                                  } else if (monthProvider.selectedButtonTitle == "Swap To Pump Day") {
-                                    monthProvider.changeIsPumpDay(true);
-                                    monthProvider.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
+                        onPress = () async {
+                          if (!monthProvider.isPumpDay) {
+                            Navigator.pushNamed(context, '/dayCompleted');
+                            _saveDayData(status: Status.completed, type: 'Rest Day');
+                          } else if (buttonText == "Start the workout" || buttonText == "View the workout") {
+                            await _saveDayData(
+                              type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+                              status: Status.started,
+                              title: monthProvider.pumpDayModel?.title,
+                            );
 
-                                    _saveDayData(
-                                      type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
-                                      status: Status.empty,
-                                      title: monthProvider.pumpDayModel?.title,
-                                    );
-                                  } else if (monthProvider.selectedButtonTitle == "Start Workout") {
-                                    await _saveDayData(
-                                      type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
-                                      status: Status.started,
-                                      title: monthProvider.pumpDayModel?.title,
-                                    );
-                                    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                    mainPageProvider.changeTab(5);
-                                    // Navigator.pop(context);
-                                  } else if (monthProvider.selectedButtonTitle == "Swap To Rest Day") {
-                                    monthProvider.changeValue(["Mark Complete", "Swap To Pump Day"], "Mark Complete");
-                                    await _saveDayData(type: "Rest Day", status: Status.empty);
-                                    monthProvider.checkPumpDayAvail();
-                                  }
-                                },
-                                child: Container(
-                                  height: media.height * 0.075,
-                                  alignment: Alignment.centerLeft,
-                                  padding: const EdgeInsets.only(left: 10),
-                                  margin: EdgeInsets.only(
-                                    bottom: ScreenUtil.verticalScale(2),
-                                    right: ScreenUtil.horizontalScale(10),
-                                    top: ScreenUtil.verticalScale(2),
-                                    left: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor,
-                                    borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(ScreenUtil.verticalScale(4)),
-                                      bottomRight: Radius.circular(ScreenUtil.verticalScale(4)),
-                                    ),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Color(0x20888888),
-                                        spreadRadius: 2,
-                                        blurRadius: 10,
-                                        offset: Offset(0, 1),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Text(
-                                    "Confirm",
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil.verticalScale(1.8),
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                            // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                            // mainPageProvider.changeTab(5);
+                            // Navigator.pop(context);
+
+                            if (!context.mounted) return;
+                            Navigator.pushNamed(context, '/today');
+                            await monthProvider.updatePumpDayStatus();
+                          } else if (buttonText == "View the workout") {
+                            Navigator.pushNamed(context, '/today');
+                          }
+                        };
+
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                          child: ButtonWidget(
+                            text: buttonText,
+                            textColor: Colors.white,
+                            onPress: onPress,
+                            color: AppColors.primaryColor,
+                            isLoading: false,
+                          ),
                         );
+
+                        // return Row(
+                        //   children: [
+                        //     Expanded(
+                        //       flex: 4,
+                        //       child: Container(
+                        //         height: media.height * 0.075,
+                        //         margin: EdgeInsets.only(
+                        //           bottom: ScreenUtil.verticalScale(2),
+                        //           left: ScreenUtil.horizontalScale(10),
+                        //           top: ScreenUtil.verticalScale(2),
+                        //         ),
+                        //         decoration: BoxDecoration(
+                        //           color: Colors.white,
+                        //           border: Border.all(color: const Color(0xFFD2CBCB)),
+                        //           borderRadius: BorderRadius.only(
+                        //             topLeft: Radius.circular(ScreenUtil.verticalScale(4)),
+                        //             bottomLeft: Radius.circular(ScreenUtil.verticalScale(4)),
+                        //           ),
+                        //           boxShadow: const [
+                        //             BoxShadow(
+                        //               color: Color(0x20888888),
+                        //               spreadRadius: 2,
+                        //               blurRadius: 10,
+                        //               offset: Offset(0, 1),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //         child: Center(
+                        //           child: DropdownButton<String>(
+                        //             value: monthProvider.selectedButtonTitle,
+                        //             icon: const Icon(Icons.keyboard_arrow_down_outlined),
+                        //             iconSize: ScreenUtil.verticalScale(4),
+                        //             iconEnabledColor: Colors.grey[400],
+                        //             elevation: 16,
+                        //             style: TextStyle(
+                        //               color: const Color(0xBB888888),
+                        //               fontSize: ScreenUtil.verticalScale(1.8),
+                        //               fontWeight: FontWeight.w600,
+                        //             ),
+                        //             underline: Container(),
+                        //             onChanged: (String? newValue) {
+                        //               monthProvider.changeSelectedButtonTitle(newValue ?? "");
+                        //             },
+                        //             items: monthProvider.buttonTitle.map<DropdownMenuItem<String>>((String value) {
+                        //               return DropdownMenuItem<String>(
+                        //                 value: value,
+                        //                 child: Text(value),
+                        //               );
+                        //             }).toList(),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Expanded(
+                        //       flex: 2,
+                        //       child: GestureDetector(
+                        //         onTap: () async {
+                        //           if (monthProvider.selectedButtonTitle == "Mark Complete") {
+                        //             Navigator.pushNamed(context, '/dayCompleted');
+                        //             _saveDayData(status: Status.completed, type: 'Rest Day');
+                        //           } else if (monthProvider.selectedButtonTitle == "Swap To Pump Day") {
+                        //             monthProvider.changeIsPumpDay(true);
+                        //             monthProvider.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
+                        //
+                        //             _saveDayData(
+                        //               type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+                        //               status: Status.empty,
+                        //               title: monthProvider.pumpDayModel?.title,
+                        //             );
+                        //           } else if (monthProvider.selectedButtonTitle == "Start Workout") {
+                        //             await _saveDayData(
+                        //               type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+                        //               status: Status.started,
+                        //               title: monthProvider.pumpDayModel?.title,
+                        //             );
+                        //             if (!context.mounted) return;
+                        //             Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                        //             mainPageProvider.changeTab(5);
+                        //             // Navigator.pop(context);
+                        //           } else if (monthProvider.selectedButtonTitle == "Swap To Rest Day") {
+                        //             monthProvider.changeValue(["Mark Complete", "Swap To Pump Day"], "Mark Complete");
+                        //             await _saveDayData(type: "Rest Day", status: Status.empty);
+                        //             monthProvider.checkPumpDayAvail();
+                        //           }
+                        //         },
+                        //         child: Container(
+                        //           height: media.height * 0.075,
+                        //           alignment: Alignment.centerLeft,
+                        //           padding: const EdgeInsets.only(left: 10),
+                        //           margin: EdgeInsets.only(
+                        //             bottom: ScreenUtil.verticalScale(2),
+                        //             right: ScreenUtil.horizontalScale(10),
+                        //             top: ScreenUtil.verticalScale(2),
+                        //             left: 5,
+                        //           ),
+                        //           decoration: BoxDecoration(
+                        //             color: AppColors.primaryColor,
+                        //             borderRadius: BorderRadius.only(
+                        //               topRight: Radius.circular(ScreenUtil.verticalScale(4)),
+                        //               bottomRight: Radius.circular(ScreenUtil.verticalScale(4)),
+                        //             ),
+                        //             boxShadow: const [
+                        //               BoxShadow(
+                        //                 color: Color(0x20888888),
+                        //                 spreadRadius: 2,
+                        //                 blurRadius: 10,
+                        //                 offset: Offset(0, 1),
+                        //               ),
+                        //             ],
+                        //           ),
+                        //           child: Text(
+                        //             "Confirm",
+                        //             style: TextStyle(
+                        //               fontSize: ScreenUtil.verticalScale(1.8),
+                        //               fontWeight: FontWeight.bold,
+                        //               color: Colors.white,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // );
                       }
                     } else {
+                      if (currentDayTitle.contains("Rest Day") && monthProvider.dayHistoryDetails?.status == Status.skipped ||
+                          monthProvider.dayHistoryDetails?.status == Status.completed) {
+                        return const SizedBox();
+                      }
                       buttonText = currentDayTitle.contains("Rest Day")
                           ? "Mark Complete"
                           : monthProvider.dayHistoryDetails?.status == Status.started ||
@@ -712,10 +749,11 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                             monthProvider.changeIsPumpDay(false);
                             await _saveDayData(status: Status.started, type: 'Workout Day');
                           }
-                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                          mainPageProvider.changeTab(5);
+                          if (!context.mounted) return;
+                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                          // mainPageProvider.changeTab(5);
                           // Navigator.pop(context);
-                          // Navigator.pushNamed(context, '/today');
+                          Navigator.pushNamed(context, '/today');
                         }
                       };
                     }
@@ -762,14 +800,25 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       onPress() async {
                         bool isSkipped = monthProvider.dayHistoryDetails?.status == Status.skipped;
                         String newStatus = isSkipped ? '' : Status.skipped;
+
                         String type = monthProvider.isPumpDay
-                            ? "Pump Day - ${monthProvider.pumpDayModel?.id}"
+                            ? isSkipped
+                                ? ""
+                                : "Pump Day - ${monthProvider.pumpDayModel?.id}"
                             : currentDayTitle.contains("Rest Day")
                                 ? 'Rest Day'
                                 : 'Workout Day';
 
                         if (!isSkipped) Navigator.pop(context);
-                        await _skipUnskipDayData(status: newStatus, type: type);
+                        await _skipUnskipDayData(
+                          status: newStatus,
+                          type: type,
+                          title: monthProvider.isPumpDay
+                              ? isSkipped
+                                  ? ""
+                                  : monthProvider.pumpDayModel?.title
+                              : "",
+                        );
                       }
 
                       return Container(
@@ -943,7 +992,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
     }
   }
 
-  Future<void> _skipUnskipDayData({required String status, required String type}) async {
+  Future<void> _skipUnskipDayData({required String status, required String type, String? title}) async {
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
@@ -959,6 +1008,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
     final data = {
+      "title": title ?? "",
       "dataId": dataId,
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
@@ -977,6 +1027,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
     );
 
     final data1 = {
+      "title": title ?? "",
       "status": status,
       "type": type,
       "startTime": status == Status.empty
@@ -998,6 +1049,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
     await monthProvider?.updateDayData();
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
+    await monthProvider?.updatePumpDayStatus();
+
     monthProvider?.manageStreak();
     monthProvider?.getLiftedWeightGraphData();
   }

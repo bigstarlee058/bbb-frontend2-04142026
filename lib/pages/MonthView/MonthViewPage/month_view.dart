@@ -275,6 +275,7 @@ class _MonthViewState extends State<MonthView> {
                                     await value.changeDaySplit(newValue);
                                     await value.filterWorkouts();
                                     await value.updateLocalData();
+                                    await value.checkForPumpDay();
                                     await value.manageStreak();
                                     await value.getLiftedWeightGraphData();
                                   },
@@ -359,40 +360,7 @@ class _MonthViewState extends State<MonthView> {
                             builder: (context, value, child) => ButtonWidget(
                               text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
                               textColor: Colors.white,
-                              onPress: monthProvider!.todayTitleId.isEmpty
-                                  ? null
-                                  : () async {
-                                      int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList?.indexWhere(
-                                        (element) {
-                                          return element == monthProvider!.todayTitleId;
-                                        },
-                                      );
-
-                                      final dayIndex = int.parse((monthProvider!
-                                                  .monthDataModel?.weeks![(monthProvider!.week ?? 1) - 1].dayList?[index ?? 0]
-                                                  .toString()
-                                                  .replaceAll("Workout", "")
-                                                  .replaceAll("Rest", "")
-                                                  .replaceAll("Day", "")
-                                                  .replaceAll(" ", "") ??
-                                              "0")) -
-                                          1;
-
-                                      DayDataModel dayData =
-                                          "${monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                  .toString()
-                                                  .contains("Workout")
-                                              ? monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1].days![dayIndex]
-                                              : DayDataModel();
-                                      monthProvider!.overviewCurrentWeek = monthProvider!.week ?? 1;
-                                      monthProvider!.overviewCurrentDay = ((index ?? 1) + 1);
-                                      monthProvider!.dayDataModel = dayData;
-                                      monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
-                                      monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
-                                      monthProvider?.updateIsPastWeek(
-                                          monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
-                                      Navigator.pushNamed(context, '/dayOverview');
-                                    },
+                              onPress: monthProvider!.todayTitleId.isEmpty ? null : () => continueWorkoutOnTap(context),
                               color: AppColors.primaryColor,
                               isLoading: false,
                             ),
@@ -408,5 +376,51 @@ class _MonthViewState extends State<MonthView> {
         ),
       ),
     );
+  }
+
+  void continueWorkoutOnTap(BuildContext context) {
+    int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList
+        ?.indexWhere((element) => element == monthProvider!.todayTitleId);
+
+    final dayIndex = int.parse((monthProvider!.monthDataModel?.weeks![(monthProvider!.week ?? 1) - 1].dayList?[index ?? 0]
+                .toString()
+                .replaceAll("Workout", "")
+                .replaceAll("Rest", "")
+                .replaceAll("Day", "")
+                .replaceAll(" ", "") ??
+            "0")) -
+        1;
+
+    DayDataModel dayData =
+        "${monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Workout")
+            ? monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1].days![dayIndex]
+            : DayDataModel();
+
+    bool isRestDay = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].dayList?[index ?? 0].contains("Rest Day");
+
+    String split = monthProvider?.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1].id}-${monthProvider!.todayTitleId}";
+
+    bool isPumpDay = (isRestDay &&
+            monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+        (isRestDay &&
+            (monthProvider!.isPumpDayAvailable &&
+                (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))));
+
+    monthProvider?.changeIsPumpDay(isPumpDay);
+
+    if (isPumpDay) {
+      monthProvider?.updatePumpDayData(monthProvider!.pumpDays[
+          int.parse(monthProvider!.monthDataModel!.weeks![monthProvider!.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+    }
+    monthProvider!.overviewCurrentWeek = monthProvider!.week ?? 1;
+    monthProvider!.overviewCurrentDay = ((index ?? 1) + 1);
+    monthProvider!.dayDataModel = dayData;
+    monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
+    monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
+    monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
+    Navigator.pushNamed(context, '/dayOverview');
   }
 }

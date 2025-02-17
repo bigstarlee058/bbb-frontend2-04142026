@@ -109,16 +109,19 @@ class _ExercisePageState extends State<ExercisePage> {
     if (monthProvider!.isPumpDay) {
       await monthProvider?.fetchDayStatusLocalData();
 
-      final data = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1].dayList![payloadModel.dayIndex! - 1];
+      // final data = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1].dayList![payloadModel.dayIndex! - 1];
+
       String split =
           monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
       String dataId =
           "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
-      await monthProvider?.checkForPumpDay(data);
+
+      // await monthProvider?.checkForPumpDay(data);
+
       if (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type!.contains("Pump Day"))) {
-        monthProvider?.changeIsPumpDay(true);
-        monthProvider?.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
+        // monthProvider?.changeIsPumpDay(true);
+        // monthProvider?.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
       }
       monthProvider!.selectedExercise = monthProvider!.pumpDayModel!.exercises![payloadModel.exerciseIndex!];
     } else {
@@ -205,6 +208,7 @@ class _ExercisePageState extends State<ExercisePage> {
     } else {
       extraSetModel = [];
     }
+    if (!context.mounted) return;
     setState(() {});
   }
 
@@ -850,29 +854,32 @@ class _ExercisePageState extends State<ExercisePage> {
                                   },
                                 ),
                                 const SizedBox(height: 10),
-                                Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                  return ButtonWidget(
-                                    text: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip the exercise",
-                                    textColor: const Color(0xFFFFFFFF),
-                                    color: AppColors.skipDayColor,
-                                    onPress: () async {
-                                      if (monthProvider.exerciseHistoryDetails?.status != Status.skipped) {
-                                        Navigator.pop(context);
-                                      }
-
-                                      await _saveExerciseData(
-                                        status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
-                                        id: monthProvider.isPumpDay && monthProvider.isCircuit
-                                            ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                            : monthProvider.exerciseDetailModel!.sId.toString(),
-                                        type: monthProvider.isPumpDay && monthProvider.isCircuit
-                                            ? "Circuit - ${monthProvider.circuitIndex}"
-                                            : "Exercise",
-                                      );
-                                    },
-                                    isLoading: false,
-                                  );
-                                }),
+                                Consumer<MonthProvider>(
+                                  builder: (context, monthProvider, child) {
+                                    return ButtonWidget(
+                                      text:
+                                          monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip the exercise",
+                                      textColor: const Color(0xFFFFFFFF),
+                                      color: AppColors.skipDayColor,
+                                      onPress: () async {
+                                        final status = monthProvider.exerciseHistoryDetails?.status;
+                                        _saveExerciseData(
+                                          status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
+                                          id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                              ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
+                                              : monthProvider.exerciseDetailModel!.sId.toString(),
+                                          type: monthProvider.isPumpDay && monthProvider.isCircuit
+                                              ? "Circuit - ${monthProvider.circuitIndex}"
+                                              : "Exercise",
+                                        );
+                                        if (status != Status.skipped) {
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                      isLoading: false,
+                                    );
+                                  },
+                                ),
                               ],
                               const EquipmentSection(),
                             ],

@@ -122,11 +122,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       GestureDetector(
-                                        onTap: () {
+                                        onTap: () async {
                                           // mainPageProvider.changeTab(4);
                                           Navigator.pushNamed(context, '/streak-calendar');
-                                          // Navigator.pushNamed(
-                                          // context, '/streak');
+                                          // Navigator.pushNamed(context, '/streak');
                                         },
                                         child: Row(
                                           children: [

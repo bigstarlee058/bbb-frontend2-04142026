@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -228,7 +226,6 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log('widget.exerciseHistoryData :::::::::::::::::: ${widget.exerciseHistoryData}');
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -450,7 +447,6 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                 itemCount: finalData.length,
                 padding: EdgeInsets.zero,
                 itemBuilder: (context, index) {
-                  log('finalData.length :::::::::::::::::: ${finalData.length}');
                   return Container(
                     decoration: BoxDecoration(
                       color: Colors.grey.withValues(alpha: .1),

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
-import 'package:bbb/pages/MonthView/TodayPage/today_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
 import 'package:bbb/pages/dashboard_page.dart';
@@ -17,7 +16,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vimeo_video_player/vimeo_video_player.dart';
 
-import '../components/streak_calendar.dart';
 import '../providers/main_page_provider.dart';
 import '../providers/user_data_provider.dart';
 
@@ -72,7 +70,11 @@ class _MainPageState extends State<MainPage> {
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async => await _initializeFetchData().then(
-        (value) async => await monthProvider.onInit(),
+        (value) async {
+          if (monthProvider.monthDataModel == null) {
+            await monthProvider.onInit();
+          }
+        },
       ),
     );
 
@@ -81,8 +83,8 @@ class _MainPageState extends State<MainPage> {
       const MonthView(),
       const ToolsPage(),
       const ProfileSettingsPage(),
-      const StreakCalendarPage(),
-      const TodayPage(),
+      // const StreakCalendarPage(),
+      // const TodayPage(),
     ];
   }
 
@@ -130,9 +132,10 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _initializeFetchData() async {
-    debugPrint("this is initial state func");
+    debugPrint("this  is initial state func");
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    if (monthProvider.monthLocalDataModel.isNotEmpty) return;
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {

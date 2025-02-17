@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:bbb/components/athletes_list_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/collection_grid.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/staff_list_widget.dart';
-import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
@@ -31,8 +32,8 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final today = DateTime.now();
-  late ScrollController _scrollController;
-  double _opacity = 1.0;
+  // late ScrollController _scrollController;
+  // double _opacity = 1.0;
   // UserDataManager userManager = UserDataManager();
   List<String> title = [];
   int focusedIndexStuff = 0;
@@ -61,16 +62,16 @@ class _DashboardPageState extends State<DashboardPage> {
     loadFeaturedCollectionData();
     requestNotificationPermission();
 
-    _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      double offset = _scrollController.offset;
-      double newOpacity = (40 - offset) / 40;
-      newOpacity = newOpacity.clamp(0.0, 1.0);
-
-      setState(() {
-        _opacity = newOpacity;
-      });
-    });
+    // _scrollController = ScrollController();
+    // _scrollController.addListener(() {
+    //   double offset = _scrollController.offset;
+    //   double newOpacity = (40 - offset) / 40;
+    //   newOpacity = newOpacity.clamp(0.0, 1.0);
+    //
+    //   setState(() {
+    //     _opacity = newOpacity;
+    //   });
+    // });
   }
 
   Future<void> requestNotificationPermission() async {
@@ -104,11 +105,12 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    // _scrollController.dispose();
     super.dispose();
   }
 
   Future<void> _initializeFetchData() async {
+    log('DASHBOARD PAGE INIT');
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {
@@ -127,6 +129,7 @@ class _DashboardPageState extends State<DashboardPage> {
         );
       },
     );
+    await Future.delayed(Duration(seconds: 2));
     loader = false;
     setState(() {});
   }
@@ -143,7 +146,7 @@ class _DashboardPageState extends State<DashboardPage> {
       body: CustomMaterialIndicator(
         onRefresh: onRefresh,
         child: SingleChildScrollView(
-          controller: _scrollController,
+          // controller: _scrollController,
           physics: const ClampingScrollPhysics(),
           child: Column(
             children: [
@@ -170,62 +173,59 @@ class _DashboardPageState extends State<DashboardPage> {
                             child: SafeArea(
                               child: Column(
                                 children: [
-                                  Opacity(
-                                    opacity: _opacity,
-                                    child: Container(
-                                      margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                              left: ScreenUtil.horizontalScale(8),
-                                              top: ScreenUtil.verticalScale(0),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Consumer<UserDataProvider>(
-                                                    builder: (context, userData, child) => userData.userName != ""
-                                                        ? Text(
-                                                            // 'Hi Nick'
-                                                            'Hi ${userData.userName}',
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2.9),
-                                                              height: 2,
-                                                            ),
-                                                          )
-                                                        : const SizedBox()),
-                                              ],
-                                            ),
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            left: ScreenUtil.horizontalScale(8),
+                                            top: ScreenUtil.verticalScale(0),
                                           ),
-                                          Column(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                      left: ScreenUtil.horizontalScale(0),
-                                                      right: ScreenUtil.horizontalScale(0),
-                                                      top: ScreenUtil.verticalScale(0),
-                                                    ),
-                                                    child: const CommonStreakWithNotification(routeString: "dashboard"),
-                                                  )
-                                                ],
-                                              ),
+                                              Consumer<UserDataProvider>(
+                                                  builder: (context, userData, child) => userData.userName != ""
+                                                      ? Text(
+                                                          // 'Hi Nick'
+                                                          'Hi ${userData.userName}',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.verticalScale(2.9),
+                                                            height: 2,
+                                                          ),
+                                                        )
+                                                      : const SizedBox()),
                                             ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: ScreenUtil.horizontalScale(0),
+                                                    right: ScreenUtil.horizontalScale(0),
+                                                    top: ScreenUtil.verticalScale(0),
+                                                  ),
+                                                  child: const CommonStreakWithNotification(routeString: "dashboard"),
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   Consumer<MonthProvider>(
                                     builder: (context, monthData, child) {
-                                      if (monthData.monthDataModel?.weeks == null) {
+                                      if (monthData.monthDataModel?.weeks == null || monthData.loader) {
                                         return const SizedBox();
                                       }
                                       if (monthData.todayTitleId.isNotEmpty) {
@@ -301,18 +301,27 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 child: Column(
                                                   children: [
                                                     Builder(builder: (context) {
-                                                      DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
-                                                        (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                        orElse: () => DayHistoryModel(),
-                                                      );
+                                                      // DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
+                                                      //   (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                                      //   orElse: () => DayHistoryModel(),
+                                                      // );
                                                       return Text(
-                                                        matchingElement.id != null
+                                                        /*matchingElement.id != null
                                                             ? matchingElement.title ?? "Pump Day"
-                                                            : !isRestDay
-                                                                ? monthData.monthDataModel!.weeks![monthData.week! - 1]
-                                                                    .days![nextWorkOutIndex].title
-                                                                : (monthData
-                                                                    .monthDataModel?.weeks?[monthData.week! - 1].dayList?[index ?? 0]),
+                                                            : */
+                                                        !isRestDay
+                                                            ? monthData.monthDataModel!.weeks![monthData.week! - 1].days![nextWorkOutIndex]
+                                                                    .title ??
+                                                                ""
+                                                            : monthData
+                                                                    .pumpDays[int.parse(monthData.monthDataModel!
+                                                                            .weeks![monthData.week! - 1].dayList![index ?? 0]
+                                                                            .toString()
+                                                                            .split(" ")
+                                                                            .last) -
+                                                                        1]
+                                                                    .title ??
+                                                                "",
                                                         textAlign: TextAlign.center,
                                                         style: TextStyle(
                                                           color: Colors.white,
@@ -348,18 +357,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                                             : Colors.white,
                                                         onPress: status == Status.completed || status == Status.skipped
                                                             ? null
-                                                            : () async {
-                                                                monthData.overviewCurrentWeek = monthData.week ?? 1;
-                                                                monthData.overviewCurrentDay = ((index ?? 1) + 1);
-                                                                monthData.dayDataModel = dayData;
-                                                                userData?.previousPage = true;
-                                                                monthData.alternateEquipmentType = monthData.equipmentType;
-                                                                monthData.weekDataModel =
-                                                                    monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
-                                                                monthData.updateIsPastWeek(
-                                                                    monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
-                                                                Navigator.pushNamed(context, '/dayOverview');
-                                                              },
+                                                            : () =>
+                                                                continueWorkoutOnTap(isRestDay, monthData, dataId, index, dayData, context),
                                                         isLoading: false,
                                                       ),
                                               )
@@ -797,7 +796,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                             onPageChanged: (index, reason) {},
                                             scrollDirection: Axis.horizontal,
                                           ),
-                                          itemBuilder: (context, index, realIndex) {                                            
+                                          itemBuilder: (context, index, realIndex) {
                                             return CollectionGrid(collection: dataProvider.collectionsData[index]);
                                           },
                                         ),
@@ -909,5 +908,30 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
     );
+  }
+
+  void continueWorkoutOnTap(
+      bool isRestDay, MonthProvider monthData, String dataId, int? index, DayDataModel dayData, BuildContext context) {
+    bool isPumpDay = (isRestDay &&
+            monthData.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+        (isRestDay &&
+            (monthData.isPumpDayAvailable &&
+                (monthData.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))));
+
+    monthData.changeIsPumpDay(isPumpDay);
+
+    if (isPumpDay) {
+      monthData.updatePumpDayData(monthData
+          .pumpDays[int.parse(monthData.monthDataModel!.weeks![monthData.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+    }
+
+    monthData.overviewCurrentWeek = monthData.week ?? 1;
+    monthData.overviewCurrentDay = ((index ?? 1) + 1);
+    monthData.dayDataModel = dayData;
+    userData?.previousPage = true;
+    monthData.alternateEquipmentType = monthData.equipmentType;
+    monthData.weekDataModel = monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
+    monthData.updateIsPastWeek(monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
+    Navigator.pushNamed(context, '/dayOverview');
   }
 }
