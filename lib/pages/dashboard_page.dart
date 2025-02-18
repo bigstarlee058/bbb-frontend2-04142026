@@ -916,7 +916,14 @@ class _DashboardPageState extends State<DashboardPage> {
             monthData.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             (monthData.isPumpDayAvailable &&
-                (monthData.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))));
+                (monthData.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (monthProvider.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthData.changeIsPumpDay(isPumpDay);
 

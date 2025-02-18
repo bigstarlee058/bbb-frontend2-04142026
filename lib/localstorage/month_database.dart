@@ -12,6 +12,7 @@ class DatabaseHelper {
   static const String removedExerciseHistory = "RemovedExerciseHistory";
   static const String exerciseNotes = "ExerciseNotes";
   static const String extraExerciseHistory = "ExtraExerciseHistory";
+  static const String swapExerciseHistory = "SwapExerciseHistory";
 
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   factory DatabaseHelper() => _instance;
@@ -122,7 +123,11 @@ class DatabaseHelper {
       CREATE TABLE IF NOT EXISTS $removedExerciseHistory (
         id INTEGER PRIMARY KEY autoincrement,
         dataId TEXT,
-        exerciseId TEXT
+        exerciseId TEXT, 
+        split TEXT,
+        monthId TEXT,
+        weekId TEXT,
+        dayId TEXT
       )
     ''');
 
@@ -153,6 +158,21 @@ class DatabaseHelper {
         weekId TEXT,
         dayId TEXT,
         date TEXT, 
+        exerciseId TEXT,
+        exerciseJson Text
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $swapExerciseHistory (
+        id INTEGER PRIMARY KEY autoincrement,
+        dataId TEXT,
+        split TEXT,
+        monthId TEXT,
+        weekId TEXT,
+        dayId TEXT,
+        date TEXT, 
+        insertIndex TEXT,
         exerciseId TEXT,
         exerciseJson Text
       )

@@ -17,6 +17,7 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/pump_day_model.dart';
 import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/rest_day_model.dart';
+import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -1323,6 +1324,27 @@ class MonthProvider extends ChangeNotifier {
       addedExerciseList = List<ExtraExerciseModel>.from(data.map((x) => ExtraExerciseModel.fromJson(x)));
     } else {
       addedExerciseList = [];
+    }
+    notifyListeners();
+  }
+
+  List<SwapExerciseModel> swapExerciseList = [];
+
+  Future<void> fetchSwapExerciseData() async {
+    swapExerciseList = [];
+    String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    final data = await DatabaseHelper().getFilteredWithMWDData(
+        tableName: DatabaseHelper.swapExerciseHistory,
+        monthId: monthDataModel?.id ?? "",
+        split: split,
+        weekId: monthDataModel!.weeks?[week! - 1].id ?? "",
+        dayId: monthDataModel!.weeks?[week! - 1].idList![overviewCurrentDay - 1]);
+
+    if (data.isNotEmpty) {
+      swapExerciseList = List<SwapExerciseModel>.from(data.map((x) => SwapExerciseModel.fromJson(x)));
+    } else {
+      swapExerciseList = [];
     }
     notifyListeners();
   }

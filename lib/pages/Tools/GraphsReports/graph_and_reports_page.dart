@@ -622,7 +622,14 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
             monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             (monthProvider.isPumpDayAvailable &&
-                (monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))));
+                (monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (monthProvider.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider.changeIsPumpDay(isPumpDay);
 

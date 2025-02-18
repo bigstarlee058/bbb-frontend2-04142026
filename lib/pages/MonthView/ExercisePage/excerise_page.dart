@@ -863,7 +863,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                       color: AppColors.skipDayColor,
                                       onPress: () async {
                                         final status = monthProvider.exerciseHistoryDetails?.status;
-                                        _saveExerciseData(
+                                        await _saveExerciseData(
                                           status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
                                           id: monthProvider.isPumpDay && monthProvider.isCircuit
                                               ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
@@ -1106,10 +1106,9 @@ class _ExercisePageState extends State<ExercisePage> {
     }
 
     await monthProvider?.fetchExerciseStatusLocalData();
-    await monthProvider?.fetchExerciseHistoryLocalData();
-    monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
-
     await monthProvider?.updateDayData();
+    monthProvider?.fetchExerciseHistoryLocalData();
+    monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
     monthProvider?.getLiftedWeightGraphData();
 
     if (status == Status.completed && type == "Exercise") {
