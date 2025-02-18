@@ -441,7 +441,14 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")));
+            (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
+        (isRestDay &&
+            monthProvider!.isPumpDayAvailable &&
+            (monthProvider!.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
+        (isRestDay &&
+            monthProvider!.isPumpDayAvailable &&
+            (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider?.changeIsPumpDay(isPumpDay);
 
@@ -477,14 +484,16 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           },
           child: Container(
             width: 90,
-            padding: EdgeInsets.symmetric(
-              vertical: ScreenUtil.verticalScale(0.9),
-            ),
+            padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.9)),
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(7), color: AppColors.primaryColor),
             child: Center(
               child: Text(
                 "Pump Day",
-                style: TextStyle(fontSize: ScreenUtil.verticalScale(1.5), fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.5),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -515,9 +524,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           },
           child: Container(
             width: 90,
-            padding: EdgeInsets.symmetric(
-              vertical: ScreenUtil.verticalScale(0.9),
-            ),
+            padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.9)),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(7),
               color: Colors.blue,
@@ -527,7 +534,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 "Rest Day",
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.5),
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
               ),
