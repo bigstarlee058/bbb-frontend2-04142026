@@ -100,8 +100,9 @@ class _CircuitsViewState extends State<CircuitsView> {
                                 margin: const EdgeInsets.only(left: 10),
                                 decoration: BoxDecoration(
                                   color: monthProvider.dayHistoryModel.any((element) =>
-                                          element.dataId == dayDtaId &&
-                                          (element.status == Status.completed || element.status == Status.skipped))
+                                              element.dataId == dayDtaId &&
+                                              (element.status == Status.completed || element.status == Status.skipped)) ||
+                                          monthProvider.isPastWeek
                                       ? AppColors.primaryColor
                                       : data == null
                                           ? Colors.transparent
@@ -126,7 +127,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                       : (((data.lastRound ?? 1) - 1) > index) ||
                                               monthProvider.dayHistoryModel.any((element) =>
                                                   element.dataId == dayDtaId &&
-                                                  (element.status == Status.completed || element.status == Status.skipped))
+                                                  (element.status == Status.completed || element.status == Status.skipped)) ||
+                                              monthProvider.isPastWeek
                                           ? Icon(
                                               Icons.check,
                                               color: Colors.white,

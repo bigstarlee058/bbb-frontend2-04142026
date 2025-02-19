@@ -155,7 +155,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
     return Slidable(
       enabled: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted ? false : true,
-      endActionPane: widget.isCircuit
+      endActionPane: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted
           ? null
           : widget.enabled
               ? ActionPane(

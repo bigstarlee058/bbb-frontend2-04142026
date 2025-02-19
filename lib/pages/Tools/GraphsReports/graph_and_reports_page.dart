@@ -458,7 +458,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                           width: media.width,
                         ),
                         SizedBox(
-                          height: media.height * 2,
+                          height: media.height,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
