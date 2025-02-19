@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/select_dropdown.dart';
@@ -530,8 +532,17 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                     Color buttonColor = AppColors.primaryColor;
 
                     if (currentDayTitle.contains("Rest Day") && monthProvider.isPastWeek) {
-                      buttonText = monthProvider.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped";
-                      onPress = null;
+                      if (monthProvider.isPumpDay) {
+                        buttonText = "View the workout";
+                        onPress = () {
+                          Navigator.pushNamed(context, '/today');
+                        };
+                        log('0 :::::::::::::::::: 0');
+                      } else {
+                        buttonText = monthProvider.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped";
+                        onPress = null;
+                        log('1 :::::::::::::::::: 1');
+                      }
                     } else if (monthProvider.isPumpDay &&
                         !monthProvider.isPastWeek &&
                         monthProvider.dayHistoryDetails?.status == Status.skipped) {
@@ -542,6 +553,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                         // Navigator.pop(context);
                         Navigator.pushNamed(context, '/today');
                       };
+                      log('2 :::::::::::::::::: 2');
                     } else if (monthProvider.isPastWeek ||
                         (monthProvider.isPumpDay &&
                             (monthProvider.dayHistoryDetails?.status == Status.completed ||
@@ -553,11 +565,16 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                         // Navigator.pop(context);
                         Navigator.pushNamed(context, '/today');
                       };
+                      log('3 :::::::::::::::::: 3');
                     } else if (currentDayTitle.contains("Rest Day") && (monthProvider.isPumpDay)) {
                       if (monthProvider.dayHistoryDetails?.status == Status.skipped ||
                           monthProvider.dayHistoryDetails?.status == Status.completed) {
+                        log('4 :::::::::::::::::: 4');
+
                         return const SizedBox();
                       } else {
+                        log('5 :::::::::::::::::: 5');
+
                         buttonText = !monthProvider.isPumpDay
                             ? "Mark Complete"
                             : monthProvider.dayHistoryDetails?.status == Status.started ||
@@ -726,10 +743,15 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                         // );
                       }
                     } else {
-                      if (currentDayTitle.contains("Rest Day") && monthProvider.dayHistoryDetails?.status == Status.skipped ||
-                          monthProvider.dayHistoryDetails?.status == Status.completed) {
+                      if (currentDayTitle.contains("Rest Day") &&
+                          (monthProvider.dayHistoryDetails?.status == Status.skipped ||
+                              monthProvider.dayHistoryDetails?.status == Status.completed)) {
+                        log('7 :::::::::::::::::: 7');
+
                         return const SizedBox();
                       }
+                      log('8 :::::::::::::::::: 8');
+
                       buttonText = currentDayTitle.contains("Rest Day")
                           ? "Mark Complete"
                           : monthProvider.dayHistoryDetails?.status == Status.started ||

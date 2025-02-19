@@ -104,8 +104,7 @@ class _ExercisePageState extends State<ExercisePage> {
     monthProvider!.selectedExIndex = payloadModel.exerciseIndex!;
 
     isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-    isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped;
-
+    isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
     if (monthProvider!.isPumpDay) {
       await monthProvider?.fetchDayStatusLocalData();
 
@@ -190,7 +189,7 @@ class _ExercisePageState extends State<ExercisePage> {
 
       await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
       isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-      isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped;
+      isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
       isCurrentExerciseCompleted = monthProvider?.exerciseHistoryDetails?.status == Status.completed;
       isCurrentExerciseSkipped = monthProvider?.exerciseHistoryDetails?.status == Status.skipped;
       isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);

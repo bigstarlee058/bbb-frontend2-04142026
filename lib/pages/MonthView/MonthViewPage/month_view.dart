@@ -312,6 +312,10 @@ class _MonthViewState extends State<MonthView> {
                         ),
                         Consumer<MonthProvider>(
                           builder: (context, value, child) {
+                            if (value.week! > 4) {
+                              return const SizedBox();
+                            }
+
                             String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
 
                             return value.isFilterLoading

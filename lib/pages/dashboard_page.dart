@@ -137,13 +137,14 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     if (dataProvider == null || userData == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
     }
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomMaterialIndicator(
+        color: AppColors.primaryColor,
         onRefresh: onRefresh,
         child: SingleChildScrollView(
           // controller: _scrollController,
@@ -228,6 +229,11 @@ class _DashboardPageState extends State<DashboardPage> {
                                       if (monthData.monthDataModel?.weeks == null || monthData.loader) {
                                         return const SizedBox();
                                       }
+
+                                      if (monthData.week! > 4) {
+                                        return const SizedBox();
+                                      }
+
                                       if (monthData.todayTitleId.isNotEmpty) {
                                         int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList
                                             ?.indexWhere((element) => element == monthData.todayTitleId);
@@ -488,14 +494,23 @@ class _DashboardPageState extends State<DashboardPage> {
                             builder: (context, value, child) {
                               if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
 
-                              final val1 = (value.currentWeek - 1) * 7;
+                              final startTime = value.startTime ?? DateTime.now();
+
+                              int dayDelta = DateTime(today.year, today.month, today.day)
+                                  .difference(DateTime(startTime.year, startTime.month, startTime.day))
+                                  .inDays;
+
+                              int week = (dayDelta ~/ 7) + 1;
+
+                              final val1 = (week - 1) * 7;
+
                               final val2 = value.allDayHistoryModel.where((element) =>
                                   element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
                                   element.split == value.splitType &&
                                   element.monthId == value.monthDataModel?.id &&
                                   (element.status == "Completed" || element.status == "Skipped"));
 
-                              final count = val2.length + val1;
+                              final count = week > 4 ? val1 : val1 + val2.length;
 
                               return Column(
                                 children: [
