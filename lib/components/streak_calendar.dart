@@ -26,7 +26,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    debugPrint("this is streak page ${monthProvider?.routeString}");
     super.initState();
   }
 

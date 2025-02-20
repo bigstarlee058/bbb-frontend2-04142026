@@ -82,19 +82,15 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<void> fetchExtraAddedExercise() async {
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) => setState(
-          () {
-            exercises = [];
-            loader = true;
-            exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
-            totalWarmups =
-                monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
-          },
-        ),
-      );
-    }
+    setState(
+      () {
+        exercises = [];
+        loader = true;
+        exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
+        totalWarmups =
+            monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
+      },
+    );
 
     await monthProvider?.fetchExtraAddedExerciseData().then(
       (value) {
@@ -1256,7 +1252,7 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> swipeExerciseDialog(int selectedIndex, dynamic exercise) async {
     monthProvider?.fetchAllExercise();
     monthProvider?.fetchRelatedExercise(exercise.exerciseId ?? "");
-
+    searchQuery = "";
     if (mounted) {
       return showDialog(
         context: context,
@@ -1264,8 +1260,12 @@ class _TodayPageState extends State<TodayPage> {
           var media = MediaQuery.of(context).size;
           int? selectRelatedExerciseSwapIndex;
           int? selectExerciseSwapIndex;
-          int itemsPerPage = monthProvider!.relatedExercises.isEmpty ? 4 : 3;
-          int itemsPerPageRelated = 1;
+          int itemsPerPage = monthProvider!.relatedExercises.isEmpty
+              ? 4
+              : monthProvider!.relatedExercises.length > 2
+                  ? 2
+                  : 3;
+          int itemsPerPageRelated = 2;
           int currentPageRelated = 0;
           int currentPageAll = 0;
 
@@ -1279,7 +1279,7 @@ class _TodayPageState extends State<TodayPage> {
                       ? ConstrainedBox(
                           constraints: BoxConstraints(
                             maxWidth: ScreenUtil.horizontalScale(96),
-                            maxHeight: ScreenUtil.verticalScale(62),
+                            maxHeight: ScreenUtil.verticalScale(58),
                           ),
                           child: Center(child: CircularProgressIndicator(color: AppColors.primaryColor)),
                         )
@@ -1575,10 +1575,10 @@ class _TodayPageState extends State<TodayPage> {
                                           )
                                         : const Center(
                                             child: Padding(
-                                              padding: EdgeInsets.only(top: 8.0, bottom: 13),
+                                              padding: EdgeInsets.only(top: 12, bottom: 15),
                                               child: Text(
                                                 "No related exercise available!",
-                                                style: TextStyle(fontSize: 14),
+                                                style: TextStyle(fontSize: 18),
                                               ),
                                             ),
                                           ),
@@ -1596,45 +1596,58 @@ class _TodayPageState extends State<TodayPage> {
                                         ),
                                       ),
                                     ),
-                                    SearchEquipmentField(
-                                      onChanged: (query) {
-                                        setState(() {
-                                          searchQuery = query;
-                                          currentPageAll = 0;
-                                          monthProvider?.fetchAllFilterEx(query);
-                                        });
-                                      },
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 5),
+                                      child: SearchEquipmentField(
+                                        onChanged: (query) {
+                                          setState(() {
+                                            searchQuery = query;
+                                            currentPageAll = 0;
+                                            monthProvider?.fetchAllFilterEx(query);
+                                          });
+                                        },
+                                      ),
                                     ),
-                                    monthProvider!.allFilterExercises.isNotEmpty
-                                        ? Column(
-                                            children: [
-                                              ConstrainedBox(
-                                                constraints: BoxConstraints(
-                                                  maxHeight: ScreenUtil.verticalScale(60),
-                                                ),
-                                                child: SingleChildScrollView(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                    child: Column(
-                                                      children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll),
+                                    searchQuery.isEmpty
+                                        ? SizedBox(
+                                            height: media.width * 0.4,
+                                          )
+                                        : monthProvider!.allFilterExercises.isNotEmpty
+                                            ? Column(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints: BoxConstraints(
+                                                      maxHeight: ScreenUtil.verticalScale(60),
                                                     ),
+                                                    child: SingleChildScrollView(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                        child: Column(
+                                                          children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  buildPaginationControls(
+                                                    currentPageAll,
+                                                    monthProvider!.allFilterExercises.length,
+                                                    (page) {
+                                                      setState(() {
+                                                        currentPageAll = page;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              )
+                                            : Padding(
+                                                padding: const EdgeInsets.only(bottom: 5),
+                                                child: Center(
+                                                  child: Text(
+                                                    "No exercise available!",
+                                                    style: TextStyle(fontSize: 18),
                                                   ),
                                                 ),
                                               ),
-                                              buildPaginationControls(
-                                                currentPageAll,
-                                                monthProvider!.allFilterExercises.length,
-                                                (page) {
-                                                  setState(() {
-                                                    currentPageAll = page;
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          )
-                                        : Center(
-                                            child: Text("No exercise available"),
-                                          ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                                       child: Row(
@@ -1905,7 +1918,7 @@ class SearchEquipmentField extends StatelessWidget {
         onChanged: onChanged,
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
-          hintText: 'Search Equipment',
+          hintText: 'Search Exercises',
           hintStyle: TextStyle(
             color: Colors.black45,
             fontSize: ScreenUtil.verticalScale(2),
