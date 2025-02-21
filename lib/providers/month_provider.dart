@@ -1104,6 +1104,10 @@ class MonthProvider extends ChangeNotifier {
     streak = 0;
     DateTime? pastDate;
 
+    log('data :::::::::::::::::: ${data.map(
+      (e) => e.endTime,
+    )}');
+
     try {
       for (var element in data) {
         DateTime currentDate = element.endTime!;
@@ -1112,9 +1116,11 @@ class MonthProvider extends ChangeNotifier {
         DateTime now = DateTime.now();
         DateTime today = DateTime(now.year, now.month, now.day);
 
-        if (today.isAfter(localDay) && today != localDay) {
-          streak = 0;
-          break;
+        if (today != localDay) {
+          if (today.isBefore(localDay)) {
+            streak = 0;
+            break;
+          }
         }
 
         if (pastDate != null) {
