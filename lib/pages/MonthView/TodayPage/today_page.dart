@@ -449,6 +449,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     Padding(
                                                       padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                                       child: WorkoutCard(
+                                                        image: exercises[i].thumbnail ??
+                                                            "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                                                         dataId: dataId,
                                                         isDayCompleted: isCurrentDayCompleted,
                                                         isDaySkipped: isCurrentDaySkipped,
@@ -462,12 +464,13 @@ class _TodayPageState extends State<TodayPage> {
                                                         exerciseIndex: i,
                                                         onPress: (Function()? function) async {
                                                           await onPressed(
-                                                                  i,
-                                                                  dataId,
-                                                                  i ==
-                                                                      exercises.indexWhere(
-                                                                          (element) => element.exerciseId == exercises.last.exerciseId))
-                                                              .then(
+                                                            i,
+                                                            dataId,
+                                                            i ==
+                                                                exercises.indexWhere(
+                                                                  (element) => element.exerciseId == exercises.last.exerciseId,
+                                                                ),
+                                                          ).then(
                                                             (value) {
                                                               function!();
                                                             },
@@ -735,7 +738,7 @@ class _TodayPageState extends State<TodayPage> {
                     networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
                         ? monthProvider.warmUpModel?.thumbnail ??
                             "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                        : monthProvider.warmUpModel?.thumbnail ?? "",
+                        : monthProvider.warmUpModel?.thumbnail ?? "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                     borderRadius: BorderRadius.all(
                       Radius.circular(ScreenUtil.verticalScale(1)),
                     ),
@@ -956,7 +959,7 @@ class _TodayPageState extends State<TodayPage> {
                                 maxHeight: ScreenUtil.verticalScale(65),
                               ),
                               child: Builder(builder: (context) {
-                                List<Widget> buildExerciseList(List exercises, int currentPage, bool isAll) {
+                                List<Widget> buildExerciseList(List<Exercise> exercises, int currentPage, bool isAll) {
                                   int startIndex = currentPage * itemsPerPage + (!isAll ? 0 : monthProvider!.relatedExercises.length);
                                   int endIndex =
                                       (startIndex + itemsPerPage) > exercises.length + (!isAll ? 0 : monthProvider!.relatedExercises.length)
@@ -977,23 +980,21 @@ class _TodayPageState extends State<TodayPage> {
                                             Expanded(
                                               child: Row(
                                                 children: [
-                                                  Container(
+                                                  appShimmerImage(
                                                     width: ScreenUtil.horizontalScale(10),
                                                     height: ScreenUtil.horizontalScale(10),
-                                                    decoration: BoxDecoration(
-                                                      image: const DecorationImage(
-                                                        image: AssetImage('assets/img/card.png'),
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                      borderRadius: BorderRadius.all(
-                                                        Radius.circular(ScreenUtil.horizontalScale(1)),
-                                                      ),
+                                                    networkImageUrl:
+                                                        exercises[i - (!isAll ? 0 : monthProvider!.relatedExercises.length)].thumbnail ??
+                                                            "",
+                                                    fit: BoxFit.cover,
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(ScreenUtil.horizontalScale(1)),
                                                     ),
                                                   ),
                                                   SizedBox(width: ScreenUtil.horizontalScale(2)),
                                                   Flexible(
                                                       child: Text(
-                                                    exercises[i - (!isAll ? 0 : monthProvider!.relatedExercises.length)].title,
+                                                    exercises[i - (!isAll ? 0 : monthProvider!.relatedExercises.length)].title ?? "",
                                                     style: TextStyle(
                                                       color: Colors.black,
                                                       fontSize: ScreenUtil.verticalScale(2),
@@ -1164,6 +1165,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     rest: exercises[0].rest ?? 0,
                                                     weight: exercises[0].weight ?? 0,
                                                     formats: exercises[0].formats ?? [],
+                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                                                     extra: exercises[0].extra ?? [],
                                                   );
                                                 } else {
@@ -1173,6 +1176,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     typeId: 1,
                                                     name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
                                                         "Exercise ${exercises.length + 1}",
+                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                                                     guide: "",
                                                     sets: 5,
                                                     reps: 10,
@@ -1215,7 +1220,6 @@ class _TodayPageState extends State<TodayPage> {
                                                     .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
                                                 await monthProvider?.fetchExtraAddedExerciseData();
                                                 setState(() {});
-                                                await Future.delayed(Duration(milliseconds: 100));
                                                 if (!context.mounted) return;
                                                 Navigator.pop(context);
                                               },
@@ -1290,7 +1294,7 @@ class _TodayPageState extends State<TodayPage> {
                               maxHeight: ScreenUtil.verticalScale(70),
                             ),
                             child: Builder(builder: (context) {
-                              List<Widget> buildExerciseList(List exercises, int currentPage) {
+                              List<Widget> buildExerciseList(List<Exercise> exercises, int currentPage) {
                                 int startIndex = currentPage * itemsPerPage;
                                 int endIndex =
                                     (startIndex + itemsPerPage) > exercises.length ? exercises.length : startIndex + itemsPerPage;
@@ -1310,23 +1314,20 @@ class _TodayPageState extends State<TodayPage> {
                                           Expanded(
                                             child: Row(
                                               children: [
-                                                Container(
+                                                appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  decoration: BoxDecoration(
-                                                    image: const DecorationImage(
-                                                      image: AssetImage('assets/img/card.png'),
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(ScreenUtil.horizontalScale(1)),
-                                                    ),
+                                                  networkImageUrl: exercises[i - (0)].thumbnail ??
+                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  fit: BoxFit.cover,
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(ScreenUtil.horizontalScale(1)),
                                                   ),
                                                 ),
                                                 SizedBox(width: ScreenUtil.horizontalScale(2)),
                                                 Flexible(
                                                     child: Text(
-                                                  exercises[i - (0)].title,
+                                                  exercises[i - (0)].title ?? "",
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: ScreenUtil.verticalScale(2),
@@ -1397,7 +1398,7 @@ class _TodayPageState extends State<TodayPage> {
                                 );
                               }
 
-                              List<Widget> buildRelatedExerciseList(List exercises, int currentPage) {
+                              List<Widget> buildRelatedExerciseList(List<RelatedExercises> exercises, int currentPage) {
                                 int startIndex = currentPage * itemsPerPageRelated;
                                 int endIndex = (startIndex + itemsPerPageRelated) > exercises.length
                                     ? exercises.length
@@ -1419,23 +1420,20 @@ class _TodayPageState extends State<TodayPage> {
                                           Expanded(
                                             child: Row(
                                               children: [
-                                                Container(
+                                                appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  decoration: BoxDecoration(
-                                                    image: const DecorationImage(
-                                                      image: AssetImage('assets/img/card.png'),
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(ScreenUtil.horizontalScale(1)),
-                                                    ),
+                                                  networkImageUrl: exercises[i].thumbnail ??
+                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  fit: BoxFit.cover,
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(ScreenUtil.horizontalScale(1)),
                                                   ),
                                                 ),
                                                 SizedBox(width: ScreenUtil.horizontalScale(2)),
                                                 Flexible(
                                                     child: Text(
-                                                  exercises[i].title,
+                                                  exercises[i].title ?? "",
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: ScreenUtil.verticalScale(2),
@@ -1575,10 +1573,10 @@ class _TodayPageState extends State<TodayPage> {
                                           )
                                         : const Center(
                                             child: Padding(
-                                              padding: EdgeInsets.only(top: 12, bottom: 15),
+                                              padding: EdgeInsets.only(top: 12, bottom: 18),
                                               child: Text(
                                                 "No related exercise available!",
-                                                style: TextStyle(fontSize: 18),
+                                                style: TextStyle(fontSize: 16),
                                               ),
                                             ),
                                           ),
@@ -1683,7 +1681,11 @@ class _TodayPageState extends State<TodayPage> {
                                                 id: "",
                                                 exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
                                                 typeId: exercises[selectedIndex].typeId ?? 1,
-                                                name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                                thumbnail: exerciseDataModel?.thumbnail ??
+                                                    relatedExerciseData?.thumbnail ??
+                                                    "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                name: exerciseDataModel?.title ??
+                                                    relatedExerciseData?.title ??
                                                     "Exercise ${exercises.length + 1}",
                                                 guide: exercises[selectedIndex].guide ?? "",
                                                 sets: exercises[selectedIndex].sets ?? 0,
@@ -1730,7 +1732,6 @@ class _TodayPageState extends State<TodayPage> {
                                               await monthProvider?.fetchSwapExerciseData();
                                               await removeExercise(exercise.exerciseId ?? "");
                                               setState(() {});
-                                              await Future.delayed(Duration(milliseconds: 100));
                                               if (!context.mounted) return;
                                               Navigator.pop(context);
                                             },

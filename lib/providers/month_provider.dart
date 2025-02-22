@@ -21,7 +21,7 @@ import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -854,7 +854,6 @@ class MonthProvider extends ChangeNotifier {
 
       url = Uri.http(url.authority, url.path);
       String? userIdToken = await getAuthToken();
-
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -1104,9 +1103,7 @@ class MonthProvider extends ChangeNotifier {
     streak = 0;
     DateTime? pastDate;
 
-    log('data :::::::::::::::::: ${data.map(
-      (e) => e.endTime,
-    )}');
+    log('data :::::::::::::::::: ${data.map((e) => e.endTime)}');
 
     try {
       for (var element in data) {
@@ -1908,7 +1905,15 @@ class MonthProvider extends ChangeNotifier {
 
   List<Map<String, dynamic>> reportProcessWeightLiftedGraphData(List<Map<String, dynamic>> data) {
     totalWeightLiftedInAWeek = 0;
-    List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    List<String> allDays = [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun",
+    ];
 
     try {
       for (String day in allDays) {
