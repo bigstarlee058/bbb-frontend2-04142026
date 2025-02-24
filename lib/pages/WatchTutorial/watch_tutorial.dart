@@ -294,7 +294,7 @@ class _WatchTutorialState extends State<WatchTutorial> {
                           child: Text(tutorialDesc,
                               textAlign: TextAlign.start,
                               style: const TextStyle(
-                                fontSize: 20, // Customize font size for better readability
+                                fontSize: 18, // Customize font size for better readability
                                 color: Colors.black,
                               )))),
                   SizedBox(height: ScreenUtil.verticalScale(2)),

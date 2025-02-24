@@ -36,6 +36,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     ScreenUtil.init(context);
 
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => monthProvider?.manageStreak(),
+      // ),
       backgroundColor: const Color.fromARGB(255, 52, 11, 11),
       body: Stack(
         children: [

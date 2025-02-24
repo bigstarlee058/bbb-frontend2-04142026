@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -70,9 +71,13 @@ class _TodayPageState extends State<TodayPage> {
             fetchWarmupData();
             monthProvider?.fetchExerciseStatusLocalData();
             fetchRemovedExerciseLocalData();
-
+            log(' monthProvider?.dayHistoryDetails? :::::::::::::::::: ${jsonEncode(monthProvider?.dayHistoryDetails)}');
+            log('monthProvider?.actualWeek :::::::::::::::::: ${monthProvider?.actualWeek}');
             isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-            isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
+            isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+                monthProvider?.dayHistoryDetails == null ||
+                (monthProvider!.actualWeek! > 4 && monthProvider?.dayHistoryDetails?.status == Status.started);
+
             monthProvider?.fetchAllExercise();
           },
         );
@@ -84,11 +89,15 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> fetchExtraAddedExercise() async {
     setState(
       () {
+        log('monthProvider!.dayDataModel!.exercises! :::::::::::::::::: ${monthProvider!.dayDataModel!.exercises!}');
         exercises = [];
+        log('exercises :::::::::::::::::: ${exercises.length}');
         loader = true;
         exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
         totalWarmups =
             monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
+
+        log('exercises :::::::::::::::::: ${exercises.length}');
       },
     );
 
@@ -228,10 +237,15 @@ class _TodayPageState extends State<TodayPage> {
 
   @override
   Widget build(BuildContext context) {
+    log('isCurrentDaySkipped :::::::::::::::::: $isCurrentDaySkipped');
+
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => fetchExtraAddedExercise(),
+      // ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -458,9 +472,10 @@ class _TodayPageState extends State<TodayPage> {
                                                         isCircuit: false,
                                                         isCompleted: monthProvider!.exerciseHistoryModel.any(
                                                             (element) => element.dataId == dataId && element.status == Status.completed),
-                                                        isSkipped: monthProvider!.exerciseHistoryModel.any((element) =>
-                                                                element.dataId == dataId && element.status == Status.skipped) ||
-                                                            isExist,
+                                                        isSkipped: (monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                    element.dataId == dataId && element.status == Status.skipped) ||
+                                                                isExist) ||
+                                                            isCurrentDaySkipped,
                                                         exerciseIndex: i,
                                                         onPress: (Function()? function) async {
                                                           await onPressed(
@@ -531,9 +546,8 @@ class _TodayPageState extends State<TodayPage> {
                               ),
                               const SizedBox(height: 36),
                               monthProvider?.dayHistoryDetails == null ||
-                                      (monthProvider?.dayHistoryDetails?.status == Status.skipped ||
-                                              monthProvider?.dayHistoryDetails?.status == Status.completed) &&
-                                          monthProvider!.isPastWeek
+                                      (isCurrentDaySkipped || isCurrentDayCompleted) ||
+                                      monthProvider!.isPastWeek
                                   ? Container(
                                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                       child: ButtonWidget(

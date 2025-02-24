@@ -444,12 +444,14 @@ class MonthProvider extends ChangeNotifier {
               endTime = monthDataModel?.endDate ?? DateTime.now();
 
               filter();
+
               int dayDelta = DateTime(today.year, today.month, today.day)
                   .difference(DateTime(startTime!.year, startTime!.month, startTime!.day))
                   .inDays;
               actualWeek = (dayDelta ~/ 7) + 1;
               week = actualWeek! > 4 ? 4 : actualWeek;
               day = dayDelta % 7 + 1;
+
               currentWeek = week!;
 
               await fetchMonthLocalData();
@@ -1103,35 +1105,48 @@ class MonthProvider extends ChangeNotifier {
     streak = 0;
     DateTime? pastDate;
 
-    log('data :::::::::::::::::: ${data.map((e) => e.endTime)}');
-
+    DateTime today = DateTime.now();
+    DateTime currentDate = DateTime(today.year, today.month, today.day);
+    log('data :::::::::::::::::: $data');
+    List<DayHistoryModel> filteredDataList = data.where((e) {
+      DateTime date = e.endTime ?? e.startTime!;
+      DateTime localTime = date.toLocal();
+      DateTime localDay = DateTime(localTime.year, localTime.month, localTime.day);
+      return localDay.isBefore(currentDate) || localDay.isAtSameMomentAs(currentDate);
+    }).toList();
+    log('filteredDataList :::::::::::::::::: ${filteredDataList.map((e) => e.endTime)}');
     try {
-      for (var element in data) {
+      if (filteredDataList.length == 1) {
+        DateTime currentDate = filteredDataList[0].endTime ?? filteredDataList[0].startTime!;
+        DateTime localTime = currentDate.toLocal();
+        DateTime localDay = DateTime(localTime.year, localTime.month, localTime.day);
+        pastDate = localDay;
+      }
+
+      for (var element in filteredDataList) {
         DateTime currentDate = element.endTime!;
         DateTime localTime = currentDate.toLocal();
         DateTime localDay = DateTime(localTime.year, localTime.month, localTime.day);
+
+        DateTime currentDate1 = filteredDataList[0].endTime ?? filteredDataList[0].startTime!;
+        DateTime localTime1 = currentDate1.toLocal();
+        DateTime localDay1 = DateTime(localTime1.year, localTime1.month, localTime1.day);
+
         DateTime now = DateTime.now();
         DateTime today = DateTime(now.year, now.month, now.day);
-
-        if (today != localDay) {
-          if (today.isBefore(localDay)) {
+        DateTime firstDay = DateTime(localDay1.year, localDay1.month, localDay1.day);
+        if (firstDay != today) {
+          int difference = today.difference(firstDay).inDays;
+          if (difference > 1) {
+            log('difference > 1 :::::$difference::::::::::::: ${difference > 1}');
             streak = 0;
             break;
           }
         }
 
         if (pastDate != null) {
-          DateTime pastDay = DateTime(pastDate.year, pastDate.month, pastDate.day);
-
-          if (pastDay != today) {
-            int difference = today.difference(pastDay).inDays;
-            if (difference > 1) {
-              streak = 0;
-              break;
-            }
-          }
-
           int difference = pastDate.difference(localDay).inDays;
+
           if (difference > 1) {
             break;
           }
@@ -1141,7 +1156,7 @@ class MonthProvider extends ChangeNotifier {
         } else {
           break;
         }
-        pastDate = localTime;
+        pastDate = localDay;
       }
     } catch (e) {
       debugPrint('Error managing streak: $e');
