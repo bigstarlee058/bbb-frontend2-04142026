@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -70,9 +71,13 @@ class _TodayPageState extends State<TodayPage> {
             fetchWarmupData();
             monthProvider?.fetchExerciseStatusLocalData();
             fetchRemovedExerciseLocalData();
-
+            log(' monthProvider?.dayHistoryDetails? :::::::::::::::::: ${jsonEncode(monthProvider?.dayHistoryDetails)}');
+            log('monthProvider?.actualWeek :::::::::::::::::: ${monthProvider?.actualWeek}');
             isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-            isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
+            isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+                monthProvider?.dayHistoryDetails == null ||
+                (monthProvider!.actualWeek! > 4 && monthProvider?.dayHistoryDetails?.status == Status.started);
+
             monthProvider?.fetchAllExercise();
           },
         );
@@ -82,19 +87,19 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<void> fetchExtraAddedExercise() async {
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) => setState(
-          () {
-            exercises = [];
-            loader = true;
-            exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
-            totalWarmups =
-                monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
-          },
-        ),
-      );
-    }
+    setState(
+      () {
+        log('monthProvider!.dayDataModel!.exercises! :::::::::::::::::: ${monthProvider!.dayDataModel!.exercises!}');
+        exercises = [];
+        log('exercises :::::::::::::::::: ${exercises.length}');
+        loader = true;
+        exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
+        totalWarmups =
+            monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
+
+        log('exercises :::::::::::::::::: ${exercises.length}');
+      },
+    );
 
     await monthProvider?.fetchExtraAddedExerciseData().then(
       (value) {
@@ -232,10 +237,15 @@ class _TodayPageState extends State<TodayPage> {
 
   @override
   Widget build(BuildContext context) {
+    log('isCurrentDaySkipped :::::::::::::::::: $isCurrentDaySkipped');
+
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => fetchExtraAddedExercise(),
+      // ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -453,6 +463,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     Padding(
                                                       padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                                       child: WorkoutCard(
+                                                        image: exercises[i].thumbnail ??
+                                                            "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                                                         dataId: dataId,
                                                         isDayCompleted: isCurrentDayCompleted,
                                                         isDaySkipped: isCurrentDaySkipped,
@@ -460,18 +472,20 @@ class _TodayPageState extends State<TodayPage> {
                                                         isCircuit: false,
                                                         isCompleted: monthProvider!.exerciseHistoryModel.any(
                                                             (element) => element.dataId == dataId && element.status == Status.completed),
-                                                        isSkipped: monthProvider!.exerciseHistoryModel.any((element) =>
-                                                                element.dataId == dataId && element.status == Status.skipped) ||
-                                                            isExist,
+                                                        isSkipped: (monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                    element.dataId == dataId && element.status == Status.skipped) ||
+                                                                isExist) ||
+                                                            isCurrentDaySkipped,
                                                         exerciseIndex: i,
                                                         onPress: (Function()? function) async {
                                                           await onPressed(
-                                                                  i,
-                                                                  dataId,
-                                                                  i ==
-                                                                      exercises.indexWhere(
-                                                                          (element) => element.exerciseId == exercises.last.exerciseId))
-                                                              .then(
+                                                            i,
+                                                            dataId,
+                                                            i ==
+                                                                exercises.indexWhere(
+                                                                  (element) => element.exerciseId == exercises.last.exerciseId,
+                                                                ),
+                                                          ).then(
                                                             (value) {
                                                               function!();
                                                             },
@@ -532,9 +546,8 @@ class _TodayPageState extends State<TodayPage> {
                               ),
                               const SizedBox(height: 36),
                               monthProvider?.dayHistoryDetails == null ||
-                                      (monthProvider?.dayHistoryDetails?.status == Status.skipped ||
-                                              monthProvider?.dayHistoryDetails?.status == Status.completed) &&
-                                          monthProvider!.isPastWeek
+                                      (isCurrentDaySkipped || isCurrentDayCompleted) ||
+                                      monthProvider!.isPastWeek
                                   ? Container(
                                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                       child: ButtonWidget(
@@ -739,7 +752,7 @@ class _TodayPageState extends State<TodayPage> {
                     networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
                         ? monthProvider.warmUpModel?.thumbnail ??
                             "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                        : monthProvider.warmUpModel?.thumbnail ?? "",
+                        : monthProvider.warmUpModel?.thumbnail ?? "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                     borderRadius: BorderRadius.all(
                       Radius.circular(ScreenUtil.verticalScale(1)),
                     ),
@@ -960,7 +973,7 @@ class _TodayPageState extends State<TodayPage> {
                                 maxHeight: ScreenUtil.verticalScale(65),
                               ),
                               child: Builder(builder: (context) {
-                                List<Widget> buildExerciseList(List exercises, int currentPage, bool isAll) {
+                                List<Widget> buildExerciseList(List<Exercise> exercises, int currentPage, bool isAll) {
                                   int startIndex = currentPage * itemsPerPage + (!isAll ? 0 : monthProvider!.relatedExercises.length);
                                   int endIndex =
                                       (startIndex + itemsPerPage) > exercises.length + (!isAll ? 0 : monthProvider!.relatedExercises.length)
@@ -981,23 +994,21 @@ class _TodayPageState extends State<TodayPage> {
                                             Expanded(
                                               child: Row(
                                                 children: [
-                                                  Container(
+                                                  appShimmerImage(
                                                     width: ScreenUtil.horizontalScale(10),
                                                     height: ScreenUtil.horizontalScale(10),
-                                                    decoration: BoxDecoration(
-                                                      image: const DecorationImage(
-                                                        image: AssetImage('assets/img/card.png'),
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                      borderRadius: BorderRadius.all(
-                                                        Radius.circular(ScreenUtil.horizontalScale(1)),
-                                                      ),
+                                                    networkImageUrl:
+                                                        exercises[i - (!isAll ? 0 : monthProvider!.relatedExercises.length)].thumbnail ??
+                                                            "",
+                                                    fit: BoxFit.cover,
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(ScreenUtil.horizontalScale(1)),
                                                     ),
                                                   ),
                                                   SizedBox(width: ScreenUtil.horizontalScale(2)),
                                                   Flexible(
                                                       child: Text(
-                                                    exercises[i - (!isAll ? 0 : monthProvider!.relatedExercises.length)].title,
+                                                    exercises[i - (!isAll ? 0 : monthProvider!.relatedExercises.length)].title ?? "",
                                                     style: TextStyle(
                                                       color: Colors.black,
                                                       fontSize: ScreenUtil.verticalScale(2),
@@ -1168,6 +1179,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     rest: exercises[0].rest ?? 0,
                                                     weight: exercises[0].weight ?? 0,
                                                     formats: exercises[0].formats ?? [],
+                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                                                     extra: exercises[0].extra ?? [],
                                                   );
                                                 } else {
@@ -1177,6 +1190,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     typeId: 1,
                                                     name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
                                                         "Exercise ${exercises.length + 1}",
+                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
                                                     guide: "",
                                                     sets: 5,
                                                     reps: 10,
@@ -1219,7 +1234,6 @@ class _TodayPageState extends State<TodayPage> {
                                                     .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
                                                 await monthProvider?.fetchExtraAddedExerciseData();
                                                 setState(() {});
-                                                await Future.delayed(Duration(milliseconds: 100));
                                                 if (!context.mounted) return;
                                                 Navigator.pop(context);
                                               },
@@ -1256,7 +1270,7 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> swipeExerciseDialog(int selectedIndex, dynamic exercise) async {
     monthProvider?.fetchAllExercise();
     monthProvider?.fetchRelatedExercise(exercise.exerciseId ?? "");
-
+    searchQuery = "";
     if (mounted) {
       return showDialog(
         context: context,
@@ -1264,8 +1278,12 @@ class _TodayPageState extends State<TodayPage> {
           var media = MediaQuery.of(context).size;
           int? selectRelatedExerciseSwapIndex;
           int? selectExerciseSwapIndex;
-          int itemsPerPage = monthProvider!.relatedExercises.isEmpty ? 4 : 3;
-          int itemsPerPageRelated = 1;
+          int itemsPerPage = monthProvider!.relatedExercises.isEmpty
+              ? 4
+              : monthProvider!.relatedExercises.length > 2
+                  ? 2
+                  : 3;
+          int itemsPerPageRelated = 2;
           int currentPageRelated = 0;
           int currentPageAll = 0;
 
@@ -1279,7 +1297,7 @@ class _TodayPageState extends State<TodayPage> {
                       ? ConstrainedBox(
                           constraints: BoxConstraints(
                             maxWidth: ScreenUtil.horizontalScale(96),
-                            maxHeight: ScreenUtil.verticalScale(62),
+                            maxHeight: ScreenUtil.verticalScale(58),
                           ),
                           child: Center(child: CircularProgressIndicator(color: AppColors.primaryColor)),
                         )
@@ -1290,7 +1308,7 @@ class _TodayPageState extends State<TodayPage> {
                               maxHeight: ScreenUtil.verticalScale(70),
                             ),
                             child: Builder(builder: (context) {
-                              List<Widget> buildExerciseList(List exercises, int currentPage) {
+                              List<Widget> buildExerciseList(List<Exercise> exercises, int currentPage) {
                                 int startIndex = currentPage * itemsPerPage;
                                 int endIndex =
                                     (startIndex + itemsPerPage) > exercises.length ? exercises.length : startIndex + itemsPerPage;
@@ -1310,23 +1328,20 @@ class _TodayPageState extends State<TodayPage> {
                                           Expanded(
                                             child: Row(
                                               children: [
-                                                Container(
+                                                appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  decoration: BoxDecoration(
-                                                    image: const DecorationImage(
-                                                      image: AssetImage('assets/img/card.png'),
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(ScreenUtil.horizontalScale(1)),
-                                                    ),
+                                                  networkImageUrl: exercises[i - (0)].thumbnail ??
+                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  fit: BoxFit.cover,
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(ScreenUtil.horizontalScale(1)),
                                                   ),
                                                 ),
                                                 SizedBox(width: ScreenUtil.horizontalScale(2)),
                                                 Flexible(
                                                     child: Text(
-                                                  exercises[i - (0)].title,
+                                                  exercises[i - (0)].title ?? "",
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: ScreenUtil.verticalScale(2),
@@ -1397,7 +1412,7 @@ class _TodayPageState extends State<TodayPage> {
                                 );
                               }
 
-                              List<Widget> buildRelatedExerciseList(List exercises, int currentPage) {
+                              List<Widget> buildRelatedExerciseList(List<RelatedExercises> exercises, int currentPage) {
                                 int startIndex = currentPage * itemsPerPageRelated;
                                 int endIndex = (startIndex + itemsPerPageRelated) > exercises.length
                                     ? exercises.length
@@ -1419,23 +1434,20 @@ class _TodayPageState extends State<TodayPage> {
                                           Expanded(
                                             child: Row(
                                               children: [
-                                                Container(
+                                                appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  decoration: BoxDecoration(
-                                                    image: const DecorationImage(
-                                                      image: AssetImage('assets/img/card.png'),
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(ScreenUtil.horizontalScale(1)),
-                                                    ),
+                                                  networkImageUrl: exercises[i].thumbnail ??
+                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  fit: BoxFit.cover,
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(ScreenUtil.horizontalScale(1)),
                                                   ),
                                                 ),
                                                 SizedBox(width: ScreenUtil.horizontalScale(2)),
                                                 Flexible(
                                                     child: Text(
-                                                  exercises[i].title,
+                                                  exercises[i].title ?? "",
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: ScreenUtil.verticalScale(2),
@@ -1575,10 +1587,10 @@ class _TodayPageState extends State<TodayPage> {
                                           )
                                         : const Center(
                                             child: Padding(
-                                              padding: EdgeInsets.only(top: 8.0, bottom: 13),
+                                              padding: EdgeInsets.only(top: 12, bottom: 18),
                                               child: Text(
                                                 "No related exercise available!",
-                                                style: TextStyle(fontSize: 14),
+                                                style: TextStyle(fontSize: 16),
                                               ),
                                             ),
                                           ),
@@ -1596,45 +1608,58 @@ class _TodayPageState extends State<TodayPage> {
                                         ),
                                       ),
                                     ),
-                                    SearchEquipmentField(
-                                      onChanged: (query) {
-                                        setState(() {
-                                          searchQuery = query;
-                                          currentPageAll = 0;
-                                          monthProvider?.fetchAllFilterEx(query);
-                                        });
-                                      },
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 5),
+                                      child: SearchEquipmentField(
+                                        onChanged: (query) {
+                                          setState(() {
+                                            searchQuery = query;
+                                            currentPageAll = 0;
+                                            monthProvider?.fetchAllFilterEx(query);
+                                          });
+                                        },
+                                      ),
                                     ),
-                                    monthProvider!.allFilterExercises.isNotEmpty
-                                        ? Column(
-                                            children: [
-                                              ConstrainedBox(
-                                                constraints: BoxConstraints(
-                                                  maxHeight: ScreenUtil.verticalScale(60),
-                                                ),
-                                                child: SingleChildScrollView(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                    child: Column(
-                                                      children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll),
+                                    searchQuery.isEmpty
+                                        ? SizedBox(
+                                            height: media.width * 0.4,
+                                          )
+                                        : monthProvider!.allFilterExercises.isNotEmpty
+                                            ? Column(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints: BoxConstraints(
+                                                      maxHeight: ScreenUtil.verticalScale(60),
                                                     ),
+                                                    child: SingleChildScrollView(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                        child: Column(
+                                                          children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  buildPaginationControls(
+                                                    currentPageAll,
+                                                    monthProvider!.allFilterExercises.length,
+                                                    (page) {
+                                                      setState(() {
+                                                        currentPageAll = page;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              )
+                                            : Padding(
+                                                padding: const EdgeInsets.only(bottom: 5),
+                                                child: Center(
+                                                  child: Text(
+                                                    "No exercise available!",
+                                                    style: TextStyle(fontSize: 18),
                                                   ),
                                                 ),
                                               ),
-                                              buildPaginationControls(
-                                                currentPageAll,
-                                                monthProvider!.allFilterExercises.length,
-                                                (page) {
-                                                  setState(() {
-                                                    currentPageAll = page;
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          )
-                                        : Center(
-                                            child: Text("No exercise available"),
-                                          ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                                       child: Row(
@@ -1670,7 +1695,11 @@ class _TodayPageState extends State<TodayPage> {
                                                 id: "",
                                                 exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
                                                 typeId: exercises[selectedIndex].typeId ?? 1,
-                                                name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                                thumbnail: exerciseDataModel?.thumbnail ??
+                                                    relatedExerciseData?.thumbnail ??
+                                                    "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                name: exerciseDataModel?.title ??
+                                                    relatedExerciseData?.title ??
                                                     "Exercise ${exercises.length + 1}",
                                                 guide: exercises[selectedIndex].guide ?? "",
                                                 sets: exercises[selectedIndex].sets ?? 0,
@@ -1717,7 +1746,6 @@ class _TodayPageState extends State<TodayPage> {
                                               await monthProvider?.fetchSwapExerciseData();
                                               await removeExercise(exercise.exerciseId ?? "");
                                               setState(() {});
-                                              await Future.delayed(Duration(milliseconds: 100));
                                               if (!context.mounted) return;
                                               Navigator.pop(context);
                                             },
@@ -1905,7 +1933,7 @@ class SearchEquipmentField extends StatelessWidget {
         onChanged: onChanged,
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
-          hintText: 'Search Equipment',
+          hintText: 'Search Exercises',
           hintStyle: TextStyle(
             color: Colors.black45,
             fontSize: ScreenUtil.verticalScale(2),

@@ -56,79 +56,95 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
 
   Widget equipmentCard(String title, String imageurl, String description, String link) {
     var media = MediaQuery.of(context).size;
-    return GestureDetector(
+    return Container(
+      width: media.width,
+      height: ScreenUtil.verticalScale(11),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor,
+        borderRadius: BorderRadius.all(
+          Radius.circular(ScreenUtil.verticalScale(7)),
+        ),
+      ),
+      child: GestureDetector(
         onTap: () {
-          _launchURL(link); // Launch the external URL when tapped
+          _launchURL(link);
         },
-        child: Container(
-          decoration: const BoxDecoration(
-              // color: Color(0xFF000000),
-              ),
-          child: Stack(
-            children: [
-              Container(
-                width: ScreenUtil.horizontalScale(100),
-                height: ScreenUtil.verticalScale(11),
-                margin: const EdgeInsets.symmetric(vertical: 15), // Padding around the background
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(ScreenUtil.verticalScale(7)),
-                  ),
-                ),
-                child: Padding( // Adds left padding
-                  padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(29), right: ScreenUtil.horizontalScale(10)), // Adjust padding as needed
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center, // Centers content vertically
-                    crossAxisAlignment: CrossAxisAlignment.start, // Aligns text to the left
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ScreenUtil.verticalScale(2),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: ScreenUtil.verticalScale(1)), // Spacing between title and description
-                      Text(
-                        description,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ScreenUtil.verticalScale(2),
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2, // Limits to one line
-                        overflow: TextOverflow.ellipsis, // Adds "..." if text is too long
-                      ),
-                    ],
-                  ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                 ),
               ),
-              Positioned(
-                left: 20,
-                top: 10,
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: imageurl.isNotEmpty
-                        ? Image.network(
-                            imageurl.startsWith('https://storage.cloud.google.com/')
-                                ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                : imageurl,
-                            width: ScreenUtil.verticalScale(11) + 10,
-                            height: ScreenUtil.verticalScale(11) + 10,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            'assets/img/warm-up-placeholder.png',
-                            width: ScreenUtil.verticalScale(11) + 10,
-                            height: ScreenUtil.verticalScale(11) + 10,
-                            fit: BoxFit.cover,
-                          )),
+              child: Center(
+                child: imageurl.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                        ),
+                        child: Image.network(
+                          imageurl.startsWith('https://storage.cloud.google.com/')
+                              ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                              : imageurl,
+                          width: ScreenUtil.verticalScale(11),
+                          height: ScreenUtil.verticalScale(11),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                        ),
+                        child: Image.asset(
+                          'assets/img/warm-up-placeholder.png',
+                          width: ScreenUtil.verticalScale(11),
+                          height: ScreenUtil.verticalScale(11),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
               ),
-            ],
-          ),
-        ));
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil.verticalScale(2),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: ScreenUtil.verticalScale(1)),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil.verticalScale(1.7),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 15),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -196,7 +212,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
-                                              dataProvider?.collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+                                              dataProvider?.collectionData =
+                                                  Collections(id: "", title: "", description: "", photo: "", equipments: []);
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                               mainPageProvider.changeTab(0);
                                             },
@@ -264,10 +281,10 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                     ),
                   ],
                 ),
-                Consumer<DataProvider>(builder: (context, dataProvider, child) {                  
+                Consumer<DataProvider>(builder: (context, dataProvider, child) {
                   final List<Equipment> equipments = dataProvider.collectionData.equipments
                       .map<Equipment>((e) => Equipment.fromJson(e)) // or `e as Equipment`
-                      .toList();                  
+                      .toList();
                   return equipments.isNotEmpty
                       ? Container(
                           margin: EdgeInsets.only(top: media.height / 2.8),
@@ -283,10 +300,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               margin: EdgeInsets.only(top: media.height / 19, right: 20, left: 20),
                               child: Column(
                                 children: equipments.map((equipment) {
-                                  debugPrint("this is collection view ${equipment.link}");
                                   return Column(
                                     children: [
-                                      const SizedBox(height: 14),
                                       equipmentCard(
                                         equipment.title,
                                         equipment.thumbnail,

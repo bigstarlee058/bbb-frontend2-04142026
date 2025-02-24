@@ -11,6 +11,7 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/payload_model.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/add_notes.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/exercise_set_card.dart';
+import 'package:bbb/pages/MonthView/ExercisePage/exercise_tutorial.dart';
 import 'package:bbb/pages/MonthView/TodayPage/equipment_section.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -56,21 +57,46 @@ class _ExercisePageState extends State<ExercisePage> {
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       argument = ModalRoute.of(context)?.settings.arguments as String?;
       if (argument != "Exercise") {
-        NotificationService.clearNotification();
-        await fromNotification();
+        await fromNotification().then(
+          (value) => clearNotificationAndNavigateExercise(),
+        );
       } else {
-        fetchExercise();
-        NotificationService.clearNotification();
+        await fetchExercise().then(
+          (value) => clearNotificationAndNavigateExercise(),
+        );
       }
     });
 
     super.initState();
   }
 
-  fromNotification() async {
+  clearNotificationAndNavigateExercise() async {
+    String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+    await Future.delayed(Duration(milliseconds: 700));
+    NotificationService.clearNotification().then(
+      (value) {
+        if (isChecked != "true") {
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              insetPadding: EdgeInsets.symmetric(horizontal: 25),
+              child: ExerciseTutorialScreen(),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Future<void> fromNotification() async {
     setState(() {
       loading = true;
     });
@@ -141,7 +167,7 @@ class _ExercisePageState extends State<ExercisePage> {
   List values = [];
   Timer? _hideControlsTimer;
 
-  void fetchExercise({String? exerciseId, int? exerciseIndex, bool? isPumpDay, bool? isCircuit, String? circuitIndex}) async {
+  Future<void> fetchExercise({String? exerciseId, int? exerciseIndex, bool? isPumpDay, bool? isCircuit, String? circuitIndex}) async {
     if (monthProvider?.isWarmup == false) {
       setState(() {
         loading = true;

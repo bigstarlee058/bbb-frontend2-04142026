@@ -9,6 +9,7 @@ import 'package:bbb/pages/CollectionView/collection_detail_page.dart';
 import 'package:bbb/pages/MonthView/DayCompletedPage/day_completed_page.dart';
 import 'package:bbb/pages/MonthView/DayOverviewPage/day_overview.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/excerise_page.dart';
+import 'package:bbb/pages/MonthView/ExercisePage/exercise_tutorial.dart';
 import 'package:bbb/pages/MonthView/TodayPage/today_page.dart';
 import 'package:bbb/pages/Notification/notifications_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/language_page.dart';
@@ -211,6 +212,7 @@ class _MyAppState extends State<MyApp> {
           AppRoutes.todayScreen: (context) => const TodayPage(),
           AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),
           AppRoutes.exerciseScreen: (context) => const ExercisePage(),
+          AppRoutes.exerciseTutorialScreen: (context) => const ExerciseTutorialScreen(),
           AppRoutes.recalculateScreen: (context) => const RecalculatePage(),
           AppRoutes.streakScreen: (context) => const StreakPage(),
           AppRoutes.calendarScreen: (context) => const CalendarPage(),

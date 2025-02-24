@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -437,6 +439,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     // );
     // monthProvider?.changeIsPumpDay(val);
 
+    DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel.firstWhere(
+      (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+      orElse: () => DayHistoryModel(),
+    );
+
+    bool isRestDayForPastWeek =
+        monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek && (!(matchingElement.title ?? "").contains("Pump Day"));
     bool isPumpDay = (isRestDay &&
             monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
@@ -450,7 +459,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider!.isPumpDayAvailable &&
             (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
-    monthProvider?.changeIsPumpDay(isPumpDay);
+    log('isPumpDay :::::::::::::::::: $isPumpDay');
+
+    monthProvider?.changeIsPumpDay(isRestDayForPastWeek ? !isRestDayForPastWeek : isPumpDay);
 
     if (isPumpDay) {
       monthProvider?.updatePumpDayData(monthProvider!.pumpDays[

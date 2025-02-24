@@ -80,7 +80,8 @@ dependencies:
   background_app_bar: ^2.1.0+1
   keyboard_actions: ^4.2.0
   custom_refresh_indicator: ^4.0.1
-
+  pdf:
+  printing:
 
 #  flutter_dotenv: ^5.1.0
 

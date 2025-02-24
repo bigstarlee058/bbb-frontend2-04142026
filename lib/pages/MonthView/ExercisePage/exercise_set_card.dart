@@ -130,7 +130,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     }
     setCompleted = widget.isCompleted;
     await monthProvider?.fetchExerciseHistoryLocalData();
-    if (!context.mounted) return;
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
   }
 
@@ -647,29 +647,48 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                   const SizedBox(height: 8),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: List.generate(5, (index) {
-                                      return ChoiceChip(
-                                        label: Text(effortValue[index]),
-                                        selected: effort == index,
-                                        onSelected: (bool selected) {
-                                          widget.isEditable ? selectEffort(selected ? index : 100) : null;
-                                        },
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(2),
-                                          vertical: ScreenUtil.verticalScale(2),
-                                        ),
-                                        shape: const RoundedRectangleBorder(
-                                          side: BorderSide(color: Colors.white),
-                                        ),
-                                        backgroundColor: Colors.white,
-                                        selectedColor: AppColors.primaryColor,
-                                        labelStyle: TextStyle(
-                                          color: effort == index ? Colors.white : Colors.black,
-                                        ),
-                                        checkmarkColor: Colors.white,
-                                        showCheckmark: true,
-                                      );
-                                    }),
+                                    children: List.generate(
+                                      5,
+                                      (index) {
+                                        return Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            ChoiceChip(
+                                              label: Text(effortValue[index]),
+                                              selected: effort == index,
+                                              onSelected: (bool selected) {
+                                                widget.isEditable ? selectEffort(selected ? index : 100) : null;
+                                              },
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: ScreenUtil.horizontalScale(2),
+                                                vertical: ScreenUtil.verticalScale(2),
+                                              ),
+                                              shape: const RoundedRectangleBorder(
+                                                side: BorderSide(color: Colors.white),
+                                              ),
+                                              backgroundColor: Colors.white,
+                                              selectedColor: AppColors.primaryColor,
+                                              labelStyle: TextStyle(
+                                                color: effort == index ? Colors.white : Colors.black,
+                                              ),
+                                              checkmarkColor: Colors.white,
+                                              showCheckmark: true,
+                                            ),
+                                            // Positioned(
+                                            //   top: 0.5,
+                                            //   left: index == 4 ? 0.5 : 3,
+                                            //   child: RotatedBox(
+                                            //     quarterTurns: 2,
+                                            //     child: CustomPaint(
+                                            //       size: Size(index == 4 ? 50 : 42, 12),
+                                            //       painter: TrianglePainter(),
+                                            //     ),
+                                            //   ),
+                                            // ),
+                                          ],
+                                        );
+                                      },
+                                    ),
                                   ),
                                   const SizedBox(height: 30),
                                 ],
@@ -717,5 +736,27 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
         ],
       ),
     );
+  }
+}
+
+class TrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = AppColors.primaryColor
+      ..style = PaintingStyle.fill;
+
+    Path path = Path();
+    path.moveTo(size.width / 2, 0);
+    path.lineTo(0, size.height);
+    path.lineTo(size.width, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
   }
 }

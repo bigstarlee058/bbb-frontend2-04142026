@@ -21,7 +21,7 @@ import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,11 +47,10 @@ class MonthProvider extends ChangeNotifier {
 
   List<WeekType> weekStatuses = [];
   List<String> weekStatusesString = [];
-  List<String> splitTypeList = [];
   List<RestDayModel> restDayModel = [];
 
-  String selectedButtonTitle = "Mark Complete";
-  List<String> buttonTitle = ["Mark Complete", "Swap To Pump Day"];
+  // String selectedButtonTitle = "Mark Complete";
+  // List<String> buttonTitle = ["Mark Complete", "Swap To Pump Day"];
 
   bool isPumpDay = false;
   bool isPumpDayAvailable = false;
@@ -63,7 +62,7 @@ class MonthProvider extends ChangeNotifier {
 
   String todayTitleId = "";
   String circuitIndex = "";
-  String routeString = "dashboard";
+  // String routeString = "dashboard";
   int circuitsIndex = 0;
   int streak = 0;
 
@@ -77,16 +76,16 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  changeValue(List<String> val1, String val2) {
-    buttonTitle = val1;
-    selectedButtonTitle = val2;
-    notifyListeners();
-  }
+  // changeValue(List<String> val1, String val2) {
+  //   buttonTitle = val1;
+  //   selectedButtonTitle = val2;
+  //   notifyListeners();
+  // }
 
-  changeSelectedButtonTitle(String val2) {
-    selectedButtonTitle = val2;
-    notifyListeners();
-  }
+  // changeSelectedButtonTitle(String val2) {
+  //   selectedButtonTitle = val2;
+  //   notifyListeners();
+  // }
 
   changeIsPumpDay(bool val) {
     isPumpDay = val;
@@ -214,8 +213,6 @@ class MonthProvider extends ChangeNotifier {
   int currentWeek = 0;
   int overviewCurrentDay = 0;
   int overviewCurrentWeek = 0;
-
-  List<String> splitList = [];
 
   String? splitType;
 
@@ -447,12 +444,14 @@ class MonthProvider extends ChangeNotifier {
               endTime = monthDataModel?.endDate ?? DateTime.now();
 
               filter();
+
               int dayDelta = DateTime(today.year, today.month, today.day)
                   .difference(DateTime(startTime!.year, startTime!.month, startTime!.day))
                   .inDays;
               actualWeek = (dayDelta ~/ 7) + 1;
               week = actualWeek! > 4 ? 4 : actualWeek;
               day = dayDelta % 7 + 1;
+
               currentWeek = week!;
 
               await fetchMonthLocalData();
@@ -506,32 +505,32 @@ class MonthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchPumpDayData(String id) async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/pump-days/get/$id');
-    String? userIdToken = await getAuthToken();
-
-    try {
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        pumpDayModel = PumpDayModel.fromJson(jsonDecode(response.body));
-      } else {
-        throw Exception('Failed to fetch Circuits data');
-      }
-    } catch (e, stackTrace) {
-      debugPrint("Error in fetchPumpDayData: $e");
-      debugPrint("StackTrace: $stackTrace");
-      throw Exception('Failed to fetch Circuits data');
-    }
-
-    notifyListeners();
-  }
+  // Future<void> fetchPumpDayData(String id) async {
+  //   Uri url = Uri.parse('${AppConstants.serverUrl}/api/pump-days/get/$id');
+  //   String? userIdToken = await getAuthToken();
+  //
+  //   try {
+  //     final response = await http.get(
+  //       url,
+  //       headers: <String, String>{
+  //         'Content-Type': 'application/json; charset=UTF-8',
+  //         'AUTH_TOKEN': userIdToken ?? "",
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       pumpDayModel = PumpDayModel.fromJson(jsonDecode(response.body));
+  //     } else {
+  //       throw Exception('Failed to fetch Circuits data');
+  //     }
+  //   } catch (e, stackTrace) {
+  //     debugPrint("Error in fetchPumpDayData: $e");
+  //     debugPrint("StackTrace: $stackTrace");
+  //     throw Exception('Failed to fetch Circuits data');
+  //   }
+  //
+  //   notifyListeners();
+  // }
 
   Future<PumpDayModel> fetchPumpDay(String id) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/pump-days/get/$id');
@@ -710,6 +709,7 @@ class MonthProvider extends ChangeNotifier {
   List<RelatedExercises> relatedExercises = [];
   List<UsedEquipments> usedEquipments = [];
 
+  String allExercisesMainList = "";
   List<Exercise> allFilterExercises = [];
   List<Exercise> allExercises = [];
 
@@ -741,11 +741,20 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  ExerciseDetailModel? exerciseDetailModelData;
+
   Future<void> fetchRelatedExercise(String exerciseId) async {
+    if (exerciseDetailModelData != null) {
+      if (exerciseDetailModelData?.sId == exerciseId) {
+        return;
+      }
+    }
+
+    updateExerciseLoader(true);
+
     String? userIdToken = await getAuthToken();
     relatedExercises = [];
-    ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel();
-
+    exerciseDetailModelData = null;
     try {
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$exerciseId');
       final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
@@ -754,8 +763,8 @@ class MonthProvider extends ChangeNotifier {
         final responseData = jsonDecode(response.body);
         if (responseData != null) {
           exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
-          if (exerciseDetailModelData.relatedExercises != null) {
-            relatedExercises = exerciseDetailModelData.relatedExercises!;
+          if (exerciseDetailModelData?.relatedExercises != null) {
+            relatedExercises = exerciseDetailModelData!.relatedExercises!;
           }
         }
         notifyListeners();
@@ -766,9 +775,19 @@ class MonthProvider extends ChangeNotifier {
       debugPrint("Error fetching related exercises: $e");
       debugPrint("StackTrace: $stackTrace");
     }
+    updateExerciseLoader(false);
   }
 
   Future fetchAllExercise() async {
+    if (allExercisesMainList.isNotEmpty) {
+      List<dynamic> jsonData = jsonDecode(allExercisesMainList);
+      List<Exercise> exercises = jsonData.map((e) => Exercise.fromJson(e)).toList();
+      allExercises = exercises;
+      allFilterExercises = exercises;
+      notifyListeners();
+      return;
+    }
+
     updateExerciseLoader(true);
     final Map<String, String> queryParams = {
       'page': '1',
@@ -815,10 +834,12 @@ class MonthProvider extends ChangeNotifier {
   void getExercisesFromJson(responseData) {
     allExercises.clear();
     allFilterExercises.clear();
+    allExercisesMainList = "";
 
     AllExerciseModel allExerciseModel = AllExerciseModel.fromJson(responseData);
     allExercises = allExerciseModel.exercises!;
     allFilterExercises = allExerciseModel.exercises!;
+    allExercisesMainList = jsonEncode(allExerciseModel.exercises);
 
     notifyListeners();
   }
@@ -835,7 +856,6 @@ class MonthProvider extends ChangeNotifier {
 
       url = Uri.http(url.authority, url.path);
       String? userIdToken = await getAuthToken();
-
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -1085,31 +1105,48 @@ class MonthProvider extends ChangeNotifier {
     streak = 0;
     DateTime? pastDate;
 
+    DateTime today = DateTime.now();
+    DateTime currentDate = DateTime(today.year, today.month, today.day);
+    log('data :::::::::::::::::: $data');
+    List<DayHistoryModel> filteredDataList = data.where((e) {
+      DateTime date = e.endTime ?? e.startTime!;
+      DateTime localTime = date.toLocal();
+      DateTime localDay = DateTime(localTime.year, localTime.month, localTime.day);
+      return localDay.isBefore(currentDate) || localDay.isAtSameMomentAs(currentDate);
+    }).toList();
+    log('filteredDataList :::::::::::::::::: ${filteredDataList.map((e) => e.endTime)}');
     try {
-      for (var element in data) {
+      if (filteredDataList.length == 1) {
+        DateTime currentDate = filteredDataList[0].endTime ?? filteredDataList[0].startTime!;
+        DateTime localTime = currentDate.toLocal();
+        DateTime localDay = DateTime(localTime.year, localTime.month, localTime.day);
+        pastDate = localDay;
+      }
+
+      for (var element in filteredDataList) {
         DateTime currentDate = element.endTime!;
         DateTime localTime = currentDate.toLocal();
         DateTime localDay = DateTime(localTime.year, localTime.month, localTime.day);
+
+        DateTime currentDate1 = filteredDataList[0].endTime ?? filteredDataList[0].startTime!;
+        DateTime localTime1 = currentDate1.toLocal();
+        DateTime localDay1 = DateTime(localTime1.year, localTime1.month, localTime1.day);
+
         DateTime now = DateTime.now();
         DateTime today = DateTime(now.year, now.month, now.day);
-
-        if (today.isAfter(localDay) && today != localDay) {
-          streak = 0;
-          break;
+        DateTime firstDay = DateTime(localDay1.year, localDay1.month, localDay1.day);
+        if (firstDay != today) {
+          int difference = today.difference(firstDay).inDays;
+          if (difference > 1) {
+            log('difference > 1 :::::$difference::::::::::::: ${difference > 1}');
+            streak = 0;
+            break;
+          }
         }
 
         if (pastDate != null) {
-          DateTime pastDay = DateTime(pastDate.year, pastDate.month, pastDate.day);
-
-          if (pastDay != today) {
-            int difference = today.difference(pastDay).inDays;
-            if (difference > 1) {
-              streak = 0;
-              break;
-            }
-          }
-
           int difference = pastDate.difference(localDay).inDays;
+
           if (difference > 1) {
             break;
           }
@@ -1119,7 +1156,7 @@ class MonthProvider extends ChangeNotifier {
         } else {
           break;
         }
-        pastDate = localTime;
+        pastDate = localDay;
       }
     } catch (e) {
       debugPrint('Error managing streak: $e');
@@ -1883,7 +1920,15 @@ class MonthProvider extends ChangeNotifier {
 
   List<Map<String, dynamic>> reportProcessWeightLiftedGraphData(List<Map<String, dynamic>> data) {
     totalWeightLiftedInAWeek = 0;
-    List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    List<String> allDays = [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun",
+    ];
 
     try {
       for (String day in allDays) {

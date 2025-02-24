@@ -26,7 +26,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    debugPrint("this is streak page ${monthProvider?.routeString}");
     super.initState();
   }
 
@@ -37,6 +36,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     ScreenUtil.init(context);
 
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => monthProvider?.manageStreak(),
+      // ),
       backgroundColor: const Color.fromARGB(255, 52, 11, 11),
       body: Stack(
         children: [

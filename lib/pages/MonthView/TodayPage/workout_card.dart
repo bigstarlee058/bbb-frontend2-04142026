@@ -35,6 +35,7 @@ class WorkoutCard extends StatefulWidget {
     required this.isDayCompleted,
     required this.isDaySkipped,
     required this.dataId,
+    required this.image,
   });
 
   final bool isSkipped;
@@ -53,6 +54,7 @@ class WorkoutCard extends StatefulWidget {
   final bool isDayCompleted;
   final bool isDaySkipped;
   final int? roundIndex;
+  final String image;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
@@ -63,9 +65,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
   @override
   void initState() {
-    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await getTotalSets());
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => fetchImage());
-    getTotalSets();
+    super.initState();
   }
 
   num totalSets = 0;
@@ -116,20 +118,22 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   fetchImage() async {
-    String? userIdToken = await getAuthToken();
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${widget.exerciseId}');
-    url = Uri.http(url.authority, url.path);
-    final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      if (responseData != null) {
-        ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
-        gImageUrl = exerciseDetailModelData.thumbnail ?? "placeholder";
-      }
-      if (mounted) {
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          setState(() {});
-        });
+    if (widget.isCircuit) {
+      String? userIdToken = await getAuthToken();
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/${widget.exerciseId}');
+      url = Uri.http(url.authority, url.path);
+      final response = await http.get(url, headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""});
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData != null) {
+          ExerciseDetailModel exerciseDetailModelData = ExerciseDetailModel.fromJson(responseData);
+          gImageUrl = exerciseDetailModelData.thumbnail ?? "placeholder";
+        }
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            setState(() {});
+          });
+        }
       }
     }
   }
@@ -260,7 +264,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       appShimmerImage(
                         height: media.width / 4,
                         width: media.width / 4,
-                        networkImageUrl: gImageUrl,
+                        networkImageUrl: widget.isCircuit ? gImageUrl : widget.image,
                         fit: BoxFit.contain,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
