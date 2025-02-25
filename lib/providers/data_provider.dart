@@ -187,7 +187,6 @@ class DataProvider extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        debugPrint("this is fetchone ${data}");
         collectionData = Collections.fromJson(data);
         notifyListeners(); // Notify listeners to update the UI
       } else {
@@ -312,16 +311,16 @@ class DataProvider extends ChangeNotifier {
       'month': month.toString(),
       'equipment': '0',
       'split': '5',
+      'date': "${DateTime.now().toUtc()}"
     };
 
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
-    url = Uri.http(url.authority, url.path, queryParams);
-
     String? userIdToken = await getAuthToken();
     final response = await http.post(
       url,
+      body: queryParams,
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/x-www-form-urlencoded',
         'AUTH_TOKEN': userIdToken ?? "",
       },
     );

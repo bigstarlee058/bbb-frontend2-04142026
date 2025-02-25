@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -60,6 +61,11 @@ class _ExercisePageState extends State<ExercisePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       argument = ModalRoute.of(context)?.settings.arguments as String?;
+
+      setState(() {
+        loading = true;
+      });
+
       if (argument != "Exercise") {
         await fromNotification().then(
           (value) => clearNotificationAndNavigateExercise(),
@@ -97,9 +103,6 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 
   Future<void> fromNotification() async {
-    setState(() {
-      loading = true;
-    });
     await monthProvider?.onInit();
     String rawTempData = preferences.getString(SharedPreference.payload) ?? "";
     PayloadModel payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
@@ -348,7 +351,11 @@ class _ExercisePageState extends State<ExercisePage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
-      body: loading
+      body: loading &&
+              ((isExercise == 1
+                      ? (monthProvider?.exerciseDetailModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null
+                      : (monthProvider?.warmUpModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null) ==
+                  false)
           ? const Center(
               child: CircularProgressIndicator(
                 color: AppColors.primaryColor,
@@ -392,10 +399,11 @@ class _ExercisePageState extends State<ExercisePage> {
                                               height: media.height * 0.4,
                                               color: Colors.black12,
                                               child: const Center(
-                                                  child: Text(
-                                                'No Video Available',
-                                                style: TextStyle(color: Colors.white),
-                                              )),
+                                                child: Text(
+                                                  'No Video Available',
+                                                  style: TextStyle(color: Colors.white),
+                                                ),
+                                              ),
                                             ),
                                     ],
                                   ),
@@ -680,53 +688,70 @@ class _ExercisePageState extends State<ExercisePage> {
                                   final extraItem = monthProvider?.selectedExercise!.extra![index];
 
                                   setCount = int.parse(extraItem!.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
-
                                   return ListView.builder(
                                     itemCount: setCount,
                                     shrinkWrap: true,
                                     padding: EdgeInsets.zero,
                                     physics: const NeverScrollableScrollPhysics(),
                                     itemBuilder: (context, countIndex) {
-                                      String split = monthProvider
-                                              ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                              .toString()
-                                              .split(" ")[1] ??
-                                          "";
-
-                                      String ctId =
-                                          "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$countIndex-${monthProvider?.circuitIndex}";
-
-                                      bool isCompleted() {
-                                        final val = monthProvider!.historyDataModel.where((element) => element.dataId == ctId);
-                                        bool val1 = false;
-                                        if (val.isNotEmpty) {
-                                          val1 = val.first.status == Status.completed;
-                                        }
-                                        return val1;
-                                      }
-
+                                      log('countIndex :::::::::::::::::: $countIndex');
                                       bool isTimerRunning = monthProvider!.timerAddress ==
                                           "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
-
                                       if (extraItem.type == 1) warmUpIndex++;
                                       if (extraItem.type == 2) backOffIndex++;
                                       if (extraItem.type == 3) workingIndex++;
 
+                                      // String split = monthProvider
+                                      //         ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                      //         .toString()
+                                      //         .split(" ")[1] ??
+                                      //     "";
+                                      // String ctId =
+                                      //     "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$countIndex-${monthProvider?.circuitIndex}";
+                                      //
+                                      // bool isCompleted() {
+                                      //   final val = monthProvider!.historyDataModel.where((element) => element.dataId == ctId);
+                                      //   bool val1 = false;
+                                      //   if (val.isNotEmpty) {
+                                      //     val1 = val.first.status == Status.completed;
+                                      //   }
+                                      //   return val1;
+                                      // }
+
+                                      int lastDataMainIndex =
+                                          monthProvider!.historyDataModel.isNotEmpty ? monthProvider?.historyDataModel.last.index ?? 0 : 0;
+                                      int lastDataSubIndex = monthProvider!.historyDataModel.isNotEmpty
+                                          ? monthProvider?.historyDataModel.last.subIndex ?? -1
+                                          : -1;
+                                      if (lastDataSubIndex ==
+                                          ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
+                                              (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3
+                                                  ? (extraSetModel.length)
+                                                  : 0))) {
+                                        lastDataMainIndex += 1;
+                                        lastDataSubIndex = 0;
+                                      } else {
+                                        lastDataSubIndex += 1;
+                                      }
+
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 20),
                                         child: ExerciseSetCard(
+                                          availableIndexString: (lastDataMainIndex == index && lastDataSubIndex == countIndex)
+                                              ? "$lastDataMainIndex:$lastDataSubIndex"
+                                              : "",
+                                          countIndex: countIndex,
+                                          available: (lastDataMainIndex == index && lastDataSubIndex == countIndex),
                                           isEditable: isEditable,
                                           makeRefresh: () {
                                             setState(() {});
                                           },
-                                          isCompleted: isCompleted(),
                                           extraDataModel: extraItem,
                                           color: extraItem.type == 3
                                               ? const Color.fromARGB(255, 248, 248, 248)
                                               : extraItem.type == 2
                                                   ? AppColors.backOffSetColor
                                                   : AppColors.warmupColor,
-                                          // isTimerRunning: isTimerRunning,
                                           exerciseName: exerciseName,
                                           title: extraItem.type == 1
                                               ? "Warmup Set"

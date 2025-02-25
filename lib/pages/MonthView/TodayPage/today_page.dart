@@ -237,8 +237,6 @@ class _TodayPageState extends State<TodayPage> {
 
   @override
   Widget build(BuildContext context) {
-    log('isCurrentDaySkipped :::::::::::::::::: $isCurrentDaySkipped');
-
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
