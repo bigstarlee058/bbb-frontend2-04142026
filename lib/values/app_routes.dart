@@ -18,7 +18,6 @@ class AppRoutes {
 
   static const String dayCompletedScreen = '/dayCompleted';
   static const String exerciseScreen = '/exercise';
-  static const String exerciseTutorialScreen = '/exerciseTutorialScreen';
   static const String streakScreen = '/streak';
   static const String recalculateScreen = '/recalculate';
   static const String calendarScreen = '/calendar';

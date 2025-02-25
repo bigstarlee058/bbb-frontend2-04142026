@@ -440,8 +440,8 @@ class MonthProvider extends ChangeNotifier {
         (value) async {
           try {
             if (monthDataModel != null) {
-              startTime = monthDataModel?.startDate ?? DateTime.now();
-              endTime = monthDataModel?.endDate ?? DateTime.now();
+              startTime = monthDataModel?.startDate?.toLocal() ?? DateTime.now();
+              endTime = monthDataModel?.endDate?.toLocal() ?? DateTime.now();
 
               filter();
 
@@ -1729,7 +1729,7 @@ class MonthProvider extends ChangeNotifier {
   Map<String, Map<String, dynamic>> reportFilterExerciseCompletedChartData(int weekNumber) {
     reportMaximumValueOfTotalEx = 0;
 
-    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!);
+    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!.toLocal());
     var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
 
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
@@ -1848,7 +1848,7 @@ class MonthProvider extends ChangeNotifier {
   Map<String, Map<String, dynamic>> reportFilterWeightLiftedChartData(int weekNumber) {
     reportMaximumValueOfWeight = 0;
 
-    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!);
+    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!.toLocal());
     var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
     DateTime startDate = DateTime.parse(week['startDate']);
@@ -1974,7 +1974,7 @@ class MonthProvider extends ChangeNotifier {
   Map<String, Map<String, dynamic>> reportFilterTimeSpentChartData(int weekNumber) {
     reportMaximumValueOfTotalTime = 0;
 
-    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!);
+    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!.toLocal());
     var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
     DateTime startDate = DateTime.parse(week['startDate']);
