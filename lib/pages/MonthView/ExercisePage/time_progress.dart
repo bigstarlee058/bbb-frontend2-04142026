@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -54,9 +55,9 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
     NotificationService.clearNotification();
     totalTime = widget.initialDuration;
     WidgetsBinding.instance.addObserver(this);
-
+    log('widget.initialDuration :::::::::::::::::: ${widget.initialDuration}');
     currentTime = 0;
-    formattedTime = _formatTime(currentTime);
+    formattedTime = _formatTime(widget.initialDuration - currentTime);
 
     previousData = monthProvider.currentExpandedItem;
 
@@ -69,6 +70,8 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
 
         await DatabaseHelper().updateSingleValue(
             tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
+
+        await monthProvider.fetchExerciseHistoryLocalData();
       }
     });
 
@@ -83,7 +86,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
     timerTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!isPaused) {
         currentTime++;
-        formattedTime = _formatTime(currentTime);
+        formattedTime = _formatTime(widget.initialDuration - currentTime);
         if (!animationCompleted && currentTime <= totalTime) {
           controller.value = currentTime / totalTime;
         }
@@ -93,7 +96,12 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
           widget.onComplete();
         }
       }
+      if (widget.initialDuration == currentTime) {
+        isPaused = true;
+        controller.stop();
+      }
     });
+
     setState(() {});
   }
 
@@ -105,10 +113,12 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
 
   Future<void> pauseOrResumeTimer() async {
     if (isPaused) {
-      isPaused = false;
-      if (!animationCompleted) {
-        controller.forward();
-        await preferences.putString(SharedPreference.isPause, "false");
+      if (widget.initialDuration > currentTime) {
+        isPaused = false;
+        if (!animationCompleted) {
+          controller.forward();
+          await preferences.putString(SharedPreference.isPause, "false");
+        }
       }
     } else {
       isPaused = true;
@@ -126,6 +136,8 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         NotificationService.clearNotification();
         await monthProvider.getPassedTime();
         if (monthProvider.timePassed != "") {
+          log('monthProvider.timePassed  :::::::::::::::::: ${monthProvider.timePassed}');
+
           currentTime = 0;
 
           currentTime = int.parse(monthProvider.timePassed);
@@ -133,6 +145,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
           if (int.parse(monthProvider.timePassed) > totalTime) {
             await DatabaseHelper().updateSingleValue(
                 tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
+            await monthProvider.fetchExerciseHistoryLocalData();
           }
         }
         setState(() {});

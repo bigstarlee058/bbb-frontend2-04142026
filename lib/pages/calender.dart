@@ -3,6 +3,7 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -157,7 +158,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     if (date.isBefore(futureDay)) {
       for (var day in data) {
         final workoutDate = day.endTime!;
-        DateTime localTime = workoutDate.toLocal();
+        DateTime localTime = Utils.formattedDate("$workoutDate");
         if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
           if (day.status == Status.completed) {
             return _buildCustomDayCircle(date, AppColors.primaryColor);
@@ -171,7 +172,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     if (isCurrentDay) {
       for (var day in data) {
         final workoutDate = day.endTime!;
-        DateTime localTime = workoutDate.toLocal();
+        DateTime localTime = Utils.formattedDate("$workoutDate");
         if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
           if (day.status == Status.completed) {
             return _buildCustomDayCircle(date, AppColors.primaryColor);

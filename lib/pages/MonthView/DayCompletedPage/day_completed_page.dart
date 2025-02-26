@@ -5,6 +5,7 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
@@ -56,9 +57,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
           final startTime = element.startTime!;
           final endTime = element.endTime!;
 
-          DateTime localStartTime = startTime.toLocal();
-          DateTime localEndTime = endTime.toLocal();
-
+          DateTime localStartTime = Utils.formattedDate("$startTime");
+          DateTime localEndTime = Utils.formattedDate("$endTime");
           if (DateFormat('yyyy-MM-dd').format(localEndTime) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
               element.status == Status.completed) {
             int duration = localEndTime.difference(localStartTime).inSeconds;

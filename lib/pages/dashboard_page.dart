@@ -815,27 +815,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                             return CollectionGrid(collection: dataProvider.collectionsData[index]);
                                           },
                                         ),
-                                        // for (int index = 0; index < (dataProvider.collectionsData.length / 2).ceil(); index++)
-                                        //   Column(
-                                        //     children: [
-                                        //       Row(
-                                        //         mainAxisAlignment: MainAxisAlignment.start,
-                                        //         children: [
-                                        //           Expanded(child: CollectionGrid(collection: dataProvider.collectionsData[index * 2])),
-                                        //           Expanded(
-                                        //             child: (index * 2 + 1 < dataProvider.collectionsData.length)
-                                        //                 ? CollectionGrid(
-                                        //                     collection: dataProvider.collectionsData[index * 2 + 1],
-                                        //                   )
-                                        //                 : Container(),
-                                        //           ),
-                                        //         ],
-                                        //       ),
-                                        //       const SizedBox(
-                                        //         height: 14, // Adds spacing after each row
-                                        //       ),
-                                        //     ],
-                                        //   )
                                       ],
                                     ),
                                   )

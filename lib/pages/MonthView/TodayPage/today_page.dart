@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -71,8 +70,6 @@ class _TodayPageState extends State<TodayPage> {
             fetchWarmupData();
             monthProvider?.fetchExerciseStatusLocalData();
             fetchRemovedExerciseLocalData();
-            log(' monthProvider?.dayHistoryDetails? :::::::::::::::::: ${jsonEncode(monthProvider?.dayHistoryDetails)}');
-            log('monthProvider?.actualWeek :::::::::::::::::: ${monthProvider?.actualWeek}');
             isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
             isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
                 monthProvider?.dayHistoryDetails == null ||
@@ -89,15 +86,11 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> fetchExtraAddedExercise() async {
     setState(
       () {
-        log('monthProvider!.dayDataModel!.exercises! :::::::::::::::::: ${monthProvider!.dayDataModel!.exercises!}');
         exercises = [];
-        log('exercises :::::::::::::::::: ${exercises.length}');
         loader = true;
         exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
         totalWarmups =
             monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
-
-        log('exercises :::::::::::::::::: ${exercises.length}');
       },
     );
 
@@ -116,7 +109,7 @@ class _TodayPageState extends State<TodayPage> {
           (value) {
             if (monthProvider!.swapExerciseList.isNotEmpty) {
               for (var element in monthProvider!.swapExerciseList) {
-                exercises.removeWhere((exercise) => exercise.exerciseId == element.exerciseId);
+                exercises.removeAt(int.parse(element.insertIndex ?? "0"));
                 exercises.insert(int.parse(element.insertIndex ?? "0"), element.exerciseJson!);
               }
             }
@@ -241,9 +234,6 @@ class _TodayPageState extends State<TodayPage> {
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => fetchExtraAddedExercise(),
-      // ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -461,8 +451,7 @@ class _TodayPageState extends State<TodayPage> {
                                                     Padding(
                                                       padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                                       child: WorkoutCard(
-                                                        image: exercises[i].thumbnail ??
-                                                            "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                        image: exercises[i].thumbnail ?? "unknown",
                                                         dataId: dataId,
                                                         isDayCompleted: isCurrentDayCompleted,
                                                         isDaySkipped: isCurrentDaySkipped,
@@ -750,7 +739,7 @@ class _TodayPageState extends State<TodayPage> {
                     networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
                         ? monthProvider.warmUpModel?.thumbnail ??
                             "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                        : monthProvider.warmUpModel?.thumbnail ?? "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                        : monthProvider.warmUpModel?.thumbnail ?? "unknown",
                     borderRadius: BorderRadius.all(
                       Radius.circular(ScreenUtil.verticalScale(1)),
                     ),
@@ -1177,8 +1166,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     rest: exercises[0].rest ?? 0,
                                                     weight: exercises[0].weight ?? 0,
                                                     formats: exercises[0].formats ?? [],
-                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
-                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                    thumbnail:
+                                                        monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
                                                     extra: exercises[0].extra ?? [],
                                                   );
                                                 } else {
@@ -1188,8 +1177,8 @@ class _TodayPageState extends State<TodayPage> {
                                                     typeId: 1,
                                                     name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
                                                         "Exercise ${exercises.length + 1}",
-                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
-                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                    thumbnail:
+                                                        monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
                                                     guide: "",
                                                     sets: 5,
                                                     reps: 10,
@@ -1329,8 +1318,7 @@ class _TodayPageState extends State<TodayPage> {
                                                 appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  networkImageUrl: exercises[i - (0)].thumbnail ??
-                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  networkImageUrl: exercises[i - (0)].thumbnail ?? "unknown",
                                                   fit: BoxFit.cover,
                                                   borderRadius: BorderRadius.all(
                                                     Radius.circular(ScreenUtil.horizontalScale(1)),
@@ -1435,8 +1423,7 @@ class _TodayPageState extends State<TodayPage> {
                                                 appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  networkImageUrl: exercises[i].thumbnail ??
-                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  networkImageUrl: exercises[i].thumbnail ?? "unknown",
                                                   fit: BoxFit.cover,
                                                   borderRadius: BorderRadius.all(
                                                     Radius.circular(ScreenUtil.horizontalScale(1)),
@@ -1693,9 +1680,7 @@ class _TodayPageState extends State<TodayPage> {
                                                 id: "",
                                                 exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
                                                 typeId: exercises[selectedIndex].typeId ?? 1,
-                                                thumbnail: exerciseDataModel?.thumbnail ??
-                                                    relatedExerciseData?.thumbnail ??
-                                                    "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                thumbnail: exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
                                                 name: exerciseDataModel?.title ??
                                                     relatedExerciseData?.title ??
                                                     "Exercise ${exercises.length + 1}",

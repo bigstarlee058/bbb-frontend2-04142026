@@ -16,6 +16,7 @@ class SharedPreference {
   static const String payload = "PAYLOAD";
   static const String fromNotification = "FROM-NOTIFICATION";
   static const String exerciseTutorial = "EXERCISE-TUTORIAL";
+  static const String inTheExerciseScreenOrNot = "EXERCISE-SCREEN-OR-NOT";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();

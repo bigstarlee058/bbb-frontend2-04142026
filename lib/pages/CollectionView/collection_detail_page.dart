@@ -26,23 +26,17 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
   @override
   void initState() {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    dataProvider = Provider.of<DataProvider>(
-      context,
-      listen: false,
-    );
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    userData = Provider.of<UserDataProvider>(context, listen: false);
 
-    userData = Provider.of<UserDataProvider>(
-      context,
-      listen: false,
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final collection = ModalRoute.of(context)!.settings.arguments as Collections;
-      loadCollectionData(collection);
+      await loadCollectionData(collection);
     });
     super.initState();
   }
 
-  void loadCollectionData(Collections collection) async {
+  Future<void> loadCollectionData(Collections collection) async {
     await dataProvider?.fetchOneCollection(collection.id);
   }
 

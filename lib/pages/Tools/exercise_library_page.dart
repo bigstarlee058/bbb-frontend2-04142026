@@ -136,11 +136,11 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(
-                                          onPress: () {
-                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                            mainPageProvider.changeTab(2);
-                                          },
-                                        ),
+                                        onPress: () {
+                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          mainPageProvider.changeTab(2);
+                                        },
+                                      ),
                                       Text(
                                         'Exercise Library',
                                         style: TextStyle(
@@ -291,9 +291,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
       bottomSheet: Container(
         alignment: Alignment.center,
         color: Colors.white,
-        height: 48,
+        height: 65,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
           child: _numPages > 0
               ? NumberPaginator(
                   numberPages: _numPages,
@@ -303,8 +303,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                     buttonUnselectedForegroundColor: Colors.grey,
                     buttonUnselectedBackgroundColor: Colors.transparent,
                     buttonSelectedBackgroundColor: Colors.transparent,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    buttonTextStyle: TextStyle(fontSize: 15),
+                    contentPadding: EdgeInsets.zero,
+                    buttonTextStyle: TextStyle(fontSize: 16),
                   ),
                   onPageChange: (int index) {
                     setState(() {

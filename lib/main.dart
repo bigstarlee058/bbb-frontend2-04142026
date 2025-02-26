@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -32,7 +33,6 @@ import 'package:bbb/pages/meet_our_staff.dart';
 import 'package:bbb/pages/on_boarding_page.dart';
 import 'package:bbb/pages/register_page.dart';
 import 'package:bbb/pages/reset_password_page.dart';
-import 'package:bbb/pages/streak_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -78,18 +78,26 @@ void main() async {
     initSettings,
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     onDidReceiveNotificationResponse: (details) async {
-      await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
-      await preferences.putInt(SharedPreference.fromNotification, 1);
-      navigatorKey.currentState?.pushNamed('/exercise');
+      final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
+      if (isLastExerciseScreen == "NO") {
+        log('isLastExerciseScreen :::::::::::::::::: $isLastExerciseScreen');
+        await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
+        await preferences.putInt(SharedPreference.fromNotification, 1);
+        navigatorKey.currentState?.pushNamed('/exercise');
+      }
     },
   );
 
   final NotificationAppLaunchDetails? notificationAppLaunchDetails =
       await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
-    final String? payload = notificationAppLaunchDetails!.notificationResponse?.payload;
-    await preferences.putString(SharedPreference.payload, payload ?? "{}");
-    await preferences.putInt(SharedPreference.fromNotification, 1);
+    final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
+    log('isLastExerciseScreen :::::::::::::::::: $isLastExerciseScreen');
+    if (isLastExerciseScreen == "NO") {
+      final String? payload = notificationAppLaunchDetails!.notificationResponse?.payload;
+      await preferences.putString(SharedPreference.payload, payload ?? "{}");
+      await preferences.putInt(SharedPreference.fromNotification, 1);
+    }
   }
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -212,7 +220,7 @@ class _MyAppState extends State<MyApp> {
           AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),
           AppRoutes.exerciseScreen: (context) => const ExercisePage(),
           AppRoutes.recalculateScreen: (context) => const RecalculatePage(),
-          AppRoutes.streakScreen: (context) => const StreakPage(),
+          // AppRoutes.streakScreen: (context) => const StreakPage(),
           AppRoutes.calendarScreen: (context) => const CalendarPage(),
           AppRoutes.watchTutorialScreen: (context) => const WatchTutorial(),
           AppRoutes.myProfileScreen: (context) => const MyProfilePage(),

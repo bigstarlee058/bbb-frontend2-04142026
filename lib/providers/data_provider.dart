@@ -175,6 +175,8 @@ class DataProvider extends ChangeNotifier {
   Collections get oneCollection => collectionData;
 
   Future<void> fetchOneCollection(String collectionId) async {
+    collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+    notifyListeners();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/collections/get/$collectionId');
     String? userIdToken = await getAuthToken();
     try {
