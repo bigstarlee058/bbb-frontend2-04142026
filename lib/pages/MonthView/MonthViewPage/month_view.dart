@@ -312,7 +312,7 @@ class _MonthViewState extends State<MonthView> {
                         ),
                         Consumer<MonthProvider>(
                           builder: (context, value, child) {
-                            if (value.week! > 4) {
+                            if (value.week == null || value.week! > 4) {
                               return const SizedBox();
                             }
 

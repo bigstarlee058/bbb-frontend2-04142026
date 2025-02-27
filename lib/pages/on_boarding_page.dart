@@ -46,8 +46,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     int? status = preferences.getInt(SharedPreference.fromNotification);
     if (status == 1) {
       await Navigator.pushNamed(context, '/exercise');
-      await preferences.putInt(SharedPreference.fromNotification, 0);
-      await preferences.clearValue(SharedPreference.fromNotification);
     }
   }
 
@@ -68,8 +66,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       );
       await isFromNotification();
     }
-    await preferences.putInt(SharedPreference.fromNotification, 0);
-    await preferences.clearValue(SharedPreference.fromNotification);
   }
 
   void loadWelcomeContent() async {

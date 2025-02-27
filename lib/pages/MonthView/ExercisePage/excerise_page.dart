@@ -60,6 +60,12 @@ class _ExercisePageState extends State<ExercisePage> {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
+      await preferences.putInt(SharedPreference.fromNotification, 0);
+      await preferences.clearValue(SharedPreference.fromNotification);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       argument = ModalRoute.of(context)?.settings.arguments as String?;
 
       setState(() {
@@ -103,14 +109,22 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 
   Future<void> fromNotification() async {
+    setState(() {
+      loading = true;
+    });
     await monthProvider?.onInit();
     String rawTempData = preferences.getString(SharedPreference.payload) ?? "";
-    PayloadModel payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
+    if (rawTempData.isEmpty) {
+      log('Error: rawTempData is empty.');
+      return;
+    }
+    final payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
 
     monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
     int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
       return element == monthProvider?.todayTitleId;
     });
+
     final dayIndex = int.parse((monthProvider!.weekDataModel!.dayList?[index ?? 0]
                 .toString()
                 .replaceAll("Workout", "")
@@ -156,7 +170,7 @@ class _ExercisePageState extends State<ExercisePage> {
       monthProvider!.selectedExercise = dayData.exercises![payloadModel.exerciseIndex!];
     }
 
-    fetchExercise(
+    await fetchExercise(
       exerciseIndex: payloadModel.exerciseIndex!,
       isPumpDay: payloadModel.isPumpday!,
       isCircuit: payloadModel.isCircuit!,
@@ -164,7 +178,12 @@ class _ExercisePageState extends State<ExercisePage> {
       circuitIndex: payloadModel.circuitIndex!,
     );
 
+    await DatabaseHelper().updateSingleValue(
+        tableName: DatabaseHelper.exerciseHistory, id: payloadModel.dataId, columnName: 'status', newValue: Status.completed);
+    await monthProvider?.fetchExerciseHistoryLocalData();
+
     NotificationService.clearNotification();
+    setState(() {});
   }
 
   List values = [];
@@ -299,10 +318,7 @@ class _ExercisePageState extends State<ExercisePage> {
     }
   }
 
-  Size calculateVideoSize({
-    required BuildContext context,
-    required double aspectRatio,
-  }) {
+  Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
     final screenSize = MediaQuery.of(context).size;
 
     double maxWidth = screenSize.width;
@@ -320,12 +336,12 @@ class _ExercisePageState extends State<ExercisePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) async => await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO"));
     _chewieController?.dispose();
     _videoPlayerController.dispose();
     super.dispose();
   }
-
-  int count = 0;
 
   findIsAtLeastOnSet() {
     monthProvider?.selectedExercise?.extra?.forEach(
@@ -337,6 +353,7 @@ class _ExercisePageState extends State<ExercisePage> {
     setState(() {});
   }
 
+  int count = 0;
   int warmUpIndex = 0;
   int backOffIndex = 0;
   int workingIndex = 0;
@@ -679,117 +696,102 @@ class _ExercisePageState extends State<ExercisePage> {
                               const SizedBox(
                                 height: 15,
                               ),
-                              ListView.builder(
-                                itemCount: monthProvider?.selectedExercise!.extra!.length,
-                                shrinkWrap: true,
-                                padding: EdgeInsets.zero,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  final extraItem = monthProvider?.selectedExercise!.extra![index];
+                              Builder(builder: (context) {
+                                final dataHistory =
+                                    monthProvider!.historyDataModel.where((element) => element.status == Status.completed).toList();
 
-                                  setCount = int.parse(extraItem!.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
-                                  return ListView.builder(
-                                    itemCount: setCount,
-                                    shrinkWrap: true,
-                                    padding: EdgeInsets.zero,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemBuilder: (context, countIndex) {
-                                      log('countIndex :::::::::::::::::: $countIndex');
-                                      bool isTimerRunning = monthProvider!.timerAddress ==
-                                          "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
-                                      if (extraItem.type == 1) warmUpIndex++;
-                                      if (extraItem.type == 2) backOffIndex++;
-                                      if (extraItem.type == 3) workingIndex++;
+                                return ListView.builder(
+                                  itemCount: monthProvider?.selectedExercise!.extra!.length,
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.zero,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    final extraItem = monthProvider?.selectedExercise!.extra![index];
 
-                                      // String split = monthProvider
-                                      //         ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                      //         .toString()
-                                      //         .split(" ")[1] ??
-                                      //     "";
-                                      // String ctId =
-                                      //     "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$countIndex-${monthProvider?.circuitIndex}";
-                                      //
-                                      // bool isCompleted() {
-                                      //   final val = monthProvider!.historyDataModel.where((element) => element.dataId == ctId);
-                                      //   bool val1 = false;
-                                      //   if (val.isNotEmpty) {
-                                      //     val1 = val.first.status == Status.completed;
-                                      //   }
-                                      //   return val1;
-                                      // }
+                                    setCount = int.parse(extraItem!.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
+                                    return ListView.builder(
+                                      itemCount: setCount,
+                                      shrinkWrap: true,
+                                      padding: EdgeInsets.zero,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, countIndex) {
+                                        bool isTimerRunning = monthProvider!.timerAddress ==
+                                            "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
+                                        if (extraItem.type == 1) warmUpIndex++;
+                                        if (extraItem.type == 2) backOffIndex++;
+                                        if (extraItem.type == 3) workingIndex++;
 
-                                      int lastDataMainIndex =
-                                          monthProvider!.historyDataModel.isNotEmpty ? monthProvider?.historyDataModel.last.index ?? 0 : 0;
-                                      int lastDataSubIndex = monthProvider!.historyDataModel.isNotEmpty
-                                          ? monthProvider?.historyDataModel.last.subIndex ?? -1
-                                          : -1;
-                                      if (lastDataSubIndex ==
-                                          ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
-                                              (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3
-                                                  ? (extraSetModel.length)
-                                                  : 0))) {
-                                        lastDataMainIndex += 1;
-                                        lastDataSubIndex = 0;
-                                      } else {
-                                        lastDataSubIndex += 1;
-                                      }
+                                        int lastDataMainIndex = dataHistory.isNotEmpty ? (dataHistory.last.index ?? 0) : 0;
+                                        int lastDataSubIndex = dataHistory.isNotEmpty ? dataHistory.last.subIndex ?? -1 : -1;
+                                        log('dataHistory :::::::::::::::::: ${jsonEncode(dataHistory)}');
+                                        if (lastDataSubIndex ==
+                                            ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
+                                                (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3
+                                                    ? (extraSetModel.length)
+                                                    : 0))) {
+                                          lastDataMainIndex += 1;
+                                          lastDataSubIndex = 0;
+                                        } else {
+                                          lastDataSubIndex += 1;
+                                        }
 
-                                      return Padding(
-                                        padding: const EdgeInsets.only(bottom: 20),
-                                        child: ExerciseSetCard(
-                                          availableIndexString: (lastDataMainIndex == index && lastDataSubIndex == countIndex)
-                                              ? "$lastDataMainIndex:$lastDataSubIndex"
-                                              : "",
-                                          countIndex: countIndex,
-                                          available: (lastDataMainIndex == index && lastDataSubIndex == countIndex),
-                                          isEditable: isEditable,
-                                          makeRefresh: () {
-                                            setState(() {});
-                                          },
-                                          extraDataModel: extraItem,
-                                          color: extraItem.type == 3
-                                              ? const Color.fromARGB(255, 248, 248, 248)
-                                              : extraItem.type == 2
-                                                  ? AppColors.backOffSetColor
-                                                  : AppColors.warmupColor,
-                                          exerciseName: exerciseName,
-                                          title: extraItem.type == 1
-                                              ? "Warmup Set"
-                                              : extraItem.type == 2
-                                                  ? "Back-Off Set"
-                                                  : "Working Set",
-                                          isOpened: isTimerRunning
-                                              ? true
-                                              : index == 0 && countIndex == 0
-                                                  ? true
-                                                  : false,
-                                          index: index,
-                                          subIndex: List.generate(
-                                            extraItem.type == 1
-                                                ? monthProvider!.selectedWarmUpSetTotal
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: 20),
+                                          child: ExerciseSetCard(
+                                            isFromNotification:
+                                                (lastDataMainIndex == index && lastDataSubIndex == countIndex) && argument != "Exercise",
+                                            countIndex: countIndex,
+                                            completed: (lastDataMainIndex >= index && (lastDataSubIndex > countIndex)),
+                                            available: (lastDataMainIndex == index && lastDataSubIndex == countIndex),
+                                            isEditable: isEditable,
+                                            makeRefresh: () {
+                                              setState(() {});
+                                            },
+                                            extraDataModel: extraItem,
+                                            color: extraItem.type == 3
+                                                ? const Color.fromARGB(255, 248, 248, 248)
                                                 : extraItem.type == 2
-                                                    ? monthProvider!.selectedBackOffSetTotal
-                                                    : monthProvider!.selectedWorkingSetTotal,
-                                            (index) => index,
-                                          )[extraItem.type == 1
-                                              ? warmUpIndex - 1
-                                              : extraItem.type == 2
-                                                  ? backOffIndex - 1
-                                                  : workingIndex - 1],
-                                          exercise: exerciseIndex,
-                                          set: int.parse(extraItem.sets.toString()),
-                                          weight: int.parse(extraItem.weight.toString()),
-                                          reps: int.parse(extraItem.reps.toString()),
-                                          repsInReverse: 100,
-                                          load: int.parse(extraItem.load == null ? "0" : extraItem.load.toString()),
-                                          type: int.parse(extraItem.type.toString()),
-                                          restDuration: int.parse(extraItem.rest.toString()),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                                                    ? AppColors.backOffSetColor
+                                                    : AppColors.warmupColor,
+                                            exerciseName: exerciseName,
+                                            title: extraItem.type == 1
+                                                ? "Warmup Set"
+                                                : extraItem.type == 2
+                                                    ? "Back-Off Set"
+                                                    : "Working Set",
+                                            isOpened: isTimerRunning
+                                                ? true
+                                                : index == 0 && countIndex == 0
+                                                    ? true
+                                                    : false,
+                                            index: index,
+                                            subIndex: List.generate(
+                                              extraItem.type == 1
+                                                  ? monthProvider!.selectedWarmUpSetTotal
+                                                  : extraItem.type == 2
+                                                      ? monthProvider!.selectedBackOffSetTotal
+                                                      : monthProvider!.selectedWorkingSetTotal,
+                                              (index) => index,
+                                            )[extraItem.type == 1
+                                                ? warmUpIndex - 1
+                                                : extraItem.type == 2
+                                                    ? backOffIndex - 1
+                                                    : workingIndex - 1],
+                                            exercise: exerciseIndex,
+                                            set: int.parse(extraItem.sets.toString()),
+                                            weight: int.parse(extraItem.weight.toString()),
+                                            reps: int.parse(extraItem.reps.toString()),
+                                            repsInReverse: 100,
+                                            load: int.parse(extraItem.load == null ? "0" : extraItem.load.toString()),
+                                            type: int.parse(extraItem.type.toString()),
+                                            restDuration: int.parse(extraItem.rest.toString()),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              }),
                               SizedBox(height: 20),
                               count != 0 && !isCurrentDaySkipped && !isCurrentDayCompleted
                                   ? Padding(
@@ -802,7 +804,6 @@ class _ExercisePageState extends State<ExercisePage> {
                                             _addExtraSet(data.first);
                                             await Future.delayed(Duration(milliseconds: 200));
                                           }
-
                                           setState(() {});
                                         },
                                         isLoading: false,

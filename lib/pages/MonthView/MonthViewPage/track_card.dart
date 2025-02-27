@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -76,12 +74,16 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: monthProvider!.weekStatuses.isEmpty ? SizedBox() : filterViewList(),
+    return Consumer<MonthProvider>(
+      builder: (context, monthProvider, child) {
+        return Container(
+          child: monthProvider.weekStatuses.isEmpty ? SizedBox() : filterViewList(monthProvider),
+        );
+      },
     );
   }
 
-  Widget filterViewList() {
+  Widget filterViewList(MonthProvider monthProvider) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -92,6 +94,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               filterViewItem(
                 _isExpanded,
                 widget.title,
+                monthProvider,
                 onExpansionChanged: (bool isExpanded) {
                   setState(() {
                     _isExpanded = isExpanded;
@@ -106,7 +109,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     );
   }
 
-  ExpansionTileItem filterViewItem(bool initExpanded, String title, {required Null Function(bool isExpanded) onExpansionChanged}) {
+  ExpansionTileItem filterViewItem(bool initExpanded, String title, MonthProvider monthProvider,
+      {required Null Function(bool isExpanded) onExpansionChanged}) {
     ScreenUtil.init(context);
     return ExpansionTileItem(
       tilePadding: EdgeInsets.symmetric(
@@ -119,7 +123,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             child: Text(
               title != "" ? title : "Week",
               style: GoogleFonts.plusJakartaSans(
-                color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
+                color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
                 fontSize: ScreenUtil.verticalScale(2),
                 fontWeight: FontWeight.bold,
               ),
@@ -129,12 +133,12 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           SizedBox(width: ScreenUtil.verticalScale(3)),
           if (!_isExpanded)
             Builder(builder: (context) {
-              String split = monthProvider?.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
+              String split = monthProvider.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
 
               return Text(
                 '${split.toString().replaceAll("split", "")} workouts',
                 style: GoogleFonts.plusJakartaSans(
-                  color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : Colors.black38,
+                  color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : Colors.black38,
                   fontSize: ScreenUtil.verticalScale(1.5),
                   fontWeight: FontWeight.bold,
                 ),
@@ -144,13 +148,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       ),
       backgroundColor: const Color(0xFF0D0D0D),
       collapsedBackgroundColor:
-          monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : const Color(0xFF0D0D0D),
+          monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : const Color(0xFF0D0D0D),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-        color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.grey[100],
+        color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.grey[100],
       ),
-      iconColor: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.grey[400],
-      collapsedIconColor: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
+      iconColor: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.grey[400],
+      collapsedIconColor: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
       initiallyExpanded: initExpanded,
       onExpansionChanged: (bool expanded) {
         setState(() {
@@ -193,14 +197,14 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
+                  color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
                   width: 2,
                 ),
-                color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
+                color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
               ),
               child: Icon(
                 _isExpanded ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
-                color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.white,
+                color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.white,
                 weight: 900,
                 size: ScreenUtil.verticalScale(3),
               ),
@@ -223,7 +227,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       weekDataModel?.description ?? "",
                       style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(1.7),
-                          color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : const Color(0xFF888888)),
+                          color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : const Color(0xFF888888)),
                     ),
                     SizedBox(
                       height: ScreenUtil.verticalScale(3),
@@ -244,16 +248,17 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                         DayDataModel dayData =
                             weekDataModel!.dayList![index].toString().contains("Workout") ? dayDataList[dayIndex] : DayDataModel();
                         bool isRestDay = weekDataModel?.dayList?[index].contains("Rest Day");
+
                         final exerciseDetails = isRestDay ? null : dayData.exercises!;
 
                         int? exerciseCount = 0;
-                        if (exerciseDetails != null && monthProvider!.allRemovedExercise.isNotEmpty) {
-                          String split = monthProvider?.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
+                        if (exerciseDetails != null && monthProvider.allRemovedExercise.isNotEmpty) {
+                          String split = monthProvider.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
 
                           String dataId1 =
-                              "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.monthDataModel?.weeks?[mainIndex!].id}-${monthProvider?.monthDataModel?.weeks?[mainIndex!].idList![index]}";
+                              "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[mainIndex!].id}-${monthProvider.monthDataModel?.weeks?[mainIndex!].idList![index]}";
 
-                          List<String> matchingExerciseIds = monthProvider!.allRemovedExercise
+                          List<String> matchingExerciseIds = monthProvider.allRemovedExercise
                               .where((entry) => entry.dataId == dataId1)
                               .map((entry) => entry.exerciseId!)
                               .toList();
@@ -266,10 +271,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                           exerciseCount = exerciseDetails?.length;
                         }
 
-                        String split = monthProvider?.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
+                        String split = monthProvider.monthDataModel?.weeks?[mainIndex!].idList?.first.toString().split(" ")[1] ?? "";
 
                         String dataId =
-                            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.monthDataModel!.weeks![mainIndex!].id}-${weekDataModel!.idList![index]}";
+                            "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel!.weeks![mainIndex!].id}-${weekDataModel!.idList![index]}";
 
                         int nextWorkOutIndex = weekDataModel!.dayList![index].toString().contains("Workout")
                             ? int.parse(weekDataModel!.dayList![index].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
@@ -327,9 +332,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                               child: SizedBox(
                                 height: 60,
                                 child: InkWell(
-                                  onTap: monthProvider!.weekStatuses[mainIndex!] == WeekType.futureWeek
+                                  onTap: monthProvider.weekStatuses[mainIndex!] == WeekType.futureWeek
                                       ? null
-                                      : () => continueWorkoutOnTap(isRestDay, dataId, index, dayData, context),
+                                      : () => continueWorkoutOnTap(isRestDay, dataId, index, dayData, context, mainIndex!),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -342,25 +347,25 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                             padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                                             child: Builder(
                                               builder: (context) {
-                                                DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel.firstWhere(
+                                                DayHistoryModel? matchingElement = monthProvider.allDayHistoryModel.firstWhere(
                                                   (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
                                                   orElse: () => DayHistoryModel(),
                                                 );
 
                                                 return (isRestDay &&
-                                                                monthProvider!.weekStatuses[mainIndex!] == WeekType.currentWeek &&
-                                                                monthProvider!.isPumpDayAvailable) &&
-                                                            (monthProvider!.allDayHistoryModel.any((element) =>
+                                                                monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek &&
+                                                                monthProvider.isPumpDayAvailable) &&
+                                                            (monthProvider.allDayHistoryModel.any((element) =>
                                                                     (element.status != Status.skipped &&
                                                                         element.status != Status.completed &&
                                                                         (dataId == element.dataId))) ||
-                                                                (!monthProvider!.allDayHistoryModel
+                                                                (!monthProvider.allDayHistoryModel
                                                                     .map((e) => e.dataId)
                                                                     .toList()
                                                                     .contains(dataId))) ||
-                                                        (isRestDay && monthProvider!.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
+                                                        (isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
                                                             // monthProvider!.isPumpDayAvailable &&
-                                                            (monthProvider!.allDayHistoryModel.any((element) =>
+                                                            (monthProvider.allDayHistoryModel.any((element) =>
                                                                 ((element.status == Status.started) && dataId == element.dataId)))
                                                     ? pumpRestSelection(index, dayData, context)
                                                     : Text(
@@ -370,7 +375,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                                                 ? weekDataModel!.days![nextWorkOutIndex].title
                                                                 : weekDataModel!.dayList![index],
                                                         style: TextStyle(
-                                                          color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek
+                                                          color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek
                                                               ? Colors.white
                                                               : AppColors.primaryColor,
                                                           fontSize: ScreenUtil.verticalScale(2),
@@ -387,7 +392,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                               exerciseCount! > 1 ? '$exerciseCount Exercises' : " $exerciseCount Exercise",
                                               style: TextStyle(
                                                 fontSize: ScreenUtil.verticalScale(1.4),
-                                                color: monthProvider?.weekStatuses[mainIndex!] == WeekType.pastWeek
+                                                color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek
                                                     ? Colors.white
                                                     : Colors.grey,
                                                 fontWeight: FontWeight.w400,
@@ -433,7 +438,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     );
   }
 
-  void continueWorkoutOnTap(bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context) {
+  void continueWorkoutOnTap(bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex) {
     // bool val = monthProvider!.allDayHistoryModel.any(
     //   (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
     // );
@@ -458,8 +463,6 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
             (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
-
-    log('isPumpDay :::::::::::::::::: $isPumpDay');
 
     monthProvider?.changeIsPumpDay(isRestDayForPastWeek ? !isRestDayForPastWeek : isPumpDay);
 

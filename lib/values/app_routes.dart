@@ -18,7 +18,7 @@ class AppRoutes {
 
   static const String dayCompletedScreen = '/dayCompleted';
   static const String exerciseScreen = '/exercise';
-  static const String streakScreen = '/streak';
+  // static const String streakScreen = '/streak';
   static const String recalculateScreen = '/recalculate';
   static const String calendarScreen = '/calendar';
   static const String myProfileScreen = '/myprofile';

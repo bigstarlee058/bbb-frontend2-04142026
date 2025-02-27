@@ -4,7 +4,9 @@ import 'dart:developer';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/pages/MonthView/ExercisePage/time_progress.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -38,7 +40,8 @@ class ExerciseSetCard extends StatefulWidget {
     required this.makeRefresh,
     required this.isEditable,
     required this.available,
-    required this.availableIndexString,
+    required this.completed,
+    required this.isFromNotification,
   });
 
   final Color color;
@@ -60,7 +63,8 @@ class ExerciseSetCard extends StatefulWidget {
   final VoidCallback makeRefresh;
   final bool isEditable;
   final bool available;
-  final String availableIndexString;
+  final bool completed;
+  final bool isFromNotification;
 
   @override
   State<ExerciseSetCard> createState() => _ExerciseSetCardState();
@@ -75,11 +79,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   bool _showTimer = false;
   bool setCompleted = false;
 
-  int weight = 5;
-  int reps = 5;
+  int weight = 0;
+  int reps = 0;
   int effort = 100;
-  int _restDuration = 30;
-  int type = 1;
+  int _restDuration = 0;
+  int type = 0;
   int load = 0;
   int index = 0;
   int subIndex = 0;
@@ -92,6 +96,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   @override
   void initState() {
     super.initState();
+
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     weight = widget.weight;
     _weightController = TextEditingController(text: weight.toString().isEmpty ? "0" : weight.toString());
@@ -103,7 +108,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     load = widget.load;
     index = widget.index;
     subIndex = widget.countIndex;
-    // monthProvider!.fetchTimerAddress();
+    monthProvider!.fetchTimerAddress();
 
     setData();
   }
@@ -114,30 +119,26 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     isLoad = true;
     indexString = "";
     setState(() {});
-
-    if (widget.available) {
-      indexString = widget.availableIndexString;
-      WidgetsBinding.instance
-          .addPostFrameCallback((timeStamp) => monthProvider?.updateExpandedItem("${widget.index}:${widget.countIndex}"));
-    }
-    log('_restDuration :::::::::::::::::: $_restDuration');
+    await monthProvider?.fetchExerciseHistoryLocalData();
 
     await preferences.putString(SharedPreference.isPause, "false");
+
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-
     dataId =
         "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
-
-    await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
-    final expandedDataHistory = monthProvider?.expandedDataHistory;
-    if (expandedDataHistory != null) {
+    log('dataId :::::::::::::::::: $dataId');
+    HistoryDataModel? expandedDataHistory = monthProvider?.historyDataModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => HistoryDataModel(),
+    );
+    if (expandedDataHistory?.id != null && expandedDataHistory != null) {
       _repsController.text = expandedDataHistory.reps ?? "5";
       _weightController.text = expandedDataHistory.weight ?? "5";
       effort = (expandedDataHistory.effort == null ? widget.repsInReverse : int.parse(expandedDataHistory.effort ?? "0"));
       weight = int.parse(expandedDataHistory.weight!.isEmpty ? "0" : expandedDataHistory.weight ?? "5");
       reps = int.parse(expandedDataHistory.reps!.isEmpty ? "0" : expandedDataHistory.reps ?? "5");
-      setCompleted = expandedDataHistory.status == "Completed";
+      // setCompleted = expandedDataHistory.status == "Completed";
     } else {
       _weightController = TextEditingController(text: weight.toString().isEmpty ? "0" : weight.toString());
       _repsController = TextEditingController(text: reps.toString().isEmpty ? "0" : reps.toString());
@@ -146,23 +147,24 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       reps = widget.reps;
       _restDuration = widget.restDuration;
     }
-    await monthProvider?.fetchExerciseHistoryLocalData();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {
           isLoad = false;
           setState(() {});
         }));
     widget.makeRefresh();
+    if (widget.isFromNotification) {
+      await fromNotification();
+    }
   }
 
-  /// TEMP COMMENT !!! DONT DELETE THIS
-
-  // void _handleTimerComplete() {
-  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-  //     setState(() {
-  //       timerCompleted = true;
-  //     });
-  //   });
-  // }
+  void _handleTimerComplete() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        timerCompleted = true;
+      });
+      widget.makeRefresh();
+    });
+  }
 
   void incrementWeight() {
     setState(() {
@@ -214,13 +216,12 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     });
   }
 
-  /// TEMP COMMENT !!! DONT DELETE THIS
-
-  // Future<void> _handleCloseTimer() async {
-  //   _showTimer = false;
-  //   await monthProvider?.setShowTimerIndex(-1, -1, -1);
-  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
-  // }
+  Future<void> _handleCloseTimer() async {
+    _showTimer = false;
+    await monthProvider?.setShowTimerIndex(-1, -1, -1);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+    widget.makeRefresh();
+  }
 
   Future<void> _saveData() async {
     monthProvider?.timerAddress = "";
@@ -249,10 +250,16 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "index": widget.index,
       "subIndex": widget.countIndex,
       "date": "${DateTime.now().toUtc()}",
-      // "status": _restDuration == 0 ? Status.completed : Status.empty
-      "status": Status.completed
+      "status": _restDuration == 0 ? Status.completed : Status.empty
+      // "status": Status.completed
     };
 
+    await monthProvider?.fetchExerciseHistoryLocalData();
+
+    HistoryDataModel? matchingElement = monthProvider?.historyDataModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => HistoryDataModel(),
+    );
     final data1 = {
       "sets": widget.extraDataModel.sets.toString(),
       "reps": _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
@@ -262,32 +269,30 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
       "date": "${DateTime.now().toUtc()}",
-      // "status": _restDuration == 0 ? Status.completed : Status.empty
-      "status": Status.completed
+      "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
     };
-    await monthProvider?.fetchExerciseHistoryLocalData();
-    if (monthProvider!.historyDataModel.isNotEmpty) {
-      if (monthProvider!.historyDataModel.any((element) => element.dataId == dataId)) {
-        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
-      } else {
-        await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
-      }
+    if (matchingElement?.id != null) {
+      log('data1 :::::::::::::::::: $data1');
+      await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
     } else {
       await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
     monthProvider?.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex, removeVal: true);
-    // if (_restDuration != 0) {
-    //   _showTimer = true;
-    // }
-    // setCompleted = _restDuration == 0 ? true : false;
-
-    _showTimer = false;
-    setCompleted = true;
+    if (_restDuration != 0) {
+      _showTimer = true;
+    }
 
     setState(() {});
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
     await monthProvider?.fetchExerciseHistoryLocalData();
+    widget.makeRefresh();
+  }
+
+  Future<void> fromNotification() async {
+    await monthProvider?.fetchExerciseHistoryLocalData();
+    setCompleted = true;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
     widget.makeRefresh();
   }
 
@@ -333,18 +338,19 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     super.build(context);
     context.select((MonthProvider value) => value.currentExpandedItem);
     context.select((MonthProvider value) => value.timerAddress);
-    log('monthProvider!.currentExpandedItem :::::::::::::::::: ${monthProvider!.currentExpandedItem}');
     _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
 
-    // if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.timerAddress != "") {
-    //   _showTimer = monthProvider!.timerAddress ==
-    //       "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
-    //   if (_showTimer) {
-    //     monthProvider!.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex);
-    //   }
-    // } else {
-    //   _showTimer = false;
-    // }
+    if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.timerAddress != "") {
+      _showTimer = monthProvider!.timerAddress ==
+          "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
+      if (_showTimer) {
+        monthProvider!.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex);
+      }
+    } else {
+      _showTimer = false;
+    }
+
+    log('widget.completed :::::::::::::::::: ${widget.completed}');
 
     return isLoad
         ? SizedBox()
@@ -352,12 +358,9 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
             child: Column(
               children: [
                 ColorFiltered(
-                  colorFilter: widget.available || setCompleted
+                  colorFilter: widget.available || widget.completed || /*setCompleted ||*/ _showTimer || timerCompleted
                       ? ColorFilter.mode(Colors.transparent, BlendMode.saturation)
-                      : const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.saturation,
-                        ),
+                      : const ColorFilter.mode(Colors.white, BlendMode.saturation),
                   child: Container(
                     decoration: _showTimer
                         ? BoxDecoration(
@@ -379,7 +382,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                           padding: EdgeInsets.symmetric(vertical: 15, horizontal: ScreenUtil.horizontalScale(4)),
                           child: GestureDetector(
                             onTap: () async {
-                              if (widget.available || setCompleted) {
+                              if (widget.available || widget.completed /*|| setCompleted*/) {
                                 _showTimer = false;
                                 await monthProvider?.setShowTimerIndex(-1, -1, -1);
                                 await monthProvider?.updateExpandedItem(!_isExpanded ? "${widget.index}:${widget.countIndex}" : "");
@@ -398,7 +401,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "${widget.title} ${subIndex + 1}",
+                                            "${widget.title} ${widget.subIndex + 1}",
                                             style: GoogleFonts.plusJakartaSans(
                                               color: AppColors.primaryColor,
                                               fontSize: 13,
@@ -420,7 +423,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                     ],
                                   ),
                                 ),
-                                if (timerCompleted || setCompleted)
+                                if (widget.completed || timerCompleted /*|| setCompleted*/)
                                   Container(
                                     padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
                                     margin: const EdgeInsets.only(right: 10),
@@ -728,8 +731,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                       ),
                                 if (widget.isEditable)
                                   ButtonWidget(
-                                    // text: _restDuration != 0 ? "Save & start rest timer" : "Save",
-                                    text: "Save",
+                                    text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                                    // text: "Save",
                                     textColor: Colors.white,
                                     onPress: _saveData,
                                     color: AppColors.primaryColor,
@@ -737,8 +740,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                   )
                                 else
                                   ButtonWidget(
-                                    // text: _restDuration != 0 ? "Save & start rest timer" : "Save",
-                                    text: "Save",
+                                    text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                                    // text: "Save",
                                     textColor: Colors.white,
                                     onPress: null,
                                     color: AppColors.primaryColor,
@@ -754,19 +757,24 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                     ),
                   ),
                 ),
-
-                /// TEMP COMMENT !!! DONT DELETE THIS
-
-                // if (_showTimer && _restDuration != 0) ...[
-                //   TimerWithProgressBar(
-                //     dataId: dataId,
-                //     // isTimerRunning: widget.isTimerRunning,
-                //     currentTime: monthProvider!.timePassed,
-                //     initialDuration: _restDuration,
-                //     onClose: _handleCloseTimer,
-                //     onComplete: _handleTimerComplete,
-                //   ),
-                // ],
+                if (_showTimer && _restDuration != 0) ...[
+                  TimerWithProgressBar(
+                    makeRefresh: () {
+                      widget.makeRefresh();
+                    },
+                    index: "${widget.index}",
+                    subIndex: "${widget.countIndex}",
+                    dataId: dataId,
+                    // isTimerRunning: widget.isTimerRunning,
+                    currentTime: monthProvider!.timePassed,
+                    initialDuration: _restDuration,
+                    onClose: _handleCloseTimer,
+                    onComplete: () {
+                      _handleTimerComplete();
+                      widget.makeRefresh();
+                    },
+                  ),
+                ],
               ],
             ),
           );

@@ -175,6 +175,8 @@ class DataProvider extends ChangeNotifier {
   Collections get oneCollection => collectionData;
 
   Future<void> fetchOneCollection(String collectionId) async {
+    collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+    notifyListeners();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/collections/get/$collectionId');
     String? userIdToken = await getAuthToken();
     try {
@@ -307,6 +309,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future fetchMonthWorkouts(int month) async {
+    log('DateTime.now().toUtc() :::::::::::::::::: ${"${DateTime.now().toUtc()}"}');
     final Map<String, String> queryParams = {
       'month': month.toString(),
       'equipment': '0',

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -71,8 +70,6 @@ class _TodayPageState extends State<TodayPage> {
             fetchWarmupData();
             monthProvider?.fetchExerciseStatusLocalData();
             fetchRemovedExerciseLocalData();
-            log(' monthProvider?.dayHistoryDetails? :::::::::::::::::: ${jsonEncode(monthProvider?.dayHistoryDetails)}');
-            log('monthProvider?.actualWeek :::::::::::::::::: ${monthProvider?.actualWeek}');
             isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
             isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
                 monthProvider?.dayHistoryDetails == null ||
@@ -89,15 +86,11 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> fetchExtraAddedExercise() async {
     setState(
       () {
-        log('monthProvider!.dayDataModel!.exercises! :::::::::::::::::: ${monthProvider!.dayDataModel!.exercises!}');
         exercises = [];
-        log('exercises :::::::::::::::::: ${exercises.length}');
         loader = true;
         exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
         totalWarmups =
             monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
-
-        log('exercises :::::::::::::::::: ${exercises.length}');
       },
     );
 
@@ -116,7 +109,7 @@ class _TodayPageState extends State<TodayPage> {
           (value) {
             if (monthProvider!.swapExerciseList.isNotEmpty) {
               for (var element in monthProvider!.swapExerciseList) {
-                exercises.removeWhere((exercise) => exercise.exerciseId == element.exerciseId);
+                exercises.removeAt(int.parse(element.insertIndex ?? "0"));
                 exercises.insert(int.parse(element.insertIndex ?? "0"), element.exerciseJson!);
               }
             }
@@ -241,9 +234,6 @@ class _TodayPageState extends State<TodayPage> {
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => fetchExtraAddedExercise(),
-      // ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -461,8 +451,7 @@ class _TodayPageState extends State<TodayPage> {
                                                     Padding(
                                                       padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                                       child: WorkoutCard(
-                                                        image: exercises[i].thumbnail ??
-                                                            "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                        image: exercises[i].thumbnail ?? "unknown",
                                                         dataId: dataId,
                                                         isDayCompleted: isCurrentDayCompleted,
                                                         isDaySkipped: isCurrentDaySkipped,
@@ -750,7 +739,7 @@ class _TodayPageState extends State<TodayPage> {
                     networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
                         ? monthProvider.warmUpModel?.thumbnail ??
                             "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                        : monthProvider.warmUpModel?.thumbnail ?? "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                        : monthProvider.warmUpModel?.thumbnail ?? "unknown",
                     borderRadius: BorderRadius.all(
                       Radius.circular(ScreenUtil.verticalScale(1)),
                     ),
@@ -939,7 +928,7 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> addExerciseDialog() async {
     monthProvider?.fetchAllExercise();
-
+    searchQuery = "";
     if (mounted) {
       return showDialog(
         context: context,
@@ -1087,11 +1076,11 @@ class _TodayPageState extends State<TodayPage> {
                                     children: [
                                       Container(
                                         width: media.width,
-                                        padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+                                        padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 10),
                                         child: Align(
                                           alignment: Alignment.center,
                                           child: Text(
-                                            'Select from the list:',
+                                            'Search for your exercise',
                                             style: TextStyle(
                                               fontSize: ScreenUtil.horizontalScale(5.5),
                                               fontWeight: FontWeight.bold,
@@ -1109,38 +1098,48 @@ class _TodayPageState extends State<TodayPage> {
                                           });
                                         },
                                       ),
-                                      monthProvider!.allFilterExercises.isNotEmpty
-                                          ? Column(
-                                              children: [
-                                                ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                    maxHeight: ScreenUtil.verticalScale(60),
-                                                  ),
-                                                  child: SingleChildScrollView(
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(8.0),
-                                                      child: Column(
-                                                        children:
-                                                            buildExerciseList(monthProvider!.allFilterExercises, currentPageAll, false),
+                                      searchQuery.isEmpty
+                                          ? SizedBox(
+                                              height: media.width * 0.45,
+                                            )
+                                          : monthProvider!.allFilterExercises.isNotEmpty
+                                              ? Column(
+                                                  children: [
+                                                    ConstrainedBox(
+                                                      constraints: BoxConstraints(
+                                                        maxHeight: ScreenUtil.verticalScale(60),
                                                       ),
+                                                      child: SingleChildScrollView(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Column(
+                                                            children:
+                                                                buildExerciseList(monthProvider!.allFilterExercises, currentPageAll, false),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    // Pagination controls for all exercises
+                                                    buildPaginationControls(
+                                                      currentPageAll,
+                                                      monthProvider!.allFilterExercises.length,
+                                                      (page) {
+                                                        setState(() {
+                                                          currentPageAll = page;
+                                                        });
+                                                      },
+                                                    ),
+                                                  ],
+                                                )
+                                              : SizedBox(
+                                                  height: media.width * 0.45,
+                                                  child: const Center(
+                                                    child: Text(
+                                                      "No exercise available!",
+                                                      style: TextStyle(fontSize: 17),
                                                     ),
                                                   ),
                                                 ),
-                                                // Pagination controls for all exercises
-                                                buildPaginationControls(
-                                                  currentPageAll,
-                                                  monthProvider!.allFilterExercises.length,
-                                                  (page) {
-                                                    setState(() {
-                                                      currentPageAll = page;
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            )
-                                          : const Center(
-                                              child: Text("No exercise available"),
-                                            ),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                                         child: Row(
@@ -1166,6 +1165,7 @@ class _TodayPageState extends State<TodayPage> {
                                                 ExerciseDataModel newDayExercise = ExerciseDataModel();
                                                 if (exercises.isNotEmpty) {
                                                   newDayExercise = ExerciseDataModel(
+                                                    isAddedUpdated: true,
                                                     id: "",
                                                     exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
                                                     typeId: exercises[0].typeId ?? 1,
@@ -1177,19 +1177,20 @@ class _TodayPageState extends State<TodayPage> {
                                                     rest: exercises[0].rest ?? 0,
                                                     weight: exercises[0].weight ?? 0,
                                                     formats: exercises[0].formats ?? [],
-                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
-                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                    thumbnail:
+                                                        monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
                                                     extra: exercises[0].extra ?? [],
                                                   );
                                                 } else {
                                                   newDayExercise = ExerciseDataModel(
+                                                    isAddedUpdated: true,
                                                     id: "",
                                                     exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
                                                     typeId: 1,
                                                     name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
                                                         "Exercise ${exercises.length + 1}",
-                                                    thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
-                                                        "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                    thumbnail:
+                                                        monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
                                                     guide: "",
                                                     sets: 5,
                                                     reps: 10,
@@ -1295,7 +1296,7 @@ class _TodayPageState extends State<TodayPage> {
                       ? ConstrainedBox(
                           constraints: BoxConstraints(
                             maxWidth: ScreenUtil.horizontalScale(96),
-                            maxHeight: ScreenUtil.verticalScale(58),
+                            maxHeight: ScreenUtil.verticalScale(45),
                           ),
                           child: Center(child: CircularProgressIndicator(color: AppColors.primaryColor)),
                         )
@@ -1329,8 +1330,7 @@ class _TodayPageState extends State<TodayPage> {
                                                 appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  networkImageUrl: exercises[i - (0)].thumbnail ??
-                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  networkImageUrl: exercises[i - (0)].thumbnail ?? "unknown",
                                                   fit: BoxFit.cover,
                                                   borderRadius: BorderRadius.all(
                                                     Radius.circular(ScreenUtil.horizontalScale(1)),
@@ -1435,8 +1435,7 @@ class _TodayPageState extends State<TodayPage> {
                                                 appShimmerImage(
                                                   width: ScreenUtil.horizontalScale(10),
                                                   height: ScreenUtil.horizontalScale(10),
-                                                  networkImageUrl: exercises[i].thumbnail ??
-                                                      "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                  networkImageUrl: exercises[i].thumbnail ?? "unknown",
                                                   fit: BoxFit.cover,
                                                   borderRadius: BorderRadius.all(
                                                     Radius.circular(ScreenUtil.horizontalScale(1)),
@@ -1535,7 +1534,7 @@ class _TodayPageState extends State<TodayPage> {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Select Related Exercise',
+                                          'Swap exercise option',
                                           style: TextStyle(
                                             fontSize: ScreenUtil.horizontalScale(5.5),
                                             fontWeight: FontWeight.bold,
@@ -1587,8 +1586,8 @@ class _TodayPageState extends State<TodayPage> {
                                             child: Padding(
                                               padding: EdgeInsets.only(top: 12, bottom: 18),
                                               child: Text(
-                                                "No related exercise available!",
-                                                style: TextStyle(fontSize: 16),
+                                                "No exercise available!",
+                                                style: TextStyle(fontSize: 17),
                                               ),
                                             ),
                                           ),
@@ -1598,7 +1597,7 @@ class _TodayPageState extends State<TodayPage> {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Or select from the list:',
+                                          'Or search our library',
                                           style: TextStyle(
                                               fontSize: ScreenUtil.horizontalScale(5.5),
                                               fontWeight: FontWeight.bold,
@@ -1620,7 +1619,7 @@ class _TodayPageState extends State<TodayPage> {
                                     ),
                                     searchQuery.isEmpty
                                         ? SizedBox(
-                                            height: media.width * 0.4,
+                                            height: media.width * 0.25,
                                           )
                                         : monthProvider!.allFilterExercises.isNotEmpty
                                             ? Column(
@@ -1649,12 +1648,15 @@ class _TodayPageState extends State<TodayPage> {
                                                   ),
                                                 ],
                                               )
-                                            : Padding(
-                                                padding: const EdgeInsets.only(bottom: 5),
+                                            : SizedBox(
+                                                height: media.width * 0.25,
                                                 child: Center(
-                                                  child: Text(
-                                                    "No exercise available!",
-                                                    style: TextStyle(fontSize: 18),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(bottom: 12),
+                                                    child: Text(
+                                                      "No exercise available!",
+                                                      style: TextStyle(fontSize: 17),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -1690,12 +1692,11 @@ class _TodayPageState extends State<TodayPage> {
                                               }
 
                                               ExerciseDataModel newDayExercise = ExerciseDataModel(
+                                                isAddedUpdated: true,
                                                 id: "",
                                                 exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
                                                 typeId: exercises[selectedIndex].typeId ?? 1,
-                                                thumbnail: exerciseDataModel?.thumbnail ??
-                                                    relatedExerciseData?.thumbnail ??
-                                                    "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                                thumbnail: exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
                                                 name: exerciseDataModel?.title ??
                                                     relatedExerciseData?.title ??
                                                     "Exercise ${exercises.length + 1}",

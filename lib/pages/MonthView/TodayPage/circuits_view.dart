@@ -234,8 +234,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                                           data = monthProvider.circuitModel[indexW];
                                         }
                                         return WorkoutCard(
-                                          image: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].thumbnail ??
-                                              "https://asset.cloudinary.com/de3iwsrnr/41efbf82db182182b093eeb0a294827e",
+                                          image: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].thumbnail ?? "unknown",
                                           dataId: dataId,
                                           isDayCompleted: widget.isDayCompleted,
                                           isDaySkipped: widget.isDaySkipped,

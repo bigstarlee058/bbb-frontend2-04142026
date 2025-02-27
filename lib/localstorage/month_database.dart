@@ -226,6 +226,19 @@ class DatabaseHelper {
     return results;
   }
 
+  Future<List<Map<String, dynamic>>> getFilteredWithMonthWeekDayDData(
+      {required String tableName, required String monthId, required String dayId, required String weekId}) async {
+    Database db = await database;
+
+    List<Map<String, dynamic>> results = await db.query(
+      tableName,
+      where: 'monthId = ? AND dayId = ? AND weekId = ?',
+      whereArgs: [monthId, dayId, weekId],
+    );
+
+    return results;
+  }
+
   Future<List<Map<String, dynamic>>> getFilteredWithMWData(
       {required String tableName, required String monthId, required String weekId, required String split}) async {
     Database db = await database;
