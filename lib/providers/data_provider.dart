@@ -309,6 +309,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future fetchMonthWorkouts(int month) async {
+    log('DateTime.now().toUtc() :::::::::::::::::: ${"${DateTime.now().toUtc()}"}');
     final Map<String, String> queryParams = {
       'month': month.toString(),
       'equipment': '0',

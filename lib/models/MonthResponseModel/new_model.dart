@@ -191,6 +191,7 @@ class ExerciseDataModel {
   List<ExtraDataModel>? extra;
   String? id;
   String? thumbnail;
+  bool? isAddedUpdated;
 
   ExerciseDataModel({
     this.typeId,
@@ -205,6 +206,7 @@ class ExerciseDataModel {
     this.extra,
     this.id,
     this.thumbnail,
+    this.isAddedUpdated,
   });
 
   factory ExerciseDataModel.fromJson(Map<String, dynamic> json) => ExerciseDataModel(
@@ -224,6 +226,7 @@ class ExerciseDataModel {
         extra: json["extra"] == null ? [] : List<ExtraDataModel>.from(json["extra"]!.map((x) => ExtraDataModel.fromJson(x))),
         id: json["_id"],
         thumbnail: json["thumbnails"],
+        isAddedUpdated: json["isAddedUpdated"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -243,6 +246,7 @@ class ExerciseDataModel {
                 : List<dynamic>.from(formats!.map((x) => x)),
         "extra": extra == null ? [] : List<dynamic>.from(extra!.map((x) => x.toJson())),
         "_id": id,
+        "isAddedUpdated": isAddedUpdated,
       };
 }
 

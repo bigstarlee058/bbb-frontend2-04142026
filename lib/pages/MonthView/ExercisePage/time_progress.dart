@@ -13,8 +13,12 @@ class TimerWithProgressBar extends StatefulWidget {
   final int initialDuration;
   final VoidCallback onClose;
   final VoidCallback onComplete;
+  final VoidCallback makeRefresh;
   final String currentTime;
   final String dataId;
+  final String index;
+  final String subIndex;
+
   // final bool isTimerRunning;
 
   const TimerWithProgressBar({
@@ -25,6 +29,9 @@ class TimerWithProgressBar extends StatefulWidget {
     required this.currentTime,
     // required this.isTimerRunning,
     required this.dataId,
+    required this.subIndex,
+    required this.index,
+    required this.makeRefresh,
   });
 
   @override
@@ -63,17 +70,21 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
 
     controller = AnimationController(vsync: this, duration: Duration(seconds: totalTime));
 
-    controller.addStatusListener((status) async {
-      if (status == AnimationStatus.completed) {
-        animationCompleted = true;
-        widget.onComplete();
+    controller.addStatusListener(
+      (status) async {
+        if (status == AnimationStatus.completed) {
+          animationCompleted = true;
+          widget.onComplete();
 
-        await DatabaseHelper().updateSingleValue(
-            tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
-
-        await monthProvider.fetchExerciseHistoryLocalData();
-      }
-    });
+          await DatabaseHelper()
+              .updateSingleValue(
+                  tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
+              .then(
+                (value) async => await monthProvider.fetchExerciseHistoryLocalData().then((value) => widget.makeRefresh()),
+              );
+        }
+      },
+    );
 
     startTimer();
   }
@@ -83,24 +94,38 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
     if (monthProvider.timePassed != "") {
       currentTime = int.parse(monthProvider.timePassed);
     }
-    timerTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!isPaused) {
-        currentTime++;
-        formattedTime = _formatTime(widget.initialDuration - currentTime);
-        if (!animationCompleted && currentTime <= totalTime) {
-          controller.value = currentTime / totalTime;
+    if (widget.initialDuration > currentTime) {
+      timerTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!isPaused) {
+          formattedTime = _formatTime(widget.initialDuration - currentTime);
+
+          currentTime++;
+          if (!animationCompleted && currentTime <= totalTime) {
+            controller.value = currentTime / totalTime;
+          }
+          setState(() {});
+          if (currentTime == totalTime && !animationCompleted) {
+            controller.forward();
+            widget.onComplete();
+          }
         }
-        setState(() {});
-        if (currentTime == totalTime && !animationCompleted) {
-          controller.forward();
-          widget.onComplete();
+        if (widget.initialDuration < currentTime) {
+          isPaused = true;
+          controller.stop();
         }
-      }
-      if (widget.initialDuration == currentTime) {
-        isPaused = true;
-        controller.stop();
-      }
-    });
+      });
+    } else {
+      await DatabaseHelper()
+          .updateSingleValue(tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
+          .then(
+            (value) async => await monthProvider.fetchExerciseHistoryLocalData(),
+          );
+
+      formattedTime = _formatTime(widget.initialDuration - widget.initialDuration);
+      isPaused = true;
+      controller.stop();
+      widget.makeRefresh();
+    }
 
     setState(() {});
   }
@@ -136,25 +161,28 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         NotificationService.clearNotification();
         await monthProvider.getPassedTime();
         if (monthProvider.timePassed != "") {
-          log('monthProvider.timePassed  :::::::::::::::::: ${monthProvider.timePassed}');
-
           currentTime = 0;
 
           currentTime = int.parse(monthProvider.timePassed);
 
           if (int.parse(monthProvider.timePassed) > totalTime) {
-            await DatabaseHelper().updateSingleValue(
-                tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed);
-            await monthProvider.fetchExerciseHistoryLocalData();
+            await DatabaseHelper()
+                .updateSingleValue(
+                    tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
+                .then(
+                  (value) async => await monthProvider.fetchExerciseHistoryLocalData().then(
+                        (value) => widget.makeRefresh(),
+                      ),
+                );
           }
         }
         setState(() {});
         break;
       case AppLifecycleState.inactive:
-        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context);
+        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context, widget.dataId, widget.index, widget.subIndex);
         break;
       case AppLifecycleState.paused:
-        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context);
+        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context, widget.dataId, widget.index, widget.subIndex);
         break;
       case AppLifecycleState.detached:
         break;
@@ -165,7 +193,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
 
   @override
   void dispose() {
-    monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context);
+    monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context, widget.dataId, widget.index, widget.subIndex);
     controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     timerTimer?.cancel();

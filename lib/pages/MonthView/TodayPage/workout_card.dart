@@ -325,7 +325,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                             child: Text(
                               widget.name,
                               style: TextStyle(
-                                color: AppColors.primaryColor,
+                                color: (widget.exercise.isAddedUpdated ?? false) ? AppColors.skipDayColor : AppColors.primaryColor,
                                 fontSize: widget.isCircuit ? ScreenUtil.horizontalScale(3) : ScreenUtil.horizontalScale(3.8),
                                 fontWeight: FontWeight.bold,
                                 height: 1.2,
@@ -373,8 +373,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                         : null,
                     child: Container(
                       padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryColor,
+                      decoration: BoxDecoration(
+                        color: (widget.exercise.isAddedUpdated ?? false) ? AppColors.skipDayColor : AppColors.primaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(

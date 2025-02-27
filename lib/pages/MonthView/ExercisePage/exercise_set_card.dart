@@ -40,6 +40,8 @@ class ExerciseSetCard extends StatefulWidget {
     required this.makeRefresh,
     required this.isEditable,
     required this.available,
+    required this.completed,
+    required this.isFromNotification,
   });
 
   final Color color;
@@ -61,6 +63,8 @@ class ExerciseSetCard extends StatefulWidget {
   final VoidCallback makeRefresh;
   final bool isEditable;
   final bool available;
+  final bool completed;
+  final bool isFromNotification;
 
   @override
   State<ExerciseSetCard> createState() => _ExerciseSetCardState();
@@ -75,11 +79,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   bool _showTimer = false;
   bool setCompleted = false;
 
-  int weight = 5;
-  int reps = 5;
+  int weight = 0;
+  int reps = 0;
   int effort = 100;
-  int _restDuration = 30;
-  int type = 1;
+  int _restDuration = 0;
+  int type = 0;
   int load = 0;
   int index = 0;
   int subIndex = 0;
@@ -92,6 +96,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   @override
   void initState() {
     super.initState();
+
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     weight = widget.weight;
     _weightController = TextEditingController(text: weight.toString().isEmpty ? "0" : weight.toString());
@@ -114,29 +119,26 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     isLoad = true;
     indexString = "";
     setState(() {});
-
-    // if (widget.available) {
-    //   indexString = widget.availableIndexString;
-    //   WidgetsBinding.instance
-    //       .addPostFrameCallback((timeStamp) => monthProvider?.updateExpandedItem("${widget.index}:${widget.countIndex}"));
-    // }
+    await monthProvider?.fetchExerciseHistoryLocalData();
 
     await preferences.putString(SharedPreference.isPause, "false");
+
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-
     dataId =
         "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
-
-    await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
-    final expandedDataHistory = monthProvider?.expandedDataHistory;
-    if (expandedDataHistory != null) {
+    log('dataId :::::::::::::::::: $dataId');
+    HistoryDataModel? expandedDataHistory = monthProvider?.historyDataModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => HistoryDataModel(),
+    );
+    if (expandedDataHistory?.id != null && expandedDataHistory != null) {
       _repsController.text = expandedDataHistory.reps ?? "5";
       _weightController.text = expandedDataHistory.weight ?? "5";
       effort = (expandedDataHistory.effort == null ? widget.repsInReverse : int.parse(expandedDataHistory.effort ?? "0"));
       weight = int.parse(expandedDataHistory.weight!.isEmpty ? "0" : expandedDataHistory.weight ?? "5");
       reps = int.parse(expandedDataHistory.reps!.isEmpty ? "0" : expandedDataHistory.reps ?? "5");
-      setCompleted = expandedDataHistory.status == "Completed";
+      // setCompleted = expandedDataHistory.status == "Completed";
     } else {
       _weightController = TextEditingController(text: weight.toString().isEmpty ? "0" : weight.toString());
       _repsController = TextEditingController(text: reps.toString().isEmpty ? "0" : reps.toString());
@@ -145,12 +147,14 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       reps = widget.reps;
       _restDuration = widget.restDuration;
     }
-    await monthProvider?.fetchExerciseHistoryLocalData();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {
           isLoad = false;
           setState(() {});
         }));
     widget.makeRefresh();
+    if (widget.isFromNotification) {
+      await fromNotification();
+    }
   }
 
   void _handleTimerComplete() {
@@ -158,8 +162,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       setState(() {
         timerCompleted = true;
       });
+      widget.makeRefresh();
     });
-    widget.makeRefresh();
   }
 
   void incrementWeight() {
@@ -213,15 +217,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   }
 
   Future<void> _handleCloseTimer() async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-    dataId =
-        "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
-    HistoryDataModel? matchingElement = monthProvider?.historyDataModel.firstWhere(
-      (element) => element.dataId == dataId,
-      orElse: () => HistoryDataModel(),
-    );
-    setCompleted = matchingElement?.status == Status.completed;
     _showTimer = false;
     await monthProvider?.setShowTimerIndex(-1, -1, -1);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
@@ -287,18 +282,17 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     if (_restDuration != 0) {
       _showTimer = true;
     }
-    setCompleted = matchingElement?.status == Status.completed
-        ? true
-        : _restDuration == 0
-            ? true
-            : false;
-
-    // _showTimer = false;
-    // setCompleted = true;
 
     setState(() {});
     await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
     await monthProvider?.fetchExerciseHistoryLocalData();
+    widget.makeRefresh();
+  }
+
+  Future<void> fromNotification() async {
+    await monthProvider?.fetchExerciseHistoryLocalData();
+    setCompleted = true;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
     widget.makeRefresh();
   }
 
@@ -355,15 +349,16 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     } else {
       _showTimer = false;
     }
-    log('setCompleted:::::::::::::::::: $setCompleted');
-    log('timerCompleted :::::::::::::::::: $timerCompleted');
+
+    log('widget.completed :::::::::::::::::: ${widget.completed}');
+
     return isLoad
         ? SizedBox()
         : SingleChildScrollView(
             child: Column(
               children: [
                 ColorFiltered(
-                  colorFilter: widget.available || setCompleted || _showTimer
+                  colorFilter: widget.available || widget.completed || /*setCompleted ||*/ _showTimer || timerCompleted
                       ? ColorFilter.mode(Colors.transparent, BlendMode.saturation)
                       : const ColorFilter.mode(Colors.white, BlendMode.saturation),
                   child: Container(
@@ -387,7 +382,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                           padding: EdgeInsets.symmetric(vertical: 15, horizontal: ScreenUtil.horizontalScale(4)),
                           child: GestureDetector(
                             onTap: () async {
-                              if (widget.available || setCompleted) {
+                              if (widget.available || widget.completed /*|| setCompleted*/) {
                                 _showTimer = false;
                                 await monthProvider?.setShowTimerIndex(-1, -1, -1);
                                 await monthProvider?.updateExpandedItem(!_isExpanded ? "${widget.index}:${widget.countIndex}" : "");
@@ -406,7 +401,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "${widget.title} ${subIndex + 1}",
+                                            "${widget.title} ${widget.subIndex + 1}",
                                             style: GoogleFonts.plusJakartaSans(
                                               color: AppColors.primaryColor,
                                               fontSize: 13,
@@ -428,7 +423,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                     ],
                                   ),
                                 ),
-                                if (timerCompleted || setCompleted)
+                                if (widget.completed || timerCompleted /*|| setCompleted*/)
                                   Container(
                                     padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
                                     margin: const EdgeInsets.only(right: 10),
@@ -764,12 +759,20 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                 ),
                 if (_showTimer && _restDuration != 0) ...[
                   TimerWithProgressBar(
+                    makeRefresh: () {
+                      widget.makeRefresh();
+                    },
+                    index: "${widget.index}",
+                    subIndex: "${widget.countIndex}",
                     dataId: dataId,
                     // isTimerRunning: widget.isTimerRunning,
                     currentTime: monthProvider!.timePassed,
                     initialDuration: _restDuration,
                     onClose: _handleCloseTimer,
-                    onComplete: _handleTimerComplete,
+                    onComplete: () {
+                      _handleTimerComplete();
+                      widget.makeRefresh();
+                    },
                   ),
                 ],
               ],

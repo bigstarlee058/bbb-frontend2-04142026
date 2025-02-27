@@ -282,6 +282,21 @@ class _WatchTutorialState extends State<WatchTutorial> {
                     ],
                   ),
                   SizedBox(height: ScreenUtil.verticalScale(2)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5), vertical: ScreenUtil.horizontalScale(1.5)),
+                    child: ButtonWidget(
+                      text: "Watch the App Tutorial",
+                      textColor: Colors.white,
+                      onPress: () {
+                        if (_videoPlayerController.value.isPlaying) {
+                          _videoPlayerController.pause();
+                        }
+                        Navigator.pushNamed(context, '/appTutorialScreen');
+                      },
+                      color: AppColors.primaryColor,
+                      isLoading: false,
+                    ),
+                  ),
                   Container(
                       margin: EdgeInsets.only(
                           left: ScreenUtil.horizontalScale(5),
@@ -297,29 +312,29 @@ class _WatchTutorialState extends State<WatchTutorial> {
                                 fontSize: 18, // Customize font size for better readability
                                 color: Colors.black,
                               )))),
-                  SizedBox(height: ScreenUtil.verticalScale(2)),
+                  SizedBox(height: ScreenUtil.verticalScale(1.5)),
                   // Button at the bottom
                   Container(
                     margin: EdgeInsets.only(
-                      bottom: ScreenUtil.verticalScale(3),
+                      bottom: ScreenUtil.verticalScale(4),
                       left: ScreenUtil.horizontalScale(10),
                       right: ScreenUtil.horizontalScale(10),
                     ),
                     child: Column(
                       children: [
-                        ButtonWidget(
-                          text: "Watch the App Tutorial",
-                          textColor: Colors.white,
-                          onPress: () {
-                            if (_videoPlayerController.value.isPlaying) {
-                              _videoPlayerController.pause();
-                            }
-                            Navigator.pushNamed(context, '/appTutorialScreen');
-                          },
-                          color: AppColors.primaryColor,
-                          isLoading: false,
-                        ),
-                        const SizedBox(height: 16),
+                        // ButtonWidget(
+                        //   text: "Watch the App Tutorial",
+                        //   textColor: Colors.white,
+                        //   onPress: () {
+                        //     if (_videoPlayerController.value.isPlaying) {
+                        //       _videoPlayerController.pause();
+                        //     }
+                        //     Navigator.pushNamed(context, '/appTutorialScreen');
+                        //   },
+                        //   color: AppColors.primaryColor,
+                        //   isLoading: false,
+                        // ),
+                        // const SizedBox(height: 16),
                         // ButtonWidget(
                         //   text: args["buttontext"],
                         //   textColor: Colors.white,
@@ -334,7 +349,7 @@ class _WatchTutorialState extends State<WatchTutorial> {
                             onPressed: () => Navigator.pop(context),
                             child: Text(
                               "Back",
-                              style: TextStyle(fontSize: 16, color: AppColors.primaryColor),
+                              style: TextStyle(fontSize: 18, color: AppColors.primaryColor),
                             ))
                       ],
                     ),

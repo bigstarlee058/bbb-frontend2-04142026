@@ -14,6 +14,9 @@ class PayloadModel {
   int? weekIndex;
   int? dayIndex;
   String? circuitIndex;
+  String? index;
+  String? subIndex;
+  String? dataId;
   bool? isPumpday;
   bool? isCircuit;
 
@@ -29,6 +32,9 @@ class PayloadModel {
     this.isPumpday,
     this.circuitIndex,
     this.isCircuit,
+    this.index,
+    this.dataId,
+    this.subIndex,
   });
 
   factory PayloadModel.fromJson(Map<String, dynamic> json) => PayloadModel(
@@ -43,6 +49,9 @@ class PayloadModel {
         isPumpday: json["is_pumpday"],
         isCircuit: json["is_circuit"],
         circuitIndex: json["circuit_index"],
+        index: json["index"],
+        subIndex: json["subIndex"],
+        dataId: json["dataId"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -57,5 +66,8 @@ class PayloadModel {
         "is_pumpday": isPumpday,
         "is_circuit": isCircuit,
         "circuit_index": circuitIndex,
+        "index": index,
+        "subIndex": subIndex,
+        "dataId": dataId,
       };
 }

@@ -59,8 +59,11 @@ class _ExercisePageState extends State<ExercisePage> {
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((timeStamp) async => await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES"));
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
+      await preferences.putInt(SharedPreference.fromNotification, 0);
+      await preferences.clearValue(SharedPreference.fromNotification);
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       argument = ModalRoute.of(context)?.settings.arguments as String?;
@@ -106,14 +109,22 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 
   Future<void> fromNotification() async {
+    setState(() {
+      loading = true;
+    });
     await monthProvider?.onInit();
     String rawTempData = preferences.getString(SharedPreference.payload) ?? "";
-    PayloadModel payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
+    if (rawTempData.isEmpty) {
+      log('Error: rawTempData is empty.');
+      return;
+    }
+    final payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
 
     monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
     int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
       return element == monthProvider?.todayTitleId;
     });
+
     final dayIndex = int.parse((monthProvider!.weekDataModel!.dayList?[index ?? 0]
                 .toString()
                 .replaceAll("Workout", "")
@@ -167,7 +178,12 @@ class _ExercisePageState extends State<ExercisePage> {
       circuitIndex: payloadModel.circuitIndex!,
     );
 
+    await DatabaseHelper().updateSingleValue(
+        tableName: DatabaseHelper.exerciseHistory, id: payloadModel.dataId, columnName: 'status', newValue: Status.completed);
+    await monthProvider?.fetchExerciseHistoryLocalData();
+
     NotificationService.clearNotification();
+    setState(() {});
   }
 
   List values = [];
@@ -302,10 +318,7 @@ class _ExercisePageState extends State<ExercisePage> {
     }
   }
 
-  Size calculateVideoSize({
-    required BuildContext context,
-    required double aspectRatio,
-  }) {
+  Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
     final screenSize = MediaQuery.of(context).size;
 
     double maxWidth = screenSize.width;
@@ -330,8 +343,6 @@ class _ExercisePageState extends State<ExercisePage> {
     super.dispose();
   }
 
-  int count = 0;
-
   findIsAtLeastOnSet() {
     monthProvider?.selectedExercise?.extra?.forEach(
       (element) {
@@ -342,6 +353,7 @@ class _ExercisePageState extends State<ExercisePage> {
     setState(() {});
   }
 
+  int count = 0;
   int warmUpIndex = 0;
   int backOffIndex = 0;
   int workingIndex = 0;
@@ -703,32 +715,15 @@ class _ExercisePageState extends State<ExercisePage> {
                                       padding: EdgeInsets.zero,
                                       physics: const NeverScrollableScrollPhysics(),
                                       itemBuilder: (context, countIndex) {
-                                        log('countIndex :::::::::::::::::: $countIndex');
                                         bool isTimerRunning = monthProvider!.timerAddress ==
                                             "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
                                         if (extraItem.type == 1) warmUpIndex++;
                                         if (extraItem.type == 2) backOffIndex++;
                                         if (extraItem.type == 3) workingIndex++;
 
-                                        // String split = monthProvider
-                                        //         ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                        //         .toString()
-                                        //         .split(" ")[1] ??
-                                        //     "";
-                                        // String ctId =
-                                        //     "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$countIndex-${monthProvider?.circuitIndex}";
-                                        //
-                                        // bool isCompleted() {
-                                        //   final val = monthProvider!.historyDataModel.where((element) => element.dataId == ctId);
-                                        //   bool val1 = false;
-                                        //   if (val.isNotEmpty) {
-                                        //     val1 = val.first.status == Status.completed;
-                                        //   }
-                                        //   return val1;
-                                        // }
-
                                         int lastDataMainIndex = dataHistory.isNotEmpty ? (dataHistory.last.index ?? 0) : 0;
                                         int lastDataSubIndex = dataHistory.isNotEmpty ? dataHistory.last.subIndex ?? -1 : -1;
+                                        log('dataHistory :::::::::::::::::: ${jsonEncode(dataHistory)}');
                                         if (lastDataSubIndex ==
                                             ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
                                                 (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3
@@ -743,7 +738,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                         return Padding(
                                           padding: const EdgeInsets.only(bottom: 20),
                                           child: ExerciseSetCard(
+                                            isFromNotification:
+                                                (lastDataMainIndex == index && lastDataSubIndex == countIndex) && argument != "Exercise",
                                             countIndex: countIndex,
+                                            completed: (lastDataMainIndex >= index && (lastDataSubIndex > countIndex)),
                                             available: (lastDataMainIndex == index && lastDataSubIndex == countIndex),
                                             isEditable: isEditable,
                                             makeRefresh: () {

@@ -928,7 +928,7 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> addExerciseDialog() async {
     monthProvider?.fetchAllExercise();
-
+    searchQuery = "";
     if (mounted) {
       return showDialog(
         context: context,
@@ -1076,11 +1076,11 @@ class _TodayPageState extends State<TodayPage> {
                                     children: [
                                       Container(
                                         width: media.width,
-                                        padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+                                        padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 10),
                                         child: Align(
                                           alignment: Alignment.center,
                                           child: Text(
-                                            'Select from the list:',
+                                            'Search for your exercise',
                                             style: TextStyle(
                                               fontSize: ScreenUtil.horizontalScale(5.5),
                                               fontWeight: FontWeight.bold,
@@ -1098,38 +1098,48 @@ class _TodayPageState extends State<TodayPage> {
                                           });
                                         },
                                       ),
-                                      monthProvider!.allFilterExercises.isNotEmpty
-                                          ? Column(
-                                              children: [
-                                                ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                    maxHeight: ScreenUtil.verticalScale(60),
-                                                  ),
-                                                  child: SingleChildScrollView(
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(8.0),
-                                                      child: Column(
-                                                        children:
-                                                            buildExerciseList(monthProvider!.allFilterExercises, currentPageAll, false),
+                                      searchQuery.isEmpty
+                                          ? SizedBox(
+                                              height: media.width * 0.45,
+                                            )
+                                          : monthProvider!.allFilterExercises.isNotEmpty
+                                              ? Column(
+                                                  children: [
+                                                    ConstrainedBox(
+                                                      constraints: BoxConstraints(
+                                                        maxHeight: ScreenUtil.verticalScale(60),
                                                       ),
+                                                      child: SingleChildScrollView(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Column(
+                                                            children:
+                                                                buildExerciseList(monthProvider!.allFilterExercises, currentPageAll, false),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    // Pagination controls for all exercises
+                                                    buildPaginationControls(
+                                                      currentPageAll,
+                                                      monthProvider!.allFilterExercises.length,
+                                                      (page) {
+                                                        setState(() {
+                                                          currentPageAll = page;
+                                                        });
+                                                      },
+                                                    ),
+                                                  ],
+                                                )
+                                              : SizedBox(
+                                                  height: media.width * 0.45,
+                                                  child: const Center(
+                                                    child: Text(
+                                                      "No exercise available!",
+                                                      style: TextStyle(fontSize: 17),
                                                     ),
                                                   ),
                                                 ),
-                                                // Pagination controls for all exercises
-                                                buildPaginationControls(
-                                                  currentPageAll,
-                                                  monthProvider!.allFilterExercises.length,
-                                                  (page) {
-                                                    setState(() {
-                                                      currentPageAll = page;
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            )
-                                          : const Center(
-                                              child: Text("No exercise available"),
-                                            ),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                                         child: Row(
@@ -1155,6 +1165,7 @@ class _TodayPageState extends State<TodayPage> {
                                                 ExerciseDataModel newDayExercise = ExerciseDataModel();
                                                 if (exercises.isNotEmpty) {
                                                   newDayExercise = ExerciseDataModel(
+                                                    isAddedUpdated: true,
                                                     id: "",
                                                     exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
                                                     typeId: exercises[0].typeId ?? 1,
@@ -1172,6 +1183,7 @@ class _TodayPageState extends State<TodayPage> {
                                                   );
                                                 } else {
                                                   newDayExercise = ExerciseDataModel(
+                                                    isAddedUpdated: true,
                                                     id: "",
                                                     exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
                                                     typeId: 1,
@@ -1284,7 +1296,7 @@ class _TodayPageState extends State<TodayPage> {
                       ? ConstrainedBox(
                           constraints: BoxConstraints(
                             maxWidth: ScreenUtil.horizontalScale(96),
-                            maxHeight: ScreenUtil.verticalScale(58),
+                            maxHeight: ScreenUtil.verticalScale(45),
                           ),
                           child: Center(child: CircularProgressIndicator(color: AppColors.primaryColor)),
                         )
@@ -1522,7 +1534,7 @@ class _TodayPageState extends State<TodayPage> {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Select Related Exercise',
+                                          'Swap exercise option',
                                           style: TextStyle(
                                             fontSize: ScreenUtil.horizontalScale(5.5),
                                             fontWeight: FontWeight.bold,
@@ -1574,8 +1586,8 @@ class _TodayPageState extends State<TodayPage> {
                                             child: Padding(
                                               padding: EdgeInsets.only(top: 12, bottom: 18),
                                               child: Text(
-                                                "No related exercise available!",
-                                                style: TextStyle(fontSize: 16),
+                                                "No exercise available!",
+                                                style: TextStyle(fontSize: 17),
                                               ),
                                             ),
                                           ),
@@ -1585,7 +1597,7 @@ class _TodayPageState extends State<TodayPage> {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Or select from the list:',
+                                          'Or search our library',
                                           style: TextStyle(
                                               fontSize: ScreenUtil.horizontalScale(5.5),
                                               fontWeight: FontWeight.bold,
@@ -1607,7 +1619,7 @@ class _TodayPageState extends State<TodayPage> {
                                     ),
                                     searchQuery.isEmpty
                                         ? SizedBox(
-                                            height: media.width * 0.4,
+                                            height: media.width * 0.25,
                                           )
                                         : monthProvider!.allFilterExercises.isNotEmpty
                                             ? Column(
@@ -1636,12 +1648,15 @@ class _TodayPageState extends State<TodayPage> {
                                                   ),
                                                 ],
                                               )
-                                            : Padding(
-                                                padding: const EdgeInsets.only(bottom: 5),
+                                            : SizedBox(
+                                                height: media.width * 0.25,
                                                 child: Center(
-                                                  child: Text(
-                                                    "No exercise available!",
-                                                    style: TextStyle(fontSize: 18),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(bottom: 12),
+                                                    child: Text(
+                                                      "No exercise available!",
+                                                      style: TextStyle(fontSize: 17),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -1677,6 +1692,7 @@ class _TodayPageState extends State<TodayPage> {
                                               }
 
                                               ExerciseDataModel newDayExercise = ExerciseDataModel(
+                                                isAddedUpdated: true,
                                                 id: "",
                                                 exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
                                                 typeId: exercises[selectedIndex].typeId ?? 1,

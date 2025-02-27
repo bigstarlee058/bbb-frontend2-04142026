@@ -994,7 +994,7 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> savePassedTime(String timePassed1, int totalTime, BuildContext context) async {
+  Future<void> savePassedTime(String timePassed1, int totalTime, BuildContext context, String dataId, String index, String subIndex) async {
     if (timerAddress != '') {
       timePassed = timePassed1;
       int newTime = totalTime - int.parse(timePassed);
@@ -1011,8 +1011,12 @@ class MonthProvider extends ChangeNotifier {
           'day_index': overviewCurrentDay,
           'is_pumpday': isPumpDay,
           'is_circuit': isCircuit,
-          'circuit_index': isCircuit ? circuitIndex : "0"
+          'circuit_index': isCircuit ? circuitIndex : "",
+          'index': index,
+          'subIndex': subIndex,
+          'dataId': dataId,
         };
+        log('payLoad :::::::::::::::::: $payLoad');
         NotificationService.zonedScheduleNotification(newTime, selectedExIndex, payLoad);
       }
     }
@@ -1259,10 +1263,9 @@ class MonthProvider extends ChangeNotifier {
 
   List<HistoryDataModel> historyDataModel = [];
 
-  fetchExerciseHistoryLocalData() async {
+  Future<void> fetchExerciseHistoryLocalData() async {
     try {
       String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-
       historyDataModel = [];
       final data = await DatabaseHelper().getFilteredWithExerciseData(
         split: split,
@@ -1272,10 +1275,10 @@ class MonthProvider extends ChangeNotifier {
         dayId: monthDataModel!.weeks?[overviewCurrentWeek - 1].idList![overviewCurrentDay - 1] ?? "",
         weekId: monthDataModel!.weeks?[overviewCurrentWeek - 1].id ?? "",
       );
+      log('data :::::::1111111111::::::::::: $data');
 
       if (data.isNotEmpty) {
         historyDataModel = List<HistoryDataModel>.from(json.decode(jsonEncode(data)).map((x) => HistoryDataModel.fromJson(x)));
-        return historyDataModel;
       }
     } catch (e) {
       debugPrint("Error fetching exercise history data: $e");
