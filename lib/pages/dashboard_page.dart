@@ -6,6 +6,7 @@ import 'package:bbb/components/collection_grid.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/staff_list_widget.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
@@ -20,8 +21,11 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+
+import 'MonthView/DayCompletedPage/day_completed_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -609,11 +613,66 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        Consumer<MonthProvider>(
+                          builder: (context, monthProvider, child) {
+                            List<DayHistoryModel> data = monthProvider.decodedDataAll();
+                            DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
+                            List<DateTime> dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
+                            List<String> formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                        child: Text(
+                                          "Recent Streak",
+                                          style: TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: ScreenUtil.horizontalScale(5.2),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  height: 50,
+                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4), vertical: 10),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    child: IconRow(
+                                      fromHomeScreen: true,
+                                      icons: List.generate(
+                                        formattedDates.length,
+                                        (index) => data.any((element) =>
+                                                DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
+                                                element.status == Status.completed)
+                                            ? IconDataWithDot(
+                                                icon: Icons.check,
+                                                iconColor: Colors.white,
+                                                backgroundColor: AppColors.primaryColor,
+                                                showDot: true,
+                                                dotColor: Colors.transparent)
+                                            : IconDataWithDot(
+                                                icon: Icons.close,
+                                                iconColor: Colors.white,
+                                                backgroundColor: Colors.blue,
+                                                showDot: true,
+                                                dotColor: Colors.transparent),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                         Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(8),
-                          ),
+                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

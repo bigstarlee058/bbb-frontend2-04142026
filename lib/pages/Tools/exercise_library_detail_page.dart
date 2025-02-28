@@ -35,6 +35,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
   var media;
   double height = 0.0;
   double useHeight = 0.0;
+  bool isZoom = false;
 
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
@@ -95,6 +96,9 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
+      _videoPlayerController.addListener(() {
+        setState(() {});
+      });
 
       setState(() {
         loading = false;
@@ -326,23 +330,59 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
                               left: 10,
                               right: 10,
                               child: !videoNotInitialized && _chewieController!.videoPlayerController.value.isInitialized == true
-                                  ? Container(
-                                      margin: EdgeInsets.only(bottom: media.height * 0.06, left: 20, right: 20),
-                                      child: Row(
-                                        children: [
-                                          Flexible(
-                                            child: VideoProgressIndicator(
-                                              _videoPlayerController,
-                                              allowScrubbing: true,
-                                              colors: const VideoProgressColors(
-                                                playedColor: AppColors.primaryColor,
-                                                bufferedColor: Colors.white,
-                                                backgroundColor: Colors.black26,
+                                  ? Column(
+                                      children: [
+                                        // Container(
+                                        //   margin: EdgeInsets.only(bottom: media.height * 0.06, left: 20, right: 20),
+                                        //   child: Row(
+                                        //     children: [
+                                        //       Flexible(
+                                        //         child: VideoProgressIndicator(
+                                        //           _videoPlayerController,
+                                        //           allowScrubbing: true,
+                                        //           colors: const VideoProgressColors(
+                                        //             playedColor: AppColors.primaryColor,
+                                        //             bufferedColor: Colors.white,
+                                        //             backgroundColor: Colors.black26,
+                                        //           ),
+                                        //         ),
+                                        //       )
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                        Container(
+                                          margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: SliderTheme(
+                                                  data: SliderTheme.of(context).copyWith(
+                                                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
+                                                    trackHeight: isZoom ? 7 : 4,
+                                                    trackShape: RectangularSliderTrackShape(),
+                                                    overlayShape: SliderComponentShape.noOverlay,
+                                                  ),
+                                                  child: Slider(
+                                                    activeColor: Colors.red,
+                                                    value: _videoPlayerController.value.position.inSeconds.toDouble(),
+                                                    max: _videoPlayerController.value.duration.inSeconds.toDouble(),
+                                                    onChangeStart: (value) {
+                                                      setState(() => isZoom = true);
+                                                    },
+                                                    onChangeEnd: (value) {
+                                                      setState(() => isZoom = false);
+                                                    },
+                                                    onChanged: (value) {
+                                                      _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                                                    },
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        ],
-                                      ))
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    )
                                   : const SizedBox(),
                             )
                           : const SizedBox(),

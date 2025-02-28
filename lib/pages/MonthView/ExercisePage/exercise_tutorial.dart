@@ -28,6 +28,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
   late Size videoSize1;
   Timer? _hideControlsTimer1;
   bool dontShowAgain1 = false;
+  bool isZoom = false;
 
   @override
   void initState() {
@@ -81,6 +82,9 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
         videoSize1 = calculateVideoSize(aspectRatio: _chewieController1!.aspectRatio!, context: context);
         setState(() {});
       }
+      _videoPlayerController1.addListener(() {
+        setState(() {});
+      });
 
       setState(() {
         loading1 = false;
@@ -271,23 +275,58 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                             left: 20,
                             right: 20,
                             child: !videoNotInitialized1 && _chewieController1!.videoPlayerController.value.isInitialized == true
-                                ? Container(
-                                    margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          child: VideoProgressIndicator(
-                                            _videoPlayerController1,
-                                            allowScrubbing: true,
-                                            colors: const VideoProgressColors(
-                                              playedColor: Colors.red,
-                                              bufferedColor: Colors.white,
-                                              backgroundColor: Colors.black26,
+                                ? Column(
+                                    children: [
+                                      // Container(
+                                      //     margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                                      //     child: Row(
+                                      //       children: [
+                                      //         Flexible(
+                                      //           child: VideoProgressIndicator(
+                                      //             _videoPlayerController1,
+                                      //             allowScrubbing: true,
+                                      //             colors: const VideoProgressColors(
+                                      //               playedColor: Colors.red,
+                                      //               bufferedColor: Colors.white,
+                                      //               backgroundColor: Colors.black26,
+                                      //             ),
+                                      //           ),
+                                      //         ),
+                                      //       ],
+                                      //     ),
+                                      //   ),
+                                      Container(
+                                        margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: SliderTheme(
+                                                data: SliderTheme.of(context).copyWith(
+                                                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
+                                                  trackHeight: isZoom ? 7 : 4,
+                                                  trackShape: RectangularSliderTrackShape(),
+                                                  overlayShape: SliderComponentShape.noOverlay,
+                                                ),
+                                                child: Slider(
+                                                  activeColor: Colors.red,
+                                                  value: _videoPlayerController1.value.position.inSeconds.toDouble(),
+                                                  max: _videoPlayerController1.value.duration.inSeconds.toDouble(),
+                                                  onChangeStart: (value) {
+                                                    setState(() => isZoom = true);
+                                                  },
+                                                  onChangeEnd: (value) {
+                                                    setState(() => isZoom = false);
+                                                  },
+                                                  onChanged: (value) {
+                                                    _videoPlayerController1.seekTo(Duration(seconds: value.toInt()));
+                                                  },
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   )
                                 : const SizedBox(),
                           ),

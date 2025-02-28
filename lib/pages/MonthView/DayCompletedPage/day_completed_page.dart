@@ -246,6 +246,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             height: 50,
                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
                             child: IconRow(
+                              fromHomeScreen: false,
                               icons: List.generate(
                                 formattedDates.length,
                                 (index) => data.any((element) =>
@@ -406,16 +407,16 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                           children: [
                                             const Text(
                                               'Weight Lifted',
-                                              style: TextStyle(
-                                                color: Colors.black54,
-                                              ),
+                                              style: TextStyle(color: Colors.black54),
                                             ),
-                                            const SizedBox(height: 10),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
                                             Text(
                                               '${totalWeight.toStringAsFixed(0)} Lbs',
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
-                                            ),
+                                            )
                                           ],
                                         ),
                                       ),
@@ -534,14 +535,15 @@ class BulletPoint extends StatelessWidget {
 
 class IconRow extends StatelessWidget {
   final List<IconDataWithDot> icons;
+  final bool fromHomeScreen;
 
-  const IconRow({super.key, required this.icons});
+  const IconRow({super.key, required this.icons, required this.fromHomeScreen});
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: fromHomeScreen ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: icons
           .map(

@@ -281,6 +281,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     monthProvider?.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex, removeVal: true);
     if (_restDuration != 0) {
       _showTimer = true;
+    } else {
+      setCompleted = true;
     }
 
     setState(() {});
@@ -358,7 +360,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
             child: Column(
               children: [
                 ColorFiltered(
-                  colorFilter: widget.available || widget.completed || /*setCompleted ||*/ _showTimer || timerCompleted
+                  colorFilter: widget.available || widget.completed || setCompleted || _showTimer || timerCompleted
                       ? ColorFilter.mode(Colors.transparent, BlendMode.saturation)
                       : const ColorFilter.mode(Colors.white, BlendMode.saturation),
                   child: Container(
@@ -382,7 +384,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                           padding: EdgeInsets.symmetric(vertical: 15, horizontal: ScreenUtil.horizontalScale(4)),
                           child: GestureDetector(
                             onTap: () async {
-                              if (widget.available || widget.completed /*|| setCompleted*/) {
+                              if (widget.available || widget.completed || setCompleted) {
                                 _showTimer = false;
                                 await monthProvider?.setShowTimerIndex(-1, -1, -1);
                                 await monthProvider?.updateExpandedItem(!_isExpanded ? "${widget.index}:${widget.countIndex}" : "");
@@ -423,7 +425,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                     ],
                                   ),
                                 ),
-                                if (widget.completed || timerCompleted /*|| setCompleted*/)
+                                if (widget.completed || timerCompleted || setCompleted)
                                   Container(
                                     padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
                                     margin: const EdgeInsets.only(right: 10),

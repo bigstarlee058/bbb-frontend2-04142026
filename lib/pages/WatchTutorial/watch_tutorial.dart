@@ -14,12 +14,13 @@ class WatchTutorial extends StatefulWidget {
   const WatchTutorial({super.key});
 
   @override
-  _WatchTutorialState createState() => _WatchTutorialState();
+  State<WatchTutorial> createState() => _WatchTutorialState();
 }
 
 class _WatchTutorialState extends State<WatchTutorial> {
   bool loading = false;
   bool videoNotInitialized = false;
+  bool isZoom = false;
   String tutorialDesc = "";
   DataProvider? dataProvider;
   late VideoPlayerController _videoPlayerController;
@@ -35,9 +36,7 @@ class _WatchTutorialState extends State<WatchTutorial> {
   }
 
   void fetchTutorialData() async {
-    setState(() {
-      loading = true;
-    });
+    setState(() => loading = true);
     await dataProvider?.fetchTutorialData();
     if (dataProvider!.tutorialData.files.isNotEmpty) {
       initializeVideo(dataProvider?.tutorialData.files[0]['link']);
@@ -46,24 +45,20 @@ class _WatchTutorialState extends State<WatchTutorial> {
       videoNotInitialized = true;
       setState(() {});
     }
-
     tutorialDesc = dataProvider?.tutorialData.description ?? "";
   }
 
   Future<void> initializeVideo(String url) async {
     try {
-      // Initialize the video player controller
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
-      await _videoPlayerController.initialize();
 
-      // Initialize the ChewieController with custom controls
+      await _videoPlayerController.initialize();
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
         looping: false,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
-        // Disable default controls// Use custom controls here
       );
 
       if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
@@ -71,10 +66,11 @@ class _WatchTutorialState extends State<WatchTutorial> {
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
-
-      setState(() {
-        loading = false;
+      _videoPlayerController.addListener(() {
+        setState(() {});
       });
+
+      setState(() => loading = false);
     } catch (e) {
       setState(() {
         videoNotInitialized = true;
@@ -90,19 +86,14 @@ class _WatchTutorialState extends State<WatchTutorial> {
   void hideControls() {
     _hideControlsTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) {
-        setState(() {
-          showControls = false;
-        });
+        setState(() => showControls = false);
       }
     });
   }
 
   void showControlsOnTap() {
-    setState(() {
-      showControls = !showControls;
-    });
-    _hideControlsTimer?.cancel(); // Cancel any active timer
-    // hideControls(); // Start the timer again to hide the controls after 3 seconds
+    setState(() => showControls = !showControls);
+    _hideControlsTimer?.cancel();
   }
 
   void toggleFullscreen() {
@@ -116,16 +107,9 @@ class _WatchTutorialState extends State<WatchTutorial> {
     }
   }
 
-  Size calculateVideoSize({
-    required BuildContext context,
-    required double aspectRatio, // Aspect ratio of the video (width/height)
-  }) {
-    // Maximum allowable width and height based on screen dimensions
+  Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
     double maxWidth = ScreenUtil.horizontalScale(90);
-
-    // Calculate height dynamically based on width and aspect ratio
     double calculatedHeight = maxWidth / aspectRatio;
-
     return Size(maxWidth, calculatedHeight);
   }
 
@@ -260,23 +244,59 @@ class _WatchTutorialState extends State<WatchTutorial> {
                         left: 10,
                         right: 10,
                         child: !videoNotInitialized && _chewieController!.videoPlayerController.value.isInitialized == true
-                            ? Container(
-                                margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
-                                child: Row(
-                                  children: [
-                                    Flexible(
-                                      child: VideoProgressIndicator(
-                                        _videoPlayerController,
-                                        allowScrubbing: true,
-                                        colors: const VideoProgressColors(
-                                          playedColor: Colors.red,
-                                          bufferedColor: Colors.white,
-                                          backgroundColor: Colors.black26,
+                            ? Column(
+                                children: [
+                                  // Container(
+                                  //   margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                                  //   child: Row(
+                                  //     children: [
+                                  //       Flexible(
+                                  //         child: VideoProgressIndicator(
+                                  //           _videoPlayerController,
+                                  //           allowScrubbing: true,
+                                  //           colors: const VideoProgressColors(
+                                  //             playedColor: Colors.red,
+                                  //             bufferedColor: Colors.white,
+                                  //             backgroundColor: Colors.black26,
+                                  //           ),
+                                  //         ),
+                                  //       ),
+                                  //     ],
+                                  //   ),
+                                  // ),
+                                  Container(
+                                    margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: SliderTheme(
+                                            data: SliderTheme.of(context).copyWith(
+                                              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
+                                              trackHeight: isZoom ? 7 : 4,
+                                              trackShape: RectangularSliderTrackShape(),
+                                              overlayShape: SliderComponentShape.noOverlay,
+                                            ),
+                                            child: Slider(
+                                              activeColor: Colors.red,
+                                              value: _videoPlayerController.value.position.inSeconds.toDouble(),
+                                              max: _videoPlayerController.value.duration.inSeconds.toDouble(),
+                                              onChangeStart: (value) {
+                                                setState(() => isZoom = true);
+                                              },
+                                              onChangeEnd: (value) {
+                                                setState(() => isZoom = false);
+                                              },
+                                              onChanged: (value) {
+                                                _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                                              },
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                ))
+                                  ),
+                                ],
+                              )
                             : const SizedBox(),
                       ),
                     ],
@@ -299,21 +319,17 @@ class _WatchTutorialState extends State<WatchTutorial> {
                   ),
                   Container(
                       margin: EdgeInsets.only(
-                          left: ScreenUtil.horizontalScale(5),
-                          right: ScreenUtil.horizontalScale(5),
-                          top: 15.0,
-                          bottom: 10.0), // Added bottom margin for spacing
-                      alignment: Alignment.topLeft, // Center-align the header text
+                          left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), top: 15.0, bottom: 10.0),
+                      alignment: Alignment.topLeft,
                       child: Padding(
-                          padding: EdgeInsets.all(0.0), // Add padding for better layout
+                          padding: EdgeInsets.all(0.0),
                           child: Text(tutorialDesc,
                               textAlign: TextAlign.start,
                               style: const TextStyle(
-                                fontSize: 18, // Customize font size for better readability
+                                fontSize: 18,
                                 color: Colors.black,
                               )))),
                   SizedBox(height: ScreenUtil.verticalScale(1.5)),
-                  // Button at the bottom
                   Container(
                     margin: EdgeInsets.only(
                       bottom: ScreenUtil.verticalScale(4),
@@ -344,7 +360,6 @@ class _WatchTutorialState extends State<WatchTutorial> {
                         //   color: AppColors.primaryColor,
                         //   isLoading: false,
                         // ),
-
                         TextButton(
                             onPressed: () => Navigator.pop(context),
                             child: Text(
