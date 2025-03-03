@@ -250,7 +250,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               icons: List.generate(
                                 formattedDates.length,
                                 (index) => data.any((element) =>
-                                        DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
+                                        DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
+                                            formattedDates[index] &&
                                         element.status == Status.completed)
                                     ? IconDataWithDot(
                                         icon: Icons.check,

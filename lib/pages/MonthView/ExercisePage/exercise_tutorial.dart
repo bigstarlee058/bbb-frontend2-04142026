@@ -63,18 +63,14 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
 
   Future<void> initializeVideo(String url) async {
     try {
-      // Initialize the video player controller
       _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(url));
       await _videoPlayerController1.initialize();
-
-      // Initialize the ChewieController with custom controls
       _chewieController1 = ChewieController(
         videoPlayerController: _videoPlayerController1,
         autoPlay: true,
         looping: false,
         showControls: false,
         aspectRatio: _videoPlayerController1.value.aspectRatio,
-        // Disable default controls// Use custom controls here
       );
 
       if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
@@ -115,8 +111,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
     setState(() {
       showControls = !showControls;
     });
-    _hideControlsTimer1?.cancel(); // Cancel any active timer
-    // hideControls(); // Start the timer again to hide the controls after 3 seconds
+    _hideControlsTimer1?.cancel();
   }
 
   void toggleFullscreen() {
@@ -131,12 +126,8 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
   }
 
   Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
-    // Maximum allowable width and height based on screen dimensions
     double maxWidth = ScreenUtil.horizontalScale(90);
-
-    // Calculate height dynamically based on width and aspect ratio
     double calculatedHeight = maxWidth / aspectRatio;
-
     return Size(maxWidth, calculatedHeight);
   }
 

@@ -42,6 +42,8 @@ class ExerciseSetCard extends StatefulWidget {
     required this.available,
     required this.completed,
     required this.isFromNotification,
+    required this.setCount,
+    required this.extraSetLength,
   });
 
   final Color color;
@@ -60,6 +62,8 @@ class ExerciseSetCard extends StatefulWidget {
   final int load;
   final int index;
   final int subIndex;
+  final int setCount;
+  final int extraSetLength;
   final VoidCallback makeRefresh;
   final bool isEditable;
   final bool available;
@@ -127,7 +131,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
     dataId =
         "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
-    log('dataId :::::::::::::::::: $dataId');
     HistoryDataModel? expandedDataHistory = monthProvider?.historyDataModel.firstWhere(
       (element) => element.dataId == dataId,
       orElse: () => HistoryDataModel(),
@@ -250,8 +253,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "index": widget.index,
       "subIndex": widget.countIndex,
       "date": "${DateTime.now().toUtc()}",
-      "status": _restDuration == 0 ? Status.completed : Status.empty
-      // "status": Status.completed
+      "status": Status.completed
+      // "status": _restDuration == 0 ? Status.completed : Status.empty
     };
 
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -269,10 +272,10 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
       "date": "${DateTime.now().toUtc()}",
-      "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
+      "status": Status.completed
+      // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
     };
     if (matchingElement?.id != null) {
-      log('data1 :::::::::::::::::: $data1');
       await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
     } else {
       await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
@@ -281,14 +284,36 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     monthProvider?.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex, removeVal: true);
     if (_restDuration != 0) {
       _showTimer = true;
+      setState(() {});
+      await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
+      await monthProvider?.fetchExerciseHistoryLocalData();
+      widget.makeRefresh();
     } else {
       setCompleted = true;
+      setState(() {});
+      await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
+      await monthProvider?.fetchExerciseHistoryLocalData().then(
+        (value) {
+          widget.makeRefresh();
+          final dataHistory = monthProvider!.historyDataModel.where((element) => element.status == Status.completed).toList();
+          int lastDataMainIndex = dataHistory.isNotEmpty ? (dataHistory.last.index ?? 0) : 0;
+          int lastDataSubIndex = dataHistory.isNotEmpty ? dataHistory.last.subIndex ?? -1 : -1;
+          if (lastDataSubIndex ==
+              ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
+                  (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3 ? (widget.extraSetLength) : 0))) {
+            lastDataMainIndex += 1;
+            if (lastDataMainIndex == (monthProvider!.selectedExercise!.extra!.length) && lastDataSubIndex == (widget.setCount - 1)) {
+            } else {
+              lastDataSubIndex = 0;
+            }
+          } else {
+            lastDataSubIndex += 1;
+          }
+          monthProvider?.updateExpandedItem("$lastDataMainIndex:$lastDataSubIndex");
+          widget.makeRefresh();
+        },
+      );
     }
-
-    setState(() {});
-    await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
-    await monthProvider?.fetchExerciseHistoryLocalData();
-    widget.makeRefresh();
   }
 
   Future<void> fromNotification() async {

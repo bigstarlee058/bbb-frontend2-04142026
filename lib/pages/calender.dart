@@ -141,24 +141,30 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   Widget? _buildDayState(DateTime date) {
     DateTime? oldestStartDate =
-        monthProvider?.monthLocalDataModel.map((e) => DateTime.parse(e.monthStartDate!)).reduce((a, b) => a.isBefore(b) ? a : b);
+        monthProvider?.monthLocalDataModel.map((e) => Utils.formattedDate(e.monthStartDate!)).reduce((a, b) => a.isBefore(b) ? a : b);
+
+    final nowUtc = DateTime.now();
+
     List<DayHistoryModel> data = monthProvider!.decodedDataAll();
-    bool isCurrentDay = date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day;
+
+    bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
 
     if (data.isEmpty) {
       if (isCurrentDay) {
         return _buildCurrentWorkoutDay(date);
-      } else if (oldestStartDate!.isBefore(date) && DateTime.now().isAfter(date)) {
+      } else if (oldestStartDate!.isBefore(date) && nowUtc.isAfter(date)) {
         return _buildCustomDayCircle(date, Colors.blue);
       }
     }
 
-    DateTime futureDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).add(Duration(days: 1));
+    DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
 
     if (date.isBefore(futureDay)) {
       for (var day in data) {
         final workoutDate = day.endTime!;
+
         DateTime localTime = Utils.formattedDate("$workoutDate");
+
         if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
           if (day.status == Status.completed) {
             return _buildCustomDayCircle(date, AppColors.primaryColor);
@@ -183,9 +189,10 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         return _buildCurrentWorkoutDay(date);
       }
     }
-
-    if (oldestStartDate!.isBefore(date) && DateTime.now().isAfter(date)) {
-      return _buildCustomDayCircle(date, Colors.blue);
+    if (oldestStartDate!.isBefore(date) && nowUtc.isAfter(date)) {
+      if (DateTime(futureDay.year, futureDay.month, futureDay.day) != DateTime(date.year, date.month, date.day)) {
+        return _buildCustomDayCircle(date, Colors.blue);
+      }
     }
 
     return null;

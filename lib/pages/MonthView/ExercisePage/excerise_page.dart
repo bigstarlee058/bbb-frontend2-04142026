@@ -741,7 +741,6 @@ class _ExercisePageState extends State<ExercisePage> {
                               Builder(builder: (context) {
                                 final dataHistory =
                                     monthProvider!.historyDataModel.where((element) => element.status == Status.completed).toList();
-                                log('dataHistory :::::::::::::::::: ${jsonEncode(dataHistory)}');
                                 return ListView.builder(
                                   itemCount: monthProvider?.selectedExercise!.extra!.length,
                                   shrinkWrap: true,
@@ -772,7 +771,11 @@ class _ExercisePageState extends State<ExercisePage> {
                                                     ? (extraSetModel.length)
                                                     : 0))) {
                                           lastDataMainIndex += 1;
-                                          lastDataSubIndex = 0;
+                                          if (lastDataMainIndex == (monthProvider!.selectedExercise!.extra!.length) &&
+                                              lastDataSubIndex == (setCount - 1)) {
+                                          } else {
+                                            lastDataSubIndex = 0;
+                                          }
                                         } else {
                                           lastDataSubIndex += 1;
                                         }
@@ -780,10 +783,14 @@ class _ExercisePageState extends State<ExercisePage> {
                                         return Padding(
                                           padding: const EdgeInsets.only(bottom: 20),
                                           child: ExerciseSetCard(
+                                            extraSetLength: extraSetModel.length,
+                                            setCount: setCount,
                                             isFromNotification:
                                                 (lastDataMainIndex == index && lastDataSubIndex == countIndex) && argument != "Exercise",
                                             countIndex: countIndex,
-                                            completed: (lastDataMainIndex >= index && (lastDataSubIndex > countIndex)),
+                                            completed: (lastDataMainIndex >= index &&
+                                                (lastDataSubIndex >= countIndex &&
+                                                    !(lastDataMainIndex == index && lastDataSubIndex == countIndex))),
                                             available: (lastDataMainIndex == index && lastDataSubIndex == countIndex),
                                             isEditable: isEditable,
                                             makeRefresh: () {

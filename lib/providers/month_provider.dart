@@ -438,10 +438,12 @@ class MonthProvider extends ChangeNotifier {
 
   bool loader = false;
 
-  Future<void> onInit() async {
+  Future<void> onInit({bool isEnabled = true}) async {
     try {
-      loader = true;
-      notifyListeners();
+      if (isEnabled) {
+        loader = true;
+        notifyListeners();
+      }
 
       String split = (preferences.getString(SharedPreference.split) ?? "").replaceAll("split", "");
       await changeDaySplit(split);
@@ -1193,13 +1195,15 @@ class MonthProvider extends ChangeNotifier {
       );
 
       decodedData.removeWhere((element) => element.status == Status.empty || element.status == Status.started);
+
       decodedData.sort((a, b) {
         DateTime aDate = a.endTime!;
         DateTime localTimeADate = Utils.formattedDate("$aDate");
         DateTime bDate = b.endTime!;
         DateTime localTimeBDate = Utils.formattedDate("$bDate");
-        return DateTime(localTimeBDate.year, localTimeBDate.month, localTimeBDate.day)
-            .compareTo(DateTime(localTimeADate.year, localTimeADate.month, localTimeADate.day));
+        // return DateTime(localTimeBDate.year, localTimeBDate.month, localTimeBDate.day)
+        //     .compareTo(DateTime(localTimeADate.year, localTimeADate.month, localTimeADate.day));
+        return localTimeBDate.compareTo(localTimeADate);
       });
 
       DateTime now = DateTime.now();
@@ -1209,7 +1213,7 @@ class MonthProvider extends ChangeNotifier {
         DateTime date = element.endTime!;
         DateTime localTimeADate = Utils.formattedDate("$date");
         DateTime localDay = DateTime(localTimeADate.year, localTimeADate.month, localTimeADate.day);
-        return localDay.isAfter(today);
+        return localDay.isAfter(today) && localDay != today;
       });
 
       Map<String, Map<String, dynamic>> latestByDay = {};
@@ -1233,7 +1237,6 @@ class MonthProvider extends ChangeNotifier {
       debugPrint('Error decoding data: $e');
       return [];
     }
-
     return decodedData;
   }
 
@@ -1573,7 +1576,6 @@ class MonthProvider extends ChangeNotifier {
         if (element.status == Status.completed) {
           DateTime dateDateTime = element.date!;
           DateTime localTime = Utils.formattedDate("$dateDateTime");
-
           DateTime aDate = element.startTime!;
           DateTime localTimeADate = Utils.formattedDate("$aDate");
           DateTime bDate = element.endTime!;
