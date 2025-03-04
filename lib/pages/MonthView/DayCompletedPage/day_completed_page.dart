@@ -447,44 +447,17 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                             child: Consumer<MonthProvider>(builder: (context, monthData, child) {
                               return ButtonWidget(
-                                text: "Next Workout",
+                                text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
                                 textColor: Colors.white,
                                 onPress: () {
                                   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                   mainPageProvider?.changeTab(1);
 
                                   if (monthData.todayTitleId.isNotEmpty) {
-                                    int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.indexWhere(
-                                      (element) => element == monthData.todayTitleId,
-                                    );
-
-                                    final dayIndex = int.parse((monthData
-                                                .monthDataModel?.weeks![(monthData.week ?? 1) - 1].dayList?[index ?? 0]
-                                                .toString()
-                                                .replaceAll("Workout", "")
-                                                .replaceAll("Rest", "")
-                                                .replaceAll("Day", "")
-                                                .replaceAll(" ", "") ??
-                                            "0")) -
-                                        1;
-
-                                    DayDataModel dayData =
-                                        "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                .toString()
-                                                .contains("Workout")
-                                            ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].days![dayIndex]
-                                            : DayDataModel();
-
-                                    monthData.overviewCurrentWeek = monthData.week ?? 1;
-                                    monthData.overviewCurrentDay = ((index ?? 1) + 1);
-                                    monthData.dayDataModel = dayData;
-                                    monthData.alternateEquipmentType = monthData.equipmentType;
-                                    monthData.weekDataModel = monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
-                                    monthData.updateIsPastWeek(monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
-                                    Navigator.pushNamed(context, '/dayOverview');
+                                    continueWorkoutOnTap(monthData, context);
                                   }
                                 },
-                                color: AppColors.primaryColor,
+                                color: monthData.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
                                 isLoading: false,
                               );
                             }),
@@ -503,6 +476,61 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
         ),
       ),
     );
+  }
+
+  void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
+      (element) => element == monthProvider.todayTitleId,
+    );
+
+    String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
+
+    final dayIndex = int.parse((monthProvider.monthDataModel?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
+                .toString()
+                .replaceAll("Workout", "")
+                .replaceAll("Rest", "")
+                .replaceAll("Day", "")
+                .replaceAll(" ", "") ??
+            "0")) -
+        1;
+    DayDataModel dayData =
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Workout")
+            ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
+            : DayDataModel();
+
+    bool isRestDay =
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Rest Day");
+
+    bool isPumpDay = (isRestDay &&
+            monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+        (isRestDay &&
+            (monthProvider.isPumpDayAvailable &&
+                (monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (monthProvider.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
+
+    monthProvider.changeIsPumpDay(isPumpDay);
+
+    if (isPumpDay) {
+      monthProvider.updatePumpDayData(monthProvider.pumpDays[
+          int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+    }
+
+    monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;
+    monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
+    monthProvider.dayDataModel = dayData;
+    monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+    monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
+    monthProvider.updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
+    Navigator.pushNamed(context, '/dayOverview');
   }
 }
 

@@ -224,13 +224,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 Column(
                   children: [
                     Text(
-                      weekDataModel?.description ?? "",
+                      weekDataModel?.description?.trim() ?? "",
                       style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(1.7),
                           color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : const Color(0xFF888888)),
                     ),
                     SizedBox(
-                      height: ScreenUtil.verticalScale(3),
+                      height: ScreenUtil.verticalScale(weekDataModel!.description!.isEmpty ? 0 : 3),
                     ),
                     ListView.builder(
                       padding: EdgeInsets.zero,
@@ -401,24 +401,26 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                           ]
                                         ],
                                       ),
-                                      Container(
-                                        padding: EdgeInsets.all(
-                                          ScreenUtil.verticalScale(0.5),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 2,
-                                          ),
-                                          color: Colors.white,
-                                        ),
-                                        child: Icon(
-                                          Icons.keyboard_arrow_right_outlined,
-                                          color: AppColors.primaryColor,
-                                          size: ScreenUtil.verticalScale(2.5),
-                                        ),
-                                      ),
+                                      monthProvider.weekStatuses[mainIndex!] == WeekType.futureWeek
+                                          ? SizedBox()
+                                          : Container(
+                                              padding: EdgeInsets.all(
+                                                ScreenUtil.verticalScale(0.5),
+                                              ),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 2,
+                                                ),
+                                                color: Colors.white,
+                                              ),
+                                              child: Icon(
+                                                Icons.keyboard_arrow_right_outlined,
+                                                color: AppColors.primaryColor,
+                                                size: ScreenUtil.verticalScale(2.5),
+                                              ),
+                                            ),
                                     ],
                                   ),
                                 ),

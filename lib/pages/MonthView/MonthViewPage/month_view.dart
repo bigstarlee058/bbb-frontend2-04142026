@@ -40,7 +40,6 @@ class _MonthViewState extends State<MonthView> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
         child: Column(
           children: [
             Stack(
@@ -241,7 +240,7 @@ class _MonthViewState extends State<MonthView> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
                       ),
                     ),
                     child: Column(
@@ -323,31 +322,35 @@ class _MonthViewState extends State<MonthView> {
                                 : value.weeksDataList.isNotEmpty
                                     ? Container(
                                         margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            for (int i = 0; i < value.weeksDataList.length; i++) ...[
-                                              WeeklyTrackCard(
-                                                  index: i,
-                                                  monthProvider: value,
-                                                  pumpDayIds: value.weeksDataList[i].pumpDayIds!,
-                                                  title:
-                                                      value.weeksDataList[i].title == "" ? "Week ${i + 1}" : value.weeksDataList[i].title!,
-                                                  thisWeek: ((i + 1) == value.week),
-                                                  restDayId: value.weeksDataList[i].restdayId!,
-                                                  weekIndex: i,
-                                                  isOpened: false,
-                                                  isCompleted: false,
-                                                  startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
-                                                  cardData: value.weeksDataList[i],
-                                                  daySplit: split,
-                                                  expandedVal: (i + 1) == value.week ? true : false,
-                                                  completedWeek: i + 1),
-                                              const SizedBox(
-                                                height: 15,
-                                              ),
+                                        child: SingleChildScrollView(
+                                          physics: NeverScrollableScrollPhysics(),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              for (int i = 0; i < value.weeksDataList.length; i++) ...[
+                                                WeeklyTrackCard(
+                                                    index: i,
+                                                    monthProvider: value,
+                                                    pumpDayIds: value.weeksDataList[i].pumpDayIds!,
+                                                    title: value.weeksDataList[i].title == ""
+                                                        ? "Week ${i + 1}"
+                                                        : value.weeksDataList[i].title!,
+                                                    thisWeek: ((i + 1) == value.week),
+                                                    restDayId: value.weeksDataList[i].restdayId!,
+                                                    weekIndex: i,
+                                                    isOpened: false,
+                                                    isCompleted: false,
+                                                    startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
+                                                    cardData: value.weeksDataList[i],
+                                                    daySplit: split,
+                                                    expandedVal: (i + 1) == value.week ? true : false,
+                                                    completedWeek: i + 1),
+                                                const SizedBox(
+                                                  height: 15,
+                                                ),
+                                              ],
                                             ],
-                                          ],
+                                          ),
                                         ),
                                       )
                                     : const Center(
@@ -364,8 +367,8 @@ class _MonthViewState extends State<MonthView> {
                             builder: (context, value, child) => ButtonWidget(
                               text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
                               textColor: Colors.white,
-                              onPress: monthProvider!.todayTitleId.isEmpty ? null : () => continueWorkoutOnTap(context),
-                              color: AppColors.primaryColor,
+                              onPress: monthProvider!.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(context),
+                              color: monthProvider!.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
                               isLoading: false,
                             ),
                           ),

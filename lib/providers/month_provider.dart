@@ -872,6 +872,7 @@ class MonthProvider extends ChangeNotifier {
 
       url = Uri.http(url.authority, url.path);
       String? userIdToken = await getAuthToken();
+      log('userIdToken :::::::::::::::::: $userIdToken');
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -949,13 +950,17 @@ class MonthProvider extends ChangeNotifier {
     timerAddress = address;
     if (timerAddress.isNotEmpty) {
       var data = timerAddress.split("-");
-      if (data.isNotEmpty && data[0] != "-1") {
-        updateExpandedItem("${data[0]}:${data[1]}");
+      if (data.isNotEmpty &&
+          data[0] != "-1" &&
+          data[2] == "$selectedExIndex" &&
+          data[3] == "$overviewCurrentWeek" &&
+          data[4] == "$overviewCurrentDay") {
+        updateExpandedItem("${data[0]}:${data[1]}:${data[2]}:${data[3]}:${data[4]}");
       } else {
-        updateExpandedItem("0:0");
+        updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
       }
     } else {
-      updateExpandedItem("0:0");
+      updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
     }
     notifyListeners();
   }

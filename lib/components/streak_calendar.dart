@@ -227,8 +227,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                   return ButtonWidget(
                                     text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
                                     textColor: Colors.white,
-                                    onPress: monthProvider.todayTitleId.isEmpty ? null : () => continueWorkoutOnTap(monthProvider, context),
-                                    color: AppColors.primaryColor,
+                                    onPress:
+                                        monthProvider.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(monthProvider, context),
+                                    color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
                                     isLoading: false,
                                   );
                                 },

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -281,7 +280,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
-    monthProvider?.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex, removeVal: true);
+    monthProvider?.setShowTimerIndex(index, widget.countIndex, monthProvider!.selectedExIndex, removeVal: true);
     if (_restDuration != 0) {
       _showTimer = true;
       setState(() {});
@@ -309,7 +308,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
           } else {
             lastDataSubIndex += 1;
           }
-          monthProvider?.updateExpandedItem("$lastDataMainIndex:$lastDataSubIndex");
+          monthProvider?.updateExpandedItem(
+              "$lastDataMainIndex:$lastDataSubIndex:${widget.exercise}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}");
           widget.makeRefresh();
         },
       );
@@ -365,19 +365,19 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     super.build(context);
     context.select((MonthProvider value) => value.currentExpandedItem);
     context.select((MonthProvider value) => value.timerAddress);
-    _isExpanded = "$index:$subIndex" == monthProvider!.currentExpandedItem;
+    _isExpanded =
+        "$index:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}" ==
+            monthProvider!.currentExpandedItem;
 
     if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.timerAddress != "") {
       _showTimer = monthProvider!.timerAddress ==
-          "$index-$subIndex-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
+          "$index-${widget.countIndex}-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
       if (_showTimer) {
-        monthProvider!.setShowTimerIndex(index, subIndex, monthProvider!.selectedExIndex);
+        monthProvider!.setShowTimerIndex(index, widget.countIndex, monthProvider!.selectedExIndex);
       }
     } else {
       _showTimer = false;
     }
-
-    log('widget.completed :::::::::::::::::: ${widget.completed}');
 
     return isLoad
         ? SizedBox()
@@ -412,7 +412,9 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                               if (widget.available || widget.completed || setCompleted) {
                                 _showTimer = false;
                                 await monthProvider?.setShowTimerIndex(-1, -1, -1);
-                                await monthProvider?.updateExpandedItem(!_isExpanded ? "${widget.index}:${widget.countIndex}" : "");
+                                await monthProvider?.updateExpandedItem(!_isExpanded
+                                    ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
+                                    : "");
 
                                 setState(() {
                                   _isExpanded = !_isExpanded;
