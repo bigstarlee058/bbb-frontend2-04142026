@@ -246,10 +246,12 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             height: 50,
                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
                             child: IconRow(
+                              fromHomeScreen: false,
                               icons: List.generate(
                                 formattedDates.length,
                                 (index) => data.any((element) =>
-                                        DateFormat('yyyy-MM-dd').format(element.endTime!) == formattedDates[index] &&
+                                        DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
+                                            formattedDates[index] &&
                                         element.status == Status.completed)
                                     ? IconDataWithDot(
                                         icon: Icons.check,
@@ -406,16 +408,16 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                           children: [
                                             const Text(
                                               'Weight Lifted',
-                                              style: TextStyle(
-                                                color: Colors.black54,
-                                              ),
+                                              style: TextStyle(color: Colors.black54),
                                             ),
-                                            const SizedBox(height: 10),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
                                             Text(
                                               '${totalWeight.toStringAsFixed(0)} Lbs',
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
-                                            ),
+                                            )
                                           ],
                                         ),
                                       ),
@@ -445,44 +447,17 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                             child: Consumer<MonthProvider>(builder: (context, monthData, child) {
                               return ButtonWidget(
-                                text: "Next Workout",
+                                text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
                                 textColor: Colors.white,
                                 onPress: () {
                                   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                   mainPageProvider?.changeTab(1);
 
                                   if (monthData.todayTitleId.isNotEmpty) {
-                                    int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.indexWhere(
-                                      (element) => element == monthData.todayTitleId,
-                                    );
-
-                                    final dayIndex = int.parse((monthData
-                                                .monthDataModel?.weeks![(monthData.week ?? 1) - 1].dayList?[index ?? 0]
-                                                .toString()
-                                                .replaceAll("Workout", "")
-                                                .replaceAll("Rest", "")
-                                                .replaceAll("Day", "")
-                                                .replaceAll(" ", "") ??
-                                            "0")) -
-                                        1;
-
-                                    DayDataModel dayData =
-                                        "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                .toString()
-                                                .contains("Workout")
-                                            ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].days![dayIndex]
-                                            : DayDataModel();
-
-                                    monthData.overviewCurrentWeek = monthData.week ?? 1;
-                                    monthData.overviewCurrentDay = ((index ?? 1) + 1);
-                                    monthData.dayDataModel = dayData;
-                                    monthData.alternateEquipmentType = monthData.equipmentType;
-                                    monthData.weekDataModel = monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
-                                    monthData.updateIsPastWeek(monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
-                                    Navigator.pushNamed(context, '/dayOverview');
+                                    continueWorkoutOnTap(monthData, context);
                                   }
                                 },
-                                color: AppColors.primaryColor,
+                                color: monthData.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
                                 isLoading: false,
                               );
                             }),
@@ -501,6 +476,61 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
         ),
       ),
     );
+  }
+
+  void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
+      (element) => element == monthProvider.todayTitleId,
+    );
+
+    String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
+
+    final dayIndex = int.parse((monthProvider.monthDataModel?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
+                .toString()
+                .replaceAll("Workout", "")
+                .replaceAll("Rest", "")
+                .replaceAll("Day", "")
+                .replaceAll(" ", "") ??
+            "0")) -
+        1;
+    DayDataModel dayData =
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Workout")
+            ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
+            : DayDataModel();
+
+    bool isRestDay =
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Rest Day");
+
+    bool isPumpDay = (isRestDay &&
+            monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+        (isRestDay &&
+            (monthProvider.isPumpDayAvailable &&
+                (monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (monthProvider.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
+        (isRestDay &&
+            monthProvider.isPumpDayAvailable &&
+            (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
+
+    monthProvider.changeIsPumpDay(isPumpDay);
+
+    if (isPumpDay) {
+      monthProvider.updatePumpDayData(monthProvider.pumpDays[
+          int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+    }
+
+    monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;
+    monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
+    monthProvider.dayDataModel = dayData;
+    monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+    monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
+    monthProvider.updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
+    Navigator.pushNamed(context, '/dayOverview');
   }
 }
 
@@ -534,14 +564,15 @@ class BulletPoint extends StatelessWidget {
 
 class IconRow extends StatelessWidget {
   final List<IconDataWithDot> icons;
+  final bool fromHomeScreen;
 
-  const IconRow({super.key, required this.icons});
+  const IconRow({super.key, required this.icons, required this.fromHomeScreen});
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: fromHomeScreen ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: icons
           .map(

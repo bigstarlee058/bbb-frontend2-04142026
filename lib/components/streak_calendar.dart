@@ -89,32 +89,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                         ),
                                         onPressed: () {
                                           Navigator.pop(context);
-                                          // if (monthProvider?.routeString == "dashboard") {
-                                          //   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          //   mainPageProvider.changeTab(0);
-                                          // } else if (monthProvider?.routeString == "today") {
-                                          //   Navigator.pushNamedAndRemoveUntil(context, '/today', (route) => false);
-                                          //   mainPageProvider.changeTab(5);
-                                          //   Navigator.pop(context);
-                                          // } else if (monthProvider?.routeString == "month") {
-                                          //   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          //   mainPageProvider.changeTab(1);
-                                          // } else if (monthProvider?.routeString == "setting") {
-                                          //   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          //   mainPageProvider.changeTab(3);
-                                          // } else if (monthProvider?.routeString == "tool") {
-                                          //   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          //   mainPageProvider.changeTab(2);
-                                          // } else if (monthProvider?.routeString == "program") {
-                                          //   Navigator.push(
-                                          //     context,
-                                          //     MaterialPageRoute(
-                                          //       builder: (context) => const ProgramInfoView(),
-                                          //     ),
-                                          //   );
-                                          // } else {
-                                          //   Navigator.pushNamed(context, monthProvider!.routeString);
-                                          // }
                                         },
                                         iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                       ),
@@ -139,7 +113,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                       right: ScreenUtil.horizontalScale(4),
                                     ),
                                     child: SizedBox(
-                                      width: ScreenUtil.horizontalScale(10), // Size of the circle
+                                      width: ScreenUtil.horizontalScale(10),
                                       height: ScreenUtil.horizontalScale(10),
                                     ),
                                   ),
@@ -253,8 +227,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                   return ButtonWidget(
                                     text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
                                     textColor: Colors.white,
-                                    onPress: monthProvider.todayTitleId.isEmpty ? null : () => continueWorkoutOnTap(monthProvider, context),
-                                    color: AppColors.primaryColor,
+                                    onPress:
+                                        monthProvider.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(monthProvider, context),
+                                    color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
                                     isLoading: false,
                                   );
                                 },

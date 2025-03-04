@@ -193,7 +193,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     c = context;
     return MultiProvider(
-      providers: [dataProvider, userDataProvider, locationProvider, mainPageProvider, programInfoProvider, monthProvider],
+      providers: [
+        dataProvider,
+        userDataProvider,
+        locationProvider,
+        mainPageProvider,
+        programInfoProvider,
+        monthProvider,
+      ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
         locale: !kReleaseMode ? DevicePreview.locale(context) : null,

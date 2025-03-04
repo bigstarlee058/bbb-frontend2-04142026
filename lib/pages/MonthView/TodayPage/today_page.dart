@@ -154,6 +154,10 @@ class _TodayPageState extends State<TodayPage> {
     monthProvider?.setSelectedExercise(exercises[exerciseIndex], exerciseIndex);
     monthProvider?.updateWarmUp(false);
     monthProvider?.updateIsLastExercise(isLast);
+    // String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+    // if (isChecked != "true") {
+    //   monthProvider?.tutorialOnInit(context);
+    // }
     await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
   }
@@ -908,6 +912,12 @@ class _TodayPageState extends State<TodayPage> {
                             isExist
                         ? null
                         : () async {
+                            // String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+                            //
+                            // if (isChecked != "true") {
+                            //   monthProvider.tutorialOnInit(context);
+                            // }
+
                             monthProvider.updateWarmUp(true);
                             monthProvider.updateIsLastExercise(false);
                             Navigator.pushNamed(context, '/exercise', arguments: "Exercise");

@@ -8,32 +8,192 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class ExerciseTutorialScreen extends StatefulWidget {
-  const ExerciseTutorialScreen({super.key});
+  const ExerciseTutorialScreen(
+      {super.key,
+      required this.loading,
+      required this.dataProvider,
+      required this.videoNotInitialized,
+      required this.videoPlayerController,
+      required this.chewieController,
+      required this.videoSize});
+
+  final bool loading;
+  final DataProvider dataProvider;
+  final bool videoNotInitialized;
+  final VideoPlayerController videoPlayerController;
+  final ChewieController chewieController;
+  final Size videoSize;
 
   @override
   State<ExerciseTutorialScreen> createState() => _ExerciseTutorialScreenState();
 }
 
 class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
-  bool loading1 = false;
-  bool videoNotInitialized1 = false;
-  String tutorialDesc1 = "";
-  DataProvider? dataProvider1;
-  late VideoPlayerController _videoPlayerController1;
-  ChewieController? _chewieController1;
-  late Size videoSize1;
-  Timer? _hideControlsTimer1;
-  bool dontShowAgain1 = false;
+  // bool loading1 = false;
+  // bool videoNotInitialized1 = false;
+  // String tutorialDesc1 = "";
+  // DataProvider? dataProvider1;
+  // late VideoPlayerController _videoPlayerController1;
+  // ChewieController? _chewieController1;
+  // late Size videoSize1;
+  // Timer? _hideControlsTimer1;
+  // bool dontShowAgain1 = false;
+  // bool isZoom = false;
+  //
+  // @override
+  // void initState() {
+  //   dataProvider1 = Provider.of<DataProvider>(context, listen: false);
+  //   fetchTutorialData();
+  //   super.initState();
+  // }
+  //
+  // updateDonTShowAgain(value) async {
+  //   dontShowAgain1 = value;
+  //   if (value == true) {
+  //     await preferences.putString(SharedPreference.exerciseTutorial, value.toString());
+  //   }
+  //   setState(() {});
+  // }
+  //
+  // void fetchTutorialData() async {
+  //   setState(() {
+  //     loading1 = true;
+  //   });
+  //   await dataProvider1?.fetchTutorialData();
+  //   if (dataProvider1!.tutorialData.files.isNotEmpty) {
+  //     initializeVideo(dataProvider1?.tutorialData.files[0]['link']);
+  //   } else {
+  //     loading1 = false;
+  //     videoNotInitialized1 = true;
+  //     setState(() {});
+  //   }
+  //
+  //   tutorialDesc1 = dataProvider1?.tutorialData.description ?? "";
+  // }
+  //
+  // Future<void> initializeVideo(String url) async {
+  //   try {
+  //     _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(url));
+  //     await _videoPlayerController1.initialize();
+  //     _chewieController1 = ChewieController(
+  //       videoPlayerController: _videoPlayerController1,
+  //       autoPlay: true,
+  //       looping: false,
+  //       showControls: false,
+  //       aspectRatio: _videoPlayerController1.value.aspectRatio,
+  //     );
+  //
+  //     if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
+  //       hideControls();
+  //       videoSize1 = calculateVideoSize(aspectRatio: _chewieController1!.aspectRatio!, context: context);
+  //       setState(() {});
+  //     }
+  //     _videoPlayerController1.addListener(() {
+  //       setState(() {});
+  //     });
+  //
+  //     setState(() {
+  //       loading1 = false;
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       videoNotInitialized1 = true;
+  //       loading1 = false;
+  //     });
+  //     debugPrint("VIDEO NOT INITIALIZED: $e");
+  //   }
+  // }
+  //
+  // bool showControls = true;
+  // bool isFullscreen = false;
+  //
+  // void hideControls() {
+  //   _hideControlsTimer1 = Timer(const Duration(seconds: 5), () {
+  //     if (mounted) {
+  //       setState(() {
+  //         showControls = false;
+  //       });
+  //     }
+  //   });
+  // }
+  //
+  // void showControlsOnTap() {
+  //   setState(() {
+  //     showControls = !showControls;
+  //   });
+  //   _hideControlsTimer1?.cancel();
+  // }
+  //
+  // void toggleFullscreen() {
+  //   setState(() {
+  //     isFullscreen = !isFullscreen;
+  //   });
+  //   if (isFullscreen) {
+  //     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+  //   } else {
+  //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  //   }
+  // }
+  //
+  // Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
+  //   double maxWidth = ScreenUtil.horizontalScale(90);
+  //   double calculatedHeight = maxWidth / aspectRatio;
+  //   return Size(maxWidth, calculatedHeight);
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   if (_chewieController1 != null) {
+  //     _chewieController1!.dispose();
+  //   }
+  //   _videoPlayerController1.dispose();
+  //   super.dispose();
+  // }
 
   @override
   void initState() {
-    dataProvider1 = Provider.of<DataProvider>(context, listen: false);
-    fetchTutorialData();
+    widget.videoPlayerController.play();
+    widget.videoPlayerController.addListener(() {
+      setState(() {});
+    });
     super.initState();
+  }
+
+  Timer? _hideControlsTimer1;
+  bool showControls1 = true;
+  bool isFullscreen1 = false;
+  bool dontShowAgain1 = false;
+  bool isZoom1 = false;
+
+  void hideControls1() {
+    _hideControlsTimer1 = Timer(const Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          showControls1 = false;
+        });
+      }
+    });
+  }
+
+  void showControlsOnTap1() {
+    setState(() {
+      showControls1 = !showControls1;
+    });
+    _hideControlsTimer1?.cancel();
+  }
+
+  void toggleFullscreen1() {
+    setState(() {
+      isFullscreen1 = !isFullscreen1;
+    });
+    if (isFullscreen1) {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+    } else {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    }
   }
 
   updateDonTShowAgain(value) async {
@@ -42,107 +202,6 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
       await preferences.putString(SharedPreference.exerciseTutorial, value.toString());
     }
     setState(() {});
-  }
-
-  void fetchTutorialData() async {
-    setState(() {
-      loading1 = true;
-    });
-    await dataProvider1?.fetchTutorialData();
-    if (dataProvider1!.tutorialData.files.isNotEmpty) {
-      initializeVideo(dataProvider1?.tutorialData.files[0]['link']);
-    } else {
-      loading1 = false;
-      videoNotInitialized1 = true;
-      setState(() {});
-    }
-
-    tutorialDesc1 = dataProvider1?.tutorialData.description ?? "";
-  }
-
-  Future<void> initializeVideo(String url) async {
-    try {
-      // Initialize the video player controller
-      _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(url));
-      await _videoPlayerController1.initialize();
-
-      // Initialize the ChewieController with custom controls
-      _chewieController1 = ChewieController(
-        videoPlayerController: _videoPlayerController1,
-        autoPlay: true,
-        looping: false,
-        showControls: false,
-        aspectRatio: _videoPlayerController1.value.aspectRatio,
-        // Disable default controls// Use custom controls here
-      );
-
-      if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
-        hideControls();
-        videoSize1 = calculateVideoSize(aspectRatio: _chewieController1!.aspectRatio!, context: context);
-        setState(() {});
-      }
-
-      setState(() {
-        loading1 = false;
-      });
-    } catch (e) {
-      setState(() {
-        videoNotInitialized1 = true;
-        loading1 = false;
-      });
-      debugPrint("VIDEO NOT INITIALIZED: $e");
-    }
-  }
-
-  bool showControls = true;
-  bool isFullscreen = false;
-
-  void hideControls() {
-    _hideControlsTimer1 = Timer(const Duration(seconds: 5), () {
-      if (mounted) {
-        setState(() {
-          showControls = false;
-        });
-      }
-    });
-  }
-
-  void showControlsOnTap() {
-    setState(() {
-      showControls = !showControls;
-    });
-    _hideControlsTimer1?.cancel(); // Cancel any active timer
-    // hideControls(); // Start the timer again to hide the controls after 3 seconds
-  }
-
-  void toggleFullscreen() {
-    setState(() {
-      isFullscreen = !isFullscreen;
-    });
-    if (isFullscreen) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
-    } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-    }
-  }
-
-  Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
-    // Maximum allowable width and height based on screen dimensions
-    double maxWidth = ScreenUtil.horizontalScale(90);
-
-    // Calculate height dynamically based on width and aspect ratio
-    double calculatedHeight = maxWidth / aspectRatio;
-
-    return Size(maxWidth, calculatedHeight);
-  }
-
-  @override
-  void dispose() {
-    if (_chewieController1 != null) {
-      _chewieController1!.dispose();
-    }
-    _videoPlayerController1.dispose();
-    super.dispose();
   }
 
   @override
@@ -156,7 +215,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
             borderRadius: BorderRadius.circular(30),
             color: const Color(0xFFFFFFFF),
           ),
-          child: loading1
+          child: widget.loading
               ? const Center(
                   child: CircularProgressIndicator(
                     color: AppColors.primaryColor,
@@ -183,17 +242,17 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              showControlsOnTap();
+                              showControlsOnTap1();
                             },
                             child: Column(
                               children: [
-                                dataProvider1!.tutorialData.files.isNotEmpty && !videoNotInitialized1
+                                widget.dataProvider.tutorialData.files.isNotEmpty && !widget.videoNotInitialized
                                     ? SizedBox(
-                                        height: videoSize1.height - 18,
-                                        width: videoSize1.width - 6,
+                                        height: widget.videoSize.height - 18,
+                                        width: widget.videoSize.width - 6,
                                         child: Center(
                                           child: Chewie(
-                                            controller: _chewieController1!,
+                                            controller: widget.chewieController,
                                           ),
                                         ),
                                       )
@@ -209,14 +268,14 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                               ],
                             ),
                           ),
-                          videoNotInitialized1
+                          widget.videoNotInitialized
                               ? const SizedBox()
                               : Positioned(
-                                  bottom: videoSize1.height / 2.5,
+                                  bottom: widget.videoSize.height / 2.5,
                                   left: 15,
                                   right: 15,
                                   child: Visibility(
-                                    visible: showControls,
+                                    visible: showControls1,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
@@ -228,23 +287,25 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
-                                            _videoPlayerController1.seekTo(
-                                              _videoPlayerController1.value.position - const Duration(seconds: 10),
+                                            widget.videoPlayerController.seekTo(
+                                              widget.videoPlayerController.value.position - const Duration(seconds: 10),
                                             );
                                           },
                                         ),
                                         IconButton(
                                           iconSize: 60,
                                           icon: Icon(
-                                            _videoPlayerController1.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                                            widget.videoPlayerController.value.isPlaying
+                                                ? Icons.pause_circle_filled
+                                                : Icons.play_circle_filled,
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
                                             setState(() {
-                                              if (_videoPlayerController1.value.isPlaying) {
-                                                _videoPlayerController1.pause();
+                                              if (widget.videoPlayerController.value.isPlaying) {
+                                                widget.videoPlayerController.pause();
                                               } else {
-                                                _videoPlayerController1.play();
+                                                widget.videoPlayerController.play();
                                               }
                                             });
                                           },
@@ -257,8 +318,8 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
-                                            _videoPlayerController1.seekTo(
-                                              _videoPlayerController1.value.position + const Duration(seconds: 10),
+                                            widget.videoPlayerController.seekTo(
+                                              widget.videoPlayerController.value.position + const Duration(seconds: 10),
                                             );
                                           },
                                         ),
@@ -270,24 +331,42 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                             bottom: -5,
                             left: 20,
                             right: 20,
-                            child: !videoNotInitialized1 && _chewieController1!.videoPlayerController.value.isInitialized == true
-                                ? Container(
-                                    margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          child: VideoProgressIndicator(
-                                            _videoPlayerController1,
-                                            allowScrubbing: true,
-                                            colors: const VideoProgressColors(
-                                              playedColor: Colors.red,
-                                              bufferedColor: Colors.white,
-                                              backgroundColor: Colors.black26,
+                            child: !widget.videoNotInitialized && widget.chewieController.videoPlayerController.value.isInitialized == true
+                                ? Column(
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: SliderTheme(
+                                                data: SliderTheme.of(context).copyWith(
+                                                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
+                                                  trackHeight: isZoom1 ? 7 : 4,
+                                                  trackShape: RectangularSliderTrackShape(),
+                                                  overlayShape: SliderComponentShape.noOverlay,
+                                                ),
+                                                child: Slider(
+                                                  activeColor: Colors.red,
+                                                  value: widget.videoPlayerController.value.position.inSeconds.toDouble(),
+                                                  max: widget.videoPlayerController.value.duration.inSeconds.toDouble(),
+                                                  onChangeStart: (value) {
+                                                    setState(() => isZoom1 = true);
+                                                  },
+                                                  onChangeEnd: (value) {
+                                                    setState(() => isZoom1 = false);
+                                                  },
+                                                  onChanged: (value) {
+                                                    widget.videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   )
                                 : const SizedBox(),
                           ),

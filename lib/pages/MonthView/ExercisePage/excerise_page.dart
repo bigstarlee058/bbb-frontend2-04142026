@@ -14,6 +14,7 @@ import 'package:bbb/pages/MonthView/ExercisePage/add_notes.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/exercise_set_card.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/exercise_tutorial.dart';
 import 'package:bbb/pages/MonthView/TodayPage/equipment_section.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -35,6 +36,7 @@ class _ExercisePageState extends State<ExercisePage> {
   MonthProvider? monthProvider;
   bool loading = false;
   bool videoNotInitialized = false;
+  bool isZoom = false;
 
   int exerciseIndex = 0;
   String exerciseDesc = "";
@@ -55,9 +57,70 @@ class _ExercisePageState extends State<ExercisePage> {
   bool isCurrentExerciseSkipped = false;
   bool isEditable = false;
 
+  /// EXERCISE TUTORIAL
+
+  DataProvider? dataProvider1;
+  bool loading1 = false;
+  bool videoNotInitialized1 = false;
+  late VideoPlayerController _videoPlayerController1;
+  ChewieController? _chewieController1;
+  late Size videoSize1;
+
+  Future<void> fetchTutorialData() async {
+    setState(() {
+      loading1 = true;
+      loading = true;
+    });
+    await dataProvider1?.fetchTutorialData().then(
+      (value) async {
+        if (dataProvider1!.tutorialData.files.isNotEmpty) {
+          await initializeVideo1(dataProvider1?.tutorialData.files[0]['link']);
+        } else {
+          loading1 = false;
+          videoNotInitialized1 = true;
+          setState(() {});
+        }
+      },
+    );
+  }
+
+  Future<void> initializeVideo1(String url) async {
+    try {
+      _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(url));
+      await _videoPlayerController1.initialize();
+      _chewieController1 = ChewieController(
+        videoPlayerController: _videoPlayerController1,
+        autoPlay: false,
+        looping: false,
+        showControls: false,
+        aspectRatio: _videoPlayerController1.value.aspectRatio,
+      );
+
+      if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
+        videoSize1 = calculateVideoSize1(aspectRatio: _chewieController1!.aspectRatio!, context: context);
+        setState(() {});
+      }
+      setState(() => loading1 = false);
+    } catch (e) {
+      setState(() {
+        videoNotInitialized1 = true;
+        loading1 = false;
+      });
+      debugPrint("VIDEO NOT INITIALIZED: $e");
+    }
+  }
+
+  Size calculateVideoSize1({required BuildContext context, required double aspectRatio}) {
+    double maxWidth = ScreenUtil.horizontalScale(90);
+    double calculatedHeight = maxWidth / aspectRatio;
+    return Size(maxWidth, calculatedHeight);
+  }
+
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    dataProvider1 = Provider.of<DataProvider>(context, listen: false);
+    String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
@@ -66,20 +129,35 @@ class _ExercisePageState extends State<ExercisePage> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      argument = ModalRoute.of(context)?.settings.arguments as String?;
-
-      setState(() {
-        loading = true;
-      });
-
-      if (argument != "Exercise") {
-        await fromNotification().then(
-          (value) => clearNotificationAndNavigateExercise(),
+      String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+      if (isChecked != "true") {
+        await fetchTutorialData().then(
+          (value) async {
+            argument = ModalRoute.of(context)?.settings.arguments as String?;
+            setState(() => loading = true);
+            if (argument != "Exercise") {
+              await fromNotification().then(
+                (value) => clearNotificationAndNavigateExercise(),
+              );
+            } else {
+              await fetchExercise().then(
+                (value) => clearNotificationAndNavigateExercise(),
+              );
+            }
+          },
         );
       } else {
-        await fetchExercise().then(
-          (value) => clearNotificationAndNavigateExercise(),
-        );
+        argument = ModalRoute.of(context)?.settings.arguments as String?;
+        setState(() => loading = true);
+        if (argument != "Exercise") {
+          await fromNotification().then(
+            (value) => clearNotificationAndNavigateExercise(),
+          );
+        } else {
+          await fetchExercise().then(
+            (value) => clearNotificationAndNavigateExercise(),
+          );
+        }
       }
     });
 
@@ -88,23 +166,16 @@ class _ExercisePageState extends State<ExercisePage> {
 
   clearNotificationAndNavigateExercise() async {
     String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
-    await Future.delayed(Duration(milliseconds: 700));
-    NotificationService.clearNotification().then(
-      (value) {
-        if (isChecked != "true") {
-          showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              insetPadding: EdgeInsets.symmetric(horizontal: 25),
-              child: ExerciseTutorialScreen(),
-            ),
-          );
-        }
-      },
+    await Future.delayed(Duration(seconds: 2)).then(
+      (value) async => await NotificationService.clearNotification().then(
+        (value) {
+          if (isChecked != "true") {
+            if (_chewieController1 != null && !loading1) {
+              tutorialVideo(context);
+            }
+          }
+        },
+      ),
     );
   }
 
@@ -276,6 +347,10 @@ class _ExercisePageState extends State<ExercisePage> {
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
+
+      _videoPlayerController.addListener(() {
+        setState(() {});
+      });
 
       setState(() {
         loading = false;
@@ -530,23 +605,60 @@ class _ExercisePageState extends State<ExercisePage> {
                               left: 10,
                               right: 10,
                               child: !videoNotInitialized && _chewieController?.videoPlayerController.value.isInitialized == true
-                                  ? Container(
-                                      margin: EdgeInsets.only(bottom: media.height * 0.06, left: 20, right: 20),
-                                      child: Row(
-                                        children: [
-                                          Flexible(
-                                            child: VideoProgressIndicator(
-                                              _videoPlayerController,
-                                              allowScrubbing: true,
-                                              colors: const VideoProgressColors(
-                                                playedColor: AppColors.primaryColor,
-                                                bufferedColor: Colors.white,
-                                                backgroundColor: Colors.black26,
+                                  ? Column(
+                                      children: [
+                                        // Container(
+                                        //   margin: EdgeInsets.only(bottom: media.height * 0.06, left: 20, right: 20),
+                                        //   child: Row(
+                                        //     children: [
+                                        //       Flexible(
+                                        //         child: VideoProgressIndicator(
+                                        //           _videoPlayerController,
+                                        //           allowScrubbing: true,
+                                        //           colors: const VideoProgressColors(
+                                        //             playedColor: AppColors.primaryColor,
+                                        //             bufferedColor: Colors.white,
+                                        //             backgroundColor: Colors.black26,
+                                        //           ),
+                                        //         ),
+                                        //       )
+                                        //     ],
+                                        //   ),
+                                        // ),
+
+                                        Container(
+                                          margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: SliderTheme(
+                                                  data: SliderTheme.of(context).copyWith(
+                                                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
+                                                    trackHeight: isZoom ? 7 : 4,
+                                                    trackShape: RectangularSliderTrackShape(),
+                                                    overlayShape: SliderComponentShape.noOverlay,
+                                                  ),
+                                                  child: Slider(
+                                                    activeColor: Colors.red,
+                                                    value: _videoPlayerController.value.position.inSeconds.toDouble(),
+                                                    max: _videoPlayerController.value.duration.inSeconds.toDouble(),
+                                                    onChangeStart: (value) {
+                                                      setState(() => isZoom = true);
+                                                    },
+                                                    onChangeEnd: (value) {
+                                                      setState(() => isZoom = false);
+                                                    },
+                                                    onChanged: (value) {
+                                                      _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                                                    },
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        ],
-                                      ))
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    )
                                   : const SizedBox(),
                             )
                           : const SizedBox(),
@@ -699,7 +811,6 @@ class _ExercisePageState extends State<ExercisePage> {
                               Builder(builder: (context) {
                                 final dataHistory =
                                     monthProvider!.historyDataModel.where((element) => element.status == Status.completed).toList();
-
                                 return ListView.builder(
                                   itemCount: monthProvider?.selectedExercise!.extra!.length,
                                   shrinkWrap: true,
@@ -723,14 +834,18 @@ class _ExercisePageState extends State<ExercisePage> {
 
                                         int lastDataMainIndex = dataHistory.isNotEmpty ? (dataHistory.last.index ?? 0) : 0;
                                         int lastDataSubIndex = dataHistory.isNotEmpty ? dataHistory.last.subIndex ?? -1 : -1;
-                                        log('dataHistory :::::::::::::::::: ${jsonEncode(dataHistory)}');
+
                                         if (lastDataSubIndex ==
                                             ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
                                                 (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3
                                                     ? (extraSetModel.length)
                                                     : 0))) {
                                           lastDataMainIndex += 1;
-                                          lastDataSubIndex = 0;
+                                          if (lastDataMainIndex == (monthProvider!.selectedExercise!.extra!.length) &&
+                                              lastDataSubIndex == (setCount - 1)) {
+                                          } else {
+                                            lastDataSubIndex = 0;
+                                          }
                                         } else {
                                           lastDataSubIndex += 1;
                                         }
@@ -738,10 +853,14 @@ class _ExercisePageState extends State<ExercisePage> {
                                         return Padding(
                                           padding: const EdgeInsets.only(bottom: 20),
                                           child: ExerciseSetCard(
+                                            extraSetLength: extraSetModel.length,
+                                            setCount: setCount,
                                             isFromNotification:
                                                 (lastDataMainIndex == index && lastDataSubIndex == countIndex) && argument != "Exercise",
                                             countIndex: countIndex,
-                                            completed: (lastDataMainIndex >= index && (lastDataSubIndex > countIndex)),
+                                            completed: (lastDataMainIndex >= index &&
+                                                (lastDataSubIndex >= countIndex &&
+                                                    !(lastDataMainIndex == index && lastDataSubIndex == countIndex))),
                                             available: (lastDataMainIndex == index && lastDataSubIndex == countIndex),
                                             isEditable: isEditable,
                                             makeRefresh: () {
@@ -971,6 +1090,36 @@ class _ExercisePageState extends State<ExercisePage> {
                     isLoading: false,
                   ),
                 ),
+    );
+  }
+
+  Future<dynamic> tutorialVideo(BuildContext context) {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          insetPadding: EdgeInsets.symmetric(horizontal: 25),
+          child: ExerciseTutorialScreen(
+            loading: loading1,
+            dataProvider: dataProvider1!,
+            chewieController: _chewieController1!,
+            videoNotInitialized: videoNotInitialized1,
+            videoPlayerController: _videoPlayerController1,
+            videoSize: videoSize1,
+          ),
+        );
+      },
+    ).then(
+      (value) {
+        if (_chewieController1 != null) {
+          _chewieController1!.dispose();
+        }
+        _videoPlayerController1.dispose();
+      },
     );
   }
 
