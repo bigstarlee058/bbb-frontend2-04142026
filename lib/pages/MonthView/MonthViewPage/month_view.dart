@@ -8,6 +8,7 @@ import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -25,10 +26,12 @@ class MonthView extends StatefulWidget {
 
 class _MonthViewState extends State<MonthView> {
   MonthProvider? monthProvider;
+  ScrollProvider? scrollProvider;
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     monthProvider?.mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     super.initState();
   }
@@ -39,345 +42,459 @@ class _MonthViewState extends State<MonthView> {
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
+      body: NotificationListener(
+        onNotification: (ScrollNotification notification) {
+          scrollProvider?.updateOffSet1(notification.metrics.pixels);
+          return true;
+        },
+        child: Stack(
           children: [
-            Stack(
-              children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: media.height / 2,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 2,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(4),
-                                        ),
-                                        decoration: const BoxDecoration(
-                                          color: Color(0XFFd18a9b),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: SizedBox(
-                                          width: ScreenUtil.horizontalScale(10),
-                                          height: ScreenUtil.horizontalScale(10),
-                                          child: IconButton(
-                                            padding: EdgeInsets.zero,
-                                            icon: const Icon(
-                                              Icons.keyboard_arrow_left,
-                                              color: Colors.white,
-                                            ),
-                                            onPressed: () {
-                                              monthProvider!.mainPageProvider.changeTab(0);
-                                            },
-                                            iconSize: ScreenUtil.verticalScale(4),
-                                          ),
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: "month")
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(8),
-                                    vertical: ScreenUtil.verticalScale(1.9),
-                                  ),
-                                  height: media.height * 0.22,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        child: Column(
-                                          children: [
-                                            monthProvider!.startTime != null && monthProvider!.endTime != null
-                                                ? Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Text(
-                                                        monthProvider!.startTime == null || monthProvider!.startTime.toString() == ""
-                                                            ? ""
-                                                            : DateFormat('MM/dd').format(monthProvider!.startTime!),
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: ScreenUtil.verticalScale(2),
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        monthProvider!.endTime == null || monthProvider!.endTime.toString() == ""
-                                                            ? ""
-                                                            : DateFormat(' - MM/dd').format(monthProvider!.endTime!),
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: ScreenUtil.verticalScale(2),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                : const SizedBox(),
-                                            // const SizedBox(height: 5),
-                                            Text(
-                                              monthProvider!.monthDataModel?.title ?? "",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.horizontalScale(6),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      // const SizedBox(height: 10),
-                                      Container(
-                                        margin: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(9),
-                                        ),
-                                        child: ButtonWidget(
-                                          text: "Watch Video Intro",
-                                          color: const Color(0xEEFFFFFF),
-                                          onPress: () {
-                                            Navigator.of(context).push(
-                                              FadePageRoute(
-                                                page: const VideoIntroWidget(
-                                                  vimeoId: '953289606',
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          textColor: AppColors.primaryColor,
-                                          isLoading: false,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                            vertical: ScreenUtil.verticalScale(33),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ProgramInfoView(),
-                                ),
-                              );
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "View Program Info",
-                                  style: TextStyle(
-                                    decorationColor: Colors.white,
-                                    color: Colors.white,
-                                    fontSize: ScreenUtil.verticalScale(2.2),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 2.54,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+            Consumer<ScrollProvider>(builder: (context, scrollProvider, child) {
+              return Opacity(
+                opacity: scrollProvider.scrollOffset1 <= 0.0 ? 1 : 0,
+                child: Container(
+                  height: media.height / 2,
+                  width: media.width,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/img/back.jpg'),
+                      fit: BoxFit.cover,
+                      opacity: 1,
                     ),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(
-                    top: media.height / 2.55,
-                    bottom: ScreenUtil.verticalScale(15),
                   ),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(8),
-                            vertical: ScreenUtil.verticalScale(3),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+              );
+            }),
+            Consumer<ScrollProvider>(
+              builder: (context, scrollProvider, child) {
+                return scrollProvider.scrollOffset1 <= 0.0
+                    ? Positioned(
+                        top: media.height / 27.8,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
                                 margin: EdgeInsets.only(
-                                  left: ScreenUtil.horizontalScale(3),
+                                  left: ScreenUtil.horizontalScale(4),
                                 ),
-                                child: Text(
-                                  'Choose workout day split',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: const Color(0xBB888888),
-                                    fontSize: ScreenUtil.verticalScale(1.5),
-                                    fontWeight: FontWeight.w700,
+                                decoration: const BoxDecoration(
+                                  color: Color(0XFFd18a9b),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: SizedBox(
+                                  width: ScreenUtil.horizontalScale(10),
+                                  height: ScreenUtil.horizontalScale(10),
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: const Icon(
+                                      Icons.keyboard_arrow_left,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      monthProvider?.mainPageProvider.changeTab(0);
+                                    },
+                                    iconSize: ScreenUtil.verticalScale(4),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              Consumer<MonthProvider>(
-                                builder: (context, value, child) => SelectDropdown1(
-                                  onChange: (String newValue) async {
-                                    await value.changeDaySplit(newValue);
-                                    await value.filterWorkouts();
-                                    await value.updateLocalData();
-                                    await value.checkForPumpDay();
-                                    await value.manageStreak();
-                                    await value.getLiftedWeightGraphData();
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 32),
-                              Container(
-                                margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(3)),
-                                child: Text(
-                                  'Choose equipment availability',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: const Color(0xBB888888),
-                                    fontSize: ScreenUtil.verticalScale(1.5),
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Consumer<MonthProvider>(
-                                builder: (context, value, child) => SelectDropdown(
-                                  onChange: (String newValue) async {
-                                    value.changeEquipmentType(newValue);
-                                    await value.filterWorkouts();
-                                    await value.updateLocalData();
-                                  },
-                                ),
-                              )
+                              const CommonStreakWithNotification(routeString: "month")
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Consumer<MonthProvider>(
-                          builder: (context, value, child) {
-                            if (value.week == null || value.week! > 4) {
-                              return const SizedBox();
-                            }
-
-                            String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
-
-                            return value.isFilterLoading
-                                ? const SizedBox()
-                                : value.weeksDataList.isNotEmpty
-                                    ? Container(
-                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                                        child: SingleChildScrollView(
-                                          physics: NeverScrollableScrollPhysics(),
+                      )
+                    : SizedBox();
+              },
+            ),
+            RefreshIndicator(
+              color: AppColors.primaryColor,
+              onRefresh: () async => await monthProvider?.onInit(isEnabled: false),
+              child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: BouncingScrollPhysics(),
+                children: [
+                  Stack(
+                    children: [
+                      Column(
+                        children: [
+                          Stack(
+                            children: [
+                              Consumer<ScrollProvider>(builder: (context, scrollProvider, child) {
+                                return Opacity(
+                                  opacity: scrollProvider.scrollOffset1 > 0.0 ? 1 : 0,
+                                  child: Container(
+                                    height: media.height / 2,
+                                    width: media.width,
+                                    decoration: const BoxDecoration(
+                                      image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              SizedBox(
+                                height: media.height / 2,
+                                width: media.width,
+                                child: SafeArea(
+                                  child: Column(
+                                    children: [
+                                      Consumer<ScrollProvider>(
+                                        builder: (context, scrollProvider, child) {
+                                          return scrollProvider.scrollOffset1 >= 0.0
+                                              ? Container(
+                                                  margin: const EdgeInsets.only(right: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                          left: ScreenUtil.horizontalScale(4),
+                                                        ),
+                                                        decoration: const BoxDecoration(
+                                                          color: Color(0XFFd18a9b),
+                                                          shape: BoxShape.circle,
+                                                        ),
+                                                        child: SizedBox(
+                                                          width: ScreenUtil.horizontalScale(10),
+                                                          height: ScreenUtil.horizontalScale(10),
+                                                          child: IconButton(
+                                                            padding: EdgeInsets.zero,
+                                                            icon: const Icon(
+                                                              Icons.keyboard_arrow_left,
+                                                              color: Colors.white,
+                                                            ),
+                                                            onPressed: () {
+                                                              monthProvider?.mainPageProvider.changeTab(0);
+                                                            },
+                                                            iconSize: ScreenUtil.verticalScale(4),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const CommonStreakWithNotification(routeString: "month")
+                                                    ],
+                                                  ),
+                                                )
+                                              : SizedBox(height: media.height / 18);
+                                        },
+                                      ),
+                                      Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                        return Container(
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: ScreenUtil.horizontalScale(8),
+                                            vertical: ScreenUtil.verticalScale(1.9),
+                                          ),
+                                          height: media.height * 0.22,
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
-                                              for (int i = 0; i < value.weeksDataList.length; i++) ...[
-                                                WeeklyTrackCard(
-                                                    index: i,
-                                                    monthProvider: value,
-                                                    pumpDayIds: value.weeksDataList[i].pumpDayIds!,
-                                                    title: value.weeksDataList[i].title == ""
-                                                        ? "Week ${i + 1}"
-                                                        : value.weeksDataList[i].title!,
-                                                    thisWeek: ((i + 1) == value.week),
-                                                    restDayId: value.weeksDataList[i].restdayId!,
-                                                    weekIndex: i,
-                                                    isOpened: false,
-                                                    isCompleted: false,
-                                                    startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
-                                                    cardData: value.weeksDataList[i],
-                                                    daySplit: split,
-                                                    expandedVal: (i + 1) == value.week ? true : false,
-                                                    completedWeek: i + 1),
-                                                const SizedBox(
-                                                  height: 15,
+                                              SizedBox(
+                                                child: Column(
+                                                  children: [
+                                                    monthProvider.startTime != null && monthProvider.endTime != null
+                                                        ? Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Text(
+                                                                monthProvider.startTime == null || monthProvider.startTime.toString() == ""
+                                                                    ? ""
+                                                                    : DateFormat('MM/dd').format(monthProvider.startTime!),
+                                                                style: TextStyle(
+                                                                  color: Colors.white,
+                                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                monthProvider.endTime == null || monthProvider.endTime.toString() == ""
+                                                                    ? ""
+                                                                    : DateFormat(' - MM/dd').format(monthProvider.endTime!),
+                                                                style: TextStyle(
+                                                                  color: Colors.white,
+                                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : const SizedBox(),
+                                                    // const SizedBox(height: 5),
+                                                    Text(
+                                                      monthProvider.monthDataModel?.title ?? "",
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil.horizontalScale(6),
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                              ),
+                                              // const SizedBox(height: 10),
+                                              Container(
+                                                margin: EdgeInsets.symmetric(
+                                                  horizontal: ScreenUtil.horizontalScale(9),
+                                                ),
+                                                child: ButtonWidget(
+                                                  text: "Watch Video Intro",
+                                                  color: const Color(0xEEFFFFFF),
+                                                  onPress: () {
+                                                    Navigator.of(context).push(
+                                                      FadePageRoute(
+                                                        page: const VideoIntroWidget(
+                                                          vimeoId: '953289606',
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  textColor: AppColors.primaryColor,
+                                                  isLoading: false,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
                                             ],
                                           ),
+                                        );
+                                      }),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.symmetric(
+                                  vertical: ScreenUtil.verticalScale(33),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const ProgramInfoView(),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "View Program Info",
+                                        style: TextStyle(
+                                          decorationColor: Colors.white,
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil.verticalScale(2.2),
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                      )
-                                    : const Center(
-                                        child: Text("No workout data available"),
-                                      );
-                          },
-                        ),
-                        const SizedBox(height: 15),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(5),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: media.height / 2.54,
+                                width: media.width,
+                                child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: ClipPath(
+                                    clipper: DiagonalClipper(),
+                                    child: Container(
+                                      height: media.height / 11,
+                                      width: media.width / 6,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          child: Consumer<MonthProvider>(
-                            builder: (context, value, child) => ButtonWidget(
-                              text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
-                              textColor: Colors.white,
-                              onPress: monthProvider!.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(context),
-                              color: monthProvider!.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                              isLoading: false,
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(
+                          top: media.height / 2.55,
+                          bottom: ScreenUtil.verticalScale(15),
+                        ),
+                        child: Container(
+                          width: media.width,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
                             ),
                           ),
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(8),
+                                  vertical: ScreenUtil.verticalScale(3),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                        left: ScreenUtil.horizontalScale(3),
+                                      ),
+                                      child: Text(
+                                        'Choose workout day split',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: const Color(0xBB888888),
+                                          fontSize: ScreenUtil.verticalScale(1.5),
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Consumer<MonthProvider>(
+                                      builder: (context, value, child) => SelectDropdown1(
+                                        onChange: (String newValue) async {
+                                          await value.changeDaySplit(newValue);
+                                          await value.filterWorkouts();
+                                          await value.updateLocalData();
+                                          await value.checkForPumpDay();
+                                          await value.manageStreak();
+                                          await value.getLiftedWeightGraphData();
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(height: 32),
+                                    Container(
+                                      margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(3)),
+                                      child: Text(
+                                        'Choose equipment availability',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: const Color(0xBB888888),
+                                          fontSize: ScreenUtil.verticalScale(1.5),
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Consumer<MonthProvider>(
+                                      builder: (context, value, child) => SelectDropdown(
+                                        onChange: (String newValue) async {
+                                          value.changeEquipmentType(newValue);
+                                          await value.filterWorkouts();
+                                          await value.updateLocalData();
+                                        },
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Consumer<MonthProvider>(
+                                builder: (context, value, child) {
+                                  if (value.week == null || value.week! > 4) {
+                                    return const SizedBox();
+                                  }
+
+                                  String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+                                  return value.isFilterLoading
+                                      ? const SizedBox()
+                                      : value.weeksDataList.isNotEmpty
+                                          ? Container(
+                                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount: value.weeksDataList.length,
+                                                    padding: EdgeInsets.zero,
+                                                    physics: NeverScrollableScrollPhysics(),
+                                                    itemBuilder: (context, index) {
+                                                      return Column(
+                                                        children: [
+                                                          WeeklyTrackCard(
+                                                              index: index,
+                                                              monthProvider: value,
+                                                              pumpDayIds: value.weeksDataList[index].pumpDayIds!,
+                                                              title: value.weeksDataList[index].title == ""
+                                                                  ? "Week ${index + 1}"
+                                                                  : value.weeksDataList[index].title!,
+                                                              thisWeek: ((index + 1) == value.week),
+                                                              restDayId: value.weeksDataList[index].restdayId!,
+                                                              weekIndex: index,
+                                                              isOpened: false,
+                                                              isCompleted: false,
+                                                              startDate: (value.startTime ?? DateTime.now()).add(Duration(days: index * 7)),
+                                                              cardData: value.weeksDataList[index],
+                                                              daySplit: split,
+                                                              expandedVal: (index + 1) == value.week ? true : false,
+                                                              completedWeek: index + 1),
+                                                          const SizedBox(
+                                                            height: 15,
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ),
+
+                                                  // for (int i = 0; i < value.weeksDataList.length; i++) ...[
+                                                  //   WeeklyTrackCard(
+                                                  //       index: i,
+                                                  //       monthProvider: value,
+                                                  //       pumpDayIds: value.weeksDataList[i].pumpDayIds!,
+                                                  //       title: value.weeksDataList[i].title == ""
+                                                  //           ? "Week ${i + 1}"
+                                                  //           : value.weeksDataList[i].title!,
+                                                  //       thisWeek: ((i + 1) == value.week),
+                                                  //       restDayId: value.weeksDataList[i].restdayId!,
+                                                  //       weekIndex: i,
+                                                  //       isOpened: false,
+                                                  //       isCompleted: false,
+                                                  //       startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
+                                                  //       cardData: value.weeksDataList[i],
+                                                  //       daySplit: split,
+                                                  //       expandedVal: (i + 1) == value.week ? true : false,
+                                                  //       completedWeek: i + 1),
+                                                  //   const SizedBox(
+                                                  //     height: 15,
+                                                  //   ),
+                                                  // ],
+                                                ],
+                                              ),
+                                            )
+                                          : const Center(
+                                              child: Text("No workout data available"),
+                                            );
+                                },
+                              ),
+                              const SizedBox(height: 15),
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(5),
+                                ),
+                                child: Consumer<MonthProvider>(
+                                  builder: (context, value, child) => ButtonWidget(
+                                    text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
+                                    textColor: Colors.white,
+                                    onPress: monthProvider!.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(context),
+                                    color: monthProvider!.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
+                                    isLoading: false,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

@@ -37,6 +37,7 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
+import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:device_preview/device_preview.dart';
@@ -150,6 +151,9 @@ class _MyAppState extends State<MyApp> {
   final monthProvider = ChangeNotifierProvider<MonthProvider>(
     create: (context) => MonthProvider(),
   );
+  final scrollProvider = ChangeNotifierProvider<ScrollProvider>(
+    create: (context) => ScrollProvider(),
+  );
 
   // ignore: unused_field
   late AppLinks _appLinks;
@@ -200,6 +204,7 @@ class _MyAppState extends State<MyApp> {
         mainPageProvider,
         programInfoProvider,
         monthProvider,
+        scrollProvider,
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,

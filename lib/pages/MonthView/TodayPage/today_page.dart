@@ -306,66 +306,143 @@ class _TodayPageState extends State<TodayPage> {
                                           ],
                                         ),
                                       ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil.horizontalScale(8),
+                                          vertical: ScreenUtil.verticalScale(1.9),
+                                        ),
+                                        height: media.height * 0.22,
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              "Option ${monthProvider!.alternateEquipmentType}:",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2),
-                                              ),
-                                            ),
-                                            Text(
-                                              monthProvider!.alternateEquipmentType == "A"
-                                                  ? "Fully equipped gym"
-                                                  : monthProvider?.alternateEquipmentType == "B"
-                                                      ? "Home gym"
-                                                      : "Dumbbells and bands",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.3),
-                                              ),
-                                            ),
                                             SizedBox(
-                                              height: ScreenUtil.verticalScale(0.5),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "Option ${monthProvider!.alternateEquipmentType}:",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: ScreenUtil.verticalScale(2),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(bottom: 5),
+                                                    child: Text(
+                                                      monthProvider!.alternateEquipmentType == "A"
+                                                          ? "Fully equipped gym"
+                                                          : monthProvider?.alternateEquipmentType == "B"
+                                                              ? "Home gym"
+                                                              : "Dumbbells and bands",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil.verticalScale(2),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                                    return Padding(
+                                                      padding: const EdgeInsets.only(bottom: 5),
+                                                      child: Text(
+                                                        monthProvider.isPumpDay
+                                                            ? monthProvider.pumpDayModel?.title ?? "Pump Day"
+                                                            : currentDayTitle,
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: ScreenUtil.horizontalScale(6),
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  })
+                                                ],
+                                              ),
                                             ),
-                                            Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                              return Text(
-                                                monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  height: 1.1,
-                                                  fontSize: ScreenUtil.verticalScale(4),
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              );
-                                            }),
+                                            Container(
+                                              margin: EdgeInsets.symmetric(
+                                                horizontal: ScreenUtil.horizontalScale(9),
+                                              ),
+                                              child: ButtonWidget(
+                                                text: "Watch Video Intro",
+                                                color: const Color(0xEEFFFFFF),
+                                                onPress: () {
+                                                  Navigator.of(context).push(
+                                                    FadePageRoute(
+                                                      page: const VideoIntroWidget(vimeoId: '953289606'),
+                                                    ),
+                                                  );
+                                                },
+                                                textColor: AppColors.primaryColor,
+                                                isLoading: false,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
                                           ],
                                         ),
                                       ),
-                                      SizedBox(height: ScreenUtil.verticalScale(2.5)),
-                                      Container(
-                                        margin: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(10),
-                                        ),
-                                        child: ButtonWidget(
-                                          text: "Watch Video Intro",
-                                          color: const Color(0xEEFFFFFF),
-                                          onPress: () {
-                                            Navigator.of(context).push(
-                                              FadePageRoute(
-                                                page: const VideoIntroWidget(vimeoId: '953289606'),
-                                              ),
-                                            );
-                                          },
-                                          textColor: AppColors.primaryColor,
-                                          isLoading: false,
-                                        ),
-                                      ),
+                                      // Padding(
+                                      //   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                      //   child: Column(
+                                      //     mainAxisAlignment: MainAxisAlignment.center,
+                                      //     children: [
+                                      //       Text(
+                                      //         "Option ${monthProvider!.alternateEquipmentType}:",
+                                      //         style: TextStyle(
+                                      //           color: Colors.white,
+                                      //           fontSize: ScreenUtil.verticalScale(2),
+                                      //         ),
+                                      //       ),
+                                      //       Text(
+                                      //         monthProvider!.alternateEquipmentType == "A"
+                                      //             ? "Fully equipped gym"
+                                      //             : monthProvider?.alternateEquipmentType == "B"
+                                      //                 ? "Home gym"
+                                      //                 : "Dumbbells and bands",
+                                      //         style: TextStyle(
+                                      //           color: Colors.white,
+                                      //           fontSize: ScreenUtil.verticalScale(2.3),
+                                      //         ),
+                                      //       ),
+                                      //       SizedBox(
+                                      //         height: ScreenUtil.verticalScale(0.5),
+                                      //       ),
+                                      //       Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                      //         return Text(
+                                      //           monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
+                                      //           textAlign: TextAlign.center,
+                                      //           style: TextStyle(
+                                      //             color: Colors.white,
+                                      //             height: 1.1,
+                                      //             fontSize: ScreenUtil.verticalScale(4),
+                                      //             fontWeight: FontWeight.bold,
+                                      //           ),
+                                      //         );
+                                      //       }),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                      // SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                                      // Container(
+                                      //   margin: EdgeInsets.symmetric(
+                                      //     horizontal: ScreenUtil.horizontalScale(10),
+                                      //   ),
+                                      //   child: ButtonWidget(
+                                      //     text: "Watch Video Intro",
+                                      //     color: const Color(0xEEFFFFFF),
+                                      //     onPress: () {
+                                      //       Navigator.of(context).push(
+                                      //         FadePageRoute(
+                                      //           page: const VideoIntroWidget(vimeoId: '953289606'),
+                                      //         ),
+                                      //       );
+                                      //     },
+                                      //     textColor: AppColors.primaryColor,
+                                      //     isLoading: false,
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                 ),
@@ -572,6 +649,8 @@ class _TodayPageState extends State<TodayPage> {
                                                               : "Workout Day",
                                                           status1: Status.completed);
                                                       if (!context.mounted) return;
+                                                      value.updateCurrentDayTitleId(
+                                                          value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
                                                       Navigator.pushNamed(context, '/dayCompleted');
                                                     },
                                               color: AppColors.primaryColor,

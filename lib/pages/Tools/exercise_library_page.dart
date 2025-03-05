@@ -130,28 +130,51 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      BackArrowWidget(
-                                        onPress: () {
-                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          mainPageProvider.changeTab(2);
-                                        },
-                                      ),
-                                      Text(
-                                        'Exercise Library',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(5.5),
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/exerciseLibrary')
-                                    ],
+                                AppBar(
+                                  backgroundColor: Colors.transparent,
+                                  centerTitle: true,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(2);
+                                    },
                                   ),
+                                  title: Text(
+                                    'Exercise Library',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                                    ),
+                                  ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                    )
+                                  ],
                                 ),
+                                // Container(
+                                //   margin: const EdgeInsets.only(right: 10),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       BackArrowWidget(
+                                //         onPress: () {
+                                //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                //           mainPageProvider.changeTab(2);
+                                //         },
+                                //       ),
+                                //       Text(
+                                //         'Exercise Library',
+                                //         style: TextStyle(
+                                //           color: Colors.white,
+                                //           fontSize: ScreenUtil.horizontalScale(5.5),
+                                //         ),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: '/exerciseLibrary')
+                                //     ],
+                                //   ),
+                                // ),
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(7),

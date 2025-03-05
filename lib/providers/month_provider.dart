@@ -62,6 +62,7 @@ class MonthProvider extends ChangeNotifier {
   DateTime selectedWeekDate = DateTime.now();
 
   String todayTitleId = "";
+  String currentDayTitleId = "";
   String circuitIndex = "";
   // String routeString = "dashboard";
   int circuitsIndex = 0;
@@ -111,6 +112,11 @@ class MonthProvider extends ChangeNotifier {
 
   updateIsCircuit(bool val) {
     isCircuit = val;
+    notifyListeners();
+  }
+
+  updateCurrentDayTitleId(String val) {
+    currentDayTitleId = val;
     notifyListeners();
   }
 

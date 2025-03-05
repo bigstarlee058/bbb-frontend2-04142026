@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
@@ -200,9 +201,12 @@ class _MainPageState extends State<MainPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   IconButton(
-                    onPressed: () {
-                      mainPageProvider.changeTab(0);
-                    },
+                    onPressed: mainPageProvider.selectedPage != 0
+                        ? () {
+                            HapticFeedBack.buttonClick();
+                            mainPageProvider.changeTab(0);
+                          }
+                        : null,
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/1-home.svg',
@@ -213,9 +217,12 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      mainPageProvider.changeTab(1);
-                    },
+                    onPressed: mainPageProvider.selectedPage != 1
+                        ? () {
+                            HapticFeedBack.buttonClick();
+                            mainPageProvider.changeTab(1);
+                          }
+                        : null,
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/2-calendar.svg',
@@ -226,9 +233,12 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      mainPageProvider.changeTab(2);
-                    },
+                    onPressed: mainPageProvider.selectedPage != 2
+                        ? () {
+                            HapticFeedBack.buttonClick();
+                            mainPageProvider.changeTab(2);
+                          }
+                        : null,
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/3-statistics.svg',
@@ -239,9 +249,12 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      mainPageProvider.changeTab(3);
-                    },
+                    onPressed: mainPageProvider.selectedPage != 3
+                        ? () {
+                            HapticFeedBack.buttonClick();
+                            mainPageProvider.changeTab(3);
+                          }
+                        : null,
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/4-account.svg',
@@ -255,7 +268,7 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
-          body: _pages[value.otherPage > 3 ? value.otherPage : value.selectedPage],
+          body: _pages[value.selectedPage],
         ),
       ),
     );

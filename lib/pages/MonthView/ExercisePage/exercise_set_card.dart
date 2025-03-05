@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -22,7 +23,7 @@ class ExerciseSetCard extends StatefulWidget {
     super.key,
     required this.title,
     required this.isOpened,
-    required this.exercise,
+    // required this.exercise,
     required this.set,
     required this.weight,
     required this.reps,
@@ -50,7 +51,7 @@ class ExerciseSetCard extends StatefulWidget {
   final String exerciseName;
   final ExtraDataModel extraDataModel;
   final bool isOpened;
-  final int exercise;
+  // final int exercise;
   final int set;
   final int weight;
   final int reps;
@@ -309,7 +310,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
             lastDataSubIndex += 1;
           }
           monthProvider?.updateExpandedItem(
-              "$lastDataMainIndex:$lastDataSubIndex:${widget.exercise}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}");
+              "$lastDataMainIndex:$lastDataSubIndex:${monthProvider?.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}");
           widget.makeRefresh();
         },
       );
@@ -365,6 +366,9 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     super.build(context);
     context.select((MonthProvider value) => value.currentExpandedItem);
     context.select((MonthProvider value) => value.timerAddress);
+    context.select((MonthProvider value) => value.selectedExIndex);
+
+    log(' monthProvider!.currentExpandedItem :::::::::::::::::: ${monthProvider!.currentExpandedItem}');
     _isExpanded =
         "$index:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}" ==
             monthProvider!.currentExpandedItem;

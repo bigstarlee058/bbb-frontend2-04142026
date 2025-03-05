@@ -14,13 +14,13 @@ import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -46,6 +46,7 @@ class _DashboardPageState extends State<DashboardPage> {
   DataProvider? dataProvider;
   late MainPageProvider mainPageProvider;
   late MonthProvider monthProvider;
+  late ScrollProvider scrollProvider;
   String selectedChart = "Exercises Completed";
   Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
 
@@ -59,6 +60,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Future<void> onInit() async {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     loadUserInfo();
@@ -118,24 +120,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  bool loader = false;
-  Future<void> onRefresh() async {
-    loader = true;
-    setState(() {});
-    await onInit().then(
-      (value) {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (timeStamp) async => await _initializeFetchData().then((value) async => await monthProvider.onInit(isEnabled: false)),
-        );
-      },
-    );
-    await Future.delayed(Duration(milliseconds: 3000));
-    loader = false;
-    setState(() {});
-  }
-
-  double _scrollOffset = 0;
-
   @override
   Widget build(BuildContext context) {
     if (dataProvider == null || userData == null) {
@@ -143,89 +127,99 @@ class _DashboardPageState extends State<DashboardPage> {
     }
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
+    // context.select((MonthProvider value) => value.scrollOffset);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
-          setState(() {
-            _scrollOffset = notification.metrics.pixels;
-          });
+          scrollProvider.updateOffSet(notification.metrics.pixels);
           return true;
         },
         child: Stack(
           children: [
-            Container(
-              height: media.height / 2,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/img/back.jpg'),
-                  fit: BoxFit.cover,
-                  opacity: 1,
-                ),
-              ),
+            Consumer<ScrollProvider>(
+              builder: (context, scrollProvider, child) {
+                return Opacity(
+                  opacity: scrollProvider.scrollOffset <= 0.0 ? 1 : 0,
+                  child: Container(
+                    height: media.height / 2,
+                    width: media.width,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/img/back.jpg'),
+                        fit: BoxFit.cover,
+                        opacity: 1,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-            _scrollOffset <= 0.0
-                ? Positioned(
-                    top: media.height / 27.8,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 10, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(
-                              left: ScreenUtil.horizontalScale(8),
-                              top: ScreenUtil.verticalScale(0),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Consumer<UserDataProvider>(
-                                    builder: (context, userData, child) => userData.userName != ""
-                                        ? Text(
-                                            // 'Hi Nick'
-                                            'Hi ${userData.userName}',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: ScreenUtil.verticalScale(2.9),
-                                              height: 2,
-                                            ),
-                                          )
-                                        : const SizedBox()),
-                              ],
-                            ),
-                          ),
-                          Column(
+            Consumer<ScrollProvider>(
+              builder: (context, scrollProvider, child) {
+                return scrollProvider.scrollOffset <= 0.0
+                    ? Positioned(
+                        top: media.height / 27.8,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 10, bottom: 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  left: ScreenUtil.horizontalScale(8),
+                                  top: ScreenUtil.verticalScale(0),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Consumer<UserDataProvider>(
+                                        builder: (context, userData, child) => userData.userName != ""
+                                            ? Text(
+                                                // 'Hi Nick'
+                                                'Hi ${userData.userName}',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.verticalScale(2.9),
+                                                  height: 2,
+                                                ),
+                                              )
+                                            : const SizedBox()),
+                                  ],
+                                ),
+                              ),
+                              Column(
                                 children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      left: ScreenUtil.horizontalScale(0),
-                                      right: ScreenUtil.horizontalScale(0),
-                                      top: ScreenUtil.verticalScale(0),
-                                    ),
-                                    child: const CommonStreakWithNotification(routeString: "dashboard"),
-                                  )
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          left: ScreenUtil.horizontalScale(0),
+                                          right: ScreenUtil.horizontalScale(0),
+                                          top: ScreenUtil.verticalScale(0),
+                                        ),
+                                        child: const CommonStreakWithNotification(routeString: "dashboard"),
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                  )
-                : SizedBox(),
-            CustomMaterialIndicator(
+                        ),
+                      )
+                    : SizedBox();
+              },
+            ),
+            RefreshIndicator(
               color: AppColors.primaryColor,
-              onRefresh: onRefresh,
+              onRefresh: () async => await _initializeFetchData().then((value) async => await monthProvider.onInit(isEnabled: false)),
               child: SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
                 child: Column(
@@ -236,19 +230,19 @@ class _DashboardPageState extends State<DashboardPage> {
                           children: [
                             Stack(
                               children: [
-                                Opacity(
-                                  opacity: 0,
-                                  child: Container(
-                                    height: media.height / 2,
-                                    width: media.width,
-                                    decoration: const BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage('assets/img/back.jpg'),
-                                        fit: BoxFit.cover,
-                                        opacity: 1,
+                                Consumer<ScrollProvider>(
+                                  builder: (context, scrollProvider, child) {
+                                    return Opacity(
+                                      opacity: scrollProvider.scrollOffset > 0.0 ? 1 : 0,
+                                      child: Container(
+                                        height: media.height / 2,
+                                        width: media.width,
+                                        decoration: const BoxDecoration(
+                                          image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
                                 SizedBox(
                                   height: media.height / 2,
@@ -256,58 +250,62 @@ class _DashboardPageState extends State<DashboardPage> {
                                   child: SafeArea(
                                     child: Column(
                                       children: [
-                                        _scrollOffset >= 0.0
-                                            ? Container(
-                                                margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                        left: ScreenUtil.horizontalScale(8),
-                                                        top: ScreenUtil.verticalScale(0),
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: [
-                                                          Consumer<UserDataProvider>(
-                                                              builder: (context, userData, child) => userData.userName != ""
-                                                                  ? Text(
-                                                                      // 'Hi Nick'
-                                                                      'Hi ${userData.userName}',
-                                                                      style: TextStyle(
-                                                                        color: Colors.white,
-                                                                        fontSize: ScreenUtil.verticalScale(2.9),
-                                                                        height: 2,
-                                                                      ),
-                                                                    )
-                                                                  : const SizedBox()),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Column(
+                                        Consumer<ScrollProvider>(
+                                          builder: (context, scrollProvider, child) {
+                                            return scrollProvider.scrollOffset >= 0.0
+                                                ? Container(
+                                                    margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                        Padding(
+                                                          padding: EdgeInsets.only(
+                                                            left: ScreenUtil.horizontalScale(8),
+                                                            top: ScreenUtil.verticalScale(0),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Consumer<UserDataProvider>(
+                                                                  builder: (context, userData, child) => userData.userName != ""
+                                                                      ? Text(
+                                                                          // 'Hi Nick'
+                                                                          'Hi ${userData.userName}',
+                                                                          style: TextStyle(
+                                                                            color: Colors.white,
+                                                                            fontSize: ScreenUtil.verticalScale(2.9),
+                                                                            height: 2,
+                                                                          ),
+                                                                        )
+                                                                      : const SizedBox()),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Column(
                                                           children: [
-                                                            Padding(
-                                                              padding: EdgeInsets.only(
-                                                                left: ScreenUtil.horizontalScale(0),
-                                                                right: ScreenUtil.horizontalScale(0),
-                                                                top: ScreenUtil.verticalScale(0),
-                                                              ),
-                                                              child: const CommonStreakWithNotification(routeString: "dashboard"),
-                                                            )
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsets.only(
+                                                                    left: ScreenUtil.horizontalScale(0),
+                                                                    right: ScreenUtil.horizontalScale(0),
+                                                                    top: ScreenUtil.verticalScale(0),
+                                                                  ),
+                                                                  child: const CommonStreakWithNotification(routeString: "dashboard"),
+                                                                )
+                                                              ],
+                                                            ),
                                                           ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
-                                                ),
-                                              )
-                                            : SizedBox(height: media.height / 15),
+                                                  )
+                                                : SizedBox(height: media.height / 15);
+                                          },
+                                        ),
                                         Consumer<MonthProvider>(
                                           builder: (context, monthData, child) {
                                             if ((monthData.monthDataModel?.weeks == null || monthData.loader)) {

@@ -131,11 +131,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    const SizedBox(
-                                      height: 22,
-                                    ),
+                                    const SizedBox(height: 15),
                                     Text(
-                                      'Your current Streak',
+                                      'Your Current Streak',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: ScreenUtil.verticalScale(2.5),
@@ -143,18 +141,25 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                         height: 1,
                                       ),
                                     ),
-                                    Builder(builder: (context) {
-                                      final streak = context.watch<MonthProvider>().streak;
-                                      return Text(
-                                        '$streak',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(4),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.3,
-                                        ),
-                                      );
-                                    }),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 2),
+                                      ),
+                                      padding: EdgeInsets.all(10),
+                                      child: Builder(builder: (context) {
+                                        final streak = context.watch<MonthProvider>().streak;
+                                        return Text(
+                                          '$streak',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: ScreenUtil.verticalScale(3.2),
+                                            fontWeight: FontWeight.bold,
+                                            height: 1.3,
+                                          ),
+                                        );
+                                      }),
+                                    ),
                                   ],
                                 ),
                               ),

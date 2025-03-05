@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/notification_service.dart';
@@ -526,7 +527,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
                                                 ),
-                                                onPressed: () => Navigator.pop(context),
+                                                onPressed: () {
+                                                  HapticFeedBack.buttonClick();
+                                                  Navigator.pop(context);
+                                                },
                                                 iconSize: ScreenUtil.verticalScale(4),
                                               ),
                                             ),
@@ -896,7 +900,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                                 : extraItem.type == 2
                                                     ? backOffIndex - 1
                                                     : workingIndex - 1],
-                                            exercise: exerciseIndex,
+                                            // exercise: exerciseIndex,
                                             set: int.parse(extraItem.sets.toString()),
                                             weight: int.parse(extraItem.weight.toString()),
                                             reps: int.parse(extraItem.reps.toString()),
@@ -964,6 +968,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                                           : "Finish & Next",
                                               textColor: Colors.white,
                                               onPress: () async {
+                                                log('i ::::::::::::::::::  :::::::::::::::::: ${monthProvider.selectedExIndex}');
                                                 int count = 0;
                                                 await _saveExerciseData(
                                                     status: Status.completed,
@@ -1008,6 +1013,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                                                 element.exerciseId ==
                                                                 monthProvider.dayDataModel!.exercises?.last.exerciseId);
                                                         monthProvider.updateIsLastExercise(isLast);
+
                                                         await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
                                                         break;
                                                       }
