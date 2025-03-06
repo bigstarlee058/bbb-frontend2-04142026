@@ -1,4 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -138,7 +139,10 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
                                                 ),
-                                                onPressed: () => Navigator.pop(context),
+                                                onPressed: () {
+                                                  HapticFeedBack.buttonClick();
+                                                  Navigator.pop(context);
+                                                },
                                                 iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                               ),
                                             ),

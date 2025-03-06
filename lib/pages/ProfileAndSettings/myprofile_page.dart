@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/profile_image_handler.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -170,10 +171,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(
-                                             onPress: () {
-                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                              mainPageProvider.changeTab(3);
-                                            },
+                                        onPress: () {
+                                          HapticFeedBack.buttonClick();
+                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          mainPageProvider.changeTab(3);
+                                        },
                                       ),
                                       const CommonStreakWithNotification(routeString: '/myprofile')
                                     ],
@@ -209,7 +211,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                         builder: (context, userData, child) => userData.userName != ""
                                             ? Text(
                                                 // 'Hi, Nick',
-                                                '${userData.userName}',
+                                                userData.userName,
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: ScreenUtil.horizontalScale(8),

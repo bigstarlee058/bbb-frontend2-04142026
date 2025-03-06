@@ -121,7 +121,6 @@ class _ExercisePageState extends State<ExercisePage> {
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider1 = Provider.of<DataProvider>(context, listen: false);
-    String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
@@ -968,7 +967,6 @@ class _ExercisePageState extends State<ExercisePage> {
                                                           : "Finish & Next",
                                               textColor: Colors.white,
                                               onPress: () async {
-                                                log('i ::::::::::::::::::  :::::::::::::::::: ${monthProvider.selectedExIndex}');
                                                 int count = 0;
                                                 await _saveExerciseData(
                                                     status: Status.completed,

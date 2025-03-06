@@ -1,6 +1,7 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
@@ -471,6 +472,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                     children: [
                                       BackArrowWidget(
                                         onPress: () {
+                                          HapticFeedBack.buttonClick();
                                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                           mainPageProvider.changeTab(2);
                                         },

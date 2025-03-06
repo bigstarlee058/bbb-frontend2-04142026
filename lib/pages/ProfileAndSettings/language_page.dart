@@ -1,11 +1,12 @@
+import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
-import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:provider/provider.dart';
 
 class LanguagePage extends StatefulWidget {
@@ -68,15 +69,15 @@ class _LanguagePageState extends State<LanguagePage> {
                                     horizontal: ScreenUtil.horizontalScale(3),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(
-                                            onPress: () {
-                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                              mainPageProvider.changeTab(3);
-                                            },
-                                          ),
+                                        onPress: () {
+                                          HapticFeedBack.buttonClick();
+                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          mainPageProvider.changeTab(3);
+                                        },
+                                      ),
                                       CommonStreakWithNotification(routeString: '/languageScreen')
                                     ],
                                   ),
@@ -108,13 +109,13 @@ class _LanguagePageState extends State<LanguagePage> {
                                             ),
                                             child: selectedLanguage == 'English'
                                                 ? Image.asset(
-                                              'assets/img/american.png',
-                                              fit: BoxFit.fill,
-                                            )
+                                                    'assets/img/american.png',
+                                                    fit: BoxFit.fill,
+                                                  )
                                                 : Image.asset(
-                                              'assets/img/spanish.png',
-                                              fit: BoxFit.fill,
-                                            )),
+                                                    'assets/img/spanish.png',
+                                                    fit: BoxFit.fill,
+                                                  )),
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.horizontalScale(5),
@@ -123,8 +124,7 @@ class _LanguagePageState extends State<LanguagePage> {
                                         "Select Your Language",
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize:
-                                          ScreenUtil.horizontalScale(8),
+                                          fontSize: ScreenUtil.horizontalScale(8),
                                           fontWeight: FontWeight.bold,
                                           height: 1,
                                         ),
@@ -177,16 +177,14 @@ class _LanguagePageState extends State<LanguagePage> {
                         Builder(builder: (context) {
                           return ListView.builder(
                             shrinkWrap: true,
-                            physics:
-                            ClampingScrollPhysics(), // Prevent scrolling if content fits
+                            physics: ClampingScrollPhysics(), // Prevent scrolling if content fits
                             itemCount: languages.length,
                             itemBuilder: (context, index) {
                               final language = languages[index];
                               return Column(
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.fromLTRB(24, 0, 8,
-                                        0), // Add padding to left and right
+                                    padding: EdgeInsets.fromLTRB(24, 0, 8, 0), // Add padding to left and right
                                     child: ListTile(
                                       title: Text(
                                         language['name'] ?? '',
@@ -200,35 +198,29 @@ class _LanguagePageState extends State<LanguagePage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Container(
-                                              height:
-                                              ScreenUtil.horizontalScale(8),
-                                              width: ScreenUtil.horizontalScale(
-                                                  12),
+                                              height: ScreenUtil.horizontalScale(8),
+                                              width: ScreenUtil.horizontalScale(12),
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius: BorderRadius.all(
                                                   Radius.circular(
-                                                    ScreenUtil.horizontalScale(
-                                                        .5),
+                                                    ScreenUtil.horizontalScale(.5),
                                                   ),
                                                 ),
                                               ),
                                               child: ClipRRect(
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                    ScreenUtil.horizontalScale(
-                                                        1),
+                                                  borderRadius: BorderRadius.circular(
+                                                    ScreenUtil.horizontalScale(1),
                                                   ),
-                                                  child: language['name'] ==
-                                                      'English'
+                                                  child: language['name'] == 'English'
                                                       ? Image.asset(
-                                                    'assets/img/american.png',
-                                                    fit: BoxFit.fill,
-                                                  )
+                                                          'assets/img/american.png',
+                                                          fit: BoxFit.fill,
+                                                        )
                                                       : Image.asset(
-                                                    'assets/img/spanish.png',
-                                                    fit: BoxFit.fill,
-                                                  ))),
+                                                          'assets/img/spanish.png',
+                                                          fit: BoxFit.fill,
+                                                        ))),
                                           SizedBox(width: 10),
                                           Radio<String>(
                                             activeColor: AppColors.primaryColor,
@@ -246,15 +238,14 @@ class _LanguagePageState extends State<LanguagePage> {
                                   ),
                                   index == languages.length - 1
                                       ? SizedBox(
-                                    height: 0,
-                                  )
+                                          height: 0,
+                                        )
                                       : Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        28, 0, 28, 0),
-                                    child: Divider(
-                                      thickness: 0.3,
-                                    ),
-                                  ), // Divider between items
+                                          padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
+                                          child: Divider(
+                                            thickness: 0.3,
+                                          ),
+                                        ), // Divider between items
                                 ],
                               );
                             },
@@ -295,5 +286,4 @@ class _LanguagePageState extends State<LanguagePage> {
       ),
     );
   }
-
 }

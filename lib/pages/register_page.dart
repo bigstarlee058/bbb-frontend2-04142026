@@ -4,13 +4,13 @@ import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/pages/email_verification_page.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:http/http.dart' as http;
 
 class RegisterPage extends StatefulWidget {
@@ -54,8 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       );
 
-      Navigator.push(context,
-          MaterialPageRoute(builder: (ctx) => const EmailVerificationScreen()));
+      Navigator.push(context, MaterialPageRoute(builder: (ctx) => const EmailVerificationScreen()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         showDialog(
@@ -63,8 +62,7 @@ class _RegisterPageState extends State<RegisterPage> {
             builder: (BuildContext context) {
               return const AppAlertDialog(
                 title: "",
-                description:
-                    "An account with this email already exists.\nPlease log in instead.",
+                description: "An account with this email already exists.\nPlease log in instead.",
               );
             });
       }
@@ -107,7 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(), 
+        physics: const ClampingScrollPhysics(),
         child: Form(
           key: _formKey,
           child: Column(
@@ -124,7 +122,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         color: AppColors.primaryColor,
                       ),
                     ),
-                    BackArrowWidget(onPress: () => {Navigator.pop(context)}),
+                    BackArrowWidget(onPress: () {
+                      HapticFeedBack.buttonClick();
+                      Navigator.pop(context);
+                    }),
                     Align(
                       alignment: Alignment.bottomRight,
                       child: ClipPath(
@@ -237,9 +238,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                 ),
                                 icon: Icon(
-                                  isObscure
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
+                                  isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                   color: const Color(0XFFd9d9d9),
                                 ),
                               ),
@@ -276,9 +275,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                 ),
                                 icon: Icon(
-                                  isObscure
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
+                                  isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                   color: const Color(0XFFd9d9d9),
                                 ),
                               ),

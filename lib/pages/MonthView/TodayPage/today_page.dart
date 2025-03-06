@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
@@ -293,6 +294,8 @@ class _TodayPageState extends State<TodayPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
+                                                        HapticFeedBack.buttonClick();
+
                                                         Navigator.pop(context);
                                                         // Navigator.pushNamed(context, '/dayOverview');
                                                       },

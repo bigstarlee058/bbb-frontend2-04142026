@@ -1,19 +1,17 @@
-import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/icon_row_with_dot.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+// import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 // import 'package:bbb/storage/userdata_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
-import 'package:flutter/widgets.dart';
 
 class JoinedChallengePage extends StatefulWidget {
   const JoinedChallengePage({super.key});
@@ -100,19 +98,24 @@ class _JoinedChallengePageState extends State<JoinedChallengePage> {
                                     children: [
                                       Container(
                                         margin: EdgeInsets.only(
-                                          left:ScreenUtil.horizontalScale(4),
+                                          left: ScreenUtil.horizontalScale(4),
                                         ),
                                         decoration: const BoxDecoration(
-                                          color:Color(0XFFd18a9b),
+                                          color: Color(0XFFd18a9b),
                                           shape: BoxShape.circle,
                                         ),
                                         child: SizedBox(
                                           width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                          height:ScreenUtil.horizontalScale(10),
+                                          height: ScreenUtil.horizontalScale(10),
                                           child: IconButton(
                                             padding: EdgeInsets.zero, // Removes the default padding
-                                            icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white,),
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_left,
+                                              color: Colors.white,
+                                            ),
                                             onPressed: () {
+                                              HapticFeedBack.buttonClick();
+
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                               mainPageProvider.changeTab(0);
                                             },

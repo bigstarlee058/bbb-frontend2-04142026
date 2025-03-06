@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -81,7 +80,6 @@ void main() async {
     onDidReceiveNotificationResponse: (details) async {
       final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
       if (isLastExerciseScreen == "NO") {
-        log('isLastExerciseScreen :::::::::::::::::: $isLastExerciseScreen');
         await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
         await preferences.putInt(SharedPreference.fromNotification, 1);
         navigatorKey.currentState?.pushNamed('/exercise');
@@ -93,7 +91,6 @@ void main() async {
       await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
     final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
-    log('isLastExerciseScreen :::::::::::::::::: $isLastExerciseScreen');
     if (isLastExerciseScreen == "NO") {
       final String? payload = notificationAppLaunchDetails!.notificationResponse?.payload;
       await preferences.putString(SharedPreference.payload, payload ?? "{}");

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -90,9 +88,6 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       time = formatDuration(duration);
       totalWeight = double.parse(data1.totalWeight ?? "0");
       exerciseCompleted = int.parse(data1.completedExercise ?? "0");
-      log('time :::::::::::::::::: $time');
-      log('totalWeight :::::::::::::::::: $totalWeight');
-      log('exerciseCompleted :::::::::::::::::: $exerciseCompleted');
     }
 
     await Future.delayed(const Duration(milliseconds: 1000));

@@ -77,7 +77,6 @@ class _DashboardPageState extends State<DashboardPage> {
     //
     //   setState(() {
     //     _opacity = newOpacity;
-    //     log('_opacity :::::::::::::::::: $_opacity');
     //   });
     // });
   }

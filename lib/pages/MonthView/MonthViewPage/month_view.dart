@@ -1,5 +1,6 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/components/select_dropdown1.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -95,6 +96,8 @@ class _MonthViewState extends State<MonthView> {
                                       color: Colors.white,
                                     ),
                                     onPressed: () {
+                                      HapticFeedBack.buttonClick();
+
                                       monthProvider?.mainPageProvider.changeTab(0);
                                     },
                                     iconSize: ScreenUtil.verticalScale(4),
@@ -167,6 +170,8 @@ class _MonthViewState extends State<MonthView> {
                                                               color: Colors.white,
                                                             ),
                                                             onPressed: () {
+                                                              HapticFeedBack.buttonClick();
+
                                                               monthProvider?.mainPageProvider.changeTab(0);
                                                             },
                                                             iconSize: ScreenUtil.verticalScale(4),

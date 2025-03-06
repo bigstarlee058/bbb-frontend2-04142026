@@ -878,7 +878,6 @@ class MonthProvider extends ChangeNotifier {
 
       url = Uri.http(url.authority, url.path);
       String? userIdToken = await getAuthToken();
-      log('userIdToken :::::::::::::::::: $userIdToken');
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -1029,7 +1028,6 @@ class MonthProvider extends ChangeNotifier {
           'subIndex': subIndex,
           'dataId': dataId,
         };
-        log('payLoad :::::::::::::::::: $payLoad');
         NotificationService.zonedScheduleNotification(newTime, selectedExIndex, payLoad);
       }
     }
@@ -1168,7 +1166,6 @@ class MonthProvider extends ChangeNotifier {
         if (firstDay != today) {
           int difference = today.difference(firstDay).inDays;
           if (difference > 1) {
-            log('difference > 1 :::::$difference::::::::::::: ${difference > 1}');
             streak = 0;
             break;
           }
@@ -1289,7 +1286,6 @@ class MonthProvider extends ChangeNotifier {
         dayId: monthDataModel!.weeks?[overviewCurrentWeek - 1].idList![overviewCurrentDay - 1] ?? "",
         weekId: monthDataModel!.weeks?[overviewCurrentWeek - 1].id ?? "",
       );
-      log('data :::::::1111111111::::::::::: $data');
 
       if (data.isNotEmpty) {
         historyDataModel = List<HistoryDataModel>.from(json.decode(jsonEncode(data)).map((x) => HistoryDataModel.fromJson(x)));

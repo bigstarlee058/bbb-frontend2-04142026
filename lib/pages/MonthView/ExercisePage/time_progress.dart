@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -62,7 +61,6 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
     NotificationService.clearNotification();
     totalTime = widget.initialDuration;
     WidgetsBinding.instance.addObserver(this);
-    log('widget.initialDuration :::::::::::::::::: ${widget.initialDuration}');
     currentTime = 0;
     formattedTime = _formatTime(widget.initialDuration - currentTime);
 

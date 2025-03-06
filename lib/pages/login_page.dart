@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 // import 'package:bbb/pages/email_verification_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/pages/reset_password_page.dart';
@@ -197,6 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                         alignment: Alignment.topLeft,
                         child: SafeArea(
                           child: BackArrowWidget(onPress: () {
+                            HapticFeedBack.buttonClick();
                             Navigator.pop(context);
                           }),
                         ),

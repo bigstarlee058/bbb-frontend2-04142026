@@ -1,6 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/models/collections.dart';
-import 'package:bbb/models/equipment.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/notifications.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -8,9 +7,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -60,8 +57,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             children: [
               Container(
                   width: ScreenUtil.horizontalScale(100),
-                  margin: EdgeInsets.symmetric(
-                      horizontal: ScreenUtil.horizontalScale(5), vertical: ScreenUtil.verticalScale(0.2)),
+                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5), vertical: ScreenUtil.verticalScale(0.2)),
                   padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -165,19 +161,25 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                           children: [
                                             Container(
                                               margin: EdgeInsets.only(
-                                                left:ScreenUtil.horizontalScale(4),
+                                                left: ScreenUtil.horizontalScale(4),
                                               ),
                                               decoration: const BoxDecoration(
-                                                color:Color(0XFFd18a9b),
+                                                color: Color(0XFFd18a9b),
                                                 shape: BoxShape.circle,
                                               ),
                                               child: SizedBox(
                                                 width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                                height:ScreenUtil.horizontalScale(10),
+                                                height: ScreenUtil.horizontalScale(10),
                                                 child: IconButton(
                                                   padding: EdgeInsets.zero, // Removes the default padding
-                                                  icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white,),
-                                                  onPressed: () => Navigator.pop(context),
+                                                  icon: const Icon(
+                                                    Icons.keyboard_arrow_left,
+                                                    color: Colors.white,
+                                                  ),
+                                                  onPressed: () {
+                                                    HapticFeedBack.buttonClick();
+                                                    Navigator.pop(context);
+                                                  },
                                                   iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                                 ),
                                               ),
@@ -261,8 +263,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             ),
                           ),
                           child: Container(
-                              margin:
-                                  EdgeInsets.only(top: (ScreenUtil.verticalScale(80) - 300) / 2, right: 20, left: 20),
+                              margin: EdgeInsets.only(top: (ScreenUtil.verticalScale(80) - 300) / 2, right: 20, left: 20),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -301,8 +302,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       bottomNavigationBar: Wrap(
         children: [
           Container(
-            margin:
-                EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10), vertical: ScreenUtil.verticalScale(2)),
+            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10), vertical: ScreenUtil.verticalScale(2)),
             child: Column(
               children: [
                 Row(

@@ -1,4 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 // import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/calender.dart';
@@ -88,6 +89,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                           color: Colors.white,
                                         ),
                                         onPressed: () {
+                                          HapticFeedBack.buttonClick();
                                           Navigator.pop(context);
                                         },
                                         iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same

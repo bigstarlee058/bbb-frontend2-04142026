@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
@@ -181,6 +182,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
+                                                        HapticFeedBack.buttonClick();
+
                                                         Navigator.pop(context);
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
@@ -379,6 +382,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
+                                                        HapticFeedBack.buttonClick();
+
                                                         Navigator.pop(context);
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),

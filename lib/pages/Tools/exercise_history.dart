@@ -1,3 +1,4 @@
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -120,6 +121,8 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                           size: ScreenUtil.verticalScale(4), // Adjust size using ScreenUtil
                         ),
                         onPressed: () {
+                          HapticFeedBack.buttonClick();
+
                           Navigator.pop(context);
                         },
                       ),

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -275,6 +274,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "status": Status.completed
       // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
     };
+
     if (matchingElement?.id != null) {
       await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
     } else {
@@ -368,7 +368,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     context.select((MonthProvider value) => value.timerAddress);
     context.select((MonthProvider value) => value.selectedExIndex);
 
-    log(' monthProvider!.currentExpandedItem :::::::::::::::::: ${monthProvider!.currentExpandedItem}');
     _isExpanded =
         "$index:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}" ==
             monthProvider!.currentExpandedItem;
