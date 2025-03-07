@@ -70,42 +70,56 @@ class _MonthViewState extends State<MonthView> {
               builder: (context, scrollProvider, child) {
                 return scrollProvider.scrollOffset1 <= 0.0
                     ? Positioned(
-                        top: media.height / 27.8,
+                        top: 0,
                         left: 0,
                         right: 0,
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(
-                                  left: ScreenUtil.horizontalScale(4),
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Color(0XFFd18a9b),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: SizedBox(
-                                  width: ScreenUtil.horizontalScale(10),
-                                  height: ScreenUtil.horizontalScale(10),
-                                  child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    icon: const Icon(
-                                      Icons.keyboard_arrow_left,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () {
-                                      HapticFeedBack.buttonClick();
+                        child: SizedBox(
+                          height: media.height / 2,
+                          width: media.width,
+                          child: SafeArea(
+                            child: Column(
+                              children: [
+                                Consumer<ScrollProvider>(
+                                  builder: (context, scrollProvider, child) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(right: 10),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                              left: ScreenUtil.horizontalScale(4),
+                                            ),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: SizedBox(
+                                              width: ScreenUtil.horizontalScale(10),
+                                              height: ScreenUtil.horizontalScale(10),
+                                              child: IconButton(
+                                                padding: EdgeInsets.zero,
+                                                icon: const Icon(
+                                                  Icons.keyboard_arrow_left,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  HapticFeedBack.buttonClick();
 
-                                      monthProvider?.mainPageProvider.changeTab(0);
-                                    },
-                                    iconSize: ScreenUtil.verticalScale(4),
-                                  ),
+                                                  monthProvider?.mainPageProvider.changeTab(0);
+                                                },
+                                                iconSize: ScreenUtil.verticalScale(4),
+                                              ),
+                                            ),
+                                          ),
+                                          const CommonStreakWithNotification(routeString: "month")
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                              const CommonStreakWithNotification(routeString: "month")
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       )
@@ -146,13 +160,13 @@ class _MonthViewState extends State<MonthView> {
                                     children: [
                                       Consumer<ScrollProvider>(
                                         builder: (context, scrollProvider, child) {
-                                          return scrollProvider.scrollOffset1 >= 0.0
-                                              ? Container(
-                                                  margin: const EdgeInsets.only(right: 10),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Container(
+                                          return Container(
+                                            margin: const EdgeInsets.only(right: 10),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                scrollProvider.scrollOffset1 >= 0.0
+                                                    ? Container(
                                                         margin: EdgeInsets.only(
                                                           left: ScreenUtil.horizontalScale(4),
                                                         ),
@@ -177,19 +191,57 @@ class _MonthViewState extends State<MonthView> {
                                                             iconSize: ScreenUtil.verticalScale(4),
                                                           ),
                                                         ),
-                                                      ),
-                                                      const CommonStreakWithNotification(routeString: "month")
-                                                    ],
-                                                  ),
-                                                )
-                                              : SizedBox(height: media.height / 18);
+                                                      )
+                                                    : SizedBox(),
+                                                scrollProvider.scrollOffset1 >= 0.0
+                                                    ? const CommonStreakWithNotification(routeString: "month")
+                                                    : Row(
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Container(
+                                                                alignment: Alignment.center,
+                                                                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.transparent,
+                                                                  shape: BoxShape.circle,
+                                                                  border: Border.all(color: Colors.transparent),
+                                                                ),
+                                                                child: Text(
+                                                                  '',
+                                                                  style: TextStyle(
+                                                                    color: Colors.transparent,
+                                                                    fontSize: ScreenUtil.verticalScale(0.8),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Icon(
+                                                                Icons.local_fire_department_outlined,
+                                                                color: Colors.transparent,
+                                                                size: ScreenUtil.verticalScale(3),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          IconButton(
+                                                            onPressed: null,
+                                                            icon: Icon(
+                                                              Icons.notifications_none,
+                                                              color: Colors.transparent,
+                                                              size: ScreenUtil.verticalScale(3),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      )
+                                              ],
+                                            ),
+                                          );
                                         },
                                       ),
                                       Consumer<MonthProvider>(builder: (context, monthProvider, child) {
                                         return Container(
                                           margin: EdgeInsets.symmetric(
                                             horizontal: ScreenUtil.horizontalScale(8),
-                                            vertical: ScreenUtil.verticalScale(1.9),
+                                            vertical: ScreenUtil.verticalScale(2),
                                           ),
                                           height: media.height * 0.22,
                                           child: Column(
@@ -224,7 +276,7 @@ class _MonthViewState extends State<MonthView> {
                                                             ],
                                                           )
                                                         : const SizedBox(),
-                                                    // const SizedBox(height: 5),
+                                                    const SizedBox(height: 5),
                                                     Text(
                                                       monthProvider.monthDataModel?.title ?? "",
                                                       textAlign: TextAlign.center,
@@ -237,14 +289,13 @@ class _MonthViewState extends State<MonthView> {
                                                   ],
                                                 ),
                                               ),
-                                              // const SizedBox(height: 10),
                                               Container(
                                                 margin: EdgeInsets.symmetric(
                                                   horizontal: ScreenUtil.horizontalScale(9),
                                                 ),
                                                 child: ButtonWidget(
                                                   text: "Watch Video Intro",
-                                                  color: const Color(0xEEFFFFFF),
+                                                  color: Colors.white,
                                                   onPress: () {
                                                     Navigator.of(context).push(
                                                       FadePageRoute(

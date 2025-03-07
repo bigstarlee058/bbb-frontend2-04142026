@@ -261,12 +261,13 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         .split(" ")[1] ??
                                                     "";
                                                 return ButtonWidget(
-                                                  text: (monthProvider.dayDataModel != null &&
-                                                          monthProvider.dayDataModel!.formats != null &&
-                                                          monthProvider.dayDataModel!.formats!
-                                                              .contains(split.toString().replaceAll("split", "")))
-                                                      ? "Watch Video"
-                                                      : "Watch Video Intro",
+                                                  // text: (monthProvider.dayDataModel != null &&
+                                                  //         monthProvider.dayDataModel!.formats != null &&
+                                                  //         monthProvider.dayDataModel!.formats!
+                                                  //             .contains(split.toString().replaceAll("split", "")))
+                                                  //     ? "Watch Video"
+                                                  //     : "Watch Video Intro",
+                                                  text: "Watch Video",
                                                   color: const Color(0xEEFFFFFF),
                                                   onPress: () {
                                                     Navigator.of(context).push(

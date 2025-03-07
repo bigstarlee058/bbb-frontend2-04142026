@@ -461,7 +461,7 @@ class DataProvider extends ChangeNotifier {
       monthDataModelSplit3.weeks?.forEach(
         (element) async {
           final data = await monthProvider?.fetchRestDay(element.restdayId ?? "");
-          dataList.add(data!);
+          dataList.add(data);
           await preferences.putString("REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
         },
       );

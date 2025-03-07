@@ -129,6 +129,9 @@ class _DashboardPageState extends State<DashboardPage> {
     // context.select((MonthProvider value) => value.scrollOffset);
 
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => ApiRepo().fetchSwapExercise(),
+      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -159,57 +162,68 @@ class _DashboardPageState extends State<DashboardPage> {
               builder: (context, scrollProvider, child) {
                 return scrollProvider.scrollOffset <= 0.0
                     ? Positioned(
-                        top: media.height / 27.8,
+                        top: 0,
                         left: 0,
                         right: 0,
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 10, bottom: 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: ScreenUtil.horizontalScale(8),
-                                  top: ScreenUtil.verticalScale(0),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) => userData.userName != ""
-                                            ? Text(
-                                                // 'Hi Nick'
-                                                'Hi ${userData.userName}',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.verticalScale(2.9),
-                                                  height: 2,
-                                                ),
-                                              )
-                                            : const SizedBox()),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                        child: SizedBox(
+                          height: media.height / 2,
+                          width: media.width,
+                          child: SafeArea(
+                            child: Consumer<ScrollProvider>(
+                              builder: (context, scrollProvider, child) {
+                                return Container(
+                                  margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(0),
-                                          right: ScreenUtil.horizontalScale(0),
+                                          left: ScreenUtil.horizontalScale(8),
                                           top: ScreenUtil.verticalScale(0),
                                         ),
-                                        child: const CommonStreakWithNotification(routeString: "dashboard"),
-                                      )
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Consumer<UserDataProvider>(
+                                              builder: (context, userData, child) => userData.userName != ""
+                                                  ? Text(
+                                                      // 'Hi Nick'
+                                                      'Hi ${userData.userName}',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil.verticalScale(2.9),
+                                                        height: 2,
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: ScreenUtil.horizontalScale(0),
+                                                  right: ScreenUtil.horizontalScale(0),
+                                                  top: ScreenUtil.verticalScale(0),
+                                                ),
+                                                child: const CommonStreakWithNotification(routeString: "dashboard"),
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ],
+                                );
+                              },
+                            ),
                           ),
                         ),
                       )
@@ -251,58 +265,94 @@ class _DashboardPageState extends State<DashboardPage> {
                                       children: [
                                         Consumer<ScrollProvider>(
                                           builder: (context, scrollProvider, child) {
-                                            return scrollProvider.scrollOffset >= 0.0
-                                                ? Container(
-                                                    margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                            return Container(
+                                              margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                      left: ScreenUtil.horizontalScale(8),
+                                                      top: ScreenUtil.verticalScale(0),
+                                                    ),
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
-                                                        Padding(
-                                                          padding: EdgeInsets.only(
-                                                            left: ScreenUtil.horizontalScale(8),
-                                                            top: ScreenUtil.verticalScale(0),
-                                                          ),
-                                                          child: Row(
-                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                            children: [
-                                                              Consumer<UserDataProvider>(
-                                                                  builder: (context, userData, child) => userData.userName != ""
-                                                                      ? Text(
-                                                                          // 'Hi Nick'
-                                                                          'Hi ${userData.userName}',
-                                                                          style: TextStyle(
-                                                                            color: Colors.white,
-                                                                            fontSize: ScreenUtil.verticalScale(2.9),
-                                                                            height: 2,
-                                                                          ),
-                                                                        )
-                                                                      : const SizedBox()),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: EdgeInsets.only(
-                                                                    left: ScreenUtil.horizontalScale(0),
-                                                                    right: ScreenUtil.horizontalScale(0),
-                                                                    top: ScreenUtil.verticalScale(0),
-                                                                  ),
-                                                                  child: const CommonStreakWithNotification(routeString: "dashboard"),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
+                                                        Consumer<UserDataProvider>(
+                                                            builder: (context, userData, child) => userData.userName != ""
+                                                                ? Text(
+                                                                    // 'Hi Nick'
+                                                                    scrollProvider.scrollOffset >= 0.0 ? 'Hi ${userData.userName}' : "",
+                                                                    style: TextStyle(
+                                                                      color: Colors.white,
+                                                                      fontSize: ScreenUtil.verticalScale(2.9),
+                                                                      height: 2,
+                                                                    ),
+                                                                  )
+                                                                : const SizedBox()),
                                                       ],
                                                     ),
-                                                  )
-                                                : SizedBox(height: media.height / 15);
+                                                  ),
+                                                  Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Padding(
+                                                            padding: EdgeInsets.only(
+                                                              left: ScreenUtil.horizontalScale(0),
+                                                              right: ScreenUtil.horizontalScale(0),
+                                                              top: ScreenUtil.verticalScale(0),
+                                                            ),
+                                                            child: scrollProvider.scrollOffset >= 0.0
+                                                                ? const CommonStreakWithNotification(routeString: "dashboard")
+                                                                : Row(
+                                                                    children: [
+                                                                      Row(
+                                                                        children: [
+                                                                          Container(
+                                                                            alignment: Alignment.center,
+                                                                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                                                                            decoration: BoxDecoration(
+                                                                              color: Colors.transparent,
+                                                                              shape: BoxShape.circle,
+                                                                              border: Border.all(color: Colors.transparent),
+                                                                            ),
+                                                                            child: Text(
+                                                                              '',
+                                                                              style: TextStyle(
+                                                                                color: Colors.transparent,
+                                                                                fontSize: ScreenUtil.verticalScale(0.8),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          Icon(
+                                                                            Icons.local_fire_department_outlined,
+                                                                            color: Colors.transparent,
+                                                                            size: ScreenUtil.verticalScale(3),
+                                                                          )
+                                                                        ],
+                                                                      ),
+                                                                      IconButton(
+                                                                        onPressed: null,
+                                                                        icon: Icon(
+                                                                          Icons.notifications_none,
+                                                                          color: Colors.transparent,
+                                                                          size: ScreenUtil.verticalScale(3),
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            );
                                           },
                                         ),
                                         Consumer<MonthProvider>(
