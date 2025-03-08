@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/time_progress.dart';
@@ -275,9 +276,47 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
     };
 
+    final apiReqBody = {
+      "dataId": dataId,
+      "split": split,
+      "exerciseId": monthProvider?.exerciseDetailModel?.sId.toString(),
+      "extraId": widget.extraDataModel.id.toString(),
+      "monthId": monthProvider?.monthDataModel?.id,
+      "weekId": monthProvider?.weekDataModel?.id,
+      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "sets": widget.extraDataModel.sets.toString(),
+      "reps": _repsController.text.isEmpty ? 0 : _repsController.text.toString(),
+      "weight": _weightController.text.isEmpty ? 0 : _weightController.text.toString(),
+      "rest": widget.extraDataModel.rest.toString(),
+      "load": load.toString(),
+      "type": widget.extraDataModel.type.toString(),
+      "effort": effort.toString(),
+      "index": "${widget.index}",
+      "subIndex": "${widget.countIndex}",
+      "date": "${DateTime.now().toUtc()}",
+      "status": Status.completed
+      // "status": _restDuration == 0 ? Status.completed : Status.empty
+    };
+
+    final apiReqBody1 = {
+      "sets": widget.extraDataModel.sets.toString(),
+      "reps": _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
+      "weight": _weightController.text.isEmpty ? "0" : _weightController.text.toString(),
+      "rest": widget.extraDataModel.rest.toString(),
+      "load": load.toString(),
+      "type": widget.extraDataModel.type.toString(),
+      "effort": effort.toString(),
+      "date": "${DateTime.now().toUtc()}",
+      "status": Status.completed,
+      "dataId": dataId,
+      // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
+    };
+
     if (matchingElement?.id != null) {
+      ApiRepo.updateExerciseHistory(body: apiReqBody1);
       await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
     } else {
+      ApiRepo.addExerciseHistory(body: apiReqBody);
       await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 

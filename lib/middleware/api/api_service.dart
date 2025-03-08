@@ -21,7 +21,7 @@ class ApiService extends BaseService {
   Future<dynamic> getResponse({required APIType apiType, required String url, Map<String, dynamic>? body}) async {
     try {
       String? userIdToken = await getAuthToken();
-      Map<String, String> header = {"Content-Type": "application/json", 'AUTH_TOKEN': userIdToken ?? ""};
+      Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
       String mainUrl = AppConstants.serverUrl + url;
       if (apiType == APIType.aGet) {
         var result = await http.get(Uri.parse(mainUrl), headers: header);

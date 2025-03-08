@@ -6,6 +6,7 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
@@ -248,7 +249,11 @@ class _ExercisePageState extends State<ExercisePage> {
       exerciseId: payloadModel.exerciseId!,
       circuitIndex: payloadModel.circuitIndex!,
     );
-
+    final data = {
+      "status": "Completed",
+      "dataId": payloadModel.dataId,
+    };
+    ApiRepo.updateExerciseHistory(body: data);
     await DatabaseHelper().updateSingleValue(
         tableName: DatabaseHelper.exerciseHistory, id: payloadModel.dataId, columnName: 'status', newValue: Status.completed);
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -815,7 +820,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                 final dataHistory =
                                     monthProvider!.historyDataModel.where((element) => element.status == Status.completed).toList();
                                 return ListView.builder(
-                                  itemCount: monthProvider?.selectedExercise!.extra!.length,
+                                  itemCount: monthProvider?.selectedExercise?.extra?.length ?? 0,
                                   shrinkWrap: true,
                                   padding: EdgeInsets.zero,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -1191,6 +1196,18 @@ class _ExercisePageState extends State<ExercisePage> {
       "date": "${DateTime.now().toUtc()}",
       "dataId": dataId,
     };
+    final apiReqBody = {
+      "sets": 1,
+      "reps": "${extra.reps}",
+      "weight": "${extra.weight}",
+      "rest": "${extra.reps}",
+      "load": "${extra.load}",
+      "type": "${extra.type}",
+      "extraId": "",
+      "date": "${DateTime.now().toUtc()}",
+      "dataId": dataId,
+    };
+    ApiRepo.addExtraSet(body: apiReqBody);
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.extraSetHistory);
 
     await fetchExtraSetLocalData(dataId);
@@ -1299,13 +1316,23 @@ class _ExercisePageState extends State<ExercisePage> {
       "totalWeight": totalWeight.toString(),
     };
 
+    final apiReqBody = {
+      "status": status,
+      "type": type,
+      "totalWeight": totalWeight.toString(),
+      "dataId": dataId,
+    };
+
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
+        ApiRepo.updateExerciseStatus(body: apiReqBody);
         await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
+        ApiRepo.addExerciseStatus(body: data);
         await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
+      ApiRepo.addExerciseStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
 

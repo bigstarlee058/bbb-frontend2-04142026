@@ -86,7 +86,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
         setState(() {});
       });
     }
-    if (widget.exercise.extra!.isNotEmpty) {
+    if (widget.exercise.extra?.isNotEmpty ?? false) {
       for (var element in widget.exercise.extra!) {
         if (element.type != 1) {
           totalSets += int.parse(element.sets.toString());
