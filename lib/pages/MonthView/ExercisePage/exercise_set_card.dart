@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
@@ -227,6 +228,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   }
 
   Future<void> _saveData() async {
+    HapticFeedBack.buttonClick();
     monthProvider?.timerAddress = "";
     monthProvider?.timePassed = "";
     reps = int.tryParse(_repsController.text) ?? 0;

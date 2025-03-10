@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/custom_prints.dart';
@@ -253,7 +252,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
                                                   color: Colors.white,
                                                 ),
                                                 onPressed: () {
-                                                  HapticFeedBack.buttonClick();
+                                                  // HapticFeedBack.buttonClick();
                                                   Navigator.pop(context);
                                                 },
                                                 iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same

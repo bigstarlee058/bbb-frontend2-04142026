@@ -40,7 +40,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () => monthProvider?.manageStreak(),
       // ),
-      backgroundColor: const Color.fromARGB(255, 52, 11, 11),
+      // backgroundColor: const Color.fromARGB(255, 52, 11, 11),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           SizedBox(
@@ -61,12 +62,11 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                           opacity: 1,
                         ),
                       ),
-                      child: SizedBox(
-                        height: media.height / 1.8,
-                        width: media.width,
-                        child: SafeArea(
+                      child: SafeArea(
+                        child: SizedBox(
+                          height: media.height / 1.8,
+                          width: media.width,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,14 +89,13 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                           color: Colors.white,
                                         ),
                                         onPressed: () {
-                                          HapticFeedBack.buttonClick();
+                                          // HapticFeedBack.buttonClick();
                                           Navigator.pop(context);
                                         },
                                         iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                       ),
                                     ),
                                   ),
-                                  // const Spacer(),
                                   Expanded(
                                     child: Center(
                                       child: Text(
@@ -119,55 +118,53 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                       height: ScreenUtil.horizontalScale(10),
                                     ),
                                   ),
-                                  // const CommonStreakWithNotification(),
-                                  // SizedBox(
-                                  //   width: ScreenUtil.verticalScale(1.15),
-                                  // ),
                                 ],
                               ),
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(12),
-                                ),
-                                height: media.height * 0.28,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 15),
-                                    Text(
-                                      'Your Current Streak',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: ScreenUtil.verticalScale(2.5),
-                                        fontWeight: FontWeight.normal,
-                                        height: 1,
-                                      ),
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 2),
-                                      ),
-                                      padding: EdgeInsets.all(10),
-                                      child: Builder(builder: (context) {
-                                        final streak = context.watch<MonthProvider>().streak;
-                                        return Text(
-                                          '$streak',
+                              SizedBox(
+                                height: media.height / 4.9,
+                                width: media.width,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 5),
+                                        child: Text(
+                                          'Your Current Streak',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: ScreenUtil.verticalScale(3.2),
-                                            fontWeight: FontWeight.bold,
-                                            height: 1.3,
+                                            fontSize: ScreenUtil.verticalScale(2.5),
+                                            fontWeight: FontWeight.normal,
                                           ),
-                                        );
-                                      }),
-                                    ),
-                                  ],
+                                        ),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 1.7),
+                                        ),
+                                        padding: EdgeInsets.all(("${context.watch<MonthProvider>().streak}").length > 3
+                                            ? 19
+                                            : ("${context.watch<MonthProvider>().streak}").length > 2
+                                                ? 10
+                                                : ("${context.watch<MonthProvider>().streak}").length > 1
+                                                    ? 5
+                                                    : 2),
+                                        child: Center(
+                                          child: Text(
+                                            '${context.watch<MonthProvider>().streak}',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(2.6),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: ScreenUtil.verticalScale(1),
-                              ),
+                              )
                             ],
                           ),
                         ),
@@ -342,6 +339,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
   }
 
   void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    HapticFeedBack.buttonClick();
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
       (element) => element == monthProvider.todayTitleId,
     );

@@ -6,7 +6,7 @@ class HapticFeedBack {
   static Future buttonClick() async {
     if (await Vibration.hasVibrator()) {
       await Vibration.vibrate(
-        duration: 50,
+        duration: 35,
       );
     } else {
       log("Device does not support vibration");

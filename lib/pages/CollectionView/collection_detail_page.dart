@@ -1,5 +1,4 @@
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -207,8 +206,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
-                                              HapticFeedBack.buttonClick();
-
+                                              // HapticFeedBack.buttonClick();
                                               dataProvider?.collectionData =
                                                   Collections(id: "", title: "", description: "", photo: "", equipments: []);
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);

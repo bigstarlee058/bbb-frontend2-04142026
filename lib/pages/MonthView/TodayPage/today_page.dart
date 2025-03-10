@@ -298,8 +298,7 @@ class _TodayPageState extends State<TodayPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
-                                                        HapticFeedBack.buttonClick();
-
+                                                        // HapticFeedBack.buttonClick();
                                                         Navigator.pop(context);
                                                         // Navigator.pushNamed(context, '/dayOverview');
                                                       },
@@ -649,6 +648,7 @@ class _TodayPageState extends State<TodayPage> {
                                                       value.dayHistoryDetails?.status == Status.skipped
                                                   ? null
                                                   : () async {
+                                                      HapticFeedBack.buttonClick();
                                                       await _saveDayData(
                                                           status: Status.skipped,
                                                           type: monthProvider!.isPumpDay
@@ -673,6 +673,7 @@ class _TodayPageState extends State<TodayPage> {
                                                     text: "Skip the workout",
                                                     textColor: Colors.white,
                                                     onPress: () async {
+                                                      HapticFeedBack.buttonClick();
                                                       await _saveDayData(
                                                           status: Status.skipped,
                                                           type: monthProvider!.isPumpDay
@@ -998,6 +999,7 @@ class _TodayPageState extends State<TodayPage> {
                             isExist
                         ? null
                         : () async {
+                            HapticFeedBack.buttonClick();
                             // String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
                             //
                             // if (isChecked != "true") {

@@ -1,6 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/rep_line_chart.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -82,8 +81,7 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
-                                              HapticFeedBack.buttonClick();
-
+                                              // HapticFeedBack.buttonClick();
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                               Navigator.pushNamed(context, '/nutritionCalculator');
                                             },

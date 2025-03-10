@@ -1,6 +1,5 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -125,7 +124,7 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(
                                     onPress: () {
-                                      HapticFeedBack.buttonClick();
+                                      // HapticFeedBack.buttonClick();
                                       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                       mainPageProvider.changeTab(2);
                                     },

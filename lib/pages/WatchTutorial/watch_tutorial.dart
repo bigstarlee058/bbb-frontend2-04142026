@@ -307,11 +307,11 @@ class _WatchTutorialState extends State<WatchTutorial> {
                     child: ButtonWidget(
                       text: "Watch the App Tutorial",
                       textColor: Colors.white,
-                      onPress: () {
+                      onPress: () async {
                         if (_videoPlayerController.value.isPlaying) {
                           _videoPlayerController.pause();
                         }
-                        Navigator.pushNamed(context, '/appTutorialScreen');
+                        await Navigator.pushNamed(context, '/appTutorialScreen');
                       },
                       color: AppColors.primaryColor,
                       isLoading: false,

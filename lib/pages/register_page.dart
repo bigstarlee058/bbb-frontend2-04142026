@@ -4,7 +4,6 @@ import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/pages/email_verification_page.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
@@ -123,7 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     BackArrowWidget(onPress: () {
-                      HapticFeedBack.buttonClick();
+                      // HapticFeedBack.buttonClick();
                       Navigator.pop(context);
                     }),
                     Align(

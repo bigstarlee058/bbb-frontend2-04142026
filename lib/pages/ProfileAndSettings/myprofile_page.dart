@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/profile_image_handler.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -172,7 +171,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     children: [
                                       BackArrowWidget(
                                         onPress: () {
-                                          HapticFeedBack.buttonClick();
+                                          // HapticFeedBack.buttonClick();
                                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                           mainPageProvider.changeTab(3);
                                         },

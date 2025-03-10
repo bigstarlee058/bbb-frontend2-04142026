@@ -183,8 +183,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
-                                                        HapticFeedBack.buttonClick();
-
+                                                        // HapticFeedBack.buttonClick();
                                                         Navigator.pop(context);
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
@@ -384,8 +383,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
-                                                        HapticFeedBack.buttonClick();
-
+                                                        // HapticFeedBack.buttonClick();
                                                         Navigator.pop(context);
                                                       },
                                                       iconSize: ScreenUtil.verticalScale(4),
@@ -691,6 +689,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       if (monthProvider.isPumpDay) {
                         buttonText = "View the workout";
                         onPress = () {
+                          HapticFeedBack.buttonClick();
                           Navigator.pushNamed(context, '/today');
                         };
                         log('0 :::::::::::::::::: 0');
@@ -707,6 +706,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                         // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                         // mainPageProvider.changeTab(5);
                         // Navigator.pop(context);
+                        HapticFeedBack.buttonClick();
                         Navigator.pushNamed(context, '/today');
                       };
                       log('2 :::::::::::::::::: 2');
@@ -719,6 +719,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                         // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                         // mainPageProvider.changeTab(5);
                         // Navigator.pop(context);
+                        HapticFeedBack.buttonClick();
                         Navigator.pushNamed(context, '/today');
                       };
                       log('3 :::::::::::::::::: 3');
@@ -741,6 +742,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                     : "Start the workout";
 
                         onPress = () async {
+                          HapticFeedBack.buttonClick();
                           if (!monthProvider.isPumpDay) {
                             monthProvider
                                 .updateCurrentDayTitleId(monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]);
@@ -920,6 +922,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                   : "Start the workout";
 
                       onPress = () async {
+                        HapticFeedBack.buttonClick();
                         if (currentDayTitle.contains("Rest Day")) {
                           monthProvider.updateCurrentDayTitleId(monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]);
                           Navigator.pushNamed(context, '/dayCompleted');
@@ -979,6 +982,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                     if (monthProvider.dayHistoryDetails?.status != Status.completed) {
                       String buttonText = monthProvider.dayHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip Day";
                       onPress() async {
+                        HapticFeedBack.buttonClick();
                         bool isSkipped = monthProvider.dayHistoryDetails?.status == Status.skipped;
                         String newStatus = isSkipped ? '' : Status.skipped;
 

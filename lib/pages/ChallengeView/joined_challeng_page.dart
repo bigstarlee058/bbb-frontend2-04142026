@@ -1,6 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/challenges.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -114,8 +113,7 @@ class _JoinedChallengePageState extends State<JoinedChallengePage> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
-                                              HapticFeedBack.buttonClick();
-
+                                              // HapticFeedBack.buttonClick();
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                               mainPageProvider.changeTab(0);
                                             },

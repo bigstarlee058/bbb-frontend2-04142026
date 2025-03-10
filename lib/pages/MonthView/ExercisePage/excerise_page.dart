@@ -532,7 +532,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                                   color: Colors.white,
                                                 ),
                                                 onPressed: () {
-                                                  HapticFeedBack.buttonClick();
+                                                  // HapticFeedBack.buttonClick();
                                                   Navigator.pop(context);
                                                 },
                                                 iconSize: ScreenUtil.verticalScale(4),
@@ -972,6 +972,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                                           : "Finish & Next",
                                               textColor: Colors.white,
                                               onPress: () async {
+                                                HapticFeedBack.buttonClick();
                                                 int count = 0;
                                                 await _saveExerciseData(
                                                     status: Status.completed,
@@ -1041,6 +1042,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                       textColor: const Color(0xFFFFFFFF),
                                       color: AppColors.skipDayColor,
                                       onPress: () async {
+                                        HapticFeedBack.buttonClick();
                                         final status = monthProvider.exerciseHistoryDetails?.status;
                                         await _saveExerciseData(
                                           status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",

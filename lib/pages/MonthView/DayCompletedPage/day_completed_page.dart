@@ -1,4 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -592,6 +593,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   }
 
   void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    HapticFeedBack.buttonClick();
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
       (element) => element == monthProvider.todayTitleId,
     );

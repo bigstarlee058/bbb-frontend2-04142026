@@ -472,7 +472,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                     children: [
                                       BackArrowWidget(
                                         onPress: () {
-                                          HapticFeedBack.buttonClick();
+                                          // HapticFeedBack.buttonClick();
                                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                           mainPageProvider.changeTab(2);
                                         },
@@ -600,6 +600,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   }
 
   void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    HapticFeedBack.buttonClick();
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList
         ?.indexWhere((element) => element == monthProvider.todayTitleId);
 

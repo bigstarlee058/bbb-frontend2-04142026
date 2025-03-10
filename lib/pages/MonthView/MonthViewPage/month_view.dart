@@ -104,8 +104,7 @@ class _MonthViewState extends State<MonthView> {
                                                   color: Colors.white,
                                                 ),
                                                 onPressed: () {
-                                                  HapticFeedBack.buttonClick();
-
+                                                  // HapticFeedBack.buttonClick();
                                                   monthProvider?.mainPageProvider.changeTab(0);
                                                 },
                                                 iconSize: ScreenUtil.verticalScale(4),
@@ -184,8 +183,7 @@ class _MonthViewState extends State<MonthView> {
                                                               color: Colors.white,
                                                             ),
                                                             onPressed: () {
-                                                              HapticFeedBack.buttonClick();
-
+                                                              // HapticFeedBack.buttonClick();
                                                               monthProvider?.mainPageProvider.changeTab(0);
                                                             },
                                                             iconSize: ScreenUtil.verticalScale(4),
@@ -531,7 +529,7 @@ class _MonthViewState extends State<MonthView> {
                               const SizedBox(height: 15),
                               Container(
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(5),
+                                  horizontal: ScreenUtil.horizontalScale(6.5),
                                 ),
                                 child: Consumer<MonthProvider>(
                                   builder: (context, value, child) => ButtonWidget(
@@ -559,6 +557,7 @@ class _MonthViewState extends State<MonthView> {
   }
 
   void continueWorkoutOnTap(BuildContext context) {
+    HapticFeedBack.buttonClick();
     int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList
         ?.indexWhere((element) => element == monthProvider!.todayTitleId);
 

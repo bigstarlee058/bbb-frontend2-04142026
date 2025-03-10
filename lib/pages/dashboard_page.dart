@@ -4,6 +4,7 @@ import 'package:bbb/components/athletes_list_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/collection_grid.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
@@ -698,6 +699,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Expanded(
                                       child: ElevatedButton(
                                         onPressed: () {
+                                          HapticFeedBack.buttonClick();
                                           mainPageProvider.changeTab(1);
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -1078,6 +1080,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void continueWorkoutOnTap(
       bool isRestDay, MonthProvider monthData, String dataId, int? index, DayDataModel dayData, BuildContext context) {
+    HapticFeedBack.buttonClick();
     bool isPumpDay = (isRestDay &&
             monthData.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&

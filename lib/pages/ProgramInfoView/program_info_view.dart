@@ -1,4 +1,3 @@
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/program_info_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
@@ -95,8 +94,7 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
-                                              HapticFeedBack.buttonClick();
-
+                                              // HapticFeedBack.buttonClick();
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                               mainPageProvider.changeTab(1);
                                             },
