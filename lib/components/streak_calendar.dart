@@ -381,8 +381,29 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     monthProvider.changeIsPumpDay(isPumpDay);
 
     if (isPumpDay) {
-      monthProvider.updatePumpDayData(monthProvider.pumpDays[
-          int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+      final dataList = monthProvider.dayHistoryModel
+          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .toList();
+
+      if (dataList.isNotEmpty) {
+        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
+            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        if (index1 != -1) {
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
+        } else {
+          int index1 =
+              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
+              ? 0
+              : index1 == 0
+                  ? 1
+                  : 0]);
+        }
+      } else {
+        monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
+      }
+      // monthProvider.updatePumpDayData(monthProvider.pumpDays[
+      //     int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
     }
 
     monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;

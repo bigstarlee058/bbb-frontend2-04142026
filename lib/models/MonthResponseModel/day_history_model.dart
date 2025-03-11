@@ -20,6 +20,7 @@ class DayHistoryModel {
   String? type;
   String? completedExercise;
   String? totalWeight;
+  String? averageRIR;
 
   DayHistoryModel({
     this.id,
@@ -36,6 +37,7 @@ class DayHistoryModel {
     this.type,
     this.completedExercise,
     this.totalWeight,
+    this.averageRIR,
   });
 
   factory DayHistoryModel.fromJson(Map<String, dynamic> json) {
@@ -55,6 +57,7 @@ class DayHistoryModel {
       type: json["type"],
       completedExercise: json["completedExercise"],
       totalWeight: json["totalWeight"],
+      averageRIR: json["averageRIR"],
     );
   }
 
@@ -73,5 +76,6 @@ class DayHistoryModel {
         "type": type,
         "totalWeight": totalWeight,
         "completedExercise": completedExercise,
+        "averageRIR": averageRIR,
       };
 }

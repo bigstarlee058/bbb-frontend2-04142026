@@ -55,7 +55,8 @@ class DatabaseHelper {
         date TEXT,  
         `index` INTEGER,
         subIndex INTEGER,
-        status TEXT
+        status TEXT,
+        totalSet TEXT
       )
     ''');
 
@@ -71,7 +72,9 @@ class DatabaseHelper {
         type TEXT,
         date TEXT,  
         status TEXT,
-        totalWeight TEXT
+        totalWeight TEXT,
+        totalSet TEXT,
+        totalRIR TEXT
       )
     ''');
 
@@ -90,7 +93,8 @@ class DatabaseHelper {
         endTime TEXT,
         type TEXT,
         totalWeight TEXT,
-        completedExercise TEXT
+        completedExercise TEXT,
+        averageRIR TEXT
       )
     ''');
 

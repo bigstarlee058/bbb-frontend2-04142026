@@ -6,7 +6,6 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
@@ -249,11 +248,11 @@ class _ExercisePageState extends State<ExercisePage> {
       exerciseId: payloadModel.exerciseId!,
       circuitIndex: payloadModel.circuitIndex!,
     );
-    final data = {
-      "status": "Completed",
-      "dataId": payloadModel.dataId,
-    };
-    ApiRepo.updateExerciseHistory(body: data);
+    // final data = {
+    //   "status": "Completed",
+    //   "dataId": payloadModel.dataId,
+    // };
+    // ApiRepo.updateExerciseHistory(body: data);
     await DatabaseHelper().updateSingleValue(
         tableName: DatabaseHelper.exerciseHistory, id: payloadModel.dataId, columnName: 'status', newValue: Status.completed);
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -819,6 +818,7 @@ class _ExercisePageState extends State<ExercisePage> {
                               Builder(builder: (context) {
                                 final dataHistory =
                                     monthProvider!.historyDataModel.where((element) => element.status == Status.completed).toList();
+                                // log('jsonEncode(dataHistory) :::::::::::::::::: ${jsonEncode(dataHistory)}');
                                 return ListView.builder(
                                   itemCount: monthProvider?.selectedExercise?.extra?.length ?? 0,
                                   shrinkWrap: true,
@@ -826,7 +826,6 @@ class _ExercisePageState extends State<ExercisePage> {
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemBuilder: (context, index) {
                                     final extraItem = monthProvider?.selectedExercise!.extra![index];
-
                                     setCount = int.parse(extraItem!.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
                                     return ListView.builder(
                                       itemCount: setCount,
@@ -857,18 +856,33 @@ class _ExercisePageState extends State<ExercisePage> {
                                         } else {
                                           lastDataSubIndex += 1;
                                         }
+                                        int totalSets = 0;
+
+                                        if (monthProvider?.selectedExercise!.extra!.isNotEmpty ?? false) {
+                                          for (var element in monthProvider!.selectedExercise!.extra!) {
+                                            if (element.type != 1) {
+                                              totalSets += int.parse(element.sets.toString());
+                                            }
+                                          }
+                                        }
+                                        for (var element in extraSetModel) {
+                                          if (element.type != 1) {
+                                            totalSets += int.parse(element.sets.toString());
+                                          }
+                                        }
 
                                         return Padding(
                                           padding: const EdgeInsets.only(bottom: 20),
                                           child: ExerciseSetCard(
+                                            totalRIRSet: totalSets,
                                             extraSetLength: extraSetModel.length,
                                             setCount: setCount,
                                             isFromNotification:
                                                 (lastDataMainIndex == index && lastDataSubIndex == countIndex) && argument != "Exercise",
                                             countIndex: countIndex,
-                                            completed: (lastDataMainIndex >= index &&
+                                            completed: lastDataMainIndex >= index &&
                                                 (lastDataSubIndex >= countIndex &&
-                                                    !(lastDataMainIndex == index && lastDataSubIndex == countIndex))),
+                                                    !(lastDataMainIndex == index && lastDataSubIndex == countIndex)),
                                             available: (lastDataMainIndex == index && lastDataSubIndex == countIndex),
                                             isEditable: isEditable,
                                             makeRefresh: () {
@@ -1042,20 +1056,24 @@ class _ExercisePageState extends State<ExercisePage> {
                                       textColor: const Color(0xFFFFFFFF),
                                       color: AppColors.skipDayColor,
                                       onPress: () async {
-                                        HapticFeedBack.buttonClick();
-                                        final status = monthProvider.exerciseHistoryDetails?.status;
-                                        await _saveExerciseData(
-                                          status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
-                                          id: monthProvider.isPumpDay && monthProvider.isCircuit
-                                              ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                              : monthProvider.exerciseDetailModel!.sId.toString(),
-                                          type: monthProvider.isPumpDay && monthProvider.isCircuit
-                                              ? "Circuit - ${monthProvider.circuitIndex}"
-                                              : "Exercise",
+                                        WidgetsBinding.instance.addPostFrameCallback(
+                                          (timeStamp) async {
+                                            HapticFeedBack.buttonClick();
+                                            final status = monthProvider.exerciseHistoryDetails?.status;
+                                            await _saveExerciseData(
+                                              status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
+                                              id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                                  ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
+                                                  : monthProvider.exerciseDetailModel!.sId.toString(),
+                                              type: monthProvider.isPumpDay && monthProvider.isCircuit
+                                                  ? "Circuit - ${monthProvider.circuitIndex}"
+                                                  : "Exercise",
+                                            );
+                                            if (status != Status.skipped) {
+                                              Navigator.pop(context);
+                                            }
+                                          },
                                         );
-                                        if (status != Status.skipped) {
-                                          Navigator.pop(context);
-                                        }
                                       },
                                       isLoading: false,
                                     );
@@ -1198,18 +1216,18 @@ class _ExercisePageState extends State<ExercisePage> {
       "date": "${DateTime.now().toUtc()}",
       "dataId": dataId,
     };
-    final apiReqBody = {
-      "sets": 1,
-      "reps": "${extra.reps}",
-      "weight": "${extra.weight}",
-      "rest": "${extra.reps}",
-      "load": "${extra.load}",
-      "type": "${extra.type}",
-      "extraId": "",
-      "date": "${DateTime.now().toUtc()}",
-      "dataId": dataId,
-    };
-    ApiRepo.addExtraSet(body: apiReqBody);
+    // final apiReqBody = {
+    //   "sets": 1,
+    //   "reps": "${extra.reps}",
+    //   "weight": "${extra.weight}",
+    //   "rest": "${extra.reps}",
+    //   "load": "${extra.load}",
+    //   "type": "${extra.type}",
+    //   "extraId": "",
+    //   "date": "${DateTime.now().toUtc()}",
+    //   "dataId": dataId,
+    // };
+    // ApiRepo.addExtraSet(body: apiReqBody);
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.extraSetHistory);
 
     await fetchExtraSetLocalData(dataId);
@@ -1280,6 +1298,8 @@ class _ExercisePageState extends State<ExercisePage> {
     }
 
     double totalWeight = 0;
+    double totalRIR = 0;
+    double totalSet = 0;
 
     if (status == Status.completed) {
       totalWeight = 0;
@@ -1290,8 +1310,15 @@ class _ExercisePageState extends State<ExercisePage> {
           final effort = double.parse(element.effort.toString().replaceAll("+", ""));
           final cal = weight * (reps + effort);
           totalWeight += cal;
+          if (effort != 100) {
+            totalRIR += effort;
+          }
         },
       );
+      final data = monthProvider!.historyDataModel.where((element) => element.type != "1");
+      if (data.isNotEmpty) {
+        totalSet = double.parse(data.first.totalSet.toString());
+      }
     }
 
     await monthProvider?.fetchCircuitModelLocalData();
@@ -1310,31 +1337,35 @@ class _ExercisePageState extends State<ExercisePage> {
       "status": status,
       "type": type,
       "totalWeight": totalWeight.toString(),
+      "totalRIR": totalRIR.toString(),
+      "totalSet": totalSet.toString(),
     };
 
     final data1 = {
       "status": status,
       "type": type,
       "totalWeight": totalWeight.toString(),
+      "totalRIR": totalRIR.toString(),
+      "totalSet": totalSet.toString(),
     };
 
-    final apiReqBody = {
-      "status": status,
-      "type": type,
-      "totalWeight": totalWeight.toString(),
-      "dataId": dataId,
-    };
+    // final apiReqBody = {
+    //   "status": status,
+    //   "type": type,
+    //   "totalWeight": totalWeight.toString(),
+    //   "dataId": dataId,
+    // };
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
-        ApiRepo.updateExerciseStatus(body: apiReqBody);
+        // ApiRepo.updateExerciseStatus(body: apiReqBody);
         await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
-        ApiRepo.addExerciseStatus(body: data);
+        // ApiRepo.addExerciseStatus(body: data);
         await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
-      ApiRepo.addExerciseStatus(body: data);
+      // ApiRepo.addExerciseStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
 

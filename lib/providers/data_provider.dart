@@ -72,6 +72,7 @@ class DataProvider extends ChangeNotifier {
     };
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/challenges');
     String? userIdToken = await getAuthToken();
+    log('userIdToken :::::::::::::::::: $userIdToken');
     final response = await http.put(url,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',

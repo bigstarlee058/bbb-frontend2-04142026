@@ -4,7 +4,6 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/time_progress.dart';
@@ -45,6 +44,7 @@ class ExerciseSetCard extends StatefulWidget {
     required this.isFromNotification,
     required this.setCount,
     required this.extraSetLength,
+    required this.totalRIRSet,
   });
 
   final Color color;
@@ -65,6 +65,7 @@ class ExerciseSetCard extends StatefulWidget {
   final int subIndex;
   final int setCount;
   final int extraSetLength;
+  final int totalRIRSet;
   final VoidCallback makeRefresh;
   final bool isEditable;
   final bool available;
@@ -114,12 +115,28 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     index = widget.index;
     subIndex = widget.countIndex;
     monthProvider!.fetchTimerAddress();
+    setCompletedOrNot();
 
     setData();
   }
 
   bool isLoad = false;
   String indexString = "";
+
+  setCompletedOrNot() async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    dataId =
+        "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
+    await monthProvider?.fetchSingleSetLocalData(dataId).then(
+      (value) {
+        if (value?.status == Status.completed) {
+          setCompleted = true;
+        }
+      },
+    );
+  }
+
   setData() async {
     isLoad = true;
     indexString = "";
@@ -151,6 +168,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       reps = widget.reps;
       _restDuration = widget.restDuration;
     }
+    // await setCompletedOrNot();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {
           isLoad = false;
           setState(() {});
@@ -255,7 +273,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "index": widget.index,
       "subIndex": widget.countIndex,
       "date": "${DateTime.now().toUtc()}",
-      "status": Status.completed
+      "status": Status.completed,
+      "totalSet": widget.totalRIRSet
       // "status": _restDuration == 0 ? Status.completed : Status.empty
     };
 
@@ -274,57 +293,59 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
       "date": "${DateTime.now().toUtc()}",
-      "status": Status.completed
-      // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
-    };
-
-    final apiReqBody = {
-      "dataId": dataId,
-      "split": split,
-      "exerciseId": monthProvider?.exerciseDetailModel?.sId.toString(),
-      "extraId": widget.extraDataModel.id.toString(),
-      "monthId": monthProvider?.monthDataModel?.id,
-      "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "sets": widget.extraDataModel.sets.toString(),
-      "reps": _repsController.text.isEmpty ? 0 : _repsController.text.toString(),
-      "weight": _weightController.text.isEmpty ? 0 : _weightController.text.toString(),
-      "rest": widget.extraDataModel.rest.toString(),
-      "load": load.toString(),
-      "type": widget.extraDataModel.type.toString(),
-      "effort": effort.toString(),
-      "index": "${widget.index}",
-      "subIndex": "${widget.countIndex}",
-      "date": "${DateTime.now().toUtc()}",
-      "status": Status.completed
-      // "status": _restDuration == 0 ? Status.completed : Status.empty
-    };
-
-    final apiReqBody1 = {
-      "sets": widget.extraDataModel.sets.toString(),
-      "reps": _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
-      "weight": _weightController.text.isEmpty ? "0" : _weightController.text.toString(),
-      "rest": widget.extraDataModel.rest.toString(),
-      "load": load.toString(),
-      "type": widget.extraDataModel.type.toString(),
-      "effort": effort.toString(),
-      "date": "${DateTime.now().toUtc()}",
       "status": Status.completed,
-      "dataId": dataId,
+      "totalSet": widget.totalRIRSet
       // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
     };
+
+    // final apiReqBody = {
+    //   "dataId": dataId,
+    //   "split": split,
+    //   "exerciseId": monthProvider?.exerciseDetailModel?.sId.toString(),
+    //   "extraId": widget.extraDataModel.id.toString(),
+    //   "monthId": monthProvider?.monthDataModel?.id,
+    //   "weekId": monthProvider?.weekDataModel?.id,
+    //   "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+    //   "sets": widget.extraDataModel.sets.toString(),
+    //   "reps": _repsController.text.isEmpty ? 0 : _repsController.text.toString(),
+    //   "weight": _weightController.text.isEmpty ? 0 : _weightController.text.toString(),
+    //   "rest": widget.extraDataModel.rest.toString(),
+    //   "load": load.toString(),
+    //   "type": widget.extraDataModel.type.toString(),
+    //   "effort": effort.toString(),
+    //   "index": "${widget.index}",
+    //   "subIndex": "${widget.countIndex}",
+    //   "date": "${DateTime.now().toUtc()}",
+    //   "status": Status.completed
+    //   // "status": _restDuration == 0 ? Status.completed : Status.empty
+    // };
+    //
+    // final apiReqBody1 = {
+    //   "sets": widget.extraDataModel.sets.toString(),
+    //   "reps": _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
+    //   "weight": _weightController.text.isEmpty ? "0" : _weightController.text.toString(),
+    //   "rest": widget.extraDataModel.rest.toString(),
+    //   "load": load.toString(),
+    //   "type": widget.extraDataModel.type.toString(),
+    //   "effort": effort.toString(),
+    //   "date": "${DateTime.now().toUtc()}",
+    //   "status": Status.completed,
+    //   "dataId": dataId,
+    //   // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
+    // };
 
     if (matchingElement?.id != null) {
-      ApiRepo.updateExerciseHistory(body: apiReqBody1);
+      // ApiRepo.updateExerciseHistory(body: apiReqBody1);
       await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
     } else {
-      ApiRepo.addExerciseHistory(body: apiReqBody);
+      // ApiRepo.addExerciseHistory(body: apiReqBody);
       await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
     monthProvider?.setShowTimerIndex(index, widget.countIndex, monthProvider!.selectedExIndex, removeVal: true);
     if (_restDuration != 0) {
       _showTimer = true;
+      setCompleted = true;
       setState(() {});
       await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
       await monthProvider?.fetchExerciseHistoryLocalData();
@@ -422,6 +443,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     } else {
       _showTimer = false;
     }
+    // log('::::::::::::::::::| ${widget.available} |::::::::::::::::::| ${widget.completed} |::::::::::::::::::| $setCompleted |::::::::::::::::::| $_showTimer |::::::::::::::::::| $timerCompleted |::::::::::::::::::');
 
     return isLoad
         ? SizedBox()
@@ -431,7 +453,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                 ColorFiltered(
                   colorFilter: widget.available || widget.completed || setCompleted || _showTimer || timerCompleted
                       ? ColorFilter.mode(Colors.transparent, BlendMode.saturation)
-                      : const ColorFilter.mode(Colors.white, BlendMode.saturation),
+                      : ColorFilter.mode(Colors.white.withValues(alpha: 0.45), BlendMode.saturation),
                   child: Container(
                     decoration: _showTimer
                         ? BoxDecoration(
@@ -467,6 +489,12 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                             },
                             child: Row(
                               children: [
+                                // if (!(widget.available || widget.completed || setCompleted || _showTimer || timerCompleted)) ...[
+                                //   Icon(CupertinoIcons.lock_circle, color: AppColors.primaryColor),
+                                //   SizedBox(
+                                //     width: 10,
+                                //   )
+                                // ],
                                 Expanded(
                                   child: Row(
                                     children: [

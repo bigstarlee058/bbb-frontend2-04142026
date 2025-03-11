@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
-import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -90,7 +90,7 @@ class _TodayPageState extends State<TodayPage> {
       () {
         exercises = [];
         loader = true;
-        exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
+        exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises ?? [];
         totalWarmups =
             monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
       },
@@ -198,7 +198,7 @@ class _TodayPageState extends State<TodayPage> {
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
     };
-    ApiRepo.addRemovedExercise(body: data);
+    // ApiRepo.addRemovedExercise(body: data);
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.removedExerciseHistory);
     await fetchRemovedExerciseLocalData();
 
@@ -206,7 +206,7 @@ class _TodayPageState extends State<TodayPage> {
       ExtraExerciseModel data =
           monthProvider!.addedExerciseList.firstWhere((element) => element.dataId == dataId, orElse: () => ExtraExerciseModel());
       if (data.id != null) {
-        ApiRepo.deleteExtraExercise(dataId: data.dataId ?? "");
+        // ApiRepo.deleteExtraExercise(dataId: data.dataId ?? "");
         await DatabaseHelper().deleteSingleData(tableName: DatabaseHelper.extraExerciseHistory, id: data.dataId ?? "");
         await monthProvider?.fetchExtraAddedExerciseData();
       }
@@ -216,7 +216,7 @@ class _TodayPageState extends State<TodayPage> {
       SwapExerciseModel data =
           monthProvider!.swapExerciseList.firstWhere((element) => element.dataId == dataId, orElse: () => SwapExerciseModel());
       if (data.id != null) {
-        ApiRepo.deleteSwapExercise(dataId: data.dataId ?? "");
+        // ApiRepo.deleteSwapExercise(dataId: data.dataId ?? "");
         await DatabaseHelper().deleteSingleData(tableName: DatabaseHelper.swapExerciseHistory, id: data.dataId ?? "");
         await monthProvider?.fetchSwapExerciseData();
       }
@@ -1334,13 +1334,13 @@ class _TodayPageState extends State<TodayPage> {
                                                   orElse: () => RemovedExerciseModel(),
                                                 );
                                                 if (removedDataExit.id != null) {
-                                                  ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                                  // ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
                                                   await DatabaseHelper().deleteSingleData(
                                                       tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
                                                 }
 
                                                 exercises.add(newDayExercise);
-                                                ApiRepo.addExtraExercise(body: data);
+                                                // ApiRepo.addExtraExercise(body: data);
                                                 await DatabaseHelper()
                                                     .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
                                                 await monthProvider?.fetchExtraAddedExerciseData();
@@ -1848,13 +1848,13 @@ class _TodayPageState extends State<TodayPage> {
                                               );
 
                                               if (removedDataExit.id != null) {
-                                                ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                                // ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
                                                 await DatabaseHelper().deleteSingleData(
                                                     tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
                                               }
                                               exercises.removeAt(selectedIndex);
                                               exercises.insert(selectedIndex, newDayExercise);
-                                              ApiRepo.addSwapExercise(body: data);
+                                              // ApiRepo.addSwapExercise(body: data);
                                               await DatabaseHelper().insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
                                               await monthProvider?.fetchSwapExerciseData();
                                               await removeExercise(exercise.exerciseId ?? "");
@@ -1916,42 +1916,48 @@ class _TodayPageState extends State<TodayPage> {
       "status": status,
       "type": type,
     };
-    final apiReqBody = {
-      "status": status,
-      "type": type,
-      "dataId": dataId,
-    };
+    // final apiReqBody = {
+    //   "status": status,
+    //   "type": type,
+    //   "dataId": dataId,
+    // };
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
-        ApiRepo.updateExerciseStatus(body: apiReqBody);
+        // ApiRepo.updateExerciseStatus(body: apiReqBody);
         await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
-        ApiRepo.addExerciseStatus(body: data);
+        // ApiRepo.addExerciseStatus(body: data);
         await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
-      ApiRepo.addExerciseStatus(body: data);
+      // ApiRepo.addExerciseStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
   }
 
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
     await monthProvider?.fetchExerciseStatusLocalData();
+    log('exerciseHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider?.exerciseHistoryModel)}');
 
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     double totalWeight = 0;
     int exCount = 0;
+    double totalSet = 0;
+    double totalRIR = 0;
 
     for (int i = 0; i < monthProvider!.exerciseHistoryModel.length; i++) {
       var element = monthProvider!.exerciseHistoryModel[i];
       if (element.status == Status.completed) {
         exCount++;
         totalWeight += double.parse(element.totalWeight!);
+        totalSet += double.parse(element.totalSet ?? "0");
+        totalRIR += double.parse(element.totalRIR ?? "0");
       }
     }
+    double average = totalRIR / totalSet;
 
     if (monthProvider!.isPumpDay) {
       if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
@@ -2019,16 +2025,17 @@ class _TodayPageState extends State<TodayPage> {
       "endTime": (status == Status.completed || status == Status.skipped) ? "${DateTime.now().toUtc()}" : "",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),
+      "averageRIR": average.toString()
     };
-    final apiReqBody = {
-      "status": status1,
-      "type": type,
-      "endTime": (status == Status.completed || status == Status.skipped) ? "${DateTime.now().toUtc()}" : "",
-      "totalWeight": totalWeight.toString(),
-      "completedExercise": exCount.toString(),
-      "dataId": dataId,
-    };
-    ApiRepo.updateDayStatus(body: apiReqBody);
+    // final apiReqBody = {
+    //   "status": status1,
+    //   "type": type,
+    //   "endTime": (status == Status.completed || status == Status.skipped) ? "${DateTime.now().toUtc()}" : "",
+    //   "totalWeight": totalWeight.toString(),
+    //   "completedExercise": exCount.toString(),
+    //   "dataId": dataId,
+    // };
+    // ApiRepo.updateDayStatus(body: apiReqBody);
     await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
 
     await monthProvider?.updateDayData();

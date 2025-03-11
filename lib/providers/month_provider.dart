@@ -172,34 +172,37 @@ class MonthProvider extends ChangeNotifier {
       pumpDays = [];
       notifyListeners();
 
-      for (var element in monthDataModel?.weeks?[week! - 1].idList ?? []) {
-        String id = "";
-
-        if (element.toString().contains("Rest Day")) {
-          try {
-            int restDayIndex = int.parse(element.toString().split(" ").last);
-            int i = restDayIndex - 1;
-            int index = i % 2;
-
-            if (monthDataModel!.weeks?[week! - 1].pumpDayIds?.isNotEmpty == true) {
-              if (monthDataModel!.weeks![week! - 1].pumpDayIds!.length == 1) {
-                id = monthDataModel!.weeks![week! - 1].pumpDayIds![0];
-              } else {
-                id = monthDataModel!.weeks![week! - 1].pumpDayIds![index];
-              }
-
-              var value = await fetchPumpDay(id);
-              pumpDays.add(value);
-            } else {
-              debugPrint("Warning: No pumpDayIds found for week ${week! - 1}");
-            }
-          } catch (e, stackTrace) {
-            debugPrint("Error processing element: $element");
-            debugPrint("Error: $e");
-            debugPrint("StackTrace: $stackTrace");
-          }
-        }
+      for (var element in monthDataModel!.weeks?[week! - 1].pumpDayIds ?? []) {
+        var value = await fetchPumpDay(element);
+        pumpDays.add(value);
       }
+
+      // for (var element in monthDataModel?.weeks?[week! - 1].idList ?? []) {
+      //   String id = "";
+      //   if (element.toString().contains("Rest Day")) {
+      //     try {
+      //       int restDayIndex = int.parse(element.toString().split(" ").last);
+      //       int i = restDayIndex - 1;
+      //       int index = i % 2;
+      //
+      //       if (monthDataModel!.weeks?[week! - 1].pumpDayIds?.isNotEmpty == true) {
+      //         if (monthDataModel!.weeks![week! - 1].pumpDayIds!.length == 1) {
+      //           id = monthDataModel!.weeks![week! - 1].pumpDayIds![0];
+      //         } else {
+      //           id = monthDataModel!.weeks![week! - 1].pumpDayIds![index];
+      //         }
+      //         var value = await fetchPumpDay(id);
+      //         pumpDays.add(value);
+      //       } else {
+      //         debugPrint("Warning: No pumpDayIds found for week ${week! - 1}");
+      //       }
+      //     } catch (e, stackTrace) {
+      //       debugPrint("Error processing element: $element");
+      //       debugPrint("Error: $e");
+      //       debugPrint("StackTrace: $stackTrace");
+      //     }
+      //   }
+      // }
 
       notifyListeners();
     } catch (e, stackTrace) {
@@ -1270,6 +1273,27 @@ class MonthProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  Future<HistoryDataModel?> fetchSingleSetLocalData(dataId) async {
+    HistoryDataModel? expandedDataHistory;
+
+    try {
+      final data = await DatabaseHelper().getDataByDataId(
+        tableName: DatabaseHelper.exerciseHistory,
+        id: dataId,
+      );
+
+      if (data != null) {
+        expandedDataHistory = HistoryDataModel.fromJson(data);
+      } else {
+        expandedDataHistory = null;
+      }
+    } catch (e) {
+      debugPrint('Error fetching exercise data: $e');
+      expandedDataHistory = null;
+    }
+    return expandedDataHistory;
   }
 
   List<HistoryDataModel> historyDataModel = [];

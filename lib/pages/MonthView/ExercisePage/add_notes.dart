@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
-import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -185,7 +184,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
       "date": "${DateTime.now().toUtc()}",
       "note": _noteController.text.trim(),
     };
-    ApiRepo.addExerciseNotes(body: data);
+    // ApiRepo.addExerciseNotes(body: data);
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseNotes);
 
     getNotesData();

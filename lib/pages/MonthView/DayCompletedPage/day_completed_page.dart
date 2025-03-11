@@ -26,6 +26,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   List<DayHistoryModel> data = [];
   double totalWeight = 0;
   int exerciseCompleted = 0;
+  double averageRIR = 0;
   String time = "";
   bool loader = true;
 
@@ -45,6 +46,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     time = "";
     totalWeight = 0;
     exerciseCompleted = 0;
+    averageRIR = 0;
 
     data = monthProvider!.decodedDataAll();
     DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
@@ -89,6 +91,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       time = formatDuration(duration);
       totalWeight = double.parse(data1.totalWeight ?? "0");
       exerciseCompleted = int.parse(data1.completedExercise ?? "0");
+      averageRIR = double.parse(data1.averageRIR ?? "0");
     }
 
     await Future.delayed(const Duration(milliseconds: 1000));
@@ -397,7 +400,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                               height: 10,
                                             ),
                                             Text(
-                                              '0',
+                                              averageRIR.toStringAsFixed(2),
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
                                             )
@@ -548,6 +551,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               text: "Back to Dashboard",
                               textColor: const Color(0x40000000),
                               onPress: () {
+                                monthProvider?.checkForPumpDay();
                                 Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                 mainPageProvider?.changeTab(0);
                                 // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
@@ -564,6 +568,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
                                 textColor: Colors.white,
                                 onPress: () {
+                                  monthProvider?.checkForPumpDay();
                                   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                   mainPageProvider?.changeTab(1);
 
@@ -635,8 +640,29 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     monthProvider.changeIsPumpDay(isPumpDay);
 
     if (isPumpDay) {
-      monthProvider.updatePumpDayData(monthProvider.pumpDays[
-          int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+      final dataList = monthProvider.dayHistoryModel
+          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .toList();
+
+      if (dataList.isNotEmpty) {
+        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
+            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        if (index1 != -1) {
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
+        } else {
+          int index1 =
+              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
+              ? 0
+              : index1 == 0
+                  ? 1
+                  : 0]);
+        }
+      } else {
+        monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
+      }
+      // monthProvider.updatePumpDayData(monthProvider.pumpDays[
+      //     int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
     }
 
     monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;

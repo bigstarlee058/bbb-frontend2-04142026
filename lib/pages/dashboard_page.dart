@@ -127,12 +127,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    // context.select((MonthProvider value) => value.scrollOffset);
-
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => ApiRepo().fetchSwapExercise(),
-      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -416,6 +411,40 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       1
                                                   : 0;
 
+                                              String pumpDayTitle = "Pump Day";
+
+                                              final dataList = monthProvider.dayHistoryModel
+                                                  .where((element) =>
+                                                      element.type?.contains("Pump Day") == true && element.status != Status.empty)
+                                                  .toList();
+                                              if (monthProvider.pumpDays.isNotEmpty) {
+                                                if (dataList.isNotEmpty) {
+                                                  int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
+                                                      (e1.dayId == monthProvider.todayTitleId &&
+                                                          e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+                                                  if (index1 != -1) {
+                                                    pumpDayTitle = monthProvider.pumpDays[index1].title ?? "Pump Day";
+                                                  } else {
+                                                    if (monthProvider.pumpDays.length == 1) {
+                                                      pumpDayTitle = monthProvider.pumpDays[0].title ?? "Pump Day";
+                                                    } else {
+                                                      int index1 = monthProvider.pumpDays.indexWhere((el1) =>
+                                                          dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+                                                      pumpDayTitle = monthProvider
+                                                              .pumpDays[index == -1
+                                                                  ? 0
+                                                                  : index1 == 0
+                                                                      ? 1
+                                                                      : 0]
+                                                              .title ??
+                                                          "Pump Day";
+                                                    }
+                                                  }
+                                                } else {
+                                                  pumpDayTitle = monthProvider.pumpDays[0].title ?? "Pump Day";
+                                                }
+                                              }
+
                                               return Container(
                                                 margin: EdgeInsets.symmetric(
                                                   horizontal: ScreenUtil.horizontalScale(8),
@@ -452,15 +481,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                   ? monthData.monthDataModel!.weeks![monthData.week! - 1]
                                                                           .days![nextWorkOutIndex].title ??
                                                                       ""
-                                                                  : monthData
-                                                                          .pumpDays[int.parse(monthData.monthDataModel!
-                                                                                  .weeks![monthData.week! - 1].dayList![index ?? 0]
-                                                                                  .toString()
-                                                                                  .split(" ")
-                                                                                  .last) -
-                                                                              1]
-                                                                          .title ??
-                                                                      "",
+                                                                  : monthData.pumpDays.isEmpty
+                                                                      ? "Pump Day"
+                                                                      : pumpDayTitle,
                                                               textAlign: TextAlign.center,
                                                               style: TextStyle(
                                                                 color: Colors.white,
@@ -1097,8 +1120,29 @@ class _DashboardPageState extends State<DashboardPage> {
     monthData.changeIsPumpDay(isPumpDay);
 
     if (isPumpDay) {
-      monthData.updatePumpDayData(monthData
-          .pumpDays[int.parse(monthData.monthDataModel!.weeks![monthData.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+      final dataList = monthProvider.dayHistoryModel
+          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .toList();
+
+      if (dataList.isNotEmpty) {
+        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
+            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        if (index1 != -1) {
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
+        } else {
+          int index1 =
+              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
+              ? 0
+              : index1 == 0
+                  ? 1
+                  : 0]);
+        }
+      } else {
+        monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
+      }
+      // monthData.updatePumpDayData(monthData
+      //     .pumpDays[int.parse(monthData.monthDataModel!.weeks![monthData.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
     }
 
     monthData.overviewCurrentWeek = monthData.week ?? 1;

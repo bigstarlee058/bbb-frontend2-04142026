@@ -17,6 +17,8 @@ class ExerciseHistoryModel {
   String? status;
   String? split;
   String? totalWeight;
+  String? totalSet;
+  String? totalRIR;
 
   ExerciseHistoryModel({
     this.id,
@@ -30,6 +32,8 @@ class ExerciseHistoryModel {
     this.status,
     this.split,
     this.totalWeight,
+    this.totalSet,
+    this.totalRIR,
   });
 
   factory ExerciseHistoryModel.fromJson(Map<String, dynamic> json) => ExerciseHistoryModel(
@@ -44,6 +48,8 @@ class ExerciseHistoryModel {
         status: json["status"],
         split: json["split"],
         totalWeight: json["totalWeight"],
+        totalSet: json["totalSet"],
+        totalRIR: json["totalRIR"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -58,5 +64,7 @@ class ExerciseHistoryModel {
         "status": status,
         "split": split,
         "totalWeight": totalWeight,
+        "totalSet": totalSet,
+        "totalRIR": totalRIR,
       };
 }

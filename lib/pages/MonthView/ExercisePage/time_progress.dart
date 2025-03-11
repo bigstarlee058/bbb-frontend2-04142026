@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -74,7 +73,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         if (status == AnimationStatus.completed) {
           animationCompleted = true;
           widget.onComplete();
-          ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
+          // ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
           await DatabaseHelper()
               .updateSingleValue(
                   tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
@@ -114,7 +113,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         }
       });
     } else {
-      ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
+      // ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
       await DatabaseHelper()
           .updateSingleValue(tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
           .then(
@@ -166,7 +165,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
           currentTime = int.parse(monthProvider.timePassed);
 
           if (int.parse(monthProvider.timePassed) > totalTime) {
-            ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
+            // ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
             await DatabaseHelper()
                 .updateSingleValue(
                     tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
