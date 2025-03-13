@@ -68,7 +68,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     mainIndex = widget.index;
     weekDataModel = widget.monthProvider?.weeksDataList[mainIndex!];
     thisWeek = ((mainIndex! + 1) == monthProvider?.week);
-    _isExpanded = false;
+    // _isExpanded = false;
+    _isExpanded = (mainIndex! + 1) == monthProvider?.week ? true : false;
     dayDataList = weekDataModel!.days!;
   }
 
@@ -124,7 +125,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         return ListTile(
           contentPadding: EdgeInsets.symmetric(
             horizontal: ScreenUtil.horizontalScale(5),
-            vertical: ScreenUtil.verticalScale(0.6),
+            vertical: ScreenUtil.verticalScale(0.5),
           ),
           title: Row(
             children: [

@@ -372,7 +372,8 @@ class _TodayPageState extends State<TodayPage> {
                                                 horizontal: ScreenUtil.horizontalScale(9),
                                               ),
                                               child: ButtonWidget(
-                                                text: "Watch Video Intro",
+                                                // text: "Watch Video Intro",
+                                                text: "Watch Video",
                                                 color: const Color(0xEEFFFFFF),
                                                 onPress: () {
                                                   Navigator.of(context).push(

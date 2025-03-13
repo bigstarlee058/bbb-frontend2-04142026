@@ -131,7 +131,11 @@ class _DashboardPageState extends State<DashboardPage> {
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
-          scrollProvider.updateOffSet(notification.metrics.pixels);
+          WidgetsBinding.instance.scheduleFrameCallback(
+            (timeStamp) {
+              scrollProvider.updateOffSet(notification.metrics.pixels);
+            },
+          );
           return true;
         },
         child: Stack(
@@ -1028,7 +1032,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           top: ScreenUtil.verticalScale(2),
                                           bottom: 20),
                                       child: Text(
-                                        "Meet our Staff",
+                                        "Meet our team",
                                         style: TextStyle(
                                           color: AppColors.primaryColor,
                                           fontSize: ScreenUtil.verticalScale(2.3),

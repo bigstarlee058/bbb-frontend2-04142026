@@ -454,18 +454,19 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                 horizontal: ScreenUtil.horizontalScale(9),
                                               ),
                                               child: Builder(builder: (context) {
-                                                String split = monthProvider
-                                                        .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
-                                                        .toString()
-                                                        .split(" ")[1] ??
-                                                    "";
+                                                // String split = monthProvider
+                                                //         .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                //         .toString()
+                                                //         .split(" ")[1] ??
+                                                //     "";
                                                 return ButtonWidget(
-                                                  text: (monthProvider.dayDataModel != null &&
-                                                          monthProvider.dayDataModel!.formats != null &&
-                                                          monthProvider.dayDataModel!.formats!
-                                                              .contains(split.toString().replaceAll("split", "")))
-                                                      ? "Watch Video"
-                                                      : "Watch Video Intro",
+                                                  // text: (monthProvider.dayDataModel != null &&
+                                                  //         monthProvider.dayDataModel!.formats != null &&
+                                                  //         monthProvider.dayDataModel!.formats!
+                                                  //             .contains(split.toString().replaceAll("split", "")))
+                                                  //     ? "Watch Video"
+                                                  //     : "Watch Video Intro",
+                                                  text: "Watch Video",
                                                   color: const Color(0xEEFFFFFF),
                                                   onPress: () {
                                                     Navigator.of(context).push(

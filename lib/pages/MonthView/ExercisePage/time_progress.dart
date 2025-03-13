@@ -204,11 +204,13 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      margin: EdgeInsets.only(top: 20),
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
+        // borderRadius: const BorderRadius.only(
+        //   bottomLeft: Radius.circular(30),
+        //   bottomRight: Radius.circular(30),
+        // ),
+        borderRadius: const BorderRadius.all(Radius.circular(30)),
         color: currentTime >= totalTime * 0.9 ? const Color(0xff008000) : AppColors.primaryColor,
       ),
       child: Row(

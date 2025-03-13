@@ -27,7 +27,7 @@ class NotificationService {
     );
 
     await flutterLocalNotificationsPlugin
-        .zonedSchedule(id, 'Target rest reached!', 'Return to the app to continue you exercise',
+        .zonedSchedule(id, 'Target rest reached!', 'Your Timer has reached 0, get back to your workout and keep your progress going',
             tz.TZDateTime.now(tz.local).add(Duration(seconds: second)), const NotificationDetails(android: androidDetails),
             androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
             payload: jsonEncode(payload),

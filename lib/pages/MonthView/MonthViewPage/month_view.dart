@@ -45,8 +45,11 @@ class _MonthViewState extends State<MonthView> {
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
-          scrollProvider?.updateOffSet1(notification.metrics.pixels);
-
+          WidgetsBinding.instance.scheduleFrameCallback(
+            (timeStamp) {
+              scrollProvider?.updateOffSet1(notification.metrics.pixels);
+            },
+          );
           return true;
         },
         child: Stack(

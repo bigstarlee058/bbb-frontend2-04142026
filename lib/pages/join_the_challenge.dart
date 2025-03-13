@@ -261,7 +261,7 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
           Container(
               margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
               child: ButtonWidget(
-                text: "Join the Challenge",
+                text: "Join the competition",
                 // (userData!.currentDayObj.formats
                 //     .contains(userData?.selectedDaySplit))
                 //     ? (isThisWeek && !isCompleted && !isSkipped

@@ -54,7 +54,8 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
 
       groupedData[formattedDate]!['totalWeight'] = groupedData[formattedDate]!['totalWeight']! + weight;
       groupedData[formattedDate]!['totalReps'] = groupedData[formattedDate]!['totalReps']! + reps.toDouble();
-      groupedData[formattedDate]!['totalRIR'] = groupedData[formattedDate]!['totalRIR']! + repsInReverse.toDouble();
+      groupedData[formattedDate]!['totalRIR'] =
+          groupedData[formattedDate]!['totalRIR']! + (repsInReverse == 100 ? 0 : repsInReverse.toDouble());
     }
     chartData = [];
     dateLabels = [];

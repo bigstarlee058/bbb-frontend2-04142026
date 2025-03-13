@@ -29,7 +29,7 @@ class StaffListWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Staff',
+              'Team',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: ScreenUtil.horizontalScale(3.6),

@@ -41,6 +41,7 @@ class ExpansionPanel {
     required this.headerBuilder,
     required this.body,
     this.isExpanded = false,
+    this.isTrailing = true,
     this.canTapOnHeader = false,
     this.backgroundColor,
     this.splashColor,
@@ -50,6 +51,7 @@ class ExpansionPanel {
   final ExpansionPanelHeaderBuilder headerBuilder;
   final Widget body;
   final bool isExpanded;
+  final bool? isTrailing;
   final Color? splashColor;
   final Color? highlightColor;
   final bool canTapOnHeader;
@@ -202,16 +204,18 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
         _isChildExpanded(index),
       );
 
-      Widget expandIconPadded = Padding(
-        padding: const EdgeInsetsDirectional.only(end: 8.0),
-        child: ExpandIcon(
-          color: widget.expandIconColor,
-          iconColor: child.highlightColor,
-          isExpanded: _isChildExpanded(index),
-          padding: _kExpandIconPadding,
-          onPressed: !child.canTapOnHeader ? (bool isExpanded) => _handlePressed(isExpanded, index) : null,
-        ),
-      );
+      Widget expandIconPadded = child.isTrailing == true
+          ? Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8.0),
+              child: ExpandIcon(
+                color: widget.expandIconColor,
+                iconColor: child.highlightColor,
+                isExpanded: _isChildExpanded(index),
+                padding: _kExpandIconPadding,
+                onPressed: !child.canTapOnHeader ? (bool isExpanded) => _handlePressed(isExpanded, index) : null,
+              ),
+            )
+          : SizedBox();
 
       if (!child.canTapOnHeader) {
         final MaterialLocalizations localizations = MaterialLocalizations.of(context);

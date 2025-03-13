@@ -1,8 +1,8 @@
-import 'package:bbb/models/challenges.dart';
-import 'package:flutter/material.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/models/challenges.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:flutter/material.dart';
 
 class JoinChallengeWidget extends StatelessWidget {
   final Challenges featureChallenge;
@@ -73,21 +73,16 @@ class JoinChallengeWidget extends StatelessWidget {
                         maxLines: 2,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ScreenUtil.horizontalScale(8),
-                          fontWeight: FontWeight.bold,
-                          height: 1.35
-                        ),
+                            color: Colors.white, fontSize: ScreenUtil.horizontalScale(8), fontWeight: FontWeight.bold, height: 1.35),
                       ),
                     ),
-                    
                     Container(
                       margin: EdgeInsets.symmetric(
                         vertical: ScreenUtil.verticalScale(2),
                         horizontal: ScreenUtil.horizontalScale(18),
                       ),
                       child: ButtonWidget(
-                        text: 'Join the Challenge',
+                        text: 'Join the competition',
                         textColor: Colors.white,
                         color: AppColors.primaryColor,
                         onPress: () {
@@ -116,28 +111,28 @@ class MiddleClipper extends CustomClipper<Path> {
 
     path.quadraticBezierTo(
       size.width * 0.05, size.height * 0.1, // Control point
-      size.width * 0.15, size.height * 0.1,  // End point
+      size.width * 0.15, size.height * 0.1, // End point
     );
 
     path.lineTo(size.width * 0.85, size.height * 0.1);
 
     path.quadraticBezierTo(
-      size.width * 0.95, size.height * 0.1,  // Control point
-      size.width, size.height * 0,           // End point
+      size.width * 0.95, size.height * 0.1, // Control point
+      size.width, size.height * 0, // End point
     );
 
     path.lineTo(size.width, size.height * 0.8);
 
     path.quadraticBezierTo(
-      size.width * 0.95, size.height * 0.9,  // Control point
-      size.width * 0.85, size.height * 0.9,   // End point
+      size.width * 0.95, size.height * 0.9, // Control point
+      size.width * 0.85, size.height * 0.9, // End point
     );
 
     path.lineTo(size.width * 0.15, size.height * 0.9);
 
     path.quadraticBezierTo(
-      size.width * 0.05, size.height * 0.9,  // Control point
-      0, size.height * 1,                   // End point
+      size.width * 0.05, size.height * 0.9, // Control point
+      0, size.height * 1, // End point
     );
 
     path.lineTo(0, size.height * 0.2);

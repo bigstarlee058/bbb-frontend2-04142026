@@ -968,7 +968,9 @@ class MonthProvider extends ChangeNotifier {
         updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
       }
     } else {
-      updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
+      if (currentExpandedItem == "0:0") {
+        updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
+      }
     }
     notifyListeners();
   }
