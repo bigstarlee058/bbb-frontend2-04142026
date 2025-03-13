@@ -251,7 +251,10 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
                                                 ),
-                                                onPressed: () => Navigator.pop(context),
+                                                onPressed: () {
+                                                  // HapticFeedBack.buttonClick();
+                                                  Navigator.pop(context);
+                                                },
                                                 iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                               ),
                                             ),

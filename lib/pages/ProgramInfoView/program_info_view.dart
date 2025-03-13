@@ -21,7 +21,6 @@ class ProgramInfoView extends StatefulWidget {
 class _ProgramInfoViewState extends State<ProgramInfoView> {
   final Map<int, bool> _expandedStates = {0: true};
   late MainPageProvider mainPageProvider;
-    
 
   List<Map<String, dynamic>> data = [
     {"title": "Training Guidelines", "description": ""},
@@ -95,6 +94,7 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
+                                              // HapticFeedBack.buttonClick();
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                               mainPageProvider.changeTab(1);
                                             },

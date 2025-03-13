@@ -1,3 +1,5 @@
+import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -5,9 +7,8 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:bbb/components/common_streak_with_notification.dart';
+
 import '../../providers/data_provider.dart';
 
 class BonusLibraryPage extends StatefulWidget {
@@ -113,34 +114,58 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 2.2,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      BackArrowWidget(
-                                          onPress: () {
-                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                            mainPageProvider.changeTab(2);
-                                          },
-                                        ),
-                                      Text(
-                                        'Bonuses',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(5.5),
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/bonusLibrary')
-                                    ],
+                                AppBar(
+                                  backgroundColor: Colors.transparent,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      // HapticFeedBack.buttonClick();
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(2);
+                                    },
                                   ),
+                                  centerTitle: true,
+                                  title: Text(
+                                    'Bonuses',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                                    ),
+                                  ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/bonusLibrary'),
+                                    )
+                                  ],
                                 ),
+                                // Container(
+                                //   margin: const EdgeInsets.only(right: 10),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       BackArrowWidget(
+                                //         onPress: () {
+                                //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                //           mainPageProvider.changeTab(2);
+                                //         },
+                                //       ),
+                                //       Text(
+                                //         'Bonuses',
+                                //         style: TextStyle(
+                                //           color: Colors.white,
+                                //           fontSize: ScreenUtil.horizontalScale(5.5),
+                                //         ),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: '/bonusLibrary')
+                                //     ],
+                                //   ),
+                                // ),
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(7),
@@ -395,7 +420,7 @@ class SearchBonusField extends StatelessWidget {
         onChanged: onChanged, // Notify the parent of text changes
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
-          hintText: 'Search Bonuse',
+          hintText: 'Search Bonuses',
           hintStyle: TextStyle(
             color: Colors.black45,
             fontSize: ScreenUtil.verticalScale(2),

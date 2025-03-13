@@ -1,6 +1,7 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
@@ -471,6 +472,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                     children: [
                                       BackArrowWidget(
                                         onPress: () {
+                                          // HapticFeedBack.buttonClick();
                                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                           mainPageProvider.changeTab(2);
                                         },
@@ -598,6 +600,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   }
 
   void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    HapticFeedBack.buttonClick();
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList
         ?.indexWhere((element) => element == monthProvider.todayTitleId);
 
@@ -632,10 +635,31 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
             (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider.changeIsPumpDay(isPumpDay);
-
     if (isPumpDay) {
-      monthProvider.updatePumpDayData(monthProvider.pumpDays[
-          int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+      final dataList = monthProvider.dayHistoryModel
+          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .toList();
+
+      if (dataList.isNotEmpty) {
+        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
+            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        if (index1 != -1) {
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
+        } else {
+          int index1 =
+              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
+              ? 0
+              : index1 == 0
+                  ? 1
+                  : 0]);
+        }
+      } else {
+        monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
+      }
+
+      // monthProvider.updatePumpDayData(monthProvider.pumpDays[
+      //     int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
     }
 
     DayDataModel dayData =

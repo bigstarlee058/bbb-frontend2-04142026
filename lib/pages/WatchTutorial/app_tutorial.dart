@@ -165,7 +165,7 @@ class _AppTutorialState extends State<AppTutorial> {
                       IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
+                          Navigator.of(context).pop();
                         },
                       ),
                     ],
@@ -350,6 +350,7 @@ class _AppTutorialState extends State<AppTutorial> {
                       text: "Close",
                       textColor: Colors.white,
                       onPress: () {
+                        Navigator.pop(context);
                         Navigator.pop(context);
                       },
                       color: AppColors.primaryColor,

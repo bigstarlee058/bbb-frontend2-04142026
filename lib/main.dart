@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -37,6 +36,7 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
+import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:device_preview/device_preview.dart';
@@ -80,7 +80,6 @@ void main() async {
     onDidReceiveNotificationResponse: (details) async {
       final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
       if (isLastExerciseScreen == "NO") {
-        log('isLastExerciseScreen :::::::::::::::::: $isLastExerciseScreen');
         await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
         await preferences.putInt(SharedPreference.fromNotification, 1);
         navigatorKey.currentState?.pushNamed('/exercise');
@@ -92,7 +91,6 @@ void main() async {
       await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
     final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
-    log('isLastExerciseScreen :::::::::::::::::: $isLastExerciseScreen');
     if (isLastExerciseScreen == "NO") {
       final String? payload = notificationAppLaunchDetails!.notificationResponse?.payload;
       await preferences.putString(SharedPreference.payload, payload ?? "{}");
@@ -150,6 +148,9 @@ class _MyAppState extends State<MyApp> {
   final monthProvider = ChangeNotifierProvider<MonthProvider>(
     create: (context) => MonthProvider(),
   );
+  final scrollProvider = ChangeNotifierProvider<ScrollProvider>(
+    create: (context) => ScrollProvider(),
+  );
 
   // ignore: unused_field
   late AppLinks _appLinks;
@@ -192,54 +193,58 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     c = context;
-    return MultiProvider(
-      providers: [
-        dataProvider,
-        userDataProvider,
-        locationProvider,
-        mainPageProvider,
-        programInfoProvider,
-        monthProvider,
-      ],
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        locale: !kReleaseMode ? DevicePreview.locale(context) : null,
-        builder: !kReleaseMode ? DevicePreview.appBuilder : null,
-        title: 'Booty by Bret',
-        debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.onBoardingScreen,
-        routes: {
-          AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
-          AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-          AppRoutes.loginScreen: (context) => const LoginPage(image: ''),
-          AppRoutes.registerScreen: (context) => const RegisterPage(),
-          AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
-          AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),
-          AppRoutes.exerciseHistory: (context) => const ExerciseHistoryPage(),
-          AppRoutes.exerciseLibraryDetailScreen: (context) => const ExerciseLibraryDetailPage(),
-          AppRoutes.exerciseLibraryScreen: (context) => const ExerciseLibraryPage(),
-          AppRoutes.equipmentLibraryScreen: (context) => const EquipmentLibraryPage(),
-          AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
-          AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(),
-          AppRoutes.emailVerificationScreen: (context) => const EmailVerificationScreen(),
-          AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
-          AppRoutes.todayScreen: (context) => const TodayPage(),
-          AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),
-          AppRoutes.exerciseScreen: (context) => const ExercisePage(),
-          AppRoutes.recalculateScreen: (context) => const RecalculatePage(),
-          // AppRoutes.streakScreen: (context) => const StreakPage(),
-          AppRoutes.calendarScreen: (context) => const CalendarPage(),
-          AppRoutes.watchTutorialScreen: (context) => const WatchTutorial(),
-          AppRoutes.myProfileScreen: (context) => const MyProfilePage(),
-          AppRoutes.languageScreen: (context) => const LanguagePage(),
-          AppRoutes.streakCalendarScreen: (context) => const StreakCalendarPage(),
-          AppRoutes.notificationsScreen: (context) => const NotificationsPage(),
-          AppRoutes.joinChallengeScreen: (context) => const JoinTheChallengePage(),
-          AppRoutes.meetOurStaff: (context) => const MeetOurStaff(),
-          AppRoutes.joinedChallengeScreen: (context) => const JoinedChallengePage(),
-          AppRoutes.collectionDetailScreen: (context) => const CollectionDetailPage(),
-          AppRoutes.appTutorialScreen: (context) => const AppTutorial(),
-        },
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1)),
+      child: MultiProvider(
+        providers: [
+          dataProvider,
+          userDataProvider,
+          locationProvider,
+          mainPageProvider,
+          programInfoProvider,
+          monthProvider,
+          scrollProvider,
+        ],
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          locale: !kReleaseMode ? DevicePreview.locale(context) : null,
+          builder: !kReleaseMode ? DevicePreview.appBuilder : null,
+          title: 'Booty by Bret',
+          debugShowCheckedModeBanner: false,
+          initialRoute: AppRoutes.onBoardingScreen,
+          routes: {
+            AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
+            AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+            AppRoutes.loginScreen: (context) => const LoginPage(image: ''),
+            AppRoutes.registerScreen: (context) => const RegisterPage(),
+            AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
+            AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),
+            AppRoutes.exerciseHistory: (context) => const ExerciseHistoryPage(),
+            AppRoutes.exerciseLibraryDetailScreen: (context) => const ExerciseLibraryDetailPage(),
+            AppRoutes.exerciseLibraryScreen: (context) => const ExerciseLibraryPage(),
+            AppRoutes.equipmentLibraryScreen: (context) => const EquipmentLibraryPage(),
+            AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
+            AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(),
+            AppRoutes.emailVerificationScreen: (context) => const EmailVerificationScreen(),
+            AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
+            AppRoutes.todayScreen: (context) => const TodayPage(),
+            AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),
+            AppRoutes.exerciseScreen: (context) => const ExercisePage(),
+            AppRoutes.recalculateScreen: (context) => const RecalculatePage(),
+            // AppRoutes.streakScreen: (context) => const StreakPage(),
+            AppRoutes.calendarScreen: (context) => const CalendarPage(),
+            AppRoutes.watchTutorialScreen: (context) => const WatchTutorial(),
+            AppRoutes.myProfileScreen: (context) => const MyProfilePage(),
+            AppRoutes.languageScreen: (context) => const LanguagePage(),
+            AppRoutes.streakCalendarScreen: (context) => const StreakCalendarPage(),
+            AppRoutes.notificationsScreen: (context) => const NotificationsPage(),
+            AppRoutes.joinChallengeScreen: (context) => const JoinTheChallengePage(),
+            AppRoutes.meetOurStaff: (context) => const MeetOurStaff(),
+            AppRoutes.joinedChallengeScreen: (context) => const JoinedChallengePage(),
+            AppRoutes.collectionDetailScreen: (context) => const CollectionDetailPage(),
+            AppRoutes.appTutorialScreen: (context) => const AppTutorial(),
+          },
+        ),
       ),
     );
   }

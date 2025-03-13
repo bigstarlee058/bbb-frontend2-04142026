@@ -1,5 +1,5 @@
-import 'package:bbb/components/activity_line_chart.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -25,8 +25,9 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   DateTime today = DateTime.now();
   List<DayHistoryModel> data = [];
   double totalWeight = 0;
+  int exerciseCompleted = 0;
+  double averageRIR = 0;
   String time = "";
-
   bool loader = true;
 
   @override
@@ -44,37 +45,61 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   onInit() async {
     time = "";
     totalWeight = 0;
+    exerciseCompleted = 0;
+    averageRIR = 0;
 
     data = monthProvider!.decodedDataAll();
     DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
     dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
     formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
 
-    int totalWorkoutDuration = 0;
-    monthProvider?.allDayHistoryModel.forEach(
-      (element) {
-        if (element.endTime != null) {
-          final startTime = element.startTime!;
-          final endTime = element.endTime!;
+    // int totalWorkoutDuration = 0;
+    // monthProvider?.allDayHistoryModel.forEach(
+    //   (element) {
+    //     if (element.endTime != null) {
+    //       final startTime = element.startTime!;
+    //       final endTime = element.endTime!;
+    //       DateTime localStartTime = Utils.formattedDate("$startTime");
+    //       DateTime localEndTime = Utils.formattedDate("$endTime");
+    //       if (DateFormat('yyyy-MM-dd').format(localEndTime) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
+    //           element.status == Status.completed) {
+    //         int duration = localEndTime.difference(localStartTime).inSeconds;
+    //         totalWorkoutDuration += duration;
+    //         totalWeight += double.parse(element.totalWeight ?? "0");
+    //       }
+    //     }
+    //   },
+    // );
 
-          DateTime localStartTime = Utils.formattedDate("$startTime");
-          DateTime localEndTime = Utils.formattedDate("$endTime");
-          if (DateFormat('yyyy-MM-dd').format(localEndTime) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
-              element.status == Status.completed) {
-            int duration = localEndTime.difference(localStartTime).inSeconds;
-            totalWorkoutDuration += duration;
-            totalWeight += double.parse(element.totalWeight ?? "0");
-          }
-        }
+    DayHistoryModel? data1 = monthProvider?.allDayHistoryModel.firstWhere(
+      (element) {
+        String split =
+            monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+        String dataId =
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id ?? monthProvider?.monthDataModel?.weeks?[(monthProvider?.overviewCurrentWeek)! - 1].id}-${monthProvider?.currentDayTitleId}";
+        return element.dataId == dataId;
       },
     );
 
-    time = formatDuration(totalWorkoutDuration);
-    await Future.delayed(const Duration(milliseconds: 1000));
-    if (loader != false) {
-      loader = false;
-      setState(() {});
+    if (data1 != null) {
+      final startTime = data1.startTime!;
+      final endTime = data1.endTime!;
+
+      DateTime localStartTime = Utils.formattedDate("$startTime");
+      DateTime localEndTime = Utils.formattedDate("$endTime");
+      int duration = localEndTime.difference(localStartTime).inSeconds;
+      time = formatDuration(duration);
+      totalWeight = double.parse(data1.totalWeight ?? "0");
+      exerciseCompleted = int.parse(data1.completedExercise ?? "0");
+      averageRIR = double.parse(data1.averageRIR ?? "0");
     }
+
+    await Future.delayed(const Duration(milliseconds: 1000));
+    // if (loader != false) {
+    //   loader = false;
+    //   setState(() {});
+    // }
+    setState(() {});
   }
 
   String formatDuration(int seconds) {
@@ -88,6 +113,9 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => onInit(),
+      // ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -268,7 +296,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               ),
                             ),
                           ),
-                          SizedBox(height: ScreenUtil.horizontalScale(6)),
+                          SizedBox(height: ScreenUtil.horizontalScale(3.5)),
                           Text(
                             "Here's an overview of your today's workout.",
                             style: TextStyle(
@@ -285,7 +313,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: ScreenUtil.horizontalScale(3)),
+                          SizedBox(height: ScreenUtil.horizontalScale(5)),
                           Container(
                             margin: EdgeInsets.symmetric(
                               horizontal: ScreenUtil.horizontalScale(8),
@@ -294,48 +322,137 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Container(
-                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          spreadRadius: 2,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 1),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil.verticalScale(4.1),
+                                          vertical: ScreenUtil.verticalScale(2),
                                         ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.bolt,
-                                              color: Colors.black38,
-                                              size: ScreenUtil.horizontalScale(5),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(ScreenUtil.verticalScale(3)),
+                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              spreadRadius: 2,
+                                              blurRadius: 10,
+                                              offset: Offset(0, 1),
                                             ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            const Text(
+                                              'Exercise\nCompleted',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(color: Colors.black54),
+                                            ),
+                                            const SizedBox(height: 10),
                                             Text(
-                                              "Today's Activity",
-                                              style: TextStyle(
-                                                color: Colors.black54,
-                                                fontSize: ScreenUtil.horizontalScale(3.3),
+                                              "$exerciseCompleted",
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Color(0xFFDD1166),
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.w500,
                                               ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil.verticalScale(3.5),
+                                          vertical: ScreenUtil.verticalScale(2),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                              ScreenUtil.verticalScale(3),
+                                            ),
+                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              spreadRadius: 2,
+                                              blurRadius: 10,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            const Text(
+                                              'Average RIR',
+                                              style: TextStyle(color: Colors.black54),
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              averageRIR.toStringAsFixed(2),
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
                                             )
                                           ],
                                         ),
-                                        SizedBox(height: ScreenUtil.horizontalScale(2)),
-                                        const ActivityLineChart(),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(width: 16),
+                                // Expanded(
+                                //   child: Container(
+                                //     padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
+                                //     decoration: const BoxDecoration(
+                                //       color: Colors.white,
+                                //       borderRadius: BorderRadius.all(
+                                //         Radius.circular(20),
+                                //       ),
+                                //       boxShadow: [
+                                //         BoxShadow(
+                                //           color: Colors.black12,
+                                //           spreadRadius: 2,
+                                //           blurRadius: 10,
+                                //           offset: Offset(0, 1),
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     child: Column(
+                                //       children: [
+                                //         Row(
+                                //           children: [
+                                //             Icon(
+                                //               Icons.bolt,
+                                //               color: Colors.black38,
+                                //               size: ScreenUtil.horizontalScale(5),
+                                //             ),
+                                //             Text(
+                                //               "Today's Activity",
+                                //               style: TextStyle(
+                                //                 color: Colors.black54,
+                                //                 fontSize: ScreenUtil.horizontalScale(3.3),
+                                //                 fontWeight: FontWeight.w500,
+                                //               ),
+                                //             )
+                                //           ],
+                                //         ),
+                                //         SizedBox(height: ScreenUtil.horizontalScale(2)),
+                                //         const ActivityLineChart(),
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
+                                const SizedBox(width: 5),
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -368,7 +485,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                             ),
                                             const SizedBox(height: 10),
                                             Text(
-                                              time,
+                                              time.isEmpty ? " \n " : time,
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(
                                                 color: Color(0xFFDD1166),
@@ -434,6 +551,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               text: "Back to Dashboard",
                               textColor: const Color(0x40000000),
                               onPress: () {
+                                monthProvider?.checkForPumpDay();
                                 Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                 mainPageProvider?.changeTab(0);
                                 // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
@@ -450,6 +568,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
                                 textColor: Colors.white,
                                 onPress: () {
+                                  monthProvider?.checkForPumpDay();
                                   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                   mainPageProvider?.changeTab(1);
 
@@ -479,6 +598,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   }
 
   void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    HapticFeedBack.buttonClick();
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
       (element) => element == monthProvider.todayTitleId,
     );
@@ -520,8 +640,29 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     monthProvider.changeIsPumpDay(isPumpDay);
 
     if (isPumpDay) {
-      monthProvider.updatePumpDayData(monthProvider.pumpDays[
-          int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+      final dataList = monthProvider.dayHistoryModel
+          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .toList();
+
+      if (dataList.isNotEmpty) {
+        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
+            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        if (index1 != -1) {
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
+        } else {
+          int index1 =
+              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
+              ? 0
+              : index1 == 0
+                  ? 1
+                  : 0]);
+        }
+      } else {
+        monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
+      }
+      // monthProvider.updatePumpDayData(monthProvider.pumpDays[
+      //     int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
     }
 
     monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;

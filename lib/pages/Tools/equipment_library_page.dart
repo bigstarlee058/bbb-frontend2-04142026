@@ -1,3 +1,5 @@
+import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -5,9 +7,8 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:bbb/components/common_streak_with_notification.dart';
+
 import '../../providers/data_provider.dart';
 
 class EquipmentLibraryPage extends StatefulWidget {
@@ -55,19 +56,15 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
 
     return _filteredEquipments.sublist(
       startIndex,
-      endIndex > _filteredEquipments.length
-          ? _filteredEquipments.length
-          : endIndex,
+      endIndex > _filteredEquipments.length ? _filteredEquipments.length : endIndex,
     );
   }
 
   void _applyFilters() {
     setState(() {
       // Filter equipments based on selected equipment, category, and search query
-      _filteredEquipments =
-          dataProvider!.adminEquipmentsData.where((equipment) {
-        bool matchesSearch = _searchQuery.isEmpty ||
-            equipment.title.toLowerCase().contains(_searchQuery.toLowerCase());
+      _filteredEquipments = dataProvider!.adminEquipmentsData.where((equipment) {
+        bool matchesSearch = _searchQuery.isEmpty || equipment.title.toLowerCase().contains(_searchQuery.toLowerCase());
 
         return matchesSearch;
       }).toList();
@@ -124,40 +121,60 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      BackArrowWidget(
-                                          onPress: () {
-                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                            mainPageProvider.changeTab(2);
-                                          },
-                                      ),
-                                      Text(
-                                        'Apparel & Equipment',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize:
-                                              ScreenUtil.horizontalScale(5.5),
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/equipmentLibrary')
-                                    ],
+                                AppBar(
+                                  centerTitle: true,
+                                  backgroundColor: Colors.transparent,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      // HapticFeedBack.buttonClick();
+                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      mainPageProvider.changeTab(2);
+                                    },
                                   ),
+                                  title: Text(
+                                    'Apparel & Equipment',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5),
+                                    ),
+                                  ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                    )
+                                  ],
                                 ),
+                                // Container(
+                                //   margin: const EdgeInsets.only(right: 10),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       BackArrowWidget(
+                                //         onPress: () {
+                                //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                //           mainPageProvider.changeTab(2);
+                                //         },
+                                //       ),
+                                //       Text(
+                                //         'Apparel & Equipment',
+                                //         style: TextStyle(
+                                //           color: Colors.white,
+                                //           fontSize: ScreenUtil.horizontalScale(5),
+                                //         ),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: '/equipmentLibrary')
+                                //     ],
+                                //   ),
+                                // ),
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(7),
                                   ),
                                   height: media.height * 0.2,
                                   child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         SizedBox(
                                           height: ScreenUtil.horizontalScale(1),
@@ -165,8 +182,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                         SearchEquipmentField(
                                           onChanged: (query) {
                                             setState(() {
-                                              _searchQuery =
-                                                  query; // Update the search query
+                                              _searchQuery = query; // Update the search query
                                               _currentPage = 0;
                                               _applyFilters(); // Reset pagination when searching
                                             });
@@ -242,25 +258,23 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                   height: ScreenUtil.verticalScale(2),
                                 ),
                                 dataProvider == null || dataProvider!.adminEquipmentsData.isEmpty || _filteredEquipments.isEmpty
-                                ? SizedBox(
-                                    height: ScreenUtil.verticalScale(10),
-                                  )
-                                : Column(
-                                  children: _getPaginatedEquipments()
-                                      .map((equipment) {
-                                    return Column(
-                                      children: [
-                                        equipmentCard(
-                                          equipment, // Dynamically display equipment
-                                        ),
-                                        SizedBox(
-                                          height: ScreenUtil.verticalScale(2),
-                                        ),
-                                      ],
-                                    );
-                                  }).toList(),
-                                ),
-                                
+                                    ? SizedBox(
+                                        height: ScreenUtil.verticalScale(10),
+                                      )
+                                    : Column(
+                                        children: _getPaginatedEquipments().map((equipment) {
+                                          return Column(
+                                            children: [
+                                              equipmentCard(
+                                                equipment, // Dynamically display equipment
+                                              ),
+                                              SizedBox(
+                                                height: ScreenUtil.verticalScale(2),
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ),
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(2),
                                 ),
@@ -328,7 +342,6 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
           ),
         ],
       ),
-      
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -341,14 +354,10 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: equipment.thumbnail.isNotEmpty
-                        ? NetworkImage(equipment.thumbnail
-                                .startsWith('https://storage.cloud.google.com/')
-                            ? equipment.thumbnail.replaceFirst(
-                                'https://storage.cloud.google.com/',
-                                'https://storage.googleapis.com/')
+                        ? NetworkImage(equipment.thumbnail.startsWith('https://storage.cloud.google.com/')
+                            ? equipment.thumbnail.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                             : equipment.thumbnail)
-                        : const AssetImage(
-                            'assets/img/library_placeholder.png'),
+                        : const AssetImage('assets/img/library_placeholder.png'),
                     fit: BoxFit.cover,
                     opacity: 1,
                   ),
@@ -379,8 +388,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
               horizontal: ScreenUtil.verticalScale(0.7),
               vertical: ScreenUtil.verticalScale(0.7),
             ),
-            decoration: const BoxDecoration(
-                color: AppColors.primaryColor, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: AppColors.primaryColor, shape: BoxShape.circle),
             child: Icon(
               Icons.play_arrow,
               color: Colors.white,
@@ -514,10 +522,8 @@ class _FilterSortButtonState extends State<FilterSortButton> {
               child: SingleChildScrollView(
                 // Wrap the content in a SingleChildScrollView
                 child: Container(
-                  width: ScreenUtil.horizontalScale(
-                      96), // Set the width of the popup to match the button
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+                  width: ScreenUtil.horizontalScale(96), // Set the width of the popup to match the button
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -533,8 +539,7 @@ class _FilterSortButtonState extends State<FilterSortButton> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.close,
-                                color: Color(0xFF9a354e)),
+                            icon: const Icon(Icons.close, color: Color(0xFF9a354e)),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -553,35 +558,24 @@ class _FilterSortButtonState extends State<FilterSortButton> {
                         collapsedTextColor: Colors.black,
                         collapsedShape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(
-                              color: Color.fromARGB(255, 252, 252, 252),
-                              width: 1),
+                          side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(
-                              color: Color(0xFF9a354e), width: 1),
+                          side: const BorderSide(color: Color(0xFF9a354e), width: 1),
                         ),
                         iconColor: Colors.black,
                         collapsedIconColor: const Color(0xFF9a354e),
-                        initiallyExpanded:
-                            isExpanded[0], // Set initial expanded state
+                        initiallyExpanded: isExpanded[0], // Set initial expanded state
                         onExpansionChanged: (isExpandedState) {
                           setState(() {
                             // Set the current index to true and others to false
                             isExpanded = [isExpandedState, false, false];
                           });
                         },
-                        children: <String>[
-                          'A-Z',
-                          'Z-A',
-                          'Newest added',
-                          'Oldest added'
-                        ].map((String option) {
+                        children: <String>['A-Z', 'Z-A', 'Newest added', 'Oldest added'].map((String option) {
                           return RadioListTile<String>(
-                            title: Text(option,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black)),
+                            title: Text(option, style: const TextStyle(fontSize: 14, color: Colors.black)),
                             value: option,
                             groupValue: _selectedSortBy,
                             onChanged: (String? value) {
@@ -589,8 +583,7 @@ class _FilterSortButtonState extends State<FilterSortButton> {
                                 _selectedSortBy = value!;
                               });
                             },
-                            activeColor: const Color(
-                                0xFF9a354e), // Change the checked color here
+                            activeColor: const Color(0xFF9a354e), // Change the checked color here
                             hoverColor: Colors.white,
                           );
                         }).toList(),
@@ -603,8 +596,7 @@ class _FilterSortButtonState extends State<FilterSortButton> {
                         height: 80,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                                0xFF9a354e), // Apply now button color
+                            backgroundColor: const Color(0xFF9a354e), // Apply now button color
                             padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
                           onPressed: () {

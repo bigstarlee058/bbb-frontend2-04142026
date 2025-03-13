@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -62,7 +61,6 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
     NotificationService.clearNotification();
     totalTime = widget.initialDuration;
     WidgetsBinding.instance.addObserver(this);
-    log('widget.initialDuration :::::::::::::::::: ${widget.initialDuration}');
     currentTime = 0;
     formattedTime = _formatTime(widget.initialDuration - currentTime);
 
@@ -75,7 +73,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         if (status == AnimationStatus.completed) {
           animationCompleted = true;
           widget.onComplete();
-
+          // ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
           await DatabaseHelper()
               .updateSingleValue(
                   tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
@@ -115,6 +113,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         }
       });
     } else {
+      // ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
       await DatabaseHelper()
           .updateSingleValue(tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
           .then(
@@ -166,6 +165,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
           currentTime = int.parse(monthProvider.timePassed);
 
           if (int.parse(monthProvider.timePassed) > totalTime) {
+            // ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
             await DatabaseHelper()
                 .updateSingleValue(
                     tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
@@ -204,11 +204,13 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      margin: EdgeInsets.only(top: 20),
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
+        // borderRadius: const BorderRadius.only(
+        //   bottomLeft: Radius.circular(30),
+        //   bottomRight: Radius.circular(30),
+        // ),
+        borderRadius: const BorderRadius.all(Radius.circular(30)),
         color: currentTime >= totalTime * 0.9 ? const Color(0xff008000) : AppColors.primaryColor,
       ),
       child: Row(

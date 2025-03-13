@@ -206,6 +206,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                               color: Colors.white,
                                             ),
                                             onPressed: () {
+                                              // HapticFeedBack.buttonClick();
                                               dataProvider?.collectionData =
                                                   Collections(id: "", title: "", description: "", photo: "", equipments: []);
                                               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);

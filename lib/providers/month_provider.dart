@@ -62,6 +62,7 @@ class MonthProvider extends ChangeNotifier {
   DateTime selectedWeekDate = DateTime.now();
 
   String todayTitleId = "";
+  String currentDayTitleId = "";
   String circuitIndex = "";
   // String routeString = "dashboard";
   int circuitsIndex = 0;
@@ -111,6 +112,11 @@ class MonthProvider extends ChangeNotifier {
 
   updateIsCircuit(bool val) {
     isCircuit = val;
+    notifyListeners();
+  }
+
+  updateCurrentDayTitleId(String val) {
+    currentDayTitleId = val;
     notifyListeners();
   }
 
@@ -166,34 +172,37 @@ class MonthProvider extends ChangeNotifier {
       pumpDays = [];
       notifyListeners();
 
-      for (var element in monthDataModel?.weeks?[week! - 1].idList ?? []) {
-        String id = "";
-
-        if (element.toString().contains("Rest Day")) {
-          try {
-            int restDayIndex = int.parse(element.toString().split(" ").last);
-            int i = restDayIndex - 1;
-            int index = i % 2;
-
-            if (monthDataModel!.weeks?[week! - 1].pumpDayIds?.isNotEmpty == true) {
-              if (monthDataModel!.weeks![week! - 1].pumpDayIds!.length == 1) {
-                id = monthDataModel!.weeks![week! - 1].pumpDayIds![0];
-              } else {
-                id = monthDataModel!.weeks![week! - 1].pumpDayIds![index];
-              }
-
-              var value = await fetchPumpDay(id);
-              pumpDays.add(value);
-            } else {
-              debugPrint("Warning: No pumpDayIds found for week ${week! - 1}");
-            }
-          } catch (e, stackTrace) {
-            debugPrint("Error processing element: $element");
-            debugPrint("Error: $e");
-            debugPrint("StackTrace: $stackTrace");
-          }
-        }
+      for (var element in monthDataModel!.weeks?[week! - 1].pumpDayIds ?? []) {
+        var value = await fetchPumpDay(element);
+        pumpDays.add(value);
       }
+
+      // for (var element in monthDataModel?.weeks?[week! - 1].idList ?? []) {
+      //   String id = "";
+      //   if (element.toString().contains("Rest Day")) {
+      //     try {
+      //       int restDayIndex = int.parse(element.toString().split(" ").last);
+      //       int i = restDayIndex - 1;
+      //       int index = i % 2;
+      //
+      //       if (monthDataModel!.weeks?[week! - 1].pumpDayIds?.isNotEmpty == true) {
+      //         if (monthDataModel!.weeks![week! - 1].pumpDayIds!.length == 1) {
+      //           id = monthDataModel!.weeks![week! - 1].pumpDayIds![0];
+      //         } else {
+      //           id = monthDataModel!.weeks![week! - 1].pumpDayIds![index];
+      //         }
+      //         var value = await fetchPumpDay(id);
+      //         pumpDays.add(value);
+      //       } else {
+      //         debugPrint("Warning: No pumpDayIds found for week ${week! - 1}");
+      //       }
+      //     } catch (e, stackTrace) {
+      //       debugPrint("Error processing element: $element");
+      //       debugPrint("Error: $e");
+      //       debugPrint("StackTrace: $stackTrace");
+      //     }
+      //   }
+      // }
 
       notifyListeners();
     } catch (e, stackTrace) {
@@ -872,7 +881,6 @@ class MonthProvider extends ChangeNotifier {
 
       url = Uri.http(url.authority, url.path);
       String? userIdToken = await getAuthToken();
-      log('userIdToken :::::::::::::::::: $userIdToken');
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -960,7 +968,9 @@ class MonthProvider extends ChangeNotifier {
         updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
       }
     } else {
-      updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
+      if (currentExpandedItem == "0:0") {
+        updateExpandedItem("0:0:$selectedExIndex:$overviewCurrentWeek:$overviewCurrentDay");
+      }
     }
     notifyListeners();
   }
@@ -1023,7 +1033,6 @@ class MonthProvider extends ChangeNotifier {
           'subIndex': subIndex,
           'dataId': dataId,
         };
-        log('payLoad :::::::::::::::::: $payLoad');
         NotificationService.zonedScheduleNotification(newTime, selectedExIndex, payLoad);
       }
     }
@@ -1162,7 +1171,6 @@ class MonthProvider extends ChangeNotifier {
         if (firstDay != today) {
           int difference = today.difference(firstDay).inDays;
           if (difference > 1) {
-            log('difference > 1 :::::$difference::::::::::::: ${difference > 1}');
             streak = 0;
             break;
           }
@@ -1269,6 +1277,27 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<HistoryDataModel?> fetchSingleSetLocalData(dataId) async {
+    HistoryDataModel? expandedDataHistory;
+
+    try {
+      final data = await DatabaseHelper().getDataByDataId(
+        tableName: DatabaseHelper.exerciseHistory,
+        id: dataId,
+      );
+
+      if (data != null) {
+        expandedDataHistory = HistoryDataModel.fromJson(data);
+      } else {
+        expandedDataHistory = null;
+      }
+    } catch (e) {
+      debugPrint('Error fetching exercise data: $e');
+      expandedDataHistory = null;
+    }
+    return expandedDataHistory;
+  }
+
   List<HistoryDataModel> historyDataModel = [];
 
   Future<void> fetchExerciseHistoryLocalData() async {
@@ -1283,7 +1312,6 @@ class MonthProvider extends ChangeNotifier {
         dayId: monthDataModel!.weeks?[overviewCurrentWeek - 1].idList![overviewCurrentDay - 1] ?? "",
         weekId: monthDataModel!.weeks?[overviewCurrentWeek - 1].id ?? "",
       );
-      log('data :::::::1111111111::::::::::: $data');
 
       if (data.isNotEmpty) {
         historyDataModel = List<HistoryDataModel>.from(json.decode(jsonEncode(data)).map((x) => HistoryDataModel.fromJson(x)));

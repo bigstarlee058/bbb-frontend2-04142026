@@ -184,6 +184,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
       "date": "${DateTime.now().toUtc()}",
       "note": _noteController.text.trim(),
     };
+    // ApiRepo.addExerciseNotes(body: data);
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseNotes);
 
     getNotesData();

@@ -24,6 +24,7 @@ class HistoryDataModel {
   int? subIndex;
   String? status;
   String? split;
+  String? totalSet;
 
   HistoryDataModel({
     this.id,
@@ -44,6 +45,7 @@ class HistoryDataModel {
     this.monthId,
     this.dayId,
     this.split,
+    this.totalSet,
   });
 
   factory HistoryDataModel.fromJson(Map<String, dynamic> json) => HistoryDataModel(
@@ -65,6 +67,7 @@ class HistoryDataModel {
         monthId: json["monthId"],
         dayId: json["dayId"],
         split: json["split"],
+        totalSet: json["totalSet"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -86,5 +89,6 @@ class HistoryDataModel {
         "status": status,
         "monthId": monthId,
         "dayId": dayId,
+        "totalSet": totalSet,
       };
 }

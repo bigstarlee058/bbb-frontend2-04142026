@@ -170,10 +170,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(
-                                             onPress: () {
-                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                              mainPageProvider.changeTab(3);
-                                            },
+                                        onPress: () {
+                                          // HapticFeedBack.buttonClick();
+                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          mainPageProvider.changeTab(3);
+                                        },
                                       ),
                                       const CommonStreakWithNotification(routeString: '/myprofile')
                                     ],
@@ -209,7 +210,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                         builder: (context, userData, child) => userData.userName != ""
                                             ? Text(
                                                 // 'Hi, Nick',
-                                                '${userData.userName}',
+                                                userData.userName,
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: ScreenUtil.horizontalScale(8),

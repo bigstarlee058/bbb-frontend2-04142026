@@ -72,6 +72,7 @@ class DataProvider extends ChangeNotifier {
     };
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/challenges');
     String? userIdToken = await getAuthToken();
+    log('userIdToken :::::::::::::::::: $userIdToken');
     final response = await http.put(url,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -79,7 +80,7 @@ class DataProvider extends ChangeNotifier {
         },
         body: jsonEncode(challengeDetail));
     if (response.statusCode == 200) {
-      debugPrint('User data updated successfully');
+      log('User data updated successfully');
       return true;
     } else {
       throw Exception('Failed to update user data: ${response.body}');
@@ -220,7 +221,6 @@ class DataProvider extends ChangeNotifier {
         List<ExerciseLibrary> exerciseList = exercisesData.map((exerciseJson) {
           return ExerciseLibrary.fromJson(exerciseJson);
         }).toList();
-        debugPrint("this is data provider ${exerciseList.length}");
         List<dynamic> categoriesData = responseData['categories'];
         List<CategoryTitle> categoryList = categoriesData.map((categoryJson) {
           return CategoryTitle.fromJson(categoryJson);
@@ -309,7 +309,6 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future fetchMonthWorkouts(int month) async {
-    log('DateTime.now().toUtc() :::::::::::::::::: ${"${DateTime.now().toUtc()}"}');
     final Map<String, String> queryParams = {
       'month': month.toString(),
       'equipment': '0',
@@ -328,7 +327,6 @@ class DataProvider extends ChangeNotifier {
       },
     );
 
-    // Print JSON as a string for debugging
     if (response.statusCode == 200) {
       await getMonthInfoFromJson(jsonDecode(response.body));
       notifyListeners();
@@ -339,7 +337,6 @@ class DataProvider extends ChangeNotifier {
 
   ///OLD
   Future<void> getMonthInfoFromJson(Map<String, dynamic> responseData) async {
-    debugPrint("this is fetch month workout data");
     try {
       MonthDataModel monthDataModelSplit3 = MonthDataModel.fromJson(responseData);
       MonthDataModel monthDataModelSplit4 = MonthDataModel.fromJson(responseData);
@@ -462,14 +459,142 @@ class DataProvider extends ChangeNotifier {
       monthDataModelSplit3.weeks?.forEach(
         (element) async {
           final data = await monthProvider?.fetchRestDay(element.restdayId ?? "");
-          dataList.add(data!);
+          dataList.add(data);
           await preferences.putString("REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
         },
       );
 
+      /// final exerciseHistroy = await ApiRepo.fetchExerciseHistory();
+      // List<ExerciseStatusDataModel> exerciseStatus = await ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? "");
+      //
+      // if (exerciseStatus.isNotEmpty) {
+      //   for (var element in exerciseStatus) {
+      //     final body = {
+      //       "dataId": element.dataId ?? "",
+      //       "exerciseId": element.exerciseId ?? "",
+      //       "monthId": element.monthId ?? "",
+      //       "weekId": element.weekId ?? "",
+      //       "dayId": element.dayId ?? "",
+      //       "split": element.split ?? "",
+      //       "date": "${element.date ?? ""}",
+      //       "status": element.status ?? "",
+      //       "type": element.type ?? "",
+      //       "totalWeight": element.totalWeight ?? "",
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
+      //   }
+      // }
+      //
+      // List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
+      //
+      // if (dayStatus.isNotEmpty) {
+      //   for (var element in dayStatus) {
+      //     final body = {
+      //       "title": element.title ?? "",
+      //       "dataId": element.dataId ?? " ",
+      //       "monthId": element.monthId ?? "",
+      //       "weekId": element.weekId ?? "",
+      //       "dayId": element.dayId ?? "",
+      //       "split": element.split ?? "",
+      //       "date": element.date ?? "",
+      //       "status": element.status ?? "",
+      //       "type": element.type ?? "",
+      //       "startTime": element.startTime ?? "",
+      //       "endTime": element.endTime ?? "",
+      //       "completedExercise": element.completedExerciseCount ?? "",
+      //       "totalWeight": element.totalWeight ?? "",
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.dayStatus);
+      //   }
+      // }
+      // List<ExerciseNotesDataModel> exerciseNotes = await ApiRepo.fetchExerciseNotes();
+      //
+      // if (exerciseNotes.isNotEmpty) {
+      //   for (var element in exerciseNotes) {
+      //     final body = {
+      //       "exerciseId": element.exerciseId ?? "",
+      //       "date": element.date ?? "",
+      //       "note": element.note ?? "",
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseNotes);
+      //   }
+      // }
+      //
+      // List<ExtraSetDataModel> extraSet = await ApiRepo.fetchExtraSet(monthDataModelSplit3.id ?? "");
+      //
+      // if (extraSet.isNotEmpty) {
+      //   for (var element in extraSet) {
+      //     final body = {
+      //       "sets": element.sets,
+      //       "reps": "${element.reps}",
+      //       "weight": "${element.weight}",
+      //       "rest": "${element.reps}",
+      //       "load": "${element.load}",
+      //       "type": "${element.type}",
+      //       "extraId": "${element.extraId}",
+      //       "date": element.date,
+      //       "dataId": element.dataId,
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
+      //   }
+      // }
+      //
+      // List<RemovedExerciseDataModel> removedExercise = await ApiRepo.fetchRemovedExercise(monthDataModelSplit3.id ?? "");
+      //
+      // if (removedExercise.isNotEmpty) {
+      //   for (var element in removedExercise) {
+      //     final body = {
+      //       "exerciseId": element.exerciseId ?? "",
+      //       "dataId": element.dataId ?? "",
+      //       "split": element.split ?? "",
+      //       "monthId": element.monthId ?? "",
+      //       "weekId": element.weekId ?? "",
+      //       "dayId": element.dataId ?? "",
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
+      //   }
+      // }
+      //
+      // List<ExtraExerciseDataModel> extraExercise = await ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? "");
+      //
+      // if (extraExercise.isNotEmpty) {
+      //   for (var element in extraExercise) {
+      //     final body = {
+      //       "dataId": element.dataId ?? "",
+      //       "split": element.split ?? "",
+      //       "monthId": element.monthId ?? "",
+      //       "weekId": element.weekId ?? "",
+      //       "dayId": element.dayId ?? "",
+      //       "date": element.date ?? "",
+      //       "exerciseId": element.exerciseId ?? "",
+      //       "exerciseJson": element.exerciseJson ?? ""
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.extraExerciseHistory);
+      //   }
+      // }
+      //
+      // List<SwapExerciseDataModel> swapExercise = await ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? "");
+      //
+      // if (swapExercise.isNotEmpty) {
+      //   for (var element in swapExercise) {
+      //     final body = {
+      //       "dataId": element.dataId ?? "",
+      //       "split": element.split ?? "",
+      //       "monthId": element.monthId ?? "",
+      //       "weekId": element.weekId ?? "",
+      //       "dayId": element.dayId ?? "",
+      //       "date": element.date ?? "",
+      //       "exerciseId": element.exerciseId ?? "",
+      //       "exerciseJson": element.exerciseJson ?? "",
+      //       "insertIndex": element.insertIndex ?? ""
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
+      //   }
+      // }
+
       notifyListeners();
     } catch (e) {
-      debugPrint("issue in month view loading=> $e");
+      log("issue in month view loading=> $e");
     }
   }
 
@@ -493,7 +618,6 @@ class DataProvider extends ChangeNotifier {
           bonusCheckpoint = responseData["bonusCheckpoint"];
           workoutCheckpoint = responseData["workoutCheckpoint"];
         } else {
-          // Parse the timestamps to DateTime
           DateTime currentEquipmentCheckpoint = DateTime.parse(equipmentCheckpoint);
           DateTime currentBonusCheckoutPoint = DateTime.parse(bonusCheckpoint);
           DateTime currentWorkoutCheckPoint = DateTime.parse(workoutCheckpoint);
@@ -501,18 +625,17 @@ class DataProvider extends ChangeNotifier {
           DateTime newBonusCheckpoint = DateTime.parse(responseData["bonusCheckpoint"]);
           DateTime newWorkoutCheckpoint = DateTime.parse(responseData["workoutCheckpoint"]);
 
-          // Compare the DateTime values
           if (currentEquipmentCheckpoint.isBefore(newEquipmentCheckpoint)) {
-            equipmentCheckpointState = true; // Update the state
-            equipmentCheckpoint = responseData["equipmentCheckpoint"]; // Update the checkpoint
+            equipmentCheckpointState = true;
+            equipmentCheckpoint = responseData["equipmentCheckpoint"];
           }
           if (currentBonusCheckoutPoint.isBefore(newBonusCheckpoint)) {
-            bonusCheckpointState = true; // Update the state
-            bonusCheckpoint = responseData["bonusCheckpoint"]; // Update the checkpoint
+            bonusCheckpointState = true;
+            bonusCheckpoint = responseData["bonusCheckpoint"];
           }
           if (currentWorkoutCheckPoint.isBefore(newWorkoutCheckpoint)) {
-            workoutCheckpointState = true; // Update the state
-            workoutCheckpoint = responseData["workoutCheckpoint"]; // Update the checkpoint
+            workoutCheckpointState = true;
+            workoutCheckpoint = responseData["workoutCheckpoint"];
           }
         }
         notifyListeners();

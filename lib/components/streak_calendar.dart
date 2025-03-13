@@ -1,4 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 // import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/calender.dart';
@@ -39,7 +40,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () => monthProvider?.manageStreak(),
       // ),
-      backgroundColor: const Color.fromARGB(255, 52, 11, 11),
+      // backgroundColor: const Color.fromARGB(255, 52, 11, 11),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           SizedBox(
@@ -60,12 +62,11 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                           opacity: 1,
                         ),
                       ),
-                      child: SizedBox(
-                        height: media.height / 1.8,
-                        width: media.width,
-                        child: SafeArea(
+                      child: SafeArea(
+                        child: SizedBox(
+                          height: media.height / 1.8,
+                          width: media.width,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,13 +89,13 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                           color: Colors.white,
                                         ),
                                         onPressed: () {
+                                          // HapticFeedBack.buttonClick();
                                           Navigator.pop(context);
                                         },
                                         iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                       ),
                                     ),
                                   ),
-                                  // const Spacer(),
                                   Expanded(
                                     child: Center(
                                       child: Text(
@@ -117,50 +118,53 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                       height: ScreenUtil.horizontalScale(10),
                                     ),
                                   ),
-                                  // const CommonStreakWithNotification(),
-                                  // SizedBox(
-                                  //   width: ScreenUtil.verticalScale(1.15),
-                                  // ),
                                 ],
                               ),
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(12),
-                                ),
-                                height: media.height * 0.28,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      height: 22,
-                                    ),
-                                    Text(
-                                      'Your current Streak',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: ScreenUtil.verticalScale(2.5),
-                                        fontWeight: FontWeight.normal,
-                                        height: 1,
-                                      ),
-                                    ),
-                                    Builder(builder: (context) {
-                                      final streak = context.watch<MonthProvider>().streak;
-                                      return Text(
-                                        '$streak',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(4),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.3,
-                                        ),
-                                      );
-                                    }),
-                                  ],
-                                ),
-                              ),
                               SizedBox(
-                                height: ScreenUtil.verticalScale(1),
-                              ),
+                                height: media.height / 4.9,
+                                width: media.width,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 5),
+                                        child: Text(
+                                          'Your Current Streak',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: ScreenUtil.verticalScale(2.5),
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 1.7),
+                                        ),
+                                        padding: EdgeInsets.all(("${context.watch<MonthProvider>().streak}").length > 3
+                                            ? 19
+                                            : ("${context.watch<MonthProvider>().streak}").length > 2
+                                                ? 10
+                                                : ("${context.watch<MonthProvider>().streak}").length > 1
+                                                    ? 5
+                                                    : 2),
+                                        child: Center(
+                                          child: Text(
+                                            '${context.watch<MonthProvider>().streak}',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(2.6),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -335,6 +339,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
   }
 
   void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+    HapticFeedBack.buttonClick();
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
       (element) => element == monthProvider.todayTitleId,
     );
@@ -376,8 +381,29 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     monthProvider.changeIsPumpDay(isPumpDay);
 
     if (isPumpDay) {
-      monthProvider.updatePumpDayData(monthProvider.pumpDays[
-          int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
+      final dataList = monthProvider.dayHistoryModel
+          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .toList();
+
+      if (dataList.isNotEmpty) {
+        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
+            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        if (index1 != -1) {
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
+        } else {
+          int index1 =
+              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
+              ? 0
+              : index1 == 0
+                  ? 1
+                  : 0]);
+        }
+      } else {
+        monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
+      }
+      // monthProvider.updatePumpDayData(monthProvider.pumpDays[
+      //     int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
     }
 
     monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;

@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
@@ -88,7 +90,7 @@ class _TodayPageState extends State<TodayPage> {
       () {
         exercises = [];
         loader = true;
-        exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises!;
+        exercises = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises! : monthProvider!.dayDataModel!.exercises ?? [];
         totalWarmups =
             monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups!.length : monthProvider!.dayDataModel!.warmups!.length;
       },
@@ -196,6 +198,7 @@ class _TodayPageState extends State<TodayPage> {
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
     };
+    // ApiRepo.addRemovedExercise(body: data);
     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.removedExerciseHistory);
     await fetchRemovedExerciseLocalData();
 
@@ -203,6 +206,7 @@ class _TodayPageState extends State<TodayPage> {
       ExtraExerciseModel data =
           monthProvider!.addedExerciseList.firstWhere((element) => element.dataId == dataId, orElse: () => ExtraExerciseModel());
       if (data.id != null) {
+        // ApiRepo.deleteExtraExercise(dataId: data.dataId ?? "");
         await DatabaseHelper().deleteSingleData(tableName: DatabaseHelper.extraExerciseHistory, id: data.dataId ?? "");
         await monthProvider?.fetchExtraAddedExerciseData();
       }
@@ -212,6 +216,7 @@ class _TodayPageState extends State<TodayPage> {
       SwapExerciseModel data =
           monthProvider!.swapExerciseList.firstWhere((element) => element.dataId == dataId, orElse: () => SwapExerciseModel());
       if (data.id != null) {
+        // ApiRepo.deleteSwapExercise(dataId: data.dataId ?? "");
         await DatabaseHelper().deleteSingleData(tableName: DatabaseHelper.swapExerciseHistory, id: data.dataId ?? "");
         await monthProvider?.fetchSwapExerciseData();
       }
@@ -293,6 +298,7 @@ class _TodayPageState extends State<TodayPage> {
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
+                                                        // HapticFeedBack.buttonClick();
                                                         Navigator.pop(context);
                                                         // Navigator.pushNamed(context, '/dayOverview');
                                                       },
@@ -306,66 +312,144 @@ class _TodayPageState extends State<TodayPage> {
                                           ],
                                         ),
                                       ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil.horizontalScale(8),
+                                          vertical: ScreenUtil.verticalScale(1.9),
+                                        ),
+                                        height: media.height * 0.22,
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              "Option ${monthProvider!.alternateEquipmentType}:",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2),
-                                              ),
-                                            ),
-                                            Text(
-                                              monthProvider!.alternateEquipmentType == "A"
-                                                  ? "Fully equipped gym"
-                                                  : monthProvider?.alternateEquipmentType == "B"
-                                                      ? "Home gym"
-                                                      : "Dumbbells and bands",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.3),
-                                              ),
-                                            ),
                                             SizedBox(
-                                              height: ScreenUtil.verticalScale(0.5),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "Option ${monthProvider!.alternateEquipmentType}:",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: ScreenUtil.verticalScale(2),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(bottom: 5),
+                                                    child: Text(
+                                                      monthProvider!.alternateEquipmentType == "A"
+                                                          ? "Fully equipped gym"
+                                                          : monthProvider?.alternateEquipmentType == "B"
+                                                              ? "Home gym"
+                                                              : "Dumbbells and bands",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil.verticalScale(2),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                                    return Padding(
+                                                      padding: const EdgeInsets.only(bottom: 5),
+                                                      child: Text(
+                                                        monthProvider.isPumpDay
+                                                            ? monthProvider.pumpDayModel?.title ?? "Pump Day"
+                                                            : currentDayTitle,
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: ScreenUtil.horizontalScale(6),
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  })
+                                                ],
+                                              ),
                                             ),
-                                            Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                              return Text(
-                                                monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  height: 1.1,
-                                                  fontSize: ScreenUtil.verticalScale(4),
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              );
-                                            }),
+                                            Container(
+                                              margin: EdgeInsets.symmetric(
+                                                horizontal: ScreenUtil.horizontalScale(9),
+                                              ),
+                                              child: ButtonWidget(
+                                                // text: "Watch Video Intro",
+                                                text: "Watch Video",
+                                                color: const Color(0xEEFFFFFF),
+                                                onPress: () {
+                                                  Navigator.of(context).push(
+                                                    FadePageRoute(
+                                                      page: const VideoIntroWidget(vimeoId: '953289606'),
+                                                    ),
+                                                  );
+                                                },
+                                                textColor: AppColors.primaryColor,
+                                                isLoading: false,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
                                           ],
                                         ),
                                       ),
-                                      SizedBox(height: ScreenUtil.verticalScale(2.5)),
-                                      Container(
-                                        margin: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(10),
-                                        ),
-                                        child: ButtonWidget(
-                                          text: "Watch Video Intro",
-                                          color: const Color(0xEEFFFFFF),
-                                          onPress: () {
-                                            Navigator.of(context).push(
-                                              FadePageRoute(
-                                                page: const VideoIntroWidget(vimeoId: '953289606'),
-                                              ),
-                                            );
-                                          },
-                                          textColor: AppColors.primaryColor,
-                                          isLoading: false,
-                                        ),
-                                      ),
+                                      // Padding(
+                                      //   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                      //   child: Column(
+                                      //     mainAxisAlignment: MainAxisAlignment.center,
+                                      //     children: [
+                                      //       Text(
+                                      //         "Option ${monthProvider!.alternateEquipmentType}:",
+                                      //         style: TextStyle(
+                                      //           color: Colors.white,
+                                      //           fontSize: ScreenUtil.verticalScale(2),
+                                      //         ),
+                                      //       ),
+                                      //       Text(
+                                      //         monthProvider!.alternateEquipmentType == "A"
+                                      //             ? "Fully equipped gym"
+                                      //             : monthProvider?.alternateEquipmentType == "B"
+                                      //                 ? "Home gym"
+                                      //                 : "Dumbbells and bands",
+                                      //         style: TextStyle(
+                                      //           color: Colors.white,
+                                      //           fontSize: ScreenUtil.verticalScale(2.3),
+                                      //         ),
+                                      //       ),
+                                      //       SizedBox(
+                                      //         height: ScreenUtil.verticalScale(0.5),
+                                      //       ),
+                                      //       Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                      //         return Text(
+                                      //           monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
+                                      //           textAlign: TextAlign.center,
+                                      //           style: TextStyle(
+                                      //             color: Colors.white,
+                                      //             height: 1.1,
+                                      //             fontSize: ScreenUtil.verticalScale(4),
+                                      //             fontWeight: FontWeight.bold,
+                                      //           ),
+                                      //         );
+                                      //       }),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                      // SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                                      // Container(
+                                      //   margin: EdgeInsets.symmetric(
+                                      //     horizontal: ScreenUtil.horizontalScale(10),
+                                      //   ),
+                                      //   child: ButtonWidget(
+                                      //     text: "Watch Video Intro",
+                                      //     color: const Color(0xEEFFFFFF),
+                                      //     onPress: () {
+                                      //       Navigator.of(context).push(
+                                      //         FadePageRoute(
+                                      //           page: const VideoIntroWidget(vimeoId: '953289606'),
+                                      //         ),
+                                      //       );
+                                      //     },
+                                      //     textColor: AppColors.primaryColor,
+                                      //     isLoading: false,
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                 ),
@@ -565,6 +649,7 @@ class _TodayPageState extends State<TodayPage> {
                                                       value.dayHistoryDetails?.status == Status.skipped
                                                   ? null
                                                   : () async {
+                                                      HapticFeedBack.buttonClick();
                                                       await _saveDayData(
                                                           status: Status.skipped,
                                                           type: monthProvider!.isPumpDay
@@ -572,6 +657,8 @@ class _TodayPageState extends State<TodayPage> {
                                                               : "Workout Day",
                                                           status1: Status.completed);
                                                       if (!context.mounted) return;
+                                                      value.updateCurrentDayTitleId(
+                                                          value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
                                                       Navigator.pushNamed(context, '/dayCompleted');
                                                     },
                                               color: AppColors.primaryColor,
@@ -587,6 +674,7 @@ class _TodayPageState extends State<TodayPage> {
                                                     text: "Skip the workout",
                                                     textColor: Colors.white,
                                                     onPress: () async {
+                                                      HapticFeedBack.buttonClick();
                                                       await _saveDayData(
                                                           status: Status.skipped,
                                                           type: monthProvider!.isPumpDay
@@ -912,6 +1000,7 @@ class _TodayPageState extends State<TodayPage> {
                             isExist
                         ? null
                         : () async {
+                            HapticFeedBack.buttonClick();
                             // String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
                             //
                             // if (isChecked != "true") {
@@ -1173,6 +1262,7 @@ class _TodayPageState extends State<TodayPage> {
                                             ElevatedButton(
                                               onPressed: () async {
                                                 ExerciseDataModel newDayExercise = ExerciseDataModel();
+
                                                 if (exercises.isNotEmpty) {
                                                   newDayExercise = ExerciseDataModel(
                                                     isAddedUpdated: true,
@@ -1207,6 +1297,17 @@ class _TodayPageState extends State<TodayPage> {
                                                     rest: 3,
                                                     weight: 30,
                                                     formats: ["A", "B", "C"],
+                                                    extra: [
+                                                      ExtraDataModel(
+                                                        weight: 0,
+                                                        rest: 120,
+                                                        load: 0,
+                                                        reps: 0,
+                                                        sets: 3,
+                                                        type: 3,
+                                                        id: "extraaddedexercisesetsdefaultvalueid",
+                                                      )
+                                                    ],
                                                   );
                                                 }
 
@@ -1234,11 +1335,13 @@ class _TodayPageState extends State<TodayPage> {
                                                   orElse: () => RemovedExerciseModel(),
                                                 );
                                                 if (removedDataExit.id != null) {
+                                                  // ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
                                                   await DatabaseHelper().deleteSingleData(
                                                       tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
                                                 }
 
                                                 exercises.add(newDayExercise);
+                                                // ApiRepo.addExtraExercise(body: data);
                                                 await DatabaseHelper()
                                                     .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
                                                 await monthProvider?.fetchExtraAddedExerciseData();
@@ -1746,11 +1849,13 @@ class _TodayPageState extends State<TodayPage> {
                                               );
 
                                               if (removedDataExit.id != null) {
+                                                // ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
                                                 await DatabaseHelper().deleteSingleData(
                                                     tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
                                               }
                                               exercises.removeAt(selectedIndex);
                                               exercises.insert(selectedIndex, newDayExercise);
+                                              // ApiRepo.addSwapExercise(body: data);
                                               await DatabaseHelper().insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
                                               await monthProvider?.fetchSwapExerciseData();
                                               await removeExercise(exercise.exerciseId ?? "");
@@ -1812,34 +1917,48 @@ class _TodayPageState extends State<TodayPage> {
       "status": status,
       "type": type,
     };
+    // final apiReqBody = {
+    //   "status": status,
+    //   "type": type,
+    //   "dataId": dataId,
+    // };
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
+        // ApiRepo.updateExerciseStatus(body: apiReqBody);
         await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
+        // ApiRepo.addExerciseStatus(body: data);
         await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
+      // ApiRepo.addExerciseStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
   }
 
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
     await monthProvider?.fetchExerciseStatusLocalData();
+    log('exerciseHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider?.exerciseHistoryModel)}');
 
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     double totalWeight = 0;
     int exCount = 0;
+    double totalSet = 0;
+    double totalRIR = 0;
 
     for (int i = 0; i < monthProvider!.exerciseHistoryModel.length; i++) {
       var element = monthProvider!.exerciseHistoryModel[i];
       if (element.status == Status.completed) {
         exCount++;
         totalWeight += double.parse(element.totalWeight!);
+        totalSet += double.parse(element.totalSet ?? "0");
+        totalRIR += double.parse(element.totalRIR ?? "0");
       }
     }
+    double average = totalRIR / totalSet;
 
     if (monthProvider!.isPumpDay) {
       if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
@@ -1907,8 +2026,17 @@ class _TodayPageState extends State<TodayPage> {
       "endTime": (status == Status.completed || status == Status.skipped) ? "${DateTime.now().toUtc()}" : "",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),
+      "averageRIR": average.toString()
     };
-
+    // final apiReqBody = {
+    //   "status": status1,
+    //   "type": type,
+    //   "endTime": (status == Status.completed || status == Status.skipped) ? "${DateTime.now().toUtc()}" : "",
+    //   "totalWeight": totalWeight.toString(),
+    //   "completedExercise": exCount.toString(),
+    //   "dataId": dataId,
+    // };
+    // ApiRepo.updateDayStatus(body: apiReqBody);
     await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
 
     await monthProvider?.updateDayData();

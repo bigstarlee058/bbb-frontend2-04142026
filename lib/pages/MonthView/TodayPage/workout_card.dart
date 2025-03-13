@@ -86,7 +86,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
         setState(() {});
       });
     }
-    if (widget.exercise.extra!.isNotEmpty) {
+    if (widget.exercise.extra?.isNotEmpty ?? false) {
       for (var element in widget.exercise.extra!) {
         if (element.type != 1) {
           totalSets += int.parse(element.sets.toString());
@@ -140,7 +140,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
   List<ExtraSetModel> extraSetModel = [];
   fetchExtraSetLocalData() async {
-    final data = await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.extraSetHistory, where: 'dataId', id: widget.dataId);
+    final data = await DatabaseHelper()
+        .getDataFromTable(tableName: DatabaseHelper.extraSetHistory, where: 'dataId', id: "EXTRA-ADDED${widget.dataId}");
     if (data.isNotEmpty) {
       extraSetModel = List<ExtraSetModel>.from(json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
     } else {

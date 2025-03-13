@@ -87,11 +87,12 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       BackArrowWidget(
-                                          onPress: () {
-                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                            mainPageProvider.changeTab(2);
-                                          },
-                                        ),
+                                        onPress: () {
+                                          // HapticFeedBack.buttonClick();
+                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          mainPageProvider.changeTab(2);
+                                        },
+                                      ),
                                       Container(
                                         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
                                         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
