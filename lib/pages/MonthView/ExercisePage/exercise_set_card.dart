@@ -12,6 +12,7 @@ import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
@@ -170,14 +171,16 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       reps = widget.reps;
       _restDuration = widget.restDuration;
     }
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {
-          isLoad = false;
-          setState(() {});
-        }));
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => isLoad = false);
+      }
+    });
+
     widget.makeRefresh();
-    if (widget.isFromNotification) {
-      await fromNotification();
-    }
+    // if (widget.isFromNotification) {
+    //   await fromNotification();
+    // }
   }
 
   void _handleTimerComplete() {
@@ -248,13 +251,14 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
 
   Future<void> _saveData() async {
     HapticFeedBack.buttonClick();
+    _handleCloseTimer();
     monthProvider?.timerAddress = "";
     monthProvider?.timePassed = "";
-    _handleCloseTimer();
+
     _showTimer = false;
 
     int lastDataMainIndex = widget.index;
-    int lastDataSubIndex = widget.subIndex;
+    int lastDataSubIndex = widget.countIndex;
     if (lastDataSubIndex ==
         ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
             (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3 ? (widget.extraSetLength) : 0))) {
@@ -377,11 +381,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     }
   }
 
-  Future<void> fromNotification() async {
-    await monthProvider?.fetchExerciseHistoryLocalData();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
-    widget.makeRefresh();
-  }
+  // Future<void> fromNotification() async {
+  //   await monthProvider?.fetchExerciseHistoryLocalData();
+  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+  //   widget.makeRefresh();
+  // }
 
   @override
   void dispose() {
@@ -589,6 +593,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                           ),
                                           const SizedBox(height: 8),
                                           Container(
+                                            constraints: BoxConstraints(minWidth: ScreenUtil.horizontalScale(30)),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               boxShadow: [
@@ -605,17 +610,19 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                               vertical: ScreenUtil.verticalScale(0.3),
                                             ),
                                             child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
+                                                // SizedBox(
+                                                //   width: 38,
+                                                //   child: IconButton(
+                                                //     icon: const Icon(Icons.remove),
+                                                //     color: AppColors.primaryColor,
+                                                //     onPressed: widget.isEditable ? decrementWeight : null,
+                                                //   ),
+                                                // ),
                                                 SizedBox(
-                                                  width: 38,
-                                                  child: IconButton(
-                                                    icon: const Icon(Icons.remove),
-                                                    color: AppColors.primaryColor,
-                                                    onPressed: widget.isEditable ? decrementWeight : null,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 35,
+                                                  // width: 35,
+                                                  width: ScreenUtil.horizontalScale(25),
                                                   child: KeyboardActions(
                                                     autoScroll: false,
                                                     config: _buildConfig(context),
@@ -632,7 +639,15 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                       decoration: const InputDecoration(
                                                         border: InputBorder.none,
                                                       ),
+                                                      onTap: () {
+                                                        if (_weightController.text == "0") {
+                                                          _weightController.clear();
+                                                        }
+                                                      },
                                                       onChanged: (value) {
+                                                        if (value == "0") {
+                                                          _weightController.clear();
+                                                        }
                                                         if (value.isEmpty) {
                                                           _weightController.text = "0";
                                                           setState(() {});
@@ -656,14 +671,14 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                     ),
                                                   ),
                                                 ),
-                                                SizedBox(
-                                                  width: 38,
-                                                  child: IconButton(
-                                                    icon: const Icon(Icons.add),
-                                                    color: AppColors.primaryColor,
-                                                    onPressed: widget.isEditable ? incrementWeight : null,
-                                                  ),
-                                                ),
+                                                // SizedBox(
+                                                //   width: 38,
+                                                //   child: IconButton(
+                                                //     icon: const Icon(Icons.add),
+                                                //     color: AppColors.primaryColor,
+                                                //     onPressed: widget.isEditable ? incrementWeight : null,
+                                                //   ),
+                                                // ),
                                               ],
                                             ),
                                           ),

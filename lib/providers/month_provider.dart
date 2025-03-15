@@ -815,8 +815,8 @@ class MonthProvider extends ChangeNotifier {
 
     updateExerciseLoader(true);
     final Map<String, String> queryParams = {
-      'page': '1',
-      'perPage': '10',
+      'page': '',
+      'perPage': '',
       'search': '',
       'sortBy': '',
     };

@@ -348,7 +348,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             const Text(
-                                              'Exercise\nCompleted',
+                                              'Exercises\nCompleted',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(color: Colors.black54),
                                             ),
