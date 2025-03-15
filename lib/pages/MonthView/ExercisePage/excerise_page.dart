@@ -22,6 +22,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -124,9 +125,10 @@ class _ExercisePageState extends State<ExercisePage> {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider1 = Provider.of<DataProvider>(context, listen: false);
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+    WidgetsBinding.instance.scheduleFrameCallback((timeStamp) async {
       await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
       await preferences.putInt(SharedPreference.fromNotification, 0);
+      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
       await preferences.clearValue(SharedPreference.fromNotification);
     });
 
@@ -138,13 +140,9 @@ class _ExercisePageState extends State<ExercisePage> {
             argument = ModalRoute.of(context)?.settings.arguments as String?;
             setState(() => loading = true);
             if (argument != "Exercise") {
-              await fromNotification().then(
-                (value) => clearNotificationAndNavigateExercise(),
-              );
+              await fromNotification().then((value) => clearNotificationAndNavigateExercise());
             } else {
-              await fetchExercise().then(
-                (value) => clearNotificationAndNavigateExercise(),
-              );
+              await fetchExercise().then((value) => clearNotificationAndNavigateExercise());
             }
           },
         );
@@ -363,10 +361,15 @@ class _ExercisePageState extends State<ExercisePage> {
         loading = false;
       });
     } catch (e) {
-      setState(() {
-        videoNotInitialized = true;
-        loading = false;
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            videoNotInitialized = true;
+            loading = false;
+          });
+        }
       });
+
       debugPrint("VIDEO NOT INITIALIZED: $e");
     }
   }
@@ -421,9 +424,13 @@ class _ExercisePageState extends State<ExercisePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       monthProvider?.updateExpandedItem("0:0");
       await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO");
+      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+        _chewieController?.dispose();
+        _videoPlayerController.dispose();
+      }
+      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO");
     });
-    _chewieController?.dispose();
-    _videoPlayerController.dispose();
+
     super.dispose();
   }
 
@@ -1028,73 +1035,81 @@ class _ExercisePageState extends State<ExercisePage> {
                                         : Padding(
                                             padding: const EdgeInsets.only(top: 10),
                                             child: ButtonWidget(
-                                              text: monthProvider.exerciseHistoryDetails?.status == Status.completed
-                                                  ? "Save"
-                                                  : monthProvider.isLastExercise
-                                                      ? "Finish"
-                                                      : monthProvider.isPumpDay && monthProvider.isCircuit
-                                                          ? "Finish"
-                                                          : "Finish & Next",
-                                              textColor: Colors.white,
-                                              onPress: () async {
-                                                HapticFeedBack.buttonClick();
-                                                int count = 0;
-                                                await _saveExerciseData(
-                                                    status: Status.completed,
-                                                    id: monthProvider.isPumpDay && monthProvider.isCircuit
-                                                        ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                                        : monthProvider.exerciseDetailModel!.sId.toString(),
-                                                    type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise");
+                                                text: monthProvider.exerciseHistoryDetails?.status == Status.completed
+                                                    ? "Save"
+                                                    : monthProvider.isLastExercise
+                                                        ? "Finish"
+                                                        : monthProvider.isPumpDay && monthProvider.isCircuit
+                                                            ? "Finish"
+                                                            : "Finish & Next",
+                                                textColor: Colors.white,
+                                                onPress: () async {
+                                                  HapticFeedBack.buttonClick();
+                                                  int count = 0;
+                                                  await _saveExerciseData(
+                                                      status: Status.completed,
+                                                      id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                                          ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
+                                                          : monthProvider.exerciseDetailModel!.sId.toString(),
+                                                      type:
+                                                          monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise");
 
-                                                if (monthProvider.isPumpDay && monthProvider.isCircuit) {
-                                                  Navigator.pop(context);
-                                                } else {
-                                                  for (var element in monthProvider.exerciseHistoryModel) {
-                                                    if (element.status.toString() == Status.completed) {
-                                                      count++;
-                                                    }
-                                                  }
-                                                  String split = monthProvider
-                                                          .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
-                                                          .toString()
-                                                          .split(" ")[1] ??
-                                                      "";
+                                                  log('monthProvider.exerciseHistoryDetails?.status == Status.completed :::::::::::::::::: $isCurrentExerciseCompleted');
 
-                                                  if (monthProvider.dayDataModel?.exercises?.length != count &&
-                                                      monthProvider.dayDataModel?.exercises?.length != monthProvider.selectedExIndex + 1) {
-                                                    Navigator.pop(context);
+                                                  WidgetsBinding.instance.addPostFrameCallback(
+                                                    (timeStamp) async {
+                                                      if ((monthProvider.isPumpDay && monthProvider.isCircuit) ||
+                                                          isCurrentExerciseCompleted) {
+                                                        Navigator.pop(context);
+                                                      } else {
+                                                        for (var element in monthProvider.exerciseHistoryModel) {
+                                                          if (element.status.toString() == Status.completed) {
+                                                            count++;
+                                                          }
+                                                        }
+                                                        String split = monthProvider
+                                                                .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                                .toString()
+                                                                .split(" ")[1] ??
+                                                            "";
 
-                                                    await Future.delayed(const Duration(milliseconds: 100));
+                                                        if (monthProvider.dayDataModel?.exercises?.length != count &&
+                                                            monthProvider.dayDataModel?.exercises?.length !=
+                                                                monthProvider.selectedExIndex + 1) {
+                                                          Navigator.pop(context);
 
-                                                    int skipIndex = monthProvider.selectedExIndex + 1;
-                                                    for (int i = skipIndex; i < monthProvider.dayDataModel!.exercises!.length; i++) {
-                                                      var elementI = monthProvider.dayDataModel!.exercises![i];
-                                                      String dataId =
-                                                          "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-                                                      bool val = monthProvider.exerciseHistoryModel
-                                                          .any((element) => element.dataId == dataId && element.status == Status.completed);
-                                                      if (val == false) {
-                                                        monthProvider.setSelectedExercise(elementI, i);
-                                                        monthProvider.updateWarmUp(false);
+                                                          await Future.delayed(const Duration(milliseconds: 100));
 
-                                                        bool isLast = i ==
-                                                            monthProvider.dayDataModel!.exercises?.indexWhere((element) =>
-                                                                element.exerciseId ==
-                                                                monthProvider.dayDataModel!.exercises?.last.exerciseId);
-                                                        monthProvider.updateIsLastExercise(isLast);
+                                                          int skipIndex = monthProvider.selectedExIndex + 1;
+                                                          for (int i = skipIndex; i < monthProvider.dayDataModel!.exercises!.length; i++) {
+                                                            var elementI = monthProvider.dayDataModel!.exercises![i];
+                                                            String dataId =
+                                                                "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+                                                            bool val = monthProvider.exerciseHistoryModel.any((element) =>
+                                                                element.dataId == dataId && element.status == Status.completed);
+                                                            if (val == false) {
+                                                              monthProvider.setSelectedExercise(elementI, i);
+                                                              monthProvider.updateWarmUp(false);
 
-                                                        await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
-                                                        break;
+                                                              bool isLast = i ==
+                                                                  monthProvider.dayDataModel!.exercises?.indexWhere((element) =>
+                                                                      element.exerciseId ==
+                                                                      monthProvider.dayDataModel!.exercises?.last.exerciseId);
+                                                              monthProvider.updateIsLastExercise(isLast);
+
+                                                              await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                                                              break;
+                                                            }
+                                                          }
+                                                        } else {
+                                                          Navigator.pop(context);
+                                                        }
                                                       }
-                                                    }
-                                                  } else {
-                                                    Navigator.pop(context);
-                                                  }
-                                                }
-                                              },
-                                              color: AppColors.primaryColor,
-                                              isLoading: false,
-                                            ),
+                                                    },
+                                                  );
+                                                },
+                                                color: AppColors.primaryColor,
+                                                isLoading: false),
                                           );
                                   },
                                 ),
@@ -1431,7 +1446,7 @@ class _ExercisePageState extends State<ExercisePage> {
     monthProvider?.getLiftedWeightGraphData();
 
     if (status == Status.completed && type == "Exercise") {
-      monthProvider?.exerciseCompletedApi();
+      // monthProvider?.exerciseCompletedApi();
     }
   }
 }

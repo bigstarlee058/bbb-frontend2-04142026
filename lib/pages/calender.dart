@@ -82,59 +82,57 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-            child: Card(
-              color: Colors.grey.shade50,
-              elevation: 4,
-              shadowColor: Colors.black.withValues(alpha: 0.4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: SizedBox(
-                  child: TableCalendar(
-                    rowHeight: 40.0,
-                    daysOfWeekHeight: 20.0,
-                    firstDay: DateTime.utc(2020, 1, 1),
-                    lastDay: DateTime.utc(2030, 12, 31),
-                    focusedDay: _focusedDay,
-                    selectedDayPredicate: (day) {
-                      return isSameDay(_selectedDay, day);
-                    },
-                    headerStyle: HeaderStyle(
-                      headerPadding: const EdgeInsets.only(bottom: 10),
-                      formatButtonVisible: false,
-                      titleCentered: true,
-                      leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
-                      rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
-                      titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
-                      titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
-                    ),
-                    calendarStyle: const CalendarStyle(
-                      defaultTextStyle: TextStyle(fontSize: 12.0),
-                      weekendTextStyle: TextStyle(fontSize: 12.0),
-                      outsideTextStyle: TextStyle(fontSize: 10.0),
-                    ),
-                    calendarBuilders: CalendarBuilders(
-                      todayBuilder: (context, day, focusedDay) => _buildDayState(day),
-                      outsideBuilder: (context, date, _) {
-                        return _buildDayState(date);
-                      },
-                      defaultBuilder: (context, date, _) {
-                        return _buildDayState(date);
-                      },
-                    ),
-                  ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+      child: Card(
+        color: Colors.grey.shade50,
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: SizedBox(
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: TableCalendar(
+                availableGestures: AvailableGestures.horizontalSwipe,
+                rowHeight: 40.0,
+                daysOfWeekHeight: 20.0,
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                headerStyle: HeaderStyle(
+                  headerPadding: const EdgeInsets.only(bottom: 10),
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+                  titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+                ),
+                calendarStyle: const CalendarStyle(
+                  defaultTextStyle: TextStyle(fontSize: 12.0),
+                  weekendTextStyle: TextStyle(fontSize: 12.0),
+                  outsideTextStyle: TextStyle(fontSize: 10.0),
+                ),
+                calendarBuilders: CalendarBuilders(
+                  todayBuilder: (context, day, focusedDay) => _buildDayState(day),
+                  outsideBuilder: (context, date, _) {
+                    return _buildDayState(date);
+                  },
+                  defaultBuilder: (context, date, _) {
+                    return _buildDayState(date);
+                  },
                 ),
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -26,8 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-
-import 'MonthView/DayCompletedPage/day_completed_page.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -748,10 +747,6 @@ class _DashboardPageState extends State<DashboardPage> {
                               ),
                               Consumer<MonthProvider>(
                                 builder: (context, monthProvider, child) {
-                                  List<DayHistoryModel> data = monthProvider.decodedDataAll();
-                                  DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
-                                  List<DateTime> dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
-                                  List<String> formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
                                   return Column(
                                     children: [
                                       Padding(
@@ -772,46 +767,13 @@ class _DashboardPageState extends State<DashboardPage> {
                                           ],
                                         ),
                                       ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(context, '/streak-calendar');
-                                        },
-                                        child: Container(
-                                          height: 50,
-                                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4), vertical: 10),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                                            child: IconRow(
-                                              fromHomeScreen: true,
-                                              icons: List.generate(
-                                                formattedDates.length,
-                                                (index) => data.any((element) =>
-                                                        DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
-                                                            formattedDates[index] &&
-                                                        element.status == Status.completed)
-                                                    ? IconDataWithDot(
-                                                        icon: Icons.check,
-                                                        iconColor: Colors.white,
-                                                        backgroundColor: AppColors.primaryColor,
-                                                        showDot: true,
-                                                        dotColor: Colors.transparent)
-                                                    : IconDataWithDot(
-                                                        icon: Icons.close,
-                                                        iconColor: Colors.white,
-                                                        backgroundColor: Colors.blue,
-                                                        showDot: true,
-                                                        dotColor: Colors.transparent),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                      CustomCalendarWidget(monthProvider: monthProvider),
                                     ],
                                   );
                                 },
                               ),
                               Container(
-                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: 15),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -876,7 +838,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 15),
+
                               Container(
                                 margin: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(10),
@@ -1157,5 +1119,182 @@ class _DashboardPageState extends State<DashboardPage> {
     monthData.weekDataModel = monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
     monthData.updateIsPastWeek(monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
     Navigator.pushNamed(context, '/dayOverview');
+  }
+}
+
+class CustomCalendarWidget extends StatefulWidget {
+  const CustomCalendarWidget({super.key, required this.monthProvider});
+  final MonthProvider monthProvider;
+  @override
+  State<CustomCalendarWidget> createState() => _CustomCalendarWidgetState();
+}
+
+class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
+  late DateTime _focusedDay;
+  DateTime? _selectedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusedDay = DateTime.now();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+      child: Card(
+        color: Colors.grey.shade50,
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: SizedBox(
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: TableCalendar(
+                availableGestures: AvailableGestures.horizontalSwipe,
+                rowHeight: 40.0,
+                daysOfWeekHeight: 20.0,
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                headerStyle: HeaderStyle(
+                  headerPadding: const EdgeInsets.only(bottom: 10),
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+                  titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+                ),
+                calendarStyle: const CalendarStyle(
+                  defaultTextStyle: TextStyle(fontSize: 12.0),
+                  weekendTextStyle: TextStyle(fontSize: 12.0),
+                  outsideTextStyle: TextStyle(fontSize: 10.0),
+                ),
+                calendarBuilders: CalendarBuilders(
+                  todayBuilder: (context, day, focusedDay) => _buildDayState(day),
+                  outsideBuilder: (context, date, _) {
+                    return _buildDayState(date);
+                  },
+                  defaultBuilder: (context, date, _) {
+                    return _buildDayState(date);
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget? _buildDayState(DateTime date) {
+    if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
+      DateTime? oldestStartDate = widget.monthProvider.monthLocalDataModel
+          .map((e) => Utils.formattedDate(e.monthStartDate!))
+          .reduce((a, b) => a.isBefore(b) ? a : b);
+
+      final nowUtc = DateTime.now();
+
+      List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
+
+      bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
+
+      if (data.isEmpty) {
+        if (isCurrentDay) {
+          return _buildCurrentWorkoutDay(date);
+        } else if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
+          return _buildCustomDayCircle(date, Colors.blue);
+        }
+      }
+
+      DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
+
+      if (date.isBefore(futureDay)) {
+        for (var day in data) {
+          final workoutDate = day.endTime!;
+
+          DateTime localTime = Utils.formattedDate("$workoutDate");
+
+          if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+            if (day.status == Status.completed) {
+              return _buildCustomDayCircle(date, AppColors.primaryColor);
+            } else if (day.status == Status.skipped) {
+              return _buildCustomDayCircle(date, Colors.blue);
+            }
+          }
+        }
+      }
+
+      if (isCurrentDay) {
+        for (var day in data) {
+          final workoutDate = day.endTime!;
+          DateTime localTime = Utils.formattedDate("$workoutDate");
+          if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+            if (day.status == Status.completed) {
+              return _buildCustomDayCircle(date, AppColors.primaryColor);
+            } else if (day.status == Status.skipped) {
+              return _buildCustomDayCircle(date, Colors.blue);
+            }
+          }
+          return _buildCurrentWorkoutDay(date);
+        }
+      }
+      if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
+        if (DateTime(futureDay.year, futureDay.month, futureDay.day) != DateTime(date.year, date.month, date.day)) {
+          return _buildCustomDayCircle(date, Colors.blue);
+        }
+      }
+    }
+    return null;
+  }
+
+  Widget _buildCustomDayCircle(DateTime date, Color circleColor) {
+    return Container(
+      alignment: Alignment.center,
+      width: 28.0,
+      height: 28.0,
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: circleColor,
+      ),
+      child: Text(
+        '${date.day}',
+        style: const TextStyle(
+          fontSize: 14.0,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrentWorkoutDay(DateTime date) {
+    return Container(
+      alignment: Alignment.center,
+      width: 28.0,
+      height: 28.0,
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+        border: Border.all(color: AppColors.primaryColor),
+      ),
+      child: Text(
+        '${date.day}',
+        style: const TextStyle(
+          fontSize: 14.0,
+          color: AppColors.primaryColor,
+        ),
+      ),
+    );
   }
 }
