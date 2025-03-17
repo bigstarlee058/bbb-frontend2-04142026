@@ -386,6 +386,8 @@ class MonthProvider extends ChangeNotifier {
       newLastSplit = [];
       newStreakData = [];
 
+      allSplitDayHistoryModel.removeWhere((element) => element.status == Status.empty || element.status == Status.started);
+
       allSplitDayHistoryModel.sort((a, b) {
         DateTime aDate = a.endTime ?? a.startTime ?? a.date!;
         DateTime localTimeADate = Utils.formattedDate("$aDate");
@@ -1201,7 +1203,6 @@ class MonthProvider extends ChangeNotifier {
   List<DayHistoryModel> decodedDataAll() {
     String encodedTempData = jsonEncode(allSplitDayHistoryModel);
     List<DayHistoryModel> decodedData;
-
     try {
       decodedData = List<DayHistoryModel>.from(
         json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)),
