@@ -1039,9 +1039,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                                     ? "Save"
                                                     : monthProvider.isLastExercise
                                                         ? "Finish"
-                                                        : monthProvider.isPumpDay && monthProvider.isCircuit
+                                                        : /*monthProvider.isPumpDay && monthProvider.isCircuit
                                                             ? "Finish"
-                                                            : "Finish & Next",
+                                                            :*/
+                                                        "Finish & Next",
                                                 textColor: Colors.white,
                                                 onPress: () async {
                                                   HapticFeedBack.buttonClick();
@@ -1054,24 +1055,103 @@ class _ExercisePageState extends State<ExercisePage> {
                                                       type:
                                                           monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise");
 
-                                                  log('monthProvider.exerciseHistoryDetails?.status == Status.completed :::::::::::::::::: $isCurrentExerciseCompleted');
-
                                                   WidgetsBinding.instance.addPostFrameCallback(
                                                     (timeStamp) async {
-                                                      if ((monthProvider.isPumpDay && monthProvider.isCircuit) ||
-                                                          isCurrentExerciseCompleted) {
+                                                      String split = monthProvider
+                                                              .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                              .toString()
+                                                              .split(" ")[1] ??
+                                                          "";
+                                                      if (isCurrentExerciseCompleted) {
                                                         Navigator.pop(context);
+                                                        return;
+                                                      } else if (monthProvider.isPumpDay && monthProvider.isCircuit) {
+                                                        if (monthProvider.exerciseHistoryModel.isNotEmpty) {
+                                                          final lastSubmittedData = monthProvider.exerciseHistoryModel.last;
+                                                          String lastDataId = lastSubmittedData.dataId!.split("-").last.replaceAll(" ", "");
+                                                          List<String> circuitData = lastDataId.split(":");
+
+                                                          int circuitIndex = int.parse(circuitData.first);
+                                                          int circuitRound = int.parse(circuitData.last);
+
+                                                          monthProvider.exerciseHistoryModel.removeWhere((element) =>
+                                                              !element.type!.contains("Circuit - $circuitIndex:") &&
+                                                              element.type!.contains("Circuit") &&
+                                                              (element.status != Status.started || element.status != Status.completed));
+
+                                                          var circuitExercises =
+                                                              monthProvider.pumpDayModel!.circuits![circuitIndex].circuitExercises!;
+                                                          int? exerciseIndex = circuitExercises.indexWhere(
+                                                              (element) => element.exerciseId == monthProvider.exerciseDetailModel!.sId);
+
+                                                          bool isLastExercise = (circuitExercises.length == (exerciseIndex + 1));
+                                                          bool isLastRound = (monthProvider.pumpDayModel!.circuits![circuitIndex].round ==
+                                                              (circuitRound + 1));
+
+                                                          // int? nextPendingIndex;
+                                                          // for (int i = exerciseIndex + 1; i < circuitExercises.length; i++) {
+                                                          //   final exerciseHistory = monthProvider.exerciseHistoryModel.firstWhere(
+                                                          //     (e) =>
+                                                          //         e.dataId!.contains("$circuitIndex:$circuitRound") &&
+                                                          //         e.exerciseId == circuitExercises[i].exerciseId,
+                                                          //     orElse: () => ExerciseHistoryModel(),
+                                                          //   );
+                                                          //   if (exerciseHistory.id == null || exerciseHistory.status != Status.completed) {
+                                                          //     nextPendingIndex = i;
+                                                          //     break;
+                                                          //   }
+                                                          // }
+                                                          // if (nextPendingIndex == null) {
+                                                          //   if (monthProvider.pumpDayModel!.circuits![circuitIndex].round ==
+                                                          //       (circuitRound + 1)) {
+                                                          //     Navigator.pop(context);
+                                                          //     return;
+                                                          //   }
+                                                          //   if (monthProvider.exerciseHistoryModel.length <
+                                                          //       ((circuitRound + 1) * circuitExercises.length)) {
+                                                          //     Navigator.pop(context);
+                                                          //     return;
+                                                          //   }
+                                                          //
+                                                          //   circuitRound++;
+                                                          //   nextPendingIndex = 0;
+                                                          // }
+
+                                                          if (isLastExercise) {
+                                                            if (isLastRound) {
+                                                              Navigator.pop(context);
+                                                              return;
+                                                            }
+                                                            if (monthProvider.exerciseHistoryModel.length <
+                                                                ((circuitRound + 1) * circuitExercises.length)) {
+                                                              Navigator.pop(context);
+                                                              return;
+                                                            }
+                                                            circuitRound++;
+                                                            exerciseIndex = 0;
+                                                          } else {
+                                                            exerciseIndex++;
+                                                          }
+
+                                                          monthProvider.updateIsCircuit(true);
+                                                          monthProvider.updateCircuit("$circuitIndex:$circuitRound", circuitIndex);
+                                                          String dataId =
+                                                              "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${circuitExercises[exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
+                                                          monthProvider.setSelectedExercise(circuitExercises[exerciseIndex], exerciseIndex);
+                                                          monthProvider.updateWarmUp(false);
+                                                          monthProvider.updateIsLastExercise(false);
+                                                          Navigator.pop(context);
+                                                          await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                                                          monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
+                                                        }
+
+                                                        return;
                                                       } else {
                                                         for (var element in monthProvider.exerciseHistoryModel) {
                                                           if (element.status.toString() == Status.completed) {
                                                             count++;
                                                           }
                                                         }
-                                                        String split = monthProvider
-                                                                .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
-                                                                .toString()
-                                                                .split(" ")[1] ??
-                                                            "";
 
                                                         if (monthProvider.dayDataModel?.exercises?.length != count &&
                                                             monthProvider.dayDataModel?.exercises?.length !=

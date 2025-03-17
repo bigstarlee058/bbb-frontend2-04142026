@@ -131,7 +131,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
         }
         if (mounted) {
           WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            setState(() {});
+            if (mounted) {
+              setState(() {});
+            }
           });
         }
       }
@@ -223,7 +225,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
           ],
         ),
         child: ElevatedButton(
-          onPressed: widget.enabled
+          onPressed: widget.enabled && widget.onPress != null
               ? () async {
                   await getTotalSets();
                   final provider = Provider.of<MonthProvider>(context, listen: false);
