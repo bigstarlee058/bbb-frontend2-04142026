@@ -6,6 +6,7 @@ import 'package:bbb/components/collection_grid.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
+import 'package:bbb/components/program_phases_widget.dart';
 import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -869,8 +870,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
                                   ///Please recheck this multiple
                                   ? JoinChallengeWidget(featureChallenge: featureChallengeData)
-                                  : Container(),
-
+                                  : SizedBox(height: ScreenUtil.verticalScale(5)),
+                                  
+                              ProgramPhasesWidget(),
                               /// New Method
 
                               SizedBox(
@@ -978,7 +980,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                             ],
                                           ),
                                         )
-                                      : const SizedBox();
+                                      : SizedBox(height: ScreenUtil.verticalScale(5));
                                 },
                               ),
 
