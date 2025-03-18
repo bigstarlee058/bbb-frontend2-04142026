@@ -1125,7 +1125,6 @@ class _ExercisePageState extends State<ExercisePage> {
                                                             if (monthProvider.exerciseHistoryModel.length <
                                                                 ((circuitRound + 1) * circuitExercises.length)) {
                                                               Navigator.pop(context);
-                                                              return;
                                                             }
                                                             circuitRound++;
                                                             exerciseIndex = 0;
@@ -1144,8 +1143,6 @@ class _ExercisePageState extends State<ExercisePage> {
                                                           await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
                                                           monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
                                                         }
-
-                                                        return;
                                                       } else {
                                                         for (var element in monthProvider.exerciseHistoryModel) {
                                                           if (element.status.toString() == Status.completed) {

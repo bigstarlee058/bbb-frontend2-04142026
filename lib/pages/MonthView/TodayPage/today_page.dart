@@ -46,11 +46,13 @@ class _TodayPageState extends State<TodayPage> {
   String currentDayTitle = '';
   MainPageProvider? mainPageProvider;
   bool loader = false;
+  late ActionSliderController _sliderController;
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    _sliderController = ActionSliderController();
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
@@ -83,6 +85,12 @@ class _TodayPageState extends State<TodayPage> {
       },
     );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _sliderController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchExtraAddedExercise() async {
@@ -667,20 +675,25 @@ class _TodayPageState extends State<TodayPage> {
                                                           status1: Status.completed);
                                                       value.updateCurrentDayTitleId(
                                                           value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
-                                                      controller.loading();
-                                                      await Future.delayed(Duration(seconds: 1));
-                                                      controller.success();
-                                                      await Future.delayed(Duration(seconds: 1)).then(
-                                                        (value) {
-                                                          Navigator.pushNamed(context, '/dayCompleted');
-                                                        },
-                                                      );
+
+                                                      if (mounted) {
+                                                        _sliderController.loading();
+                                                      }
+
+                                                      await Future.delayed(Duration(milliseconds: 500));
+
+                                                      if (mounted) {
+                                                        _sliderController.success();
+                                                      }
+
+                                                      if (!context.mounted) return;
+                                                      Navigator.pushNamed(context, '/dayCompleted');
                                                     },
                                                     child: Text(
-                                                      "Swipe to complete workout",
+                                                      "Swipe to complete",
                                                       style: TextStyle(
                                                         color: Colors.white,
-                                                        fontSize: ScreenUtil.verticalScale(2),
+                                                        fontSize: ScreenUtil.verticalScale(2.2),
                                                         fontWeight: FontWeight.bold,
                                                       ),
                                                     ),

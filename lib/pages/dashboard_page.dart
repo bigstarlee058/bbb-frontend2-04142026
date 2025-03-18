@@ -539,6 +539,12 @@ class _DashboardPageState extends State<DashboardPage> {
 
                                               String dataId =
                                                   "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
+
+                                              DayHistoryModel data = monthData.allDayHistoryModel.firstWhere(
+                                                (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                                orElse: () => DayHistoryModel(title: "Pump Day"),
+                                              );
+
                                               return Container(
                                                 margin: EdgeInsets.symmetric(
                                                   horizontal: ScreenUtil.horizontalScale(8),
@@ -563,10 +569,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       child: Column(
                                                         children: [
                                                           Text(
-                                                            monthData.allDayHistoryModel.any(
-                                                              (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                            )
-                                                                ? "Pump Day"
+                                                            data.id != null
+                                                                ? data.title
                                                                 : (monthData
                                                                         .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList?.last) ??
                                                                     "",
