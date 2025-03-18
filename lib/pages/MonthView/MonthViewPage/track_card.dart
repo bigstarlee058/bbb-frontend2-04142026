@@ -279,7 +279,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                 )
                             ],
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 7),
                           Expanded(
                             child: SizedBox(
                               height: 60,
@@ -489,7 +489,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             await Navigator.pushNamed(context, '/dayOverview');
           },
           child: Container(
-            width: 90,
+            width: 85,
             padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.9)),
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(7), color: AppColors.primaryColor),
             child: Center(

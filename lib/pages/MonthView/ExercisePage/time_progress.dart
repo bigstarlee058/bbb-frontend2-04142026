@@ -58,7 +58,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
   String? previousData;
 
   timerOnInit() {
-    NotificationService.clearNotification();
+    NotificationService.clearNotification(10);
     totalTime = widget.initialDuration;
     WidgetsBinding.instance.addObserver(this);
     currentTime = 0;
@@ -157,7 +157,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
-        NotificationService.clearNotification();
+        NotificationService.clearNotification(10);
         await monthProvider.getPassedTime();
         if (monthProvider.timePassed != "") {
           currentTime = 0;

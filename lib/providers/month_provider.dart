@@ -468,6 +468,9 @@ class MonthProvider extends ChangeNotifier {
             if (monthDataModel != null) {
               startTime = Utils.formattedDate("${monthDataModel?.startDate ?? DateTime.now().toUtc()}");
               endTime = Utils.formattedDate("${monthDataModel?.endDate ?? DateTime.now().toUtc()}");
+              log('monthDataModel?.endDate :::::::::::::::::: ${monthDataModel?.endDate}');
+              log('monthDataModel?.startDate :::::::::::::::::: ${monthDataModel?.startDate}');
+              NotificationService.scheduleMonthlyReminder(20, monthDataModel?.endDate ?? DateTime.now().toUtc());
 
               int dayDelta = DateTime(today.year, today.month, today.day)
                   .difference(DateTime(startTime!.year, startTime!.month, startTime!.day))
@@ -993,7 +996,7 @@ class MonthProvider extends ChangeNotifier {
     } else {
       log("CLEAR VALUES");
       clearValues();
-      NotificationService.clearNotification();
+      NotificationService.clearNotification(10);
     }
     notifyListeners();
   }
@@ -1001,7 +1004,7 @@ class MonthProvider extends ChangeNotifier {
   clearValues() async {
     timerAddress = "";
     timePassed = "";
-    NotificationService.clearNotification();
+    NotificationService.clearNotification(10);
     await preferences.putString(SharedPreference.lastTimerAddress, "");
     await preferences.putString(SharedPreference.lastTimerPassed, "");
     await preferences.putString(SharedPreference.lastExitTime, "");

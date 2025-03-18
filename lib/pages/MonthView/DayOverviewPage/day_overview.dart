@@ -1107,7 +1107,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
               bool? val =
                   monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
               if (val == true) {
-                await _unskipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
+                await _unskipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
               }
             }
           }
@@ -1157,7 +1157,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
               if (val == false) {
-                await _skipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
+                await _skipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
               }
             }
           }

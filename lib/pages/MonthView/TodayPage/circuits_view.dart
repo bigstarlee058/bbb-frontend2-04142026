@@ -202,7 +202,7 @@ class _CircuitsViewState extends State<CircuitsView> {
 
                                     ExerciseDataModel exercise = widget.circuit[circuitsIndex].circuitExercises![exerciseIndex];
 
-                                    String tempIndex = "$circuitsIndex:$roundIndex";
+                                    String tempIndex = "$circuitsIndex:$roundIndex:$exerciseIndex";
 
                                     String dataId =
                                         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${exercise.exerciseId}-$tempIndex";
@@ -233,6 +233,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         if (indexW != -1) {
                                           data = monthProvider.circuitModel[indexW];
                                         }
+
                                         return WorkoutCard(
                                           image: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].thumbnail ?? "unknown",
                                           dataId: dataId,
@@ -251,7 +252,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                               ? roundIndex == 0
                                                   ? (Function()? function) async {
                                                       monthProvider.updateIsCircuit(true);
-                                                      monthProvider.updateCircuit("$circuitsIndex:$roundIndex", circuitsIndex);
+                                                      monthProvider.updateCircuit(
+                                                          "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
                                                       String dataId =
                                                           "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                       monthProvider.setSelectedExercise(
@@ -271,7 +273,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                                               : ((data.lastRound ?? 1) - 1) >= widget.circuit[circuitsIndex].selectedDot!
                                                   ? (Function()? function) async {
                                                       monthProvider.updateIsCircuit(true);
-                                                      monthProvider.updateCircuit("$circuitsIndex:$roundIndex", circuitsIndex);
+                                                      monthProvider.updateCircuit(
+                                                          "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
                                                       String dataId =
                                                           "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                       monthProvider.setSelectedExercise(
