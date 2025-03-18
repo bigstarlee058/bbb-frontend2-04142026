@@ -91,7 +91,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       time = formatDuration(duration);
       totalWeight = double.parse(data1.totalWeight ?? "0");
       exerciseCompleted = int.parse(data1.completedExercise ?? "0");
-      averageRIR = double.parse(data1.averageRIR ?? "0");
+      averageRIR = double.parse(data1.averageRIR == "NaN" ? "0" : data1.averageRIR ?? "0");
     }
 
     await Future.delayed(const Duration(milliseconds: 1000));
