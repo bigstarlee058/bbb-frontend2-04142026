@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:action_slider/action_slider.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
@@ -23,6 +22,7 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 import '../../../models/MonthResponseModel/all_exercise_model.dart';
 
@@ -46,13 +46,12 @@ class _TodayPageState extends State<TodayPage> {
   String currentDayTitle = '';
   MainPageProvider? mainPageProvider;
   bool loader = false;
-  late ActionSliderController _sliderController;
+  final GlobalKey<SlideActionState> key = GlobalKey();
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    _sliderController = ActionSliderController();
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
@@ -85,12 +84,6 @@ class _TodayPageState extends State<TodayPage> {
       },
     );
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _sliderController.dispose();
-    super.dispose();
   }
 
   Future<void> fetchExtraAddedExercise() async {
@@ -648,46 +641,18 @@ class _TodayPageState extends State<TodayPage> {
                                                   value.dayHistoryDetails?.status != Status.completed
                                               ? Padding(
                                                   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                  child: ActionSlider.standard(
-                                                    height: ScreenUtil.verticalScale(7),
-                                                    backgroundColor: AppColors.primaryColor,
-                                                    toggleColor: AppColors.backOffSetColor,
-                                                    boxShadow: [],
-                                                    icon: Icon(Icons.double_arrow, color: AppColors.primaryColor),
-                                                    successIcon: Icon(
-                                                      Icons.check_rounded,
-                                                      color: AppColors.primaryColor,
-                                                    ),
-                                                    loadingIcon: Padding(
-                                                      padding: const EdgeInsets.all(10),
-                                                      child: CircularProgressIndicator(
-                                                        color: AppColors.primaryColor,
-                                                        strokeWidth: 2.5,
-                                                      ),
-                                                    ),
-                                                    action: (controller) async {
-                                                      HapticFeedBack.buttonClick();
-                                                      _saveDayData(
-                                                          status: Status.skipped,
-                                                          type: monthProvider!.isPumpDay
-                                                              ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                                              : "Workout Day",
-                                                          status1: Status.completed);
-                                                      value.updateCurrentDayTitleId(
-                                                          value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
-
-                                                      if (mounted) {
-                                                        _sliderController.loading();
-                                                      }
-
-                                                      await Future.delayed(Duration(milliseconds: 500));
-
-                                                      if (mounted) {
-                                                        _sliderController.success();
-                                                      }
-
-                                                      if (!context.mounted) return;
-                                                      Navigator.pushNamed(context, '/dayCompleted');
+                                                  child: SlideAction(
+                                                    key: key,
+                                                    height: ScreenUtil.verticalScale(7.5),
+                                                    outerColor: AppColors.primaryColor,
+                                                    innerColor: AppColors.backOffSetColor,
+                                                    sliderButtonIconSize: ScreenUtil.verticalScale(2),
+                                                    onSubmit: () async {
+                                                      return await onSwipe(value).then(
+                                                        (value) {
+                                                          key.currentState?.reset();
+                                                        },
+                                                      );
                                                     },
                                                     child: Text(
                                                       "Swipe to complete",
@@ -697,8 +662,77 @@ class _TodayPageState extends State<TodayPage> {
                                                         fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
-                                                  ),
-                                                )
+                                                  )
+
+                                                  //     ConfirmationSlider(
+                                                  //   width: double.infinity,
+                                                  //   height: ScreenUtil.verticalScale(7.5),
+                                                  //   onConfirmation: () => onSwipe,
+                                                  //   sliderButtonContent: Icon(Icons.chevron_right, color: AppColors.primaryColor, size: 30),
+                                                  //   text: "Swipe to complete",
+                                                  //   backgroundColor: AppColors.primaryColor,
+                                                  //   foregroundColor: AppColors.backOffSetColor,
+                                                  //   backgroundColorEnd: AppColors.primaryColor,
+                                                  //   textStyle: TextStyle(
+                                                  //     color: Colors.white,
+                                                  //     fontSize: ScreenUtil.verticalScale(2.2),
+                                                  //     fontWeight: FontWeight.bold,
+                                                  //   ),
+                                                  // ),
+                                                  )
+                                              // ? Padding(
+                                              //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                              //     child: ActionSlider.standard(
+                                              //       height: ScreenUtil.verticalScale(7),
+                                              //       backgroundColor: AppColors.primaryColor,
+                                              //       toggleColor: AppColors.backOffSetColor,
+                                              //       boxShadow: [],
+                                              //       icon: Icon(Icons.double_arrow, color: AppColors.primaryColor),
+                                              //       successIcon: Icon(
+                                              //         Icons.check_rounded,
+                                              //         color: AppColors.primaryColor,
+                                              //       ),
+                                              //       loadingIcon: Padding(
+                                              //         padding: const EdgeInsets.all(10),
+                                              //         child: CircularProgressIndicator(
+                                              //           color: AppColors.primaryColor,
+                                              //           strokeWidth: 2.5,
+                                              //         ),
+                                              //       ),
+                                              //       action: (controller) async {
+                                              //         HapticFeedBack.buttonClick();
+                                              //         _saveDayData(
+                                              //             status: Status.skipped,
+                                              //             type: monthProvider!.isPumpDay
+                                              //                 ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                              //                 : "Workout Day",
+                                              //             status1: Status.completed);
+                                              //         value.updateCurrentDayTitleId(
+                                              //             value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
+                                              //
+                                              //         if (mounted) {
+                                              //           _sliderController.loading();
+                                              //         }
+                                              //
+                                              //         await Future.delayed(Duration(milliseconds: 1000));
+                                              //
+                                              //         if (mounted) {
+                                              //           _sliderController.success();
+                                              //         }
+                                              //
+                                              //         if (!context.mounted) return;
+                                              //         Navigator.pushNamed(context, '/dayCompleted');
+                                              //       },
+                                              //       child: Text(
+                                              //         "Swipe to complete",
+                                              //         style: TextStyle(
+                                              //           color: Colors.white,
+                                              //           fontSize: ScreenUtil.verticalScale(2.2),
+                                              //           fontWeight: FontWeight.bold,
+                                              //         ),
+                                              //       ),
+                                              //     ),
+                                              //   )
                                               : Container(
                                                   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
                                                   child: ButtonWidget(
@@ -979,6 +1013,29 @@ class _TodayPageState extends State<TodayPage> {
         ),
       ),
     );
+  }
+
+  Future<void> onSwipe(MonthProvider value) async {
+    HapticFeedBack.buttonClick();
+    await _saveDayData(
+        status: Status.skipped,
+        type: monthProvider!.isPumpDay ? "Pump Day - ${monthProvider?.pumpDayModel?.id}" : "Workout Day",
+        status1: Status.completed);
+
+    value.updateCurrentDayTitleId(value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
+
+    // if (mounted) {
+    // _sliderController.loading();
+    // }
+
+    // await Future.delayed(Duration(milliseconds: 1000));
+
+    // if (mounted) {
+    //   _sliderController.success();
+    // }
+
+    if (!mounted) return;
+    Navigator.pushNamed(context, '/dayCompleted');
   }
 
   /// WARMUP SECTION
@@ -2161,7 +2218,7 @@ class _TodayPageState extends State<TodayPage> {
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
               if (val == false) {
-                await _saveExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j", type: 'Circuit - $i:$j');
+                await _saveExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
               }
             }
           }
