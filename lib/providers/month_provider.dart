@@ -471,6 +471,7 @@ class MonthProvider extends ChangeNotifier {
               log('monthDataModel?.endDate :::::::::::::::::: ${monthDataModel?.endDate}');
               log('monthDataModel?.startDate :::::::::::::::::: ${monthDataModel?.startDate}');
               NotificationService.scheduleMonthlyReminder(20, monthDataModel?.endDate ?? DateTime.now().toUtc());
+              await NotificationService.scheduleWeekReminder(30, monthDataModel?.endDate ?? DateTime.now().toUtc());
 
               int dayDelta = DateTime(today.year, today.month, today.day)
                   .difference(DateTime(startTime!.year, startTime!.month, startTime!.day))

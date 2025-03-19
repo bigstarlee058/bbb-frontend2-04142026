@@ -24,6 +24,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -361,7 +362,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                               return const SizedBox();
                                             }
 
-                                            if (monthData.week! > 4) {
+                                            if ((monthData.week ?? 0) > 4) {
                                               return const SizedBox();
                                             }
 
@@ -870,13 +871,76 @@ class _DashboardPageState extends State<DashboardPage> {
                                   isLoading: false,
                                 ),
                               ),
+                              const SizedBox(height: 15),
+                              InkWell(
+                                onTap: () {},
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      top: ScreenUtil.horizontalScale(5),
+                                      left: ScreenUtil.horizontalScale(8),
+                                      right: ScreenUtil.horizontalScale(8),
+                                      bottom: ScreenUtil.horizontalScale(8),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Achievements',
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: AppColors.primaryColor,
+                                                fontSize: 19,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        SvgPicture.asset(
+                                          height: 50,
+                                          'assets/img/verified (1).svg',
+                                          color: AppColors.primaryColor,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(10),
+                                ),
+                                child: ButtonWidget(
+                                  text: 'See all Achievements',
+                                  textColor: Colors.white,
+                                  color: AppColors.primaryColor,
+                                  onPress: () {
+                                    Navigator.pushNamed(context, "/seeAllAchievementPage");
+                                  },
+                                  isLoading: false,
+                                ),
+                              ),
                               featureChallengeData.id != ""
 
                                   ///Please recheck this multiple
                                   ? JoinChallengeWidget(featureChallenge: featureChallengeData)
                                   : SizedBox(height: ScreenUtil.verticalScale(5)),
-                                  
+
                               ProgramPhasesWidget(),
+
                               /// New Method
 
                               SizedBox(

@@ -34,7 +34,39 @@ class NotificationService {
     );
   }
 
-  static Future<void> scheduleWeekReminder(int id, DateTime startDateUtc, DateTime endDateUtc) async {
+  // static Future<void> scheduleWeekReminder(int id, DateTime startDateUtc, DateTime endDateUtc) async {
+  //   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+  //     'weekly_reminder_channel',
+  //     'Weekly Reminder',
+  //     channelDescription: 'This channel is for weekly workout reminders',
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //   );
+  //
+  //   final tz.TZDateTime startDate = tz.TZDateTime.from(startDateUtc, tz.local);
+  //   final tz.TZDateTime endDate = tz.TZDateTime.from(endDateUtc, tz.local);
+  //   tz.TZDateTime current = startDate;
+  //   while (current.weekday != DateTime.sunday) {
+  //     current = current.add(const Duration(days: 1));
+  //   }
+  //   int notificationId = id;
+  //   while (current.isBefore(endDate) || current.isAtSameMomentAs(endDate)) {
+  //     clearNotification(id);
+  //     await flutterLocalNotificationsPlugin.zonedSchedule(
+  //       notificationId,
+  //       'Workout Reminder',
+  //       'Your workout week is ending today at midnight. Update your progress and prepare for next week!',
+  //       current,
+  //       const NotificationDetails(android: androidDetails),
+  //       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+  //       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+  //     );
+  //     debugPrint("Scheduled notification for: $current");
+  //     notificationId++;
+  //     current = current.add(const Duration(days: 7));
+  //   }
+  // }
+  static Future<void> scheduleWeekReminder(int id, DateTime endDateUtc) async {
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'weekly_reminder_channel',
       'Weekly Reminder',
@@ -43,32 +75,80 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    final tz.TZDateTime startDate = tz.TZDateTime.from(startDateUtc, tz.local);
-    final tz.TZDateTime endDate = tz.TZDateTime.from(endDateUtc, tz.local);
-    tz.TZDateTime current = startDate;
-    while (current.weekday != DateTime.sunday) {
-      current = current.add(const Duration(days: 1));
+    DateTime nowUtc = DateTime.now().toUtc();
+    tz.TZDateTime nowLocal = tz.TZDateTime.from(nowUtc, tz.local);
+    tz.TZDateTime endDate = tz.TZDateTime.from(endDateUtc, tz.local);
+
+    // Find the next Sunday
+    tz.TZDateTime nextSunday = tz.TZDateTime(tz.local, nowLocal.year, nowLocal.month, nowLocal.day, 12, 0, 0);
+
+    // If today is not Sunday, move to the next Sunday
+    if (nowLocal.weekday != DateTime.sunday) {
+      nextSunday = nextSunday.add(Duration(days: (7 - nowLocal.weekday) % 7));
     }
+
+    // If today is Sunday but it's already past 12 PM, schedule for next Sunday
+    if (nowLocal.weekday == DateTime.sunday && nowLocal.hour >= 12) {
+      nextSunday = nextSunday.add(const Duration(days: 7));
+    }
+
+    // Ensure the scheduled date is in the future
+    if (nextSunday.isBefore(nowLocal)) {
+      debugPrint("Skipping scheduling: nextSunday ($nextSunday) is in the past.");
+      return;
+    }
+
     int notificationId = id;
-    while (current.isBefore(endDate) || current.isAtSameMomentAs(endDate)) {
-      clearNotification(id);
+    while (nextSunday.isBefore(endDate) || nextSunday.isAtSameMomentAs(endDate)) {
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notificationId,
         'Workout Reminder',
         'Your workout week is ending today at midnight. Update your progress and prepare for next week!',
-        current,
+        nextSunday,
         const NotificationDetails(android: androidDetails),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       );
-      debugPrint("Scheduled notification for: $current");
+
+      debugPrint("✅ Scheduled Sunday notification for: $nextSunday");
+
+      // Move to the next Sunday
+      nextSunday = nextSunday.add(const Duration(days: 7));
       notificationId++;
-      current = current.add(const Duration(days: 7));
     }
   }
 
+  // static Future<void> scheduleMonthlyReminder(int id, DateTime utcDate) async {
+  //   clearNotification(id);
+  //   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+  //     'monthly_reminder_channel',
+  //     'Monthly Reminder',
+  //     channelDescription: 'This channel is for monthly workout reminders',
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //   );
+  //
+  //   final tz.TZDateTime scheduledTime = tz.TZDateTime.from(utcDate.subtract(Duration(hours: 12)), tz.local);
+  //
+  //   await flutterLocalNotificationsPlugin
+  //       .zonedSchedule(
+  //     id,
+  //     'Monthly Workout Reminder',
+  //     'Your workout month is ending today at midnight. Update your progress and prepare for a new month!',
+  //     scheduledTime,
+  //     const NotificationDetails(android: androidDetails),
+  //     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+  //     uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+  //   )
+  //       .catchError(
+  //     (error) {
+  //       debugPrint('error==========>>>>>$error');
+  //     },
+  //   );
+  // }
   static Future<void> scheduleMonthlyReminder(int id, DateTime utcDate) async {
     clearNotification(id);
+
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'monthly_reminder_channel',
       'Monthly Reminder',
@@ -77,7 +157,15 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(utcDate.subtract(Duration(hours: 12)), tz.local);
+    // Convert endDate to local timezone
+    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(utcDate, tz.local).subtract(const Duration(hours: 12));
+
+    // Ensure the scheduled time is in the future
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    if (scheduledTime.isBefore(now)) {
+      debugPrint("Skipping notification scheduling because the date is in the past: $scheduledTime");
+      return;
+    }
 
     await flutterLocalNotificationsPlugin
         .zonedSchedule(
@@ -89,10 +177,10 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
     )
-        .catchError(
-      (error) {
-        debugPrint('error==========>>>>>$error');
-      },
-    );
+        .catchError((error) {
+      debugPrint('Error scheduling notification: $error');
+    });
+
+    debugPrint("Scheduled monthly reminder for: $scheduledTime");
   }
 }

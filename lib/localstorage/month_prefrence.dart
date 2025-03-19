@@ -17,6 +17,7 @@ class SharedPreference {
   static const String fromNotification = "FROM-NOTIFICATION";
   static const String exerciseTutorial = "EXERCISE-TUTORIAL";
   static const String inTheExerciseScreenOrNot = "EXERCISE-SCREEN-OR-NOT";
+  static const String notificationSwitch = "notificationSwitch";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();
@@ -32,6 +33,14 @@ class SharedPreference {
 
   Future<bool?> putInt(String key, int value) async {
     return _preferences?.setInt(key, value);
+  }
+
+  Future<bool?> setBool(String key, bool value) async {
+    return _preferences?.setBool(key, value);
+  }
+
+  Future<bool?> getBool(String key) async {
+    return _preferences?.getBool(key);
   }
 
   int? getInt(String key, {int defValue = 0}) {

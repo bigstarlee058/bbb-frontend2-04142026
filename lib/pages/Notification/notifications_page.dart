@@ -8,6 +8,8 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../localstorage/month_prefrence.dart';
+
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
 
@@ -18,7 +20,7 @@ class NotificationsPage extends StatefulWidget {
 class _NotificationsPageState extends State<NotificationsPage> {
   DataProvider? dataProvider;
   UserDataProvider? userData;
-  bool isSwitchOn = false;
+  bool? isSwitchOn = false;
   List<Notifications> notificationData = [
     // Notifications(id: "1", title: "Test1", description: "Test Notification 1"),
     // Notifications(id: "2", title: "Test2", description: "Test Notification 2"),
@@ -30,6 +32,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   void initState() {
+    getSwitch();
     dataProvider = Provider.of<DataProvider>(
       context,
       listen: false,
@@ -40,6 +43,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
       listen: false,
     );
     super.initState();
+  }
+
+  Future<void> getSwitch() async {
+    isSwitchOn = await preferences.getBool(
+      SharedPreference.notificationSwitch,
+    );
+    setState(() {});
+    debugPrint('isSwitchOn notification:::::::::::::::::: $isSwitchOn');
   }
 
   Widget notificationCard(String title, String description) {
@@ -316,11 +327,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       ),
                     ),
                     Switch(
-                      value: isSwitchOn, // Boolean value
-                      onChanged: (bool value) {
+                      value: isSwitchOn ?? false, // Boolean value
+                      onChanged: (bool value) async {
                         setState(() {
                           isSwitchOn = value; // Update state
                         });
+                        await preferences.setBool(SharedPreference.notificationSwitch, isSwitchOn ?? false);
                       },
                       activeColor: AppColors.primaryColor,
                     ),

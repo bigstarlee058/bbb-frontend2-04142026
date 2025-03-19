@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ToolsPageButton extends StatelessWidget {
-  const ToolsPageButton(
-      {super.key, required this.title, required this.icon, required this.url});
+  const ToolsPageButton({super.key, required this.title, required this.icon, required this.url});
 
   final String title;
   final String url;
@@ -46,8 +45,7 @@ class ToolsPageButton extends StatelessWidget {
                   icon, // Path to your SVG file
                   width: 30,
                   height: 30,
-                  colorFilter:
-                      const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ), // Spacing between icon and text
                 const SizedBox(
                   width: 30,

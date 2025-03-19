@@ -1,7 +1,6 @@
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/tools_page_button.dart';
 import 'package:bbb/utils/screen_util.dart';
-import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +12,11 @@ class ToolsPage extends StatefulWidget {
 }
 
 class _ToolsPageState extends State<ToolsPage> {
+  final List<Map<String, String>> items = [
+    {
+      "image": "assets/img/verified (1).svg",
+    },
+  ];
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -47,13 +51,10 @@ class _ToolsPageState extends State<ToolsPage> {
                             child: Column(
                               children: [
                                 Container(
-                                  margin: const EdgeInsets.only(
-                                      right: 10, bottom: 0),
+                                  margin: const EdgeInsets.only(right: 10, bottom: 0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(
                                         height: 15,
@@ -64,16 +65,13 @@ class _ToolsPageState extends State<ToolsPage> {
                                           top: ScreenUtil.verticalScale(1),
                                         ),
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
                                               'Tools',
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize:
-                                                    ScreenUtil.verticalScale(
-                                                        2.5),
+                                                fontSize: ScreenUtil.verticalScale(2.5),
                                               ),
                                             ),
                                           ],
@@ -150,6 +148,14 @@ class _ToolsPageState extends State<ToolsPage> {
                                   title: 'Graphs & Reports',
                                   icon: 'assets/icons/graphs.svg',
                                   url: '/graphAndReports',
+                                ),
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(1.3),
+                                ),
+                                const ToolsPageButton(
+                                  title: 'Achievements',
+                                  icon: 'assets/img/verified (1).svg',
+                                  url: '/seeAllAchievementPage',
                                 ),
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(1.3),

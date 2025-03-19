@@ -273,7 +273,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
-                              settingsButton('Settings', Icons.settings, () => {}),
+                              settingsButton('Settings', Icons.settings, () => Navigator.pushNamed(context, '/SettingPage')),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),

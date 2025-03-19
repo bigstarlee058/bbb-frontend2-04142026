@@ -13,6 +13,7 @@ import 'package:bbb/pages/MonthView/TodayPage/today_page.dart';
 import 'package:bbb/pages/Notification/notifications_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/language_page.dart';
 import 'package:bbb/pages/ProfileAndSettings/myprofile_page.dart';
+import 'package:bbb/pages/ProfileAndSettings/setting_page.dart';
 import 'package:bbb/pages/Tools/GraphsReports/graph_and_reports_page.dart';
 import 'package:bbb/pages/Tools/bonus_library_page.dart';
 import 'package:bbb/pages/Tools/equipment_library_page.dart';
@@ -21,6 +22,7 @@ import 'package:bbb/pages/Tools/exercise_library_detail_page.dart';
 import 'package:bbb/pages/Tools/exercise_library_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
+import 'package:bbb/pages/Tools/seeall_achievement_page.dart';
 import 'package:bbb/pages/WatchTutorial/app_tutorial.dart';
 import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
 import 'package:bbb/pages/calendar_page.dart';
@@ -243,6 +245,8 @@ class _MyAppState extends State<MyApp> {
             AppRoutes.joinedChallengeScreen: (context) => const JoinedChallengePage(),
             AppRoutes.collectionDetailScreen: (context) => const CollectionDetailPage(),
             AppRoutes.appTutorialScreen: (context) => const AppTutorial(),
+            AppRoutes.settingPage: (context) => const SettingPage(),
+            AppRoutes.seeAllAchievementPage: (context) => const SeeAllAchievementPage(),
           },
         ),
       ),
