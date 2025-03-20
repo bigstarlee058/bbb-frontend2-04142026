@@ -83,9 +83,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
         locationProvider.fillDetails(userData1['detail']['country'], userData1['detail']['state'], userData1['detail']['city']);
       }
     });
-    // } catch (e) {
-    //   print('Failed to load user data: $e');
-    // }
   }
 
   bool isLoading = false;

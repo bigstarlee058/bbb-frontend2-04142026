@@ -112,9 +112,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                 Column(
                   children: [
                     Stack(
-                      children: [
+                      children: <Widget>[
                         Container(
-                          height: media.height / 2.3,
+                          height: media.height / 2,
                           width: media.width,
                           decoration: const BoxDecoration(
                             image: DecorationImage(
@@ -124,8 +124,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                             ),
                           ),
                         ),
-                        Container(
-                          height: media.height / 2.2,
+                        SizedBox(
+                          height: media.height / 3.2,
                           width: media.width,
                           child: SafeArea(
                             child: Column(

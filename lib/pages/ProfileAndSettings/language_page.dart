@@ -103,18 +103,19 @@ class _LanguagePageState extends State<LanguagePage> {
                                           ),
                                         ),
                                         child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              ScreenUtil.horizontalScale(1.5),
-                                            ),
-                                            child: selectedLanguage == 'English'
-                                                ? Image.asset(
-                                                    'assets/img/american.png',
-                                                    fit: BoxFit.fill,
-                                                  )
-                                                : Image.asset(
-                                                    'assets/img/spanish.png',
-                                                    fit: BoxFit.fill,
-                                                  )),
+                                          borderRadius: BorderRadius.circular(
+                                            ScreenUtil.horizontalScale(1.5),
+                                          ),
+                                          child: selectedLanguage == 'English'
+                                              ? Image.asset(
+                                                  'assets/img/american.png',
+                                                  fit: BoxFit.fill,
+                                                )
+                                              : Image.asset(
+                                                  'assets/img/spanish.png',
+                                                  fit: BoxFit.fill,
+                                                ),
+                                        ),
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.horizontalScale(5),

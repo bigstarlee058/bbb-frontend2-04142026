@@ -1,6 +1,8 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -27,11 +29,8 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> getSwitch() async {
-    isSwitchOn = await preferences.getBool(
-      SharedPreference.notificationSwitch,
-    );
+    isSwitchOn = await preferences.getBool(SharedPreference.notificationSwitch);
     setState(() {});
-    debugPrint('isSwitchOn :::::::::::::::::: $isSwitchOn');
   }
 
   bool isLoading = false;
@@ -94,7 +93,7 @@ class _SettingPageState extends State<SettingPage> {
                                       horizontal: ScreenUtil.horizontalScale(10), vertical: ScreenUtil.verticalScale(10)),
                                   child: Center(
                                     child: Text(
-                                      'Setting',
+                                      'Settings',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: ScreenUtil.horizontalScale(8),
@@ -130,68 +129,82 @@ class _SettingPageState extends State<SettingPage> {
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(
-                    top: media.height / 2.65,
-                    bottom: ScreenUtil.verticalScale(15),
-                  ),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
-                      ),
+                  margin: EdgeInsets.only(top: media.height / 2.65, bottom: ScreenUtil.verticalScale(15)),
+                  width: media.width,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildProfileField(
-                          context: context,
-                          label: "Unit of measurement",
-                          isFirstSelected: isSelected,
-                          onFirstTap: () {
-                            setState(() {
-                              isSelected = true; // Select first option
-                            });
-                          },
-                          onSecondTap: () {
-                            setState(() {
-                              isSelected = false; // Select second option
-                            });
-                          },
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // SizedBox(height: ScreenUtil.verticalScale(3.5)),
+                      // _buildProfileField(
+                      //   context: context,
+                      //   label: "Units of measurement",
+                      //   isFirstSelected: isSelected,
+                      //   onFirstTap: () {
+                      //     setState(() {
+                      //       isSelected = true;
+                      //     });
+                      //   },
+                      //   onSecondTap: () {
+                      //     setState(() {
+                      //       isSelected = false;
+                      //     });
+                      //   },
+                      // ),
+                      // Padding(
+                      //   padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
+                      //   child: Divider(
+                      //     thickness: 0.3,
+                      //     height: 0,
+                      //   ),
+                      // ),
+                      Container(
+                        margin: EdgeInsets.only(
+                          left: ScreenUtil.horizontalScale(9),
+                          right: ScreenUtil.horizontalScale(9),
+                          bottom: ScreenUtil.verticalScale(0.8),
+                          top: ScreenUtil.verticalScale(2),
                         ),
-                        Container(
-                          margin: EdgeInsets.only(
-                            left: ScreenUtil.horizontalScale(12),
-                            right: ScreenUtil.horizontalScale(12),
-                            bottom: ScreenUtil.verticalScale(0.8),
-                          ),
-                          height: ScreenUtil.verticalScale(8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Enable notifications?",
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        height: ScreenUtil.verticalScale(8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Enable notifications?",
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                              Switch(
+                            ),
+                            Consumer<MonthProvider>(builder: (context, monthDataModel, child) {
+                              return Switch(
                                 value: isSwitchOn ?? false, // Boolean value
-                                onChanged: (bool value) {
+                                onChanged: (bool value) async {
                                   setState(() {
                                     isSwitchOn = value; // Update state
                                   });
+                                  await preferences.setBool(SharedPreference.notificationSwitch, isSwitchOn ?? false);
+                                  if (isSwitchOn == true) {
+                                    await NotificationService.scheduleMonthlyReminder(20, monthDataModel.endTime ?? DateTime.now().toUtc());
+                                    await NotificationService.scheduleWeekReminder(30, monthDataModel.endTime ?? DateTime.now().toUtc());
+                                  } else {
+                                    await NotificationService.clearScheduledNotification();
+                                  }
                                 },
                                 activeColor: AppColors.primaryColor,
-                              ),
-                            ],
-                          ),
+                              );
+                            }),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: ScreenUtil.verticalScale(7)),
+                    ],
                   ),
                 ),
               ],
@@ -206,16 +219,13 @@ class _SettingPageState extends State<SettingPage> {
   Widget _buildProfileField({
     required BuildContext context,
     required String label,
-    required bool isFirstSelected, // Track selection state
-    required VoidCallback onFirstTap, // Tap for first option
-    required VoidCallback onSecondTap, // Tap for second option
+    required bool isFirstSelected,
+    required VoidCallback onFirstTap,
+    required VoidCallback onSecondTap,
   }) {
     return Container(
-      margin: EdgeInsets.only(
-        left: ScreenUtil.horizontalScale(12),
-        right: ScreenUtil.horizontalScale(12),
-        bottom: ScreenUtil.verticalScale(0.8),
-        top: ScreenUtil.verticalScale(3.5),
+      margin: EdgeInsets.symmetric(
+        horizontal: ScreenUtil.horizontalScale(9),
       ),
       height: ScreenUtil.verticalScale(8),
       child: Row(
@@ -239,9 +249,7 @@ class _SettingPageState extends State<SettingPage> {
             width: 10,
           ),
           _buildOption("lb/in", isFirstSelected, onFirstTap),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 15),
           _buildOption("kg/cm", !isFirstSelected, onSecondTap),
         ],
       ),

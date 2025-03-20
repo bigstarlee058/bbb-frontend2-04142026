@@ -2,7 +2,6 @@ import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 // import 'package:fl_chart/fl_chart.dart';
@@ -73,91 +72,44 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: media.height / 3.2),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: media.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(bottom: 50),
-                          child: GridView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3, // 3 columns
-                              crossAxisSpacing: 12, // Space between columns
-                              mainAxisSpacing: 34, // Space between rows
-                              childAspectRatio: 0.8, // Adjust height ratio
-                            ),
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              return _buildGridItem(items[index], index);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Column(
-                  children: [
-                    Stack(
-                      children: [
                         SizedBox(
-                          height: media.height / 2,
-                          width: media.width,
-                        ),
-                        SizedBox(
-                          height: media.height,
+                          height: media.height / 2.5,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      BackArrowWidget(
-                                        onPress: () {
-                                          if (mainPageProvider.selectedPage == 0) {
-                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                            mainPageProvider.changeTab(0);
-                                          } else {
-                                            // HapticFeedBack.buttonClick();
-                                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                            mainPageProvider.changeTab(2);
-                                          }
-                                        },
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(25)),
-                                        child: Consumer<UserDataProvider>(builder: (context, userData, child) {
-                                          return Text(
-                                            // 'Hi, Nick',
-                                            'Achievement',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: ScreenUtil.horizontalScale(5.5),
-                                            ),
-                                          );
-                                        }),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/graphAndReports')
-                                    ],
+                                AppBar(
+                                  centerTitle: true,
+                                  backgroundColor: Colors.transparent,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  title: Text(
+                                    'Achievements',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5),
+                                    ),
+                                  ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                SizedBox(
+                                  width: media.width * 0.4,
+                                  child: Text(
+                                    "Here's a look at your achievements",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(4.5),
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ],
@@ -165,7 +117,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 3.19,
+                          height: media.height / 4.59,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -185,6 +137,36 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     ),
                   ],
                 ),
+                Container(
+                  margin: EdgeInsets.only(top: media.height / 4.6),
+                  child: Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: media.width,
+                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(bottom: 50),
+                          child: GridView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3, crossAxisSpacing: 12, mainAxisSpacing: 20, childAspectRatio: 0.8),
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              return Container(color: Colors.transparent, child: _buildGridItem(items[index], index));
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
@@ -195,17 +177,14 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
 
   Widget _buildGridItem(Map<String, String> item, int index) {
     return Container(
-      padding: EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Prevents extra space
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Image Container (Fixed size)
           SizedBox(
-            height: 70, // Reduce height for better spacing
+            height: 70,
             width: 70,
             child: SvgPicture.asset(
               item["image"]!,
@@ -214,25 +193,29 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
             ),
           ),
           SizedBox(height: 5),
-
-          // Title
           Text(
             item["text"]!,
             maxLines: 1,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 11,
+              color: index == 1 ? AppColors.primaryColor : Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: 2),
-
-          // Description (Fixes Cut-Off Issue)
           Flexible(
             child: Text(
               item["description"]!,
-              maxLines: 2,
+              maxLines: 1,
               textAlign: TextAlign.center,
-              overflow: TextOverflow.visible, // Ensures it is readable
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+              overflow: TextOverflow.visible,
+              style: TextStyle(
+                fontSize: 11,
+                color: index == 1 ? AppColors.primaryColor : Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],

@@ -877,12 +877,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
                                   child: Container(
-                                    padding: EdgeInsets.only(
-                                      top: ScreenUtil.horizontalScale(5),
-                                      left: ScreenUtil.horizontalScale(8),
-                                      right: ScreenUtil.horizontalScale(8),
-                                      bottom: ScreenUtil.horizontalScale(8),
-                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.horizontalScale(5)),
                                     decoration: BoxDecoration(
                                       color: Colors.grey[100],
                                       borderRadius: BorderRadius.circular(15),
@@ -891,28 +887,40 @@ class _DashboardPageState extends State<DashboardPage> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Achievements',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: AppColors.primaryColor,
-                                                fontSize: 19,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                        Center(
+                                          child: Text(
+                                            'Achievements',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: AppColors.primaryColor,
+                                              fontSize: 19,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                          ],
+                                          ),
                                         ),
                                         const SizedBox(
-                                          height: 10,
+                                          height: 15,
                                         ),
-                                        SvgPicture.asset(
-                                          height: 50,
-                                          'assets/img/verified (1).svg',
-                                          color: AppColors.primaryColor,
-                                          fit: BoxFit.contain,
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              height: 50,
+                                              'assets/img/verified (1).svg',
+                                              color: AppColors.primaryColor,
+                                              fit: BoxFit.contain,
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              "Road to Fitness",
+                                              maxLines: 1,
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(fontSize: 13, color: AppColors.primaryColor, fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),

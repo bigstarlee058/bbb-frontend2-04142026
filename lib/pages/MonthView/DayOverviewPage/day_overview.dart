@@ -1103,7 +1103,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
             for (int z = 0; z < elementI.circuitExercises!.length; z++) {
               var elementZ = elementI.circuitExercises?[z];
               String dataId =
-                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j:$z";
               bool? val =
                   monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
               if (val == true) {

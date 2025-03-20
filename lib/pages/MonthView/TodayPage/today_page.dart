@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/custom_slide_to_act.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
@@ -22,7 +24,6 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:slide_to_act/slide_to_act.dart';
 
 import '../../../models/MonthResponseModel/all_exercise_model.dart';
 
@@ -46,12 +47,60 @@ class _TodayPageState extends State<TodayPage> {
   String currentDayTitle = '';
   MainPageProvider? mainPageProvider;
   bool loader = false;
-  final GlobalKey<SlideActionState> key = GlobalKey();
+  final GlobalKey<CustomSlideActionState> key = GlobalKey();
+
+  // bool isInit = true;
+  //
+  // Future<void> initData() async {
+  //   mainPageProvider?.changeTab(1);
+  //
+  //   final dayIndex = monthProvider!.overviewCurrentDay;
+  //   await monthProvider?.fetchSingleDayHistoryLocalData();
+  //   await monthProvider?.fetchDayStatusLocalData();
+  //   await monthProvider?.fetchExerciseStatusLocalData();
+  //
+  //   int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+  //       ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+  //       : 0;
+  //   currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+  //       ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+  //       : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
+  //   await monthProvider?.getRestDayData();
+  //
+  //   await fetchExtraAddedExercise().then(
+  //     (value) {
+  //       int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1].toString().contains("Workout")
+  //           ? int.parse(monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1]
+  //                   .toString()
+  //                   .replaceAll("Day ", "")
+  //                   .replaceAll(" Workout", "")) -
+  //               1
+  //           : 0;
+  //       currentDayTitle = monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1].toString().contains("Workout")
+  //           ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+  //           : monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1];
+  //       fetchWarmupData();
+  //       monthProvider?.fetchExerciseStatusLocalData();
+  //       fetchRemovedExerciseLocalData();
+  //       isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
+  //       isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+  //           monthProvider?.dayHistoryDetails == null ||
+  //           (monthProvider!.actualWeek! > 4 && monthProvider?.dayHistoryDetails?.status == Status.started);
+  //
+  //       monthProvider?.fetchAllExercise();
+  //     },
+  //   );
+  //
+  //   isInit = false;
+  //   setState(() {});
+  // }
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await initData());
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
@@ -243,7 +292,15 @@ class _TodayPageState extends State<TodayPage> {
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
-    return Scaffold(
+    return /*isInit
+        ? Container(
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryColor),
+            ),
+          )
+        :*/
+        Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -621,172 +678,203 @@ class _TodayPageState extends State<TodayPage> {
                                 color: Colors.black12,
                               ),
                               const SizedBox(height: 36),
-                              monthProvider?.dayHistoryDetails == null ||
-                                      (isCurrentDaySkipped || isCurrentDayCompleted) ||
-                                      monthProvider!.isPastWeek
-                                  ? Container(
-                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                      child: ButtonWidget(
-                                        text: monthProvider?.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
-                                        textColor: Colors.white,
-                                        onPress: null,
-                                        color: AppColors.primaryColor,
-                                        isLoading: false,
-                                      ),
-                                    )
-                                  : Consumer<MonthProvider>(
-                                      builder: (context, value, child) => Column(
-                                        children: [
-                                          value.dayHistoryDetails?.status != Status.skipped &&
-                                                  value.dayHistoryDetails?.status != Status.completed
-                                              ? Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                  child: SlideAction(
-                                                    key: key,
-                                                    height: ScreenUtil.verticalScale(7.5),
-                                                    outerColor: AppColors.primaryColor,
-                                                    innerColor: AppColors.backOffSetColor,
-                                                    sliderButtonIconSize: ScreenUtil.verticalScale(2),
-                                                    onSubmit: () async {
-                                                      return await onSwipe(value).then(
-                                                        (value) {
-                                                          key.currentState?.reset();
+                              Consumer<MonthProvider>(builder: (context, value, child) {
+                                return /*value.dayHistoryDetails != null && value.dayHistoryDetails?.status == Status.skipped
+                                    ? Container(
+                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                        child: ButtonWidget(
+                                          text: "Unskip?",
+                                          textColor: Colors.white,
+                                          onPress: () async {
+                                            String type = value.isPumpDay ? "" : 'Workout Day';
+
+                                            await _skipUnskipDayData(
+                                              status: "",
+                                              type: type,
+                                              title: "",
+                                            );
+                                            isCurrentDaySkipped = false;
+                                            setState(() {});
+                                          },
+                                          color: AppColors.skipDayColor,
+                                          isLoading: false,
+                                        ),
+                                      )
+                                    :*/
+                                    value.dayHistoryDetails == null || (isCurrentDaySkipped || isCurrentDayCompleted) || value.isPastWeek
+                                        ? Container(
+                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                            child: ButtonWidget(
+                                              text: value.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
+                                              textColor: Colors.white,
+                                              onPress: null,
+                                              color: AppColors.primaryColor,
+                                              isLoading: false,
+                                            ),
+                                          )
+                                        : Column(
+                                            children: [
+                                              value.dayHistoryDetails?.status != Status.skipped &&
+                                                      value.dayHistoryDetails?.status != Status.completed
+                                                  ? Padding(
+                                                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                      child: CustomSlideAction(
+                                                        key: key,
+                                                        height: ScreenUtil.verticalScale(7.5),
+                                                        outerColor: AppColors.primaryColor,
+                                                        innerColor: AppColors.backOffSetColor,
+                                                        sliderButtonIconPadding: ScreenUtil.verticalScale(1.3),
+                                                        submitButtonIconPadding: ScreenUtil.verticalScale(1.8),
+                                                        sliderButtonIcon: Icon(
+                                                          Icons.keyboard_arrow_right_outlined,
+                                                          color: AppColors.primaryColor,
+                                                          size: ScreenUtil.verticalScale(3.5),
+                                                        ),
+                                                        submittedButtonIcon: Icon(
+                                                          Icons.done,
+                                                          color: AppColors.primaryColor,
+                                                          size: ScreenUtil.verticalScale(2.5),
+                                                        ),
+                                                        onSubmit: () async {
+                                                          return await onSwipe(value).then(
+                                                            (value) {
+                                                              key.currentState?.reset();
+                                                            },
+                                                          );
                                                         },
-                                                      );
-                                                    },
-                                                    child: Text(
-                                                      "Swipe to complete",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: ScreenUtil.verticalScale(2.2),
-                                                        fontWeight: FontWeight.bold,
+                                                        child: Text(
+                                                          "Swipe to complete",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.verticalScale(2.2),
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      )
+
+                                                      //     ConfirmationSlider(
+                                                      //   width: double.infinity,
+                                                      //   height: ScreenUtil.verticalScale(7.5),
+                                                      //   onConfirmation: () => onSwipe,
+                                                      //   sliderButtonContent: Icon(Icons.chevron_right, color: AppColors.primaryColor, size: 30),
+                                                      //   text: "Swipe to complete",
+                                                      //   backgroundColor: AppColors.primaryColor,
+                                                      //   foregroundColor: AppColors.backOffSetColor,
+                                                      //   backgroundColorEnd: AppColors.primaryColor,
+                                                      //   textStyle: TextStyle(
+                                                      //     color: Colors.white,
+                                                      //     fontSize: ScreenUtil.verticalScale(2.2),
+                                                      //     fontWeight: FontWeight.bold,
+                                                      //   ),
+                                                      // ),
+                                                      )
+                                                  // ? Padding(
+                                                  //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                  //     child: ActionSlider.standard(
+                                                  //       height: ScreenUtil.verticalScale(7),
+                                                  //       backgroundColor: AppColors.primaryColor,
+                                                  //       toggleColor: AppColors.backOffSetColor,
+                                                  //       boxShadow: [],
+                                                  //       icon: Icon(Icons.double_arrow, color: AppColors.primaryColor),
+                                                  //       successIcon: Icon(
+                                                  //         Icons.check_rounded,
+                                                  //         color: AppColors.primaryColor,
+                                                  //       ),
+                                                  //       loadingIcon: Padding(
+                                                  //         padding: const EdgeInsets.all(10),
+                                                  //         child: CircularProgressIndicator(
+                                                  //           color: AppColors.primaryColor,
+                                                  //           strokeWidth: 2.5,
+                                                  //         ),
+                                                  //       ),
+                                                  //       action: (controller) async {
+                                                  //         HapticFeedBack.buttonClick();
+                                                  //         _saveDayData(
+                                                  //             status: Status.skipped,
+                                                  //             type: monthProvider!.isPumpDay
+                                                  //                 ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                                  //                 : "Workout Day",
+                                                  //             status1: Status.completed);
+                                                  //         value.updateCurrentDayTitleId(
+                                                  //             value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
+                                                  //
+                                                  //         if (mounted) {
+                                                  //           _sliderController.loading();
+                                                  //         }
+                                                  //
+                                                  //         await Future.delayed(Duration(milliseconds: 1000));
+                                                  //
+                                                  //         if (mounted) {
+                                                  //           _sliderController.success();
+                                                  //         }
+                                                  //
+                                                  //         if (!context.mounted) return;
+                                                  //         Navigator.pushNamed(context, '/dayCompleted');
+                                                  //       },
+                                                  //       child: Text(
+                                                  //         "Swipe to complete",
+                                                  //         style: TextStyle(
+                                                  //           color: Colors.white,
+                                                  //           fontSize: ScreenUtil.verticalScale(2.2),
+                                                  //           fontWeight: FontWeight.bold,
+                                                  //         ),
+                                                  //       ),
+                                                  //     ),
+                                                  //   )
+                                                  : Container(
+                                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                      child: ButtonWidget(
+                                                        text: value.dayHistoryDetails?.status == Status.completed
+                                                            ? "Completed"
+                                                            : value.dayHistoryDetails?.status == Status.skipped
+                                                                ? "Skipped"
+                                                                : "Finish the workout",
+                                                        textColor: Colors.white,
+                                                        onPress: value.dayHistoryDetails?.status == Status.completed ||
+                                                                value.dayHistoryDetails?.status == Status.skipped
+                                                            ? null
+                                                            : () async {
+                                                                HapticFeedBack.buttonClick();
+                                                                await _saveDayData(
+                                                                    status: Status.skipped,
+                                                                    type: monthProvider!.isPumpDay
+                                                                        ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                                                        : "Workout Day",
+                                                                    status1: Status.completed);
+                                                                if (!context.mounted) return;
+                                                                value.updateCurrentDayTitleId(
+                                                                    value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
+                                                                Navigator.pushNamed(context, '/dayCompleted');
+                                                              },
+                                                        color: AppColors.primaryColor,
+                                                        isLoading: false,
                                                       ),
                                                     ),
-                                                  )
-
-                                                  //     ConfirmationSlider(
-                                                  //   width: double.infinity,
-                                                  //   height: ScreenUtil.verticalScale(7.5),
-                                                  //   onConfirmation: () => onSwipe,
-                                                  //   sliderButtonContent: Icon(Icons.chevron_right, color: AppColors.primaryColor, size: 30),
-                                                  //   text: "Swipe to complete",
-                                                  //   backgroundColor: AppColors.primaryColor,
-                                                  //   foregroundColor: AppColors.backOffSetColor,
-                                                  //   backgroundColorEnd: AppColors.primaryColor,
-                                                  //   textStyle: TextStyle(
-                                                  //     color: Colors.white,
-                                                  //     fontSize: ScreenUtil.verticalScale(2.2),
-                                                  //     fontWeight: FontWeight.bold,
-                                                  //   ),
-                                                  // ),
-                                                  )
-                                              // ? Padding(
-                                              //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                              //     child: ActionSlider.standard(
-                                              //       height: ScreenUtil.verticalScale(7),
-                                              //       backgroundColor: AppColors.primaryColor,
-                                              //       toggleColor: AppColors.backOffSetColor,
-                                              //       boxShadow: [],
-                                              //       icon: Icon(Icons.double_arrow, color: AppColors.primaryColor),
-                                              //       successIcon: Icon(
-                                              //         Icons.check_rounded,
-                                              //         color: AppColors.primaryColor,
-                                              //       ),
-                                              //       loadingIcon: Padding(
-                                              //         padding: const EdgeInsets.all(10),
-                                              //         child: CircularProgressIndicator(
-                                              //           color: AppColors.primaryColor,
-                                              //           strokeWidth: 2.5,
-                                              //         ),
-                                              //       ),
-                                              //       action: (controller) async {
-                                              //         HapticFeedBack.buttonClick();
-                                              //         _saveDayData(
-                                              //             status: Status.skipped,
-                                              //             type: monthProvider!.isPumpDay
-                                              //                 ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                              //                 : "Workout Day",
-                                              //             status1: Status.completed);
-                                              //         value.updateCurrentDayTitleId(
-                                              //             value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
-                                              //
-                                              //         if (mounted) {
-                                              //           _sliderController.loading();
-                                              //         }
-                                              //
-                                              //         await Future.delayed(Duration(milliseconds: 1000));
-                                              //
-                                              //         if (mounted) {
-                                              //           _sliderController.success();
-                                              //         }
-                                              //
-                                              //         if (!context.mounted) return;
-                                              //         Navigator.pushNamed(context, '/dayCompleted');
-                                              //       },
-                                              //       child: Text(
-                                              //         "Swipe to complete",
-                                              //         style: TextStyle(
-                                              //           color: Colors.white,
-                                              //           fontSize: ScreenUtil.verticalScale(2.2),
-                                              //           fontWeight: FontWeight.bold,
-                                              //         ),
-                                              //       ),
-                                              //     ),
-                                              //   )
-                                              : Container(
-                                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                  child: ButtonWidget(
-                                                    text: value.dayHistoryDetails?.status == Status.completed
-                                                        ? "Completed"
-                                                        : value.dayHistoryDetails?.status == Status.skipped
-                                                            ? "Skipped"
-                                                            : "Finish the workout",
-                                                    textColor: Colors.white,
-                                                    onPress: value.dayHistoryDetails?.status == Status.completed ||
-                                                            value.dayHistoryDetails?.status == Status.skipped
-                                                        ? null
-                                                        : () async {
-                                                            HapticFeedBack.buttonClick();
-                                                            await _saveDayData(
-                                                                status: Status.skipped,
-                                                                type: monthProvider!.isPumpDay
-                                                                    ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                                                    : "Workout Day",
-                                                                status1: Status.completed);
-                                                            if (!context.mounted) return;
-                                                            value.updateCurrentDayTitleId(
-                                                                value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
-                                                            Navigator.pushNamed(context, '/dayCompleted');
-                                                          },
-                                                    color: AppColors.primaryColor,
-                                                    isLoading: false,
-                                                  ),
-                                                ),
-                                          const SizedBox(height: 14),
-                                          value.dayHistoryDetails?.status != Status.skipped &&
-                                                  value.dayHistoryDetails?.status != Status.completed
-                                              ? Container(
-                                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                  child: ButtonWidget(
-                                                    text: "Skip the workout",
-                                                    textColor: Colors.white,
-                                                    color: AppColors.skipDayColor,
-                                                    isLoading: false,
-                                                    onPress: () async {
-                                                      showDialog(
-                                                        barrierDismissible: false,
-                                                        context: context,
-                                                        builder: (c1) {
-                                                          return skipWorkoutDialog(context, c1);
+                                              const SizedBox(height: 14),
+                                              value.dayHistoryDetails?.status != Status.skipped &&
+                                                      value.dayHistoryDetails?.status != Status.completed
+                                                  ? Container(
+                                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                      child: ButtonWidget(
+                                                        text: "Skip the workout",
+                                                        textColor: Colors.white,
+                                                        color: AppColors.skipDayColor,
+                                                        isLoading: false,
+                                                        onPress: () async {
+                                                          showDialog(
+                                                            barrierDismissible: false,
+                                                            context: context,
+                                                            builder: (c1) {
+                                                              return skipWorkoutDialog(context, c1);
+                                                            },
+                                                          );
                                                         },
-                                                      );
-                                                    },
-                                                  ),
-                                                )
-                                              : const SizedBox(),
-                                        ],
-                                      ),
-                                    ),
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
+                                            ],
+                                          );
+                              }),
                               const SizedBox(
                                 height: 90,
                               ),
@@ -962,7 +1050,7 @@ class _TodayPageState extends State<TodayPage> {
                               onPressed: () async {
                                 _saveDayData(
                                     status: Status.skipped,
-                                    type: monthProvider!.isPumpDay ? "Pump Day- ${monthProvider?.pumpDayModel?.id}" : "Workout Day",
+                                    type: monthProvider!.isPumpDay ? "Pump Day - ${monthProvider?.pumpDayModel?.id}" : "Workout Day",
                                     status1: Status.skipped);
                                 Navigator.of(c1).pop();
                                 if (!context.mounted) return;
@@ -2261,16 +2349,17 @@ class _TodayPageState extends State<TodayPage> {
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
-    ///
-
+    final data = monthProvider?.dayHistoryModel.where((element) => element.dataId == dataId).toList();
     final data1 = {
       "status": status1,
       "type": type,
       "endTime": (status == Status.completed || status == Status.skipped) ? "${DateTime.now().toUtc()}" : "",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),
-      "averageRIR": average.toString()
+      "averageRIR": average.toString(),
+      if (data!.isNotEmpty) "startTime": data.first.startTime == null ? "${DateTime.now().toUtc()}" : data.first.startTime.toString()
     };
+    log('data1 :::::::::::::::::: $data1');
     // final apiReqBody = {
     //   "status": status1,
     //   "type": type,
@@ -2287,10 +2376,145 @@ class _TodayPageState extends State<TodayPage> {
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.updatePumpDayStatus();
-
     monthProvider?.manageStreak();
     monthProvider?.getLiftedWeightGraphData();
   }
+
+  // Future<void> _skipUnskipDayData({required String status, required String type, String? title}) async {
+  //   String split =
+  //       monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  //
+  //   await unSkipped(status);
+  //
+  //   String dataId =
+  //       "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+  //
+  //   final data = {
+  //     "title": title ?? "",
+  //     "dataId": dataId,
+  //     "monthId": monthProvider?.monthDataModel?.id,
+  //     "weekId": monthProvider?.weekDataModel?.id,
+  //     "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+  //     "split": split,
+  //     "date": "${DateTime.now().toUtc()}",
+  //     "status": status,
+  //     "type": type,
+  //     "startTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+  //     "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+  //   };
+  //
+  //   DayHistoryModel? matchingElement =
+  //       monthProvider?.dayHistoryModel.firstWhere((element) => element.dataId == dataId, orElse: () => DayHistoryModel());
+  //
+  //   final data1 = {
+  //     "title": title ?? "",
+  //     "status": status,
+  //     "type": type,
+  //     "startTime": status == Status.empty
+  //         ? ""
+  //         : matchingElement?.startTime == null
+  //             ? "${DateTime.now().toUtc()}"
+  //             : matchingElement?.startTime.toString(),
+  //     "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+  //   };
+  //   // final data1apiReqBody = {
+  //   //   "title": title ?? "",
+  //   //   "status": status,
+  //   //   "type": type,
+  //   //   "startTime": status == Status.empty
+  //   //       ? ""
+  //   //       : matchingElement?.startTime == null
+  //   //           ? "${DateTime.now().toUtc()}"
+  //   //           : matchingElement?.startTime.toString(),
+  //   //   "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+  //   //   "dataId": dataId,
+  //   // };
+  //
+  //   if (matchingElement?.id != null) {
+  //     // ApiRepo.updateDayStatus(body: data1apiReqBody);
+  //     await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+  //   } else {
+  //     // ApiRepo.addDayStatus(body: data);
+  //     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+  //   }
+  //   await monthProvider?.fetchSingleDayHistoryLocalData();
+  //   await monthProvider?.updateDayData();
+  //   await monthProvider?.fetchExerciseHistoryLocalData();
+  //   await monthProvider?.fetchExerciseStatusLocalData();
+  //   await monthProvider?.updatePumpDayStatus();
+  //   monthProvider?.manageStreak();
+  //   monthProvider?.getLiftedWeightGraphData();
+  // }
+
+  // Future<void> unSkipped(String status) async {
+  //   String split =
+  //       monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  //
+  //   if (monthProvider!.isPumpDay) {
+  //     if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
+  //       final data = monthProvider!.pumpDayModel!.circuits!;
+  //       for (int i = 0; i < data.length; i++) {
+  //         var elementI = data[i];
+  //         for (int j = 0; j < elementI.round!; j++) {
+  //           for (int z = 0; z < elementI.circuitExercises!.length; z++) {
+  //             var elementZ = elementI.circuitExercises?[z];
+  //             String dataId =
+  //                 "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j:$z";
+  //             bool? val =
+  //                 monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
+  //             if (val == true) {
+  //               await _unskipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //
+  //   if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises != null : monthProvider!.dayDataModel!.exercises != null) {
+  //     final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises : monthProvider!.dayDataModel!.exercises;
+  //     for (int i = 0; i < data!.length; i++) {
+  //       var elementI = data[i];
+  //       String dataId =
+  //           "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+  //       bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
+  //       if (val == true) {
+  //         await _unskipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
+  //       }
+  //     }
+  //   }
+  //   if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups != null : monthProvider!.dayDataModel!.warmups != null) {
+  //     final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups : monthProvider!.dayDataModel!.warmups;
+  //     for (int i = 0; i < data!.length; i++) {
+  //       var elementI = data[i];
+  //       String dataId =
+  //           "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
+  //       bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
+  //       if (val == true) {
+  //         await _unskipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
+  //       }
+  //     }
+  //   }
+  // }
+
+  // Future<void> _unskipExerciseData({required String status, required String id, required String type}) async {
+  //   String split =
+  //       monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  //
+  //   String dataId =
+  //       "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
+  //   final data = {
+  //     "status": status,
+  //     "type": type,
+  //   };
+  //   // final apiReqBody = {
+  //   //   "status": status,
+  //   //   "type": type,
+  //   //   "dataId": dataId,
+  //   // };
+  //   // ApiRepo.updateExerciseStatus(body: apiReqBody);
+  //   await DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
+  // }
 }
 
 class SearchEquipmentField extends StatelessWidget {

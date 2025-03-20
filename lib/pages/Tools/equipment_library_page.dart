@@ -105,7 +105,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                     Stack(
                       children: [
                         Container(
-                          height: media.height / 2.3,
+                          height: media.height / 2,
                           width: media.width,
                           decoration: const BoxDecoration(
                             image: DecorationImage(
@@ -116,7 +116,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                           ),
                         ),
                         Container(
-                          height: media.height / 2.2,
+                          height: media.height / 3.2,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
