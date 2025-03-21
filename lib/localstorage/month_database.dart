@@ -156,14 +156,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS $extraExerciseHistory (
         id INTEGER PRIMARY KEY autoincrement,
-        dataId TEXT,
-        split TEXT,
-        monthId TEXT,
-        weekId TEXT,
-        dayId TEXT,
-        date TEXT, 
-        exerciseId TEXT,
-        exerciseJson Text
+  extraExerciseHistory
       )
     ''');
 

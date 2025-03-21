@@ -3,6 +3,9 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/components/select_dropdown1.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/middleware/api/api_repo.dart';
+import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
 import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
@@ -560,7 +563,7 @@ class _MonthViewState extends State<MonthView> {
     );
   }
 
-  void continueWorkoutOnTap(BuildContext context) {
+  Future<void> continueWorkoutOnTap(BuildContext context) async {
     HapticFeedBack.buttonClick();
     int? index = monthProvider!.monthDataModel?.weeks?[(monthProvider!.week ?? 1) - 1].idList
         ?.indexWhere((element) => element == monthProvider!.todayTitleId);
@@ -632,6 +635,108 @@ class _MonthViewState extends State<MonthView> {
     monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
     monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
     monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
-    Navigator.pushNamed(context, '/dayOverview');
+
+    final dayIndex1 = monthProvider!.overviewCurrentDay;
+
+    int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
+        ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex1 - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+        : 0;
+    String currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
+        ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+        : monthProvider!.weekDataModel!.dayList![dayIndex1 - 1];
+    if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay)) {
+      Navigator.pushNamed(context, '/dayOverview');
+    } else {
+      if (monthProvider!.isPumpDay) {
+        if ((monthProvider!.allSplitDayHistoryModel
+                .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+            false) {
+          _saveDayData(
+              type: "Pump Day - ${monthProvider!.pumpDayModel?.id}", status: Status.started, title: monthProvider!.pumpDayModel?.title);
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today').then(
+            (value) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await monthProvider!.checkForPumpDay());
+            },
+          );
+        } else {
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today');
+        }
+      } else {
+        if ((monthProvider!.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
+          _saveDayData(status: Status.started, type: 'Workout Day');
+        }
+        if (!context.mounted) return;
+        await Navigator.pushNamed(context, '/today');
+      }
+    }
+    // Navigator.pushNamed(context, '/dayOverview');
+  }
+
+  Future<void> _saveDayData({required String status, required String type, String? title}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+
+    final data = {
+      "title": title ?? "",
+      "dataId": dataId,
+      "monthId": monthProvider?.monthDataModel?.id,
+      "weekId": monthProvider?.weekDataModel?.id,
+      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "split": split,
+      "date": "${DateTime.now().toUtc()}",
+      "status": status,
+      "type": type,
+      "startTime": "${DateTime.now().toUtc()}",
+      "endTime": "",
+    };
+
+    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => DayHistoryModel(),
+    );
+
+    final data1 = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+    };
+
+    final apiBody = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "dataId": dataId
+    };
+
+    if (matchingElement?.id != null) {
+      ApiRepo.updateDayStatus(body: apiBody);
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+    } else {
+      ApiRepo.addDayStatus(body: data);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+    }
+
+    await monthProvider?.fetchAllDayStatusLocalData();
+    monthProvider?.findWeekStatuses();
+    monthProvider?.fetchToday();
+    monthProvider?.manageStreak();
+    monthProvider?.getLiftedWeightGraphData();
   }
 }

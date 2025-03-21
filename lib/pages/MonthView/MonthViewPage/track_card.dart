@@ -1,7 +1,6 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:bbb/components/expansion_panel.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -308,36 +307,22 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                                 orElse: () => DayHistoryModel(),
                                               );
 
-                                              return (isRestDay &&
-                                                              monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek &&
-                                                              monthProvider.isPumpDayAvailable) &&
-                                                          (monthProvider.allDayHistoryModel.any((element) =>
-                                                                  (element.status != Status.skipped &&
-                                                                      element.status != Status.completed &&
-                                                                      (dataId == element.dataId))) ||
-                                                              (!monthProvider.allDayHistoryModel
-                                                                  .map((e) => e.dataId)
-                                                                  .toList()
-                                                                  .contains(dataId))) ||
-                                                      (isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
-                                                          // monthProvider!.isPumpDayAvailable &&
-                                                          (monthProvider.allDayHistoryModel.any((element) =>
-                                                              ((element.status == Status.started) && dataId == element.dataId)))
-                                                  ? pumpRestSelection(index, dayData, context, weekDataModel!.idList![index], dataId)
+                                              return isRestPumpOption(isRestDay, monthProvider, dataId)
+                                                  ? pumpRestSelection(
+                                                      index, dayData, context, weekDataModel!.idList![index], dataId, monthProvider)
                                                   : Text(
-                                                      matchingElement.id != null
-                                                          ? matchingElement.title ?? "Pump Day"
-                                                          : !isRestDay
-                                                              ? weekDataModel!.days![nextWorkOutIndex].title
+                                                      !isRestDay
+                                                          ? weekDataModel!.days![nextWorkOutIndex].title
+                                                          : (matchingElement.type ?? "").contains("Pump Day")
+                                                              ? matchingElement.title
                                                               : weekDataModel!.dayList![index],
                                                       style: TextStyle(
-                                                        color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek
-                                                            ? Colors.white
-                                                            : AppColors.primaryColor,
-                                                        fontSize: ScreenUtil.verticalScale(2),
-                                                        fontWeight: FontWeight.bold,
-                                                        height: 1,
-                                                      ),
+                                                          color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek
+                                                              ? Colors.white
+                                                              : AppColors.primaryColor,
+                                                          fontSize: ScreenUtil.verticalScale(2),
+                                                          fontWeight: FontWeight.bold,
+                                                          height: 1),
                                                     );
                                             },
                                           ),
@@ -356,26 +341,35 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                         ]
                                       ],
                                     ),
-                                    monthProvider.weekStatuses[mainIndex!] == WeekType.futureWeek
-                                        ? SizedBox()
-                                        : Container(
-                                            padding: EdgeInsets.all(
-                                              ScreenUtil.verticalScale(0.5),
-                                            ),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: Colors.white,
-                                                width: 2,
+                                    Builder(builder: (context) {
+                                      DayHistoryModel? matchingElement = monthProvider.allDayHistoryModel.firstWhere(
+                                        (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                        orElse: () => DayHistoryModel(),
+                                      );
+                                      return monthProvider.weekStatuses[mainIndex!] == WeekType.futureWeek ||
+                                              (!isRestPumpOption(isRestDay, monthProvider, dataId) &&
+                                                  isRestDay &&
+                                                  !(matchingElement.type ?? "").contains("Pump Day"))
+                                          ? SizedBox()
+                                          : Container(
+                                              padding: EdgeInsets.all(
+                                                ScreenUtil.verticalScale(0.5),
                                               ),
-                                              color: Colors.white,
-                                            ),
-                                            child: Icon(
-                                              Icons.keyboard_arrow_right_outlined,
-                                              color: AppColors.primaryColor,
-                                              size: ScreenUtil.verticalScale(2.5),
-                                            ),
-                                          ),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 2,
+                                                ),
+                                                color: Colors.white,
+                                              ),
+                                              child: Icon(
+                                                Icons.keyboard_arrow_right_outlined,
+                                                color: AppColors.primaryColor,
+                                                size: ScreenUtil.verticalScale(2.5),
+                                              ),
+                                            );
+                                    }),
                                   ],
                                 ),
                               ),
@@ -392,6 +386,15 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         ),
       ),
     );
+  }
+
+  bool isRestPumpOption(bool isRestDay, MonthProvider monthProvider, String dataId) {
+    return (isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek && monthProvider.isPumpDayAvailable) &&
+            (monthProvider.allDayHistoryModel.any(
+                    (element) => (element.status != Status.skipped && element.status != Status.completed && (dataId == element.dataId))) ||
+                (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId))) ||
+        (isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
+            (monthProvider.allDayHistoryModel.any((element) => ((element.status == Status.started) && dataId == element.dataId)));
   }
 
   Future<void> continueWorkoutOnTap(
@@ -423,20 +426,14 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
           .toList();
 
-      log('dataList :::::::::::::::::: ${jsonEncode(dataList)}');
-      log(' monthProvider!.pumpDays :::::::::::::::::: ${monthProvider!.pumpDays.map(
-        (e) => e.id,
-      )}');
       if (dataList!.isNotEmpty) {
         int index1 = monthProvider!.pumpDays
             .indexWhere((el1) => dataList.any((e1) => (e1.dayId == dayId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
-        log('index1 :::::::::::::::::: $index1');
         if (index1 != -1) {
           monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index1]);
         } else {
           int index1 =
               monthProvider!.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
-          log('index1 :::::::::11::::::::: $index1');
           monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index == -1
               ? 0
               : index1 == 0
@@ -455,93 +452,110 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     monthProvider?.weekDataModel = weekDataModel;
     monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
-    // final dayIndex = monthProvider!.overviewCurrentDay;
-    // int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
-    //     ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
-    //     : 0;
-    // String currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
-    //     ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
-    //     : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
-    //
-    // if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay)) {
-    //   Navigator.pushNamed(context, '/dayOverview');
-    // } else {
-    //   if (monthProvider!.isPumpDay) {
-    //     if ((monthProvider!.allSplitDayHistoryModel
-    //             .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
-    //         false) {
-    //       await _saveDayData(
-    //         type: "Pump Day - ${monthProvider!.pumpDayModel?.id}",
-    //         status: Status.started,
-    //         title: monthProvider!.pumpDayModel?.title,
-    //       );
-    //     }
-    //   } else {
-    //     if ((monthProvider?.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
-    //       await _saveDayData(
-    //         status: Status.started,
-    //         type: 'Workout Day',
-    //       );
-    //     }
-    //   }
-    //   if (!context.mounted) return;
-    //   await Navigator.pushNamed(context, '/today');
-    // }
+    final dayIndex = monthProvider!.overviewCurrentDay;
+    int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+        ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+        : 0;
+    String currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+        ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+        : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
 
-    Navigator.pushNamed(context, '/dayOverview');
+    if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay)) {
+      Navigator.pushNamed(context, '/dayOverview');
+    } else {
+      if (monthProvider!.isPumpDay) {
+        if ((monthProvider!.allSplitDayHistoryModel
+                .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+            false) {
+          _saveDayData(
+              type: "Pump Day - ${monthProvider!.pumpDayModel?.id}", status: Status.started, title: monthProvider!.pumpDayModel?.title);
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today').then(
+            (value) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await monthProvider?.checkForPumpDay());
+            },
+          );
+        } else {
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today');
+        }
+      } else {
+        if ((monthProvider?.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
+          _saveDayData(status: Status.started, type: 'Workout Day');
+        }
+        if (!context.mounted) return;
+        await Navigator.pushNamed(context, '/today');
+      }
+    }
+
+    // Navigator.pushNamed(context, '/dayOverview');
   }
 
-  Widget pumpRestSelection(int index, DayDataModel dayData, BuildContext context, String dayId, String dataId) {
+  Widget pumpRestSelection(
+    int index,
+    DayDataModel dayData,
+    BuildContext context,
+    String dayId,
+    String dataId,
+    MonthProvider monthProvider,
+  ) {
     return Row(
       children: [
         GestureDetector(
           onTap: () async {
-            monthProvider?.changeIsPumpDay(true);
+            monthProvider.changeIsPumpDay(true);
 
-            final dataList = monthProvider?.dayHistoryModel
+            final dataList = monthProvider.dayHistoryModel
                 .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
                 .toList();
 
-            if (dataList!.isNotEmpty) {
-              int index1 = monthProvider!.pumpDays.indexWhere(
+            if (dataList.isNotEmpty) {
+              int index1 = monthProvider.pumpDays.indexWhere(
                   (el1) => dataList.any((e1) => (e1.dayId == dayId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
               if (index1 != -1) {
-                monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index1]);
+                monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
               } else {
-                int index1 = monthProvider!.pumpDays
+                int index1 = monthProvider.pumpDays
                     .indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
-                monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index == -1
+                monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
                     ? 0
                     : index1 == 0
                         ? 1
                         : 0]);
               }
             } else {
-              monthProvider?.updatePumpDayData(monthProvider!.pumpDays[0]);
+              monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
             }
 
             // monthProvider?.updatePumpDayData(monthProvider!.pumpDays[
             //     int.parse(monthProvider!.monthDataModel!.weeks![monthProvider!.week! - 1].dayList![index].toString().split(" ").last) - 1]);
-            monthProvider?.overviewCurrentWeek = widget.weekIndex + 1;
-            monthProvider?.overviewCurrentDay = index + 1;
-            monthProvider?.dayDataModel = dayData;
-            monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
-            monthProvider?.weekDataModel = weekDataModel;
-            monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
+            monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
+            monthProvider.overviewCurrentDay = index + 1;
+            monthProvider.dayDataModel = dayData;
+            monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+            monthProvider.weekDataModel = weekDataModel;
+            monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
-            // if ((monthProvider!.allSplitDayHistoryModel.any(
-            //         (element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
-            //     false) {
-            //   await _saveDayData(
-            //     type: "Pump Day - ${monthProvider!.pumpDayModel?.id}",
-            //     status: Status.started,
-            //     title: monthProvider!.pumpDayModel?.title,
-            //   );
-            // }
-            //
-            // if (!context.mounted) return;
-            // await Navigator.pushNamed(context, '/today');
-            await Navigator.pushNamed(context, '/dayOverview');
+            if ((monthProvider.allSplitDayHistoryModel.any(
+                    (element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+                false) {
+              _saveDayData(
+                type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+                status: Status.started,
+                title: monthProvider.pumpDayModel?.title,
+              );
+              if (!context.mounted) return;
+              await Navigator.pushNamed(context, '/today').then(
+                (value) {
+                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await monthProvider.checkForPumpDay());
+                },
+              );
+            } else {
+              if (!context.mounted) return;
+              await Navigator.pushNamed(context, '/today');
+            }
+
+            // await Navigator.pushNamed(context, '/dayOverview');
           },
           child: Container(
             width: 85,
@@ -574,13 +588,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         ),
         GestureDetector(
           onTap: () {
-            monthProvider?.changeIsPumpDay(false);
-            monthProvider?.overviewCurrentWeek = widget.weekIndex + 1;
-            monthProvider?.overviewCurrentDay = index + 1;
-            monthProvider?.dayDataModel = dayData;
-            monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
-            monthProvider?.weekDataModel = weekDataModel;
-            monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
+            monthProvider.changeIsPumpDay(false);
+            monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
+            monthProvider.overviewCurrentDay = index + 1;
+            monthProvider.dayDataModel = dayData;
+            monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+            monthProvider.weekDataModel = weekDataModel;
+            monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
             Navigator.pushNamed(context, '/dayOverview');
           },
           child: Container(
@@ -703,58 +717,71 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     );
   }
 
-  // Future<void> _saveDayData({required String status, required String type, String? title}) async {
-  //   String split =
-  //       monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-  //
-  //   String dataId =
-  //       "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
-  //
-  //   final data = {
-  //     "title": title ?? "",
-  //     "dataId": dataId,
-  //     "monthId": monthProvider?.monthDataModel?.id,
-  //     "weekId": monthProvider?.weekDataModel?.id,
-  //     "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-  //     "split": split,
-  //     "date": "${DateTime.now().toUtc()}",
-  //     "status": status,
-  //     "type": type,
-  //     "startTime": "${DateTime.now().toUtc()}",
-  //     "endTime": "",
-  //   };
-  //
-  //   DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
-  //     (element) => element.dataId == dataId,
-  //     orElse: () => DayHistoryModel(),
-  //   );
-  //
-  //   final data1 = {
-  //     "title": title ?? "",
-  //     "status": status,
-  //     "type": type,
-  //     "startTime": status == Status.empty
-  //         ? ""
-  //         : matchingElement?.startTime == null
-  //             ? "${DateTime.now().toUtc()}"
-  //             : matchingElement?.startTime.toString(),
-  //     "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
-  //   };
-  //
-  //   if (matchingElement?.id != null) {
-  //     // ApiRepo.updateDayStatus(body: apiReqBody);
-  //     await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
-  //   } else {
-  //     // ApiRepo.addDayStatus(body: data);
-  //     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
-  //   }
-  //
-  //   // await monthProvider?.fetchDayStatusLocalData();
-  //   // await monthProvider?.fetchSingleDayHistoryLocalData();
-  //   // await monthProvider?.updateDayData();
-  //   monthProvider?.findWeekStatuses();
-  //   monthProvider?.fetchToday();
-  //   monthProvider?.manageStreak();
-  //   monthProvider?.getLiftedWeightGraphData();
-  // }
+  Future<void> _saveDayData({required String status, required String type, String? title}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+
+    final data = {
+      "title": title ?? "",
+      "dataId": dataId,
+      "monthId": monthProvider?.monthDataModel?.id,
+      "weekId": monthProvider?.weekDataModel?.id,
+      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "split": split,
+      "date": "${DateTime.now().toUtc()}",
+      "status": status,
+      "type": type,
+      "startTime": "${DateTime.now().toUtc()}",
+      "endTime": "",
+    };
+
+    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => DayHistoryModel(),
+    );
+
+    final data1 = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+    };
+
+    final apiBody = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "dataId": dataId
+    };
+
+    if (matchingElement?.id != null) {
+      ApiRepo.updateDayStatus(body: apiBody);
+
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+    } else {
+      ApiRepo.addDayStatus(body: data);
+
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+    }
+
+    await monthProvider?.fetchAllDayStatusLocalData();
+    monthProvider?.findWeekStatuses();
+    monthProvider?.fetchToday();
+    monthProvider?.manageStreak();
+    monthProvider?.getLiftedWeightGraphData();
+  }
 }

@@ -21,6 +21,7 @@ class DayStatusDataModel {
   String? type;
   String? totalWeight;
   String? completedExerciseCount;
+  String? averageRIR;
   DateTime? createdAt;
   DateTime? updatedAt;
   int? v;
@@ -41,6 +42,7 @@ class DayStatusDataModel {
     this.endTime,
     this.type,
     this.totalWeight,
+    this.averageRIR,
     this.completedExerciseCount,
     this.createdAt,
     this.updatedAt,
@@ -53,6 +55,7 @@ class DayStatusDataModel {
         userId: json["userId"],
         split: json["split"],
         dataId: json["dataId"],
+        averageRIR: json["averageRIR"],
         monthId: json["monthId"],
         weekId: json["weekId"],
         dayId: json["dayId"],
@@ -76,6 +79,7 @@ class DayStatusDataModel {
         "split": split,
         "dataId": dataId,
         "monthId": monthId,
+        "averageRIR": averageRIR,
         "weekId": weekId,
         "dayId": dayId,
         "date": date?.toIso8601String(),

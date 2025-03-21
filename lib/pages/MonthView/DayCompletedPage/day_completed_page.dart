@@ -1,5 +1,7 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -47,29 +49,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     totalWeight = 0;
     exerciseCompleted = 0;
     averageRIR = 0;
-
     data = monthProvider!.decodedDataAll();
     DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
     dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
     formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
-
-    // int totalWorkoutDuration = 0;
-    // monthProvider?.allDayHistoryModel.forEach(
-    //   (element) {
-    //     if (element.endTime != null) {
-    //       final startTime = element.startTime!;
-    //       final endTime = element.endTime!;
-    //       DateTime localStartTime = Utils.formattedDate("$startTime");
-    //       DateTime localEndTime = Utils.formattedDate("$endTime");
-    //       if (DateFormat('yyyy-MM-dd').format(localEndTime) == DateFormat('yyyy-MM-dd').format(DateTime.now()) &&
-    //           element.status == Status.completed) {
-    //         int duration = localEndTime.difference(localStartTime).inSeconds;
-    //         totalWorkoutDuration += duration;
-    //         totalWeight += double.parse(element.totalWeight ?? "0");
-    //       }
-    //     }
-    //   },
-    // );
 
     DayHistoryModel? data1 = monthProvider?.allDayHistoryModel.firstWhere(
       (element) {
@@ -95,10 +78,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     }
 
     await Future.delayed(const Duration(milliseconds: 1000));
-    // if (loader != false) {
-    //   loader = false;
-    //   setState(() {});
-    // }
+
     setState(() {});
   }
 
@@ -113,493 +93,548 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => onInit(),
-      // ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: media.height / 2,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 2,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () async {
-                                          // mainPageProvider.changeTab(4);
-                                          Navigator.pushNamed(context, '/streak-calendar');
-                                          // Navigator.pushNamed(context, '/streak');
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black12,
-                                                shape: BoxShape.circle,
-                                                border: Border.all(color: Colors.white),
-                                              ),
-                                              child: Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                                return Text(
-                                                  monthProvider.streak.toString(),
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: ScreenUtil.verticalScale(0.8),
-                                                  ),
-                                                );
-                                              }),
-                                            ),
-                                            Icon(
-                                              Icons.local_fire_department_outlined,
-                                              color: Colors.white,
-                                              size: ScreenUtil.verticalScale(3),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(context, '/notifications');
-                                        },
-                                        icon: Icon(
-                                          Icons.notifications_none,
-                                          color: Colors.white,
-                                          size: ScreenUtil.verticalScale(3),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(5),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(height: ScreenUtil.horizontalScale(10)),
-                                      Text(
-                                        'Congratulations!',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(8.5),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        'You completed',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(2),
-                                        ),
-                                      ),
-                                      Text(
-                                        "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(3),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 2.79,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+      body: Stack(
+        children: [
+          Stack(
+            children: [
+              Container(
+                height: media.height / 2,
+                width: media.width,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: media.height / 2.8),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
-                      ),
-                    ),
-                    child: Container(
-                      margin: EdgeInsets.only(top: media.height / 19),
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 50,
-                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
-                            child: IconRow(
-                              fromHomeScreen: false,
-                              icons: List.generate(
-                                formattedDates.length,
-                                (index) => data.any((element) =>
-                                        DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
-                                            formattedDates[index] &&
-                                        element.status == Status.completed)
-                                    ? IconDataWithDot(
-                                        icon: Icons.check,
-                                        iconColor: Colors.white,
-                                        backgroundColor: AppColors.primaryColor,
-                                        showDot: true,
-                                        dotColor: Colors.transparent)
-                                    : IconDataWithDot(
-                                        icon: Icons.close,
-                                        iconColor: Colors.white,
-                                        backgroundColor: Colors.blue,
-                                        showDot: true,
-                                        dotColor: Colors.transparent),
+              ),
+              SizedBox(
+                height: media.height / 2,
+                width: media.width,
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                Navigator.pushNamed(context, '/streak-calendar');
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black12,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white),
+                                    ),
+                                    child: Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                      return Text(
+                                        monthProvider.streak.toString(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil.verticalScale(0.8),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  Icon(
+                                    Icons.local_fire_department_outlined,
+                                    color: Colors.white,
+                                    size: ScreenUtil.verticalScale(3),
+                                  )
+                                ],
                               ),
                             ),
-                          ),
-                          SizedBox(height: ScreenUtil.horizontalScale(3.5)),
-                          Text(
-                            "Here's an overview of your today's workout.",
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: ScreenUtil.horizontalScale(3.6),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            "Now recover and get ready for tomorrow!",
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: ScreenUtil.horizontalScale(3.6),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: ScreenUtil.horizontalScale(5)),
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.verticalScale(4.1),
-                                          vertical: ScreenUtil.verticalScale(2),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(ScreenUtil.verticalScale(3)),
-                                          ),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              spreadRadius: 2,
-                                              blurRadius: 10,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            const Text(
-                                              'Exercises\nCompleted',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(color: Colors.black54),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              "$exerciseCompleted",
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: Color(0xFFDD1166),
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.verticalScale(3.5),
-                                          vertical: ScreenUtil.verticalScale(2),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                              ScreenUtil.verticalScale(3),
-                                            ),
-                                          ),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              spreadRadius: 2,
-                                              blurRadius: 10,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            const Text(
-                                              'Average RIR',
-                                              style: TextStyle(color: Colors.black54),
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              averageRIR.toStringAsFixed(2),
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Expanded(
-                                //   child: Container(
-                                //     padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
-                                //     decoration: const BoxDecoration(
-                                //       color: Colors.white,
-                                //       borderRadius: BorderRadius.all(
-                                //         Radius.circular(20),
-                                //       ),
-                                //       boxShadow: [
-                                //         BoxShadow(
-                                //           color: Colors.black12,
-                                //           spreadRadius: 2,
-                                //           blurRadius: 10,
-                                //           offset: Offset(0, 1),
-                                //         ),
-                                //       ],
-                                //     ),
-                                //     child: Column(
-                                //       children: [
-                                //         Row(
-                                //           children: [
-                                //             Icon(
-                                //               Icons.bolt,
-                                //               color: Colors.black38,
-                                //               size: ScreenUtil.horizontalScale(5),
-                                //             ),
-                                //             Text(
-                                //               "Today's Activity",
-                                //               style: TextStyle(
-                                //                 color: Colors.black54,
-                                //                 fontSize: ScreenUtil.horizontalScale(3.3),
-                                //                 fontWeight: FontWeight.w500,
-                                //               ),
-                                //             )
-                                //           ],
-                                //         ),
-                                //         SizedBox(height: ScreenUtil.horizontalScale(2)),
-                                //         const ActivityLineChart(),
-                                //       ],
-                                //     ),
-                                //   ),
-                                // ),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.verticalScale(4.1),
-                                          vertical: ScreenUtil.verticalScale(2),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(ScreenUtil.verticalScale(3)),
-                                          ),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              spreadRadius: 2,
-                                              blurRadius: 10,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Time Spent',
-                                              style: TextStyle(color: Colors.black54),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              time.isEmpty ? " \n " : time,
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: Color(0xFFDD1166),
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.verticalScale(3.5),
-                                          vertical: ScreenUtil.verticalScale(2),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                              ScreenUtil.verticalScale(3),
-                                            ),
-                                          ),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              spreadRadius: 2,
-                                              blurRadius: 10,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            const Text(
-                                              'Weight Lifted',
-                                              style: TextStyle(color: Colors.black54),
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              '${totalWeight.toStringAsFixed(0)} Lbs',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 60),
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                            child: ButtonWidget(
-                              text: "Back to Dashboard",
-                              // textColor: const Color(0x40000000),
-                              textColor: Colors.white,
-                              onPress: () {
-                                monthProvider?.checkForPumpDay();
-                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                mainPageProvider?.changeTab(0);
-                                // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/notifications');
                               },
-                              // color: const Color(0xC0FFFFFF),
-                              color: AppColors.primaryColor,
-                              isLoading: false,
+                              icon: Icon(
+                                Icons.notifications_none,
+                                color: Colors.white,
+                                size: ScreenUtil.verticalScale(3),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(5),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: ScreenUtil.horizontalScale(10)),
+                            Text(
+                              'Congratulations!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: ScreenUtil.horizontalScale(8.5),
+                                fontWeight: FontWeight.bold,
+                                height: 1,
+                              ),
                             ),
-                          ),
-                          // const SizedBox(height: 16),
-                          // Container(
-                          //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                          //   child: Consumer<MonthProvider>(builder: (context, monthData, child) {
-                          //     return ButtonWidget(
-                          //       text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
-                          //       textColor: Colors.white,
-                          //       onPress: () {
-                          //         monthProvider?.checkForPumpDay();
-                          //         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                          //         mainPageProvider?.changeTab(1);
-                          //
-                          //         if (monthData.todayTitleId.isNotEmpty) {
-                          //           continueWorkoutOnTap(monthData, context);
-                          //         }
-                          //       },
-                          //       color: monthData.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                          //       isLoading: false,
-                          //     );
-                          //   }),
-                          // ),
-                          // const SizedBox(
-                          //   height: 50,
-                          // ),
-                        ],
+                            const SizedBox(height: 10),
+                            Text(
+                              'You completed',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: ScreenUtil.verticalScale(2),
+                              ),
+                            ),
+                            Text(
+                              "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: ScreenUtil.verticalScale(3),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: media.height / 2.79,
+                width: media.width,
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: ClipPath(
+                    clipper: DiagonalClipper(),
+                    child: Container(
+                      height: media.height / 11,
+                      width: media.width / 6,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          Container(
+            margin: EdgeInsets.only(top: media.height / 2.8),
+            child: Container(
+              width: media.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                ),
+              ),
+              child: Container(
+                margin: EdgeInsets.only(top: media.height / 20),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
+                      child: IconRow(
+                        fromHomeScreen: false,
+                        icons: List.generate(
+                          formattedDates.length,
+                          (index) => data.any((element) =>
+                                  DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
+                                      formattedDates[index] &&
+                                  element.status == Status.completed)
+                              ? IconDataWithDot(
+                                  icon: Icons.check,
+                                  iconColor: Colors.white,
+                                  backgroundColor: AppColors.primaryColor,
+                                  showDot: true,
+                                  dotColor: Colors.transparent)
+                              : IconDataWithDot(
+                                  icon: Icons.close,
+                                  iconColor: Colors.white,
+                                  backgroundColor: Colors.blue,
+                                  showDot: true,
+                                  dotColor: Colors.transparent),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: ScreenUtil.horizontalScale(2)),
+                    Text(
+                      "Here's an overview of your today's workout.",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: ScreenUtil.horizontalScale(3.6),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      "Now recover and get ready for tomorrow!",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: ScreenUtil.horizontalScale(3.6),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: ScreenUtil.horizontalScale(5)),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(ScreenUtil.verticalScale(3)),
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            spreadRadius: 2,
+                            blurRadius: 10,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Exercises Completed',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "$exerciseCompleted",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Color(0xFFDD1166),
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: ScreenUtil.horizontalScale(4.5)),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(ScreenUtil.verticalScale(3)),
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    spreadRadius: 2,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Weight Lifted',
+                                    style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    '${totalWeight.toStringAsFixed(0)} Lbs',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: ScreenUtil.horizontalScale(4.5)),
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(ScreenUtil.verticalScale(3)),
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    spreadRadius: 2,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Average RIR',
+                                    style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    averageRIR == 0 ? "0" : averageRIR.toStringAsFixed(2),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(
+                    //     horizontal: ScreenUtil.horizontalScale(8),
+                    //   ),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       Expanded(
+                    //         child: Column(
+                    //           mainAxisAlignment: MainAxisAlignment.start,
+                    //           children: [
+                    //             Container(
+                    //               padding: EdgeInsets.symmetric(
+                    //                 horizontal: ScreenUtil.verticalScale(4.1),
+                    //                 vertical: ScreenUtil.verticalScale(2),
+                    //               ),
+                    //               decoration: BoxDecoration(
+                    //                 color: Colors.white,
+                    //                 borderRadius: BorderRadius.all(
+                    //                   Radius.circular(ScreenUtil.verticalScale(3)),
+                    //                 ),
+                    //                 boxShadow: const [
+                    //                   BoxShadow(
+                    //                     color: Colors.black12,
+                    //                     spreadRadius: 2,
+                    //                     blurRadius: 10,
+                    //                     offset: Offset(0, 1),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               child: Column(
+                    //                 crossAxisAlignment: CrossAxisAlignment.center,
+                    //                 children: [
+                    //                   const Text(
+                    //                     'Exercises\nCompleted',
+                    //                     textAlign: TextAlign.center,
+                    //                     style: TextStyle(color: Colors.black54),
+                    //                   ),
+                    //                   const SizedBox(height: 10),
+                    //                   Text(
+                    //                     "$exerciseCompleted",
+                    //                     textAlign: TextAlign.center,
+                    //                     style: const TextStyle(
+                    //                       color: Color(0xFFDD1166),
+                    //                       fontSize: 16,
+                    //                       fontWeight: FontWeight.w500,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //             const SizedBox(
+                    //               height: 20,
+                    //             ),
+                    //             Container(
+                    //               padding: EdgeInsets.symmetric(
+                    //                 horizontal: ScreenUtil.verticalScale(3.5),
+                    //                 vertical: ScreenUtil.verticalScale(2),
+                    //               ),
+                    //               decoration: BoxDecoration(
+                    //                 color: Colors.white,
+                    //                 borderRadius: BorderRadius.all(
+                    //                   Radius.circular(
+                    //                     ScreenUtil.verticalScale(3),
+                    //                   ),
+                    //                 ),
+                    //                 boxShadow: const [
+                    //                   BoxShadow(
+                    //                     color: Colors.black12,
+                    //                     spreadRadius: 2,
+                    //                     blurRadius: 10,
+                    //                     offset: Offset(0, 1),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               child: Column(
+                    //                 crossAxisAlignment: CrossAxisAlignment.center,
+                    //                 children: [
+                    //                   const Text(
+                    //                     'Average RIR',
+                    //                     style: TextStyle(color: Colors.black54),
+                    //                   ),
+                    //                   const SizedBox(
+                    //                     height: 10,
+                    //                   ),
+                    //                   Text(
+                    //                     averageRIR.toStringAsFixed(2),
+                    //                     textAlign: TextAlign.center,
+                    //                     style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
+                    //                   )
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //       const SizedBox(width: 5),
+                    //       Expanded(
+                    //         child: Column(
+                    //           mainAxisAlignment: MainAxisAlignment.start,
+                    //           children: [
+                    //             Container(
+                    //               padding: EdgeInsets.symmetric(
+                    //                 horizontal: ScreenUtil.verticalScale(4.1),
+                    //                 vertical: ScreenUtil.verticalScale(2),
+                    //               ),
+                    //               decoration: BoxDecoration(
+                    //                 color: Colors.white,
+                    //                 borderRadius: BorderRadius.all(
+                    //                   Radius.circular(ScreenUtil.verticalScale(3)),
+                    //                 ),
+                    //                 boxShadow: const [
+                    //                   BoxShadow(
+                    //                     color: Colors.black12,
+                    //                     spreadRadius: 2,
+                    //                     blurRadius: 10,
+                    //                     offset: Offset(0, 1),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               child: Column(
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   const Text(
+                    //                     'Time Spent',
+                    //                     style: TextStyle(color: Colors.black54),
+                    //                   ),
+                    //                   const SizedBox(height: 10),
+                    //                   Text(
+                    //                     time.isEmpty ? " \n " : time,
+                    //                     textAlign: TextAlign.center,
+                    //                     style: const TextStyle(
+                    //                       color: Color(0xFFDD1166),
+                    //                       fontSize: 15,
+                    //                       fontWeight: FontWeight.w500,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //             const SizedBox(
+                    //               height: 20,
+                    //             ),
+                    //             Container(
+                    //               padding: EdgeInsets.symmetric(
+                    //                 horizontal: ScreenUtil.verticalScale(3.5),
+                    //                 vertical: ScreenUtil.verticalScale(2),
+                    //               ),
+                    //               decoration: BoxDecoration(
+                    //                 color: Colors.white,
+                    //                 borderRadius: BorderRadius.all(
+                    //                   Radius.circular(
+                    //                     ScreenUtil.verticalScale(3),
+                    //                   ),
+                    //                 ),
+                    //                 boxShadow: const [
+                    //                   BoxShadow(
+                    //                     color: Colors.black12,
+                    //                     spreadRadius: 2,
+                    //                     blurRadius: 10,
+                    //                     offset: Offset(0, 1),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               child: Column(
+                    //                 crossAxisAlignment: CrossAxisAlignment.center,
+                    //                 children: [
+                    //                   const Text(
+                    //                     'Weight Lifted',
+                    //                     style: TextStyle(color: Colors.black54),
+                    //                   ),
+                    //                   const SizedBox(
+                    //                     height: 10,
+                    //                   ),
+                    //                   Text(
+                    //                     '${totalWeight.toStringAsFixed(0)} Lbs',
+                    //                     textAlign: TextAlign.center,
+                    //                     style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
+                    //                   )
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    Spacer(),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                      child: ButtonWidget(
+                        text: "Back to Dashboard",
+                        // textColor: const Color(0x40000000),
+                        textColor: Colors.white,
+                        onPress: () {
+                          monthProvider?.checkForPumpDay();
+                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                          mainPageProvider?.changeTab(0);
+                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                        },
+                        // color: const Color(0xC0FFFFFF),
+                        color: AppColors.primaryColor,
+                        isLoading: false,
+                      ),
+                    ),
+                    // const SizedBox(height: 16),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                    //   child: Consumer<MonthProvider>(builder: (context, monthData, child) {
+                    //     return ButtonWidget(
+                    //       text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
+                    //       textColor: Colors.white,
+                    //       onPress: () {
+                    //         monthProvider?.checkForPumpDay();
+                    //         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                    //         mainPageProvider?.changeTab(1);
+                    //
+                    //         if (monthData.todayTitleId.isNotEmpty) {
+                    //           continueWorkoutOnTap(monthData, context);
+                    //         }
+                    //       },
+                    //       color: monthData.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
+                    //       isLoading: false,
+                    //     );
+                    //   }),
+                    // ),
+                    // const SizedBox(height: 30),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  void continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) {
+  Future<void> continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) async {
     HapticFeedBack.buttonClick();
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
       (element) => element == monthProvider.todayTitleId,
@@ -673,7 +708,110 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     monthProvider.alternateEquipmentType = monthProvider.equipmentType;
     monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
     monthProvider.updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
-    Navigator.pushNamed(context, '/dayOverview');
+
+    final dayIndex1 = monthProvider.overviewCurrentDay;
+
+    int nextWorkOutIndex = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
+        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+        : 0;
+    String currentDayTitle = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
+        ? monthProvider.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+        : monthProvider.weekDataModel!.dayList![dayIndex1 - 1];
+
+    if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay)) {
+      Navigator.pushNamed(context, '/dayOverview');
+    } else {
+      if (monthProvider.isPumpDay) {
+        if ((monthProvider.allSplitDayHistoryModel
+                .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+            false) {
+          _saveDayData(
+              type: "Pump Day - ${monthProvider.pumpDayModel?.id}", status: Status.started, title: monthProvider.pumpDayModel?.title);
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today').then(
+            (value) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await monthProvider.checkForPumpDay());
+            },
+          );
+        } else {
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today');
+        }
+      } else {
+        if ((monthProvider.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
+          _saveDayData(status: Status.started, type: 'Workout Day');
+        }
+        if (!context.mounted) return;
+        await Navigator.pushNamed(context, '/today');
+      }
+    }
+
+    // Navigator.pushNamed(context, '/dayOverview');
+  }
+
+  Future<void> _saveDayData({required String status, required String type, String? title}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+
+    final data = {
+      "title": title ?? "",
+      "dataId": dataId,
+      "monthId": monthProvider?.monthDataModel?.id,
+      "weekId": monthProvider?.weekDataModel?.id,
+      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "split": split,
+      "date": "${DateTime.now().toUtc()}",
+      "status": status,
+      "type": type,
+      "startTime": "${DateTime.now().toUtc()}",
+      "endTime": "",
+    };
+
+    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => DayHistoryModel(),
+    );
+
+    final data1 = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+    };
+
+    final apiBody = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "dataId": dataId
+    };
+
+    if (matchingElement?.id != null) {
+      ApiRepo.updateDayStatus(body: apiBody);
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+    } else {
+      ApiRepo.addDayStatus(body: data);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+    }
+    await monthProvider?.fetchAllDayStatusLocalData();
+    monthProvider?.findWeekStatuses();
+    monthProvider?.fetchToday();
+    monthProvider?.manageStreak();
+    monthProvider?.getLiftedWeightGraphData();
   }
 }
 
