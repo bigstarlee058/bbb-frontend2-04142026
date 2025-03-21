@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:bbb/components/expansion_panel.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -320,7 +323,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                                           // monthProvider!.isPumpDayAvailable &&
                                                           (monthProvider.allDayHistoryModel.any((element) =>
                                                               ((element.status == Status.started) && dataId == element.dataId)))
-                                                  ? pumpRestSelection(index, dayData, context, weekDataModel!.idList![index])
+                                                  ? pumpRestSelection(index, dayData, context, weekDataModel!.idList![index], dataId)
                                                   : Text(
                                                       matchingElement.id != null
                                                           ? matchingElement.title ?? "Pump Day"
@@ -391,8 +394,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     );
   }
 
-  void continueWorkoutOnTap(
-      bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex, String dayId) {
+  Future<void> continueWorkoutOnTap(
+      bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex, String dayId) async {
     DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel.firstWhere(
       (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
       orElse: () => DayHistoryModel(),
@@ -420,14 +423,20 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
           .toList();
 
+      log('dataList :::::::::::::::::: ${jsonEncode(dataList)}');
+      log(' monthProvider!.pumpDays :::::::::::::::::: ${monthProvider!.pumpDays.map(
+        (e) => e.id,
+      )}');
       if (dataList!.isNotEmpty) {
         int index1 = monthProvider!.pumpDays
             .indexWhere((el1) => dataList.any((e1) => (e1.dayId == dayId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        log('index1 :::::::::::::::::: $index1');
         if (index1 != -1) {
           monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index1]);
         } else {
           int index1 =
               monthProvider!.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          log('index1 :::::::::11::::::::: $index1');
           monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index == -1
               ? 0
               : index1 == 0
@@ -437,7 +446,6 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       } else {
         monthProvider?.updatePumpDayData(monthProvider!.pumpDays[0]);
       }
-      // monthProvider?.updatePumpDayData(monthProvider!.pumpDays[0]);
     }
 
     monthProvider?.overviewCurrentWeek = widget.weekIndex + 1;
@@ -446,10 +454,44 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
     monthProvider?.weekDataModel = weekDataModel;
     monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
+
+    // final dayIndex = monthProvider!.overviewCurrentDay;
+    // int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+    //     ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+    //     : 0;
+    // String currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+    //     ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+    //     : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
+    //
+    // if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay)) {
+    //   Navigator.pushNamed(context, '/dayOverview');
+    // } else {
+    //   if (monthProvider!.isPumpDay) {
+    //     if ((monthProvider!.allSplitDayHistoryModel
+    //             .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+    //         false) {
+    //       await _saveDayData(
+    //         type: "Pump Day - ${monthProvider!.pumpDayModel?.id}",
+    //         status: Status.started,
+    //         title: monthProvider!.pumpDayModel?.title,
+    //       );
+    //     }
+    //   } else {
+    //     if ((monthProvider?.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
+    //       await _saveDayData(
+    //         status: Status.started,
+    //         type: 'Workout Day',
+    //       );
+    //     }
+    //   }
+    //   if (!context.mounted) return;
+    //   await Navigator.pushNamed(context, '/today');
+    // }
+
     Navigator.pushNamed(context, '/dayOverview');
   }
 
-  Widget pumpRestSelection(int index, DayDataModel dayData, BuildContext context, String dayId) {
+  Widget pumpRestSelection(int index, DayDataModel dayData, BuildContext context, String dayId, String dataId) {
     return Row(
       children: [
         GestureDetector(
@@ -486,6 +528,19 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
             monthProvider?.weekDataModel = weekDataModel;
             monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
+
+            // if ((monthProvider!.allSplitDayHistoryModel.any(
+            //         (element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+            //     false) {
+            //   await _saveDayData(
+            //     type: "Pump Day - ${monthProvider!.pumpDayModel?.id}",
+            //     status: Status.started,
+            //     title: monthProvider!.pumpDayModel?.title,
+            //   );
+            // }
+            //
+            // if (!context.mounted) return;
+            // await Navigator.pushNamed(context, '/today');
             await Navigator.pushNamed(context, '/dayOverview');
           },
           child: Container(
@@ -647,4 +702,59 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       ),
     );
   }
+
+  // Future<void> _saveDayData({required String status, required String type, String? title}) async {
+  //   String split =
+  //       monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  //
+  //   String dataId =
+  //       "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+  //
+  //   final data = {
+  //     "title": title ?? "",
+  //     "dataId": dataId,
+  //     "monthId": monthProvider?.monthDataModel?.id,
+  //     "weekId": monthProvider?.weekDataModel?.id,
+  //     "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+  //     "split": split,
+  //     "date": "${DateTime.now().toUtc()}",
+  //     "status": status,
+  //     "type": type,
+  //     "startTime": "${DateTime.now().toUtc()}",
+  //     "endTime": "",
+  //   };
+  //
+  //   DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+  //     (element) => element.dataId == dataId,
+  //     orElse: () => DayHistoryModel(),
+  //   );
+  //
+  //   final data1 = {
+  //     "title": title ?? "",
+  //     "status": status,
+  //     "type": type,
+  //     "startTime": status == Status.empty
+  //         ? ""
+  //         : matchingElement?.startTime == null
+  //             ? "${DateTime.now().toUtc()}"
+  //             : matchingElement?.startTime.toString(),
+  //     "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+  //   };
+  //
+  //   if (matchingElement?.id != null) {
+  //     // ApiRepo.updateDayStatus(body: apiReqBody);
+  //     await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+  //   } else {
+  //     // ApiRepo.addDayStatus(body: data);
+  //     await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+  //   }
+  //
+  //   // await monthProvider?.fetchDayStatusLocalData();
+  //   // await monthProvider?.fetchSingleDayHistoryLocalData();
+  //   // await monthProvider?.updateDayData();
+  //   monthProvider?.findWeekStatuses();
+  //   monthProvider?.fetchToday();
+  //   monthProvider?.manageStreak();
+  //   monthProvider?.getLiftedWeightGraphData();
+  // }
 }

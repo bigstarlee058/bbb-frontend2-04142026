@@ -544,46 +544,48 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 60),
                           Container(
                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                             child: ButtonWidget(
                               text: "Back to Dashboard",
-                              textColor: const Color(0x40000000),
+                              // textColor: const Color(0x40000000),
+                              textColor: Colors.white,
                               onPress: () {
                                 monthProvider?.checkForPumpDay();
                                 Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                                 mainPageProvider?.changeTab(0);
                                 // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                               },
-                              color: const Color(0xC0FFFFFF),
+                              // color: const Color(0xC0FFFFFF),
+                              color: AppColors.primaryColor,
                               isLoading: false,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                            child: Consumer<MonthProvider>(builder: (context, monthData, child) {
-                              return ButtonWidget(
-                                text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
-                                textColor: Colors.white,
-                                onPress: () {
-                                  monthProvider?.checkForPumpDay();
-                                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                  mainPageProvider?.changeTab(1);
-
-                                  if (monthData.todayTitleId.isNotEmpty) {
-                                    continueWorkoutOnTap(monthData, context);
-                                  }
-                                },
-                                color: monthData.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                                isLoading: false,
-                              );
-                            }),
-                          ),
-                          const SizedBox(
-                            height: 50,
-                          ),
+                          // const SizedBox(height: 16),
+                          // Container(
+                          //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                          //   child: Consumer<MonthProvider>(builder: (context, monthData, child) {
+                          //     return ButtonWidget(
+                          //       text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
+                          //       textColor: Colors.white,
+                          //       onPress: () {
+                          //         monthProvider?.checkForPumpDay();
+                          //         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                          //         mainPageProvider?.changeTab(1);
+                          //
+                          //         if (monthData.todayTitleId.isNotEmpty) {
+                          //           continueWorkoutOnTap(monthData, context);
+                          //         }
+                          //       },
+                          //       color: monthData.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
+                          //       isLoading: false,
+                          //     );
+                          //   }),
+                          // ),
+                          // const SizedBox(
+                          //   height: 50,
+                          // ),
                         ],
                       ),
                     ),

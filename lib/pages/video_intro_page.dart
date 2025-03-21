@@ -143,7 +143,9 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> {
 
   @override
   void dispose() {
-    _chewieController!.dispose();
+    if (_chewieController != null) {
+      _chewieController!.dispose();
+    }
     _videoPlayerController.dispose();
     super.dispose();
   }

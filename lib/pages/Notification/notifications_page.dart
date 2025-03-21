@@ -1,6 +1,8 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/notifications.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -46,9 +48,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   Future<void> getSwitch() async {
-    isSwitchOn = await preferences.getBool(
-      SharedPreference.notificationSwitch,
-    );
+    isSwitchOn = await preferences.getBool(SharedPreference.notificationSwitch);
     setState(() {});
     debugPrint('isSwitchOn notification:::::::::::::::::: $isSwitchOn');
   }
@@ -155,65 +155,69 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             ),
                           ),
                         ),
-                        Container(
-                          height: 176.25,
+                        SizedBox(
+                          height: media.height / 4,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
                               children: [
                                 Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                left: ScreenUtil.horizontalScale(4),
-                                              ),
-                                              decoration: const BoxDecoration(
-                                                color: Color(0XFFd18a9b),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: SizedBox(
-                                                width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                                height: ScreenUtil.horizontalScale(10),
-                                                child: IconButton(
-                                                  padding: EdgeInsets.zero, // Removes the default padding
-                                                  icon: const Icon(
-                                                    Icons.keyboard_arrow_left,
-                                                    color: Colors.white,
-                                                  ),
-                                                  onPressed: () {
-                                                    // HapticFeedBack.buttonClick();
-                                                    Navigator.pop(context);
-                                                  },
-                                                  iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
-                                                ),
-                                              ),
+                                  margin: const EdgeInsets.only(right: 10),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                              left: ScreenUtil.horizontalScale(4),
                                             ),
-                                          ],
-                                        ),
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            'Notifications',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: ScreenUtil.verticalScale(3),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: SizedBox(
+                                              width: ScreenUtil.horizontalScale(10), // Size of the circle
+                                              height: ScreenUtil.horizontalScale(10),
+                                              child: IconButton(
+                                                padding: EdgeInsets.zero, // Removes the default padding
+                                                icon: const Icon(
+                                                  Icons.keyboard_arrow_left,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  // HapticFeedBack.buttonClick();
+                                                  Navigator.pop(context);
+                                                },
+                                                iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
+                                              ),
                                             ),
                                           ),
-                                        )
-                                      ],
-                                    )),
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Notifications',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: ScreenUtil.horizontalScale(10),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                         ),
                         SizedBox(
-                          height: 126.34,
+                          height: media.height / 7.9,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -235,7 +239,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 ),
                 notificationData.isNotEmpty
                     ? Container(
-                        margin: EdgeInsets.only(top: 125.89),
+                        margin: EdgeInsets.only(top: media.height / 8),
                         child: Container(
                           width: media.width,
                           decoration: BoxDecoration(
@@ -263,7 +267,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         ),
                       )
                     : Container(
-                        margin: EdgeInsets.only(top: 125.89),
+                        margin: EdgeInsets.only(top: media.height / 8),
                         child: Container(
                           width: media.width,
                           decoration: BoxDecoration(
@@ -326,16 +330,24 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Switch(
-                      value: isSwitchOn ?? false, // Boolean value
-                      onChanged: (bool value) async {
-                        setState(() {
-                          isSwitchOn = value; // Update state
-                        });
-                        await preferences.setBool(SharedPreference.notificationSwitch, isSwitchOn ?? false);
-                      },
-                      activeColor: AppColors.primaryColor,
-                    ),
+                    Consumer<MonthProvider>(builder: (context, monthDataModel, child) {
+                      return Switch(
+                        value: isSwitchOn ?? false, // Boolean value
+                        onChanged: (bool value) async {
+                          setState(() {
+                            isSwitchOn = value; // Update state
+                          });
+                          await preferences.setBool(SharedPreference.notificationSwitch, isSwitchOn ?? false);
+                          if (isSwitchOn == true) {
+                            await NotificationService.scheduleMonthlyReminder(20, monthDataModel.endTime ?? DateTime.now().toUtc());
+                            await NotificationService.scheduleWeekReminder(30, monthDataModel.endTime ?? DateTime.now().toUtc());
+                          } else {
+                            await NotificationService.clearScheduledNotification();
+                          }
+                        },
+                        activeColor: AppColors.primaryColor,
+                      );
+                    }),
                   ],
                 ),
                 SizedBox(

@@ -44,7 +44,7 @@ class _ToolsPageState extends State<ToolsPage> {
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 4,
                           width: media.width,
                           child: SafeArea(
