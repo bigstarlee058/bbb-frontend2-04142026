@@ -94,7 +94,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                         },
                                       ),
                                       Container(
-                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
+                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(6)),
                                         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
                                           return Text(
                                             'Hi ${userData.userName}',

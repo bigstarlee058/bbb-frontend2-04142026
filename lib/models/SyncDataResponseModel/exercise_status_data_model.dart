@@ -16,6 +16,8 @@ class ExerciseStatusDataModel {
   String? dataId;
   String? exerciseId;
   String? totalWeight;
+  String? totalRIR;
+  String? totalSet;
   String? monthId;
   String? weekId;
   String? dayId;
@@ -38,6 +40,8 @@ class ExerciseStatusDataModel {
     this.weekId,
     this.dayId,
     this.date,
+    this.totalSet,
+    this.totalRIR,
     this.status,
     this.type,
     this.createdAt,
@@ -52,6 +56,8 @@ class ExerciseStatusDataModel {
         split: json["split"],
         dataId: json["dataId"],
         exerciseId: json["exerciseId"],
+        totalRIR: json["totalRIR"],
+        totalSet: json["totalSet"],
         totalWeight: json["totalWeight"],
         monthId: json["monthId"],
         weekId: json["weekId"],
@@ -72,6 +78,8 @@ class ExerciseStatusDataModel {
         "dataId": dataId,
         "exerciseId": exerciseId,
         "totalWeight": totalWeight,
+        "totalSet": totalSet,
+        "totalRIR": totalRIR,
         "monthId": monthId,
         "weekId": weekId,
         "dayId": dayId,

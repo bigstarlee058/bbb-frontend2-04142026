@@ -23,20 +23,20 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
 
   MonthProvider? monthProvider;
   final List<Map<String, String>> items = [
-    {"image": "assets/img/verified (1).svg", "text": "Road to Fitness", "description": 'Your First Workout'},
-    {"image": "assets/img/verified (1).svg", "text": "Sprint Boost", "description": "Speed Training"},
-    {"image": "assets/img/verified (1).svg", "text": "Summit Strength", "description": "Your Climbing Guide"},
-    {"image": "assets/img/verified (1).svg", "text": "Core Power", "description": "Ab Workout Challenge"},
-    {"image": "assets/img/verified (1).svg", "text": "Sprint Boost", "description": "Speed Training"},
-    {"image": "assets/img/verified (1).svg", "text": "Yoga Zen", "description": "Mindful Yoga Journey"},
-    {"image": "assets/img/verified (1).svg", "text": "Summit Strength", "description": "Your Climbing Guide"},
-    {"image": "assets/img/verified (1).svg", "text": "Core Power", "description": "Ab Workout Challenge"},
-    {"image": "assets/img/verified (1).svg", "text": "Sprint Boost", "description": "Speed Training"},
-    {"image": "assets/img/verified (1).svg", "text": "Road to Fitness", "description": "Your First Workout"},
-    {"image": "assets/img/verified (1).svg", "text": "Core Power", "description": "Ab Workout Challenge"},
-    {"image": "assets/img/verified (1).svg", "text": "Sprint Boost", "description": "Speed Training"},
-    {"image": "assets/img/verified (1).svg", "text": "Yoga Zen", "description": "Mindful Yoga Journey"},
-    {"image": "assets/img/verified (1).svg", "text": "Summit Strength", "description": "Your Climbing Guide"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
+    {"image": "assets/img/verified (1).svg"},
   ];
 
   @override
@@ -194,7 +194,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
           ),
           SizedBox(height: 5),
           Text(
-            item["text"]!,
+            "Lorem ipsum",
             maxLines: 1,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
@@ -207,7 +207,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
           SizedBox(height: 2),
           Flexible(
             child: Text(
-              item["description"]!,
+              "Lorem ipsum dolor",
               maxLines: 1,
               textAlign: TextAlign.center,
               overflow: TextOverflow.visible,

@@ -22,6 +22,7 @@ class ApiService extends BaseService {
     try {
       String? userIdToken = await getAuthToken();
       Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
+      log('header :::::::::::::::::: $header');
       String mainUrl = AppConstants.serverUrl + url;
       if (apiType == APIType.aGet) {
         var result = await http.get(Uri.parse(mainUrl), headers: header);

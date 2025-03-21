@@ -81,11 +81,13 @@ class _WorkoutCardState extends State<WorkoutCard> {
     warmUpSetTotal = 0;
     workingSetTotal = 0;
     backOffSetTotal = 0;
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (mounted) {
         setState(() {});
-      });
-    }
+      }
+    });
+
     if (widget.exercise.extra?.isNotEmpty ?? false) {
       for (var element in widget.exercise.extra!) {
         if (element.type != 1) {
@@ -104,11 +106,12 @@ class _WorkoutCardState extends State<WorkoutCard> {
       if (element.type == 2) backOffSetTotal += int.parse(element.sets.toString());
       if (element.type == 3) workingSetTotal += int.parse(element.sets.toString());
     }
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (mounted) {
         setState(() {});
-      });
-    }
+      }
+    });
   }
 
   Future<String?> getAuthToken() async {
@@ -149,11 +152,12 @@ class _WorkoutCardState extends State<WorkoutCard> {
     } else {
       extraSetModel = [];
     }
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (mounted) {
         setState(() {});
-      });
-    }
+      }
+    });
   }
 
   @override

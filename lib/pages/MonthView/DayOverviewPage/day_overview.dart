@@ -5,6 +5,7 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -1050,23 +1051,23 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
       "status": status,
       "type": type,
     };
-    // final apiReqBody = {
-    //   "date": "${DateTime.now().toUtc()}",
-    //   "status": status,
-    //   "type": type,
-    //   "dataId": dataId,
-    // };
+    final apiReqBody = {
+      "date": "${DateTime.now().toUtc()}",
+      "status": status,
+      "type": type,
+      "dataId": dataId,
+    };
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
       if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
-        // ApiRepo.updateExerciseStatus(body: apiReqBody);
+        ApiRepo.updateExerciseStatus(body: apiReqBody);
         await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
-        // ApiRepo.addExerciseStatus(body: data);
+        ApiRepo.addExerciseStatus(body: data);
         await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
-      // ApiRepo.addExerciseStatus(body: data);
+      ApiRepo.addExerciseStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
   }
@@ -1077,16 +1078,9 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
-    final data = {
-      "status": status,
-      "type": type,
-    };
-    // final apiReqBody = {
-    //   "status": status,
-    //   "type": type,
-    //   "dataId": dataId,
-    // };
-    // ApiRepo.updateExerciseStatus(body: apiReqBody);
+    final data = {"status": status, "type": type};
+    final apiReqBody = {"status": status, "type": type, "dataId": dataId};
+    ApiRepo.updateExerciseStatus(body: apiReqBody);
     await DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
   }
 
@@ -1237,24 +1231,24 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
               : matchingElement?.startTime.toString(),
       "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
     };
-    // final data1apiReqBody = {
-    //   "title": title ?? "",
-    //   "status": status,
-    //   "type": type,
-    //   "startTime": status == Status.empty
-    //       ? ""
-    //       : matchingElement?.startTime == null
-    //           ? "${DateTime.now().toUtc()}"
-    //           : matchingElement?.startTime.toString(),
-    //   "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
-    //   "dataId": dataId,
-    // };
+    final apiBody = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+      "dataId": dataId,
+    };
 
     if (matchingElement?.id != null) {
-      // ApiRepo.updateDayStatus(body: data1apiReqBody);
+      ApiRepo.updateDayStatus(body: apiBody);
       await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
-      // ApiRepo.addDayStatus(body: data);
+      ApiRepo.addDayStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
@@ -1306,24 +1300,24 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
               : matchingElement?.startTime.toString(),
       "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
     };
-    // final apiReqBody = {
-    //   "title": title ?? "",
-    //   "status": status,
-    //   "type": type,
-    //   "startTime": status == Status.empty
-    //       ? ""
-    //       : matchingElement?.startTime == null
-    //           ? "${DateTime.now().toUtc()}"
-    //           : matchingElement?.startTime.toString(),
-    //   "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
-    //   "dataId": dataId,
-    // };
+    final apiBody = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "dataId": dataId,
+    };
 
     if (matchingElement?.id != null) {
-      // ApiRepo.updateDayStatus(body: apiReqBody);
+      ApiRepo.updateDayStatus(body: apiBody);
       await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
-      // ApiRepo.addDayStatus(body: data);
+      ApiRepo.addDayStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 

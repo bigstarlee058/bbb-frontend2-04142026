@@ -464,7 +464,35 @@ class DataProvider extends ChangeNotifier {
         },
       );
 
-      // final exerciseHistroy = await ApiRepo.fetchExerciseHistory();
+      // List<ExerciseHistoryDataModel> exerciseHistroy = await ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? "");
+      //
+      // if (exerciseHistroy.isNotEmpty) {
+      //   for (var element in exerciseHistroy) {
+      //     final body = {
+      //       "split": element.split ?? "",
+      //       "dataId": element.dataId ?? "",
+      //       "exerciseId": element.exerciseId ?? "",
+      //       "extraId": element.extraId ?? "",
+      //       "monthId": element.monthId ?? "",
+      //       "weekId": element.weekId ?? "",
+      //       "dayId": element.dayId ?? "",
+      //       "sets": element.sets?.toString() ?? "",
+      //       "reps": element.reps?.toString() ?? "",
+      //       "weight": element.weight?.toString() ?? "",
+      //       "rest": element.rest?.toString() ?? "",
+      //       "load": element.load?.toString() ?? "",
+      //       "type": element.type ?? "",
+      //       "effort": element.effort?.toString() ?? "",
+      //       "date": element.date?.toString() ?? "",
+      //       "index": int.parse(element.index ?? "0"),
+      //       "subIndex": int.parse(element.subIndex ?? ""),
+      //       "status": element.status ?? "",
+      //       "totalSet": element.totalSet?.toString() ?? "",
+      //     };
+      //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+      //   }
+      // }
+      //
       // List<ExerciseStatusDataModel> exerciseStatus = await ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? "");
       //
       // if (exerciseStatus.isNotEmpty) {
@@ -480,11 +508,12 @@ class DataProvider extends ChangeNotifier {
       //       "status": element.status ?? "",
       //       "type": element.type ?? "",
       //       "totalWeight": element.totalWeight ?? "",
+      //       "totalSet": element.totalSet ?? "",
+      //       "totalRIR": element.totalRIR ?? "",
       //     };
       //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
       //   }
       // }
-      //
       // List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
       //
       // if (dayStatus.isNotEmpty) {
@@ -503,6 +532,7 @@ class DataProvider extends ChangeNotifier {
       //       "endTime": element.endTime ?? "",
       //       "completedExercise": element.completedExerciseCount ?? "",
       //       "totalWeight": element.totalWeight ?? "",
+      //       "averageRIR": element.averageRIR ?? "",
       //     };
       //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.dayStatus);
       //   }
@@ -525,12 +555,12 @@ class DataProvider extends ChangeNotifier {
       // if (extraSet.isNotEmpty) {
       //   for (var element in extraSet) {
       //     final body = {
-      //       "sets": element.sets,
-      //       "reps": "${element.reps}",
-      //       "weight": "${element.weight}",
-      //       "rest": "${element.reps}",
-      //       "load": "${element.load}",
-      //       "type": "${element.type}",
+      //       "sets": int.parse(element.sets ?? ""),
+      //       "reps": int.parse(element.reps ?? ""),
+      //       "weight": int.parse(element.weight ?? ""),
+      //       "rest": int.parse(element.reps ?? ""),
+      //       "load": int.parse(element.load ?? ""),
+      //       "type": int.parse(element.type ?? ""),
       //       "extraId": "${element.extraId}",
       //       "date": element.date,
       //       "dataId": element.dataId,
