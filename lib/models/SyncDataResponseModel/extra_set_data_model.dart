@@ -9,7 +9,7 @@ class ExtraSetDataModel {
   String? id;
   String? userId;
   String? dataId;
-  DateTime? date;
+  String? date;
   String? sets;
   String? reps;
   String? weight;
@@ -17,8 +17,8 @@ class ExtraSetDataModel {
   String? load;
   String? type;
   String? extraId;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? getExtraSetModelId;
 
@@ -44,7 +44,7 @@ class ExtraSetDataModel {
         id: json["_id"],
         userId: json["userId"],
         dataId: json["dataId"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        date: json["date"],
         sets: json["sets"],
         reps: json["reps"],
         weight: json["weight"],
@@ -52,8 +52,8 @@ class ExtraSetDataModel {
         load: json["load"],
         type: json["type"],
         extraId: json["extraId"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
         getExtraSetModelId: json["id"],
       );
@@ -62,7 +62,7 @@ class ExtraSetDataModel {
         "_id": id,
         "userId": userId,
         "dataId": dataId,
-        "date": date?.toIso8601String(),
+        "date": date,
         "sets": sets,
         "reps": reps,
         "weight": weight,
@@ -70,8 +70,8 @@ class ExtraSetDataModel {
         "load": load,
         "type": type,
         "extraId": extraId,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
         "id": getExtraSetModelId,
       };

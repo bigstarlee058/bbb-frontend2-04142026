@@ -23,20 +23,60 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
 
   MonthProvider? monthProvider;
   final List<Map<String, String>> items = [
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
-    {"image": "assets/img/verified (1).svg"},
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "Breaking the Ice",
+      "subtitle": "Your First Workout Finished"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "I Got This",
+      "subtitle": "First Week Finished"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "I'm Determined ",
+      "subtitle": "First Month Finished"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "3 in a Row",
+      "subtitle": "Achieved the streak of 3"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "7 in a Row",
+      "subtitle": "Achieved the streak of 7"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "14 in a Row",
+      "subtitle": "Achieved the Streak of 14"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "30 in a row",
+      "subtitle": "Achieved teh streak of 30"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "250k Monster",
+      "subtitle": "Total Weight Lifted > 250k lbs"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "500k Monster",
+      "subtitle": "Total Weight Lifted > 500k lbs"
+    },
   ];
 
   @override
@@ -147,23 +187,23 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                         topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: media.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(bottom: 50),
-                          child: GridView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3, crossAxisSpacing: 12, mainAxisSpacing: 20, childAspectRatio: 0.8),
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              return Container(color: Colors.transparent, child: _buildGridItem(items[index], index));
-                            },
-                          ),
-                        ),
-                      ],
+                    child: Container(
+                      width: media.width,
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
+                      child: GridView.builder(
+                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: ScreenUtil.horizontalScale(1),
+                            mainAxisSpacing: ScreenUtil.horizontalScale(1),
+                            childAspectRatio: 0.8),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          return _buildGridItem(items[index], index);
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -184,36 +224,36 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            height: 70,
-            width: 70,
+            height: ScreenUtil.verticalScale(9),
+            width: ScreenUtil.verticalScale(9),
             child: SvgPicture.asset(
               item["image"]!,
-              color: index == 1 ? AppColors.primaryColor : Colors.grey,
+              color: index == 0 ? AppColors.primaryColor : Colors.grey,
               fit: BoxFit.contain,
             ),
           ),
           SizedBox(height: 5),
           Text(
-            "Lorem ipsum",
+            item["title"]!,
             maxLines: 1,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 11,
-              color: index == 1 ? AppColors.primaryColor : Colors.black,
+              fontSize: ScreenUtil.verticalScale(1.45),
+              color: index == 0 ? AppColors.primaryColor : Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 2),
+          SizedBox(height: 1),
           Flexible(
             child: Text(
-              "Lorem ipsum dolor",
+              item["subtitle"]!,
               maxLines: 1,
               textAlign: TextAlign.center,
               overflow: TextOverflow.visible,
               style: TextStyle(
-                fontSize: 11,
-                color: index == 1 ? AppColors.primaryColor : Colors.black,
+                fontSize: ScreenUtil.verticalScale(1.1),
+                color: index == 0 ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.w500,
               ),
             ),

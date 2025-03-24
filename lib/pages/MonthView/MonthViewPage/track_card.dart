@@ -399,10 +399,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   Future<void> continueWorkoutOnTap(
       bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex, String dayId) async {
-    DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel.firstWhere(
-      (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-      orElse: () => DayHistoryModel(),
-    );
+    DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel
+        .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
 
     bool isRestDayForPastWeek =
         monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek && (!(matchingElement.title ?? "").contains("Pump Day"));
@@ -460,8 +458,19 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
         : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
 
-    if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay)) {
-      Navigator.pushNamed(context, '/dayOverview');
+    final isCompletedOrSkipped = (monthProvider!.allSplitDayHistoryModel
+        .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
+
+    if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && isCompletedOrSkipped) {
+      return;
+    } else if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && !isCompletedOrSkipped) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (c1) {
+          return skipWorkoutDialog(context, c1);
+        },
+      );
     } else {
       if (monthProvider!.isPumpDay) {
         if ((monthProvider!.allSplitDayHistoryModel
@@ -595,7 +604,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider.alternateEquipmentType = monthProvider.equipmentType;
             monthProvider.weekDataModel = weekDataModel;
             monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
-            Navigator.pushNamed(context, '/dayOverview');
+            showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (c1) {
+                return skipWorkoutDialog(context, c1);
+              },
+            );
           },
           child: Container(
             width: 90,
@@ -617,6 +632,141 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget skipWorkoutDialog(BuildContext context, BuildContext c1) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFFFFFF),
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)).copyWith(top: ScreenUtil.verticalScale(2.5)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: ScreenUtil.verticalScale(2)),
+                    Text(
+                      "Rest Day",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: ScreenUtil.verticalScale(2.4),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
+                      child: Text(
+                        "Would you like to mark the rest day complete or skip?",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ScreenUtil.verticalScale(2),
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await _saveDayData(status: Status.skipped, type: 'Rest Day', endDate: true).then(
+                                  (value) {
+                                    monthProvider?.onInit(isEnabled: false);
+                                  },
+                                );
+                                if (!c1.mounted) return;
+                                Navigator.of(c1).pop();
+                                await monthProvider?.checkForPumpDay();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                backgroundColor: AppColors.skipDayColor,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: ScreenUtil.verticalScale(1.7),
+                                ),
+                              ),
+                              child: Text(
+                                "Skip day",
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.verticalScale(2),
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: ScreenUtil.horizontalScale(3)),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await _saveDayData(status: Status.completed, type: 'Rest Day', endDate: true).then(
+                                  (value) {
+                                    monthProvider?.onInit(isEnabled: false);
+                                  },
+                                );
+                                if (!c1.mounted) return;
+                                Navigator.of(c1).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                backgroundColor: AppColors.primaryColor,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: ScreenUtil.verticalScale(1.7),
+                                ),
+                              ),
+                              child: Text(
+                                "Mark complete",
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.verticalScale(2),
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.7)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.of(c1).pop();
+                      },
+                    ),
+                    SizedBox(width: ScreenUtil.horizontalScale(2)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -717,7 +867,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     );
   }
 
-  Future<void> _saveDayData({required String status, required String type, String? title}) async {
+  Future<void> _saveDayData({required String status, required String type, String? title, bool endDate = false}) async {
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
@@ -735,7 +885,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       "status": status,
       "type": type,
       "startTime": "${DateTime.now().toUtc()}",
-      "endTime": "",
+      "endTime": endDate ? "${DateTime.now().toUtc()}" : "",
     };
 
     DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
@@ -752,7 +902,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
     };
 
     final apiBody = {
@@ -764,7 +914,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
       "dataId": dataId
     };
 

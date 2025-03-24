@@ -9,10 +9,10 @@ class ExerciseNotesDataModel {
   String? id;
   String? userId;
   String? exerciseId;
-  DateTime? date;
+  String? date;
   String? note;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? getExerciseNotesModelId;
 
@@ -32,10 +32,10 @@ class ExerciseNotesDataModel {
         id: json["_id"],
         userId: json["userId"],
         exerciseId: json["exerciseId"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        date: json["date"],
         note: json["note"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
         getExerciseNotesModelId: json["id"],
       );
@@ -44,10 +44,10 @@ class ExerciseNotesDataModel {
         "_id": id,
         "userId": userId,
         "exerciseId": exerciseId,
-        "date": date?.toIso8601String(),
+        "date": date,
         "note": note,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
         "id": getExerciseNotesModelId,
       };

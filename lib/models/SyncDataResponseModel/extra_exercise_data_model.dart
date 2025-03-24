@@ -13,11 +13,11 @@ class ExtraExerciseDataModel {
   String? monthId;
   String? weekId;
   String? dayId;
-  DateTime? date;
+  String? date;
   String? exerciseId;
   String? exerciseJson;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? getExtraExerciseModelId;
 
@@ -46,11 +46,11 @@ class ExtraExerciseDataModel {
         monthId: json["monthId"],
         weekId: json["weekId"],
         dayId: json["dayId"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        date: json["date"],
         exerciseId: json["exerciseId"],
         exerciseJson: json["exerciseJson"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
         getExtraExerciseModelId: json["id"],
       );
@@ -63,11 +63,11 @@ class ExtraExerciseDataModel {
         "monthId": monthId,
         "weekId": weekId,
         "dayId": dayId,
-        "date": date?.toIso8601String(),
+        "date": date,
         "exerciseId": exerciseId,
         "exerciseJson": exerciseJson,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
         "id": getExtraExerciseModelId,
       };

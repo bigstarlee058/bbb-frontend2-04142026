@@ -1041,16 +1041,16 @@ class MonthProvider extends ChangeNotifier {
 
     for (var element in historyDataModel) {
       if (element.type == "1") {
-        totalFormat1Weight += int.parse(element.weight ?? "0");
-        totalFormat1Reps += int.parse(element.reps ?? "0");
+        totalFormat1Weight += int.parse((element.weight?.isNotEmpty ?? false ? element.weight : "0") ?? "0");
+        totalFormat1Reps += int.parse((element.reps?.isNotEmpty ?? false ? element.reps : "0") ?? "0");
       }
       if (element.type == "2") {
-        totalFormat2Weight += int.parse(element.weight ?? "0");
-        totalFormat2Reps += int.parse(element.reps ?? "0");
+        totalFormat2Weight += int.parse((element.weight?.isNotEmpty ?? false ? element.weight : "0") ?? "0");
+        totalFormat2Reps += int.parse((element.reps?.isNotEmpty ?? false ? element.reps : "0") ?? "0");
       }
       if (element.type == "3") {
-        totalFormat3Weight += int.parse(element.weight ?? "0");
-        totalFormat3Reps += int.parse(element.reps ?? "0");
+        totalFormat3Weight += int.parse((element.weight?.isNotEmpty ?? false ? element.weight : "0") ?? "0");
+        totalFormat3Reps += int.parse((element.reps?.isNotEmpty ?? false ? element.reps : "0") ?? "0");
       }
     }
 
@@ -1565,111 +1565,112 @@ class MonthProvider extends ChangeNotifier {
   List<Map<String, dynamic>> liftedWeightEachDay = [];
 
   Map<String, Map<String, dynamic>> filterChartData() {
-    try {
-      maximumValueOfWeight = 0;
-      maximumValueOfTotalEx = 0;
-      maximumValueOfTotalTime = 0;
-      const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
-      DateTime today = DateTime.now().toUtc();
-      DateTime sixDaysAgo = today.subtract(const Duration(days: 6));
+    // try {
+    maximumValueOfWeight = 0;
+    maximumValueOfTotalEx = 0;
+    maximumValueOfTotalTime = 0;
+    const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
+    DateTime today = DateTime.now().toUtc();
+    DateTime sixDaysAgo = today.subtract(const Duration(days: 6));
 
-      List<DayHistoryModel> filteredData = allDayHistoryModel.where((entry) {
-        if (entry.status != Status.completed) {
-          return false;
-        }
-        DateTime entryDate = entry.endTime!;
-        DateTime localTime = Utils.formattedDate("$entryDate");
-        return localTime.isAfter(sixDaysAgo) && localTime.isBefore(today.add(const Duration(days: 1)));
-      }).toList();
+    List<DayHistoryModel> filteredData = allDayHistoryModel.where((entry) {
+      if (entry.status != Status.completed) {
+        return false;
+      }
+      DateTime entryDate = entry.endTime!;
+      DateTime localTime = Utils.formattedDate("$entryDate");
+      return localTime.isAfter(sixDaysAgo) && localTime.isBefore(today.add(const Duration(days: 1)));
+    }).toList();
 
-      Map<String, Map<String, dynamic>> combinedData = {};
-      for (var element in filteredData) {
-        if (element.status == Status.completed) {
-          DateTime dateDateTime = element.date!;
-          DateTime localTime = Utils.formattedDate("$dateDateTime");
-          DateTime aDate = element.startTime!;
-          DateTime localTimeADate = Utils.formattedDate("$aDate");
-          DateTime bDate = element.endTime!;
-          DateTime localTimeBDate = Utils.formattedDate("$bDate");
+    Map<String, Map<String, dynamic>> combinedData = {};
+    for (var element in filteredData) {
+      if (element.status == Status.completed) {
+        DateTime dateDateTime = element.date!;
+        DateTime localTime = Utils.formattedDate("$dateDateTime");
+        DateTime aDate = element.startTime!;
+        DateTime localTimeADate = Utils.formattedDate("$aDate");
+        DateTime bDate = element.endTime!;
+        DateTime localTimeBDate = Utils.formattedDate("$bDate");
 
-          String date = localTime.toIso8601String().split('T')[0];
-          double totalWeight = double.parse(element.totalWeight ?? "0");
-          int completedExercise = int.parse(element.completedExercise ?? "0");
+        String date = localTime.toIso8601String().split('T')[0];
+        double totalWeight = double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
+        int completedExercise = int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
 
-          int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
+        int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
 
-          String day = weekdays[localTime.weekday] ?? "";
-          if (combinedData.containsKey(date)) {
-            combinedData[date]!['totalWeight'] += totalWeight;
-            combinedData[date]!['completedExercise'] += completedExercise;
-            combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
-          } else {
-            combinedData[date] = {
-              'date': date,
-              'totalWeight': totalWeight,
-              'day': day,
-              'completedExercise': completedExercise,
-              'workoutTime': workoutTimeInSeconds,
-            };
-          }
+        String day = weekdays[localTime.weekday] ?? "";
+        if (combinedData.containsKey(date)) {
+          combinedData[date]!['totalWeight'] += totalWeight;
+          combinedData[date]!['completedExercise'] += completedExercise;
+          combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
+        } else {
+          combinedData[date] = {
+            'date': date,
+            'totalWeight': totalWeight,
+            'day': day,
+            'completedExercise': completedExercise,
+            'workoutTime': workoutTimeInSeconds,
+          };
         }
       }
-
-      combinedData.forEach((key, value) {
-        if (double.parse(value["totalWeight"].toString()) > maximumValueOfWeight) {
-          maximumValueOfWeight = double.parse(value["totalWeight"].toString());
-        }
-        if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
-          maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
-        }
-
-        final timeInSeconds = double.parse(value["workoutTime"].toString());
-        int hours = timeInSeconds ~/ 3600;
-
-        if (double.parse(value["workoutTime"].toString()) > maximumValueOfTotalTime) {
-          maximumValueOfTotalTime = double.parse(hours.toString());
-        }
-      });
-
-      maximumValueOfWeight += 3000;
-      maximumValueOfTotalEx += 6;
-      maximumValueOfTotalTime += 2;
-
-      notifyListeners();
-      return combinedData;
-    } catch (e) {
-      debugPrint("Error filtering chart data: $e");
-      return {};
     }
+
+    combinedData.forEach((key, value) {
+      if (double.parse(value["totalWeight"].toString()) > maximumValueOfWeight) {
+        maximumValueOfWeight = double.parse(value["totalWeight"].toString());
+      }
+      if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
+        maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
+      }
+
+      final timeInSeconds = double.parse(value["workoutTime"].toString());
+      int hours = timeInSeconds ~/ 3600;
+
+      if (double.parse(value["workoutTime"].toString()) > maximumValueOfTotalTime) {
+        maximumValueOfTotalTime = double.parse(hours.toString());
+      }
+    });
+
+    maximumValueOfWeight += 3000;
+    maximumValueOfTotalEx += 6;
+    maximumValueOfTotalTime += 2;
+
+    notifyListeners();
+    return combinedData;
+    // } catch (e) {
+    //   debugPrint("Error filtering chart data: $e");
+    //   return {};
+    // }
   }
 
   Future<void> getLiftedWeightGraphData() async {
-    try {
-      liftedWeightEachDay = [];
-      graphHistory = [];
+    // try {
+    liftedWeightEachDay = [];
+    liftedWeightEachDay = [];
+    graphHistory = [];
 
-      Map<String, Map<String, dynamic>> combinedData = filterChartData();
+    Map<String, Map<String, dynamic>> combinedData = filterChartData();
 
-      if (combinedData.isNotEmpty) {
-        combinedData.forEach(
-          (key, value) {
-            liftedWeightEachDay.add({
-              "day": value['day'],
-              "totalCompletedExercise": value['completedExercise'],
-              "totalTime": value['workoutTime'],
-              "totalWeight": value['totalWeight'],
-              "date": key,
-            });
-          },
-        );
-      }
-
-      graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
-
-      notifyListeners();
-    } catch (e) {
-      debugPrint("Error getting lifted weight graph data: $e");
+    if (combinedData.isNotEmpty) {
+      combinedData.forEach(
+        (key, value) {
+          liftedWeightEachDay.add({
+            "day": value['day'],
+            "totalCompletedExercise": value['completedExercise'],
+            "totalTime": value['workoutTime'],
+            "totalWeight": value['totalWeight'],
+            "date": key,
+          });
+        },
+      );
     }
+
+    graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
+
+    notifyListeners();
+    // } catch (e) {
+    //   debugPrint("Error getting lifted weight graph data: $e");
+    // }
   }
 
   List<Map<String, dynamic>> processLiftedWeightGraphData(List<Map<String, dynamic>> data) {
@@ -1780,7 +1781,7 @@ class MonthProvider extends ChangeNotifier {
         if (element.status == Status.completed) {
           DateTime dateDateTime = element.date!;
           String date = dateDateTime.toIso8601String().split('T')[0];
-          int completedExercise = int.parse(element.completedExercise ?? "0");
+          int completedExercise = int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
           String day = weekdays[dateDateTime.weekday] ?? "";
 
           if (combinedData.containsKey(date)) {
@@ -1900,7 +1901,7 @@ class MonthProvider extends ChangeNotifier {
       if (element.status == Status.completed) {
         DateTime dateDateTime = element.date!;
         String date = dateDateTime.toIso8601String().split('T')[0];
-        double totalWeight = double.parse(element.totalWeight ?? "0");
+        double totalWeight = double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
         String day = weekdays[dateDateTime.weekday] ?? "";
         if (combinedData.containsKey(date)) {
           combinedData[date]!['totalWeight'] += totalWeight;

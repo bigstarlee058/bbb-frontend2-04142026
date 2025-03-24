@@ -14,8 +14,8 @@ class RemovedExerciseDataModel {
   String? split;
   String? weekId;
   String? dayId;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? getRemoveExerciseModelId;
 
@@ -43,8 +43,8 @@ class RemovedExerciseDataModel {
         split: json["split"],
         weekId: json["weekId"],
         dayId: json["dayId"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
         getRemoveExerciseModelId: json["id"],
       );
@@ -58,8 +58,8 @@ class RemovedExerciseDataModel {
         "split": split,
         "weekId": weekId,
         "dayId": dayId,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
         "id": getRemoveExerciseModelId,
       };

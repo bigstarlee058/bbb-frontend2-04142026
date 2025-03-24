@@ -13,17 +13,17 @@ class DayStatusDataModel {
   String? monthId;
   String? weekId;
   String? dayId;
-  DateTime? date;
+  String? date;
   String? status;
   String? title;
-  DateTime? startTime;
+  String? startTime;
   String? endTime;
   String? type;
   String? totalWeight;
   String? completedExerciseCount;
   String? averageRIR;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? getDayStautsModelId;
 
@@ -59,16 +59,16 @@ class DayStatusDataModel {
         monthId: json["monthId"],
         weekId: json["weekId"],
         dayId: json["dayId"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        date: json["date"],
         status: json["status"],
         title: json["title"],
-        startTime: json["startTime"] == null ? null : DateTime.parse(json["startTime"]),
+        startTime: json["startTime"],
         endTime: json["endTime"],
         type: json["type"],
         totalWeight: json["totalWeight"],
         completedExerciseCount: json["completedExerciseCount"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
         getDayStautsModelId: json["id"],
       );
@@ -82,16 +82,16 @@ class DayStatusDataModel {
         "averageRIR": averageRIR,
         "weekId": weekId,
         "dayId": dayId,
-        "date": date?.toIso8601String(),
+        "date": date,
         "status": status,
         "title": title,
-        "startTime": startTime?.toIso8601String(),
+        "startTime": startTime,
         "endTime": endTime,
         "type": type,
         "totalWeight": totalWeight,
         "completedExerciseCount": completedExerciseCount,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
         "id": getDayStautsModelId,
       };
