@@ -371,12 +371,10 @@ class _DashboardPageState extends State<DashboardPage> {
                                             if (monthData.todayTitleId.isNotEmpty) {
                                               int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList
                                                   ?.indexWhere((element) => element == monthData.todayTitleId);
-
                                               String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
                                                       .toString()
                                                       .split(" ")[1] ??
                                                   "";
-
                                               String dataId =
                                                   "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
 
@@ -394,6 +392,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                           .replaceAll(" ", "") ??
                                                       "0")) -
                                                   1;
+
                                               DayDataModel dayData =
                                                   "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
                                                           .toString()
@@ -418,26 +417,27 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       1
                                                   : 0;
 
-                                              String pumpDayTitle = "Pump Day";
+                                              String todayTitleName = "Pump Day";
 
                                               final dataList = monthProvider.dayHistoryModel
                                                   .where((element) =>
                                                       element.type?.contains("Pump Day") == true && element.status != Status.empty)
                                                   .toList();
+
                                               if (monthProvider.pumpDays.isNotEmpty) {
                                                 if (dataList.isNotEmpty) {
                                                   int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
                                                       (e1.dayId == monthProvider.todayTitleId &&
                                                           e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
                                                   if (index1 != -1) {
-                                                    pumpDayTitle = monthProvider.pumpDays[index1].title ?? "Pump Day";
+                                                    todayTitleName = monthProvider.pumpDays[index1].title ?? "Pump Day";
                                                   } else {
                                                     if (monthProvider.pumpDays.length == 1) {
-                                                      pumpDayTitle = monthProvider.pumpDays[0].title ?? "Pump Day";
+                                                      todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
                                                     } else {
                                                       int index1 = monthProvider.pumpDays.indexWhere((el1) =>
                                                           dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
-                                                      pumpDayTitle = monthProvider
+                                                      todayTitleName = monthProvider
                                                               .pumpDays[index == -1
                                                                   ? 0
                                                                   : index1 == 0
@@ -448,7 +448,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     }
                                                   }
                                                 } else {
-                                                  pumpDayTitle = monthProvider.pumpDays[0].title ?? "Pump Day";
+                                                  todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
                                                 }
                                               }
 
@@ -484,13 +484,17 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               /*matchingElement.id != null
                                                                   ? matchingElement.title ?? "Pump Day"
                                                                   : */
-                                                              !isRestDay
-                                                                  ? monthData.monthDataModel!.weeks![monthData.week! - 1]
-                                                                          .days![nextWorkOutIndex].title ??
+                                                              !monthData.isPumpDayAvailable
+                                                                  ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
+                                                                          .dayList![index ?? 0] ??
                                                                       ""
-                                                                  : monthData.pumpDays.isEmpty
-                                                                      ? "Pump Day"
-                                                                      : pumpDayTitle,
+                                                                  : !isRestDay
+                                                                      ? monthData.monthDataModel!.weeks![monthData.week! - 1]
+                                                                              .days![nextWorkOutIndex].title ??
+                                                                          ""
+                                                                      : monthData.pumpDays.isEmpty
+                                                                          ? "Pump Day"
+                                                                          : todayTitleName,
                                                               textAlign: TextAlign.center,
                                                               style: TextStyle(
                                                                 color: Colors.white,
@@ -907,7 +911,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             SvgPicture.asset(
-                                              height: 50,
+                                              height: ScreenUtil.verticalScale(7),
                                               'assets/img/verified (1).svg',
                                               color: AppColors.primaryColor,
                                               fit: BoxFit.contain,
@@ -916,11 +920,14 @@ class _DashboardPageState extends State<DashboardPage> {
                                               height: 10,
                                             ),
                                             Text(
-                                              "Lorem ipsum",
+                                              "Breaking the Ice",
                                               maxLines: 1,
                                               textAlign: TextAlign.center,
                                               overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(fontSize: 13, color: AppColors.primaryColor, fontWeight: FontWeight.bold),
+                                              style: TextStyle(
+                                                  fontSize: ScreenUtil.verticalScale(1.45),
+                                                  color: AppColors.primaryColor,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ],
                                         ),
@@ -1206,8 +1213,26 @@ class _DashboardPageState extends State<DashboardPage> {
     String currentDayTitle = monthProvider.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
         ? monthProvider.weekDataModel!.days![nextWorkOutIndex].title ?? ""
         : monthProvider.weekDataModel!.dayList![dayIndex - 1];
-    if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay)) {
-      Navigator.pushNamed(context, '/dayOverview');
+    // if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay)) {
+    //   Navigator.pushNamed(context, '/dayOverview');
+    // }
+
+    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel
+        .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
+
+    if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && isCompletedOrSkipped) {
+      return;
+    } else if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && !isCompletedOrSkipped) {
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      context.read<MainPageProvider>().changeTab(1);
+
+      // showDialog(
+      //   barrierDismissible: false,
+      //   context: context,
+      //   builder: (c1) {
+      //     return skipWorkoutDialog(context, c1);
+      //   },
+      // );
     } else {
       if (monthProvider.isPumpDay) {
         if ((monthProvider.allSplitDayHistoryModel
@@ -1300,6 +1325,132 @@ class _DashboardPageState extends State<DashboardPage> {
     monthProvider.manageStreak();
     monthProvider.getLiftedWeightGraphData();
   }
+
+  // Widget skipWorkoutDialog(BuildContext context, BuildContext c1) {
+  //   return Dialog(
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.circular(20),
+  //     ),
+  //     insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+  //     child: ClipRRect(
+  //       borderRadius: BorderRadius.circular(20),
+  //       child: Container(
+  //         decoration: BoxDecoration(
+  //           borderRadius: BorderRadius.circular(20),
+  //           color: const Color(0xFFFFFFFF),
+  //         ),
+  //         child: Stack(
+  //           children: [
+  //             Padding(
+  //               padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)).copyWith(top: ScreenUtil.verticalScale(2.5)),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   SizedBox(height: ScreenUtil.verticalScale(2)),
+  //                   Text(
+  //                     "Rest Day",
+  //                     style: TextStyle(
+  //                       color: Colors.black,
+  //                       fontSize: ScreenUtil.verticalScale(2.4),
+  //                       fontWeight: FontWeight.bold,
+  //                     ),
+  //                   ),
+  //                   Padding(
+  //                     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
+  //                     child: Text(
+  //                       "Would you like to mark the rest day complete or skip?",
+  //                       textAlign: TextAlign.center,
+  //                       style: TextStyle(
+  //                         color: Colors.black,
+  //                         fontSize: ScreenUtil.verticalScale(2),
+  //                         fontWeight: FontWeight.normal,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   Padding(
+  //                     padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+  //                     child: Row(
+  //                       children: [
+  //                         Expanded(
+  //                           child: ElevatedButton(
+  //                             onPressed: () async {
+  //                               await _saveDayData(status: Status.skipped, type: 'Rest Day');
+  //                               if (!c1.mounted) return;
+  //                               Navigator.of(c1).pop();
+  //                             },
+  //                             style: ElevatedButton.styleFrom(
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(15),
+  //                               ),
+  //                               backgroundColor: AppColors.skipDayColor,
+  //                               padding: EdgeInsets.symmetric(
+  //                                 vertical: ScreenUtil.verticalScale(1.7),
+  //                               ),
+  //                             ),
+  //                             child: Text(
+  //                               "Skip day",
+  //                               style: TextStyle(
+  //                                 fontSize: ScreenUtil.verticalScale(2),
+  //                                 fontWeight: FontWeight.bold,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                         SizedBox(width: ScreenUtil.horizontalScale(3)),
+  //                         Expanded(
+  //                           child: ElevatedButton(
+  //                             onPressed: () async {
+  //                               await _saveDayData(status: Status.completed, type: 'Rest Day');
+  //                               if (!c1.mounted) return;
+  //                               Navigator.of(c1).pop();
+  //                             },
+  //                             style: ElevatedButton.styleFrom(
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(15),
+  //                               ),
+  //                               backgroundColor: AppColors.primaryColor,
+  //                               padding: EdgeInsets.symmetric(
+  //                                 vertical: ScreenUtil.verticalScale(1.7),
+  //                               ),
+  //                             ),
+  //                             child: Text(
+  //                               "Mark complete",
+  //                               style: TextStyle(
+  //                                 fontSize: ScreenUtil.verticalScale(2),
+  //                                 fontWeight: FontWeight.bold,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   )
+  //                 ],
+  //               ),
+  //             ),
+  //             Padding(
+  //               padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.7)),
+  //               child: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.end,
+  //                 children: [
+  //                   IconButton(
+  //                     icon: const Icon(Icons.close),
+  //                     onPressed: () {
+  //                       Navigator.of(c1).pop();
+  //                     },
+  //                   ),
+  //                   SizedBox(width: ScreenUtil.horizontalScale(2)),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }
 
 class CustomCalendarWidget extends StatefulWidget {

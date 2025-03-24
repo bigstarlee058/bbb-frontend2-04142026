@@ -3,8 +3,6 @@ import 'dart:developer';
 
 import 'package:bbb/middleware/api/api_exception.dart';
 import 'package:bbb/middleware/api/base_service.dart';
-import 'package:bbb/values/app_constants.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum APIType { aPost, aGet, aDelete, aPut }
@@ -20,23 +18,23 @@ class ApiService extends BaseService {
 
   Future<dynamic> getResponse({required APIType apiType, required String url, Map<String, dynamic>? body}) async {
     try {
-      String? userIdToken = await getAuthToken();
-      Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
-      log('header :::::::::::::::::: $header');
-      String mainUrl = AppConstants.serverUrl + url;
-      if (apiType == APIType.aGet) {
-        var result = await http.get(Uri.parse(mainUrl), headers: header);
-        response = returnResponse(result.statusCode, result.body);
-      } else if (apiType == APIType.aPost) {
-        var result = await http.post(Uri.parse(mainUrl), headers: header, body: body);
-        response = returnResponse(result.statusCode, result.body);
-      } else if (apiType == APIType.aPut) {
-        var result = await http.put(Uri.parse(mainUrl), headers: header, body: body);
-        response = returnResponse(result.statusCode, result.body);
-      } else if (apiType == APIType.aDelete) {
-        var result = await http.delete(Uri.parse(mainUrl), headers: header);
-        response = returnResponse(result.statusCode, result.body);
-      }
+      // String? userIdToken = await getAuthToken();
+      // Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
+      // log('header :::::::::::::::::: $header');
+      // String mainUrl = AppConstants.serverUrl + url;
+      // if (apiType == APIType.aGet) {
+      //   var result = await http.get(Uri.parse(mainUrl), headers: header);
+      //   response = returnResponse(result.statusCode, result.body);
+      // } else if (apiType == APIType.aPost) {
+      //   var result = await http.post(Uri.parse(mainUrl), headers: header, body: body);
+      //   response = returnResponse(result.statusCode, result.body);
+      // } else if (apiType == APIType.aPut) {
+      //   var result = await http.put(Uri.parse(mainUrl), headers: header, body: body);
+      //   response = returnResponse(result.statusCode, result.body);
+      // } else if (apiType == APIType.aDelete) {
+      //   var result = await http.delete(Uri.parse(mainUrl), headers: header);
+      //   response = returnResponse(result.statusCode, result.body);
+      // }
       return response;
     } catch (e) {
       log('Error=>.ERROR. $e');

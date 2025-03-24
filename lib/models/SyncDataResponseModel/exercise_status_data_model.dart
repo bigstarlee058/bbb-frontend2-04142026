@@ -21,11 +21,11 @@ class ExerciseStatusDataModel {
   String? monthId;
   String? weekId;
   String? dayId;
-  DateTime? date;
+  String? date;
   String? status;
   String? type;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? getExerciseStatusModelId;
 
@@ -62,11 +62,11 @@ class ExerciseStatusDataModel {
         monthId: json["monthId"],
         weekId: json["weekId"],
         dayId: json["dayId"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        date: json["date"],
         status: json["status"],
         type: json["type"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
         getExerciseStatusModelId: json["id"],
       );
@@ -83,11 +83,11 @@ class ExerciseStatusDataModel {
         "monthId": monthId,
         "weekId": weekId,
         "dayId": dayId,
-        "date": date?.toIso8601String(),
+        "date": date,
         "status": status,
         "type": type,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
         "id": getExerciseStatusModelId,
       };

@@ -50,6 +50,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+
     vimeoVideoPlayer = VimeoVideoPlayer(
       // url: 'https://player.vimeo.com/video/953289606',
       // autoPlay: true,
@@ -146,16 +147,16 @@ class _MainPageState extends State<MainPage> {
 
   void _startPeriodicUpdate() {
     _timer = Timer.periodic(
-      const Duration(minutes: 1), // Set the interval to 5 minutes
+      const Duration(minutes: 1),
       (Timer timer) {
-        _initializeData(); // Call the data initialization method
+        _initializeData();
       },
     );
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    _timer?.cancel();
     super.dispose();
   }
 

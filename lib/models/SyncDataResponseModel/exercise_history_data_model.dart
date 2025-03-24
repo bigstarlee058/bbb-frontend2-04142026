@@ -19,7 +19,7 @@ class ExerciseHistoryDataModel {
   String? monthId;
   String? weekId;
   String? dayId;
-  DateTime? date;
+  String? date;
   String? status;
   String? sets;
   String? reps;
@@ -31,8 +31,8 @@ class ExerciseHistoryDataModel {
   String? index;
   String? subIndex;
   String? totalSet;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? exerciseHistoryDataModelId;
 
@@ -74,7 +74,7 @@ class ExerciseHistoryDataModel {
         monthId: json["monthId"],
         weekId: json["weekId"],
         dayId: json["dayId"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        date: json["date"],
         status: json["status"],
         type: json["type"],
         totalSet: json["totalSet"],
@@ -86,8 +86,8 @@ class ExerciseHistoryDataModel {
         effort: json["effort"],
         index: json["index"],
         subIndex: json["subIndex"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
         exerciseHistoryDataModelId: json["id"],
       );
@@ -103,7 +103,7 @@ class ExerciseHistoryDataModel {
         "weekId": weekId,
         "dayId": dayId,
         "type": type,
-        "date": date?.toIso8601String(),
+        "date": date,
         "status": status,
         "sets": sets,
         "reps": reps,
@@ -114,8 +114,8 @@ class ExerciseHistoryDataModel {
         "effort": effort,
         "index": index,
         "subIndex": subIndex,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
         "id": exerciseHistoryDataModelId,
       };

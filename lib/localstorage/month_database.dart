@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:path/path.dart' as path1;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -156,7 +158,14 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS $extraExerciseHistory (
         id INTEGER PRIMARY KEY autoincrement,
-  extraExerciseHistory
+         dataId TEXT,
+         split TEXT,
+         monthId TEXT,
+         weekId TEXT,
+         dayId TEXT,
+         date TEXT, 
+         exerciseId TEXT,
+         exerciseJson Text
       )
     ''');
 
@@ -174,6 +183,36 @@ class DatabaseHelper {
         exerciseJson Text
       )
     ''');
+  }
+
+  Future<bool> areAllTablesEmpty() async {
+    Database db = await database;
+    const tables = [
+      DatabaseHelper.exerciseHistory,
+      DatabaseHelper.exerciseStatus,
+      DatabaseHelper.dayStatus,
+      DatabaseHelper.circuitManager,
+      DatabaseHelper.extraSetHistory,
+      DatabaseHelper.removedExerciseHistory,
+      DatabaseHelper.exerciseNotes,
+      DatabaseHelper.extraExerciseHistory,
+      DatabaseHelper.swapExerciseHistory,
+    ];
+
+    try {
+      for (String table in tables) {
+        final result = await db.rawQuery('SELECT COUNT(*) as count FROM $table');
+        final count = Sqflite.firstIntValue(result);
+        log('Table: $table, Count: $count');
+        if ((count ?? 0) > 0) {
+          return false;
+        }
+      }
+      return true;
+    } catch (e) {
+      log('Error checking tables: $e');
+      return false;
+    }
   }
 
   Future<int> insertData({required String tableName, required Map<String, dynamic> data}) async {
