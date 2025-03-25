@@ -874,6 +874,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
+    if (status == Status.completed) {
+      ApiRepo.addDayStatusList(body: {"date": "${DateTime.now().toUtc()}", "status": Status.completed});
+    }
+
     final data = {
       "title": title ?? "",
       "dataId": dataId,

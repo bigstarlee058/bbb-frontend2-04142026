@@ -138,10 +138,17 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   }
 
   Widget? _buildDayState(DateTime date) {
-    DateTime? oldestStartDate =
-        monthProvider?.monthLocalDataModel.map((e) => Utils.formattedDate(e.monthStartDate!)).reduce((a, b) => a.isBefore(b) ? a : b);
-
     final nowUtc = DateTime.now();
+
+    DateTime oldestStartDate = monthProvider!.monthLocalDataModel
+        .map(
+          (e) => DateFormat("dd-MM-yyyy").parse(
+            DateFormat("dd-MM-yyyy").format(
+              Utils.formattedDate(e.monthStartDate!),
+            ),
+          ),
+        )
+        .reduce((a, b) => a.isBefore(b) ? a : b);
 
     List<DayHistoryModel> data = monthProvider!.decodedDataAll();
 
@@ -150,7 +157,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     if (data.isEmpty) {
       if (isCurrentDay) {
         return _buildCurrentWorkoutDay(date);
-      } else if (oldestStartDate!.isBefore(date) && nowUtc.isAfter(date)) {
+      } else if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
         return _buildCustomDayCircle(date, Colors.blue);
       }
     }
@@ -158,6 +165,20 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
 
     if (date.isBefore(futureDay)) {
+      if (monthProvider!.dayStatusList.isNotEmpty) {
+        for (var day in monthProvider!.dayStatusList) {
+          final workoutDate = day.date;
+          DateTime localTime = Utils.formattedDate("$workoutDate");
+          if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+            if (day.status == Status.completed) {
+              return _buildCustomDayCircle(date, AppColors.primaryColor);
+            } else if (day.status == Status.skipped) {
+              return _buildCustomDayCircle(date, Colors.blue);
+            }
+          }
+        }
+      }
+
       for (var day in data) {
         final workoutDate = day.endTime!;
 
@@ -187,7 +208,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         return _buildCurrentWorkoutDay(date);
       }
     }
-    if (oldestStartDate!.isBefore(date) && nowUtc.isAfter(date)) {
+    if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
       if (DateTime(futureDay.year, futureDay.month, futureDay.day) != DateTime(date.year, date.month, date.day)) {
         return _buildCustomDayCircle(date, Colors.blue);
       }

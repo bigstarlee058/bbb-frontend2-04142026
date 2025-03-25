@@ -2170,7 +2170,9 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
     await monthProvider?.fetchExerciseStatusLocalData();
-
+    if (status1 == Status.completed) {
+      ApiRepo.addDayStatusList(body: {"date": "${DateTime.now().toUtc()}", "status": Status.completed});
+    }
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 

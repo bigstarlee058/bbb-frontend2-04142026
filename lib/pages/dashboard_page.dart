@@ -766,7 +766,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         child: Row(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                              padding: const EdgeInsets.only(top: 22, bottom: 10),
                                               child: Text(
                                                 "Recent Streak",
                                                 style: TextStyle(
@@ -785,7 +785,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 },
                               ),
                               Container(
-                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: 15),
+                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(top: 25, bottom: 20),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -1466,8 +1466,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   @override
   void initState() {
-    super.initState();
     _focusedDay = DateTime.now();
+    super.initState();
   }
 
   @override
@@ -1529,14 +1529,19 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   Widget? _buildDayState(DateTime date) {
     if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
-      DateTime? oldestStartDate = widget.monthProvider.monthLocalDataModel
-          .map((e) => Utils.formattedDate(e.monthStartDate!))
+      DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
+          .map(
+            (e) => DateFormat("dd-MM-yyyy").parse(
+              DateFormat("dd-MM-yyyy").format(
+                Utils.formattedDate(e.monthStartDate!),
+              ),
+            ),
+          )
           .reduce((a, b) => a.isBefore(b) ? a : b);
 
       final nowUtc = DateTime.now();
 
       List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
-
       bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
 
       if (data.isEmpty) {
@@ -1548,8 +1553,21 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
 
       DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
-
       if (date.isBefore(futureDay)) {
+        if (widget.monthProvider.dayStatusList.isNotEmpty) {
+          for (var day in widget.monthProvider.dayStatusList) {
+            final workoutDate = day.date;
+            DateTime localTime = Utils.formattedDate("$workoutDate");
+            if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+              if (day.status == Status.completed) {
+                return _buildCustomDayCircle(date, AppColors.primaryColor);
+              } else if (day.status == Status.skipped) {
+                return _buildCustomDayCircle(date, Colors.blue);
+              }
+            }
+          }
+        }
+
         for (var day in data) {
           final workoutDate = day.endTime!;
 
@@ -1584,7 +1602,14 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           return _buildCustomDayCircle(date, Colors.blue);
         }
       }
+    } else {
+      final nowUtc = DateTime.now();
+      bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
+      if (isCurrentDay) {
+        return _buildCurrentWorkoutDay(date);
+      }
     }
+
     return null;
   }
 

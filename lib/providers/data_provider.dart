@@ -13,6 +13,7 @@ import 'package:bbb/models/SyncDataResponseModel/exercise_status_data_model.dart
 import 'package:bbb/models/SyncDataResponseModel/extra_exercise_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/extra_set_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/removed_exercise_data_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/streak_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/swap_exercise_data_model.dart';
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/models/category.dart';
@@ -506,6 +507,7 @@ class DataProvider extends ChangeNotifier {
             }
           }
           List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
+
           if (dayStatus.isNotEmpty) {
             for (var element in dayStatus) {
               final body = {
@@ -602,6 +604,8 @@ class DataProvider extends ChangeNotifier {
               await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
             }
           }
+          StreakDataModel? streakDataModel = await ApiRepo.fetchStreakCount();
+          await preferences.putInt(SharedPreference.lastStreakCount, int.parse((streakDataModel?.count ?? "0")));
         }
       }
       notifyListeners();
@@ -623,8 +627,6 @@ class DataProvider extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-
-        log('data :::::::::::::::::: $data');
 
         var responseData = data[0];
 
