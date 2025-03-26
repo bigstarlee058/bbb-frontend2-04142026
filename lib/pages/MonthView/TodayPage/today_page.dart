@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
@@ -781,12 +782,10 @@ class _TodayPageState extends State<TodayPage> {
                                                               color: AppColors.skipDayColor,
                                                               isLoading: false,
                                                               onPress: () async {
-                                                                showDialog(
-                                                                  barrierDismissible: false,
+                                                                AnimatedDialog.showAnimatedDialog(
                                                                   context: context,
-                                                                  builder: (c1) {
-                                                                    return skipWorkoutDialog(context, c1);
-                                                                  },
+                                                                  builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
+                                                                  curve: Curves.fastOutSlowIn,
                                                                 );
                                                               },
                                                             ),

@@ -1,3 +1,4 @@
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
@@ -464,12 +465,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && isCompletedOrSkipped) {
       return;
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && !isCompletedOrSkipped) {
-      showDialog(
-        barrierDismissible: false,
+      AnimatedDialog.showAnimatedDialog(
         context: context,
-        builder: (c1) {
-          return skipWorkoutDialog(context, c1);
-        },
+        builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
+        curve: Curves.fastOutSlowIn,
       );
     } else {
       if (monthProvider!.isPumpDay) {
@@ -604,12 +603,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider.alternateEquipmentType = monthProvider.equipmentType;
             monthProvider.weekDataModel = weekDataModel;
             monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
-            showDialog(
-              barrierDismissible: false,
+            AnimatedDialog.showAnimatedDialog(
               context: context,
-              builder: (c1) {
-                return skipWorkoutDialog(context, c1);
-              },
+              builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
+              curve: Curves.fastOutSlowIn,
             );
           },
           child: Container(

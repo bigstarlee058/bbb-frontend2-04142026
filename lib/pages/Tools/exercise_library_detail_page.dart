@@ -78,7 +78,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
   Future<void> initializeVideo(String url) async {
     try {
       // Initialize the video player controller
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
+      _videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
       await _videoPlayerController.initialize();
 
       // Initialize the ChewieController with custom controls

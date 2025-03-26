@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/athletes_list_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/collection_grid.dart';
@@ -20,6 +21,7 @@ import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/components/share_achievement_dialog.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -878,64 +880,82 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-                              InkWell(
-                                onTap: () {},
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.horizontalScale(5)),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Center(
-                                          child: Text(
-                                            'Achievements',
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: AppColors.primaryColor,
-                                              fontSize: 19,
-                                              fontWeight: FontWeight.bold,
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.horizontalScale(5)),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          'Achievements',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: List.generate(
+                                          1,
+                                          (index) => GestureDetector(
+                                            onTap: () {
+                                              AnimatedDialog.showAnimatedDialog(
+                                                context: context,
+                                                builder: (BuildContext context) => ShareAchievementDialog(
+                                                  title: "Breaking the Ice",
+                                                  imagePath: 'assets/img/verified (1).svg',
+                                                  subtitle: "Your First Workout Finished",
+                                                  time: DateTime.now(),
+                                                ),
+                                                curve: Curves.fastOutSlowIn,
+                                              );
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                SvgPicture.asset(
+                                                  height: ScreenUtil.verticalScale(7),
+                                                  'assets/img/verified (1).svg',
+                                                  color: AppColors.primaryColor,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  "Breaking the Ice",
+                                                  maxLines: 1,
+                                                  textAlign: TextAlign.center,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      fontSize: ScreenUtil.verticalScale(1.45),
+                                                      color: AppColors.primaryColor,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(
-                                          height: 15,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              height: ScreenUtil.verticalScale(7),
-                                              'assets/img/verified (1).svg',
-                                              color: AppColors.primaryColor,
-                                              fit: BoxFit.contain,
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              "Breaking the Ice",
-                                              maxLines: 1,
-                                              textAlign: TextAlign.center,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  fontSize: ScreenUtil.verticalScale(1.45),
-                                                  color: AppColors.primaryColor,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
+
                               Container(
                                 margin: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(10),

@@ -32,14 +32,15 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     super.initState();
     loadWelcomeContent();
     _checkLoginStatus();
-    _videoController = VideoPlayerController.asset('assets/videos/welcome_new.mp4')
-      ..initialize().then((_) {
-        setState(() {
-          _isVideoInitialized = true;
-          _videoController.setLooping(true);
-          _videoController.play();
-        });
-      });
+    _videoController =
+        VideoPlayerController.asset('assets/videos/welcome_new.mp4', videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
+          ..initialize().then((_) {
+            setState(() {
+              _isVideoInitialized = true;
+              _videoController.setLooping(true);
+              _videoController.play();
+            });
+          });
   }
 
   isFromNotification() async {

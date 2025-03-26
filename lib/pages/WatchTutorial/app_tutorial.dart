@@ -56,7 +56,7 @@ class _AppTutorialState extends State<AppTutorial> {
     try {
       // Initialize the video player controller
       _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
       await _videoPlayerController.initialize();
 
       // Initialize the ChewieController with custom controls

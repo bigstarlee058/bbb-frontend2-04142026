@@ -9,6 +9,7 @@ import 'package:bbb/models/SyncDataResponseModel/exercise_notes_data_model.dart'
 import 'package:bbb/models/SyncDataResponseModel/exercise_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/extra_exercise_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/extra_set_data_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/month_enrollment_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/removed_exercise_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/streak_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/swap_exercise_data_model.dart';
@@ -229,5 +230,17 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(apiType: APIType.aPost, url: BaseService.addDayStatusList, body: body);
     log('response-addDayStatusList :::::::::::::::::: $response');
     return response;
+  }
+
+  /// MonthEnrollment ========================================================================
+
+  static Future<List<MonthEnrollmentDataModel>> fetchMonthEnrollment() async {
+    var response = await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchMonthEnrollment);
+    log('response :::::::::::::::::: $response');
+    if (response is List) {
+      return response.map((json) => MonthEnrollmentDataModel.fromJson(json)).toList();
+    } else {
+      throw Exception("Unexpected response format: $response");
+    }
   }
 }
