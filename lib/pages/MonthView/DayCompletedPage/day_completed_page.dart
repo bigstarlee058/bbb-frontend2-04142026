@@ -623,7 +623,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                     //   }),
                     // ),
                     // const SizedBox(height: 30),
-                    const SizedBox(height: 20),
+                    SizedBox(height: ScreenUtil.horizontalScale(7.5)),
                   ],
                 ),
               ),

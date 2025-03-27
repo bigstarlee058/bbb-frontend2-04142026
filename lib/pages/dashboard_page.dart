@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/athletes_list_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/collection_grid.dart';
@@ -20,6 +21,7 @@ import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/components/share_achievement_dialog.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -766,7 +768,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         child: Row(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                              padding: const EdgeInsets.only(top: 22, bottom: 10),
                                               child: Text(
                                                 "Recent Streak",
                                                 style: TextStyle(
@@ -785,7 +787,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 },
                               ),
                               Container(
-                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: 15),
+                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(top: 25, bottom: 20),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -878,64 +880,82 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-                              InkWell(
-                                onTap: () {},
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.horizontalScale(5)),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Center(
-                                          child: Text(
-                                            'Achievements',
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: AppColors.primaryColor,
-                                              fontSize: 19,
-                                              fontWeight: FontWeight.bold,
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.horizontalScale(5)),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          'Achievements',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: List.generate(
+                                          1,
+                                          (index) => GestureDetector(
+                                            onTap: () {
+                                              AnimatedDialog.showAnimatedDialog(
+                                                context: context,
+                                                builder: (BuildContext context) => ShareAchievementDialog(
+                                                  title: "Breaking the Ice",
+                                                  imagePath: 'assets/img/verified (1).svg',
+                                                  subtitle: "Your First Workout Finished",
+                                                  time: DateTime.now(),
+                                                ),
+                                                curve: Curves.fastOutSlowIn,
+                                              );
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                SvgPicture.asset(
+                                                  height: ScreenUtil.verticalScale(7),
+                                                  'assets/img/verified (1).svg',
+                                                  color: AppColors.primaryColor,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  "Breaking the Ice",
+                                                  maxLines: 1,
+                                                  textAlign: TextAlign.center,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      fontSize: ScreenUtil.verticalScale(1.45),
+                                                      color: AppColors.primaryColor,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(
-                                          height: 15,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              height: ScreenUtil.verticalScale(7),
-                                              'assets/img/verified (1).svg',
-                                              color: AppColors.primaryColor,
-                                              fit: BoxFit.contain,
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              "Breaking the Ice",
-                                              maxLines: 1,
-                                              textAlign: TextAlign.center,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  fontSize: ScreenUtil.verticalScale(1.45),
-                                                  color: AppColors.primaryColor,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
+
                               Container(
                                 margin: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(10),
@@ -1466,8 +1486,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   @override
   void initState() {
-    super.initState();
     _focusedDay = DateTime.now();
+    super.initState();
   }
 
   @override
@@ -1529,14 +1549,19 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   Widget? _buildDayState(DateTime date) {
     if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
-      DateTime? oldestStartDate = widget.monthProvider.monthLocalDataModel
-          .map((e) => Utils.formattedDate(e.monthStartDate!))
+      DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
+          .map(
+            (e) => DateFormat("dd-MM-yyyy").parse(
+              DateFormat("dd-MM-yyyy").format(
+                Utils.formattedDate(e.monthStartDate!),
+              ),
+            ),
+          )
           .reduce((a, b) => a.isBefore(b) ? a : b);
 
       final nowUtc = DateTime.now();
 
       List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
-
       bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
 
       if (data.isEmpty) {
@@ -1548,8 +1573,21 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
 
       DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
-
       if (date.isBefore(futureDay)) {
+        if (widget.monthProvider.dayStatusList.isNotEmpty) {
+          for (var day in widget.monthProvider.dayStatusList) {
+            final workoutDate = day.date;
+            DateTime localTime = Utils.formattedDate("$workoutDate");
+            if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+              if (day.status == Status.completed) {
+                return _buildCustomDayCircle(date, AppColors.primaryColor);
+              } else if (day.status == Status.skipped) {
+                return _buildCustomDayCircle(date, Colors.blue);
+              }
+            }
+          }
+        }
+
         for (var day in data) {
           final workoutDate = day.endTime!;
 
@@ -1584,7 +1622,14 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           return _buildCustomDayCircle(date, Colors.blue);
         }
       }
+    } else {
+      final nowUtc = DateTime.now();
+      bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
+      if (isCurrentDay) {
+        return _buildCurrentWorkoutDay(date);
+      }
     }
+
     return null;
   }
 

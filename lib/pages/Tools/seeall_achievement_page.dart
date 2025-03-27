@@ -1,5 +1,7 @@
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/share_achievement_dialog.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -141,16 +143,13 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                SizedBox(
-                                  width: media.width * 0.4,
-                                  child: Text(
-                                    "Here's a look at your achievements",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.horizontalScale(4.5),
-                                    ),
-                                    textAlign: TextAlign.center,
+                                Text(
+                                  "Here's a look at your\nachievements",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: ScreenUtil.verticalScale(1.9),
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ],
                             ),
@@ -216,49 +215,63 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
   }
 
   Widget _buildGridItem(Map<String, String> item, int index) {
-    return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: ScreenUtil.verticalScale(9),
-            width: ScreenUtil.verticalScale(9),
-            child: SvgPicture.asset(
-              item["image"]!,
-              color: index == 0 ? AppColors.primaryColor : Colors.grey,
-              fit: BoxFit.contain,
-            ),
+    return GestureDetector(
+      onTap: () {
+        AnimatedDialog.showAnimatedDialog(
+          context: context,
+          builder: (BuildContext context) => ShareAchievementDialog(
+            title: item["title"]!,
+            imagePath: item["image"]!,
+            subtitle: item["subtitle"]!,
+            time: DateTime.now(),
           ),
-          SizedBox(height: 5),
-          Text(
-            item["title"]!,
-            maxLines: 1,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: ScreenUtil.verticalScale(1.45),
-              color: index == 0 ? AppColors.primaryColor : Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 1),
-          Flexible(
-            child: Text(
-              item["subtitle"]!,
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.visible,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.1),
-                color: index == 0 ? AppColors.primaryColor : Colors.black,
-                fontWeight: FontWeight.w500,
+          curve: Curves.fastOutSlowIn,
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: ScreenUtil.verticalScale(9),
+              width: ScreenUtil.verticalScale(9),
+              child: SvgPicture.asset(
+                item["image"]!,
+                colorFilter: ColorFilter.mode(index == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                fit: BoxFit.contain,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 5),
+            Text(
+              item["title"]!,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.45),
+                color: index == 0 ? AppColors.primaryColor : Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 1),
+            Flexible(
+              child: Text(
+                item["subtitle"]!,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.1),
+                  color: index == 0 ? AppColors.primaryColor : Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

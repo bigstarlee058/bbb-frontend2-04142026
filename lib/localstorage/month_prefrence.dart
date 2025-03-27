@@ -18,6 +18,7 @@ class SharedPreference {
   static const String exerciseTutorial = "EXERCISE-TUTORIAL";
   static const String inTheExerciseScreenOrNot = "EXERCISE-SCREEN-OR-NOT";
   static const String notificationSwitch = "notificationSwitch";
+  static const String isHapticFeedbackOn = "IS-HAPTIC-FEEDBACK-ON";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();

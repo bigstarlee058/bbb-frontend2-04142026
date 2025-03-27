@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
@@ -781,12 +782,10 @@ class _TodayPageState extends State<TodayPage> {
                                                               color: AppColors.skipDayColor,
                                                               isLoading: false,
                                                               onPress: () async {
-                                                                showDialog(
-                                                                  barrierDismissible: false,
+                                                                AnimatedDialog.showAnimatedDialog(
                                                                   context: context,
-                                                                  builder: (c1) {
-                                                                    return skipWorkoutDialog(context, c1);
-                                                                  },
+                                                                  builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
+                                                                  curve: Curves.fastOutSlowIn,
                                                                 );
                                                               },
                                                             ),
@@ -2170,7 +2169,9 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
     await monthProvider?.fetchExerciseStatusLocalData();
-
+    if (status1 == Status.completed) {
+      ApiRepo.addDayStatusList(body: {"date": "${DateTime.now().toUtc()}", "status": Status.completed});
+    }
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 

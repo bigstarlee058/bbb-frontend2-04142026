@@ -50,7 +50,8 @@ class _WatchTutorialState extends State<WatchTutorial> {
 
   Future<void> initializeVideo(String url) async {
     try {
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
+      _videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
 
       await _videoPlayerController.initialize();
       _chewieController = ChewieController(

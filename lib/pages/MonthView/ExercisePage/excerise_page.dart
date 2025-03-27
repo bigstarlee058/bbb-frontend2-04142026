@@ -92,7 +92,8 @@ class _ExercisePageState extends State<ExercisePage> {
 
   Future<void> initializeVideo1(String url) async {
     try {
-      _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(url));
+      _videoPlayerController1 =
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
       await _videoPlayerController1.initialize();
       _chewieController1 = ChewieController(
         videoPlayerController: _videoPlayerController1,
@@ -336,7 +337,8 @@ class _ExercisePageState extends State<ExercisePage> {
 
   Future<void> initializeVideo(String url) async {
     try {
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
+      _videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
       await _videoPlayerController.initialize();
 
       _chewieController = ChewieController(

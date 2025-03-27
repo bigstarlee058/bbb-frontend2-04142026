@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/all_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
@@ -19,6 +20,7 @@ import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/rest_day_model.dart';
 import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/day_status_list_data_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -351,7 +353,7 @@ class MonthProvider extends ChangeNotifier {
 
   MonthDataModel? pastMonthDataModel;
   List<String> lastSplit = [];
-
+  List<DayStatusListDataModel> dayStatusList = [];
   List<DayHistoryModel> newStreakData = [];
   List<String> newLastSplit = [];
 
@@ -455,6 +457,7 @@ class MonthProvider extends ChangeNotifier {
 
               currentWeek = week!;
 
+              dayStatusList = await ApiRepo.fetchDayStatusList() ?? [];
               await fetchMonthLocalData();
               await fetchAllDayStatusLocalData();
               await fetchDayStatusLocalData();
@@ -463,7 +466,6 @@ class MonthProvider extends ChangeNotifier {
               await manageStreak();
               findWeekStatuses();
               fetchToday();
-
               filter();
             }
           } catch (innerError, innerStackTrace) {
@@ -1115,14 +1117,14 @@ class MonthProvider extends ChangeNotifier {
 
   manageStreak() async {
     List<DayHistoryModel> data = decodedDataAll();
-    streak = 0;
+    int streak = 0;
+    int savedStreak = preferences.getInt(SharedPreference.lastStreakCount) ?? 0;
     DateTime? pastDate;
 
     DateTime today = DateTime.now();
     DateTime currentDate = DateTime(today.year, today.month, today.day);
     List<DayHistoryModel> filteredDataList = data.where((e) {
       DateTime date = e.endTime ?? e.startTime!;
-
       DateTime localTime = Utils.formattedDate("$date");
       DateTime localDay = DateTime(localTime.year, localTime.month, localTime.day);
       return localDay.isBefore(currentDate) || localDay.isAtSameMomentAs(currentDate);
@@ -1157,7 +1159,6 @@ class MonthProvider extends ChangeNotifier {
 
         if (pastDate != null) {
           int difference = pastDate.difference(localDay).inDays;
-
           if (difference > 1) {
             break;
           }
@@ -1171,6 +1172,13 @@ class MonthProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error managing streak: $e');
+    }
+    if (savedStreak != streak) {
+      this.streak = streak;
+      var data = {'count': '$streak'};
+      await ApiRepo.updateStreakCount(body: data);
+    } else {
+      this.streak = savedStreak;
     }
 
     await preferences.putInt(SharedPreference.lastStreakCount, streak);
@@ -1759,7 +1767,8 @@ class MonthProvider extends ChangeNotifier {
   Map<String, Map<String, dynamic>> reportFilterExerciseCompletedChartData(int weekNumber) {
     reportMaximumValueOfTotalEx = 0;
 
-    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!.toLocal());
+    List<Map<String, dynamic>> weeks =
+        getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()), Utils.formattedDate(monthDataModel!.endDate!.toString()));
     var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
 
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
@@ -1878,7 +1887,8 @@ class MonthProvider extends ChangeNotifier {
   Map<String, Map<String, dynamic>> reportFilterWeightLiftedChartData(int weekNumber) {
     reportMaximumValueOfWeight = 0;
 
-    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!.toLocal());
+    List<Map<String, dynamic>> weeks =
+        getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()), Utils.formattedDate(monthDataModel!.endDate!.toString()));
     var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
     DateTime startDate = DateTime.parse(week['startDate']);
@@ -2004,7 +2014,8 @@ class MonthProvider extends ChangeNotifier {
   Map<String, Map<String, dynamic>> reportFilterTimeSpentChartData(int weekNumber) {
     reportMaximumValueOfTotalTime = 0;
 
-    List<Map<String, dynamic>> weeks = getWeeks(monthDataModel!.startDate!, monthDataModel!.endDate!.toLocal());
+    List<Map<String, dynamic>> weeks =
+        getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()), Utils.formattedDate(monthDataModel!.endDate!.toString()));
     var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
     DateTime startDate = DateTime.parse(week['startDate']);

@@ -1,3 +1,4 @@
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
@@ -464,12 +465,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && isCompletedOrSkipped) {
       return;
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && !isCompletedOrSkipped) {
-      showDialog(
-        barrierDismissible: false,
+      AnimatedDialog.showAnimatedDialog(
         context: context,
-        builder: (c1) {
-          return skipWorkoutDialog(context, c1);
-        },
+        builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
+        curve: Curves.fastOutSlowIn,
       );
     } else {
       if (monthProvider!.isPumpDay) {
@@ -604,12 +603,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider.alternateEquipmentType = monthProvider.equipmentType;
             monthProvider.weekDataModel = weekDataModel;
             monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
-            showDialog(
-              barrierDismissible: false,
+            AnimatedDialog.showAnimatedDialog(
               context: context,
-              builder: (c1) {
-                return skipWorkoutDialog(context, c1);
-              },
+              builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
+              curve: Curves.fastOutSlowIn,
             );
           },
           child: Container(
@@ -873,6 +870,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+
+    if (status == Status.completed) {
+      ApiRepo.addDayStatusList(body: {"date": "${DateTime.now().toUtc()}", "status": Status.completed});
+    }
 
     final data = {
       "title": title ?? "",

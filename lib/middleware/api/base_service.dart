@@ -28,4 +28,12 @@ abstract class BaseService<T> {
   static const fetchSwapExercise = "/api/swap-exercise/fetch";
   static const addSwapExercise = "/api/swap-exercise/add";
   static const deleteSwapExercise = "/api/swap-exercise/delete";
+
+  static const updateStreakCount = "/api/streak-count/update";
+  static const fetchStreakCount = "/api/streak-count/fetch";
+
+  static const addDayStatusList = "/api/day-status-list/add";
+  static const fetchDayStatusList = "/api/day-status-list/fetch";
+
+  static const fetchMonthEnrollment = "/api/months-enrollment/fetch";
 }

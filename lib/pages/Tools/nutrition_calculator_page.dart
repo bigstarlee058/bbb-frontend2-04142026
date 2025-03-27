@@ -122,7 +122,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                       SizedBox(
                                         width: ScreenUtil.horizontalScale(50),
                                         child: Text(
-                                          "Let's calculate your nutritional requirements",
+                                          "Let's calculate your\nnutritional requirements",
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: ScreenUtil.verticalScale(1.8),

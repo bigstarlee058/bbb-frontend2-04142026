@@ -12,7 +12,9 @@ import 'package:bbb/models/SyncDataResponseModel/exercise_notes_data_model.dart'
 import 'package:bbb/models/SyncDataResponseModel/exercise_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/extra_exercise_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/extra_set_data_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/month_enrollment_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/removed_exercise_data_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/streak_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/swap_exercise_data_model.dart';
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/models/category.dart';
@@ -331,10 +333,7 @@ class DataProvider extends ChangeNotifier {
     final response = await http.post(
       url,
       body: queryParams,
-      headers: <String, String>{
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'AUTH_TOKEN': userIdToken ?? "",
-      },
+      headers: <String, String>{'Content-Type': 'application/x-www-form-urlencoded', 'AUTH_TOKEN': userIdToken ?? ""},
     );
 
     if (response.statusCode == 200) {
@@ -506,6 +505,7 @@ class DataProvider extends ChangeNotifier {
             }
           }
           List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
+
           if (dayStatus.isNotEmpty) {
             for (var element in dayStatus) {
               final body = {
@@ -602,6 +602,19 @@ class DataProvider extends ChangeNotifier {
               await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
             }
           }
+          List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+          if (monthEnrollment.isNotEmpty) {
+            for (var element in monthEnrollment) {
+              final body = {
+                "monthId": element.id ?? "",
+                "monthStartDate": element.startDate.toString(),
+                "monthEndDate": element.endDate.toString(),
+              };
+              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.monthHistory);
+            }
+          }
+          StreakDataModel? streakDataModel = await ApiRepo.fetchStreakCount();
+          await preferences.putInt(SharedPreference.lastStreakCount, int.parse((streakDataModel?.count ?? "0")));
         }
       }
       notifyListeners();
@@ -623,8 +636,6 @@ class DataProvider extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-
-        log('data :::::::::::::::::: $data');
 
         var responseData = data[0];
 

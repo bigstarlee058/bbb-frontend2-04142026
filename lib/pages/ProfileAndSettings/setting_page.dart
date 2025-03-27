@@ -19,7 +19,8 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  bool? isSwitchOn = false;
+  bool? isSwitchOn = true;
+  bool? isHapticFeedbackOn = true;
   late MainPageProvider mainPageProvider;
   @override
   void initState() {
@@ -29,13 +30,20 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> getSwitch() async {
-    isSwitchOn = await preferences.getBool(SharedPreference.notificationSwitch);
+    final raw1 = await preferences.getBool(SharedPreference.notificationSwitch);
+    final raw2 = await preferences.getBool(SharedPreference.isHapticFeedbackOn);
+    if (raw1 != null) {
+      isSwitchOn = await preferences.getBool(SharedPreference.notificationSwitch);
+    } else {
+      await preferences.setBool(SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
+    }
+    if (raw2 != null) {
+      isHapticFeedbackOn = await preferences.getBool(SharedPreference.isHapticFeedbackOn);
+    } else {
+      await preferences.setBool(SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
+    }
     setState(() {});
   }
-
-  bool isLoading = false;
-
-  bool isSelected = true; // State variable
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +175,6 @@ class _SettingPageState extends State<SettingPage> {
                         margin: EdgeInsets.only(
                           left: ScreenUtil.horizontalScale(9),
                           right: ScreenUtil.horizontalScale(9),
-                          bottom: ScreenUtil.verticalScale(0.8),
                           top: ScreenUtil.verticalScale(2),
                         ),
                         height: ScreenUtil.verticalScale(8),
@@ -203,7 +210,48 @@ class _SettingPageState extends State<SettingPage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: ScreenUtil.verticalScale(7)),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
+                        child: Divider(
+                          thickness: 0.3,
+                          height: 0,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(
+                          left: ScreenUtil.horizontalScale(9),
+                          right: ScreenUtil.horizontalScale(9),
+                          bottom: ScreenUtil.verticalScale(0.8),
+                        ),
+                        height: ScreenUtil.verticalScale(8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Haptic Feedback?",
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Consumer<MonthProvider>(
+                              builder: (context, monthDataModel, child) {
+                                return Switch(
+                                  value: isHapticFeedbackOn ?? false, // Boolean value
+                                  onChanged: (bool value) async {
+                                    setState(() {
+                                      isHapticFeedbackOn = value; // Update state
+                                    });
+                                    await preferences.setBool(SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
+                                  },
+                                  activeColor: AppColors.primaryColor,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

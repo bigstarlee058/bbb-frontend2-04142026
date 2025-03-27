@@ -7,6 +7,7 @@ import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -143,7 +144,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                       itemCount: dataList.length,
                       itemBuilder: (context, index) {
                         final note = dataList[index];
-                        return _buildNoteRow(DateFormat("dd-MM-yyyy").format(note.date!.toLocal()), note.note!);
+                        return _buildNoteRow(DateFormat("dd-MM-yyyy").format(Utils.formattedDate(note.date.toString())), note.note!);
                       },
                     ),
                   ),
