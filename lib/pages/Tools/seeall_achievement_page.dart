@@ -24,67 +24,12 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
   late MainPageProvider mainPageProvider;
 
   MonthProvider? monthProvider;
-  final List<Map<String, String>> items = [
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "Breaking the Ice",
-      "subtitle": "Your First Workout Finished"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "I Got This",
-      "subtitle": "First Week Finished"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "I'm Determined ",
-      "subtitle": "First Month Finished"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "3 in a Row",
-      "subtitle": "Achieved the streak of 3"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "7 in a Row",
-      "subtitle": "Achieved the streak of 7"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "14 in a Row",
-      "subtitle": "Achieved the Streak of 14"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "30 in a row",
-      "subtitle": "Achieved teh streak of 30"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "250k Monster",
-      "subtitle": "Total Weight Lifted > 250k lbs"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "500k Monster",
-      "subtitle": "Total Weight Lifted > 500k lbs"
-    },
-  ];
 
   @override
   void initState() {
-    super.initState();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    super.initState();
   }
 
   @override
@@ -198,9 +143,9 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                             crossAxisSpacing: ScreenUtil.horizontalScale(1),
                             mainAxisSpacing: ScreenUtil.horizontalScale(1),
                             childAspectRatio: 0.8),
-                        itemCount: items.length,
+                        itemCount: monthProvider?.items.length,
                         itemBuilder: (context, index) {
-                          return _buildGridItem(items[index], index);
+                          return _buildGridItem(monthProvider!.items[index], index);
                         },
                       ),
                     ),
@@ -214,19 +159,21 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
     );
   }
 
-  Widget _buildGridItem(Map<String, String> item, int index) {
+  Widget _buildGridItem(Map<String, dynamic> item, int index) {
     return GestureDetector(
       onTap: () {
-        AnimatedDialog.showAnimatedDialog(
-          context: context,
-          builder: (BuildContext context) => ShareAchievementDialog(
-            title: item["title"]!,
-            imagePath: item["image"]!,
-            subtitle: item["subtitle"]!,
-            time: DateTime.now(),
-          ),
-          curve: Curves.fastOutSlowIn,
-        );
+        if (item["isArchived"]! == true) {
+          AnimatedDialog.showAnimatedDialog(
+            context: context,
+            builder: (BuildContext context) => ShareAchievementDialog(
+              title: item["title"]!,
+              imagePath: item["image"]!,
+              subtitle: item["subtitle"]!,
+              time: DateTime.now(),
+            ),
+            curve: Curves.fastOutSlowIn,
+          );
+        }
       },
       child: Container(
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
@@ -240,7 +187,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               width: ScreenUtil.verticalScale(9),
               child: SvgPicture.asset(
                 item["image"]!,
-                colorFilter: ColorFilter.mode(index == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(item["isArchived"]! == true ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                 fit: BoxFit.contain,
               ),
             ),
@@ -252,7 +199,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: ScreenUtil.verticalScale(1.45),
-                color: index == 0 ? AppColors.primaryColor : Colors.black,
+                color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -265,7 +212,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                 overflow: TextOverflow.visible,
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.1),
-                  color: index == 0 ? AppColors.primaryColor : Colors.black,
+                  color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                   fontWeight: FontWeight.w500,
                 ),
               ),

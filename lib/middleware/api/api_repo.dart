@@ -200,7 +200,7 @@ class ApiRepo extends BaseService {
   static Future<StreakDataModel?> fetchStreakCount() async {
     var response = await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchStreakCount);
     if (response != null) {
-      return response.map((json) => StreakDataModel.fromJson(json));
+      return StreakDataModel.fromJson(response);
     } else {
       log("Unexpected response format: $response");
       return null;

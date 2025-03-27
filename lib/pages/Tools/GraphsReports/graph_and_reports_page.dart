@@ -342,7 +342,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'Total Weight Lifted',
+                                          'Total Weight\nLifted',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.horizontalScale(3.6)),
                                         ),
@@ -353,7 +353,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                               '${monthProvider.totalWeightLiftedInAWeek.toStringAsFixed(0)} lbs',
                                               style: TextStyle(
                                                 color: const Color(0xFFDD1166),
-                                                fontSize: ScreenUtil.horizontalScale(5),
+                                                fontSize: ScreenUtil.horizontalScale(4.5),
                                               ),
                                             );
                                           },
@@ -392,7 +392,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'Total completed Exercises',
+                                          'Total completed\nExercises',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: Colors.black54,
@@ -406,7 +406,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                               monthProvider.totalExerciseCompletedInAWeek.toStringAsFixed(0),
                                               style: TextStyle(
                                                 color: const Color(0xFFDD1166),
-                                                fontSize: ScreenUtil.horizontalScale(5),
+                                                fontSize: ScreenUtil.horizontalScale(4.5),
                                               ),
                                             );
                                           },
