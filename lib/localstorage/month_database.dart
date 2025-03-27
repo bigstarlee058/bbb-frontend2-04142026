@@ -15,6 +15,7 @@ class DatabaseHelper {
   static const String exerciseNotes = "ExerciseNotes";
   static const String extraExerciseHistory = "ExtraExerciseHistory";
   static const String swapExerciseHistory = "SwapExerciseHistory";
+  static const String achievementHistory = "AchievementHistory";
 
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   factory DatabaseHelper() => _instance;

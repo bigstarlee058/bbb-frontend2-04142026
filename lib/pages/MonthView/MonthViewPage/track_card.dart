@@ -17,6 +17,7 @@ class WeeklyTrackCard extends StatefulWidget {
   const WeeklyTrackCard({
     super.key,
     required this.index,
+    required this.restDayIndex,
     this.monthProvider,
     required this.title,
     required this.thisWeek,
@@ -33,6 +34,7 @@ class WeeklyTrackCard extends StatefulWidget {
   });
 
   final int index;
+  final int restDayIndex;
   final MonthProvider? monthProvider;
   final String title;
   final bool thisWeek;
@@ -313,10 +315,12 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                                       index, dayData, context, weekDataModel!.idList![index], dataId, monthProvider)
                                                   : Text(
                                                       !isRestDay
-                                                          ? weekDataModel!.days![nextWorkOutIndex].title
+                                                          ? "${weekDataModel!.days![nextWorkOutIndex].title}"
                                                           : (matchingElement.type ?? "").contains("Pump Day")
-                                                              ? matchingElement.title
-                                                              : weekDataModel!.dayList![index],
+                                                              ? "${matchingElement.title}"
+                                                              : monthProvider.restDayList[int.parse(
+                                                                      weekDataModel!.dayList![index].toString().split(" ").toList().last) -
+                                                                  1],
                                                       style: TextStyle(
                                                           color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek
                                                               ? Colors.white

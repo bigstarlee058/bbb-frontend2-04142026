@@ -22,7 +22,7 @@ class ShareAchievementDialog extends StatelessWidget {
   final String subtitle;
   final DateTime time;
   final ScreenshotController screenshotController = ScreenshotController();
-
+  final TextEditingController textEditingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Dialog(

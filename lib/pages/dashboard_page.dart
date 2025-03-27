@@ -8,6 +8,7 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/program_phases_widget.dart';
+import 'package:bbb/components/share_achievement_dialog.dart';
 import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
@@ -21,7 +22,6 @@ import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
-import 'package:bbb/components/share_achievement_dialog.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -907,50 +907,71 @@ class _DashboardPageState extends State<DashboardPage> {
                                       const SizedBox(
                                         height: 15,
                                       ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: List.generate(
-                                          1,
-                                          (index) => GestureDetector(
-                                            onTap: () {
-                                              AnimatedDialog.showAnimatedDialog(
-                                                context: context,
-                                                builder: (BuildContext context) => ShareAchievementDialog(
-                                                  title: "Breaking the Ice",
-                                                  imagePath: 'assets/img/verified (1).svg',
-                                                  subtitle: "Your First Workout Finished",
-                                                  time: DateTime.now(),
+                                      Consumer<MonthProvider>(builder: (context, value, child) {
+                                        final data = value.items.where((element) => element["isArchived"] == true).toList();
+                                        return !value.items.any((element) => element["isArchived"] == true)
+                                            ? Center(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(top: 2, bottom: 5),
+                                                  child: Text(
+                                                    "No achievements available!",
+                                                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                                                  ),
                                                 ),
-                                                curve: Curves.fastOutSlowIn,
+                                              )
+                                            : Builder(
+                                                builder: (context) {
+                                                  return Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: List.generate(
+                                                      3,
+                                                      (index) => (data.length - 1) < index
+                                                          ? Expanded(child: SizedBox())
+                                                          : Expanded(
+                                                              child: GestureDetector(
+                                                                onTap: () {
+                                                                  AnimatedDialog.showAnimatedDialog(
+                                                                    context: context,
+                                                                    builder: (BuildContext context) => ShareAchievementDialog(
+                                                                      title: data[index]["title"],
+                                                                      imagePath: data[index]["image"],
+                                                                      subtitle: data[index]["subtitle"],
+                                                                      time: DateTime.now(),
+                                                                    ),
+                                                                    curve: Curves.fastOutSlowIn,
+                                                                  );
+                                                                },
+                                                                child: Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                                  children: [
+                                                                    SvgPicture.asset(
+                                                                      height: ScreenUtil.verticalScale(7),
+                                                                      data[index]["image"],
+                                                                      colorFilter:
+                                                                          ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                                                                      fit: BoxFit.contain,
+                                                                    ),
+                                                                    const SizedBox(height: 10),
+                                                                    Text(
+                                                                      data[index]["title"],
+                                                                      maxLines: 1,
+                                                                      textAlign: TextAlign.center,
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                      style: TextStyle(
+                                                                        fontSize: ScreenUtil.verticalScale(1.45),
+                                                                        color: AppColors.primaryColor,
+                                                                        fontWeight: FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                    ),
+                                                  );
+                                                },
                                               );
-                                            },
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                SvgPicture.asset(
-                                                  height: ScreenUtil.verticalScale(7),
-                                                  'assets/img/verified (1).svg',
-                                                  color: AppColors.primaryColor,
-                                                  fit: BoxFit.contain,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  "Breaking the Ice",
-                                                  maxLines: 1,
-                                                  textAlign: TextAlign.center,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      fontSize: ScreenUtil.verticalScale(1.45),
-                                                      color: AppColors.primaryColor,
-                                                      fontWeight: FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                      }),
                                     ],
                                   ),
                                 ),

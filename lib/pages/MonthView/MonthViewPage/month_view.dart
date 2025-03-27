@@ -456,9 +456,7 @@ class _MonthViewState extends State<MonthView> {
                               ),
                               Consumer<MonthProvider>(
                                 builder: (context, value, child) {
-                                  if (value.week == null || value.week! > 4) {
-                                    return const SizedBox();
-                                  }
+                                  if (value.week == null || value.week! > 4) return const SizedBox();
 
                                   String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
 
@@ -479,25 +477,25 @@ class _MonthViewState extends State<MonthView> {
                                                       return Column(
                                                         children: [
                                                           WeeklyTrackCard(
-                                                              index: index,
-                                                              monthProvider: value,
-                                                              pumpDayIds: value.weeksDataList[index].pumpDayIds!,
-                                                              title: value.weeksDataList[index].title == ""
-                                                                  ? "Week ${index + 1}"
-                                                                  : value.weeksDataList[index].title!,
-                                                              thisWeek: ((index + 1) == value.week),
-                                                              restDayId: value.weeksDataList[index].restdayId!,
-                                                              weekIndex: index,
-                                                              isOpened: false,
-                                                              isCompleted: false,
-                                                              startDate: (value.startTime ?? DateTime.now()).add(Duration(days: index * 7)),
-                                                              cardData: value.weeksDataList[index],
-                                                              daySplit: split,
-                                                              expandedVal: (index + 1) == value.week ? true : false,
-                                                              completedWeek: index + 1),
-                                                          const SizedBox(
-                                                            height: 15,
+                                                            restDayIndex: 0,
+                                                            index: index,
+                                                            monthProvider: value,
+                                                            pumpDayIds: value.weeksDataList[index].pumpDayIds!,
+                                                            title: value.weeksDataList[index].title == ""
+                                                                ? "Week ${index + 1}"
+                                                                : value.weeksDataList[index].title!,
+                                                            thisWeek: ((index + 1) == value.week),
+                                                            restDayId: value.weeksDataList[index].restdayId!,
+                                                            weekIndex: index,
+                                                            isOpened: false,
+                                                            isCompleted: false,
+                                                            startDate: (value.startTime ?? DateTime.now()).add(Duration(days: index * 7)),
+                                                            cardData: value.weeksDataList[index],
+                                                            daySplit: split,
+                                                            expandedVal: (index + 1) == value.week ? true : false,
+                                                            completedWeek: index + 1,
                                                           ),
+                                                          const SizedBox(height: 15),
                                                         ],
                                                       );
                                                     },

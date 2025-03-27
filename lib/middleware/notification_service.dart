@@ -100,7 +100,9 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(utcDate, tz.local).subtract(const Duration(hours: 12));
+    final tz.TZDateTime nowLocal = tz.TZDateTime.from(utcDate, tz.local).subtract(const Duration(hours: 12));
+
+    final tz.TZDateTime scheduledTime = tz.TZDateTime(tz.local, nowLocal.year, nowLocal.month, nowLocal.day, 14, 0, 0);
 
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     if (scheduledTime.isBefore(now)) {

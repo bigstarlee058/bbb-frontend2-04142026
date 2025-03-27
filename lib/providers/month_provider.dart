@@ -563,7 +563,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> getSplitData() async {
     monthDataModel = null;
-    weeksDataList = [];
     String monthId = preferences.getString(SharedPreference.monthId) ?? "";
     String split = preferences.getString(SharedPreference.split) ?? "";
 
@@ -759,7 +758,6 @@ class MonthProvider extends ChangeNotifier {
     updateExerciseLoader(true);
 
     String? userIdToken = await getAuthToken();
-    relatedExercises = [];
     exerciseDetailModelData = null;
     try {
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$exerciseId');
@@ -838,8 +836,6 @@ class MonthProvider extends ChangeNotifier {
   }
 
   void getExercisesFromJson(responseData) {
-    allExercises.clear();
-    allFilterExercises.clear();
     allExercisesMainList = "";
 
     AllExerciseModel allExerciseModel = AllExerciseModel.fromJson(responseData);
@@ -1182,6 +1178,8 @@ class MonthProvider extends ChangeNotifier {
     }
 
     await preferences.putInt(SharedPreference.lastStreakCount, streak);
+
+    updateAchievements();
     notifyListeners();
   }
 
@@ -1289,7 +1287,7 @@ class MonthProvider extends ChangeNotifier {
   Future<void> fetchExerciseHistoryLocalData() async {
     try {
       String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-      historyDataModel = [];
+
       final data = await DatabaseHelper().getFilteredWithExerciseData(
         split: split,
         tableName: DatabaseHelper.exerciseHistory,
@@ -1301,6 +1299,8 @@ class MonthProvider extends ChangeNotifier {
 
       if (data.isNotEmpty) {
         historyDataModel = List<HistoryDataModel>.from(json.decode(jsonEncode(data)).map((x) => HistoryDataModel.fromJson(x)));
+      } else {
+        historyDataModel = [];
       }
     } catch (e) {
       debugPrint("Error fetching exercise history data: $e");
@@ -1312,13 +1312,14 @@ class MonthProvider extends ChangeNotifier {
   fetchExerciseWiseHistoryLocalData() async {
     try {
       String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-
-      exerciseWiseHistoryDataModel = [];
       final data = await DatabaseHelper().getDataByAnyWithSplitField(
           tableName: DatabaseHelper.exerciseHistory, id: "${exerciseDetailModel?.sId}", fieldName: 'exerciseId', split: split);
 
       if (data.isNotEmpty) {
         exerciseWiseHistoryDataModel = List<HistoryDataModel>.from(json.decode(jsonEncode(data)).map((x) => HistoryDataModel.fromJson(x)));
+        return exerciseWiseHistoryDataModel;
+      } else {
+        exerciseWiseHistoryDataModel = [];
         return exerciseWiseHistoryDataModel;
       }
     } catch (e) {
@@ -1331,8 +1332,6 @@ class MonthProvider extends ChangeNotifier {
   Future<void> fetchExerciseStatusLocalData() async {
     try {
       String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-      exerciseHistoryModel = [];
-
       final data = await DatabaseHelper().getFilteredWithMWDData(
         split: split,
         tableName: DatabaseHelper.exerciseStatus,
@@ -1355,7 +1354,6 @@ class MonthProvider extends ChangeNotifier {
   ExerciseHistoryModel? exerciseHistoryDetails;
   Future<void> fetchExerciseSingleExerciseLocalData(dataId) async {
     try {
-      exerciseHistoryDetails = null;
       final data = await DatabaseHelper().getDataByDataId(tableName: DatabaseHelper.exerciseStatus, id: dataId);
       if (data != null) {
         exerciseHistoryDetails = ExerciseHistoryModel.fromJson(data);
@@ -1373,7 +1371,6 @@ class MonthProvider extends ChangeNotifier {
   Future<void> fetchDayStatusLocalData() async {
     try {
       String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
-      dayHistoryModel = [];
 
       final data = await DatabaseHelper().getFilteredWithMWData(
         split: split,
@@ -1396,12 +1393,11 @@ class MonthProvider extends ChangeNotifier {
 
   List<DayHistoryModel> allDayHistoryModel = [];
   List<DayHistoryModel> allSplitDayHistoryModel = [];
+  List<String> restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
 
   Future<void> fetchAllDayStatusLocalData() async {
     try {
       String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
-
-      allDayHistoryModel = [];
 
       final data = await DatabaseHelper().getFilteredWithMData(
         split: split,
@@ -1411,6 +1407,50 @@ class MonthProvider extends ChangeNotifier {
 
       if (data.isNotEmpty) {
         allDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data)).map((x) => DayHistoryModel.fromJson(x)));
+      } else {
+        allDayHistoryModel = [];
+      }
+
+      final dataList = allDayHistoryModel
+          .where((element) => element.weekId == monthDataModel?.weeks?[week! - 1].id && element.dataId.toString().contains("Rest Day"))
+          .toList();
+
+      if (dataList.isNotEmpty) {
+        restDayList = [];
+        List<int> restDays = [];
+        Map<int, String> pumpDays = {};
+        dataList.sort((a, b) => int.parse(a.dayId!.split(" ").last).compareTo(int.parse(b.dayId!.split(" ").last)));
+        for (var item in dataList) {
+          if (item.type.toString().contains("Rest Day")) {
+            RegExp regex = RegExp(r'Rest Day (\d+)');
+            Match? match = regex.firstMatch(item.dayId ?? "");
+            if (match != null) {
+              restDays.add(int.parse(match.group(1)!));
+            }
+          } else if (item.type.toString().startsWith("Pump Day")) {
+            RegExp regex = RegExp(r'Rest Day (\d+)');
+            Match? match = regex.firstMatch(item.dayId ?? "");
+            if (match != null) {
+              int restDayNumber = int.parse(match.group(1)!);
+              pumpDays[restDayNumber] = "PUMPDAY";
+            }
+          }
+        }
+        restDays.sort();
+        int count = 1;
+        int restDayIndex = 1;
+        while (restDayList.length < 4) {
+          if (pumpDays.containsKey(count)) {
+            restDayList.add("PUMPDAY");
+          } else if (restDayIndex < restDays.length && restDays[restDayIndex] == count) {
+            restDayList.add("Rest Day $restDayIndex");
+            restDayIndex++;
+          } else {
+            restDayList.add("Rest Day $restDayIndex");
+            restDayIndex++;
+          }
+          count++;
+        }
       }
 
       notifyListeners();
@@ -1422,8 +1462,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> getAllDayStatusData() async {
     try {
-      allSplitDayHistoryModel = [];
-
       final data1 = await DatabaseHelper().fetchData(tableName: DatabaseHelper.dayStatus);
       if (data1.isNotEmpty) {
         allSplitDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data1)).map((x) => DayHistoryModel.fromJson(x)));
@@ -1442,8 +1480,6 @@ class MonthProvider extends ChangeNotifier {
       return null;
     }
     String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
-
-    dayHistoryDetails = null;
     String dataId =
         "$split-${monthDataModel?.id}-${weekDataModel?.id ?? monthDataModel?.weeks?[(overviewCurrentWeek) - 1].id}-${monthDataModel?.weeks?[(overviewCurrentWeek) - 1].idList?[overviewCurrentDay - 1] ?? ""}";
 
@@ -1464,7 +1500,6 @@ class MonthProvider extends ChangeNotifier {
   List<CircuitModel> circuitModel = [];
 
   Future<void> fetchCircuitModelLocalData() async {
-    circuitModel = [];
     try {
       final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.circuitManager);
       if (data.isNotEmpty) {
@@ -1497,7 +1532,6 @@ class MonthProvider extends ChangeNotifier {
   List<ExtraExerciseModel> addedExerciseList = [];
 
   Future<void> fetchExtraAddedExerciseData() async {
-    addedExerciseList = [];
     String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     try {
@@ -1524,7 +1558,6 @@ class MonthProvider extends ChangeNotifier {
   List<SwapExerciseModel> swapExerciseList = [];
 
   Future<void> fetchSwapExerciseData() async {
-    swapExerciseList = [];
     String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
     try {
@@ -1653,7 +1686,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> getLiftedWeightGraphData() async {
     // try {
-    liftedWeightEachDay = [];
     liftedWeightEachDay = [];
     graphHistory = [];
 
@@ -1818,10 +1850,7 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> exerciseReportGraphData({int? weekNumber}) async {
     reportExerciseCompletedEachDay = [];
-    reportExerciseCompletedGraphHistory = [];
-
     int week = weekNumber ?? currentWeek;
-
     try {
       Map<String, Map<String, dynamic>> combinedData = reportFilterExerciseCompletedChartData(week);
       if (combinedData.isNotEmpty) {
@@ -1935,7 +1964,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> weightReportGraphData({int? weekNumber}) async {
     reportWeightLiftedEachDay = [];
-    reportWeightLiftedGraphHistory = [];
     int week = weekNumber ?? currentWeek;
 
     try {
@@ -2080,7 +2108,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> timeSpentReportGraphData({int? weekNumber}) async {
     reportTimeSpentEachDay = [];
-    reportTimeSpentGraphHistory = [];
 
     int week = weekNumber ?? currentWeek;
     Map<String, Map<String, dynamic>> combinedData = reportFilterTimeSpentChartData(week);
@@ -2126,6 +2153,93 @@ class MonthProvider extends ChangeNotifier {
     }).toList();
 
     return list;
+  }
+
+  /// ::::: ACHIEVEMENT
+
+  final List<Map<String, dynamic>> items = [
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "Breaking the Ice",
+      "subtitle": "Your First Workout Finished",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "I Got This",
+      "subtitle": "First Week Finished",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "I'm Determined ",
+      "subtitle": "First Month Finished",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "3 in a Row",
+      "subtitle": "Achieved the streak of 3",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "7 in a Row",
+      "subtitle": "Achieved the streak of 7",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "14 in a Row",
+      "subtitle": "Achieved the Streak of 14",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "30 in a row",
+      "subtitle": "Achieved teh streak of 30",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "250k Monster",
+      "subtitle": "Total Weight Lifted > 250k lbs",
+      "isArchived": false
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "500k Monster",
+      "subtitle": "Total Weight Lifted > 500k lbs",
+      "isArchived": false
+    },
+  ];
+
+  updateAchievements() {
+    if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
+      items[0]["isArchived"] = true;
+    }
+    if (streak >= 3) {
+      items[3]["isArchived"] = true;
+    }
+    if (streak >= 7) {
+      items[4]["isArchived"] = true;
+    }
+    if (streak >= 14) {
+      items[5]["isArchived"] = true;
+    }
+    if (streak >= 30) {
+      items[6]["isArchived"] = true;
+    }
+    notifyListeners();
   }
 }
 
