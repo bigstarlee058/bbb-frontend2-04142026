@@ -76,6 +76,16 @@ class ApiRepo extends BaseService {
     }
   }
 
+  static Future<List<DayStatusDataModel>> fetchDayAllStatus() async {
+    var response = await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchDayStatus);
+    log('response-fetchDayStatus :::::::::::::::::: $response');
+    if (response is List) {
+      return response.map((json) => DayStatusDataModel.fromJson(json)).toList();
+    } else {
+      throw Exception("Unexpected response format: $response");
+    }
+  }
+
   static Future<void> addDayStatus({required Map<String, dynamic> body}) async {
     var response = await ApiService().getResponse(apiType: APIType.aPost, url: BaseService.addDayStatus, body: body);
     log('response-addDayStatus :::::::::::::::::: $response');

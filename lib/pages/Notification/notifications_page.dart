@@ -50,7 +50,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Future<void> getSwitch() async {
     isSwitchOn = await preferences.getBool(SharedPreference.notificationSwitch);
     setState(() {});
-    debugPrint('isSwitchOn notification:::::::::::::::::: $isSwitchOn');
   }
 
   Widget notificationCard(String title, String description) {

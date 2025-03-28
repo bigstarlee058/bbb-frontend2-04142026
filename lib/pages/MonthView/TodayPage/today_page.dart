@@ -2189,6 +2189,7 @@ class _TodayPageState extends State<TodayPage> {
         totalRIR += double.parse(element.totalRIR ?? "0");
       }
     }
+
     double average = totalRIR / totalSet;
 
     if (monthProvider!.isPumpDay) {
