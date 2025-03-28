@@ -13,6 +13,7 @@ import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
+import 'package:bbb/models/MonthResponseModel/month_enrollment_model.dart';
 import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/pump_day_model.dart';
@@ -20,7 +21,9 @@ import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/rest_day_model.dart';
 import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_list_data_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/month_enrollment_data_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -2175,7 +2178,7 @@ class MonthProvider extends ChangeNotifier {
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
-      "title": "I'm Determined ",
+      "title": "I'm Determined",
       "subtitle": "First Month Finished",
       "isArchived": false
     },
@@ -2204,7 +2207,7 @@ class MonthProvider extends ChangeNotifier {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "30 in a row",
-      "subtitle": "Achieved teh streak of 30",
+      "subtitle": "Achieved the streak of 30",
       "isArchived": false
     },
     {
@@ -2222,23 +2225,121 @@ class MonthProvider extends ChangeNotifier {
       "isArchived": false
     },
   ];
+  List<AchievementsModel> achievementsModel = [];
 
-  updateAchievements() {
-    if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
-      items[0]["isArchived"] = true;
+  updateAchievements() async {
+    final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.achievementHistory);
+    if (data.isNotEmpty) {
+      achievementsModel = List<AchievementsModel>.from(json.decode(jsonEncode(data)).map((x) => AchievementsModel.fromJson(x)));
+    } else {
+      achievementsModel = [];
     }
-    if (streak >= 3) {
-      items[3]["isArchived"] = true;
+    if (achievementsModel.any((element) => element.achievementsTitle != "Breaking the Ice") || achievementsModel.isEmpty) {
+      if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
+        items[0]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data: UpdateAchievementsRequest(achievementsTitle: "Breaking the Ice", achievementsSubtitle: "Your First Workout Finished")
+              .toJson(),
+        );
+      }
     }
-    if (streak >= 7) {
-      items[4]["isArchived"] = true;
+
+    if (achievementsModel.any((element) => element.achievementsTitle != "I'm Determined") || achievementsModel.isEmpty) {
+      if (monthLocalDataModel.length > 1 ||
+          (Utils.formattedDate(monthLocalDataModel.first.monthEndDate ?? "${DateTime.now()}").isBefore(DateTime.now()) == true)) {
+        items[2]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data: UpdateAchievementsRequest(achievementsTitle: "I'm Determined", achievementsSubtitle: "First Month Finished").toJson(),
+        );
+      }
     }
-    if (streak >= 14) {
-      items[5]["isArchived"] = true;
+
+    if (achievementsModel.any((element) => element.achievementsTitle != "3 in a Row") || achievementsModel.isEmpty) {
+      if (streak >= 3) {
+        items[3]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data: UpdateAchievementsRequest(achievementsTitle: "3 in a Row", achievementsSubtitle: "Achieved the streak of 3").toJson(),
+        );
+      }
     }
-    if (streak >= 30) {
-      items[6]["isArchived"] = true;
+
+    if (achievementsModel.any((element) => element.achievementsTitle != "7 in a Row") || achievementsModel.isEmpty) {
+      if (streak >= 7) {
+        items[4]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data: UpdateAchievementsRequest(achievementsTitle: "7 in a Row", achievementsSubtitle: "Achieved the streak of 7").toJson(),
+        );
+      }
     }
+    if (achievementsModel.any((element) => element.achievementsTitle != "14 in a Row") || achievementsModel.isEmpty) {
+      if (streak >= 14) {
+        items[5]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data: UpdateAchievementsRequest(achievementsTitle: "14 in a Row", achievementsSubtitle: "Achieved the streak of 14").toJson(),
+        );
+      }
+    }
+
+    if (achievementsModel.any((element) => element.achievementsTitle != "30 in a row") || achievementsModel.isEmpty) {
+      if (streak >= 30) {
+        items[6]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data: UpdateAchievementsRequest(achievementsTitle: "30 in a Row", achievementsSubtitle: "Achieved the streak of 30").toJson(),
+        );
+      }
+    }
+
+    if (achievementsModel.any((element) => element.achievementsTitle != "250k Monster") ||
+        achievementsModel.any((element) => element.achievementsTitle != "500k Monster") ||
+        achievementsModel.any((element) => element.achievementsTitle != "I Got This") ||
+        achievementsModel.isEmpty) {
+      List<DayStatusDataModel> dayMainData = await ApiRepo.fetchDayAllStatus();
+      double totalWeight = 0;
+
+      for (var element in dayMainData) {
+        if (element.status == Status.completed) {
+          totalWeight += double.parse(element.totalWeight ?? "0");
+        }
+      }
+
+      if (totalWeight >= 250000) {
+        items[7]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data:
+              UpdateAchievementsRequest(achievementsTitle: "250k Monster", achievementsSubtitle: "Total Weight Lifted > 250k lbs").toJson(),
+        );
+      }
+
+      if (totalWeight >= 500000) {
+        items[8]["isArchived"] = true;
+        await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.achievementHistory,
+          data:
+              UpdateAchievementsRequest(achievementsTitle: "500k Monster", achievementsSubtitle: "Total Weight Lifted > 500k lbs").toJson(),
+        );
+      }
+
+      List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+
+      if (monthEnrollment.isNotEmpty) {
+        final weekFinishedDate = monthEnrollment.first.startDate?.add(Duration(days: 7));
+        if (weekFinishedDate!.isBefore(DateTime.now())) {
+          items[1]["isArchived"] = true;
+          await DatabaseHelper().insertData(
+            tableName: DatabaseHelper.achievementHistory,
+            data: UpdateAchievementsRequest(achievementsTitle: "I Got This", achievementsSubtitle: "First Week Finished").toJson(),
+          );
+        }
+      }
+    }
+
     notifyListeners();
   }
 }
@@ -2252,4 +2353,24 @@ class _BarData {
   final Color color;
   final double value;
   final double shadowValue;
+}
+
+class UpdateAchievementsRequest {
+  final String? achievementsDate;
+  final String achievementsTitle;
+  final String achievementsSubtitle;
+
+  UpdateAchievementsRequest({
+    this.achievementsDate,
+    required this.achievementsTitle,
+    required this.achievementsSubtitle,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "achievementsDate": achievementsDate ?? "${DateTime.now().toUtc()}",
+      "achievementsTitle": achievementsTitle,
+      "achievementsSubtitle": achievementsSubtitle,
+    };
+  }
 }

@@ -39,8 +39,8 @@ class ShareAchievementDialog extends StatelessWidget {
               child: Container(
                 color: Colors.white,
                 child: SizedBox(
-                  width: ScreenUtil.verticalScale(32),
-                  height: ScreenUtil.verticalScale(32),
+                  width: ScreenUtil.verticalScale(38),
+                  height: ScreenUtil.verticalScale(38),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -59,6 +59,24 @@ class ShareAchievementDialog extends StatelessWidget {
                         textAlign: TextAlign.center,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: ScreenUtil.verticalScale(2), color: AppColors.primaryColor, fontWeight: FontWeight.bold),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Text(
+                          subtitle,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              TextStyle(fontSize: ScreenUtil.verticalScale(1.6), color: AppColors.blackColor, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Text(
+                        DateFormat('dd/MM/yyyy hh:mm a').format(time),
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: ScreenUtil.verticalScale(1.6), color: Colors.grey.shade600, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -139,17 +157,12 @@ class ShareAchievementDialog extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(15),
                                     ),
                                     backgroundColor: AppColors.primaryColor,
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: ScreenUtil.verticalScale(1.7),
-                                    ),
+                                    padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.7)),
                                   ),
                                   child: Text(
                                     "Share",
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil.verticalScale(2),
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                                    style:
+                                        TextStyle(fontSize: ScreenUtil.verticalScale(2), fontWeight: FontWeight.bold, color: Colors.white),
                                   ),
                                 ),
                               ),

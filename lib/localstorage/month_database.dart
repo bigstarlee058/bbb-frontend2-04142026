@@ -184,6 +184,15 @@ class DatabaseHelper {
         exerciseJson Text
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $achievementHistory (
+        id INTEGER PRIMARY KEY autoincrement,
+        achievementsDate TEXT, 
+        achievementsTitle TEXT,
+        achievementsSubtitle TEXT
+      )
+    ''');
   }
 
   Future<bool> areAllTablesEmpty() async {

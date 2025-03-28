@@ -1422,18 +1422,18 @@ class _ExercisePageState extends State<ExercisePage> {
 
     if (status == Status.completed) {
       totalWeight = 0;
-      monthProvider?.historyDataModel.forEach(
-        (element) {
+      if (monthProvider?.historyDataModel != null) {
+        for (var i = 0; i < monthProvider!.historyDataModel.length; i++) {
+          final element = monthProvider!.historyDataModel[i];
           final weight = double.parse(element.weight.toString());
           final reps = double.parse(element.reps.toString());
           final effort = double.parse(element.effort.toString().replaceAll("+", ""));
-          if (effort != 100) {
-            final cal = weight * (reps + effort);
-            totalWeight += cal;
-            totalRIR += effort;
-          }
-        },
-      );
+          final cal = weight * (reps + (effort == 100 ? 0 : effort));
+          totalWeight += cal;
+          totalRIR += (effort == 100 ? 0 : effort);
+        }
+      }
+
       final data = monthProvider!.historyDataModel.where((element) => element.type != "1");
       if (data.isNotEmpty) {
         totalSet = double.parse(data.first.totalSet.toString());
