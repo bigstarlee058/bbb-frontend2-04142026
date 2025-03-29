@@ -2234,7 +2234,20 @@ class MonthProvider extends ChangeNotifier {
     } else {
       achievementsModel = [];
     }
-    if (achievementsModel.any((element) => element.achievementsTitle != "Breaking the Ice") || achievementsModel.isEmpty) {
+
+    for (var element in achievementsModel) {
+      if (element.achievementsTitle == "Breaking the Ice") items[0]["isArchived"] = true;
+      if (element.achievementsTitle == "I Got This") items[1]["isArchived"] = true;
+      if (element.achievementsTitle == "I'm Determined") items[2]["isArchived"] = true;
+      if (element.achievementsTitle == "3 in a Row") items[3]["isArchived"] = true;
+      if (element.achievementsTitle == "7 in a Row") items[4]["isArchived"] = true;
+      if (element.achievementsTitle == "14 in a Row") items[5]["isArchived"] = true;
+      if (element.achievementsTitle == "30 in a Row") items[6]["isArchived"] = true;
+      if (element.achievementsTitle == "250k Monster") items[7]["isArchived"] = true;
+      if (element.achievementsTitle == "500k Monster") items[8]["isArchived"] = true;
+    }
+
+    if (items[0]["isArchived"] == false || achievementsModel.isEmpty) {
       if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
         items[0]["isArchived"] = true;
         await DatabaseHelper().insertData(
@@ -2245,7 +2258,7 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (achievementsModel.any((element) => element.achievementsTitle != "I'm Determined") || achievementsModel.isEmpty) {
+    if (items[1]["isArchived"] == false || achievementsModel.isEmpty) {
       if (monthLocalDataModel.length > 1 ||
           (Utils.formattedDate(monthLocalDataModel.first.monthEndDate ?? "${DateTime.now()}").isBefore(DateTime.now()) == true)) {
         items[2]["isArchived"] = true;
@@ -2256,7 +2269,7 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (achievementsModel.any((element) => element.achievementsTitle != "3 in a Row") || achievementsModel.isEmpty) {
+    if (items[3]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 3) {
         items[3]["isArchived"] = true;
         await DatabaseHelper().insertData(
@@ -2266,7 +2279,7 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (achievementsModel.any((element) => element.achievementsTitle != "7 in a Row") || achievementsModel.isEmpty) {
+    if (items[4]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 7) {
         items[4]["isArchived"] = true;
         await DatabaseHelper().insertData(
@@ -2275,7 +2288,7 @@ class MonthProvider extends ChangeNotifier {
         );
       }
     }
-    if (achievementsModel.any((element) => element.achievementsTitle != "14 in a Row") || achievementsModel.isEmpty) {
+    if (items[5]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 14) {
         items[5]["isArchived"] = true;
         await DatabaseHelper().insertData(
@@ -2285,7 +2298,7 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (achievementsModel.any((element) => element.achievementsTitle != "30 in a row") || achievementsModel.isEmpty) {
+    if (items[6]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 30) {
         items[6]["isArchived"] = true;
         await DatabaseHelper().insertData(
@@ -2295,9 +2308,9 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (achievementsModel.any((element) => element.achievementsTitle != "250k Monster") ||
-        achievementsModel.any((element) => element.achievementsTitle != "500k Monster") ||
-        achievementsModel.any((element) => element.achievementsTitle != "I Got This") ||
+    if (items[7]["isArchived"] == false ||
+        items[8]["isArchived"] == false ||
+        items[2]["isArchived"] == false ||
         achievementsModel.isEmpty) {
       List<DayStatusDataModel> dayMainData = await ApiRepo.fetchDayAllStatus();
       double totalWeight = 0;
