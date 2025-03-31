@@ -116,7 +116,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                           ),
                         ),
                         Container(
-                          height: media.height / 3.2,
+                          height: media.height / 2.5,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
@@ -127,8 +127,9 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                   leading: BackArrowWidget(
                                     onPress: () {
                                       // HapticFeedBack.buttonClick();
-                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                      mainPageProvider.changeTab(2);
+                                      // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      // mainPageProvider.changeTab(2);
+                                      Navigator.pop(context);
                                     },
                                   ),
                                   title: Text(
@@ -171,7 +172,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                   padding: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(7),
                                   ),
-                                  height: media.height * 0.2,
+                                  height: media.height * 0.19,
                                   child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/choice_clip.dart';
 import 'package:bbb/components/expansion_panel.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -585,72 +586,164 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'WEIGHT (LB)',
-                                            style: TextStyle(color: Colors.black54, fontSize: 13),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Container(
-                                            constraints: BoxConstraints(minWidth: ScreenUtil.horizontalScale(30)),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.03),
-                                                  spreadRadius: 2,
-                                                  blurRadius: 5,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'WEIGHT (LB)',
+                                              style: TextStyle(color: Colors.black54, fontSize: 13),
                                             ),
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: ScreenUtil.horizontalScale(1.5),
-                                              vertical: ScreenUtil.verticalScale(0.3),
+                                            const SizedBox(height: 8),
+                                            Container(
+                                              constraints: BoxConstraints(minWidth: ScreenUtil.horizontalScale(30)),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withValues(alpha: 0.03),
+                                                    spreadRadius: 2,
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: ScreenUtil.horizontalScale(1.5),
+                                                vertical: ScreenUtil.verticalScale(0.3),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  // SizedBox(
+                                                  //   width: 38,
+                                                  //   child: IconButton(
+                                                  //     icon: const Icon(Icons.remove),
+                                                  //     color: AppColors.primaryColor,
+                                                  //     onPressed: widget.isEditable ? decrementWeight : null,
+                                                  //   ),
+                                                  // ),
+                                                  Expanded(
+                                                    child: KeyboardActions(
+                                                      autoScroll: false,
+                                                      config: _buildConfig(context),
+                                                      child: TextField(
+                                                        controller: _weightController,
+                                                        keyboardType: TextInputType.number,
+                                                        onSubmitted: (value) {
+                                                          FocusScope.of(context).unfocus();
+                                                        },
+                                                        textInputAction: TextInputAction.done,
+                                                        textAlign: TextAlign.center,
+                                                        focusNode: _nodeText1,
+                                                        readOnly: widget.isEditable ? false : true,
+                                                        decoration: const InputDecoration(
+                                                          border: InputBorder.none,
+                                                        ),
+                                                        onTap: () {
+                                                          if (_weightController.text == "0") {
+                                                            _weightController.clear();
+                                                          }
+                                                        },
+                                                        onEditingComplete: () {
+                                                          if (_weightController.text == "0") {
+                                                            _weightController.clear();
+                                                          }
+                                                          if (_weightController.text.isEmpty) {
+                                                            _weightController.text = "0";
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                        onChanged: (value) {
+                                                          if (value == "0") {
+                                                            _weightController.clear();
+                                                          }
+                                                          if (value.isEmpty) {
+                                                            _weightController.text = "0";
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                        inputFormatters: [
+                                                          FilteringTextInputFormatter.digitsOnly,
+                                                          TextInputFormatter.withFunction(
+                                                            (oldValue, newValue) {
+                                                              String newText = newValue.text;
+                                                              if (newText.isNotEmpty) {
+                                                                newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                                                              }
+                                                              return TextEditingValue(
+                                                                text: newText,
+                                                                selection: TextSelection.collapsed(offset: newText.length),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // SizedBox(
+                                                  //   width: 38,
+                                                  //   child: IconButton(
+                                                  //     icon: const Icon(Icons.add),
+                                                  //     color: AppColors.primaryColor,
+                                                  //     onPressed: widget.isEditable ? incrementWeight : null,
+                                                  //   ),
+                                                  // ),
+                                                ],
+                                              ),
                                             ),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                // SizedBox(
-                                                //   width: 38,
-                                                //   child: IconButton(
-                                                //     icon: const Icon(Icons.remove),
-                                                //     color: AppColors.primaryColor,
-                                                //     onPressed: widget.isEditable ? decrementWeight : null,
-                                                //   ),
-                                                // ),
-                                                SizedBox(
-                                                  // width: 35,
-                                                  width: ScreenUtil.horizontalScale(25),
-                                                  child: KeyboardActions(
-                                                    autoScroll: false,
-                                                    config: _buildConfig(context),
-                                                    child: TextField(
-                                                      controller: _weightController,
-                                                      keyboardType: TextInputType.number,
-                                                      onSubmitted: (value) {
-                                                        FocusScope.of(context).unfocus();
-                                                      },
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 15),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'REPS',
+                                              style: TextStyle(color: Colors.black54, fontSize: 13),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: ScreenUtil.horizontalScale(1.5),
+                                                vertical: ScreenUtil.verticalScale(0.3),
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withValues(alpha: 0.03),
+                                                    spreadRadius: 2,
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: 38,
+                                                    child: IconButton(
+                                                      icon: const Icon(Icons.remove),
+                                                      color: AppColors.primaryColor,
+                                                      onPressed: widget.isEditable ? decrementReps : null,
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: TextFormField(
+                                                      controller: _repsController,
+                                                      keyboardType: const TextInputType.numberWithOptions(decimal: false, signed: true),
                                                       textInputAction: TextInputAction.done,
                                                       textAlign: TextAlign.center,
-                                                      focusNode: _nodeText1,
-                                                      readOnly: widget.isEditable ? false : true,
+                                                      readOnly: true,
                                                       decoration: const InputDecoration(
                                                         border: InputBorder.none,
                                                       ),
-                                                      onTap: () {
-                                                        if (_weightController.text == "0") {
-                                                          _weightController.clear();
-                                                        }
-                                                      },
                                                       onChanged: (value) {
-                                                        if (value == "0") {
-                                                          _weightController.clear();
-                                                        }
                                                         if (value.isEmpty) {
-                                                          _weightController.text = "0";
+                                                          _repsController.text = "0";
                                                           setState(() {});
                                                         }
                                                       },
@@ -671,100 +764,19 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                       ],
                                                     ),
                                                   ),
-                                                ),
-                                                // SizedBox(
-                                                //   width: 38,
-                                                //   child: IconButton(
-                                                //     icon: const Icon(Icons.add),
-                                                //     color: AppColors.primaryColor,
-                                                //     onPressed: widget.isEditable ? incrementWeight : null,
-                                                //   ),
-                                                // ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'REPS',
-                                            style: TextStyle(color: Colors.black54, fontSize: 13),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: ScreenUtil.horizontalScale(1.5),
-                                              vertical: ScreenUtil.verticalScale(0.3),
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.03),
-                                                  spreadRadius: 2,
-                                                  blurRadius: 5,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: 38,
-                                                  child: IconButton(
-                                                    icon: const Icon(Icons.remove),
-                                                    color: AppColors.primaryColor,
-                                                    onPressed: widget.isEditable ? decrementReps : null,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 35,
-                                                  child: TextFormField(
-                                                    controller: _repsController,
-                                                    keyboardType: const TextInputType.numberWithOptions(decimal: false, signed: true),
-                                                    textInputAction: TextInputAction.done,
-                                                    textAlign: TextAlign.center,
-                                                    readOnly: true,
-                                                    decoration: const InputDecoration(
-                                                      border: InputBorder.none,
+                                                  SizedBox(
+                                                    width: 38,
+                                                    child: IconButton(
+                                                      icon: const Icon(Icons.add),
+                                                      color: AppColors.primaryColor,
+                                                      onPressed: widget.isEditable ? incrementReps : null,
                                                     ),
-                                                    onChanged: (value) {
-                                                      if (value.isEmpty) {
-                                                        _repsController.text = "0";
-                                                        setState(() {});
-                                                      }
-                                                    },
-                                                    inputFormatters: [
-                                                      FilteringTextInputFormatter.digitsOnly,
-                                                      TextInputFormatter.withFunction(
-                                                        (oldValue, newValue) {
-                                                          String newText = newValue.text;
-                                                          if (newText.isNotEmpty) {
-                                                            newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                                                          }
-                                                          return TextEditingValue(
-                                                            text: newText,
-                                                            selection: TextSelection.collapsed(offset: newText.length),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ],
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  width: 38,
-                                                  child: IconButton(
-                                                    icon: const Icon(Icons.add),
-                                                    color: AppColors.primaryColor,
-                                                    onPressed: widget.isEditable ? incrementReps : null,
-                                                  ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -810,26 +822,14 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                   return Stack(
                                                     clipBehavior: Clip.none,
                                                     children: [
-                                                      ChoiceChip(
-                                                        label: Text(effortValue[index]),
+                                                      ChoiceChip1(
+                                                        width: ScreenUtil.verticalScale(6),
+                                                        label: effortValue[index],
                                                         selected: effort == index,
-                                                        onSelected: (bool selected) {
-                                                          widget.isEditable ? selectEffort(selected ? index : 100) : null;
+                                                        onSelected: () {
+                                                          widget.isEditable ? selectEffort(effort != index ? index : 100) : null;
                                                         },
-                                                        padding: EdgeInsets.symmetric(
-                                                          horizontal: ScreenUtil.horizontalScale(2),
-                                                          vertical: ScreenUtil.verticalScale(2),
-                                                        ),
-                                                        shape: const RoundedRectangleBorder(
-                                                          side: BorderSide(color: Colors.white),
-                                                        ),
-                                                        backgroundColor: Colors.white,
-                                                        selectedColor: AppColors.primaryColor,
-                                                        labelStyle: TextStyle(
-                                                          color: effort == index ? Colors.white : Colors.black,
-                                                        ),
-                                                        checkmarkColor: Colors.white,
-                                                        showCheckmark: true,
+                                                        labelStyle: TextStyle(color: effort == index ? Colors.white : Colors.black),
                                                       ),
                                                       // Positioned(
                                                       //   top: 0.5,

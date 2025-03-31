@@ -239,7 +239,11 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
             child: Center(
               child: Text(
                 widget.exerciseName,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

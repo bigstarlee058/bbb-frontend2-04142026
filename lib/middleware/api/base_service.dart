@@ -36,4 +36,7 @@ abstract class BaseService<T> {
   static const fetchDayStatusList = "/api/day-status-list/fetch";
 
   static const fetchMonthEnrollment = "/api/months-enrollment/fetch";
+
+  static const addAchievementsList = "/api/achievements/add";
+  static const fetchAchievementsList = "/api/achievements/fetch";
 }

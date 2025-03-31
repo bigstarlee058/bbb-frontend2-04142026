@@ -73,8 +73,9 @@ class _LanguagePageState extends State<LanguagePage> {
                                       BackArrowWidget(
                                         onPress: () {
                                           // HapticFeedBack.buttonClick();
-                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          mainPageProvider.changeTab(3);
+                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          // mainPageProvider.changeTab(3);
+                                          Navigator.pop(context);
                                         },
                                       ),
                                       CommonStreakWithNotification(routeString: '/languageScreen')

@@ -10,6 +10,7 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
 import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
 import 'package:bbb/pages/video_intro_page.dart';
+import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
@@ -32,11 +33,22 @@ class _MonthViewState extends State<MonthView> {
   MonthProvider? monthProvider;
   ScrollProvider? scrollProvider;
 
+  final DateStreamNotifier _dateNotifier = DateStreamNotifier();
+  DateTime _currentDate = DateTime.now();
+
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     monthProvider?.mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    _dateNotifier.stream.listen((newDate) {
+      if (_currentDate.day != newDate.day) {
+        setState(() {
+          _currentDate = newDate;
+          monthProvider?.onInit(isEnabled: false);
+        });
+      }
+    });
     super.initState();
   }
 

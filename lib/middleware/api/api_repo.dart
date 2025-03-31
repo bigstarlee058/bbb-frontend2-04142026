@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bbb/middleware/api/api_service.dart';
 import 'package:bbb/middleware/api/base_service.dart';
+import 'package:bbb/models/SyncDataResponseModel/avhievements_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_list_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
@@ -252,5 +253,23 @@ class ApiRepo extends BaseService {
     } else {
       throw Exception("Unexpected response format: $response");
     }
+  }
+
+  /// Achievements ========================================================================
+
+  static Future<List<AchievementsDataModel>> fetchAchievementsList() async {
+    var response = await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchAchievementsList);
+    log('response :::::::::::::::::: $response');
+    if (response is List) {
+      return response.map((json) => AchievementsDataModel.fromJson(json)).toList();
+    } else {
+      throw Exception("Unexpected response format: $response");
+    }
+  }
+
+  static Future<void> addAchievementsList({required Map<String, dynamic> body}) async {
+    var response = await ApiService().getResponse(apiType: APIType.aPost, url: BaseService.addAchievementsList, body: body);
+    log('response-addAchievementsList :::::::::::::::::: $response');
+    return response;
   }
 }

@@ -71,7 +71,6 @@ void main() async {
   );
   WidgetsFlutterBinding.ensureInitialized();
   await _configureLocalTimeZone();
-
   const androidInitializationSetting = AndroidInitializationSettings('@mipmap/ic_launcher');
   const iosInitializationSetting = DarwinInitializationSettings();
   const initSettings = InitializationSettings(android: androidInitializationSetting, iOS: iosInitializationSetting);
