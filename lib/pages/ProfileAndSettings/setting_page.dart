@@ -88,8 +88,9 @@ class _SettingPageState extends State<SettingPage> {
                                       BackArrowWidget(
                                         onPress: () {
                                           // HapticFeedBack.buttonClick();
-                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          mainPageProvider.changeTab(3);
+                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          // mainPageProvider.changeTab(3);
+                                          Navigator.pop(context);
                                         },
                                       ),
                                       const CommonStreakWithNotification(routeString: '/myprofile')

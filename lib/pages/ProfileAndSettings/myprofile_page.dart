@@ -64,7 +64,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     // try {
     final userData1 = await userData!.fetchUserInfo();
     // userData['detail'] = jsonDecode( userData['detail']);
-
+    if (!mounted) return;
     setState(() {
       _id = userData1['_id'];
       selectedName = userData1["name"];
@@ -169,8 +169,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       BackArrowWidget(
                                         onPress: () {
                                           // HapticFeedBack.buttonClick();
-                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          mainPageProvider.changeTab(3);
+                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          // mainPageProvider.changeTab(3);
+                                          Navigator.pop(context);
                                         },
                                       ),
                                       const CommonStreakWithNotification(routeString: '/myprofile')

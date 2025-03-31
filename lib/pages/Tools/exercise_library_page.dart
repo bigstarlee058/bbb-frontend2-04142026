@@ -125,7 +125,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 3.2,
+                          height: media.height / 2.5,
                           width: media.width,
                           child: SafeArea(
                             child: Column(
@@ -136,8 +136,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                   leading: BackArrowWidget(
                                     onPress: () {
                                       // HapticFeedBack.buttonClick();
-                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                      mainPageProvider.changeTab(2);
+                                      // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      // mainPageProvider.changeTab(2);
+                                      Navigator.pop(context);
                                     },
                                   ),
                                   title: Text(
@@ -180,7 +181,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                   padding: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(7),
                                   ),
-                                  height: media.height * 0.2,
+                                  height: media.height * 0.19,
                                   child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       crossAxisAlignment: CrossAxisAlignment.center,

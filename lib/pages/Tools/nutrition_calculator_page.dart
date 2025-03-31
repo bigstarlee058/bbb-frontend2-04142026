@@ -89,8 +89,9 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                       BackArrowWidget(
                                         onPress: () {
                                           // HapticFeedBack.buttonClick();
-                                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          mainPageProvider.changeTab(2);
+                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          // mainPageProvider.changeTab(2);
+                                          Navigator.pop(context);
                                         },
                                       ),
                                       Container(

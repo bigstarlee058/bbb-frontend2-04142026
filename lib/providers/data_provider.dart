@@ -6,6 +6,7 @@ import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/avhievements_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_notes_data_model.dart';
@@ -587,6 +588,7 @@ class DataProvider extends ChangeNotifier {
                 await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
               }
             }
+
             List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
             if (monthEnrollment.isNotEmpty) {
               for (var element in monthEnrollment) {
@@ -609,6 +611,17 @@ class DataProvider extends ChangeNotifier {
 
               if (matchingElement?.id == null) {
                 await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.monthHistory);
+              }
+            }
+            List<AchievementsDataModel> achievementsData = await ApiRepo.fetchAchievementsList();
+            if (achievementsData.isNotEmpty) {
+              for (var element in achievementsData) {
+                final body = {
+                  "achievementsTitle": element.achievementsTitle ?? "",
+                  "achievementsSubtitle": element.achievementsSubtitle ?? "",
+                  "achievementsDate": element.achievementsDate.toString(),
+                };
+                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.achievementHistory);
               }
             }
             StreakDataModel? streakDataModel = await ApiRepo.fetchStreakCount();

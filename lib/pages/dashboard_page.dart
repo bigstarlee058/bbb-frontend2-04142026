@@ -18,6 +18,7 @@ import 'package:bbb/models/challenges.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
 import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
@@ -55,11 +56,20 @@ class _DashboardPageState extends State<DashboardPage> {
   late ScrollProvider scrollProvider;
   String selectedChart = "Exercises Completed";
   Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
-
+  final DateStreamNotifier _dateNotifier = DateStreamNotifier();
+  DateTime _currentDate = DateTime.now();
   @override
   void initState() {
     super.initState();
     onInit();
+    _dateNotifier.stream.listen((newDate) {
+      if (_currentDate.day != newDate.day) {
+        setState(() {
+          _currentDate = newDate;
+          monthProvider.onInit(isEnabled: false);
+        });
+      }
+    });
     super.initState();
   }
 
@@ -369,10 +379,14 @@ class _DashboardPageState extends State<DashboardPage> {
                                             if ((monthData.week ?? 0) > 4) {
                                               return const SizedBox();
                                             }
-
                                             if (monthData.todayTitleId.isNotEmpty) {
                                               int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList
                                                   ?.indexWhere((element) => element == monthData.todayTitleId);
+
+                                              if ((index ?? 0) < 0) {
+                                                return SizedBox();
+                                              }
+
                                               String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
                                                       .toString()
                                                       .split(" ")[1] ??
@@ -478,25 +492,24 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       child: Column(
                                                         children: [
                                                           Builder(builder: (context) {
-                                                            // DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
-                                                            //   (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                            //   orElse: () => DayHistoryModel(),
-                                                            // );
+                                                            DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
+                                                              (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                                              orElse: () => DayHistoryModel(),
+                                                            );
                                                             return Text(
-                                                              /*matchingElement.id != null
+                                                              matchingElement.id != null
                                                                   ? matchingElement.title ?? "Pump Day"
-                                                                  : */
-                                                              !monthData.isPumpDayAvailable
-                                                                  ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
-                                                                          .dayList![index ?? 0] ??
-                                                                      ""
-                                                                  : !isRestDay
-                                                                      ? monthData.monthDataModel!.weeks![monthData.week! - 1]
-                                                                              .days![nextWorkOutIndex].title ??
+                                                                  : !monthData.isPumpDayAvailable
+                                                                      ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
+                                                                              .dayList![index ?? 0] ??
                                                                           ""
-                                                                      : monthData.pumpDays.isEmpty
-                                                                          ? "Pump Day"
-                                                                          : todayTitleName,
+                                                                      : !isRestDay
+                                                                          ? monthData.monthDataModel!.weeks![monthData.week! - 1]
+                                                                                  .days![nextWorkOutIndex].title ??
+                                                                              ""
+                                                                          : monthData.pumpDays.isEmpty
+                                                                              ? "Pump Day"
+                                                                              : todayTitleName,
                                                               textAlign: TextAlign.center,
                                                               style: TextStyle(
                                                                 color: Colors.white,

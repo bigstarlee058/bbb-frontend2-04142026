@@ -125,8 +125,9 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                                   leading: BackArrowWidget(
                                     onPress: () {
                                       // HapticFeedBack.buttonClick();
-                                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                      mainPageProvider.changeTab(2);
+                                      // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      // mainPageProvider.changeTab(2);
+                                      Navigator.pop(context);
                                     },
                                   ),
                                   centerTitle: true,

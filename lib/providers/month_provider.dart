@@ -193,7 +193,6 @@ class MonthProvider extends ChangeNotifier {
 
   /// MAIN SCREEN =============================++++++++++++++++++++++++++++++++++
 
-  DateTime today = DateTime.now();
   DateTime? startTime;
   DateTime? endTime;
 
@@ -235,7 +234,7 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchToday() async {
     try {
-      todayTitleId = "";
+      // todayTitleId = "";
 
       if (monthDataModel?.weeks == null || monthDataModel!.weeks!.isEmpty || week == null || week! - 1 < 0) {
         debugPrint("Error: Invalid week data in fetchToday.");
@@ -255,11 +254,11 @@ class MonthProvider extends ChangeNotifier {
 
           if (!value) {
             todayTitleId = element;
-
-            await preferences.putString(SharedPreference.todayTitleId, todayTitleId);
-
+            // await preferences.putString(SharedPreference.todayTitleId, todayTitleId);
             notifyListeners();
             break;
+          } else {
+            todayTitleId = "";
           }
         } catch (innerError, innerStackTrace) {
           debugPrint("Error processing element: $element");
@@ -446,20 +445,18 @@ class MonthProvider extends ChangeNotifier {
         (value) async {
           try {
             if (monthDataModel != null) {
+              DateTime today = DateTime.now();
               startTime = Utils.formattedDate("${monthDataModel?.startDate ?? DateTime.now().toUtc()}");
               endTime = Utils.formattedDate("${monthDataModel?.endDate ?? DateTime.now().toUtc()}");
               await NotificationService.scheduleMonthlyReminder(20, monthDataModel?.endDate ?? DateTime.now().toUtc());
               await NotificationService.scheduleWeekReminder(30, monthDataModel?.endDate ?? DateTime.now().toUtc());
-
               int dayDelta = DateTime(today.year, today.month, today.day)
                   .difference(DateTime(startTime!.year, startTime!.month, startTime!.day))
                   .inDays;
               actualWeek = (dayDelta ~/ 7) + 1;
               week = actualWeek! > 4 ? 4 : actualWeek;
               day = dayDelta % 7 + 1;
-
               currentWeek = week!;
-
               dayStatusList = await ApiRepo.fetchDayStatusList() ?? [];
               await fetchMonthLocalData();
               await fetchAllDayStatusLocalData();
@@ -2250,11 +2247,10 @@ class MonthProvider extends ChangeNotifier {
     if (items[0]["isArchived"] == false || achievementsModel.isEmpty) {
       if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
         items[0]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data: UpdateAchievementsRequest(achievementsTitle: "Breaking the Ice", achievementsSubtitle: "Your First Workout Finished")
-              .toJson(),
-        );
+
+        final data = UpdateAchievementsRequest(achievementsTitle: "Breaking the Ice", achievementsSubtitle: "Your First Workout Finished");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
 
@@ -2262,49 +2258,44 @@ class MonthProvider extends ChangeNotifier {
       if (monthLocalDataModel.length > 1 ||
           (Utils.formattedDate(monthLocalDataModel.first.monthEndDate ?? "${DateTime.now()}").isBefore(DateTime.now()) == true)) {
         items[2]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data: UpdateAchievementsRequest(achievementsTitle: "I'm Determined", achievementsSubtitle: "First Month Finished").toJson(),
-        );
+        final data = UpdateAchievementsRequest(achievementsTitle: "I'm Determined", achievementsSubtitle: "First Month Finished");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
 
     if (items[3]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 3) {
         items[3]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data: UpdateAchievementsRequest(achievementsTitle: "3 in a Row", achievementsSubtitle: "Achieved the streak of 3").toJson(),
-        );
+        final data = UpdateAchievementsRequest(achievementsTitle: "3 in a Row", achievementsSubtitle: "Achieved the streak of 3");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
 
     if (items[4]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 7) {
         items[4]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data: UpdateAchievementsRequest(achievementsTitle: "7 in a Row", achievementsSubtitle: "Achieved the streak of 7").toJson(),
-        );
+        final data = UpdateAchievementsRequest(achievementsTitle: "7 in a Row", achievementsSubtitle: "Achieved the streak of 7");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
     if (items[5]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 14) {
         items[5]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data: UpdateAchievementsRequest(achievementsTitle: "14 in a Row", achievementsSubtitle: "Achieved the streak of 14").toJson(),
-        );
+        final data = UpdateAchievementsRequest(achievementsTitle: "14 in a Row", achievementsSubtitle: "Achieved the streak of 14");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
 
     if (items[6]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 30) {
         items[6]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data: UpdateAchievementsRequest(achievementsTitle: "30 in a Row", achievementsSubtitle: "Achieved the streak of 30").toJson(),
-        );
+        final data = UpdateAchievementsRequest(achievementsTitle: "30 in a Row", achievementsSubtitle: "Achieved the streak of 30");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
 
@@ -2323,20 +2314,16 @@ class MonthProvider extends ChangeNotifier {
 
       if (totalWeight >= 250000) {
         items[7]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data:
-              UpdateAchievementsRequest(achievementsTitle: "250k Monster", achievementsSubtitle: "Total Weight Lifted > 250k lbs").toJson(),
-        );
+        final data = UpdateAchievementsRequest(achievementsTitle: "250k Monster", achievementsSubtitle: "Total Weight Lifted > 250k lbs");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
 
       if (totalWeight >= 500000) {
         items[8]["isArchived"] = true;
-        await DatabaseHelper().insertData(
-          tableName: DatabaseHelper.achievementHistory,
-          data:
-              UpdateAchievementsRequest(achievementsTitle: "500k Monster", achievementsSubtitle: "Total Weight Lifted > 500k lbs").toJson(),
-        );
+        final data = UpdateAchievementsRequest(achievementsTitle: "500k Monster", achievementsSubtitle: "Total Weight Lifted > 500k lbs");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
 
       List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
@@ -2345,10 +2332,9 @@ class MonthProvider extends ChangeNotifier {
         final weekFinishedDate = monthEnrollment.first.startDate?.add(Duration(days: 7));
         if (weekFinishedDate!.isBefore(DateTime.now())) {
           items[1]["isArchived"] = true;
-          await DatabaseHelper().insertData(
-            tableName: DatabaseHelper.achievementHistory,
-            data: UpdateAchievementsRequest(achievementsTitle: "I Got This", achievementsSubtitle: "First Week Finished").toJson(),
-          );
+          final data = UpdateAchievementsRequest(achievementsTitle: "I Got This", achievementsSubtitle: "First Week Finished");
+          await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+          ApiRepo.addAchievementsList(body: data.toJson1());
         }
       }
     }
@@ -2384,6 +2370,14 @@ class UpdateAchievementsRequest {
       "achievementsDate": achievementsDate ?? "${DateTime.now().toUtc()}",
       "achievementsTitle": achievementsTitle,
       "achievementsSubtitle": achievementsSubtitle,
+    };
+  }
+
+  Map<String, dynamic> toJson1() {
+    return {
+      "achievements_date": achievementsDate ?? "${DateTime.now().toUtc()}",
+      "achievements_title": achievementsTitle,
+      "achievements_subtitle": achievementsSubtitle,
     };
   }
 }

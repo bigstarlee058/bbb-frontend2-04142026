@@ -82,8 +82,9 @@ class _RecalculatePageState extends State<RecalculatePage> {
                                             ),
                                             onPressed: () {
                                               // HapticFeedBack.buttonClick();
-                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                              Navigator.pushNamed(context, '/nutritionCalculator');
+                                              // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              // Navigator.pushNamed(context, '/nutritionCalculator');
+                                              Navigator.pop(context);
                                             },
                                             iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
                                           ),
