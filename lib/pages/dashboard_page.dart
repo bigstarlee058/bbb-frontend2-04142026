@@ -143,6 +143,9 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async => await dataProvider?.fetchMonthWorkouts(3),
+      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -949,7 +952,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                       title: data[index]["title"],
                                                                       imagePath: data[index]["image"],
                                                                       subtitle: data[index]["subtitle"],
-                                                                      time: DateTime.now(),
+                                                                      time: data[index]["time"],
                                                                     ),
                                                                     curve: Curves.fastOutSlowIn,
                                                                   );

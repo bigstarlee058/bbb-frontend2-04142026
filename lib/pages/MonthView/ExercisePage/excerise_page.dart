@@ -164,6 +164,8 @@ class _ExercisePageState extends State<ExercisePage> {
       }
     });
 
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => monthProvider?.fetchExerciseHistroy());
+
     super.initState();
   }
 

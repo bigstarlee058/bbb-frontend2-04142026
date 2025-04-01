@@ -381,6 +381,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
       await monthProvider?.fetchExerciseHistoryLocalData();
     }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => monthProvider?.fetchExerciseHistroy());
   }
 
   // Future<void> fromNotification() async {

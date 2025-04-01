@@ -19,6 +19,17 @@ import 'package:flutter/material.dart';
 class ApiRepo extends BaseService {
   /// ExerciseHistory ========================================================================
 
+  static Future<List<ExerciseHistoryDataModel>> fetchExerciseForTheExercise(String exerciseId) async {
+    var response =
+        await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchExerciseHistory, body: {"exerciseId": exerciseId});
+    debugPrint('response-fetchExerciseHistory :::::::::::::::::: $response');
+    if (response is List) {
+      return response.map((json) => ExerciseHistoryDataModel.fromJson(json)).toList();
+    } else {
+      throw Exception("Unexpected response format: $response");
+    }
+  }
+
   static Future<List<ExerciseHistoryDataModel>> fetchExerciseHistory(String monthId) async {
     var response = await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchExerciseHistory, body: {"monthId": monthId});
     debugPrint('response-fetchExerciseHistory :::::::::::::::::: $response');

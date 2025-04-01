@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,7 +21,7 @@ class ShareAchievementDialog extends StatelessWidget {
   final String imagePath;
   final String title;
   final String subtitle;
-  final DateTime time;
+  final String time;
   final ScreenshotController screenshotController = ScreenshotController();
   final TextEditingController textEditingController = TextEditingController();
   @override
@@ -72,7 +73,7 @@ class ShareAchievementDialog extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        DateFormat('dd/MM/yyyy hh:mm a').format(time),
+                        DateFormat('dd/MM/yyyy hh:mm a').format(Utils.formattedDate(time)),
                         maxLines: 1,
                         textAlign: TextAlign.center,
                         overflow: TextOverflow.ellipsis,
@@ -123,7 +124,7 @@ class ShareAchievementDialog extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          DateFormat('dd/MM/yyyy hh:mm a').format(time),
+                          DateFormat('dd/MM/yyyy hh:mm a').format(Utils.formattedDate(time)),
                           maxLines: 1,
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
