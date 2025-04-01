@@ -345,6 +345,7 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> getMonthInfoFromJson({Map<String, dynamic>? responseData}) async {
     try {
+      log("responseData :::::::::::::::::: $responseData");
       if (responseData != null) {
         MonthDataModel monthDataModelSplit3 = MonthDataModel.fromJson(responseData);
         MonthDataModel monthDataModelSplit4 = MonthDataModel.fromJson(responseData);
@@ -442,7 +443,47 @@ class DataProvider extends ChangeNotifier {
           await preferences.putString("REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
         }
         final value = await DatabaseHelper().areAllTablesEmpty();
+        log('value :::::::::::::::::: $value');
         if (value) {
+          List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+
+          if (monthEnrollment.isNotEmpty) {
+            for (var element in monthEnrollment) {
+              final body = {
+                "monthId": element.id ?? "",
+                "monthStartDate": element.startDate.toString(),
+                "monthEndDate": element.endDate.toString(),
+              };
+              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.monthHistory);
+            }
+          } else {
+            MonthResponseModel? matchingElement = monthProvider?.monthLocalDataModel
+                .firstWhere((element) => element.monthId == monthDataModelSplit3.id, orElse: () => MonthResponseModel());
+
+            final data = {
+              "monthId": monthDataModelSplit3.id,
+              "monthStartDate": monthDataModelSplit3.startDate.toString(),
+              "monthEndDate": monthDataModelSplit3.endDate.toString()
+            };
+
+            if (matchingElement?.id == null) {
+              await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.monthHistory);
+            }
+          }
+          List<AchievementsDataModel> achievementsData = await ApiRepo.fetchAchievementsList();
+          if (achievementsData.isNotEmpty) {
+            for (var element in achievementsData) {
+              final body = {
+                "achievementsTitle": element.achievementsTitle ?? "",
+                "achievementsSubtitle": element.achievementsSubtitle ?? "",
+                "achievementsDate": element.achievementsDate.toString(),
+              };
+              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.achievementHistory);
+            }
+          }
+          StreakDataModel? streakDataModel = await ApiRepo.fetchStreakCount();
+          await preferences.putInt(SharedPreference.lastStreakCount, int.parse((streakDataModel?.count ?? "0")));
+
           List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
 
           if (dayStatus.isNotEmpty) {
@@ -588,44 +629,6 @@ class DataProvider extends ChangeNotifier {
                 await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
               }
             }
-
-            List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
-            if (monthEnrollment.isNotEmpty) {
-              for (var element in monthEnrollment) {
-                final body = {
-                  "monthId": element.id ?? "",
-                  "monthStartDate": element.startDate.toString(),
-                  "monthEndDate": element.endDate.toString(),
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.monthHistory);
-              }
-            } else {
-              MonthResponseModel? matchingElement = monthProvider?.monthLocalDataModel
-                  .firstWhere((element) => element.monthId == monthDataModelSplit3.id, orElse: () => MonthResponseModel());
-
-              final data = {
-                "monthId": monthDataModelSplit3.id,
-                "monthStartDate": monthDataModelSplit3.startDate.toString(),
-                "monthEndDate": monthDataModelSplit3.endDate.toString()
-              };
-
-              if (matchingElement?.id == null) {
-                await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.monthHistory);
-              }
-            }
-            List<AchievementsDataModel> achievementsData = await ApiRepo.fetchAchievementsList();
-            if (achievementsData.isNotEmpty) {
-              for (var element in achievementsData) {
-                final body = {
-                  "achievementsTitle": element.achievementsTitle ?? "",
-                  "achievementsSubtitle": element.achievementsSubtitle ?? "",
-                  "achievementsDate": element.achievementsDate.toString(),
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.achievementHistory);
-              }
-            }
-            StreakDataModel? streakDataModel = await ApiRepo.fetchStreakCount();
-            await preferences.putInt(SharedPreference.lastStreakCount, int.parse((streakDataModel?.count ?? "0")));
           }
         }
       }

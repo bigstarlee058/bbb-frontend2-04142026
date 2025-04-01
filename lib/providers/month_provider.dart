@@ -23,6 +23,7 @@ import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_list_data_model.dart';
+import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/month_enrollment_data_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/utils.dart';
@@ -54,6 +55,8 @@ class MonthProvider extends ChangeNotifier {
   List<WeekType> weekStatuses = [];
   List<String> weekStatusesString = [];
   List<RestDayModel> restDayModel = [];
+
+  List<ExerciseHistoryDataModel> exerciseHistroy = [];
 
   // String selectedButtonTitle = "Mark Complete";
   // List<String> buttonTitle = ["Mark Complete", "Swap To Pump Day"];
@@ -131,6 +134,11 @@ class MonthProvider extends ChangeNotifier {
   //   isPumpDay = false;
   //   isPumpDayAvailable = false;
   // }
+
+  fetchExerciseHistroy() async {
+    exerciseHistroy = await ApiRepo.fetchExerciseForTheExercise(selectedExercise!.exerciseId ?? "");
+    notifyListeners();
+  }
 
   Future<void> checkPumpDayAvail() async {
     try {
@@ -2163,63 +2171,72 @@ class MonthProvider extends ChangeNotifier {
       "active_image": "assets/img/verified (1).svg",
       "title": "Breaking the Ice",
       "subtitle": "Your First Workout Finished",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "I Got This",
       "subtitle": "First Week Finished",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "I'm Determined",
       "subtitle": "First Month Finished",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "3 in a Row",
       "subtitle": "Achieved the streak of 3",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "7 in a Row",
       "subtitle": "Achieved the streak of 7",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "14 in a Row",
       "subtitle": "Achieved the Streak of 14",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "30 in a row",
       "subtitle": "Achieved the streak of 30",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "250k Monster",
       "subtitle": "Total Weight Lifted > 250k lbs",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
       "title": "500k Monster",
       "subtitle": "Total Weight Lifted > 500k lbs",
-      "isArchived": false
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
     },
   ];
   List<AchievementsModel> achievementsModel = [];
@@ -2233,21 +2250,47 @@ class MonthProvider extends ChangeNotifier {
     }
 
     for (var element in achievementsModel) {
-      if (element.achievementsTitle == "Breaking the Ice") items[0]["isArchived"] = true;
-      if (element.achievementsTitle == "I Got This") items[1]["isArchived"] = true;
-      if (element.achievementsTitle == "I'm Determined") items[2]["isArchived"] = true;
-      if (element.achievementsTitle == "3 in a Row") items[3]["isArchived"] = true;
-      if (element.achievementsTitle == "7 in a Row") items[4]["isArchived"] = true;
-      if (element.achievementsTitle == "14 in a Row") items[5]["isArchived"] = true;
-      if (element.achievementsTitle == "30 in a Row") items[6]["isArchived"] = true;
-      if (element.achievementsTitle == "250k Monster") items[7]["isArchived"] = true;
-      if (element.achievementsTitle == "500k Monster") items[8]["isArchived"] = true;
+      if (element.achievementsTitle == "Breaking the Ice") {
+        items[0]["isArchived"] = true;
+        items[0]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "I Got This") {
+        items[1]["isArchived"] = true;
+        items[1]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "I'm Determined") {
+        items[2]["isArchived"] = true;
+        items[2]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "3 in a Row") {
+        items[3]["isArchived"] = true;
+        items[3]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "7 in a Row") {
+        items[4]["isArchived"] = true;
+        items[4]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "14 in a Row") {
+        items[5]["isArchived"] = true;
+        items[5]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "30 in a Row") {
+        items[6]["isArchived"] = true;
+        items[6]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "250k Monster") {
+        items[7]["isArchived"] = true;
+        items[7]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "500k Monster") {
+        items[8]["isArchived"] = true;
+        items[8]["time"] = element.achievementsDate.toString();
+      }
     }
 
     if (items[0]["isArchived"] == false || achievementsModel.isEmpty) {
       if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
         items[0]["isArchived"] = true;
-
         final data = UpdateAchievementsRequest(achievementsTitle: "Breaking the Ice", achievementsSubtitle: "Your First Workout Finished");
         await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
         ApiRepo.addAchievementsList(body: data.toJson1());

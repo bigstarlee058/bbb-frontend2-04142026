@@ -169,7 +169,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               title: item["title"]!,
               imagePath: item["image"]!,
               subtitle: item["subtitle"]!,
-              time: DateTime.now(),
+              time: item["time"],
             ),
             curve: Curves.fastOutSlowIn,
           );
