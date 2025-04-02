@@ -79,7 +79,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       double totalReps = totals['totalReps']!;
       double totalRIR = totals['totalRIR']!;
       double oneRmSession = totalWeightForDate * (1 + (totalReps + totalRIR) / 30);
-      chartData.add(FlSpot(index.toDouble(), oneRmSession));
+      chartData.add(FlSpot(index.toDouble(), double.parse(oneRmSession.toStringAsFixed(2))));
       dateLabels.add(date);
       index++;
     });
@@ -142,18 +142,16 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                   child: SafeArea(
                     child: Container(
                       margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
-                      decoration: const BoxDecoration(
-                          color: Color(0XFFd18a9b), // Make sure color is correct
-                          shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
                       child: SizedBox(
-                        width: ScreenUtil.horizontalScale(10), // Size of the circle
+                        width: ScreenUtil.horizontalScale(10),
                         height: ScreenUtil.horizontalScale(10),
                         child: IconButton(
-                          padding: EdgeInsets.zero, // Removes the default padding
+                          padding: EdgeInsets.zero,
                           icon: Icon(
                             Icons.keyboard_arrow_left,
                             color: Colors.white,
-                            size: ScreenUtil.verticalScale(4), // Adjust size using ScreenUtil
+                            size: ScreenUtil.verticalScale(4),
                           ),
                           onPressed: () {
                             Navigator.pop(context);
@@ -269,21 +267,17 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                             drawVerticalLine: false,
                                             horizontalInterval: (maxWeight / 5).ceilToDouble(),
                                             getDrawingHorizontalLine: (value) {
-                                              return const FlLine(
-                                                color: Colors.grey, // Set color of horizontal lines
-                                                strokeWidth: 0.5, // Set thickness of lines
-                                                dashArray: [5, 5], // Optional: Dash pattern for lines
-                                              );
+                                              return const FlLine(color: Colors.grey, strokeWidth: 0.5, dashArray: [5, 5]);
                                             },
                                           ),
                                           titlesData: FlTitlesData(
                                             leftTitles: AxisTitles(
                                               sideTitles: SideTitles(
                                                 showTitles: true,
-                                                reservedSize: 40, // Add space for left titles
+                                                reservedSize: 40,
                                                 getTitlesWidget: (value, meta) {
                                                   return Text(
-                                                    value.toString(), // Customize the formatting as needed
+                                                    value.toString(),
                                                     style: const TextStyle(fontSize: 10),
                                                   );
                                                 },
@@ -296,12 +290,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                 interval: 1,
                                                 getTitlesWidget: (value, meta) {
                                                   int index = value.toInt();
-                                                  // return Text(
-                                                  //   dateLabels[index],
-                                                  //   style: const TextStyle(
-                                                  //     fontSize: 10,
-                                                  //   ),
-                                                  // );
                                                   if (index >= 0 && index < dateLabels.length) {
                                                     return Text(
                                                       dateLabels[index],
@@ -327,7 +315,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                               bottom: BorderSide(width: .5),
                                             ),
                                           ),
-                                          minY: 0, // Keep Y-axis starting at 0
+                                          minY: 0,
                                           maxY: (maxWeight * 1.5).ceilToDouble(),
                                           lineBarsData: [
                                             LineChartBarData(
@@ -352,7 +340,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Left Column: Total Lifted
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -373,7 +360,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                     ),
                                   ],
                                 ),
-                                // Right Column: 1 Rep Max
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
@@ -398,118 +384,108 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                             ),
                           ),
                     const SizedBox(height: 16),
-                    Builder(
-                      builder: (context) {
-                        return historyDataModel.isEmpty || finalData.isEmpty
-                            ? const SizedBox.shrink()
-                            : Expanded(
-                                child: ListView.builder(
-                                  itemCount: finalData.length,
-                                  padding: EdgeInsets.zero,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.withValues(alpha: .1),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Row(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                // Left Side: Workout Date
-                                                Expanded(
-                                                  flex: 1, // Adjust flex if needed
-                                                  child: Text(
-                                                    DateFormat("MMM dd, yyyy")
-                                                        .format(DateFormat("dd/MM/yyyy").parse(finalData[index]["date"])),
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.normal,
-                                                    ),
-                                                  ),
+                    historyDataModel.isEmpty || finalData.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
+                            child: ListView.builder(
+                              itemCount: finalData.length,
+                              padding: EdgeInsets.zero,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withValues(alpha: .1),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: Text(
+                                                DateFormat("MMM dd, yyyy").format(DateFormat("dd/MM/yyyy").parse(finalData[index]["date"])),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.normal,
                                                 ),
-                                                // Right Side: Workout Details
-                                                Expanded(
-                                                  flex: 2, // Adjust flex if needed
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                                    children: List.generate(
-                                                      finalData[index]["data"].length,
-                                                      (index1) {
-                                                        ExerciseHistoryDataModel data = finalData[index]["data"][index1];
-                                                        return Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: Wrap(
-                                                            children: [
-                                                              RichText(
-                                                                text: TextSpan(
-                                                                  children: [
-                                                                    // Reps
-                                                                    TextSpan(
-                                                                      text: '${data.reps}',
-                                                                      style: const TextStyle(
-                                                                        fontSize: 14,
-                                                                        fontWeight: FontWeight.normal,
-                                                                        color: Colors.black,
-                                                                      ),
-                                                                    ),
-                                                                    const TextSpan(
-                                                                      text: ' × ',
-                                                                      style: TextStyle(
-                                                                        fontSize: 14,
-                                                                        color: Colors.black87,
-                                                                      ),
-                                                                    ),
-                                                                    // Weight
-                                                                    TextSpan(
-                                                                      text: '${data.weight}lbs',
-                                                                      style: const TextStyle(
-                                                                        fontSize: 14,
-                                                                        fontWeight: FontWeight.w700,
-                                                                        color: Colors.black,
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: ' @ ${data.load}% ',
-                                                                      style: TextStyle(
-                                                                        fontSize: 14,
-                                                                        fontWeight: FontWeight.normal,
-                                                                        color: Colors.black,
-                                                                      ),
-                                                                    ),
-
-                                                                    TextSpan(
-                                                                      text: '| RIR ${data.effort == "100" ? "0" : data.effort}',
-                                                                      style: const TextStyle(
-                                                                        fontSize: 14,
-                                                                        fontWeight: FontWeight.normal,
-                                                                        color: Colors.black,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            Expanded(
+                                              flex: 2,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: List.generate(
+                                                  finalData[index]["data"].length,
+                                                  (index1) {
+                                                    ExerciseHistoryDataModel data = finalData[index]["data"][index1];
+                                                    return Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: Wrap(
+                                                        children: [
+                                                          RichText(
+                                                            text: TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: '${data.reps}',
+                                                                  style: const TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.normal,
+                                                                    color: Colors.black,
+                                                                  ),
+                                                                ),
+                                                                const TextSpan(
+                                                                  text: ' × ',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    color: Colors.black87,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: '${data.weight}lbs',
+                                                                  style: const TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.w700,
+                                                                    color: Colors.black,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: ' @ ${data.load}% ',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.normal,
+                                                                    color: Colors.black,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: '| RIR ${data.effort == "100" ? "0" : data.effort}',
+                                                                  style: const TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.normal,
+                                                                    color: Colors.black,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    );
-                                  },
-                                ),
-                              );
-                      },
-                    ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                   ],
                 );
               },
@@ -542,12 +518,10 @@ class FilterButton extends StatelessWidget {
           backgroundColor: isSelected ? AppColors.primaryColor : Colors.grey[200],
           padding: const EdgeInsets.symmetric(horizontal: 1.0),
         ),
-        onPressed: onPressed, // Use the passed callback
+        onPressed: onPressed,
         child: Text(
           label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
-          ),
+          style: TextStyle(color: isSelected ? Colors.white : Colors.black),
         ),
       ),
     );
@@ -574,394 +548,3 @@ class StatCard extends StatelessWidget {
     );
   }
 }
-
-// // ignore: must_be_immutable
-// class WorkoutHistoryScreen extends StatefulWidget {
-//   final String exerciseName;
-//   List<FlSpot> chartData = [];
-//   List<String> dateLabels = [];
-//   List<ExerciseHistoryDataModel> exerciseHistoryData = [];
-//   int maxWeight = 0;
-//   int totalWeight = 0;
-//   final ValueChanged<int> onFilterSelected;
-//   final int selectedIndex;
-//   WorkoutHistoryScreen({
-//     super.key,
-//     required this.exerciseName,
-//     required this.dateLabels,
-//     required this.chartData,
-//     required this.exerciseHistoryData,
-//     required this.totalWeight,
-//     required this.maxWeight,
-//     required this.onFilterSelected,
-//     required this.selectedIndex,
-//   });
-//   @override
-//   State<WorkoutHistoryScreen> createState() => _WorkoutHistoryScreenState();
-// }
-//
-// class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
-//   final groupedData = <String, List<ExerciseHistoryDataModel>>{};
-//
-//   List<Map<String, dynamic>> finalData = [];
-//
-//   @override
-//   void initState() {
-//     filterData();
-//     super.initState();
-//   }
-//
-//   filterData() {
-//     finalData = [];
-//     log('exerciseHistoryData :::::::::::::::::: ${widget.exerciseHistoryData}');
-//     for (var item in widget.exerciseHistoryData) {
-//       final date = DateFormat("dd/MM/yyyy").format(DateTime.parse(item.date!));
-//       if (groupedData.containsKey(date)) {
-//         groupedData[date]!.add(item);
-//       } else {
-//         groupedData[date] = [item];
-//       }
-//     }
-//     finalData = groupedData.entries.map((entry) {
-//       return {
-//         "date": entry.key,
-//         "data": entry.value,
-//       };
-//     }).toList();
-//     setState(() {});
-//   }
-//
-//   commonPadding() => const EdgeInsets.fromLTRB(16, 0, 16, 0);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       body: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           const SizedBox(height: 20),
-//           Padding(
-//             padding: commonPadding(),
-//             child: Center(
-//               child: Text(
-//                 widget.exerciseName,
-//                 textAlign: TextAlign.center,
-//                 style: const TextStyle(
-//                   fontSize: 20,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
-//           ),
-//           const SizedBox(height: 8),
-//           if (widget.exerciseHistoryData.isEmpty)
-//             Padding(
-//               padding: commonPadding(),
-//               child: const Center(
-//                 child: Text(
-//                   "No data available.",
-//                   style: TextStyle(fontSize: 16),
-//                 ),
-//               ),
-//             )
-//           else
-//             Padding(
-//               padding: commonPadding(),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   const Text(
-//                     '1-Rep Max History',
-//                     style: TextStyle(fontSize: 16),
-//                   ),
-//                   Row(
-//                     children: [
-//                       FilterButton(
-//                         label: "1M",
-//                         isSelected: widget.selectedIndex == 0,
-//                         onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => widget.onFilterSelected(0)),
-//                       ),
-//                       const SizedBox(width: 5),
-//                       FilterButton(
-//                         label: "3M",
-//                         isSelected: widget.selectedIndex == 1,
-//                         onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => widget.onFilterSelected(1)),
-//                       ),
-//                       const SizedBox(width: 5),
-//                       FilterButton(
-//                         label: "1Y",
-//                         isSelected: widget.selectedIndex == 2,
-//                         onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => widget.onFilterSelected(2)),
-//                       ),
-//                     ],
-//                   )
-//                 ],
-//               ),
-//             ),
-//           const SizedBox(height: 16),
-//           widget.exerciseHistoryData.isEmpty
-//               ? const SizedBox.shrink()
-//               : Padding(
-//                   padding: commonPadding(),
-//                   child: widget.maxWeight != 0
-//                       ? SizedBox(
-//                           height: ScreenUtil.verticalScale(18),
-//                           child: LineChart(
-//                             LineChartData(
-//                               gridData: FlGridData(
-//                                 show: true,
-//                                 drawHorizontalLine: true,
-//                                 drawVerticalLine: false,
-//                                 horizontalInterval: (widget.maxWeight / 5).ceilToDouble(),
-//                                 getDrawingHorizontalLine: (value) {
-//                                   return const FlLine(
-//                                     color: Colors.grey, // Set color of horizontal lines
-//                                     strokeWidth: 0.5, // Set thickness of lines
-//                                     dashArray: [5, 5], // Optional: Dash pattern for lines
-//                                   );
-//                                 },
-//                               ),
-//                               titlesData: FlTitlesData(
-//                                 leftTitles: AxisTitles(
-//                                   sideTitles: SideTitles(
-//                                     showTitles: true,
-//                                     reservedSize: 40, // Add space for left titles
-//                                     getTitlesWidget: (value, meta) {
-//                                       return Text(
-//                                         value.toString(), // Customize the formatting as needed
-//                                         style: const TextStyle(fontSize: 10),
-//                                       );
-//                                     },
-//                                   ),
-//                                 ),
-//                                 bottomTitles: AxisTitles(
-//                                   sideTitles: SideTitles(
-//                                     showTitles: true,
-//                                     reservedSize: 30,
-//                                     getTitlesWidget: (value, meta) {
-//                                       int index = value.toInt();
-//                                       if (index >= 0 && index < widget.dateLabels.length) {
-//                                         return Text(
-//                                           widget.dateLabels[index],
-//                                           style: const TextStyle(fontSize: 10),
-//                                         );
-//                                       }
-//                                       return const Text('');
-//                                     },
-//                                   ),
-//                                 ),
-//                                 rightTitles: const AxisTitles(
-//                                   sideTitles: SideTitles(showTitles: false), // Hide right titles
-//                                 ),
-//                                 topTitles: const AxisTitles(
-//                                   sideTitles: SideTitles(showTitles: false), // Hide top titles
-//                                 ),
-//                               ),
-//                               borderData: FlBorderData(
-//                                 border: const Border(
-//                                   top: BorderSide.none,
-//                                   right: BorderSide.none,
-//                                   left: BorderSide.none,
-//                                   bottom: BorderSide(width: .5),
-//                                 ),
-//                               ),
-//                               // minX: 1, // Shift X-axis starting point
-//                               // maxX: widget.chartData.isNotEmpty ? widget.chartData.length.toDouble() : 1.0, // Dynamic maxX
-//                               minY: 0, // Keep Y-axis starting at 0
-//                               maxY: (widget.maxWeight * 1.2).ceilToDouble(),
-//                               lineBarsData: [
-//                                 LineChartBarData(
-//                                   spots: widget.chartData,
-//                                   isCurved: false,
-//                                   barWidth: .5,
-//                                   color: AppColors.primaryColor,
-//                                 ),
-//                               ],
-//                             ),
-//                           ),
-//                         )
-//                       : const SizedBox(),
-//                 ),
-//           const SizedBox(height: 30),
-//           widget.exerciseHistoryData.isEmpty
-//               ? const SizedBox.shrink()
-//               : Padding(
-//                   padding: commonPadding(),
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       // Left Column: Total Lifted
-//                       Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           Text(
-//                             '${widget.totalWeight} lbs',
-//                             style: const TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                           const SizedBox(height: 4),
-//                           const Text(
-//                             'Total Lifted',
-//                             style: TextStyle(
-//                               fontSize: 14,
-//                               color: Colors.black87,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                       // Right Column: 1 Rep Max
-//                       Column(
-//                         crossAxisAlignment: CrossAxisAlignment.end,
-//                         children: [
-//                           Text(
-//                             '${widget.maxWeight} lbs',
-//                             style: const TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                           const SizedBox(height: 4),
-//                           const Text(
-//                             '1 Rep Max',
-//                             style: TextStyle(
-//                               fontSize: 14,
-//                               color: Colors.black87,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//           const SizedBox(height: 16),
-//           if (widget.exerciseHistoryData.isEmpty || finalData.isEmpty)
-//             const SizedBox.shrink()
-//           else
-//             Expanded(
-//               child: ListView.builder(
-//                 itemCount: finalData.length,
-//                 padding: EdgeInsets.zero,
-//                 itemBuilder: (context, index) {
-//                   return Container(
-//                     decoration: BoxDecoration(
-//                       color: Colors.grey.withValues(alpha: .1),
-//                     ),
-//                     child: Column(
-//                       children: [
-//                         Padding(
-//                           padding: const EdgeInsets.all(12.0),
-//                           child: Row(
-//                             crossAxisAlignment: CrossAxisAlignment.start,
-//                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                             children: [
-//                               // Left Side: Workout Date
-//                               Expanded(
-//                                 flex: 1, // Adjust flex if needed
-//                                 child: Text(
-//                                   DateFormat("MMM dd, yyyy").format(DateFormat("dd/MM/yyyy").parse(finalData[index]["date"])),
-//                                   style: const TextStyle(
-//                                     fontSize: 16,
-//                                     fontWeight: FontWeight.normal,
-//                                   ),
-//                                 ),
-//                               ),
-//                               // Right Side: Workout Details
-//                               Expanded(
-//                                 flex: 2, // Adjust flex if needed
-//                                 child: Column(
-//                                     crossAxisAlignment: CrossAxisAlignment.end,
-//                                     children: List.generate(
-//                                       finalData[index]["data"].length,
-//                                       (index1) {
-//                                         ExerciseHistoryDataModel data = finalData[index]["data"][index1];
-//                                         return Padding(
-//                                           padding: const EdgeInsets.all(8.0),
-//                                           child: Wrap(
-//                                             children: [
-//                                               RichText(
-//                                                 text: TextSpan(
-//                                                   children: [
-//                                                     // Reps
-//                                                     TextSpan(
-//                                                       text: '${data.reps}',
-//                                                       style: const TextStyle(
-//                                                         fontSize: 14,
-//                                                         fontWeight: FontWeight.normal,
-//                                                         color: Colors.black,
-//                                                       ),
-//                                                     ),
-//                                                     const TextSpan(
-//                                                       text: ' × ',
-//                                                       style: TextStyle(
-//                                                         fontSize: 14,
-//                                                         color: Colors.black87,
-//                                                       ),
-//                                                     ),
-//                                                     // Weight
-//                                                     TextSpan(
-//                                                       text: '${data.weight}lbs',
-//                                                       style: const TextStyle(
-//                                                         fontSize: 14,
-//                                                         fontWeight: FontWeight.w700,
-//                                                         color: Colors.black,
-//                                                       ),
-//                                                     ),
-//                                                     TextSpan(
-//                                                       text: ' @ ${data.load}% ',
-//                                                       style: TextStyle(
-//                                                         fontSize: 14,
-//                                                         fontWeight: FontWeight.normal,
-//                                                         color: Colors.black,
-//                                                       ),
-//                                                     ),
-//                                                     // TextSpan(
-//                                                     //   text: data.effort == "100" ? "0" : '${data.effort}',
-//                                                     //   style: const TextStyle(
-//                                                     //     fontSize: 14,
-//                                                     //     fontWeight: FontWeight.normal,
-//                                                     //     color: Colors.black,
-//                                                     //   ),
-//                                                     // ),
-//                                                     TextSpan(
-//                                                       text: '| RIR ${data.effort == "100" ? "0" : data.effort}',
-//                                                       style: const TextStyle(
-//                                                         fontSize: 14,
-//                                                         fontWeight: FontWeight.normal,
-//                                                         color: Colors.black,
-//                                                       ),
-//                                                     ),
-//                                                   ],
-//                                                 ),
-//                                               ),
-//                                             ],
-//                                           ),
-//                                         );
-//                                       },
-//                                     )),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                         // if (index < widget.exerciseHistoryData.length - 1)
-//                         //   const Padding(
-//                         //     padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-//                         //     child: Divider(
-//                         //       thickness: .1,
-//                         //       color: Colors.transparent,
-//                         //     ),
-//                         //   ),
-//                       ],
-//                     ),
-//                   );
-//                 },
-//               ),
-//             ),
-//         ],
-//       ),
-//     );
-//   }
-// }

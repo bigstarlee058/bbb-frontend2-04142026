@@ -37,6 +37,9 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => monthProvider?.updateAchievements(),
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
