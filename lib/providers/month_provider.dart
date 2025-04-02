@@ -24,7 +24,6 @@ import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_list_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
-import 'package:bbb/models/SyncDataResponseModel/month_enrollment_data_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -2297,16 +2296,6 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (items[1]["isArchived"] == false || achievementsModel.isEmpty) {
-      if (monthLocalDataModel.length > 1 ||
-          (Utils.formattedDate(monthLocalDataModel.first.monthEndDate ?? "${DateTime.now()}").isBefore(DateTime.now()) == true)) {
-        items[2]["isArchived"] = true;
-        final data = UpdateAchievementsRequest(achievementsTitle: "I'm Determined", achievementsSubtitle: "First Month Finished");
-        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
-        ApiRepo.addAchievementsList(body: data.toJson1());
-      }
-    }
-
     if (items[3]["isArchived"] == false || achievementsModel.isEmpty) {
       if (streak >= 3) {
         items[3]["isArchived"] = true;
@@ -2345,6 +2334,7 @@ class MonthProvider extends ChangeNotifier {
     if (items[7]["isArchived"] == false ||
         items[8]["isArchived"] == false ||
         items[2]["isArchived"] == false ||
+        items[1]["isArchived"] == false ||
         achievementsModel.isEmpty) {
       List<DayStatusDataModel> dayMainData = await ApiRepo.fetchDayAllStatus();
       double totalWeight = 0;
@@ -2355,27 +2345,58 @@ class MonthProvider extends ChangeNotifier {
         }
       }
 
-      if (totalWeight >= 250000) {
+      if (items[7]["isArchived"] == false && totalWeight >= 250000) {
         items[7]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "250k Monster", achievementsSubtitle: "Total Weight Lifted > 250k lbs");
         await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
         ApiRepo.addAchievementsList(body: data.toJson1());
       }
 
-      if (totalWeight >= 500000) {
+      if (items[8]["isArchived"] == false && totalWeight >= 500000) {
         items[8]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "500k Monster", achievementsSubtitle: "Total Weight Lifted > 500k lbs");
         await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
         ApiRepo.addAchievementsList(body: data.toJson1());
       }
 
-      List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+      if (items[2]["isArchived"] == false) {
+        final startDate = monthDataModel?.startDate ?? DateTime.now();
+        final endDate = monthDataModel?.endDate ?? DateTime.now();
 
-      if (monthEnrollment.isNotEmpty) {
-        final weekFinishedDate = monthEnrollment.first.startDate?.add(Duration(days: 7));
-        if (weekFinishedDate!.isBefore(DateTime.now())) {
+        DateTime weekStart = getWeekStartDate(DateTime(startDate.year, startDate.month, startDate.day), week ?? 1);
+        DateTime weekEnd = getWeekEndDate(
+            weekStart, DateTime(endDate.year, endDate.month, endDate.day).add(Duration(days: 1)).subtract(Duration(seconds: 1)));
+        final data1 = allSplitDayHistoryModel.where((item) {
+          DateTime endTime = DateTime(item.endTime!.year, item.endTime!.month, item.endTime!.day);
+          return (item.status == Status.completed || item.status == Status.skipped) &&
+              (endTime.isAfter(weekStart) && endTime.isBefore(weekEnd) ||
+                  endTime.isAtSameMomentAs(weekStart) ||
+                  endTime.isAtSameMomentAs(weekEnd));
+        }).toList();
+        if (data1.length == 7) {
           items[1]["isArchived"] = true;
           final data = UpdateAchievementsRequest(achievementsTitle: "I Got This", achievementsSubtitle: "First Week Finished");
+          await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+          ApiRepo.addAchievementsList(body: data.toJson1());
+        }
+      }
+
+      if (items[1]["isArchived"] == false) {
+        final startDate = monthDataModel?.startDate ?? DateTime.now();
+        final endDate = monthDataModel?.endDate ?? DateTime.now();
+        final startDate1 = DateTime(startDate.year, startDate.month, startDate.day);
+        final endDate1 = DateTime(endDate.year, endDate.month, endDate.day).add(Duration(days: 1)).subtract(Duration(seconds: 1));
+        final data1 = allSplitDayHistoryModel.where((item) {
+          DateTime endTime = DateTime(item.endTime!.year, item.endTime!.month, item.endTime!.day);
+          return (item.status == Status.completed || item.status == Status.skipped) &&
+              (endTime.isAfter(startDate1) && endTime.isBefore(endDate1) ||
+                  endTime.isAtSameMomentAs(startDate1) ||
+                  endTime.isAtSameMomentAs(endDate1));
+        }).toList();
+
+        if (data1.length == 28) {
+          items[2]["isArchived"] = true;
+          final data = UpdateAchievementsRequest(achievementsTitle: "I'm Determined", achievementsSubtitle: "First Month Finished");
           await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
           ApiRepo.addAchievementsList(body: data.toJson1());
         }
@@ -2383,6 +2404,15 @@ class MonthProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  DateTime getWeekStartDate(DateTime monthStart, int weekNumber) {
+    return monthStart.add(Duration(days: (weekNumber - 1) * 7));
+  }
+
+  DateTime getWeekEndDate(DateTime weekStart, DateTime monthEnd) {
+    DateTime weekEnd = weekStart.add(Duration(days: 6));
+    return weekEnd.isAfter(monthEnd) ? monthEnd : weekEnd;
   }
 }
 

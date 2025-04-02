@@ -345,7 +345,6 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> getMonthInfoFromJson({Map<String, dynamic>? responseData}) async {
     try {
-      log("responseData :::::::::::::::::: $responseData");
       if (responseData != null) {
         MonthDataModel monthDataModelSplit3 = MonthDataModel.fromJson(responseData);
         MonthDataModel monthDataModelSplit4 = MonthDataModel.fromJson(responseData);
