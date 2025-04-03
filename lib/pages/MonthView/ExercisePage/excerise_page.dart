@@ -7,6 +7,7 @@ import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
+import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
@@ -27,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 
 class ExercisePage extends StatefulWidget {
@@ -39,6 +41,7 @@ class ExercisePage extends StatefulWidget {
 class _ExercisePageState extends State<ExercisePage> {
   MonthProvider? monthProvider;
   bool loading = false;
+  bool videoLoader = false;
   bool videoNotInitialized = false;
   bool isZoom = false;
 
@@ -93,7 +96,7 @@ class _ExercisePageState extends State<ExercisePage> {
   Future<void> initializeVideo1(String url) async {
     try {
       _videoPlayerController1 =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       await _videoPlayerController1.initialize();
       _chewieController1 = ChewieController(
         videoPlayerController: _videoPlayerController1,
@@ -107,6 +110,16 @@ class _ExercisePageState extends State<ExercisePage> {
         videoSize1 = calculateVideoSize1(aspectRatio: _chewieController1!.aspectRatio!, context: context);
         setState(() {});
       }
+
+      _videoPlayerController1.addListener(() async {
+        if (_videoPlayerController1.value.position >= _videoPlayerController1.value.duration) {
+          AudioManager.abandonAudioFocus();
+        } else {
+          AudioManager.requestAudioFocus();
+        }
+        setState(() {});
+      });
+
       setState(() => loading1 = false);
     } catch (e) {
       setState(() {
@@ -268,36 +281,31 @@ class _ExercisePageState extends State<ExercisePage> {
 
   Future<void> fetchExercise({String? exerciseId, int? exerciseIndex, bool? isPumpDay, bool? isCircuit, String? circuitIndex}) async {
     if (monthProvider?.isWarmup == false) {
-      setState(() {
-        loading = true;
-      });
-
       await monthProvider?.fetchCurrentExercise(exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
-
       isExercise = 1;
-      exerciseIndex = exerciseIndex ?? monthProvider!.selectedExIndex;
+      this.exerciseIndex = exerciseIndex ?? monthProvider!.selectedExIndex;
 
-      if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
-        initializeVideo(monthProvider!.exerciseDetailModel!.files!.first.link!);
-      } else {
-        loading = false;
-        videoNotInitialized = false;
-      }
+      // if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
+      //   initializeVideo(monthProvider!.exerciseDetailModel!.files!.first.link!);
+      // } else {
+      //   loading = false;
+      //   videoNotInitialized = false;
+      // }
       exerciseDesc = monthProvider!.exerciseDetailModel!.description ?? "";
       exerciseName = monthProvider!.exerciseDetailModel!.title ?? "";
     } else {
-      if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
-        initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
-      } else {
-        loading = false;
-        videoNotInitialized = false;
-      }
+      // if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
+      //   initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
+      // } else {
+      //   loading = false;
+      //   videoNotInitialized = false;
+      // }
       exerciseDesc = monthProvider!.warmUpModel!.description ?? "";
       exerciseName = monthProvider!.warmUpModel!.title ?? "";
     }
 
-    await monthProvider?.fetchExerciseHistoryLocalData();
-    await monthProvider?.fetchExerciseStatusLocalData();
+    monthProvider?.fetchExerciseHistoryLocalData();
+    monthProvider?.fetchExerciseStatusLocalData();
 
     if (monthProvider?.isWarmup == false) {
       String exId = (isPumpDay ?? monthProvider!.isPumpDay) && (isCircuit ?? monthProvider!.isCircuit)
@@ -320,7 +328,31 @@ class _ExercisePageState extends State<ExercisePage> {
       isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);
       findIsAtLeastOnSet();
     }
-    setState(() {});
+    setState(() => loading = false);
+    videoInitialize();
+  }
+
+  bool videoNotAvailable = false;
+
+  videoInitialize() {
+    setState(() => videoLoader = true);
+    if (monthProvider?.isWarmup == false) {
+      if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
+        initializeVideo(monthProvider!.exerciseDetailModel!.files!.first.link!);
+      } else {
+        videoNotAvailable = true;
+        videoNotInitialized = false;
+        setState(() => videoLoader = false);
+      }
+    } else {
+      if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
+        initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
+      } else {
+        videoNotAvailable = true;
+        videoNotInitialized = false;
+        setState(() => videoLoader = false);
+      }
+    }
   }
 
   List<ExtraSetModel> extraSetModel = [];
@@ -340,8 +372,13 @@ class _ExercisePageState extends State<ExercisePage> {
   Future<void> initializeVideo(String url) async {
     try {
       _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
-      await _videoPlayerController.initialize();
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+
+      await _videoPlayerController.initialize().then(
+        (value) {
+          AudioManager.requestAudioFocus();
+        },
+      );
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -356,23 +393,28 @@ class _ExercisePageState extends State<ExercisePage> {
         setState(() {});
       }
 
-      _videoPlayerController.addListener(() {
+      _videoPlayerController.addListener(() async {
+        if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+          AudioManager.abandonAudioFocus();
+        } else {
+          AudioManager.requestAudioFocus();
+        }
         setState(() {});
       });
 
       setState(() {
-        loading = false;
+        videoLoader = false;
       });
     } catch (e) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {
+            videoNotAvailable = true;
             videoNotInitialized = true;
-            loading = false;
+            videoLoader = false;
           });
         }
       });
-
       debugPrint("VIDEO NOT INITIALIZED: $e");
     }
   }
@@ -431,6 +473,8 @@ class _ExercisePageState extends State<ExercisePage> {
         _chewieController?.dispose();
         _videoPlayerController.dispose();
       }
+      AudioManager.abandonAudioFocus();
+
       await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO");
     });
 
@@ -507,14 +551,24 @@ class _ExercisePageState extends State<ExercisePage> {
                                               ),
                                             )
                                           : Container(
-                                              height: media.height * 0.4,
+                                              height: videoNotAvailable ? media.height * 0.4 : media.height * 0.82,
                                               color: Colors.black12,
-                                              child: const Center(
-                                                child: Text(
-                                                  'No Video Available',
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                              ),
+                                              child: videoNotAvailable
+                                                  ? const Center(
+                                                      child: Text(
+                                                        'No Video Available',
+                                                        style: TextStyle(color: Colors.white),
+                                                      ),
+                                                    )
+                                                  : Shimmer.fromColors(
+                                                      baseColor: AppColors.backOffSetColor.withValues(alpha: 0.8),
+                                                      highlightColor: AppColors.backOffSetColor.withValues(alpha: 0.9),
+                                                      child: Container(
+                                                        height: media.height * 0.82,
+                                                        width: double.infinity,
+                                                        decoration: BoxDecoration(color: AppColors.primaryColor),
+                                                      ),
+                                                    ),
                                             ),
                                     ],
                                   ),
@@ -596,9 +650,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                         setState(() {
                                           if (_videoPlayerController.value.isPlaying) {
                                             _videoPlayerController.pause();
+                                            AudioManager.abandonAudioFocus();
                                           } else {
                                             _videoPlayerController.play();
-                                            hideControls();
+                                            AudioManager.requestAudioFocus();
                                           }
                                         });
                                       },
@@ -1265,6 +1320,7 @@ class _ExercisePageState extends State<ExercisePage> {
           _chewieController1!.dispose();
         }
         _videoPlayerController1.dispose();
+        AudioManager.abandonAudioFocus();
       },
     );
   }

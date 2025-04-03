@@ -106,7 +106,7 @@ class ApiRepo extends BaseService {
 
   static Future<void> updateDayStatus({required Map<String, dynamic> body}) async {
     var response = await ApiService().getResponse(apiType: APIType.aPut, url: BaseService.updateDayStatus, body: body);
-    log('response-updateDayStatus :::::::::::::::::: $response');
+    log('response-11-updateDayStatus :::::::::::::::::: $response');
     return response;
   }
 

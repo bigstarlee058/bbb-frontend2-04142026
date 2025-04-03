@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -56,9 +57,13 @@ class _AppTutorialState extends State<AppTutorial> {
     try {
       // Initialize the video player controller
       _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: false));
-      await _videoPlayerController.initialize();
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
+      await _videoPlayerController.initialize().then(
+        (value) {
+          AudioManager.requestAudioFocus();
+        },
+      );
       // Initialize the ChewieController with custom controls
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -74,7 +79,12 @@ class _AppTutorialState extends State<AppTutorial> {
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
-      _videoPlayerController.addListener(() {
+      _videoPlayerController.addListener(() async {
+        if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+          AudioManager.abandonAudioFocus();
+        } else {
+          AudioManager.requestAudioFocus();
+        }
         setState(() {});
       });
 
@@ -141,6 +151,7 @@ class _AppTutorialState extends State<AppTutorial> {
       _chewieController!.dispose();
     }
     _videoPlayerController.dispose();
+    AudioManager.abandonAudioFocus();
 
     super.dispose();
   }
@@ -234,13 +245,17 @@ class _AppTutorialState extends State<AppTutorial> {
                                         color: Colors.white70,
                                       ),
                                       onPressed: () {
-                                        setState(() {
-                                          if (_videoPlayerController.value.isPlaying) {
-                                            _videoPlayerController.pause();
-                                          } else {
-                                            _videoPlayerController.play();
-                                          }
-                                        });
+                                        setState(
+                                          () {
+                                            if (_videoPlayerController.value.isPlaying) {
+                                              _videoPlayerController.pause();
+                                              AudioManager.abandonAudioFocus();
+                                            } else {
+                                              _videoPlayerController.play();
+                                              AudioManager.requestAudioFocus();
+                                            }
+                                          },
+                                        );
                                       },
                                     ),
                                     // Skip forward button

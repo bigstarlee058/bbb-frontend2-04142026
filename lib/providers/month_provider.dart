@@ -464,7 +464,7 @@ class MonthProvider extends ChangeNotifier {
               week = actualWeek! > 4 ? 4 : actualWeek;
               day = dayDelta % 7 + 1;
               currentWeek = week!;
-              dayStatusList = await ApiRepo.fetchDayStatusList() ?? [];
+              updateDayStatusList();
               await fetchMonthLocalData();
               await fetchAllDayStatusLocalData();
               await fetchDayStatusLocalData();
@@ -488,6 +488,11 @@ class MonthProvider extends ChangeNotifier {
       loader = false;
       notifyListeners();
     }
+  }
+
+  Future<void> updateDayStatusList() async {
+    dayStatusList = await ApiRepo.fetchDayStatusList() ?? [];
+    notifyListeners();
   }
 
   Future<void> fetchWarmUp(String warmUpId) async {
@@ -1185,8 +1190,7 @@ class MonthProvider extends ChangeNotifier {
     }
 
     await preferences.putInt(SharedPreference.lastStreakCount, streak);
-
-    updateAchievements();
+    await updateDayStatusList().then((value) => updateAchievements());
     notifyListeners();
   }
 
@@ -2237,6 +2241,62 @@ class MonthProvider extends ChangeNotifier {
       "isArchived": false,
       "time": "${DateTime.now().toUtc()}"
     },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "5 and Done",
+      "subtitle": "Completed 5 Days",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "10 and Done",
+      "subtitle": "Completed 10 Days",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "20 and Done",
+      "subtitle": "Completed 20 Days",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "50 and Done",
+      "subtitle": "Completed 50 Days",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "100 and Done",
+      "subtitle": "Completed 100 Days",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "250 and Done",
+      "subtitle": "Completed 250 Days",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "500 and Done",
+      "subtitle": "Completed 500 Days",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
   ];
   List<AchievementsModel> achievementsModel = [];
 
@@ -2285,9 +2345,37 @@ class MonthProvider extends ChangeNotifier {
         items[8]["isArchived"] = true;
         items[8]["time"] = element.achievementsDate.toString();
       }
+      if (element.achievementsTitle == "5 and Done") {
+        items[9]["isArchived"] = true;
+        items[9]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "10 and Done") {
+        items[10]["isArchived"] = true;
+        items[10]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "20  and Done") {
+        items[11]["isArchived"] = true;
+        items[11]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "50 and Done") {
+        items[12]["isArchived"] = true;
+        items[12]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "100 and Done") {
+        items[13]["isArchived"] = true;
+        items[13]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "250 and Done") {
+        items[14]["isArchived"] = true;
+        items[14]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "500 and Done") {
+        items[15]["isArchived"] = true;
+        items[15]["time"] = element.achievementsDate.toString();
+      }
     }
 
-    if (items[0]["isArchived"] == false || achievementsModel.isEmpty) {
+    if (items[0]["isArchived"] == false) {
       if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
         items[0]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "Breaking the Ice", achievementsSubtitle: "Your First Workout Finished");
@@ -2296,7 +2384,7 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (items[3]["isArchived"] == false || achievementsModel.isEmpty) {
+    if (items[3]["isArchived"] == false) {
       if (streak >= 3) {
         items[3]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "3 in a Row", achievementsSubtitle: "Achieved the streak of 3");
@@ -2305,7 +2393,7 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (items[4]["isArchived"] == false || achievementsModel.isEmpty) {
+    if (items[4]["isArchived"] == false) {
       if (streak >= 7) {
         items[4]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "7 in a Row", achievementsSubtitle: "Achieved the streak of 7");
@@ -2313,7 +2401,8 @@ class MonthProvider extends ChangeNotifier {
         ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
-    if (items[5]["isArchived"] == false || achievementsModel.isEmpty) {
+
+    if (items[5]["isArchived"] == false) {
       if (streak >= 14) {
         items[5]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "14 in a Row", achievementsSubtitle: "Achieved the streak of 14");
@@ -2322,7 +2411,7 @@ class MonthProvider extends ChangeNotifier {
       }
     }
 
-    if (items[6]["isArchived"] == false || achievementsModel.isEmpty) {
+    if (items[6]["isArchived"] == false) {
       if (streak >= 30) {
         items[6]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "30 in a Row", achievementsSubtitle: "Achieved the streak of 30");
@@ -2334,8 +2423,7 @@ class MonthProvider extends ChangeNotifier {
     if (items[7]["isArchived"] == false ||
         items[8]["isArchived"] == false ||
         items[2]["isArchived"] == false ||
-        items[1]["isArchived"] == false ||
-        achievementsModel.isEmpty) {
+        items[1]["isArchived"] == false) {
       List<DayStatusDataModel> dayMainData = await ApiRepo.fetchDayAllStatus();
       double totalWeight = 0;
 
@@ -2367,11 +2455,14 @@ class MonthProvider extends ChangeNotifier {
         DateTime weekEnd = getWeekEndDate(
             weekStart, DateTime(endDate.year, endDate.month, endDate.day).add(Duration(days: 1)).subtract(Duration(seconds: 1)));
         final data1 = allSplitDayHistoryModel.where((item) {
-          DateTime endTime = DateTime(item.endTime!.year, item.endTime!.month, item.endTime!.day);
-          return (item.status == Status.completed || item.status == Status.skipped) &&
-              (endTime.isAfter(weekStart) && endTime.isBefore(weekEnd) ||
-                  endTime.isAtSameMomentAs(weekStart) ||
-                  endTime.isAtSameMomentAs(weekEnd));
+          if (item.status == Status.completed || item.status == Status.skipped) {
+            DateTime endTime = DateTime(item.endTime!.year, item.endTime!.month, item.endTime!.day);
+            return (endTime.isAfter(weekStart) && endTime.isBefore(weekEnd) ||
+                endTime.isAtSameMomentAs(weekStart) ||
+                endTime.isAtSameMomentAs(weekEnd));
+          } else {
+            return false;
+          }
         }).toList();
         if (data1.length == 7) {
           items[1]["isArchived"] = true;
@@ -2387,11 +2478,14 @@ class MonthProvider extends ChangeNotifier {
         final startDate1 = DateTime(startDate.year, startDate.month, startDate.day);
         final endDate1 = DateTime(endDate.year, endDate.month, endDate.day).add(Duration(days: 1)).subtract(Duration(seconds: 1));
         final data1 = allSplitDayHistoryModel.where((item) {
-          DateTime endTime = DateTime(item.endTime!.year, item.endTime!.month, item.endTime!.day);
-          return (item.status == Status.completed || item.status == Status.skipped) &&
-              (endTime.isAfter(startDate1) && endTime.isBefore(endDate1) ||
-                  endTime.isAtSameMomentAs(startDate1) ||
-                  endTime.isAtSameMomentAs(endDate1));
+          if (item.status == Status.completed || item.status == Status.skipped) {
+            DateTime endTime = DateTime(item.endTime!.year, item.endTime!.month, item.endTime!.day);
+            return (endTime.isAfter(startDate1) && endTime.isBefore(endDate1) ||
+                endTime.isAtSameMomentAs(startDate1) ||
+                endTime.isAtSameMomentAs(endDate1));
+          } else {
+            return false;
+          }
         }).toList();
 
         if (data1.length == 28) {
@@ -2400,6 +2494,85 @@ class MonthProvider extends ChangeNotifier {
           await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
           ApiRepo.addAchievementsList(body: data.toJson1());
         }
+      }
+    }
+
+    Map<String, dynamic> filteredData = {};
+
+    List<DayStatusListDataModel> completedData = dayStatusList.where((item) => item.status == Status.completed).toList();
+
+    for (var entry in completedData) {
+      DateTime date = Utils.formattedDate("${entry.date}");
+      String dateOnly = "${date.year}-${date.month}-${date.day}";
+      if (!filteredData.containsKey(dateOnly)) {
+        filteredData[dateOnly] = entry;
+      }
+    }
+
+    List<dynamic> uniqueEntries = filteredData.values.toList();
+
+    int completedDays = uniqueEntries.length;
+
+    if (items[9]["isArchived"] == false) {
+      if (completedDays >= 5) {
+        items[9]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "5 and Done", achievementsSubtitle: "Completed 5 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+
+    if (items[10]["isArchived"] == false) {
+      if (completedDays >= 10) {
+        items[10]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "10 and Done", achievementsSubtitle: "Completed 10 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+
+    if (items[11]["isArchived"] == false) {
+      if (completedDays >= 20) {
+        items[11]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "20  and Done", achievementsSubtitle: "Completed 20 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+
+    if (items[12]["isArchived"] == false) {
+      if (completedDays >= 50) {
+        items[12]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "50 and Done", achievementsSubtitle: "Completed 50 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+
+    if (items[13]["isArchived"] == false) {
+      if (completedDays >= 100) {
+        items[13]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "100 and Done", achievementsSubtitle: "Completed 100 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+
+    if (items[14]["isArchived"] == false) {
+      if (completedDays >= 250) {
+        items[14]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "250 and Done", achievementsSubtitle: "Completed 250 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+
+    if (items[15]["isArchived"] == false) {
+      if (completedDays >= 500) {
+        items[15]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "500 and Done", achievementsSubtitle: "Completed 500 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
       }
     }
 

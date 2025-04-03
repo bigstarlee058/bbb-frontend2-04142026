@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -614,6 +615,7 @@ class _TodayPageState extends State<TodayPage> {
                                                                 );
                                                               },
                                                               openSwapModal: () async {
+                                                                await swipeExerciseDialog(i, exercises[i]);
                                                                 await swipeExerciseDialog(i, exercises[i]);
                                                               },
                                                               exercise: exercises[i],
@@ -2251,6 +2253,7 @@ class _TodayPageState extends State<TodayPage> {
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
     final data = monthProvider?.dayHistoryModel.where((element) => element.dataId == dataId).toList();
+
     final data1 = {
       "status": status1,
       "type": type,
@@ -2260,6 +2263,8 @@ class _TodayPageState extends State<TodayPage> {
       "averageRIR": average.toString(),
       if (data!.isNotEmpty) "startTime": data.first.startTime == null ? "${DateTime.now().toUtc()}" : data.first.startTime.toString()
     };
+
+    log('dataId :::::::::::::::::: ${dataId}');
 
     final apiReqBody = {
       "status": status1,
@@ -2271,7 +2276,7 @@ class _TodayPageState extends State<TodayPage> {
       "averageRIR": average.toString(),
       if (data.isNotEmpty) "startTime": data.first.startTime == null ? "${DateTime.now().toUtc()}" : data.first.startTime.toString()
     };
-    ApiRepo.updateDayStatus(body: apiReqBody);
+    await ApiRepo.updateDayStatus(body: apiReqBody);
     await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
 
     await monthProvider?.updateDayData();

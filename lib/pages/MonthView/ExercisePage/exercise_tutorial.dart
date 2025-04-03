@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -32,127 +33,6 @@ class ExerciseTutorialScreen extends StatefulWidget {
 }
 
 class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
-  // bool loading1 = false;
-  // bool videoNotInitialized1 = false;
-  // String tutorialDesc1 = "";
-  // DataProvider? dataProvider1;
-  // late VideoPlayerController _videoPlayerController1;
-  // ChewieController? _chewieController1;
-  // late Size videoSize1;
-  // Timer? _hideControlsTimer1;
-  // bool dontShowAgain1 = false;
-  // bool isZoom = false;
-  //
-  // @override
-  // void initState() {
-  //   dataProvider1 = Provider.of<DataProvider>(context, listen: false);
-  //   fetchTutorialData();
-  //   super.initState();
-  // }
-  //
-  // updateDonTShowAgain(value) async {
-  //   dontShowAgain1 = value;
-  //   if (value == true) {
-  //     await preferences.putString(SharedPreference.exerciseTutorial, value.toString());
-  //   }
-  //   setState(() {});
-  // }
-  //
-  // void fetchTutorialData() async {
-  //   setState(() {
-  //     loading1 = true;
-  //   });
-  //   await dataProvider1?.fetchTutorialData();
-  //   if (dataProvider1!.tutorialData.files.isNotEmpty) {
-  //     initializeVideo(dataProvider1?.tutorialData.files[0]['link']);
-  //   } else {
-  //     loading1 = false;
-  //     videoNotInitialized1 = true;
-  //     setState(() {});
-  //   }
-  //
-  //   tutorialDesc1 = dataProvider1?.tutorialData.description ?? "";
-  // }
-  //
-  // Future<void> initializeVideo(String url) async {
-  //   try {
-  //     _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(url));
-  //     await _videoPlayerController1.initialize();
-  //     _chewieController1 = ChewieController(
-  //       videoPlayerController: _videoPlayerController1,
-  //       autoPlay: true,
-  //       looping: false,
-  //       showControls: false,
-  //       aspectRatio: _videoPlayerController1.value.aspectRatio,
-  //     );
-  //
-  //     if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
-  //       hideControls();
-  //       videoSize1 = calculateVideoSize(aspectRatio: _chewieController1!.aspectRatio!, context: context);
-  //       setState(() {});
-  //     }
-  //     _videoPlayerController1.addListener(() {
-  //       setState(() {});
-  //     });
-  //
-  //     setState(() {
-  //       loading1 = false;
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       videoNotInitialized1 = true;
-  //       loading1 = false;
-  //     });
-  //     debugPrint("VIDEO NOT INITIALIZED: $e");
-  //   }
-  // }
-  //
-  // bool showControls = true;
-  // bool isFullscreen = false;
-  //
-  // void hideControls() {
-  //   _hideControlsTimer1 = Timer(const Duration(seconds: 5), () {
-  //     if (mounted) {
-  //       setState(() {
-  //         showControls = false;
-  //       });
-  //     }
-  //   });
-  // }
-  //
-  // void showControlsOnTap() {
-  //   setState(() {
-  //     showControls = !showControls;
-  //   });
-  //   _hideControlsTimer1?.cancel();
-  // }
-  //
-  // void toggleFullscreen() {
-  //   setState(() {
-  //     isFullscreen = !isFullscreen;
-  //   });
-  //   if (isFullscreen) {
-  //     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
-  //   } else {
-  //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  //   }
-  // }
-  //
-  // Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
-  //   double maxWidth = ScreenUtil.horizontalScale(90);
-  //   double calculatedHeight = maxWidth / aspectRatio;
-  //   return Size(maxWidth, calculatedHeight);
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   if (_chewieController1 != null) {
-  //     _chewieController1!.dispose();
-  //   }
-  //   _videoPlayerController1.dispose();
-  //   super.dispose();
-  // }
-
   @override
   void initState() {
     widget.videoPlayerController.play();
@@ -304,8 +184,10 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                                             setState(() {
                                               if (widget.videoPlayerController.value.isPlaying) {
                                                 widget.videoPlayerController.pause();
+                                                AudioManager.abandonAudioFocus();
                                               } else {
                                                 widget.videoPlayerController.play();
+                                                AudioManager.requestAudioFocus();
                                               }
                                             });
                                           },
