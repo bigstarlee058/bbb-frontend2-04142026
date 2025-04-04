@@ -650,17 +650,36 @@ class _TodayPageState extends State<TodayPage> {
                                             monthProvider!.isPastWeek
                                         ? const SizedBox()
                                         : Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                            child: ButtonWidget(
-                                              onPress: () async {
+                                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
+                                            child: GestureDetector(
+                                              onTap: () async {
                                                 await addExerciseDialog();
                                               },
-                                              isLoading: false,
-                                              color: Colors.grey,
-                                              textColor: Colors.white,
-                                              text: "Add Exercise",
+                                              child: Container(
+                                                padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
+                                                decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                        colors: [const Color(0xFF9B3651), const Color(0xFFDB4671).withValues(alpha: 0.79)],
+                                                        begin: Alignment.bottomLeft,
+                                                        end: Alignment.bottomRight),
+                                                    shape: BoxShape.circle),
+                                                child: Icon(
+                                                  Icons.add,
+                                                  color: Colors.white,
+                                                  size: ScreenUtil.verticalScale(3.5),
+                                                ),
+                                              ),
+                                            )
+                                            //  ButtonWidget(
+                                            //   onPress: () async {
+                                            //     await addExerciseDialog();
+                                            //   },
+                                            //   isLoading: false,
+                                            //   color: Colors.grey,
+                                            //   textColor: Colors.white,
+                                            //   text: "Add Exercise",
+                                            // ),
                                             ),
-                                          ),
                                     const SizedBox(height: 36),
                                     Container(
                                       height: 1,

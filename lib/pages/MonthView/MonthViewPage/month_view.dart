@@ -158,18 +158,20 @@ class _MonthViewState extends State<MonthView> {
                         children: [
                           Stack(
                             children: [
-                              Consumer<ScrollProvider>(builder: (context, scrollProvider, child) {
-                                return Opacity(
-                                  opacity: scrollProvider.scrollOffset1 > 0.0 ? 1 : 0,
-                                  child: Container(
-                                    height: media.height / 2,
-                                    width: media.width,
-                                    decoration: const BoxDecoration(
-                                      image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                              Consumer<ScrollProvider>(
+                                builder: (context, scrollProvider, child) {
+                                  return Opacity(
+                                    opacity: scrollProvider.scrollOffset1 > 0.0 ? 1 : 0,
+                                    child: Container(
+                                      height: media.height / 2,
+                                      width: media.width,
+                                      decoration: const BoxDecoration(
+                                        image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }),
+                                  );
+                                },
+                              ),
                               SizedBox(
                                 height: media.height / 2,
                                 width: media.width,
