@@ -643,24 +643,72 @@ class _TodayPageState extends State<TodayPage> {
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: ScreenUtil.verticalScale(2)),
+                                    SizedBox(height: ScreenUtil.verticalScale(1.6)),
                                     monthProvider?.dayHistoryDetails == null ||
                                             isCurrentDayCompleted ||
                                             isCurrentDaySkipped ||
                                             monthProvider!.isPastWeek
                                         ? const SizedBox()
                                         : Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                            child: ButtonWidget(
-                                              onPress: () async {
+                                            padding: const EdgeInsets.only(bottom: 5),
+                                            child: TextButton(
+                                              onPressed: () async {
                                                 await addExerciseDialog();
                                               },
-                                              isLoading: false,
-                                              color: Colors.grey,
-                                              textColor: Colors.white,
-                                              text: "Add Exercise",
+                                              child: IntrinsicWidth(
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.add,
+                                                      color: Colors.grey.shade600,
+                                                      size: ScreenUtil.verticalScale(3),
+                                                    ),
+                                                    SizedBox(width: 4),
+                                                    Text(
+                                                      "Add Exercise",
+                                                      style: TextStyle(
+                                                        fontSize: ScreenUtil.verticalScale(2),
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.grey.shade600,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           ),
+                                    // Padding(
+                                    //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
+                                    //     child: GestureDetector(
+                                    //       onTap: () async {
+                                    //         await addExerciseDialog();
+                                    //       },
+                                    //       child: Container(
+                                    //         padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
+                                    //         decoration: BoxDecoration(
+                                    //             gradient: LinearGradient(
+                                    //                 colors: [const Color(0xFF9B3651), const Color(0xFFDB4671).withValues(alpha: 0.79)],
+                                    //                 begin: Alignment.bottomLeft,
+                                    //                 end: Alignment.bottomRight),
+                                    //             shape: BoxShape.circle),
+                                    //         child: Icon(
+                                    //           Icons.add,
+                                    //           color: Colors.white,
+                                    //           size: ScreenUtil.verticalScale(3.5),
+                                    //         ),
+                                    //       ),
+                                    //     )
+                                    //     //  ButtonWidget(
+                                    //     //   onPress: () async {
+                                    //     //     await addExerciseDialog();
+                                    //     //   },
+                                    //     //   isLoading: false,
+                                    //     //   color: Colors.grey,
+                                    //     //   textColor: Colors.white,
+                                    //     //   text: "Add Exercise",
+                                    //     // ),
+                                    //     ),
                                     const SizedBox(height: 36),
                                     Container(
                                       height: 1,

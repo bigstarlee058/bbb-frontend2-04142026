@@ -74,6 +74,12 @@ class MonthProvider extends ChangeNotifier {
   // String routeString = "dashboard";
   int circuitsIndex = 0;
   int streak = 0;
+  // int selectedSection = 0;
+  //
+  // updateSelectedSection(int index) {
+  //   selectedSection = index;
+  //   notifyListeners();
+  // }
 
   updatePumpDayData(PumpDayModel value) {
     pumpDayModel = value;

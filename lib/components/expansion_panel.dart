@@ -46,10 +46,12 @@ class ExpansionPanel {
     this.backgroundColor,
     this.splashColor,
     this.highlightColor,
+    this.sideIcon,
   });
 
   final ExpansionPanelHeaderBuilder headerBuilder;
   final Widget body;
+  final Widget? sideIcon;
   final bool isExpanded;
   final bool? isTrailing;
   final Color? splashColor;
@@ -238,6 +240,7 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
               ),
             ),
           ),
+          child.sideIcon ?? SizedBox(),
           expandIconPadded,
         ],
       );

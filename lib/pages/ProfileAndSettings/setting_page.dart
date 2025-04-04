@@ -33,12 +33,12 @@ class _SettingPageState extends State<SettingPage> {
     final raw1 = await preferences.getBool(SharedPreference.notificationSwitch);
     final raw2 = await preferences.getBool(SharedPreference.isHapticFeedbackOn);
     if (raw1 != null) {
-      isSwitchOn = await preferences.getBool(SharedPreference.notificationSwitch);
+      isSwitchOn = raw1;
     } else {
-      await preferences.setBool(SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
+      await preferences.setBool(SharedPreference.notificationSwitch, isSwitchOn ?? false);
     }
     if (raw2 != null) {
-      isHapticFeedbackOn = await preferences.getBool(SharedPreference.isHapticFeedbackOn);
+      isHapticFeedbackOn = raw2;
     } else {
       await preferences.setBool(SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
     }

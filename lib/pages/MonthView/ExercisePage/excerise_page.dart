@@ -1055,10 +1055,9 @@ class _ExercisePageState extends State<ExercisePage> {
                               count != 0 && !isCurrentDaySkipped && !isCurrentDayCompleted
                                   ? Padding(
                                       padding: const EdgeInsets.only(bottom: 40),
-                                      child: ButtonWidget(
-                                        onPress: () async {
+                                      child: TextButton(
+                                        onPressed: () async {
                                           setState(() => tempSetAddressLoader = true);
-
                                           final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
                                           if (data!.isNotEmpty) {
                                             tempSetAddress = monthProvider!.currentExpandedItem;
@@ -1068,10 +1067,27 @@ class _ExercisePageState extends State<ExercisePage> {
                                           }
                                           setState(() => tempSetAddressLoader = false);
                                         },
-                                        isLoading: false,
-                                        color: Colors.grey,
-                                        textColor: Colors.white,
-                                        text: "Add Set",
+                                        child: IntrinsicWidth(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.add,
+                                                color: Colors.grey.shade600,
+                                                size: ScreenUtil.verticalScale(3),
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                "Add Set",
+                                                style: TextStyle(
+                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     )
                                   : SizedBox(),

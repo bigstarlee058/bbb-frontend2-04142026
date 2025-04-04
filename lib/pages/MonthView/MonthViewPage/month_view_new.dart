@@ -1,13 +1,13 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
-import 'package:bbb/components/select_dropdown.dart';
-import 'package:bbb/components/select_dropdown1.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/schedule_section.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
 import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/date_notifier.dart';
@@ -22,17 +22,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class MonthView extends StatefulWidget {
-  const MonthView({super.key});
+class MonthViewNew extends StatefulWidget {
+  const MonthViewNew({super.key});
 
   @override
-  State<MonthView> createState() => _MonthViewState();
+  State<MonthViewNew> createState() => _MonthViewNewState();
 }
 
-class _MonthViewState extends State<MonthView> {
+class _MonthViewNewState extends State<MonthViewNew> {
   MonthProvider? monthProvider;
   ScrollProvider? scrollProvider;
-
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
 
@@ -49,7 +48,15 @@ class _MonthViewState extends State<MonthView> {
         });
       }
     });
+
     super.initState();
+  }
+
+  int selectedSection = 0;
+
+  updateSelectedSection(int index) {
+    selectedSection = index;
+    setState(() {});
   }
 
   @override
@@ -406,160 +413,54 @@ class _MonthViewState extends State<MonthView> {
                             children: [
                               Container(
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(8),
-                                  vertical: ScreenUtil.verticalScale(3),
+                                  horizontal: ScreenUtil.horizontalScale(6),
+                                  vertical: ScreenUtil.verticalScale(2.5),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      margin: EdgeInsets.only(
-                                        left: ScreenUtil.horizontalScale(3),
-                                      ),
-                                      child: Text(
-                                        'Choose workout day split',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                          color: const Color(0xBB888888),
-                                          fontSize: ScreenUtil.verticalScale(1.5),
-                                          fontWeight: FontWeight.w700,
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: List.generate(
+                                        3,
+                                        (index) => Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              updateSelectedSection(index);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2.2)),
+                                              margin: EdgeInsets.only(left: index == 0 ? 0 : 8),
+                                              decoration: BoxDecoration(
+                                                  color: index == selectedSection ? AppColors.primaryColor : Colors.grey[100],
+                                                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5.5))),
+                                              child: Center(
+                                                child: Text(
+                                                  index == 0
+                                                      ? "Schedule"
+                                                      : index == 1
+                                                          ? "Information"
+                                                          : "Settings",
+                                                  style: TextStyle(
+                                                    color: index == selectedSection ? Colors.white : Colors.black,
+                                                    fontSize: ScreenUtil.verticalScale(1.75),
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 5),
-                                    Consumer<MonthProvider>(
-                                      builder: (context, value, child) => SelectDropdown1(
-                                        onChange: (String newValue) async {
-                                          await value.changeDaySplit(newValue);
-                                          await value.filterWorkouts();
-                                          await value.updateLocalData();
-                                          await value.checkForPumpDay();
-                                          await value.manageStreak();
-                                          await value.getLiftedWeightGraphData();
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(height: 32),
-                                    Container(
-                                      margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(3)),
-                                      child: Text(
-                                        'Choose equipment availability',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                          color: const Color(0xBB888888),
-                                          fontSize: ScreenUtil.verticalScale(1.5),
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Consumer<MonthProvider>(
-                                      builder: (context, value, child) => SelectDropdown(
-                                        onChange: (String newValue) async {
-                                          value.changeEquipmentType(newValue);
-                                          await value.filterWorkouts();
-                                          await value.updateLocalData();
-                                        },
-                                      ),
-                                    )
                                   ],
                                 ),
                               ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Consumer<MonthProvider>(
-                                builder: (context, value, child) {
-                                  if (value.week == null || value.week! > 4) return const SizedBox();
-
-                                  String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
-
-                                  return value.isFilterLoading
-                                      ? const SizedBox()
-                                      : value.weeksDataList.isNotEmpty
-                                          ? Container(
-                                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount: value.weeksDataList.length,
-                                                    padding: EdgeInsets.zero,
-                                                    physics: NeverScrollableScrollPhysics(),
-                                                    itemBuilder: (context, index) {
-                                                      return Column(
-                                                        children: [
-                                                          WeeklyTrackCard(
-                                                            restDayIndex: 0,
-                                                            index: index,
-                                                            monthProvider: value,
-                                                            pumpDayIds: value.weeksDataList[index].pumpDayIds!,
-                                                            title: value.weeksDataList[index].title == ""
-                                                                ? "Week ${index + 1}"
-                                                                : value.weeksDataList[index].title!,
-                                                            thisWeek: ((index + 1) == value.week),
-                                                            restDayId: value.weeksDataList[index].restdayId!,
-                                                            weekIndex: index,
-                                                            isOpened: false,
-                                                            isCompleted: false,
-                                                            startDate: (value.startTime ?? DateTime.now()).add(Duration(days: index * 7)),
-                                                            cardData: value.weeksDataList[index],
-                                                            daySplit: split,
-                                                            expandedVal: (index + 1) == value.week ? true : false,
-                                                            completedWeek: index + 1,
-                                                          ),
-                                                          const SizedBox(height: 15),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-
-                                                  // for (int i = 0; i < value.weeksDataList.length; i++) ...[
-                                                  //   WeeklyTrackCard(
-                                                  //       index: i,
-                                                  //       monthProvider: value,
-                                                  //       pumpDayIds: value.weeksDataList[i].pumpDayIds!,
-                                                  //       title: value.weeksDataList[i].title == ""
-                                                  //           ? "Week ${i + 1}"
-                                                  //           : value.weeksDataList[i].title!,
-                                                  //       thisWeek: ((i + 1) == value.week),
-                                                  //       restDayId: value.weeksDataList[i].restdayId!,
-                                                  //       weekIndex: i,
-                                                  //       isOpened: false,
-                                                  //       isCompleted: false,
-                                                  //       startDate: (value.startTime ?? DateTime.now()).add(Duration(days: i * 7)),
-                                                  //       cardData: value.weeksDataList[i],
-                                                  //       daySplit: split,
-                                                  //       expandedVal: (i + 1) == value.week ? true : false,
-                                                  //       completedWeek: i + 1),
-                                                  //   const SizedBox(
-                                                  //     height: 15,
-                                                  //   ),
-                                                  // ],
-                                                ],
-                                              ),
-                                            )
-                                          : const Center(
-                                              child: Text("No workout data available"),
-                                            );
-                                },
-                              ),
-                              const SizedBox(height: 15),
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(6.5),
-                                ),
-                                child: Consumer<MonthProvider>(
-                                  builder: (context, value, child) => ButtonWidget(
-                                    text: monthProvider!.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
-                                    textColor: Colors.white,
-                                    onPress: monthProvider!.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(context),
-                                    color: monthProvider!.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                                    isLoading: false,
-                                  ),
-                                ),
-                              ),
+                              Visibility(
+                                  visible: selectedSection == 0,
+                                  child: ScheduleSection(monthProvider: monthProvider!, onPress: () => continueWorkoutOnTap(context))),
+                              Visibility(visible: selectedSection == 1, child: InformationSection()),
+                              Visibility(visible: selectedSection == 2, child: SettingSection(monthProvider: monthProvider!)),
                             ],
                           ),
                         ),
