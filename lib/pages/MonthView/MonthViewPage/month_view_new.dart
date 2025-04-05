@@ -8,11 +8,11 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/schedule_section.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
-import 'package:bbb/pages/ProgramInfoView/program_info_view.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/program_info_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -34,11 +34,15 @@ class _MonthViewNewState extends State<MonthViewNew> {
   ScrollProvider? scrollProvider;
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
+  late ProgramInfoProvider provider;
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
+    provider = context.read<ProgramInfoProvider>();
+    provider.getProgramInfo(context);
+
     monthProvider?.mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     _dateNotifier.stream.listen((newDate) {
       if (_currentDate.day != newDate.day) {
@@ -263,6 +267,9 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                           );
                                         },
                                       ),
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(2),
+                                      ),
                                       Consumer<MonthProvider>(builder: (context, monthProvider, child) {
                                         return Container(
                                           margin: EdgeInsets.symmetric(
@@ -344,37 +351,37 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.symmetric(
-                                  vertical: ScreenUtil.verticalScale(33),
-                                ),
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const ProgramInfoView(),
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "View Program Info",
-                                        style: TextStyle(
-                                          decorationColor: Colors.white,
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(2.2),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                              // Container(
+                              //   alignment: Alignment.center,
+                              //   margin: EdgeInsets.symmetric(
+                              //     vertical: ScreenUtil.verticalScale(33),
+                              //   ),
+                              //   child: InkWell(
+                              //     onTap: () {
+                              //       Navigator.push(
+                              //         context,
+                              //         MaterialPageRoute(
+                              //           builder: (context) => const ProgramInfoView(),
+                              //         ),
+                              //       );
+                              //     },
+                              //     child: Column(
+                              //       mainAxisAlignment: MainAxisAlignment.center,
+                              //       crossAxisAlignment: CrossAxisAlignment.center,
+                              //       children: [
+                              //         Text(
+                              //           "View Program Info",
+                              //           style: TextStyle(
+                              //             decorationColor: Colors.white,
+                              //             color: Colors.white,
+                              //             fontSize: ScreenUtil.verticalScale(2.2),
+                              //             fontWeight: FontWeight.bold,
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ),
+                              // ),
                               SizedBox(
                                 height: media.height / 2.54,
                                 width: media.width,
@@ -459,7 +466,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                               Visibility(
                                   visible: selectedSection == 0,
                                   child: ScheduleSection(monthProvider: monthProvider!, onPress: () => continueWorkoutOnTap(context))),
-                              Visibility(visible: selectedSection == 1, child: InformationSection()),
+                              Visibility(visible: selectedSection == 1, child: InformationSection(programInfoProvider: provider)),
                               Visibility(visible: selectedSection == 2, child: SettingSection(monthProvider: monthProvider!)),
                             ],
                           ),

@@ -4,12 +4,12 @@ import 'package:bbb/middleware/api/api_exception.dart';
 import 'package:bbb/middleware/api/base_service.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum APIType { aPost, aGet, aDelete, aPut }
 
 class ApiService extends BaseService {
-  var response;
   Dio dio = Dio();
 
   Future<String?> getAuthToken() async {
@@ -21,7 +21,7 @@ class ApiService extends BaseService {
     try {
       String? userIdToken = await getAuthToken();
       Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
-      log('userIdToken :::::::::::::::::: $userIdToken');
+      debugPrint('userIdToken :::::::::::::::::: $userIdToken');
       String mainUrl = AppConstants.serverUrl + url;
 
       Response result;

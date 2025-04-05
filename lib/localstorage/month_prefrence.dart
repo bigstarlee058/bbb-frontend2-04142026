@@ -7,7 +7,7 @@ class SharedPreference {
 
   static const String monthId = "MONTH-ID";
   static const String split = "SPLIT-TYPE";
-  // static const String todayTitleId = "TODAY-TITLE-ID";
+  static const String lastMonthDataUpdate = "LAST-MONTH-UPDATE";
   static const String lastStreakCount = "STREAK-COUNT";
   static const String lastTimerAddress = "LAST-TIMER-ADDRESS";
   static const String lastTimerPassed = "LAST-TIMER-PASSED";
