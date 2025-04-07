@@ -17,7 +17,6 @@ class WeeklyTrackCard extends StatefulWidget {
   const WeeklyTrackCard({
     super.key,
     required this.index,
-    required this.restDayIndex,
     this.monthProvider,
     required this.title,
     required this.thisWeek,
@@ -34,7 +33,6 @@ class WeeklyTrackCard extends StatefulWidget {
   });
 
   final int index;
-  final int restDayIndex;
   final MonthProvider? monthProvider;
   final String title;
   final bool thisWeek;
@@ -165,6 +163,23 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           ),
         );
       },
+      // sideIcon: Container(
+      //   height: ScreenUtil.verticalScale(4),
+      //   width: ScreenUtil.verticalScale(4),
+      //   margin: EdgeInsets.only(right: 5),
+      //   decoration: BoxDecoration(
+      //     color: 1 == 2 ? AppColors.primaryColor : Colors.transparent,
+      //     shape: BoxShape.circle,
+      //     border: Border.all(color: AppColors.primaryColor),
+      //   ),
+      //   child: Center(
+      //     child: Icon(
+      //       Icons.done,
+      //       size: ScreenUtil.verticalScale(2.5),
+      //       color: 1 == 2 ? Colors.white : Colors.grey[100],
+      //     ),
+      //   ),
+      // ),
       backgroundColor: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.grey[100],
       body: Container(
         padding: EdgeInsets.symmetric(

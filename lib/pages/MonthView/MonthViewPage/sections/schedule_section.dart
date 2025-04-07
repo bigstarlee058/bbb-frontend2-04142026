@@ -1,5 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/MonthView/MonthViewPage/track_card_new.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/track_card_newww.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -40,7 +40,6 @@ class ScheduleSection extends StatelessWidget {
                                 return Column(
                                   children: [
                                     WeeklyTrackCardNew(
-                                      restDayIndex: 0,
                                       index: index,
                                       monthProvider: value,
                                       pumpDayIds: value.weeksDataList[index].pumpDayIds!,

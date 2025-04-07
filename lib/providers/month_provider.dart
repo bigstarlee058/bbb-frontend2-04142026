@@ -1431,20 +1431,21 @@ class MonthProvider extends ChangeNotifier {
       final dataList = allDayHistoryModel
           .where((element) => element.weekId == monthDataModel?.weeks?[week! - 1].id && element.dataId.toString().contains("Rest Day"))
           .toList();
-
+      log('dataList :::::::::::::::::: ${jsonEncode(dataList)}');
       if (dataList.isNotEmpty) {
         restDayList = [];
         List<int> restDays = [];
         Map<int, String> pumpDays = {};
         dataList.sort((a, b) => int.parse(a.dayId!.split(" ").last).compareTo(int.parse(b.dayId!.split(" ").last)));
         for (var item in dataList) {
-          if (item.type.toString().contains("Rest Day")) {
+          if (item.type.toString().contains("Rest Day") ||
+              (item.type.toString().startsWith("Pump Day") && (item.status != Status.completed || item.status != Status.skipped))) {
             RegExp regex = RegExp(r'Rest Day (\d+)');
             Match? match = regex.firstMatch(item.dayId ?? "");
             if (match != null) {
               restDays.add(int.parse(match.group(1)!));
             }
-          } else if (item.type.toString().startsWith("Pump Day")) {
+          } else if (item.type.toString().startsWith("Pump Day") && (item.status == Status.completed || item.status == Status.skipped)) {
             RegExp regex = RegExp(r'Rest Day (\d+)');
             Match? match = regex.firstMatch(item.dayId ?? "");
             if (match != null) {
@@ -1469,6 +1470,7 @@ class MonthProvider extends ChangeNotifier {
           count++;
         }
       }
+      log('restDayList :::::::::::::::::: ${restDayList}');
 
       notifyListeners();
     } catch (e) {

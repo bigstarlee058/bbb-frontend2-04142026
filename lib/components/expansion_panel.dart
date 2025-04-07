@@ -83,7 +83,7 @@ class ExpansionPanelList extends StatefulWidget {
     this.dividerColor,
     this.elevation = 2,
     this.expandIconColor,
-    this.materialGapSize = 16.0,
+    this.materialGapSize = 0,
   })  : _allowOnlyOnePanelOpen = false,
         initialOpenPanelValue = null;
 
@@ -97,7 +97,7 @@ class ExpansionPanelList extends StatefulWidget {
     this.dividerColor,
     this.elevation = 2,
     this.expandIconColor,
-    this.materialGapSize = 16.0,
+    this.materialGapSize = 0,
   }) : _allowOnlyOnePanelOpen = true;
 
   final List<ExpansionPanel> children;
@@ -207,15 +207,12 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
       );
 
       Widget expandIconPadded = child.isTrailing == true
-          ? Padding(
-              padding: const EdgeInsetsDirectional.only(end: 8.0),
-              child: ExpandIcon(
-                color: widget.expandIconColor,
-                iconColor: child.highlightColor,
-                isExpanded: _isChildExpanded(index),
-                padding: _kExpandIconPadding,
-                onPressed: !child.canTapOnHeader ? (bool isExpanded) => _handlePressed(isExpanded, index) : null,
-              ),
+          ? ExpandIcon(
+              color: widget.expandIconColor,
+              iconColor: child.highlightColor,
+              isExpanded: _isChildExpanded(index),
+              padding: _kExpandIconPadding,
+              onPressed: !child.canTapOnHeader ? (bool isExpanded) => _handlePressed(isExpanded, index) : null,
             )
           : SizedBox();
 
@@ -227,6 +224,7 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
           child: expandIconPadded,
         );
       }
+
       Widget header = Row(
         children: <Widget>[
           Expanded(
@@ -235,7 +233,7 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
               curve: Curves.fastOutSlowIn,
               margin: _isChildExpanded(index) ? widget.expandedHeaderPadding : EdgeInsets.zero,
               child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: _kPanelHeaderCollapsedHeight),
+                constraints: const BoxConstraints(minHeight: 20),
                 child: headerWidget,
               ),
             ),

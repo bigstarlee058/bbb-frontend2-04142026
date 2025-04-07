@@ -6,7 +6,6 @@ import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.dart';
-import 'package:bbb/pages/MonthView/MonthViewPage/sections/schedule_section.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
 import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/date_notifier.dart';
@@ -22,14 +21,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class MonthViewNew extends StatefulWidget {
-  const MonthViewNew({super.key});
+import 'sections/schedule_section.dart';
+
+class MonthView extends StatefulWidget {
+  const MonthView({super.key});
 
   @override
-  State<MonthViewNew> createState() => _MonthViewNewState();
+  State<MonthView> createState() => _MonthViewState();
 }
 
-class _MonthViewNewState extends State<MonthViewNew> {
+class _MonthViewState extends State<MonthView> {
   MonthProvider? monthProvider;
   ScrollProvider? scrollProvider;
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
@@ -463,11 +464,22 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                   ],
                                 ),
                               ),
-                              Visibility(
-                                  visible: selectedSection == 0,
-                                  child: ScheduleSection(monthProvider: monthProvider!, onPress: () => continueWorkoutOnTap(context))),
-                              Visibility(visible: selectedSection == 1, child: InformationSection(programInfoProvider: provider)),
-                              Visibility(visible: selectedSection == 2, child: SettingSection(monthProvider: monthProvider!)),
+                              Consumer<MonthProvider>(
+                                builder: (context, monthProvider, child) {
+                                  return Column(
+                                    children: [
+                                      if (!monthProvider.loader) ...[
+                                        Visibility(
+                                            visible: selectedSection == 0,
+                                            child: ScheduleSection(
+                                                monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
+                                        Visibility(visible: selectedSection == 1, child: InformationSection(programInfoProvider: provider)),
+                                        Visibility(visible: selectedSection == 2, child: SettingSection(monthProvider: monthProvider)),
+                                      ]
+                                    ],
+                                  );
+                                },
+                              )
                             ],
                           ),
                         ),

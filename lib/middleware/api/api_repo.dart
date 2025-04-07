@@ -88,7 +88,7 @@ class ApiRepo extends BaseService {
 
   static Future<List<DayStatusDataModel>> fetchDayAllStatus() async {
     var response = await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchDayStatus);
-    debugPrint('response-fetchDayStatus :::::::::::::::::: $response');
+    debugPrint('response-fetchDayAllStatus :::::::::::::::::: $response');
     if (response is List) {
       return response.map((json) => DayStatusDataModel.fromJson(json)).toList();
     } else {
