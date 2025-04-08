@@ -10,6 +10,7 @@ abstract class BaseService<T> {
   static const fetchDayStatus = "/api/day-status/fetch";
   static const addDayStatus = "/api/day-status/add";
   static const updateDayStatus = "/api/day-status/update";
+  static const deleteDayStatus = "/api/day-status/delete/";
 
   static const fetchExtraSet = "/api/extra-set/fetch";
   static const addExtraSet = "/api/extra-set/add";

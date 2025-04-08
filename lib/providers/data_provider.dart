@@ -371,30 +371,13 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split3 Rest Day 3",
               "${element.id} split3 Rest Day 4",
             ];
+            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
             element.days?.removeWhere((element) => !element.formats!.contains("3"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split3[i];
             }
           },
         );
-        for (var element in monthDataModelSplit3.weeks ?? []) {
-          element.dayList = split3;
-          element.idList = [
-            "${element.id} split3 Day 1 Workout",
-            "${element.id} split3 Rest Day 1",
-            "${element.id} split3 Day 2 Workout",
-            "${element.id} split3 Rest Day 2",
-            "${element.id} split3 Day 3 Workout",
-            "${element.id} split3 Rest Day 3",
-            "${element.id} split3 Rest Day 4",
-          ];
-
-          element.days?.removeWhere((day) => !day.formats!.contains("3"));
-
-          for (var i = 0; i < (element.days?.length ?? 0); i++) {
-            element.days?[i].dayType = split3[i];
-          }
-        }
 
         await preferences.putString("${SplitType.split3}-${monthDataModelSplit3.id}", jsonEncode(monthDataModelSplit3));
         monthDataModelSplit4.weeks?.forEach(
@@ -409,6 +392,7 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split4 Rest Day 2",
               "${element.id} split4 Rest Day 3",
             ];
+            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
             element.days?.removeWhere((element) => !element.formats!.contains("4"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split4[i];
@@ -428,6 +412,7 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split5 Rest Day 1",
               "${element.id} split5 Rest Day 2",
             ];
+            element.restDayList = ["Rest Day 1", "Rest Day 2"];
             element.days?.removeWhere((element) => !element.formats!.contains("5"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split5[i];

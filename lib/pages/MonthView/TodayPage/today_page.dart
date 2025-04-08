@@ -378,6 +378,7 @@ class _TodayPageState extends State<TodayPage> {
                                                       children: [
                                                         Text(
                                                           "Option ${monthProvider!.alternateEquipmentType}:",
+                                                          // "Option ${monthProvider!.equipmentType}:",
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: ScreenUtil.verticalScale(2),
@@ -539,6 +540,45 @@ class _TodayPageState extends State<TodayPage> {
                                 margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(8)),
                                 child: Column(
                                   children: [
+                                    // Container(
+                                    //   margin: EdgeInsets.symmetric(
+                                    //     horizontal: ScreenUtil.horizontalScale(7),
+                                    //     vertical: ScreenUtil.verticalScale(1.2),
+                                    //   ),
+                                    //   child: Builder(builder: (context) {
+                                    //     String split = monthProvider
+                                    //             ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                    //             .toString()
+                                    //             .split(" ")[1] ??
+                                    //         "";
+                                    //     return Column(
+                                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                                    //       children: [
+                                    //         if (monthProvider?.dayDataModel!.formats != null &&
+                                    //             monthProvider!.dayDataModel!.formats!
+                                    //                 .contains(split.toString().replaceAll("split", ""))) ...[
+                                    //           Container(
+                                    //             margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
+                                    //             child: Text(
+                                    //               'Choose equipment availability',
+                                    //               textAlign: TextAlign.left,
+                                    //               style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
+                                    //             ),
+                                    //           ),
+                                    //           const SizedBox(height: 10),
+                                    //           SelectDropdown(
+                                    //             onChange: (String newValue) async {
+                                    //               monthProvider?.alternateEquipmentType = newValue;
+                                    //               // monthProvider?.equipmentType = newValue;
+                                    //               monthProvider?.innerFilter();
+                                    //               // monthProvider?.filter();
+                                    //             },
+                                    //           ),
+                                    //         ]
+                                    //       ],
+                                    //     );
+                                    //   }),
+                                    // ),
                                     totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
                                     Container(
                                       width: media.width,
@@ -834,8 +874,7 @@ class _TodayPageState extends State<TodayPage> {
                                                               onPress: () async {
                                                                 AnimatedDialog.showAnimatedDialog(
                                                                   context: context,
-                                                                  builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
-                                                                  curve: Curves.fastOutSlowIn,
+                                                                  pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
                                                                 );
                                                               },
                                                             ),
@@ -1317,6 +1356,7 @@ class _TodayPageState extends State<TodayPage> {
     searchQuery = "";
     if (mounted) {
       return showDialog(
+        barrierDismissible: true,
         context: context,
         builder: (BuildContext context) {
           var media = MediaQuery.of(context).size;
@@ -1672,6 +1712,7 @@ class _TodayPageState extends State<TodayPage> {
     searchQuery = "";
     if (mounted) {
       return showDialog(
+        barrierDismissible: true,
         context: context,
         builder: (BuildContext context) {
           var media = MediaQuery.of(context).size;
@@ -2312,7 +2353,7 @@ class _TodayPageState extends State<TodayPage> {
       if (data!.isNotEmpty) "startTime": data.first.startTime == null ? "${DateTime.now().toUtc()}" : data.first.startTime.toString()
     };
 
-    log('dataId :::::::::::::::::: ${dataId}');
+    log('dataId :::::::::::::::::: $dataId');
 
     final apiReqBody = {
       "status": status1,

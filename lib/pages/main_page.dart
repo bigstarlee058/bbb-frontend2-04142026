@@ -82,7 +82,7 @@ class _MainPageState extends State<MainPage> {
 
     _pages = [
       const DashboardPage(),
-      const MonthViewNew(),
+      const MonthView(),
       const ToolsPage(),
       const ProfileSettingsPage(),
       // const StreakCalendarPage(),

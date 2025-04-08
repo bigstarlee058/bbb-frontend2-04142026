@@ -165,13 +165,12 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
         if (item["isArchived"]! == true) {
           AnimatedDialog.showAnimatedDialog(
             context: context,
-            builder: (BuildContext context) => ShareAchievementDialog(
+            pageBuilder: (c1, anim1, anim2) => ShareAchievementDialog(
               title: item["title"]!,
               imagePath: item["image"]!,
               subtitle: item["subtitle"]!,
               time: item["time"],
             ),
-            curve: Curves.fastOutSlowIn,
           );
         }
       },

@@ -670,7 +670,9 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                           SelectDropdown(
                             onChange: (String newValue) {
                               monthProvider?.alternateEquipmentType = newValue;
+                              // monthProvider?.equipmentType = newValue;
                               monthProvider?.innerFilter();
+                              // monthProvider?.filter();
                             },
                           ),
                         ]

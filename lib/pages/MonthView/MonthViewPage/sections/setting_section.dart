@@ -28,7 +28,7 @@ class _SettingSectionState extends State<SettingSection> {
             : 2;
     equipments = equipment == "A"
         ? 0
-        : split == "B"
+        : equipment == "B"
             ? 1
             : 2;
     super.initState();
@@ -477,6 +477,8 @@ class _SettingSectionState extends State<SettingSection> {
                   textColor: Colors.white,
                   color: AppColors.primaryColor,
                   onPress: () async {
+                    value.updateSettingLoader(true);
+
                     String newValue1 = splitIndex == 0
                         ? "3"
                         : splitIndex == 1
@@ -495,6 +497,12 @@ class _SettingSectionState extends State<SettingSection> {
 
                     await value.updateLocalData();
 
+                    await Future.delayed(Duration(seconds: 1)).then(
+                      (v) {
+                        value.updateSettingLoader(false);
+                      },
+                    );
+
                     Fluttertoast.showToast(
                       msg: "Saved successfully!",
                       toastLength: Toast.LENGTH_LONG,
@@ -508,7 +516,7 @@ class _SettingSectionState extends State<SettingSection> {
                     await value.manageStreak();
                     await value.getLiftedWeightGraphData();
                   },
-                  isLoading: false,
+                  isLoading: value.settingLoader,
                 ),
               );
             },

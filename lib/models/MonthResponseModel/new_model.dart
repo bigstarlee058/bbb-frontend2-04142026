@@ -64,6 +64,7 @@ class WeekDataModel {
   String? id;
   List? dayList;
   List? idList;
+  List? restDayList;
 
   WeekDataModel({
     this.index,
@@ -77,6 +78,7 @@ class WeekDataModel {
     this.id,
     this.dayList,
     this.idList,
+    this.restDayList,
   });
 
   factory WeekDataModel.fromJson(Map<String, dynamic> json) => WeekDataModel(
@@ -95,6 +97,7 @@ class WeekDataModel {
         id: json["_id"] ?? json["id"],
         dayList: json["dayList"] ?? [],
         idList: json["idList"] ?? [],
+        restDayList: json["restDayList"] ?? [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -112,7 +115,8 @@ class WeekDataModel {
         "days": days == null ? [] : List<dynamic>.from(days!.map((x) => x.toJson())),
         "_id": id,
         "dayList": dayList,
-        "idList": idList
+        "idList": idList,
+        "restDayList": restDayList
       };
 }
 

@@ -182,9 +182,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       child: Row(
                         children: [
                           SlidableAction(
-                            onPressed: (context) => widget.onRemove(),
-                            icon: Icons.close,
-                            backgroundColor: Colors.red,
+                            onPressed: (context) => widget.openSwapModal!(),
+                            icon: Icons.swap_horiz,
+                            backgroundColor: Colors.blue,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.all(0),
                             borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
@@ -201,9 +201,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       child: Row(
                         children: [
                           SlidableAction(
-                            onPressed: (context) => widget.openSwapModal!(),
-                            icon: Icons.swap_horiz,
-                            backgroundColor: Colors.blue,
+                            onPressed: (context) => widget.onRemove(),
+                            icon: Icons.close,
+                            backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.all(0),
                             borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
