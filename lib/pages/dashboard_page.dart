@@ -948,13 +948,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                 onTap: () {
                                                                   AnimatedDialog.showAnimatedDialog(
                                                                     context: context,
-                                                                    builder: (BuildContext context) => ShareAchievementDialog(
+                                                                    pageBuilder: (context, anim1, anim2) => ShareAchievementDialog(
                                                                       title: data[index]["title"],
                                                                       imagePath: data[index]["image"],
                                                                       subtitle: data[index]["subtitle"],
                                                                       time: data[index]["time"],
                                                                     ),
-                                                                    curve: Curves.fastOutSlowIn,
                                                                   );
                                                                 },
                                                                 child: Column(

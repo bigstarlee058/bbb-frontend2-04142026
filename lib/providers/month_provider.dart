@@ -65,7 +65,7 @@ class MonthProvider extends ChangeNotifier {
   bool isPastWeek = false;
   bool isCircuit = false;
   bool isLastExercise = false;
-
+  bool settingLoader = false;
   DateTime selectedWeekDate = DateTime.now();
 
   String todayTitleId = "";
@@ -88,6 +88,11 @@ class MonthProvider extends ChangeNotifier {
 
   updateIsPastWeek(bool val) {
     isPastWeek = val;
+    notifyListeners();
+  }
+
+  updateSettingLoader(bool val) {
+    settingLoader = val;
     notifyListeners();
   }
 
@@ -378,9 +383,9 @@ class MonthProvider extends ChangeNotifier {
       newLastSplit = [];
       newStreakData = [];
 
-      allSplitDayHistoryModel.removeWhere((element) => element.status == Status.empty || element.status == Status.started);
+      final data1 = allSplitDayHistoryModel.where((element) => element.status != Status.empty || element.status != Status.started).toList();
 
-      allSplitDayHistoryModel.sort((a, b) {
+      data1.sort((a, b) {
         DateTime aDate = a.endTime ?? a.startTime ?? a.date!;
         DateTime localTimeADate = Utils.formattedDate("$aDate");
         DateTime bDate = b.endTime ?? b.startTime ?? b.date!;
@@ -393,7 +398,7 @@ class MonthProvider extends ChangeNotifier {
       if (weekStatusesString.isNotEmpty) {
         for (var i = 0; i < ((weekStatusesString.length == 4) ? weekStatusesString.length : weekStatusesString.length + 1); i++) {
           try {
-            final data = allSplitDayHistoryModel.where((element) {
+            final data = data1.where((element) {
               return element.weekId == monthDataModel!.weeks![i].id;
             }).toList();
 
@@ -985,7 +990,7 @@ class MonthProvider extends ChangeNotifier {
       }
     } else {
       log("CLEAR VALUES");
-      clearValues();
+      await clearValues();
       NotificationService.clearNotification(10);
     }
     notifyListeners();
@@ -1410,7 +1415,6 @@ class MonthProvider extends ChangeNotifier {
 
   List<DayHistoryModel> allDayHistoryModel = [];
   List<DayHistoryModel> allSplitDayHistoryModel = [];
-  List<String> restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
 
   Future<void> fetchAllDayStatusLocalData() async {
     try {
@@ -1428,49 +1432,49 @@ class MonthProvider extends ChangeNotifier {
         allDayHistoryModel = [];
       }
 
-      final dataList = allDayHistoryModel
-          .where((element) => element.weekId == monthDataModel?.weeks?[week! - 1].id && element.dataId.toString().contains("Rest Day"))
-          .toList();
-      log('dataList :::::::::::::::::: ${jsonEncode(dataList)}');
-      if (dataList.isNotEmpty) {
-        restDayList = [];
-        List<int> restDays = [];
-        Map<int, String> pumpDays = {};
-        dataList.sort((a, b) => int.parse(a.dayId!.split(" ").last).compareTo(int.parse(b.dayId!.split(" ").last)));
-        for (var item in dataList) {
-          if (item.type.toString().contains("Rest Day") ||
-              (item.type.toString().startsWith("Pump Day") && (item.status != Status.completed || item.status != Status.skipped))) {
-            RegExp regex = RegExp(r'Rest Day (\d+)');
-            Match? match = regex.firstMatch(item.dayId ?? "");
-            if (match != null) {
-              restDays.add(int.parse(match.group(1)!));
-            }
-          } else if (item.type.toString().startsWith("Pump Day") && (item.status == Status.completed || item.status == Status.skipped)) {
-            RegExp regex = RegExp(r'Rest Day (\d+)');
-            Match? match = regex.firstMatch(item.dayId ?? "");
-            if (match != null) {
-              int restDayNumber = int.parse(match.group(1)!);
-              pumpDays[restDayNumber] = "PUMPDAY";
-            }
-          }
-        }
-        restDays.sort();
-        int count = 1;
-        int restDayIndex = 1;
-        while (restDayList.length < 4) {
-          if (pumpDays.containsKey(count)) {
-            restDayList.add("PUMPDAY");
-          } else if (restDayIndex < restDays.length && restDays[restDayIndex] == count) {
-            restDayList.add("Rest Day $restDayIndex");
-            restDayIndex++;
-          } else {
-            restDayList.add("Rest Day $restDayIndex");
-            restDayIndex++;
-          }
-          count++;
-        }
-      }
-      log('restDayList :::::::::::::::::: ${restDayList}');
+      // final dataList = allDayHistoryModel
+      //     .where((element) => element.weekId == monthDataModel?.weeks?[week! - 1].id && element.dataId.toString().contains("Rest Day"))
+      //     .toList();
+
+      // if (dataList.isNotEmpty) {
+      //   restDayList = [];
+      //   List<int> restDays = [];
+      //   Map<int, String> pumpDays = {};
+      //   dataList.sort((a, b) => int.parse(a.dayId!.split(" ").last).compareTo(int.parse(b.dayId!.split(" ").last)));
+      //   for (var item in dataList) {
+      //     if (item.type.toString().contains("Rest Day") ||
+      //         (item.type.toString().startsWith("Pump Day") && (item.status != Status.completed || item.status != Status.skipped))) {
+      //       RegExp regex = RegExp(r'Rest Day (\d+)');
+      //       Match? match = regex.firstMatch(item.dayId ?? "");
+      //       if (match != null) {
+      //         restDays.add(int.parse(match.group(1)!));
+      //       }
+      //     } else if (item.type.toString().startsWith("Pump Day") && (item.status == Status.completed || item.status == Status.skipped)) {
+      //       RegExp regex = RegExp(r'Rest Day (\d+)');
+      //       Match? match = regex.firstMatch(item.dayId ?? "");
+      //       if (match != null) {
+      //         int restDayNumber = int.parse(match.group(1)!);
+      //         pumpDays[restDayNumber] = "PUMPDAY";
+      //       }
+      //     }
+      //   }
+      //   restDays.sort();
+      //   int count = 1;
+      //   int restDayIndex = 1;
+      //   while (restDayList.length < 4) {
+      //     if (pumpDays.containsKey(count)) {
+      //       restDayList.add("PUMPDAY");
+      //     } else if (restDayIndex < restDays.length && restDays[restDayIndex] == count) {
+      //       restDayList.add("Rest Day $restDayIndex");
+      //       restDayIndex++;
+      //     } else {
+      //       restDayList.add("Rest Day $restDayIndex");
+      //       restDayIndex++;
+      //     }
+      //     count++;
+      //   }
+      // }
+      // log('restDayList :::::::::::::::::: ${restDayList}');
 
       notifyListeners();
     } catch (e) {
@@ -1483,6 +1487,7 @@ class MonthProvider extends ChangeNotifier {
     try {
       final data1 = await DatabaseHelper().fetchData(tableName: DatabaseHelper.dayStatus);
       if (data1.isNotEmpty) {
+        log('data1 :::::::::::1111th::::::: $data1');
         allSplitDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data1)).map((x) => DayHistoryModel.fromJson(x)));
       } else {
         allSplitDayHistoryModel = [];

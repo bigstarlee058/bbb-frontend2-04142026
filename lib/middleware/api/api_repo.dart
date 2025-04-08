@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/middleware/api/api_service.dart';
 import 'package:bbb/middleware/api/base_service.dart';
 import 'package:bbb/models/SyncDataResponseModel/avhievements_data_model.dart';
@@ -100,6 +102,18 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(apiType: APIType.aPost, url: BaseService.addDayStatus, body: body);
     debugPrint('response-addDayStatus :::::::::::::::::: $response');
     return response;
+  }
+
+  static Future<void> deleteDayStatus({required Map<String, dynamic> body}) async {
+    var response1 = await ApiService().getResponse(apiType: APIType.aGet, url: BaseService.fetchDayStatus, body: body);
+    if (response1 is List) {
+      final data = response1.map((json) => DayStatusDataModel.fromJson(json)).toList();
+      log('data :::::::::::::::::: ${data}');
+      if (data.isNotEmpty) {
+        var response = await ApiService().getResponse(apiType: APIType.aDelete, url: (BaseService.deleteDayStatus + (data.first.id ?? "")));
+        return response;
+      }
+    }
   }
 
   static Future<void> updateDayStatus({required Map<String, dynamic> body}) async {

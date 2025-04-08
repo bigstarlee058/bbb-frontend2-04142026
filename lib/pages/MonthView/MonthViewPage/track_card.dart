@@ -333,7 +333,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                                           ? "${weekDataModel!.days![nextWorkOutIndex].title}"
                                                           : (matchingElement.type ?? "").contains("Pump Day")
                                                               ? "${matchingElement.title}"
-                                                              : monthProvider.restDayList[int.parse(
+                                                              : weekDataModel!.restDayList?[int.parse(
                                                                       weekDataModel!.dayList![index].toString().split(" ").toList().last) -
                                                                   1],
                                                       style: TextStyle(
@@ -486,8 +486,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && !isCompletedOrSkipped) {
       AnimatedDialog.showAnimatedDialog(
         context: context,
-        builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
-        curve: Curves.fastOutSlowIn,
+        pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
       );
     } else {
       if (monthProvider!.isPumpDay) {
@@ -624,8 +623,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
             AnimatedDialog.showAnimatedDialog(
               context: context,
-              builder: (BuildContext c1) => skipWorkoutDialog(context, c1),
-              curve: Curves.fastOutSlowIn,
+              pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
             );
           },
           child: Container(

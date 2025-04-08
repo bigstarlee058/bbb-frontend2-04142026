@@ -1312,7 +1312,7 @@ class _ExercisePageState extends State<ExercisePage> {
 
   Future<dynamic> tutorialVideo(BuildContext context) {
     return showDialog(
-      barrierDismissible: false,
+      barrierDismissible: true,
       context: context,
       builder: (context) {
         return Dialog(
