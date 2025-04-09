@@ -1,7 +1,10 @@
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
+import 'package:bbb/components/month_view_setting_dialog.dart';
 import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -54,6 +57,18 @@ class _MonthViewState extends State<MonthView> {
       }
     });
 
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";
+        monthProvider?.monthLocalDataModel.sort((a, b) =>
+            DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
+        bool alreadySetUp = (monthId == "${monthProvider!.monthDataModel!.id}");
+        if (!alreadySetUp && monthProvider!.allDayHistoryModel.isEmpty) {
+          openSettingDialog();
+        }
+      },
+    );
+
     super.initState();
   }
 
@@ -62,6 +77,11 @@ class _MonthViewState extends State<MonthView> {
   updateSelectedSection(int index) {
     selectedSection = index;
     setState(() {});
+  }
+
+  openSettingDialog() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => AnimatedDialog.showAnimatedDialog(
+        context: context, pageBuilder: (c1, anim1, anim2) => MonthSettingDialog(monthProvider: monthProvider!)));
   }
 
   @override
@@ -564,7 +584,7 @@ class _MonthViewState extends State<MonthView> {
     monthProvider!.overviewCurrentWeek = monthProvider!.week ?? 1;
     monthProvider!.overviewCurrentDay = ((index ?? 1) + 1);
     monthProvider!.dayDataModel = dayData;
-    monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
+    // monthProvider!.alternateEquipmentType = monthProvider!.equipmentType;
     monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![(monthProvider!.week ?? 1) - 1];
     monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek);
 

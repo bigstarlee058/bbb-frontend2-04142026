@@ -388,7 +388,7 @@ class _ExercisePageState extends State<ExercisePage> {
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
 
-      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+        if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }

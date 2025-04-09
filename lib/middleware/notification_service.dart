@@ -12,6 +12,7 @@ class NotificationService {
   }
 
   static Future<void> clearScheduledNotification() async {
+    await clearNotification(10);
     await clearNotification(30);
     await clearNotification(31);
     await clearNotification(31);
@@ -20,24 +21,27 @@ class NotificationService {
   }
 
   static Future<void> zonedScheduleNotification(int second, int id, Map<String, dynamic> payload) async {
-    clearNotification(10);
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'scheduled_channel',
-      'Scheduled Notifications',
-      channelDescription: 'This channel is for scheduled notifications',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
+    await clearNotification(10).then(
+      (value) async {
+        const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+          'scheduled_channel',
+          'Scheduled Notifications',
+          channelDescription: 'This channel is for scheduled notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+        );
 
-    await flutterLocalNotificationsPlugin
-        .zonedSchedule(10, 'Target rest reached!', 'Your Timer has reached 0, get back to your workout and keep your progress going',
-            tz.TZDateTime.now(tz.local).add(Duration(seconds: second)), const NotificationDetails(android: androidDetails),
-            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-            payload: jsonEncode(payload),
-            uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime)
-        .catchError(
-      (error) {
-        debugPrint('error==========>>>>>$error');
+        await flutterLocalNotificationsPlugin
+            .zonedSchedule(10, 'Target rest reached!', 'Your Timer has reached 0, get back to your workout and keep your progress going',
+                tz.TZDateTime.now(tz.local).add(Duration(seconds: second)), const NotificationDetails(android: androidDetails),
+                androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+                payload: jsonEncode(payload),
+                uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime)
+            .catchError(
+          (error) {
+            debugPrint('error==========>>>>>$error');
+          },
+        );
       },
     );
   }

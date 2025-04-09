@@ -137,7 +137,6 @@ class _MainPageState extends State<MainPage> {
     debugPrint("this  is initial state func");
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    if (monthProvider.monthLocalDataModel.isNotEmpty) return;
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {

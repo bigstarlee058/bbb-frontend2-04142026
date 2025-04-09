@@ -466,7 +466,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     monthProvider?.overviewCurrentWeek = widget.weekIndex + 1;
     monthProvider?.overviewCurrentDay = index + 1;
     monthProvider?.dayDataModel = dayData;
-    monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
+    // monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
     monthProvider?.weekDataModel = weekDataModel;
     monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
@@ -558,7 +558,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
             monthProvider.overviewCurrentDay = index + 1;
             monthProvider.dayDataModel = dayData;
-            monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+            // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
             monthProvider.weekDataModel = weekDataModel;
             monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
@@ -618,7 +618,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
             monthProvider.overviewCurrentDay = index + 1;
             monthProvider.dayDataModel = dayData;
-            monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+            // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
             monthProvider.weekDataModel = weekDataModel;
             monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
             AnimatedDialog.showAnimatedDialog(

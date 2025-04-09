@@ -669,9 +669,9 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                           const SizedBox(height: 10),
                           SelectDropdown(
                             onChange: (String newValue) {
-                              monthProvider?.alternateEquipmentType = newValue;
+                              // monthProvider?.alternateEquipmentType = newValue;
                               // monthProvider?.equipmentType = newValue;
-                              monthProvider?.innerFilter();
+                              // monthProvider?.innerFilter();
                               // monthProvider?.filter();
                             },
                           ),

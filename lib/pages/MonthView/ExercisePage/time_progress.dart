@@ -58,7 +58,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
   bool animationCompleted = false;
   String? previousData;
 
-  timerOnInit() {
+  timerOnInit() async {
     NotificationService.clearNotification(10);
     totalTime = widget.initialDuration;
     WidgetsBinding.instance.addObserver(this);
@@ -85,11 +85,12 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
       },
     );
 
-    startTimer();
+    await startTimer();
   }
 
-  void startTimer() async {
-    await monthProvider.getPassedTime();
+  Future<void> startTimer() async {
+    currentTime = 0;
+    monthProvider.getPassedTime();
     if (monthProvider.timePassed != "") {
       currentTime = int.parse(monthProvider.timePassed);
     }
@@ -106,11 +107,13 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
           if (currentTime == totalTime && !animationCompleted) {
             controller.forward();
             widget.onComplete();
+            setState(() {});
           }
         }
         if (widget.initialDuration < currentTime) {
           isPaused = true;
           controller.stop();
+          setState(() {});
         }
       });
     } else {
@@ -125,9 +128,8 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
       isPaused = true;
       controller.stop();
       widget.makeRefresh();
+      setState(() {});
     }
-
-    setState(() {});
   }
 
   String _formatTime(int seconds) {

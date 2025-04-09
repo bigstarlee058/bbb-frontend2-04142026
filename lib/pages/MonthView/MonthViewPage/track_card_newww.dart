@@ -318,14 +318,22 @@ class _WeeklyTrackCardNewState extends State<WeeklyTrackCardNew> {
                         ),
                         const SizedBox(height: 4),
                         if (!isRestDay) ...[
-                          Text(
-                            exerciseCount! > 1 ? '$exerciseCount Exercises' : " $exerciseCount Exercise",
-                            style: TextStyle(
-                              fontSize: ScreenUtil.verticalScale(1.4),
-                              color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : Colors.grey,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                          Builder(builder: (context) {
+                            int exCount = weekDataModel!.days![nextWorkOutIndex].exercises!
+                                .where(
+                                    (element) => (element.formats!.contains(monthProvider.equipmentType) || element.isAddedUpdated == true))
+                                .toList()
+                                .length;
+
+                            return Text(
+                              exCount > 1 ? '$exCount Exercises' : " $exCount Exercise",
+                              style: TextStyle(
+                                fontSize: ScreenUtil.verticalScale(1.4),
+                                color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : Colors.grey,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            );
+                          }),
                         ]
                       ],
                     ),
@@ -436,7 +444,7 @@ class _WeeklyTrackCardNewState extends State<WeeklyTrackCardNew> {
               monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
               monthProvider.overviewCurrentDay = index + 1;
               monthProvider.dayDataModel = dayData;
-              monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+              // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
               monthProvider.weekDataModel = weekDataModel;
               monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
@@ -519,7 +527,7 @@ class _WeeklyTrackCardNewState extends State<WeeklyTrackCardNew> {
               monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
               monthProvider.overviewCurrentDay = index + 1;
               monthProvider.dayDataModel = dayData;
-              monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+              // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
               monthProvider.weekDataModel = weekDataModel;
               monthProvider.updateIsPastWeek(monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
               AnimatedDialog.showAnimatedDialog(
@@ -848,7 +856,7 @@ class _WeeklyTrackCardNewState extends State<WeeklyTrackCardNew> {
     monthProvider?.overviewCurrentWeek = widget.weekIndex + 1;
     monthProvider?.overviewCurrentDay = index + 1;
     monthProvider?.dayDataModel = dayData;
-    monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
+    // monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
     monthProvider?.weekDataModel = weekDataModel;
     monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
@@ -1056,7 +1064,7 @@ class _WeeklyTrackCardNewState extends State<WeeklyTrackCardNew> {
     monthProvider?.manageStreak();
     monthProvider?.getLiftedWeightGraphData();
     monthProvider?.fetchToday();
-    monthProvider?.filter();
+    // monthProvider?.filter();
   }
 
   Future<void> _saveDayData({required String status, required String type, String? title, bool endDate = false}) async {
