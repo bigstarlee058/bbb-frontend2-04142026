@@ -7,6 +7,7 @@ import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/custom_slide_to_act.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
+import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
@@ -377,8 +378,8 @@ class _TodayPageState extends State<TodayPage> {
                                                       crossAxisAlignment: CrossAxisAlignment.center,
                                                       children: [
                                                         Text(
-                                                          "Option ${monthProvider!.alternateEquipmentType}:",
-                                                          // "Option ${monthProvider!.equipmentType}:",
+                                                          // "Option ${monthProvider!.alternateEquipmentType}:",
+                                                          "Option ${monthProvider!.equipmentType}:",
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: ScreenUtil.verticalScale(2),
@@ -388,9 +389,11 @@ class _TodayPageState extends State<TodayPage> {
                                                         Padding(
                                                           padding: const EdgeInsets.only(bottom: 5),
                                                           child: Text(
-                                                            monthProvider!.alternateEquipmentType == "A"
+                                                            // monthProvider!.alternateEquipmentType == "A"
+                                                            monthProvider!.equipmentType == "A"
                                                                 ? "Fully equipped gym"
-                                                                : monthProvider?.alternateEquipmentType == "B"
+                                                                // : monthProvider?.alternateEquipmentType == "B"
+                                                                : monthProvider?.equipmentType == "B"
                                                                     ? "Home gym"
                                                                     : "Dumbbells and bands",
                                                             style: TextStyle(
@@ -540,45 +543,46 @@ class _TodayPageState extends State<TodayPage> {
                                 margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(8)),
                                 child: Column(
                                   children: [
-                                    // Container(
-                                    //   margin: EdgeInsets.symmetric(
-                                    //     horizontal: ScreenUtil.horizontalScale(7),
-                                    //     vertical: ScreenUtil.verticalScale(1.2),
-                                    //   ),
-                                    //   child: Builder(builder: (context) {
-                                    //     String split = monthProvider
-                                    //             ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                    //             .toString()
-                                    //             .split(" ")[1] ??
-                                    //         "";
-                                    //     return Column(
-                                    //       crossAxisAlignment: CrossAxisAlignment.start,
-                                    //       children: [
-                                    //         if (monthProvider?.dayDataModel!.formats != null &&
-                                    //             monthProvider!.dayDataModel!.formats!
-                                    //                 .contains(split.toString().replaceAll("split", ""))) ...[
-                                    //           Container(
-                                    //             margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
-                                    //             child: Text(
-                                    //               'Choose equipment availability',
-                                    //               textAlign: TextAlign.left,
-                                    //               style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
-                                    //             ),
-                                    //           ),
-                                    //           const SizedBox(height: 10),
-                                    //           SelectDropdown(
-                                    //             onChange: (String newValue) async {
-                                    //               monthProvider?.alternateEquipmentType = newValue;
-                                    //               // monthProvider?.equipmentType = newValue;
-                                    //               monthProvider?.innerFilter();
-                                    //               // monthProvider?.filter();
-                                    //             },
-                                    //           ),
-                                    //         ]
-                                    //       ],
-                                    //     );
-                                    //   }),
-                                    // ),
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(7),
+                                        vertical: ScreenUtil.verticalScale(1.2),
+                                      ),
+                                      child: Builder(builder: (context) {
+                                        String split = monthProvider
+                                                ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            if (monthProvider?.dayDataModel!.formats != null &&
+                                                monthProvider!.dayDataModel!.formats!
+                                                    .contains(split.toString().replaceAll("split", ""))) ...[
+                                              Container(
+                                                margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
+                                                child: Text(
+                                                  'Choose equipment availability',
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              SelectDropdown(
+                                                onChange: (String newValue) async {
+                                                  monthProvider?.changeEquipmentType(newValue);
+                                                  // monthProvider?.alternateEquipmentType = newValue;
+                                                  // monthProvider?.equipmentType = newValue;
+                                                  // monthProvider?.innerFilter();
+                                                  // monthProvider?.filter();
+                                                },
+                                              ),
+                                            ]
+                                          ],
+                                        );
+                                      }),
+                                    ),
                                     totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
                                     Container(
                                       width: media.width,
@@ -607,7 +611,10 @@ class _TodayPageState extends State<TodayPage> {
                                                     exercises.length,
                                                     (i) {
                                                       if (removedExercise
-                                                          .any((element) => element.exerciseId == exercises[i].exerciseId!)) {
+                                                              .any((element) => element.exerciseId == exercises[i].exerciseId!) ||
+                                                          (!exercises[i].formats!.contains(monthProvider?.equipmentType) &&
+                                                              (exercises[i].isAddedUpdated == false ||
+                                                                  exercises[i].isAddedUpdated == null))) {
                                                         return const SizedBox();
                                                       }
                                                       String split = monthProvider

@@ -412,7 +412,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;
     monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
     monthProvider.dayDataModel = dayData;
-    monthProvider.alternateEquipmentType = monthProvider.equipmentType;
+    // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
     monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
     monthProvider.updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
     Navigator.pop(context);

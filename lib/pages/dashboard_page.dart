@@ -699,9 +699,11 @@ class _DashboardPageState extends State<DashboardPage> {
                                         element.split == value.splitType &&
                                         element.monthId == value.monthDataModel?.id &&
                                         (element.status == "Completed" || element.status == "Skipped"));
+                                    int count = week > 4 ? val1 : val1 + val2.length;
 
-                                    final count = week > 4 ? val1 : val1 + val2.length;
-
+                                    if (count > 28) {
+                                      count = 28;
+                                    }
                                     return Column(
                                       children: [
                                         const SizedBox(height: 10),
@@ -1258,7 +1260,7 @@ class _DashboardPageState extends State<DashboardPage> {
     monthData.overviewCurrentDay = ((index ?? 1) + 1);
     monthData.dayDataModel = dayData;
     userData?.previousPage = true;
-    monthData.alternateEquipmentType = monthData.equipmentType;
+    // monthData.alternateEquipmentType = monthData.equipmentType;
     monthData.weekDataModel = monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1];
     monthData.updateIsPastWeek(monthData.weekStatuses[(monthData.week ?? 1) - 1] == WeekType.pastWeek);
 

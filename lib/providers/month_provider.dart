@@ -224,7 +224,7 @@ class MonthProvider extends ChangeNotifier {
   String? splitType;
 
   String equipmentType = "A";
-  String alternateEquipmentType = "A";
+  // String alternateEquipmentType = "A";
 
   MonthDataModel? monthDataModel;
   WarmUpModel? warmUpModel;
@@ -437,7 +437,7 @@ class MonthProvider extends ChangeNotifier {
         }
       }
 
-      filter();
+      // filter();
     } catch (e, stackTrace) {
       debugPrint("Error in findSplitTypeList: $e");
       debugPrint("StackTrace: $stackTrace");
@@ -484,7 +484,7 @@ class MonthProvider extends ChangeNotifier {
               await manageStreak();
               findWeekStatuses();
               fetchToday();
-              filter();
+              // filter();
             }
           } catch (innerError, innerStackTrace) {
             debugPrint("Error inside getSplitData.then in onInit: $innerError");
@@ -652,7 +652,7 @@ class MonthProvider extends ChangeNotifier {
     try {
       await Future.delayed(const Duration(milliseconds: 50));
       await getSplitData();
-      filter();
+      // filter();
     } catch (e, stackTrace) {
       debugPrint("Error in filterWorkouts: $e");
       debugPrint("StackTrace: $stackTrace");
@@ -662,73 +662,72 @@ class MonthProvider extends ChangeNotifier {
     }
   }
 
-  void filter() {
-    List<ExerciseDataModel> itemsToRemove = [];
+  // void filter() {
+  // List<ExerciseDataModel> itemsToRemove = [];
+  //
+  // try {
+  // for (var weekIndex = 0; weekIndex < (monthDataModel?.weeks?.length ?? 0); weekIndex++) {
+  //   var week = monthDataModel!.weeks![weekIndex];
+  //
+  //   for (var dayIndex = 0; dayIndex < (week.days?.length ?? 0); dayIndex++) {
+  //     var day = week.days![dayIndex];
+  //     for (var exerciseIndex = 0; exerciseIndex < (day.exercises?.length ?? 0); exerciseIndex++) {
+  //       final exercise = day.exercises![exerciseIndex];
+  //       if (!exercise.formats!.contains(equipmentType)) {
+  //         itemsToRemove.add(weeksDataList[weekIndex].days![dayIndex].exercises![exerciseIndex]);
+  //       }
+  //     }
+  //   }
+  // }
+  //
+  // for (var item in itemsToRemove) {
+  //   for (var week in weeksDataList) {
+  //     week.days?.forEach((day) {
+  //       day.exercises?.remove(item);
+  //     });
+  //   }
+  // }
+  //   } catch (e, stackTrace) {
+  //     debugPrint("Error in filter: $e");
+  //     debugPrint("StackTrace: $stackTrace");
+  //   }
+  // }
 
-    try {
-      for (var weekIndex = 0; weekIndex < (monthDataModel?.weeks?.length ?? 0); weekIndex++) {
-        var week = monthDataModel!.weeks![weekIndex];
-
-        for (var dayIndex = 0; dayIndex < (week.days?.length ?? 0); dayIndex++) {
-          var day = week.days![dayIndex];
-          for (var exerciseIndex = 0; exerciseIndex < (day.exercises?.length ?? 0); exerciseIndex++) {
-            final exercise = day.exercises![exerciseIndex];
-            if (!exercise.formats!.contains(equipmentType)) {
-              itemsToRemove.add(weeksDataList[weekIndex].days![dayIndex].exercises![exerciseIndex]);
-            }
-          }
-        }
-      }
-
-      for (var item in itemsToRemove) {
-        for (var week in weeksDataList) {
-          week.days?.forEach((day) {
-            day.exercises?.remove(item);
-          });
-        }
-      }
-    } catch (e, stackTrace) {
-      debugPrint("Error in filter: $e");
-      debugPrint("StackTrace: $stackTrace");
-    }
-  }
-
-  void innerFilter() {
-    isFilterLoading = true;
-    notifyListeners();
-    List<ExerciseDataModel> itemsToRemove = [];
-
-    try {
-      if (alternateEquipmentType != equipmentType) {
-        for (var weekIndex = 0; weekIndex < (weeksDataList.length); weekIndex++) {
-          var week = weeksDataList[weekIndex];
-          for (var dayIndex = 0; dayIndex < (week.days?.length ?? 0); dayIndex++) {
-            var day = week.days![dayIndex];
-            for (var exerciseIndex = 0; exerciseIndex < (day.exercises?.length ?? 0); exerciseIndex++) {
-              final exercise = day.exercises![exerciseIndex];
-              if (!exercise.formats!.contains(alternateEquipmentType)) {
-                itemsToRemove.add(weeksDataList[weekIndex].days![dayIndex].exercises![exerciseIndex]);
-              }
-            }
-          }
-        }
-
-        for (var item in itemsToRemove) {
-          for (var week in weeksDataList) {
-            week.days?.forEach((day) {
-              day.exercises?.remove(item);
-            });
-          }
-        }
-      }
-    } catch (e, stackTrace) {
-      debugPrint("Error in innerFilter: $e");
-      debugPrint("StackTrace: $stackTrace");
-    }
-
-    isFilterLoading = false;
-    notifyListeners();
-  }
+  // void innerFilter() {
+  //   isFilterLoading = true;
+  //   notifyListeners();
+  // List<ExerciseDataModel> itemsToRemove = [];`
+  // try {
+  // if (alternateEquipmentType != equipmentType) {
+  //   for (var weekIndex = 0; weekIndex < (weeksDataList.length); weekIndex++) {
+  //     var week = weeksDataList[weekIndex];
+  //     for (var dayIndex = 0; dayIndex < (week.days?.length ?? 0); dayIndex++) {
+  //       var day = week.days![dayIndex];
+  //       for (var exerciseIndex = 0; exerciseIndex < (day.exercises?.length ?? 0); exerciseIndex++) {
+  //         final exercise = day.exercises![exerciseIndex];
+  //         if (!exercise.formats!.contains(alternateEquipmentType)) {
+  //           itemsToRemove.add(weeksDataList[weekIndex].days![dayIndex].exercises![exerciseIndex]);
+  //         }
+  //       }
+  //     }
+  //   }
+  //
+  //   for (var item in itemsToRemove) {
+  //     for (var week in weeksDataList) {
+  //       week.days?.forEach((day) {
+  //         day.exercises?.remove(item);
+  //       });
+  //     }
+  //   }
+  // }
+  // } catch (e, stackTrace) {
+  //   debugPrint("Error in innerFilter: $e");
+  //   debugPrint("StackTrace: $stackTrace");
+  // }
+  //
+  // isFilterLoading = false;
+  // notifyListeners();
+  // }
 
   /// EXCERSIE =============================++++++++++++++++++++++++++++++++++
 
@@ -1487,7 +1486,6 @@ class MonthProvider extends ChangeNotifier {
     try {
       final data1 = await DatabaseHelper().fetchData(tableName: DatabaseHelper.dayStatus);
       if (data1.isNotEmpty) {
-        log('data1 :::::::::::1111th::::::: $data1');
         allSplitDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data1)).map((x) => DayHistoryModel.fromJson(x)));
       } else {
         allSplitDayHistoryModel = [];
