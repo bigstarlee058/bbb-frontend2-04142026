@@ -1092,10 +1092,8 @@ class _WeeklyTrackCardNewState extends State<WeeklyTrackCardNew> {
       "endTime": endDate ? "${DateTime.now().toUtc()}" : "",
     };
 
-    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
-      (element) => element.dataId == dataId,
-      orElse: () => DayHistoryModel(),
-    );
+    DayHistoryModel? matchingElement =
+        monthProvider?.dayHistoryModel.firstWhere((element) => element.dataId == dataId, orElse: () => DayHistoryModel());
 
     final data1 = {
       "title": title ?? "",
@@ -1133,6 +1131,7 @@ class _WeeklyTrackCardNewState extends State<WeeklyTrackCardNew> {
     }
 
     await monthProvider?.fetchAllDayStatusLocalData();
+
     monthProvider?.findWeekStatuses();
     monthProvider?.fetchToday();
     monthProvider?.manageStreak();

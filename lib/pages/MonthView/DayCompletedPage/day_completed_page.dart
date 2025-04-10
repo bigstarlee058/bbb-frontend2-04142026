@@ -116,11 +116,11 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            GestureDetector(
-                              onTap: () async {
+                            IconButton(
+                              onPressed: () async {
                                 Navigator.pushNamed(context, '/streak-calendar');
                               },
-                              child: Row(
+                              icon: Row(
                                 children: [
                                   Container(
                                     alignment: Alignment.center,
@@ -148,16 +148,16 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 ],
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/notifications');
-                              },
-                              icon: Icon(
-                                Icons.notifications_none,
-                                color: Colors.white,
-                                size: ScreenUtil.verticalScale(3),
-                              ),
-                            )
+                            // IconButton(
+                            //   onPressed: () {
+                            //     Navigator.pushNamed(context, '/notifications');
+                            //   },
+                            //   icon: Icon(
+                            //     Icons.notifications_none,
+                            //     color: Colors.white,
+                            //     size: ScreenUtil.verticalScale(3),
+                            //   ),
+                            // )
                           ],
                         ),
                       ),
@@ -234,29 +234,32 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                 child: Column(
                   children: [
                     Container(
-                      height: 50,
                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
-                      child: IconRow(
-                        fromHomeScreen: false,
-                        icons: List.generate(
-                          formattedDates.length,
-                          (index) => data.any((element) =>
-                                  DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
-                                      formattedDates[index] &&
-                                  element.status == Status.completed)
-                              ? IconDataWithDot(
-                                  icon: Icons.check,
-                                  iconColor: Colors.white,
-                                  backgroundColor: AppColors.primaryColor,
-                                  showDot: true,
-                                  dotColor: Colors.transparent)
-                              : IconDataWithDot(
-                                  icon: Icons.close,
-                                  iconColor: Colors.white,
-                                  backgroundColor: Colors.blue,
-                                  showDot: true,
-                                  dotColor: Colors.transparent),
-                        ),
+                      child: Column(
+                        children: [
+                          IconRow(
+                            fromHomeScreen: false,
+                            icons: List.generate(
+                              formattedDates.length,
+                              (index) => data.any((element) =>
+                                      DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
+                                          formattedDates[index] &&
+                                      element.status == Status.completed)
+                                  ? IconDataWithDot(
+                                      icon: Icons.check,
+                                      iconColor: Colors.white,
+                                      backgroundColor: AppColors.primaryColor,
+                                      showDot: true,
+                                      dotColor: Colors.transparent)
+                                  : IconDataWithDot(
+                                      icon: Icons.close,
+                                      iconColor: Colors.white,
+                                      backgroundColor: Colors.blue,
+                                      showDot: true,
+                                      dotColor: Colors.transparent),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: ScreenUtil.horizontalScale(2)),
@@ -1036,9 +1039,7 @@ class IconWithDot extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(ScreenUtil.horizontalScale(
-            1,
-          )),
+          padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
           decoration: BoxDecoration(
             color: iconData.backgroundColor,
             shape: BoxShape.circle,

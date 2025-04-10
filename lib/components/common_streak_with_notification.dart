@@ -27,14 +27,14 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
     final streak = context.watch<MonthProvider>();
     return Row(
       children: [
-        GestureDetector(
-          onTap: () async {
+        IconButton(
+          onPressed: () async {
             Navigator.pushNamed(context, '/streak-calendar');
             // monthProvider?.routeString = widget.routeString;
             // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
             // mainPageProvider.changeTab(4);
           },
-          child: Row(
+          icon: Row(
             children: [
               Container(
                 alignment: Alignment.center,
@@ -60,16 +60,16 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
             ],
           ),
         ),
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/notifications');
-          },
-          icon: Icon(
-            Icons.notifications_none,
-            color: Colors.white,
-            size: ScreenUtil.verticalScale(3),
-          ),
-        )
+        // IconButton(
+        //   onPressed: () {
+        //     Navigator.pushNamed(context, '/notifications');
+        //   },
+        //   icon: Icon(
+        //     Icons.notifications_none,
+        //     color: Colors.white,
+        //     size: ScreenUtil.verticalScale(3),
+        //   ),
+        // )
       ],
     );
   }
