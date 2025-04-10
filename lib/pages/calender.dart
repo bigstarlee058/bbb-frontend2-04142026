@@ -97,6 +97,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             child: SingleChildScrollView(
               physics: NeverScrollableScrollPhysics(),
               child: TableCalendar(
+                startingDayOfWeek: StartingDayOfWeek.monday,
                 availableGestures: AvailableGestures.horizontalSwipe,
                 rowHeight: 40.0,
                 daysOfWeekHeight: 20.0,

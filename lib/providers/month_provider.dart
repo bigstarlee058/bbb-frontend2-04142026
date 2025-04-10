@@ -1419,11 +1419,8 @@ class MonthProvider extends ChangeNotifier {
     try {
       String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
 
-      final data = await DatabaseHelper().getFilteredWithMData(
-        split: split,
-        tableName: DatabaseHelper.dayStatus,
-        monthId: monthDataModel?.id ?? "",
-      );
+      final data =
+          await DatabaseHelper().getFilteredWithMData(split: split, tableName: DatabaseHelper.dayStatus, monthId: monthDataModel?.id ?? "");
 
       if (data.isNotEmpty) {
         allDayHistoryModel = List<DayHistoryModel>.from(json.decode(jsonEncode(data)).map((x) => DayHistoryModel.fromJson(x)));
@@ -1431,49 +1428,38 @@ class MonthProvider extends ChangeNotifier {
         allDayHistoryModel = [];
       }
 
-      // final dataList = allDayHistoryModel
-      //     .where((element) => element.weekId == monthDataModel?.weeks?[week! - 1].id && element.dataId.toString().contains("Rest Day"))
-      //     .toList();
+      for (var element in monthDataModel!.weeks!) {
+        if (allDayHistoryModel.any((data) => data.weekId == element.id)) {
+          if (splitType == SplitType.split3) {
+            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
+          } else if (splitType == SplitType.split4) {
+            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
+          } else {
+            element.restDayList = ["Rest Day 1", "Rest Day 2"];
+          }
+          final list = allDayHistoryModel.where((e1) => e1.type!.contains("Pump Day") && e1.weekId == element.id).toList();
+          if (list.isNotEmpty) {
+            for (var pump in list) {
+              int pumpDayIndex = int.parse(pump.dayId?.split(" ").last ?? "1");
+              int restDayIndex = element.restDayList!.indexOf("Rest Day $pumpDayIndex");
+              if (restDayIndex != -1) {
+                element.restDayList?[restDayIndex] = "Pump Day";
+              }
+            }
+          }
+        }
+      }
 
-      // if (dataList.isNotEmpty) {
-      //   restDayList = [];
-      //   List<int> restDays = [];
-      //   Map<int, String> pumpDays = {};
-      //   dataList.sort((a, b) => int.parse(a.dayId!.split(" ").last).compareTo(int.parse(b.dayId!.split(" ").last)));
-      //   for (var item in dataList) {
-      //     if (item.type.toString().contains("Rest Day") ||
-      //         (item.type.toString().startsWith("Pump Day") && (item.status != Status.completed || item.status != Status.skipped))) {
-      //       RegExp regex = RegExp(r'Rest Day (\d+)');
-      //       Match? match = regex.firstMatch(item.dayId ?? "");
-      //       if (match != null) {
-      //         restDays.add(int.parse(match.group(1)!));
-      //       }
-      //     } else if (item.type.toString().startsWith("Pump Day") && (item.status == Status.completed || item.status == Status.skipped)) {
-      //       RegExp regex = RegExp(r'Rest Day (\d+)');
-      //       Match? match = regex.firstMatch(item.dayId ?? "");
-      //       if (match != null) {
-      //         int restDayNumber = int.parse(match.group(1)!);
-      //         pumpDays[restDayNumber] = "PUMPDAY";
-      //       }
-      //     }
-      //   }
-      //   restDays.sort();
-      //   int count = 1;
-      //   int restDayIndex = 1;
-      //   while (restDayList.length < 4) {
-      //     if (pumpDays.containsKey(count)) {
-      //       restDayList.add("PUMPDAY");
-      //     } else if (restDayIndex < restDays.length && restDays[restDayIndex] == count) {
-      //       restDayList.add("Rest Day $restDayIndex");
-      //       restDayIndex++;
-      //     } else {
-      //       restDayList.add("Rest Day $restDayIndex");
-      //       restDayIndex++;
-      //     }
-      //     count++;
-      //   }
-      // }
-      // log('restDayList :::::::::::::::::: ${restDayList}');
+      for (var element in monthDataModel!.weeks!) {
+        int restDayCount = 1;
+        for (int i = 0; i < element.restDayList!.length; i++) {
+          if (element.restDayList![i].startsWith('Rest Day')) {
+            element.restDayList![i] = 'Rest Day ${restDayCount++}';
+          }
+        }
+      }
+
+      log('monthDataModel!.weeks!.map((e) => e.restDayList,) :::::::::::::::::: ${monthDataModel!.weeks!.map((e) => e.restDayList)}');
 
       notifyListeners();
     } catch (e) {

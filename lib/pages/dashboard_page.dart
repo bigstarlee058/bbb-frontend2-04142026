@@ -354,12 +354,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                         ],
                                                                       ),
                                                                       IconButton(
-                                                                        onPressed: null,
-                                                                        icon: Icon(
-                                                                          Icons.notifications_none,
-                                                                          color: Colors.transparent,
-                                                                          size: ScreenUtil.verticalScale(3),
-                                                                        ),
+                                                                        onPressed: null, icon: SizedBox(),
+                                                                        // icon: Icon(
+                                                                        //   Icons.notifications_none,
+                                                                        //   color: Colors.transparent,
+                                                                        //   size: ScreenUtil.verticalScale(3),
+                                                                        // ),
                                                                       )
                                                                     ],
                                                                   ),
@@ -788,7 +788,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 22, bottom: 10),
                                               child: Text(
-                                                "Recent Streak",
+                                                "Streak Calendar",
                                                 style: TextStyle(
                                                   color: AppColors.primaryColor,
                                                   fontSize: ScreenUtil.horizontalScale(5.2),
@@ -1545,9 +1545,11 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             child: SingleChildScrollView(
               physics: NeverScrollableScrollPhysics(),
               child: TableCalendar(
-                availableGestures: AvailableGestures.horizontalSwipe,
+                calendarFormat: CalendarFormat.week,
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                availableGestures: AvailableGestures.none,
                 rowHeight: 40.0,
-                daysOfWeekHeight: 20.0,
+                daysOfWeekHeight: 40,
                 firstDay: DateTime.utc(2020, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
                 focusedDay: _focusedDay,
@@ -1555,7 +1557,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                   return isSameDay(_selectedDay, day);
                 },
                 headerStyle: HeaderStyle(
-                  headerPadding: const EdgeInsets.only(bottom: 10),
+                  headerPadding: const EdgeInsets.only(bottom: 2),
                   formatButtonVisible: false,
                   titleCentered: true,
                   leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
@@ -1563,6 +1565,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                   titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
                   titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
                 ),
+                headerVisible: false,
                 calendarStyle: const CalendarStyle(
                   defaultTextStyle: TextStyle(fontSize: 12.0),
                   weekendTextStyle: TextStyle(fontSize: 12.0),
@@ -1586,6 +1589,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   }
 
   Widget? _buildDayState(DateTime date) {
+    final nowUtc = DateTime.now();
+
     if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
       DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
           .map(
@@ -1596,8 +1601,6 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             ),
           )
           .reduce((a, b) => a.isBefore(b) ? a : b);
-
-      final nowUtc = DateTime.now();
 
       List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
       bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
@@ -1674,39 +1677,33 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   Widget _buildCustomDayCircle(DateTime date, Color circleColor) {
     return Container(
       alignment: Alignment.center,
-      width: 28.0,
-      height: 28.0,
+      padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: circleColor,
       ),
-      child: Text(
-        '${date.day}',
-        style: const TextStyle(
-          fontSize: 14.0,
-          color: Colors.white,
-        ),
-      ),
+      child: circleColor == Colors.blue ? Icon(Icons.close, color: Colors.white) : Icon(Icons.check, color: Colors.white),
     );
   }
 
   Widget _buildCurrentWorkoutDay(DateTime date) {
     return Container(
       alignment: Alignment.center,
-      width: 28.0,
-      height: 28.0,
+      padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white,
         border: Border.all(color: AppColors.primaryColor),
       ),
-      child: Text(
-        '${date.day}',
-        style: const TextStyle(
-          fontSize: 14.0,
-          color: AppColors.primaryColor,
+      child: Center(
+        child: Text(
+          '${date.day}',
+          style: const TextStyle(
+            fontSize: 14.0,
+            color: AppColors.primaryColor,
+          ),
         ),
       ),
     );

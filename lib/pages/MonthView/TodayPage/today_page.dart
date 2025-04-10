@@ -1138,19 +1138,14 @@ class _TodayPageState extends State<TodayPage> {
   Widget warmUpSection(Size media) {
     return Container(
       width: media.width,
-      margin: EdgeInsets.symmetric(
-        horizontal: ScreenUtil.horizontalScale(4),
-        vertical: ScreenUtil.verticalScale(2),
-      ),
+      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
       child: Container(
-        margin: EdgeInsets.symmetric(
-          horizontal: ScreenUtil.verticalScale(4),
-        ),
+        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Warm-Up',
+              'Warm up',
               style: TextStyle(fontSize: ScreenUtil.horizontalScale(6), fontWeight: FontWeight.bold, color: AppColors.primaryColor),
             ),
             const SizedBox(height: 20),
@@ -1163,193 +1158,377 @@ class _TodayPageState extends State<TodayPage> {
 
               bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  appShimmerImage(
-                    networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
-                        ? monthProvider.warmUpModel?.thumbnail ??
-                            "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                        : monthProvider.warmUpModel?.thumbnail ?? "unknown",
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(ScreenUtil.verticalScale(1)),
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(ScreenUtil.verticalScale(12)),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      spreadRadius: 1,
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
                     ),
-                    height: media.width / 3.7,
-                    width: media.width / 3.7,
-                    child: Container(
-                      decoration: monthProvider.exerciseHistoryModel
-                              .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-                          ? BoxDecoration(
-                              gradient: LinearGradient(colors: [
-                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                              ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(
-                                  ScreenUtil.verticalScale(1),
-                                ),
-                              ),
-                            )
-                          : (monthProvider.exerciseHistoryModel
-                                      .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-                                  isExist)
-                              ? BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppColors.secondColor.withValues(alpha: 0.8),
-                                      AppColors.secondColor.withValues(alpha: 0.8),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(
-                                      ScreenUtil.verticalScale(1),
-                                    ),
-                                  ),
-                                )
-                              : BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(
-                                      ScreenUtil.verticalScale(1),
-                                    ),
-                                  ),
-                                ),
-                      child: Icon(
-                        monthProvider.exerciseHistoryModel
-                                .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-                            ? Icons.check
-                            : Icons.close,
-                        color: (monthProvider.exerciseHistoryModel.any((element) =>
-                                    element.dataId == warmUpDataId &&
-                                    (element.status == Status.completed || element.status == Status.skipped)) ||
-                                isExist)
-                            ? Colors.white
-                            : Colors.transparent,
-                        size: 30,
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    monthProvider.updateWarmUp(true);
+                    monthProvider.updateIsLastExercise(false);
+                    Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                  },
+                  style: ElevatedButton.styleFrom(
+                      disabledBackgroundColor: const Color(0xFFF3F3F3),
+                      backgroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(ScreenUtil.verticalScale(12)),
+                        ),
+                        side: const BorderSide(
+                          color: Color(0x12000000),
+                          width: 0.5,
+                        ),
+                      ),
+                      padding: EdgeInsets.zero),
+                  child: Container(
+                    width: media.width,
+                    padding: EdgeInsets.only(right: ScreenUtil.verticalScale(2)),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(ScreenUtil.verticalScale(12)),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: media.width * 0.1,
-                  ),
-                  SizedBox(
-                    height: media.width / 3.7,
-                    child: Column(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Container(
-                          height: ScreenUtil.horizontalScale(6.5),
-                          width: ScreenUtil.horizontalScale(6.5),
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/deadline.png'),
-                              fit: BoxFit.cover,
-                              opacity: 0.5,
+                        Consumer<MonthProvider>(builder: (context, value, child) {
+                          return Row(
+                            children: [
+                              appShimmerImage(
+                                height: media.width / 4,
+                                width: media.width / 4,
+                                networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
+                                    ? monthProvider.warmUpModel?.thumbnail ??
+                                        "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                    : monthProvider.warmUpModel?.thumbnail ?? "unknown",
+                                fit: BoxFit.contain,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                ),
+                                child: Container(
+                                  decoration: monthProvider.exerciseHistoryModel
+                                          .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+                                      ? BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                              const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                          ),
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                            bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                          ),
+                                        )
+                                      : monthProvider.exerciseHistoryModel
+                                                  .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+                                              isExist
+                                          ? BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  AppColors.secondColor.withValues(alpha: 0.8),
+                                                  AppColors.secondColor.withValues(alpha: 0.8),
+                                                ],
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                              ),
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                              ),
+                                            )
+                                          : BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                              ),
+                                            ),
+                                  child: Icon(
+                                    monthProvider.exerciseHistoryModel
+                                            .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+                                        ? Icons.check
+                                        : Icons.close,
+                                    color: monthProvider.exerciseHistoryModel
+                                                .any((element) => element.dataId == warmUpDataId && element.status == Status.completed) ||
+                                            (monthProvider.exerciseHistoryModel
+                                                    .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+                                                isExist)
+                                        ? Colors.white
+                                        : Colors.transparent,
+                                    size: 30,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: media.width / 2.5,
+                                    child: Text(
+                                      monthProvider.warmUpModel?.title ?? "Warm IUp",
+                                      style: TextStyle(
+                                        color: AppColors.primaryColor,
+                                        fontSize: ScreenUtil.horizontalScale(3.8),
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(1.5),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
+                                        child: SvgPicture.asset(
+                                          "assets/icons/trend.svg",
+                                          colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                          width: 20,
+                                        ),
+                                      ),
+                                      Text(
+                                        1 == totalWarmups ? "1 Video" : '$totalWarmups Videos',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: ScreenUtil.verticalScale(1.5),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ],
+                          );
+                        }),
+                        GestureDetector(
+                          onTap: null,
+                          child: Container(
+                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              shape: BoxShape.circle,
                             ),
-                          ),
-                        ),
-                        Container(
-                          height: ScreenUtil.horizontalScale(6.2),
-                          width: ScreenUtil.horizontalScale(6.2),
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/play.png'),
-                              fit: BoxFit.cover,
-                              opacity: 0.3,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: ScreenUtil.horizontalScale(6),
-                          width: ScreenUtil.horizontalScale(6),
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/question.png'),
-                              fit: BoxFit.cover,
-                              opacity: 0.5,
+                            child: Icon(
+                              Icons.play_arrow,
+                              color: Colors.white,
+                              size: ScreenUtil.verticalScale(3),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 5),
-                  SizedBox(
-                    height: media.width / 3.7,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${monthProvider.warmUpModel?.length ?? ""} Min',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: ScreenUtil.horizontalScale(4.5),
-                          ),
-                        ),
-                        Text(
-                          totalWarmups == 1 ? "1 Video" : '$totalWarmups Videos',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: ScreenUtil.horizontalScale(4.5),
-                          ),
-                        ),
-                        Text(
-                          'Optional',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: ScreenUtil.horizontalScale(4.5),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                ),
               );
+
+              // return Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     appShimmerImage(
+              //       networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
+              //           ? monthProvider.warmUpModel?.thumbnail ??
+              //               "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+              //           : monthProvider.warmUpModel?.thumbnail ?? "unknown",
+              //       borderRadius: BorderRadius.all(
+              //         Radius.circular(ScreenUtil.verticalScale(1)),
+              //       ),
+              //       height: media.width / 3.7,
+              //       width: media.width / 3.7,
+              //       child: Container(
+              //         decoration: monthProvider.exerciseHistoryModel
+              //                 .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+              //             ? BoxDecoration(
+              //                 gradient: LinearGradient(colors: [
+              //                   const Color(0xFFAADDAA).withValues(alpha: 0.8),
+              //                   const Color(0xFFAADDAA).withValues(alpha: 0.8),
+              //                 ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+              //                 borderRadius: BorderRadius.all(
+              //                   Radius.circular(
+              //                     ScreenUtil.verticalScale(1),
+              //                   ),
+              //                 ),
+              //               )
+              //             : (monthProvider.exerciseHistoryModel
+              //                         .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+              //                     isExist)
+              //                 ? BoxDecoration(
+              //                     gradient: LinearGradient(
+              //                       colors: [
+              //                         AppColors.secondColor.withValues(alpha: 0.8),
+              //                         AppColors.secondColor.withValues(alpha: 0.8),
+              //                       ],
+              //                       begin: Alignment.topCenter,
+              //                       end: Alignment.bottomCenter,
+              //                     ),
+              //                     borderRadius: BorderRadius.all(
+              //                       Radius.circular(
+              //                         ScreenUtil.verticalScale(1),
+              //                       ),
+              //                     ),
+              //                   )
+              //                 : BoxDecoration(
+              //                     borderRadius: BorderRadius.all(
+              //                       Radius.circular(
+              //                         ScreenUtil.verticalScale(1),
+              //                       ),
+              //                     ),
+              //                   ),
+              //         child: Icon(
+              //           monthProvider.exerciseHistoryModel
+              //                   .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+              //               ? Icons.check
+              //               : Icons.close,
+              //           color: (monthProvider.exerciseHistoryModel.any((element) =>
+              //                       element.dataId == warmUpDataId &&
+              //                       (element.status == Status.completed || element.status == Status.skipped)) ||
+              //                   isExist)
+              //               ? Colors.white
+              //               : Colors.transparent,
+              //           size: 30,
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(
+              //       width: media.width * 0.1,
+              //     ),
+              //     SizedBox(
+              //       height: media.width / 3.7,
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //         children: [
+              //           Container(
+              //             height: ScreenUtil.horizontalScale(6.5),
+              //             width: ScreenUtil.horizontalScale(6.5),
+              //             decoration: const BoxDecoration(
+              //               image: DecorationImage(
+              //                 image: AssetImage('assets/img/deadline.png'),
+              //                 fit: BoxFit.cover,
+              //                 opacity: 0.5,
+              //               ),
+              //             ),
+              //           ),
+              //           Container(
+              //             height: ScreenUtil.horizontalScale(6.2),
+              //             width: ScreenUtil.horizontalScale(6.2),
+              //             decoration: const BoxDecoration(
+              //               image: DecorationImage(
+              //                 image: AssetImage('assets/img/play.png'),
+              //                 fit: BoxFit.cover,
+              //                 opacity: 0.3,
+              //               ),
+              //             ),
+              //           ),
+              //           Container(
+              //             height: ScreenUtil.horizontalScale(6),
+              //             width: ScreenUtil.horizontalScale(6),
+              //             decoration: const BoxDecoration(
+              //               image: DecorationImage(
+              //                 image: AssetImage('assets/img/question.png'),
+              //                 fit: BoxFit.cover,
+              //                 opacity: 0.5,
+              //               ),
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //     const SizedBox(width: 5),
+              //     SizedBox(
+              //       height: media.width / 3.7,
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           Text(
+              //             '${monthProvider.warmUpModel?.length ?? ""} Min',
+              //             style: TextStyle(
+              //               color: Colors.grey,
+              //               fontSize: ScreenUtil.horizontalScale(4.5),
+              //             ),
+              //           ),
+              //           Text(
+              //             totalWarmups == 1 ? "1 Video" : '$totalWarmups Videos',
+              //             style: TextStyle(
+              //               color: Colors.grey,
+              //               fontSize: ScreenUtil.horizontalScale(4.5),
+              //             ),
+              //           ),
+              //           Text(
+              //             'Optional',
+              //             style: TextStyle(
+              //               color: Colors.grey,
+              //               fontSize: ScreenUtil.horizontalScale(4.5),
+              //             ),
+              //           )
+              //         ],
+              //       ),
+              //     )
+              //   ],
+              // );
             }),
-            Container(
-              margin: EdgeInsets.symmetric(
-                vertical: ScreenUtil.verticalScale(3),
-              ),
-              child: Consumer<MonthProvider>(
-                builder: (context, monthProvider, child) {
-                  String split =
-                      monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ??
-                          "";
-
-                  String warmUpDataId =
-                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
-                  bool isExist =
-                      (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
-
-                  return ButtonWidget(
-                    text: monthProvider.exerciseHistoryModel
-                            .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-                        ? "Completed"
-                        : monthProvider.exerciseHistoryModel
-                                    .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-                                isExist
-                            ? "Skipped"
-                            : "Start the warm-up",
-                    textColor: Colors.white,
-                    onPress: monthProvider.exerciseHistoryModel.any((element) =>
-                                element.dataId == warmUpDataId &&
-                                (element.status == Status.completed || element.status == Status.skipped)) ||
-                            isExist
-                        ? null
-                        : () async {
-                            HapticFeedBack.buttonClick();
-                            monthProvider.updateWarmUp(true);
-                            monthProvider.updateIsLastExercise(false);
-                            Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
-                          },
-                    color: AppColors.primaryColor,
-                    isLoading: false,
-                  );
-                },
-              ),
-            ),
+            SizedBox(height: 15)
+            // Container(
+            //   margin: EdgeInsets.symmetric(
+            //     vertical: ScreenUtil.verticalScale(3),
+            //   ),
+            //   child: Consumer<MonthProvider>(
+            //     builder: (context, monthProvider, child) {
+            //       String split =
+            //           monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ??
+            //               "";
+            //
+            //       String warmUpDataId =
+            //           "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
+            //       bool isExist =
+            //           (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
+            //
+            //       return ButtonWidget(
+            //         text: monthProvider.exerciseHistoryModel
+            //                 .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+            //             ? "Completed"
+            //             : monthProvider.exerciseHistoryModel
+            //                         .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+            //                     isExist
+            //                 ? "Skipped"
+            //                 : "Start the warm-up",
+            //         textColor: Colors.white,
+            //         onPress: monthProvider.exerciseHistoryModel.any((element) =>
+            //                     element.dataId == warmUpDataId &&
+            //                     (element.status == Status.completed || element.status == Status.skipped)) ||
+            //                 isExist
+            //             ? null
+            //             : () async {
+            //                 HapticFeedBack.buttonClick();
+            //                 monthProvider.updateWarmUp(true);
+            //                 monthProvider.updateIsLastExercise(false);
+            //                 Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+            //               },
+            //         color: AppColors.primaryColor,
+            //         isLoading: false,
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),

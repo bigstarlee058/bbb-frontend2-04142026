@@ -274,12 +274,12 @@ class _MonthViewState extends State<MonthView> {
                                                             ],
                                                           ),
                                                           IconButton(
-                                                            onPressed: null,
-                                                            icon: Icon(
-                                                              Icons.notifications_none,
-                                                              color: Colors.transparent,
-                                                              size: ScreenUtil.verticalScale(3),
-                                                            ),
+                                                            onPressed: null, icon: SizedBox(),
+                                                            // icon: Icon(
+                                                            //   Icons.notifications_none,
+                                                            //   color: Colors.transparent,
+                                                            //   size: ScreenUtil.verticalScale(3),
+                                                            // ),
                                                           )
                                                         ],
                                                       )

@@ -289,10 +289,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   throw 'Could not launch $url';
                                 }
                               }),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(4.5),
-                              ),
-                              settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
+                              // SizedBox(height: ScreenUtil.horizontalScale(4.5)),
+                              // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
