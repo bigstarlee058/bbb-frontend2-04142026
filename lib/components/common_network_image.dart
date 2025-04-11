@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -33,7 +35,13 @@ Widget appImage(
 }
 
 Widget appShimmerImage(
-    {required String networkImageUrl, double? height, double? width, BoxFit? fit, BorderRadiusGeometry? borderRadius, Widget? child}) {
+    {required String networkImageUrl,
+    double? height,
+    double? width,
+    BoxFit? fit,
+    BorderRadiusGeometry? borderRadius,
+    Widget? child,
+    bool? isBlur}) {
   return CachedNetworkImage(
     imageUrl: networkImageUrl.startsWith('https://storage.cloud.google.com/')
         ? networkImageUrl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
@@ -78,14 +86,41 @@ Widget appShimmerImage(
               ),
             );
     },
-    imageBuilder: (context, imageProvider) => Container(
-      height: height,
-      width: width,
-      decoration: BoxDecoration(
-        borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
-        image: DecorationImage(image: imageProvider, fit: fit),
-      ),
-      child: child,
-    ),
+    imageBuilder: (context, imageProvider) => isBlur ?? false
+        ? Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Center(
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: Image(
+                    height: height,
+                    image: imageProvider,
+                    fit: fit,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: height! * 0.12,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          )
+        : Container(
+            height: height,
+            width: width,
+            decoration: BoxDecoration(
+              borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+              image: DecorationImage(image: imageProvider, fit: fit),
+            ),
+            child: child,
+          ),
   );
 }

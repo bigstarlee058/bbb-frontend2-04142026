@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -28,7 +29,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 
 class ExercisePage extends StatefulWidget {
@@ -388,7 +388,7 @@ class _ExercisePageState extends State<ExercisePage> {
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
 
-        if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
@@ -551,7 +551,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                               ),
                                             )
                                           : Container(
-                                              height: videoNotAvailable ? media.height * 0.4 : media.height * 0.82,
+                                              height: videoNotAvailable ? media.height * 0.4 : media.height * 0.835,
                                               color: Colors.black12,
                                               child: videoNotAvailable
                                                   ? const Center(
@@ -560,16 +560,23 @@ class _ExercisePageState extends State<ExercisePage> {
                                                         style: TextStyle(color: Colors.white),
                                                       ),
                                                     )
-                                                  : Shimmer.fromColors(
-                                                      baseColor: AppColors.backOffSetColor.withValues(alpha: 0.8),
-                                                      highlightColor: AppColors.backOffSetColor.withValues(alpha: 0.9),
-                                                      child: Container(
-                                                        height: media.height * 0.82,
-                                                        width: double.infinity,
-                                                        decoration: BoxDecoration(color: AppColors.primaryColor),
-                                                      ),
-                                                    ),
-                                            ),
+                                                  : appShimmerImage(
+                                                      height: videoNotAvailable ? media.height * 0.4 : media.height * 0.8,
+                                                      width: double.infinity,
+                                                      isBlur: true,
+                                                      networkImageUrl: monthProvider?.exerciseDetailModel?.thumbnail ?? "",
+                                                      fit: BoxFit.fill,
+                                                    )
+                                              // : Shimmer.fromColors(
+                                              //     baseColor: AppColors.primaryColor.withValues(alpha: 0.7),
+                                              //     highlightColor: AppColors.primaryColor.withValues(alpha: 0.9),
+                                              //     child: Container(
+                                              //       height: media.height * 0.82,
+                                              //       width: double.infinity,
+                                              //       decoration: BoxDecoration(color: AppColors.primaryColor),
+                                              //     ),
+                                              //   ),
+                                              ),
                                     ],
                                   ),
                                 ),

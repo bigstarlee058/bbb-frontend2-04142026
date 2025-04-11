@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -65,6 +66,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
       loading = true;
     });
     await dataProvider?.fetchCurrentEx(exerciseId, "exercise 95");
+    log('exerciseId :::::::::::::::::: $exerciseId');
     if (dataProvider!.currentExerciseObj.files.isNotEmpty) {
       initializeVideo(dataProvider?.currentExerciseObj.files[0]['link']);
     } else {
@@ -446,16 +448,15 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     SizedBox(
-                                      height: media.height * 0.018,
+                                      height: media.height * 0.032,
                                     ),
-                                    //
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.center, // Vertically center the content
                                       children: [
                                         Expanded(
                                           child: Padding(
-                                            padding: const EdgeInsets.only(top: 8, right: 10),
+                                            padding: const EdgeInsets.only(top: 5, right: 10),
                                             child: Text(
                                               exerciseName,
                                               maxLines: 2,
@@ -485,23 +486,17 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
                       child: Column(
                         children: [
                           Consumer<UserDataProvider>(
-                              builder: (context, userData, child) => Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      exerciseDesc,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  )),
-                          const SizedBox(height: 20),
+                            builder: (context, userData, child) => Align(
+                              alignment: Alignment.topLeft,
+                              child:
+                                  Text(exerciseDesc, style: const TextStyle(color: Colors.black, fontSize: 14), textAlign: TextAlign.left),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
                           const EquipmentSection(),
                         ],
                       )),
-                  const SizedBox(
-                    height: 50,
-                  ),
+                  const SizedBox(height: 50),
                 ],
               ),
             ),
@@ -522,16 +517,14 @@ class _EquipmentSectionState extends State<EquipmentSection> {
     final media = MediaQuery.of(context).size;
     return Column(
       children: [
-        const SizedBox(height: 40),
         Container(
-          height: 0.5,
-          margin: const EdgeInsets.symmetric(horizontal: 40),
+          height: 0.7,
+          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 20),
           width: media.width,
           color: Colors.black12,
         ),
-        const SizedBox(height: 40),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.symmetric(horizontal: 10),
           child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
