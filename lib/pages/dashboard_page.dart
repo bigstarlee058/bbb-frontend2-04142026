@@ -1532,54 +1532,46 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-      child: Card(
-        color: Colors.grey.shade50,
-        elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: SizedBox(
-            child: SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
-              child: TableCalendar(
-                calendarFormat: CalendarFormat.week,
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                availableGestures: AvailableGestures.none,
-                rowHeight: 40.0,
-                daysOfWeekHeight: 40,
-                firstDay: DateTime.utc(2020, 1, 1),
-                lastDay: DateTime.utc(2030, 12, 31),
-                focusedDay: _focusedDay,
-                selectedDayPredicate: (day) {
-                  return isSameDay(_selectedDay, day);
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: SizedBox(
+          child: SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: TableCalendar(
+              calendarFormat: CalendarFormat.week,
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              availableGestures: AvailableGestures.none,
+              rowHeight: 40.0,
+              daysOfWeekHeight: 40,
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) {
+                return isSameDay(_selectedDay, day);
+              },
+              headerStyle: HeaderStyle(
+                headerPadding: const EdgeInsets.only(bottom: 2),
+                formatButtonVisible: false,
+                titleCentered: true,
+                leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+                rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+                titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+                titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+              ),
+              headerVisible: false,
+              calendarStyle: const CalendarStyle(
+                defaultTextStyle: TextStyle(fontSize: 14.0),
+                weekendTextStyle: TextStyle(fontSize: 14.0),
+                outsideTextStyle: TextStyle(fontSize: 14.0),
+              ),
+              calendarBuilders: CalendarBuilders(
+                todayBuilder: (context, day, focusedDay) => _buildDayState(day),
+                outsideBuilder: (context, date, _) {
+                  return _buildDayState(date);
                 },
-                headerStyle: HeaderStyle(
-                  headerPadding: const EdgeInsets.only(bottom: 2),
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                  leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
-                  rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
-                  titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
-                  titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
-                ),
-                headerVisible: false,
-                calendarStyle: const CalendarStyle(
-                  defaultTextStyle: TextStyle(fontSize: 12.0),
-                  weekendTextStyle: TextStyle(fontSize: 12.0),
-                  outsideTextStyle: TextStyle(fontSize: 10.0),
-                ),
-                calendarBuilders: CalendarBuilders(
-                  todayBuilder: (context, day, focusedDay) => _buildDayState(day),
-                  outsideBuilder: (context, date, _) {
-                    return _buildDayState(date);
-                  },
-                  defaultBuilder: (context, date, _) {
-                    return _buildDayState(date);
-                  },
-                ),
+                defaultBuilder: (context, date, _) {
+                  return _buildDayState(date);
+                },
               ),
             ),
           ),
@@ -1662,48 +1654,185 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         if (DateTime(futureDay.year, futureDay.month, futureDay.day) != DateTime(date.year, date.month, date.day)) {
           return _buildCustomDayCircle(date, Colors.blue);
         }
+      } else {
+        return _buildNormalDay(date);
       }
     } else {
       final nowUtc = DateTime.now();
       bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
       if (isCurrentDay) {
         return _buildCurrentWorkoutDay(date);
+      } else {
+        return _buildNormalDay(date);
       }
     }
 
     return null;
   }
 
+  // Widget _buildCustomDayCircle(DateTime date, Color circleColor) {
+  //   return Container(
+  //     alignment: Alignment.center,
+  //     padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
+  //     margin: const EdgeInsets.only(bottom: 6),
+  //     decoration: BoxDecoration(
+  //       shape: BoxShape.circle,
+  //       color: circleColor,
+  //     ),
+  //     child: circleColor == Colors.blue ? Icon(Icons.close, color: Colors.white) : Icon(Icons.check, color: Colors.white),
+  //   );
+  // }
+
   Widget _buildCustomDayCircle(DateTime date, Color circleColor) {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-      margin: const EdgeInsets.only(bottom: 6),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: circleColor,
-      ),
-      child: circleColor == Colors.blue ? Icon(Icons.close, color: Colors.white) : Icon(Icons.check, color: Colors.white),
+    bool isCurrentDay = date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        isCurrentDay
+            ? Positioned(
+                top: -35,
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: Container(
+                  decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
+                  height: 150,
+                  child: Builder(
+                    builder: (context) {
+                      final text = DateFormat.E().format(date);
+                      return Container(
+                        padding: const EdgeInsets.all(5),
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          text,
+                          style: TextStyle(fontSize: 14.0, color: Colors.black),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              )
+            : SizedBox(),
+        isCurrentDay
+            ? Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(ScreenUtil.horizontalScale(0.2)),
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: circleColor,
+                ),
+                child: Center(
+                  child: Text(
+                    '${date.day}',
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )
+            : Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: circleColor,
+                ),
+                child: Text(
+                  '${date.day}',
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+      ],
     );
   }
 
+  // Widget _buildCurrentWorkoutDay(DateTime date) {
+  //   return Container(
+  //     alignment: Alignment.center,
+  //     padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
+  //     margin: const EdgeInsets.only(bottom: 6),
+  //     decoration: BoxDecoration(
+  //       shape: BoxShape.circle,
+  //       color: Colors.white,
+  //       border: Border.all(color: AppColors.primaryColor),
+  //     ),
+  //     child: Center(
+  //       child: Text(
+  //         '${date.day}',
+  //         style: const TextStyle(
+  //           fontSize: 14.0,
+  //           color: AppColors.primaryColor,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _buildCurrentWorkoutDay(DateTime date) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          top: -35,
+          bottom: 0,
+          right: 0,
+          left: 0,
+          child: Container(
+            decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
+            height: 150,
+            child: Builder(
+              builder: (context) {
+                final text = DateFormat.E().format(date);
+                return Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    text,
+                    style: TextStyle(fontSize: 14.0, color: Colors.black),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+            border: Border.all(color: AppColors.primaryColor),
+          ),
+          child: Text(
+            '${date.day}',
+            style: const TextStyle(
+              fontSize: 14.0,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNormalDay(DateTime date) {
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-      margin: const EdgeInsets.only(bottom: 6),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-        border: Border.all(color: AppColors.primaryColor),
-      ),
-      child: Center(
-        child: Text(
-          '${date.day}',
-          style: const TextStyle(
-            fontSize: 14.0,
-            color: AppColors.primaryColor,
-          ),
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        '${date.day}',
+        style: const TextStyle(
+          fontSize: 14.0,
+          color: Colors.black,
         ),
       ),
     );

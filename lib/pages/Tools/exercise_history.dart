@@ -26,13 +26,22 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
 
   @override
   void initState() {
-    super.initState();
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    _loadValue();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await fetchData().then((value) => _loadValue()));
+    super.initState();
+  }
+
+  Future<void> fetchData() async {
+    setState(() => isLoading = true);
+    try {
+      await monthProvider?.fetchExerciseHistroy();
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> _loadValue() async {
-    isLoading = true;
+    await monthProvider?.fetchExerciseHistroy();
     Map<String, Map<String, double>> groupedData = {};
     DateTime today = DateTime.now();
     DateTime startDate = today.subtract(Duration(
@@ -50,7 +59,11 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     historyDataModel.sort((a, b) => DateTime.parse(a.date ?? "").compareTo(DateTime.parse(b.date ?? "")));
 
     setState(() {});
-    if (historyDataModel.isEmpty) return;
+    if (historyDataModel.isEmpty) {
+      isLoading = false;
+      setState(() {});
+      return;
+    }
 
     for (var data in historyDataModel) {
       double weight = double.tryParse(data.weight.toString()) ?? 0.0;
@@ -59,26 +72,25 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       DateTime date = DateTime.parse(data.date!);
       String formattedDate = DateFormat('dd/MM').format(date);
       if (!groupedData.containsKey(formattedDate)) {
-        groupedData[formattedDate] = {
-          'totalWeight': 0.0,
-          'totalReps': 0.0,
-          'totalRIR': 0.0,
-        };
+        groupedData[formattedDate] = {'oneRmSession': 0.0};
       }
-
-      groupedData[formattedDate]!['totalWeight'] = groupedData[formattedDate]!['totalWeight']! + weight;
-      groupedData[formattedDate]!['totalReps'] = groupedData[formattedDate]!['totalReps']! + reps.toDouble();
-      groupedData[formattedDate]!['totalRIR'] =
-          groupedData[formattedDate]!['totalRIR']! + (repsInReverse == 100 ? 0 : repsInReverse.toDouble());
+      double rir = (repsInReverse == 100 ? 0 : repsInReverse.toDouble());
+      // groupedData[formattedDate]!['totalWeight'] = groupedData[formattedDate]!['totalWeight']! + weight;
+      // groupedData[formattedDate]!['totalReps'] = groupedData[formattedDate]!['totalReps']! + reps.toDouble();
+      // groupedData[formattedDate]!['totalRIR'] =
+      //     groupedData[formattedDate]!['totalRIR']! + (repsInReverse == 100 ? 0 : repsInReverse.toDouble());
+      double oneRmSession = weight * (1 + (reps + rir) / 30);
+      groupedData[formattedDate]!['oneRmSession'] = groupedData[formattedDate]!['oneRmSession']! + oneRmSession;
     }
     chartData = [];
     dateLabels = [];
     int index = 0;
     groupedData.forEach((date, totals) {
-      double totalWeightForDate = totals['totalWeight']!;
-      double totalReps = totals['totalReps']!;
-      double totalRIR = totals['totalRIR']!;
-      double oneRmSession = totalWeightForDate * (1 + (totalReps + totalRIR) / 30);
+      // double totalWeightForDate = totals['totalWeight']!;
+      // double totalReps = totals['totalReps']!;
+      // double totalRIR = totals['totalRIR']!;
+      // double oneRmSession = totalWeightForDate * (1 + (totalReps + totalRIR) / 30);
+      double oneRmSession = totals['oneRmSession']!;
       chartData.add(FlSpot(index.toDouble(), double.parse(oneRmSession.toStringAsFixed(2))));
       dateLabels.add(date);
       index++;
@@ -93,8 +105,8 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   Future<void> _onFilterSelected(int index) async {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       selectedFilterIndex = index;
-      await _loadValue();
       setState(() {});
+      await _loadValue();
     });
   }
 
@@ -183,313 +195,315 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
           ),
         ),
       ),
-      body: isLoading
-          ? const SizedBox()
-          : Builder(
-              builder: (context) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          Padding(
+            padding: commonPadding(),
+            child: Center(
+              child: Text(
+                monthProvider?.selectedExercise?.name ?? "",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (isLoading)
+            Expanded(
+              child: Center(
+                child: CircularProgressIndicator(color: AppColors.primaryColor),
+              ),
+            )
+          else ...[
+            if (historyDataModel.isEmpty)
+              Padding(
+                padding: commonPadding(),
+                child: const Center(
+                  child: Text(
+                    "No data available.",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: commonPadding(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: commonPadding(),
-                      child: Center(
-                        child: Text(
-                          monthProvider?.selectedExercise?.name ?? "",
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                    const Text(
+                      '1-Rep Max History',
+                      style: TextStyle(fontSize: 16),
                     ),
-                    const SizedBox(height: 8),
-                    if (historyDataModel.isEmpty)
-                      Padding(
-                        padding: commonPadding(),
-                        child: const Center(
-                          child: Text(
-                            "No data available.",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                    Row(
+                      children: [
+                        FilterButton(
+                          label: "1M",
+                          isSelected: selectedFilterIndex == 0,
+                          onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _onFilterSelected(0)),
                         ),
-                      )
-                    else
-                      Padding(
-                        padding: commonPadding(),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              '1-Rep Max History',
-                              style: TextStyle(fontSize: 16),
+                        const SizedBox(width: 5),
+                        FilterButton(
+                          label: "3M",
+                          isSelected: selectedFilterIndex == 1,
+                          onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _onFilterSelected(1)),
+                        ),
+                        const SizedBox(width: 5),
+                        FilterButton(
+                          label: "1Y",
+                          isSelected: selectedFilterIndex == 2,
+                          onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _onFilterSelected(2)),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            const SizedBox(height: 16),
+            historyDataModel.isEmpty
+                ? const SizedBox.shrink()
+                : Padding(
+                    padding: commonPadding(),
+                    child: maxWeight != 0
+                        ? SizedBox(
+                            height: ScreenUtil.verticalScale(18),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: LineChart(
+                                LineChartData(
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawHorizontalLine: true,
+                                    drawVerticalLine: false,
+                                    horizontalInterval: (maxWeight / 5).ceilToDouble(),
+                                    getDrawingHorizontalLine: (value) {
+                                      return const FlLine(color: Colors.grey, strokeWidth: 0.5, dashArray: [5, 5]);
+                                    },
+                                  ),
+                                  titlesData: FlTitlesData(
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 40,
+                                        getTitlesWidget: (value, meta) {
+                                          return Text(
+                                            value.toString(),
+                                            style: const TextStyle(fontSize: 10),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 20,
+                                        interval: 1,
+                                        getTitlesWidget: (value, meta) {
+                                          int index = value.toInt();
+                                          if (index >= 0 && index < dateLabels.length) {
+                                            return Text(
+                                              dateLabels[index],
+                                              style: const TextStyle(fontSize: 10),
+                                            );
+                                          }
+                                          return const Text('');
+                                        },
+                                      ),
+                                    ),
+                                    rightTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    topTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(
+                                    border: const Border(
+                                      top: BorderSide.none,
+                                      right: BorderSide.none,
+                                      left: BorderSide.none,
+                                      bottom: BorderSide(width: .5),
+                                    ),
+                                  ),
+                                  minY: 0,
+                                  maxY: (maxWeight * 1.5).ceilToDouble(),
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: chartData,
+                                      isCurved: false,
+                                      barWidth: .5,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                            Row(
-                              children: [
-                                FilterButton(
-                                  label: "1M",
-                                  isSelected: selectedFilterIndex == 0,
-                                  onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _onFilterSelected(0)),
-                                ),
-                                const SizedBox(width: 5),
-                                FilterButton(
-                                  label: "3M",
-                                  isSelected: selectedFilterIndex == 1,
-                                  onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _onFilterSelected(1)),
-                                ),
-                                const SizedBox(width: 5),
-                                FilterButton(
-                                  label: "1Y",
-                                  isSelected: selectedFilterIndex == 2,
-                                  onPressed: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _onFilterSelected(2)),
-                                ),
-                              ],
-                            )
+                          )
+                        : const SizedBox(),
+                  ),
+            const SizedBox(height: 25),
+            historyDataModel.isEmpty
+                ? const SizedBox.shrink()
+                : Padding(
+                    padding: commonPadding(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$totalWeight lbs',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Total Lifted',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    const SizedBox(height: 16),
-                    historyDataModel.isEmpty
-                        ? const SizedBox.shrink()
-                        : Padding(
-                            padding: commonPadding(),
-                            child: maxWeight != 0
-                                ? SizedBox(
-                                    height: ScreenUtil.verticalScale(18),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: LineChart(
-                                        LineChartData(
-                                          gridData: FlGridData(
-                                            show: true,
-                                            drawHorizontalLine: true,
-                                            drawVerticalLine: false,
-                                            horizontalInterval: (maxWeight / 5).ceilToDouble(),
-                                            getDrawingHorizontalLine: (value) {
-                                              return const FlLine(color: Colors.grey, strokeWidth: 0.5, dashArray: [5, 5]);
-                                            },
-                                          ),
-                                          titlesData: FlTitlesData(
-                                            leftTitles: AxisTitles(
-                                              sideTitles: SideTitles(
-                                                showTitles: true,
-                                                reservedSize: 40,
-                                                getTitlesWidget: (value, meta) {
-                                                  return Text(
-                                                    value.toString(),
-                                                    style: const TextStyle(fontSize: 10),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            bottomTitles: AxisTitles(
-                                              sideTitles: SideTitles(
-                                                showTitles: true,
-                                                reservedSize: 20,
-                                                interval: 1,
-                                                getTitlesWidget: (value, meta) {
-                                                  int index = value.toInt();
-                                                  if (index >= 0 && index < dateLabels.length) {
-                                                    return Text(
-                                                      dateLabels[index],
-                                                      style: const TextStyle(fontSize: 10),
-                                                    );
-                                                  }
-                                                  return const Text('');
-                                                },
-                                              ),
-                                            ),
-                                            rightTitles: const AxisTitles(
-                                              sideTitles: SideTitles(showTitles: false),
-                                            ),
-                                            topTitles: const AxisTitles(
-                                              sideTitles: SideTitles(showTitles: false),
-                                            ),
-                                          ),
-                                          borderData: FlBorderData(
-                                            border: const Border(
-                                              top: BorderSide.none,
-                                              right: BorderSide.none,
-                                              left: BorderSide.none,
-                                              bottom: BorderSide(width: .5),
-                                            ),
-                                          ),
-                                          minY: 0,
-                                          maxY: (maxWeight * 1.5).ceilToDouble(),
-                                          lineBarsData: [
-                                            LineChartBarData(
-                                              spots: chartData,
-                                              isCurved: false,
-                                              barWidth: .5,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '$maxWeight lbs',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              '1 Rep Max',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+            const SizedBox(height: 16),
+            historyDataModel.isEmpty || finalData.isEmpty
+                ? const SizedBox.shrink()
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: finalData.length,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withValues(alpha: .1),
                           ),
-                    const SizedBox(height: 25),
-                    historyDataModel.isEmpty
-                        ? const SizedBox.shrink()
-                        : Padding(
-                            padding: commonPadding(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      '$totalWeight lbs',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    const Text(
-                                      'Total Lifted',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      '$maxWeight lbs',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    const Text(
-                                      '1 Rep Max',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                    const SizedBox(height: 16),
-                    historyDataModel.isEmpty || finalData.isEmpty
-                        ? const SizedBox.shrink()
-                        : Expanded(
-                            child: ListView.builder(
-                              itemCount: finalData.length,
-                              padding: EdgeInsets.zero,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.withValues(alpha: .1),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              flex: 1,
-                                              child: Text(
-                                                DateFormat("MMM dd, yyyy").format(DateFormat("dd/MM/yyyy").parse(finalData[index]["date"])),
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              flex: 2,
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: List.generate(
-                                                  finalData[index]["data"].length,
-                                                  (index1) {
-                                                    ExerciseHistoryDataModel data = finalData[index]["data"][index1];
-                                                    return Padding(
-                                                      padding: const EdgeInsets.all(8.0),
-                                                      child: Wrap(
-                                                        children: [
-                                                          RichText(
-                                                            text: TextSpan(
-                                                              children: [
-                                                                TextSpan(
-                                                                  text: '${data.reps}',
-                                                                  style: const TextStyle(
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.normal,
-                                                                    color: Colors.black,
-                                                                  ),
-                                                                ),
-                                                                const TextSpan(
-                                                                  text: ' × ',
-                                                                  style: TextStyle(
-                                                                    fontSize: 14,
-                                                                    color: Colors.black87,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  text: '${data.weight}lbs',
-                                                                  style: const TextStyle(
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.w700,
-                                                                    color: Colors.black,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  text: ' @ ${data.load}% ',
-                                                                  style: TextStyle(
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.normal,
-                                                                    color: Colors.black,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  text: '| RIR ${data.effort == "100" ? "0" : data.effort}',
-                                                                  style: const TextStyle(
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.normal,
-                                                                    color: Colors.black,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        DateFormat("MMM dd, yyyy").format(DateFormat("dd/MM/yyyy").parse(finalData[index]["date"])),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: List.generate(
+                                          finalData[index]["data"].length,
+                                          (index1) {
+                                            ExerciseHistoryDataModel data = finalData[index]["data"][index1];
+                                            return Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Wrap(
+                                                children: [
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: '${data.reps}',
+                                                          style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.normal,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        const TextSpan(
+                                                          text: ' × ',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors.black87,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: '${data.weight}lbs',
+                                                          style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.w700,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: ' @ ${data.load}% ',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.normal,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: '| RIR ${data.effort == "100" ? "0" : data.effort}',
+                                                          style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.normal,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                  ],
-                );
-              },
-            ),
+                        );
+                      },
+                    ),
+                  ),
+          ]
+        ],
+      ),
     );
   }
 
