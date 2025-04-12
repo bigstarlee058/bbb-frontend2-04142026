@@ -699,7 +699,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                               onPressed: () async {
                                 await _saveDayData(status: Status.skipped, type: 'Rest Day', endDate: true).then(
                                   (value) {
-                                    monthProvider?.onInit(isEnabled: false);
+                                    monthProvider?.onInit(context, isEnabled: false);
                                   },
                                 );
                                 if (!c1.mounted) return;
@@ -731,7 +731,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                               onPressed: () async {
                                 await _saveDayData(status: Status.completed, type: 'Rest Day', endDate: true).then(
                                   (value) {
-                                    monthProvider?.onInit(isEnabled: false);
+                                    monthProvider?.onInit(context, isEnabled: false);
                                   },
                                 );
                                 if (!c1.mounted) return;

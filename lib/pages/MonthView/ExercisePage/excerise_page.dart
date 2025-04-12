@@ -201,7 +201,7 @@ class _ExercisePageState extends State<ExercisePage> {
     setState(() {
       loading = true;
     });
-    await monthProvider?.onInit();
+    await monthProvider?.onInit(context);
     String rawTempData = preferences.getString(SharedPreference.payload) ?? "";
     if (rawTempData.isEmpty) {
       log('Error: rawTempData is empty.');

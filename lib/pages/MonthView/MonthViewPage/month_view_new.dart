@@ -52,7 +52,7 @@ class _MonthViewState extends State<MonthView> {
       if (_currentDate.day != newDate.day) {
         setState(() {
           _currentDate = newDate;
-          monthProvider?.onInit(isEnabled: false);
+          monthProvider?.onInit(context, isEnabled: false);
         });
       }
     });
@@ -178,7 +178,7 @@ class _MonthViewState extends State<MonthView> {
             ),
             RefreshIndicator(
               color: AppColors.primaryColor,
-              onRefresh: () async => await monthProvider?.onInit(isEnabled: false),
+              onRefresh: () async => await monthProvider?.onInit(context, isEnabled: false),
               child: ListView(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
@@ -297,7 +297,7 @@ class _MonthViewState extends State<MonthView> {
                                             horizontal: ScreenUtil.horizontalScale(8),
                                             vertical: ScreenUtil.verticalScale(2),
                                           ),
-                                          height: media.height * 0.22,
+                                          height: media.height * 0.21,
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             crossAxisAlignment: CrossAxisAlignment.center,

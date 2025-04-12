@@ -60,16 +60,22 @@ class _DashboardPageState extends State<DashboardPage> {
   DateTime _currentDate = DateTime.now();
   @override
   void initState() {
-    super.initState();
-    onInit();
-    _dateNotifier.stream.listen((newDate) {
-      if (_currentDate.day != newDate.day) {
-        setState(() {
-          _currentDate = newDate;
-          monthProvider.onInit(isEnabled: false);
-        });
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) => onInit().then(
+        (value) {
+          _dateNotifier.stream.listen((newDate) {
+            if (_currentDate.day != newDate.day) {
+              setState(
+                () {
+                  _currentDate = newDate;
+                  monthProvider.onInit(context, isEnabled: false);
+                },
+              );
+            }
+          });
+        },
+      ),
+    );
     super.initState();
   }
 
@@ -118,7 +124,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  void loadUserInfo() async {
+  Future<void> loadUserInfo() async {
     await userData?.loadUserInfo();
   }
 
@@ -250,7 +256,8 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             RefreshIndicator(
               color: AppColors.primaryColor,
-              onRefresh: () async => await _initializeFetchData().then((value) async => await monthProvider.onInit(isEnabled: false)),
+              onRefresh: () async =>
+                  await _initializeFetchData().then((value) async => await monthProvider.onInit(context, isEnabled: false)),
               child: SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
                 child: Column(

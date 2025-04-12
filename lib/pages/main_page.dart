@@ -74,7 +74,7 @@ class _MainPageState extends State<MainPage> {
       (timeStamp) async => await _initializeFetchData().then(
         (value) async {
           if (monthProvider.monthDataModel == null) {
-            await monthProvider.onInit();
+            await monthProvider.onInit(context);
           }
         },
       ),
