@@ -60,22 +60,16 @@ class _DashboardPageState extends State<DashboardPage> {
   DateTime _currentDate = DateTime.now();
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) => onInit().then(
-        (value) {
-          _dateNotifier.stream.listen((newDate) {
-            if (_currentDate.day != newDate.day) {
-              setState(
-                () {
-                  _currentDate = newDate;
-                  monthProvider.onInit(context, isEnabled: false);
-                },
-              );
-            }
-          });
-        },
-      ),
-    );
+    super.initState();
+    onInit();
+    _dateNotifier.stream.listen((newDate) {
+      if (_currentDate.day != newDate.day) {
+        setState(() {
+          _currentDate = newDate;
+          monthProvider.onInit(context, isEnabled: false);
+        });
+      }
+    });
     super.initState();
   }
 
@@ -149,9 +143,6 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async => await dataProvider?.fetchMonthWorkouts(3),
-      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -684,7 +675,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ),
                                 ),
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
+                                  horizontal: ScreenUtil.horizontalScale(8.5),
                                   vertical: ScreenUtil.verticalScale(2),
                                 ),
                                 child: Consumer<MonthProvider>(
@@ -713,7 +704,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     }
                                     return Column(
                                       children: [
-                                        const SizedBox(height: 10),
+                                        const SizedBox(height: 15),
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
@@ -756,7 +747,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               const SizedBox(height: 10),
                               Container(
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(8),
+                                  horizontal: ScreenUtil.horizontalScale(9),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -789,7 +780,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   return Column(
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                                         child: Row(
                                           children: [
                                             Padding(
@@ -811,105 +802,108 @@ class _DashboardPageState extends State<DashboardPage> {
                                   );
                                 },
                               ),
-                              Container(
-                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(top: 25, bottom: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "Recent Activity",
-                                        style: TextStyle(
-                                          color: AppColors.primaryColor,
-                                          fontSize: ScreenUtil.horizontalScale(5.2),
-                                          fontWeight: FontWeight.w700,
+                              if ((monthProvider.graphHistory.isEmpty && monthProvider.reportWeightLiftedGraphHistory.isEmpty) ==
+                                  false) ...[
+                                Container(
+                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(top: 25, bottom: 20),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Recent Activity",
+                                          style: TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: ScreenUtil.horizontalScale(5.2),
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    PopupMenuButton<String>(
-                                      color: const Color.fromARGB(255, 252, 252, 252),
-                                      elevation: 10,
-                                      shadowColor: Colors.black.withValues(alpha: 0.2),
-                                      itemBuilder: (context) {
-                                        return [
-                                          "Exercises Completed",
-                                          // "Time Spent",
-                                          "Weight Lifted",
-                                        ].map((str) {
-                                          return PopupMenuItem(
-                                              value: str,
-                                              child: Material(
-                                                elevation: 0,
-                                                color: const Color.fromARGB(255, 252, 252, 252),
-                                                child: Text(
-                                                  str,
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                      PopupMenuButton<String>(
+                                        color: const Color.fromARGB(255, 252, 252, 252),
+                                        elevation: 10,
+                                        shadowColor: Colors.black.withValues(alpha: 0.2),
+                                        itemBuilder: (context) {
+                                          return [
+                                            "Exercises Completed",
+                                            // "Time Spent",
+                                            "Weight Lifted",
+                                          ].map((str) {
+                                            return PopupMenuItem(
+                                                value: str,
+                                                child: Material(
+                                                  elevation: 0,
+                                                  color: const Color.fromARGB(255, 252, 252, 252),
+                                                  child: Text(
+                                                    str,
+                                                    style: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: ScreenUtil.verticalScale(1.5),
+                                                    ),
                                                   ),
-                                                ),
-                                              ));
-                                        }).toList();
-                                      },
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: <Widget>[
-                                          Text(
-                                            selectedChart,
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: ScreenUtil.verticalScale(1.5),
+                                                ));
+                                          }).toList();
+                                        },
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: <Widget>[
+                                            Text(
+                                              selectedChart,
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: ScreenUtil.verticalScale(1.5),
+                                              ),
                                             ),
-                                          ),
-                                          const Icon(
-                                            Icons.keyboard_arrow_down_rounded,
-                                            color: Colors.grey,
-                                          ),
-                                        ],
-                                      ),
-                                      onSelected: (v) {
-                                        setState(() {
-                                          selectedChart = v;
-                                        });
-                                      },
-                                    )
-                                  ],
+                                            const Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              color: Colors.grey,
+                                            ),
+                                          ],
+                                        ),
+                                        onSelected: (v) {
+                                          setState(() {
+                                            selectedChart = v;
+                                          });
+                                        },
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(9),
+                                  ),
+                                  child: selectedChart == "Exercises Completed"
+                                      ? const ExerciseCompletedGraph()
+                                      : selectedChart == "Weight Lifted"
+                                          ? const WeightLiftedGraph()
+                                          // : const TimeSpentGraph(),
+                                          : const SizedBox(),
+                                ),
+                                const SizedBox(height: 15),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(9),
+                                  ),
+                                  child: ButtonWidget(
+                                    text: 'See all progress reports',
+                                    textColor: Colors.white,
+                                    color: AppColors.primaryColor,
+                                    onPress: () {
+                                      Navigator.pushNamed(context, "/graphAndReports");
+                                    },
+                                    isLoading: false,
+                                  ),
+                                ),
+                              ],
 
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
-                                ),
-                                child: selectedChart == "Exercises Completed"
-                                    ? const ExerciseCompletedGraph()
-                                    : selectedChart == "Weight Lifted"
-                                        ? const WeightLiftedGraph()
-                                        // : const TimeSpentGraph(),
-                                        : const SizedBox(),
-                              ),
-                              const SizedBox(height: 15),
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
-                                ),
-                                child: ButtonWidget(
-                                  text: 'See all progress reports',
-                                  textColor: Colors.white,
-                                  color: AppColors.primaryColor,
-                                  onPress: () {
-                                    Navigator.pushNamed(context, "/graphAndReports");
-                                  },
-                                  isLoading: false,
-                                ),
-                              ),
                               const SizedBox(height: 15),
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
+                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7), vertical: 15),
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.horizontalScale(5)),
+                                      horizontal: ScreenUtil.horizontalScale(3.5), vertical: ScreenUtil.horizontalScale(5)),
                                   decoration: BoxDecoration(
                                     color: Colors.grey[100],
                                     borderRadius: BorderRadius.circular(15),
@@ -1003,7 +997,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
                               Container(
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
+                                  horizontal: ScreenUtil.horizontalScale(9),
                                 ),
                                 child: ButtonWidget(
                                   text: 'See all Achievements',
@@ -1538,7 +1532,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: SizedBox(

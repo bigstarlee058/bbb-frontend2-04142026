@@ -62,7 +62,7 @@ class _MonthViewState extends State<MonthView> {
         String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";
         monthProvider?.monthLocalDataModel.sort((a, b) =>
             DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
-        bool alreadySetUp = (monthId == "${monthProvider!.monthDataModel!.id}");
+        bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
         if (!alreadySetUp && monthProvider!.allDayHistoryModel.isEmpty) {
           openSettingDialog();
         }

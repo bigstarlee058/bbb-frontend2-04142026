@@ -1463,8 +1463,6 @@ class MonthProvider extends ChangeNotifier {
         }
       }
 
-      log('monthDataModel!.weeks!.map((e) => e.restDayList,) :::::::::::::::::: ${monthDataModel!.weeks!.map((e) => e.restDayList)}');
-
       notifyListeners();
     } catch (e) {
       debugPrint("Error fetching all day status local data: $e");

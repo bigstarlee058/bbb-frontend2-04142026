@@ -1145,7 +1145,7 @@ class _TodayPageState extends State<TodayPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Warm up',
+              'Warmup',
               style: TextStyle(fontSize: ScreenUtil.horizontalScale(6), fontWeight: FontWeight.bold, color: AppColors.primaryColor),
             ),
             const SizedBox(height: 20),

@@ -2,12 +2,15 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/pages/profile_boarding_screen.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
@@ -98,6 +101,29 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: Padding(
+      //   padding: EdgeInsets.only(bottom: 75),
+      //   child: InkWell(
+      //     child: Container(
+      //       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+      //       decoration: BoxDecoration(color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
+      //       child: Text(
+      //         "Profile Onboarding",
+      //         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      //       ),
+      //     ),
+      //     onTap: () async {
+      //       await Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //           builder: (context) => ProfileBoardingScreen(
+      //             image: '',
+      //           ),
+      //         ),
+      //       );
+      //     },
+      //   ),
+      // ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -130,10 +156,27 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   margin: const EdgeInsets.only(right: 10, bottom: 0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Container(
+                                      SizedBox(
+                                        height: 15,
+                                        width: media.width / 5,
+                                      ),
+                                      Padding(
                                         padding: EdgeInsets.only(
                                           top: ScreenUtil.verticalScale(1),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Profile',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       const CommonStreakWithNotification(routeString: "setting")
@@ -147,14 +190,17 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(4),
+                                      ),
                                       GestureDetector(
                                         onTap: _pickAndUploadImage,
                                         child: Consumer<UserDataProvider>(
                                           builder: (context, userData, child) =>
                                               userData.userData['detail'] != null && userData.userData['detail']['avatarUrl'] != ""
                                                   ? Container(
-                                                      height: ScreenUtil.horizontalScale(25),
-                                                      width: ScreenUtil.horizontalScale(25),
+                                                      height: ScreenUtil.horizontalScale(23.5),
+                                                      width: ScreenUtil.horizontalScale(23.5),
                                                       decoration: BoxDecoration(
                                                         color: Colors.grey.withValues(alpha: .9),
                                                         borderRadius: BorderRadius.all(
@@ -185,7 +231,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(5),
+                                        height: ScreenUtil.horizontalScale(3),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -194,7 +240,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                 userData.userName,
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(8),
+                                                  fontSize: ScreenUtil.horizontalScale(6),
                                                   fontWeight: FontWeight.bold,
                                                   height: 1,
                                                 ),
@@ -202,15 +248,168 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             : const SizedBox(),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(2),
+                                        height: ScreenUtil.horizontalScale(0.7),
                                       ),
-                                      Text(
-                                        "Here's your profile",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(5.5),
+                                      Consumer<UserDataProvider>(
+                                        builder: (context, userData, child) => userData.userName != ""
+                                            ? Text(
+                                                userData.userEmail,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.horizontalScale(3.5),
+                                                  fontWeight: FontWeight.normal,
+                                                  height: 1,
+                                                ),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(9),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pushNamed(context, "/seeAllAchievementPage");
+                                              },
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(1.4)),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white.withValues(alpha: 0.35),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: SvgPicture.asset(
+                                                      "assets/img/verified (1).svg",
+                                                      height: 22,
+                                                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: ScreenUtil.verticalScale(0.9)),
+                                                  Builder(builder: (context) {
+                                                    final achievements = context
+                                                        .watch<MonthProvider>()
+                                                        .items
+                                                        .where((element) => element["isArchived"] == true)
+                                                        .length;
+                                                    return Column(
+                                                      children: [
+                                                        Text(
+                                                          "$achievements",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.horizontalScale(3.2),
+                                                            fontWeight: FontWeight.bold,
+                                                            height: 1,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                        Text(
+                                                          "Achievement${achievements > 1 ? "s" : ""}",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.horizontalScale(3),
+                                                            fontWeight: FontWeight.normal,
+                                                            height: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }),
+                                                ],
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                                onTap: () {
+                                                  Navigator.pushNamed(context, '/streak-calendar');
+                                                },
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      padding: EdgeInsets.all(ScreenUtil.verticalScale(1.4)),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white.withValues(alpha: 0.35),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Icon(Icons.local_fire_department_outlined, color: Colors.white, size: 22),
+                                                    ),
+                                                    SizedBox(height: ScreenUtil.verticalScale(0.9)),
+                                                    Column(
+                                                      children: [
+                                                        Text(
+                                                          "${context.watch<MonthProvider>().streak} Day${context.watch<MonthProvider>().streak > 1 ? "s" : ""}",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.horizontalScale(3.2),
+                                                            fontWeight: FontWeight.bold,
+                                                            height: 1,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                        Text(
+                                                          "Streaks",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.horizontalScale(3),
+                                                            fontWeight: FontWeight.normal,
+                                                            height: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                )),
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.all(ScreenUtil.verticalScale(1.4)),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white.withValues(alpha: 0.35),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(Icons.calendar_month, color: Colors.white, size: 22),
+                                                ),
+                                                SizedBox(height: ScreenUtil.verticalScale(0.9)),
+                                                Builder(builder: (context) {
+                                                  String accountCreatedDate = context.watch<UserDataProvider>().userData != null
+                                                      ? context.watch<UserDataProvider>().userData["createdAt"]
+                                                      : "";
+                                                  DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
+                                                  DateTime today = DateTime.now();
+                                                  int dayDifference = today.difference(targetDate).inDays;
+                                                  return Column(
+                                                    children: [
+                                                      Text(
+                                                        "$dayDifference Day${dayDifference > 1 ? "s" : ""}",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: ScreenUtil.horizontalScale(3.2),
+                                                          fontWeight: FontWeight.bold,
+                                                          height: 1,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                      Text(
+                                                        "Since Joined",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: ScreenUtil.horizontalScale(3),
+                                                          fontWeight: FontWeight.normal,
+                                                          height: 1,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                })
+                                              ],
+                                            ),
+                                          ],
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -219,7 +418,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 2.64,
+                          height: media.height / 2.25,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -241,7 +440,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                    top: media.height / 2.65,
+                    top: media.height / 2.25,
                     bottom: ScreenUtil.verticalScale(10),
                   ),
                   child: Container(
@@ -262,13 +461,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                           child: Column(
                             children: [
                               SizedBox(
-                                height: ScreenUtil.verticalScale(2),
+                                height: ScreenUtil.verticalScale(0.5),
                               ),
                               settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
                                   () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
                               ),
+
                               settingsButton('My Profile', Icons.person, () => Navigator.pushNamed(context, '/myprofile')),
                               SizedBox(
                                 height: ScreenUtil.horizontalScale(4.5),
@@ -296,7 +496,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               ),
                               settingsButton('Support', Icons.handshake, () {
                                 toSupportPage();
-                              }), //This is part modified by me
+                              }),
                               // SizedBox(
                               //   height: ScreenUtil.horizontalScale(4.5),
                               // ),
@@ -309,7 +509,10 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               ),
                               settingsButton('Log Out', Icons.logout, () {
                                 _handleLogout(context);
-                              }), //This is part modified by me
+                              }),
+                              SizedBox(
+                                height: ScreenUtil.horizontalScale(5),
+                              ),
                             ],
                           ),
                         ),
@@ -326,29 +529,29 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   }
 
   Widget settingsButton(String title, IconData icon, VoidCallback onPressed) {
-    return GestureDetector(
+    return InkWell(
       onTap: onPressed,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: ScreenUtil.horizontalScale(5),
-          vertical: ScreenUtil.verticalScale(2),
+          horizontal: ScreenUtil.horizontalScale(2.5),
+          vertical: ScreenUtil.verticalScale(1),
         ),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFAFAFA),
-          borderRadius: BorderRadius.all(
-            Radius.circular(
-              ScreenUtil.verticalScale(7),
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF000000).withValues(alpha: 0.05),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
+        // decoration: BoxDecoration(
+        //   color: const Color(0xFFFAFAFA),
+        //   borderRadius: BorderRadius.all(
+        //     Radius.circular(
+        //       ScreenUtil.verticalScale(7),
+        //     ),
+        //   ),
+        //   boxShadow: [
+        //     BoxShadow(
+        //       color: const Color(0xFF000000).withValues(alpha: 0.05),
+        //       spreadRadius: 1,
+        //       blurRadius: 3,
+        //       offset: const Offset(0, 1),
+        //     ),
+        //   ],
+        // ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

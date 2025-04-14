@@ -174,6 +174,23 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                           Navigator.pop(context);
                                         },
                                       ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          top: ScreenUtil.verticalScale(1),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'My Profile',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                       const CommonStreakWithNotification(routeString: '/myprofile')
                                     ],
                                   ),
@@ -185,6 +202,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(5),
+                                      ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
                                             ? ProfileImageWidget(
@@ -202,7 +222,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                             : const SizedBox(),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(5),
+                                        height: ScreenUtil.horizontalScale(7),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -211,8 +231,24 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                 userData.userName,
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(8),
+                                                  fontSize: ScreenUtil.horizontalScale(7),
                                                   fontWeight: FontWeight.bold,
+                                                  height: 1,
+                                                ),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(0.7),
+                                      ),
+                                      Consumer<UserDataProvider>(
+                                        builder: (context, userData, child) => userData.userName != ""
+                                            ? Text(
+                                                userData.userEmail,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.horizontalScale(3.5),
+                                                  fontWeight: FontWeight.normal,
                                                   height: 1,
                                                 ),
                                               )
