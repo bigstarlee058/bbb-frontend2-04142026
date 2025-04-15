@@ -12,9 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 
 class ProfileBoardingScreen extends StatefulWidget {
-  final String image;
-
-  const ProfileBoardingScreen({super.key, required this.image});
+  const ProfileBoardingScreen({super.key});
 
   @override
   State<ProfileBoardingScreen> createState() => _ProfileBoardingScreenState();
@@ -102,7 +100,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              'Profile',
+                                              'Welcome',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: ScreenUtil.verticalScale(2.5),
@@ -170,25 +168,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                             child: Column(
                               children: [
                                 SizedBox(
-                                  height: ScreenUtil.verticalScale(2),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: List.generate(
-                                    3,
-                                    (index) => Expanded(
-                                      child: Container(
-                                        margin: EdgeInsets.only(right: index == 2 ? 0 : 5),
-                                        height: 5,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20),
-                                          color: currentPage > (index) ? AppColors.primaryColor : Colors.grey.withValues(alpha: 0.4),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
                                   height: media.height * 0.68,
                                   child: PageView.builder(
                                     onPageChanged: (value) {
@@ -221,19 +200,48 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)).copyWith(bottom: ScreenUtil.horizontalScale(7)),
-        child: ButtonWidget(
-          text: "Next",
-          textColor: Colors.white,
-          color: AppColors.primaryColor,
-          onPress: () {
-            pageController.nextPage(
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.fastOutSlowIn,
-            );
-            // currentPage = pageController.page!.toInt();
-            setState(() {});
-          },
-          isLoading: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                right: ScreenUtil.horizontalScale(2),
+                left: ScreenUtil.horizontalScale(2),
+                bottom: ScreenUtil.verticalScale(1.5),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                  3,
+                  (index) => Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(right: index == 2 ? 0 : 5),
+                      height: 5,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: currentPage > (index) ? AppColors.primaryColor : Colors.grey.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: ScreenUtil.verticalScale(1)),
+            ButtonWidget(
+              text: "Next",
+              textColor: Colors.white,
+              color: AppColors.primaryColor,
+              onPress: () {
+                pageController.nextPage(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.fastOutSlowIn,
+                );
+                // currentPage = pageController.page!.toInt();
+                setState(() {});
+              },
+              isLoading: false,
+            ),
+          ],
         ),
       ),
     );
@@ -242,17 +250,153 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   Widget page1() => Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: ScreenUtil.verticalScale(5)),
+          SizedBox(height: ScreenUtil.verticalScale(3.5)),
           Text(
-            "Enter your details",
+            "Name",
             style: TextStyle(
-              fontSize: ScreenUtil.verticalScale(2.8),
+              fontSize: ScreenUtil.verticalScale(4),
               height: 1,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(5)),
+          SizedBox(height: ScreenUtil.verticalScale(4)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                "Enter your name",
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.8),
+                  height: 1,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(1.2)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: AppTextFormField(
+              hintText: 'Your Name',
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              onChanged: (value) {},
+              controller: nameController,
+              suffixIcon: Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: IconButton(
+                  onPressed: () {},
+                  style: ButtonStyle(
+                    minimumSize: WidgetStateProperty.all(
+                      const Size(48, 48),
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.person,
+                    color: Color(0XFFd9d9d9),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+
+  Widget page2(BuildContext context) => Column(
+        children: [
+          SizedBox(height: ScreenUtil.verticalScale(3.5)),
+          Text(
+            "Details",
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(4),
+              height: 1,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(4)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                "Add your details",
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.8),
+                  height: 1,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(1.2)),
+          _buildDropdownField(
+            context: context,
+            label: 'Gender',
+            value: selectedGender,
+            options: genderOptions,
+            hint: 'Male',
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedGender = newValue!;
+              });
+            },
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
+          _buildProfileField(
+            context: context,
+            label: 'Birthday',
+            value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
+            onTap: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime(1998, 9, 21),
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+              );
+              if (pickedDate != null && pickedDate != selectedDate) {
+                setState(() {
+                  selectedDate = pickedDate;
+                });
+              }
+            },
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
+          _buildDropdownField(
+            context: context,
+            label: 'Height',
+            value: selectedHeight,
+            options: heightOptions,
+            hint: '5\'5"',
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedHeight = newValue!;
+              });
+            },
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
+          _buildDropdownField(
+            context: context,
+            label: 'Weight',
+            value: selectedWeight,
+            options: weightOptions,
+            hint: '100 lbs',
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedWeight = newValue!;
+              });
+            },
+          ),
+        ],
+      );
+
+  Widget page3() => Column(
+        children: [
+          SizedBox(height: ScreenUtil.verticalScale(3.5)),
           Center(
             child: Container(
               height: ScreenUtil.horizontalScale(23.5),
@@ -321,103 +465,9 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(6)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: AppTextFormField(
-              hintText: 'Your Name',
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              onChanged: (value) {},
-              controller: nameController,
-              suffixIcon: Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: IconButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    minimumSize: WidgetStateProperty.all(
-                      const Size(48, 48),
-                    ),
-                  ),
-                  icon: const Icon(
-                    Icons.person,
-                    color: Color(0XFFd9d9d9),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-
-  Widget page2(BuildContext context) => Column(
-        children: [
-          SizedBox(height: ScreenUtil.verticalScale(5)),
-          _buildDropdownField(
-            context: context,
-            label: 'Gender',
-            value: selectedGender,
-            options: genderOptions,
-            hint: 'Male',
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedGender = newValue!;
-              });
-            },
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(1)),
-          _buildProfileField(
-            context: context,
-            label: 'Birthday',
-            value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
-            onTap: () async {
-              DateTime? pickedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime(1998, 9, 21),
-                firstDate: DateTime(1900),
-                lastDate: DateTime.now(),
-              );
-              if (pickedDate != null && pickedDate != selectedDate) {
-                setState(() {
-                  selectedDate = pickedDate;
-                });
-              }
-            },
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(1)),
-          _buildDropdownField(
-            context: context,
-            label: 'Height',
-            value: selectedHeight,
-            options: heightOptions,
-            hint: '5\'5"',
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedHeight = newValue!;
-              });
-            },
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(1)),
-          _buildDropdownField(
-            context: context,
-            label: 'Weight',
-            value: selectedWeight,
-            options: weightOptions,
-            hint: '100 lbs',
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedWeight = newValue!;
-              });
-            },
-          ),
-        ],
-      );
-
-  Widget page3() => Column(
-        children: [
           SizedBox(height: ScreenUtil.verticalScale(5)),
           Text(
-            "Select your goal",
+            "What’s Your Goal?",
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(2.8),
               height: 1,
@@ -426,6 +476,22 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(4)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                "Select your goal",
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.8),
+                  height: 1,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(1.2)),
           Container(
             margin: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
             padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),

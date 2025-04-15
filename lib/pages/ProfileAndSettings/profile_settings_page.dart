@@ -116,9 +116,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       //       await Navigator.push(
       //         context,
       //         MaterialPageRoute(
-      //           builder: (context) => ProfileBoardingScreen(
-      //             image: '',
-      //           ),
+      //           builder: (context) => ProfileBoardingScreen(),
       //         ),
       //       );
       //     },

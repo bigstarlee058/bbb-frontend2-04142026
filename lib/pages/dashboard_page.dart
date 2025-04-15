@@ -143,6 +143,11 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.push(context, MaterialPageRoute(builder: (context) => CalendarPage()));
+      //   },
+      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -1545,7 +1550,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
               rowHeight: 40.0,
               daysOfWeekHeight: 40,
               firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
+              lastDay: DateTime.utc(2100, 12, 31),
               focusedDay: _focusedDay,
               selectedDayPredicate: (day) {
                 return isSameDay(_selectedDay, day);
@@ -1594,7 +1599,6 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             ),
           )
           .reduce((a, b) => a.isBefore(b) ? a : b);
-
       List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
       bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
 
@@ -1837,5 +1841,280 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         ),
       ),
     );
+  }
+}
+
+class CalendarPage extends StatefulWidget {
+  const CalendarPage({super.key});
+
+  @override
+  State<CalendarPage> createState() => _CalendarPageState();
+}
+
+class _CalendarPageState extends State<CalendarPage> {
+  final DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  final List<DateTime> circleDates = [DateTime(2025, 4, 4)];
+
+  List<List<DateTime>> rangeList = [
+    [DateTime(2025, 4, 1), DateTime(2025, 4, 2), DateTime(2025, 4, 3)],
+    [DateTime(2025, 4, 5), DateTime(2025, 4, 6)],
+    [DateTime(2025, 4, 7), DateTime(2025, 4, 8), DateTime(2025, 4, 9)],
+    [DateTime(2025, 4, 10), DateTime(2025, 4, 11), DateTime(2025, 4, 12), DateTime(2025, 4, 13)],
+    [DateTime(2025, 4, 14)],
+    [DateTime(2025, 4, 15)],
+    [DateTime(2025, 4, 17), DateTime(2025, 4, 18)],
+    [DateTime(2025, 4, 19), DateTime(2025, 4, 20), DateTime(2025, 4, 21)],
+    [DateTime(2025, 4, 22), DateTime(2025, 4, 23)],
+    [DateTime(2025, 4, 24), DateTime(2025, 4, 25), DateTime(2025, 4, 26)],
+    [DateTime(2025, 4, 27)],
+    [DateTime(2025, 4, 28), DateTime(2025, 4, 29)],
+    [DateTime(2025, 4, 30)],
+    [DateTime(2025, 4, 4)],
+    [DateTime(2025, 4, 1), DateTime(2025, 4, 8)],
+    [DateTime(2025, 4, 12), DateTime(2025, 4, 13)],
+    [DateTime(2025, 4, 17), DateTime(2025, 4, 18)],
+    [DateTime(2025, 4, 19), DateTime(2025, 4, 20), DateTime(2025, 4, 21)],
+  ];
+
+  bool _isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TableCalendar(
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                availableGestures: AvailableGestures.horizontalSwipe,
+                rowHeight: ScreenUtil.verticalScale(5),
+                daysOfWeekHeight: ScreenUtil.verticalScale(3),
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                headerStyle: HeaderStyle(
+                  headerPadding: const EdgeInsets.only(bottom: 10),
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+                  titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+                ),
+                calendarStyle: CalendarStyle(
+                  defaultTextStyle: TextStyle(fontSize: 14.0),
+                  weekendTextStyle: TextStyle(fontSize: 14.0),
+                  outsideTextStyle: TextStyle(fontSize: 14.0, color: Colors.grey.shade500),
+                ),
+                onRangeSelected: (start, end, focusedDay) {},
+                onDaySelected: null,
+                calendarBuilders: CalendarBuilders(
+                  todayBuilder: (context, day, date) {
+                    final isCircle = circleDates.any((d) => _isSameDate(d, date));
+                    final isRange = rangeList.any((d) => d.any((element) => _isSameDate(element, date)));
+                    if (isCircle) {
+                      return Center(
+                        child: Container(
+                          width: ScreenUtil.verticalScale(3.5),
+                          height: ScreenUtil.verticalScale(3.5),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${date.day}',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      );
+                    } else if (isRange) {
+                      final data = findDateIndex(date);
+                      return Stack(
+                        children: [
+                          if (rangeList[data!["outerIndex"]!].length > 1 && data["innerIndex"] == 0)
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              left: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          if (rangeList[data["outerIndex"]!].length > 1 && rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              right: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.7)),
+                            decoration: BoxDecoration(
+                              color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                  ? Colors.transparent
+                                  : AppColors.backOffSetColor,
+                              borderRadius: BorderRadius.horizontal(
+                                right: (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                                    ? Radius.circular(20)
+                                    : Radius.circular(0),
+                                left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                      ? AppColors.primaryColor
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle),
+                              child: Center(
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                      color:
+                                          ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                              ? Colors.white
+                                              : Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Center(
+                        child: Text('${date.day}', style: TextStyle(color: Colors.black, fontSize: 14)),
+                      );
+                    }
+                  },
+                  defaultBuilder: (context, date, _) {
+                    final isCircle = circleDates.any((d) => _isSameDate(d, date));
+                    final isRange = rangeList.any((d) => d.any((element) => _isSameDate(element, date)));
+                    if (isCircle) {
+                      return Center(
+                        child: Container(
+                          width: ScreenUtil.verticalScale(3.5),
+                          height: ScreenUtil.verticalScale(3.5),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${date.day}',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      );
+                    } else if (isRange) {
+                      final data = findDateIndex(date);
+                      return Stack(
+                        children: [
+                          if (rangeList[data!["outerIndex"]!].length > 1 && data["innerIndex"] == 0)
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              left: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          if (rangeList[data["outerIndex"]!].length > 1 && rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              right: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.7)),
+                            decoration: BoxDecoration(
+                              color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                  ? Colors.transparent
+                                  : AppColors.backOffSetColor,
+                              borderRadius: BorderRadius.horizontal(
+                                right: (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                                    ? Radius.circular(20)
+                                    : Radius.circular(0),
+                                left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                      ? AppColors.primaryColor
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle),
+                              child: Center(
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                      color:
+                                          ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                              ? Colors.white
+                                              : Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Center(
+                        child: Text('${date.day}', style: TextStyle(color: Colors.black, fontSize: 14)),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Map<String, int>? findDateIndex(DateTime targetDate) {
+    for (int outerIndex = 0; outerIndex < rangeList.length; outerIndex++) {
+      for (int innerIndex = 0; innerIndex < rangeList[outerIndex].length; innerIndex++) {
+        DateTime date = rangeList[outerIndex][innerIndex];
+        if (date.year == targetDate.year && date.month == targetDate.month && date.day == targetDate.day) {
+          return {
+            'outerIndex': outerIndex,
+            'innerIndex': innerIndex,
+          };
+        }
+      }
+    }
+    return null;
   }
 }
