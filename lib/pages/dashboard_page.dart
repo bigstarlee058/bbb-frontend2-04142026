@@ -807,8 +807,10 @@ class _DashboardPageState extends State<DashboardPage> {
                                   );
                                 },
                               ),
-                              if ((monthProvider.graphHistory.isEmpty && monthProvider.reportWeightLiftedGraphHistory.isEmpty) ==
-                                  false) ...[
+                              if ((monthProvider.graphHistory.isEmpty && monthProvider.reportWeightLiftedGraphHistory.isEmpty) == false &&
+                                  monthProvider.allDayHistoryModel.any(
+                                    (element) => element.status == Status.completed && element.type!.contains("Workout Day"),
+                                  )) ...[
                                 Container(
                                   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(top: 25, bottom: 20),
                                   child: Row(
@@ -1547,8 +1549,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
               calendarFormat: CalendarFormat.week,
               startingDayOfWeek: StartingDayOfWeek.monday,
               availableGestures: AvailableGestures.none,
-              rowHeight: 40.0,
-              daysOfWeekHeight: 40,
+              rowHeight: ScreenUtil.verticalScale(4.55),
+              daysOfWeekHeight: ScreenUtil.verticalScale(4.55),
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2100, 12, 31),
               focusedDay: _focusedDay,
@@ -1588,7 +1590,6 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   Widget? _buildDayState(DateTime date) {
     final nowUtc = DateTime.now();
-
     if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
       DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
           .map(
@@ -1696,22 +1697,22 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       children: [
         isCurrentDay
             ? Positioned(
-                top: -35,
-                bottom: 0,
+                top: -ScreenUtil.verticalScale(4.55),
+                bottom: ScreenUtil.verticalScale(0.62),
                 right: 0,
                 left: 0,
                 child: Container(
-                  decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
-                  height: 150,
+                  decoration: BoxDecoration(color: circleColor, borderRadius: BorderRadius.circular(30)),
+                  height: ScreenUtil.verticalScale(17.2),
                   child: Builder(
                     builder: (context) {
                       final text = DateFormat.E().format(date);
                       return Container(
-                        padding: const EdgeInsets.all(5),
+                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.2)),
                         child: Text(
                           textAlign: TextAlign.center,
                           text,
-                          style: TextStyle(fontSize: 14.0, color: Colors.black),
+                          style: TextStyle(fontSize: 14.0, color: Colors.white),
                         ),
                       );
                     },
@@ -1723,7 +1724,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             ? Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(ScreenUtil.horizontalScale(0.2)),
-                margin: const EdgeInsets.only(bottom: 8),
+                margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: circleColor,
@@ -1741,7 +1742,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             : Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-                margin: const EdgeInsets.only(bottom: 8),
+                margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: circleColor,
@@ -1785,42 +1786,24 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       clipBehavior: Clip.none,
       children: [
         Positioned(
-          top: -35,
-          bottom: 0,
+          top: -ScreenUtil.verticalScale(4.55),
+          bottom: ScreenUtil.verticalScale(0.62),
           right: 0,
           left: 0,
           child: Container(
-            decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
-            height: 150,
-            child: Builder(
-              builder: (context) {
-                final text = DateFormat.E().format(date);
-                return Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    text,
-                    style: TextStyle(fontSize: 14.0, color: Colors.black),
-                  ),
-                );
-              },
-            ),
+            decoration: BoxDecoration(border: Border.all(color: AppColors.primaryColor), borderRadius: BorderRadius.circular(30)),
+            height: ScreenUtil.verticalScale(17.2),
           ),
         ),
         Container(
           alignment: Alignment.center,
           padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white,
-            border: Border.all(color: AppColors.primaryColor),
-          ),
+          margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
           child: Text(
             '${date.day}',
             style: const TextStyle(
               fontSize: 14.0,
-              color: AppColors.primaryColor,
+              color: Colors.black,
             ),
           ),
         ),
@@ -1832,7 +1815,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
       child: Text(
         '${date.day}',
         style: const TextStyle(
