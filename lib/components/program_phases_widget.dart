@@ -29,15 +29,16 @@ class ProgramPhasesWidget extends StatelessWidget {
                   color: Colors.white,
                   child: Container(
                     width: ScreenUtil.horizontalScale(60),
-                    margin: EdgeInsets.only(
-                      left: ScreenUtil.horizontalScale(6),
-                      top: ScreenUtil.verticalScale(0)),
+                    margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
                     child: Text(
                       "Program Phases",
                       maxLines: 2,
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                          color: AppColors.primaryColor, fontSize: ScreenUtil.verticalScale(2.3), fontWeight: FontWeight.bold, height: 1.35),
+                          color: AppColors.primaryColor,
+                          fontSize: ScreenUtil.verticalScale(2.3),
+                          fontWeight: FontWeight.bold,
+                          height: 1.35),
                     ),
                   ),
                 ),

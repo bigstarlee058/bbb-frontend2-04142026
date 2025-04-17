@@ -266,7 +266,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                           ),
                           child: Container(
                             margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(5),
+                              horizontal: ScreenUtil.horizontalScale(6),
                               vertical: ScreenUtil.verticalScale(2),
                             ),
                             child: dataProvider == null || dataProvider!.adminExercises.isEmpty || _filteredExercises.isEmpty

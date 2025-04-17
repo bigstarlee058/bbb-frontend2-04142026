@@ -1,6 +1,7 @@
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/staffs.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -56,6 +57,7 @@ class StaffListWidget extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
+                shape: Utils.buttonStyle,
                 padding: EdgeInsets.symmetric(
                   horizontal: ScreenUtil.horizontalScale(6),
                   vertical: ScreenUtil.verticalScale(1.5),

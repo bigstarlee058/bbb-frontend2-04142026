@@ -553,28 +553,6 @@ class _ExercisePageState extends State<ExercisePage> {
                       /// VIDEO PROGRESS
 
                       videoProgress(media, context),
-
-                      Positioned(
-                        bottom: media.height * 0.12,
-                        right: 0,
-                        child: SizedBox(
-                          height: media.height / 3.99,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
 
@@ -592,7 +570,31 @@ class _ExercisePageState extends State<ExercisePage> {
                                     ? media.height * 0.4
                                     : media.height * 0.835) -
                             media.height * 0.121),
-                    child: mainContent(media),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        mainContent(media),
+                        Positioned(
+                          top: -((media.height / 3.995)),
+                          right: 0,
+                          child: SizedBox(
+                            height: media.height / 3.99,
+                            width: media.width,
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: ClipPath(
+                                clipper: DiagonalClipper(),
+                                child: Container(
+                                  height: media.height / 11,
+                                  width: media.width / 6,
+                                  decoration: const BoxDecoration(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -1339,7 +1341,7 @@ class _ExercisePageState extends State<ExercisePage> {
                   : (monthProvider?.warmUpModel?.description ?? "") == ""
                       ? SizedBox()
                       : Padding(
-                          padding: EdgeInsets.only(top: 5, bottom: 15),
+                          padding: EdgeInsets.only(top: 5, bottom: 35),
                           child: Text(
                             monthProvider?.warmUpModel?.description ?? "",
                             style: const TextStyle(

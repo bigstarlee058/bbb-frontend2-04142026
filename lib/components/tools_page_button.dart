@@ -18,49 +18,47 @@ class ToolsPageButton extends StatelessWidget {
       Navigator.pushNamed(context, url);
     }
 
-    return Material(
-      child: SizedBox(
-        width: media.width,
-        child: InkWell(
-          onTap: onPress,
-          child: Container(
-            padding: EdgeInsets.only(
-              top: ScreenUtil.horizontalScale(12),
-              left: ScreenUtil.horizontalScale(8),
-              right: ScreenUtil.horizontalScale(8),
-              bottom: ScreenUtil.horizontalScale(13),
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(35),
-            ),
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  width: 10,
+    return SizedBox(
+      width: media.width,
+      child: GestureDetector(
+        onTap: onPress,
+        child: Container(
+          padding: EdgeInsets.only(
+            top: ScreenUtil.horizontalScale(12),
+            left: ScreenUtil.horizontalScale(8),
+            right: ScreenUtil.horizontalScale(8),
+            bottom: ScreenUtil.horizontalScale(13),
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+            borderRadius: BorderRadius.circular(35),
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                width: 10,
+              ),
+              SvgPicture.asset(
+                icon, // Path to your SVG file
+                width: 30,
+                height: 30,
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              ), // Spacing between icon and text
+              const SizedBox(
+                width: 30,
+              ),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
                 ),
-                SvgPicture.asset(
-                  icon, // Path to your SVG file
-                  width: 30,
-                  height: 30,
-                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                ), // Spacing between icon and text
-                const SizedBox(
-                  width: 30,
-                ),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

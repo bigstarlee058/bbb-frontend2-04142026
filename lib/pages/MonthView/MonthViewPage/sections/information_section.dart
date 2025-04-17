@@ -52,7 +52,7 @@ class _InformationSectionState extends State<InformationSection> {
                         ),
                       )
                     : Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
                         child: ExpansionTileGroup(
                           spaceBetweenItem: 15,
                           children: List.generate(

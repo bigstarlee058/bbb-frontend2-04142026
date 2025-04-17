@@ -63,7 +63,7 @@ class _MonthViewState extends State<MonthView> {
         monthProvider?.monthLocalDataModel.sort((a, b) =>
             DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
         bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
-        if (!alreadySetUp && monthProvider!.allDayHistoryModel.isEmpty) {
+        if (!alreadySetUp) {
           openSettingDialog();
         }
       },
@@ -72,16 +72,19 @@ class _MonthViewState extends State<MonthView> {
     super.initState();
   }
 
-  int selectedSection = 0;
-
-  updateSelectedSection(int index) {
-    selectedSection = index;
-    setState(() {});
-  }
-
   openSettingDialog() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => AnimatedDialog.showAnimatedDialog(
         context: context, pageBuilder: (c1, anim1, anim2) => MonthSettingDialog(monthProvider: monthProvider!)));
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        monthProvider?.updateSelectedSection(0);
+      },
+    );
+    super.dispose();
   }
 
   @override
@@ -447,40 +450,42 @@ class _MonthViewState extends State<MonthView> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: List.generate(
-                                        3,
-                                        (index) => Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              updateSelectedSection(index);
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2.2)),
-                                              margin: EdgeInsets.only(left: index == 0 ? 0 : 8),
-                                              decoration: BoxDecoration(
-                                                  color: index == selectedSection ? AppColors.primaryColor : Colors.grey[100],
-                                                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5.5))),
-                                              child: Center(
-                                                child: Text(
-                                                  index == 0
-                                                      ? "Schedule"
-                                                      : index == 1
-                                                          ? "Information"
-                                                          : "Settings",
-                                                  style: TextStyle(
-                                                    color: index == selectedSection ? Colors.white : Colors.black,
-                                                    fontSize: ScreenUtil.verticalScale(1.75),
-                                                    fontWeight: FontWeight.w500,
+                                    Consumer<MonthProvider>(builder: (context, controller, child) {
+                                      return Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: List.generate(
+                                          3,
+                                          (index) => Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                controller.updateSelectedSection(index);
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2.2)),
+                                                margin: EdgeInsets.only(left: index == 0 ? 0 : 8),
+                                                decoration: BoxDecoration(
+                                                    color: index == controller.selectedSection ? AppColors.primaryColor : Colors.grey[100],
+                                                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5.5))),
+                                                child: Center(
+                                                  child: Text(
+                                                    index == 0
+                                                        ? "Schedule"
+                                                        : index == 1
+                                                            ? "Information"
+                                                            : "Settings",
+                                                    style: TextStyle(
+                                                      color: index == controller.selectedSection ? Colors.white : Colors.black,
+                                                      fontSize: ScreenUtil.verticalScale(1.75),
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
+                                      );
+                                    }),
                                   ],
                                 ),
                               ),
@@ -490,11 +495,15 @@ class _MonthViewState extends State<MonthView> {
                                     children: [
                                       if (!monthProvider.loader) ...[
                                         Visibility(
-                                            visible: selectedSection == 0,
+                                            visible: monthProvider.selectedSection == 0,
                                             child: ScheduleSection(
                                                 monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
-                                        Visibility(visible: selectedSection == 1, child: InformationSection(programInfoProvider: provider)),
-                                        Visibility(visible: selectedSection == 2, child: SettingSection(monthProvider: monthProvider)),
+                                        Visibility(
+                                            visible: monthProvider.selectedSection == 1,
+                                            child: InformationSection(programInfoProvider: provider)),
+                                        Visibility(
+                                            visible: monthProvider.selectedSection == 2,
+                                            child: SettingSection(monthProvider: monthProvider)),
                                       ]
                                     ],
                                   );

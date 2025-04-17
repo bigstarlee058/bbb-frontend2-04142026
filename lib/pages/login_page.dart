@@ -334,7 +334,7 @@ class _LoginPageState extends State<LoginPage> {
                                     fontSize: 15,
                                     color: Color(0xFFA51E22),
                                   ),
-                                  text: "Forgot",
+                                  text: "Forgot password?",
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
                                       Navigator.push(
@@ -344,10 +344,6 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                                       );
                                     },
-                                ),
-                                const TextSpan(
-                                  style: TextStyle(fontSize: 15, color: Color(0xFF848484)),
-                                  text: " password?",
                                 ),
                               ],
                             )),

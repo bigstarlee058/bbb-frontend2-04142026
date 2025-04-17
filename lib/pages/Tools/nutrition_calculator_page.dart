@@ -181,11 +181,11 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                           ),
                           child: Container(
                             margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(5),
+                              horizontal: ScreenUtil.horizontalScale(6.5),
                               vertical: ScreenUtil.horizontalScale(3),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.all(ScreenUtil.verticalScale(3)),
+                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(3)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[

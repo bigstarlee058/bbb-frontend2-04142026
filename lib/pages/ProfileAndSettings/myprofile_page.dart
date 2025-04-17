@@ -417,7 +417,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             : Container(
                                 margin: EdgeInsets.symmetric(
                                   vertical: ScreenUtil.verticalScale(4),
-                                  horizontal: ScreenUtil.horizontalScale(10),
+                                  horizontal: ScreenUtil.horizontalScale(9),
                                 ),
                                 child: ButtonWidget(
                                   text: "Save",
@@ -448,10 +448,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }) {
     return Container(
       margin: EdgeInsets.only(
-        left: ScreenUtil.horizontalScale(12),
-        right: ScreenUtil.horizontalScale(12),
+        left: ScreenUtil.horizontalScale(7),
+        right: ScreenUtil.horizontalScale(7),
         bottom: ScreenUtil.verticalScale(0.8),
-        top: ScreenUtil.verticalScale(3.5),
+        top: ScreenUtil.verticalScale(3),
       ),
       height: ScreenUtil.verticalScale(6),
       child: Row(
@@ -519,7 +519,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

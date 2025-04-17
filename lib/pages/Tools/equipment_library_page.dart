@@ -250,7 +250,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                           ),
                           child: Container(
                             margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(5),
+                              horizontal: ScreenUtil.horizontalScale(6),
                               vertical: ScreenUtil.verticalScale(2),
                             ),
                             child: Column(

@@ -131,8 +131,8 @@ class _ToolsPageState extends State<ToolsPage> {
                           ),
                           child: Container(
                             margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(5),
-                              vertical: ScreenUtil.verticalScale(2),
+                              horizontal: ScreenUtil.horizontalScale(6),
+                              vertical: ScreenUtil.verticalScale(3),
                             ),
                             child: Column(
                               children: [

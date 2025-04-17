@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bbb/components/haptic_feedback%20.dart';
-import 'package:bbb/pages/MonthView/MonthViewPage/month_view_new.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
 import 'package:bbb/pages/dashboard_page.dart';

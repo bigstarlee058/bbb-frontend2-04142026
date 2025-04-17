@@ -317,7 +317,7 @@ class _WatchTutorialState extends State<WatchTutorial> {
                   ),
                   SizedBox(height: ScreenUtil.verticalScale(2)),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5), vertical: ScreenUtil.horizontalScale(1.5)),
+                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(9), vertical: ScreenUtil.horizontalScale(1.5)),
                     child: ButtonWidget(
                       text: "Watch the App Tutorial",
                       textColor: Colors.white,

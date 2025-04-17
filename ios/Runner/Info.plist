@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -22,16 +24,24 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FLTEnableImpeller</key>
+	<false/>
+	<key>FlutterImpeller</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>App wants to capture profile photo please grant camera access</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>App needs access to save screenshots</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>App wants to access to photo lib for profile images </string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-	<key>NSCameraUsageDescription</key>
-    <string>App wants to capture profile photo please grant camera access</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>App wants to access to photo lib for profile images </string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -45,17 +55,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-    <string>App needs access to save screenshots</string>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
 	<key>io.flutter.experimental.disableImpeller</key>
 	<true/>
-	<key>FlutterImpeller</key>
-	<false/>
-	<key>FLTEnableImpeller</key>
-	<false />
 </dict>
 </plist>

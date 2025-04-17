@@ -680,8 +680,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ),
                                 ),
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(8.5),
-                                  vertical: ScreenUtil.verticalScale(2),
+                                  horizontal: ScreenUtil.horizontalScale(7),
+                                  vertical: ScreenUtil.verticalScale(1.5),
                                 ),
                                 child: Consumer<MonthProvider>(
                                   builder: (context, value, child) {
@@ -752,7 +752,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               const SizedBox(height: 10),
                               Container(
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(9),
+                                  horizontal: ScreenUtil.horizontalScale(7),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -764,6 +764,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           mainPageProvider.changeTab(1);
                                         },
                                         style: ElevatedButton.styleFrom(
+                                          shape: Utils.buttonStyle,
                                           backgroundColor: AppColors.primaryColor,
                                           padding: const EdgeInsets.symmetric(vertical: 18),
                                         ),
@@ -771,6 +772,30 @@ class _DashboardPageState extends State<DashboardPage> {
                                           'Month View',
                                           style: TextStyle(
                                             color: Colors.white,
+                                            fontSize: ScreenUtil.verticalScale(2),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: ScreenUtil.horizontalScale(3)),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          HapticFeedBack.buttonClick();
+                                          monthProvider.updateSelectedSection(2);
+                                          mainPageProvider.changeTab(1);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          shape: Utils.buttonStyle,
+                                          side: BorderSide(width: 2.0, color: AppColors.primaryColor),
+                                          backgroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 18),
+                                        ),
+                                        child: Text(
+                                          'Edit Schedule',
+                                          style: TextStyle(
+                                            color: AppColors.primaryColor,
                                             fontSize: ScreenUtil.verticalScale(2),
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -789,7 +814,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                         child: Row(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 22, bottom: 10),
+                                              padding: EdgeInsets.only(
+                                                  bottom: ScreenUtil.verticalScale(1.4), top: ScreenUtil.verticalScale(2.3)),
                                               child: Text(
                                                 "Streak Calendar",
                                                 style: TextStyle(
@@ -812,7 +838,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                     (element) => element.status == Status.completed && element.type!.contains("Workout Day"),
                                   )) ...[
                                 Container(
-                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(top: 25, bottom: 20),
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -879,7 +906,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                                 Container(
                                   margin: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(9),
+                                    horizontal: ScreenUtil.horizontalScale(8.5),
                                   ),
                                   child: selectedChart == "Exercises Completed"
                                       ? const ExerciseCompletedGraph()
@@ -888,10 +915,10 @@ class _DashboardPageState extends State<DashboardPage> {
                                           // : const TimeSpentGraph(),
                                           : const SizedBox(),
                                 ),
-                                const SizedBox(height: 15),
                                 Container(
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(9),
+                                    vertical: ScreenUtil.verticalScale(1),
                                   ),
                                   child: ButtonWidget(
                                     text: 'See all progress reports',
@@ -905,9 +932,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                               ],
 
-                              const SizedBox(height: 15),
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7), vertical: 15),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
                                       horizontal: ScreenUtil.horizontalScale(3.5), vertical: ScreenUtil.horizontalScale(5)),
@@ -930,8 +957,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(
-                                        height: 15,
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(2.2),
                                       ),
                                       Consumer<MonthProvider>(builder: (context, value, child) {
                                         final data = value.items.where((element) => element["isArchived"] == true).toList();
@@ -1005,7 +1032,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               Container(
                                 margin: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(9),
-                                ),
+                                  vertical: ScreenUtil.verticalScale(1.2),
+                                ).copyWith(bottom: 0),
                                 child: ButtonWidget(
                                   text: 'See all Achievements',
                                   textColor: Colors.white,
@@ -1033,8 +1061,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Container(
                                       width: media.width,
                                       margin: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(6),
-                                          right: ScreenUtil.horizontalScale(6),
+                                          left: ScreenUtil.horizontalScale(7),
+                                          right: ScreenUtil.horizontalScale(7),
                                           top: ScreenUtil.verticalScale(0),
                                           bottom: 20),
                                       child: Text(
@@ -1093,14 +1121,14 @@ class _DashboardPageState extends State<DashboardPage> {
                                       ? Container(
                                           width: media.width,
                                           margin: EdgeInsets.only(
-                                            top: ScreenUtil.verticalScale(8),
+                                            top: ScreenUtil.verticalScale(4),
                                             bottom: ScreenUtil.verticalScale(4),
                                           ),
                                           child: Column(
                                             children: [
                                               Container(
                                                 margin: EdgeInsets.only(
-                                                    left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), bottom: 20),
+                                                    left: ScreenUtil.horizontalScale(7), right: ScreenUtil.horizontalScale(7), bottom: 20),
                                                 width: media.width,
                                                 child: Text(
                                                   "Featured Collections",
@@ -1142,10 +1170,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Container(
                                       width: media.width,
                                       margin: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(6),
-                                          right: ScreenUtil.horizontalScale(6),
-                                          top: ScreenUtil.verticalScale(2),
-                                          bottom: 20),
+                                          left: ScreenUtil.horizontalScale(7), right: ScreenUtil.horizontalScale(7), bottom: 20),
                                       child: Text(
                                         "Meet our team",
                                         style: TextStyle(
@@ -1539,48 +1564,45 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: SizedBox(
-          child: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: TableCalendar(
-              calendarFormat: CalendarFormat.week,
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              availableGestures: AvailableGestures.none,
-              rowHeight: ScreenUtil.verticalScale(4.55),
-              daysOfWeekHeight: ScreenUtil.verticalScale(4.55),
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2100, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day);
+      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5.5)),
+      child: SizedBox(
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          child: TableCalendar(
+            calendarFormat: CalendarFormat.week,
+            startingDayOfWeek: StartingDayOfWeek.monday,
+            availableGestures: AvailableGestures.none,
+            rowHeight: ScreenUtil.verticalScale(4.55),
+            daysOfWeekHeight: ScreenUtil.verticalScale(4.55),
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2100, 12, 31),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
+            headerStyle: HeaderStyle(
+              headerPadding: const EdgeInsets.only(bottom: 2),
+              formatButtonVisible: false,
+              titleCentered: true,
+              leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+              rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+              titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+              titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+            ),
+            headerVisible: false,
+            calendarStyle: const CalendarStyle(
+              defaultTextStyle: TextStyle(fontSize: 14.0),
+              weekendTextStyle: TextStyle(fontSize: 14.0),
+              outsideTextStyle: TextStyle(fontSize: 14.0),
+            ),
+            calendarBuilders: CalendarBuilders(
+              todayBuilder: (context, day, focusedDay) => _buildDayState(day),
+              outsideBuilder: (context, date, _) {
+                return _buildDayState(date);
               },
-              headerStyle: HeaderStyle(
-                headerPadding: const EdgeInsets.only(bottom: 2),
-                formatButtonVisible: false,
-                titleCentered: true,
-                leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
-                rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
-                titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
-                titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
-              ),
-              headerVisible: false,
-              calendarStyle: const CalendarStyle(
-                defaultTextStyle: TextStyle(fontSize: 14.0),
-                weekendTextStyle: TextStyle(fontSize: 14.0),
-                outsideTextStyle: TextStyle(fontSize: 14.0),
-              ),
-              calendarBuilders: CalendarBuilders(
-                todayBuilder: (context, day, focusedDay) => _buildDayState(day),
-                outsideBuilder: (context, date, _) {
-                  return _buildDayState(date);
-                },
-                defaultBuilder: (context, date, _) {
-                  return _buildDayState(date);
-                },
-              ),
+              defaultBuilder: (context, date, _) {
+                return _buildDayState(date);
+              },
             ),
           ),
         ),

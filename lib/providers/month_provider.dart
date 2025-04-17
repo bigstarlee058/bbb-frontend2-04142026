@@ -83,6 +83,12 @@ class MonthProvider extends ChangeNotifier {
   //   selectedSection = index;
   //   notifyListeners();
   // }
+  int selectedSection = 0;
+
+  updateSelectedSection(int index) {
+    selectedSection = index;
+    notifyListeners();
+  }
 
   updatePumpDayData(PumpDayModel value) {
     pumpDayModel = value;

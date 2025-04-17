@@ -138,7 +138,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                   ),
                 ),
-                BackArrowWidget(onPress: () => {})
+                BackArrowWidget(onPress: () => {Navigator.pop(context)})
               ],
             ),
             Align(

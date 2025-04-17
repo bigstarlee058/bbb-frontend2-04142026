@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/pages/profile_boarding_screen.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -336,29 +335,33 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                       child: Icon(Icons.local_fire_department_outlined, color: Colors.white, size: 22),
                                                     ),
                                                     SizedBox(height: ScreenUtil.verticalScale(0.9)),
-                                                    Column(
-                                                      children: [
-                                                        Text(
-                                                          "${context.watch<MonthProvider>().streak} Day${context.watch<MonthProvider>().streak > 1 ? "s" : ""}",
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: ScreenUtil.horizontalScale(3.2),
-                                                            fontWeight: FontWeight.bold,
-                                                            height: 1,
+                                                    Builder(builder: (context) {
+                                                      int streak = context.watch<MonthProvider>().streak;
+
+                                                      return Column(
+                                                        children: [
+                                                          Text(
+                                                            "$streak Day${streak > 1 ? "s" : ""}",
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.horizontalScale(3.2),
+                                                              fontWeight: FontWeight.bold,
+                                                              height: 1,
+                                                            ),
                                                           ),
-                                                        ),
-                                                        SizedBox(height: ScreenUtil.verticalScale(0.25)),
-                                                        Text(
-                                                          "Streaks",
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: ScreenUtil.horizontalScale(3),
-                                                            fontWeight: FontWeight.normal,
-                                                            height: 1,
+                                                          SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                          Text(
+                                                            "Streak${streak > 1 ? "s" : ""}",
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.horizontalScale(3),
+                                                              fontWeight: FontWeight.normal,
+                                                              height: 1,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    )
+                                                        ],
+                                                      );
+                                                    })
                                                   ],
                                                 )),
                                             Column(
@@ -392,7 +395,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                       ),
                                                       SizedBox(height: ScreenUtil.verticalScale(0.25)),
                                                       Text(
-                                                        "Since Joined",
+                                                        "Since Joining",
                                                         style: TextStyle(
                                                           color: Colors.white,
                                                           fontSize: ScreenUtil.horizontalScale(3),
@@ -453,14 +456,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       children: [
                         Container(
                           margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(6),
-                            vertical: ScreenUtil.verticalScale(3),
+                            horizontal: ScreenUtil.horizontalScale(7),
+                            vertical: ScreenUtil.verticalScale(2.5),
                           ),
                           child: Column(
                             children: [
-                              SizedBox(
-                                height: ScreenUtil.verticalScale(0.5),
-                              ),
                               settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
                                   () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
                               SizedBox(
@@ -531,7 +531,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       onTap: onPressed,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: ScreenUtil.horizontalScale(2.5),
           vertical: ScreenUtil.verticalScale(1),
         ),
         // decoration: BoxDecoration(
