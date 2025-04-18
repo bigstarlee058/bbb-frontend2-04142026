@@ -1,3 +1,4 @@
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
@@ -8,6 +9,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,91 +53,123 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
   Widget equipmentCard(String title, String imageurl, String description, String link) {
     var media = MediaQuery.of(context).size;
     return Container(
-      width: media.width,
-      height: ScreenUtil.verticalScale(11),
       margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.primaryColor,
-        borderRadius: BorderRadius.all(
-          Radius.circular(ScreenUtil.verticalScale(7)),
-        ),
-      ),
-      child: GestureDetector(
-        onTap: () {
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            disabledBackgroundColor: const Color(0xFFF3F3F3),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(ScreenUtil.verticalScale(12)),
+              ),
+              side: const BorderSide(color: Color(0x12000000), width: 0.5),
+            ),
+            surfaceTintColor: Colors.transparent,
+            overlayColor: Colors.grey.shade400,
+            padding: EdgeInsets.zero),
+        onPressed: () {
           _launchURL(link);
         },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+        child: Container(
+          width: media.width,
+          height: ScreenUtil.verticalScale(11),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+            // border: Border.all(color: AppColors.primaryColor),
+            borderRadius: BorderRadius.all(
+              Radius.circular(ScreenUtil.verticalScale(7)),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                  ),
+                ),
+                child: Center(
+                  child: imageurl.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                            bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                          ),
+                          child: Image.network(
+                            imageurl.startsWith('https://storage.cloud.google.com/')
+                                ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                : imageurl,
+                            width: ScreenUtil.verticalScale(11),
+                            height: ScreenUtil.verticalScale(11),
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                            bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                          ),
+                          child: Image.asset(
+                            'assets/img/warm-up-placeholder.png',
+                            width: ScreenUtil.verticalScale(11),
+                            height: ScreenUtil.verticalScale(11),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                 ),
               ),
-              child: Center(
-                child: imageurl.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                        ),
-                        child: Image.network(
-                          imageurl.startsWith('https://storage.cloud.google.com/')
-                              ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                              : imageurl,
-                          width: ScreenUtil.verticalScale(11),
-                          height: ScreenUtil.verticalScale(11),
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                        ),
-                        child: Image.asset(
-                          'assets/img/warm-up-placeholder.png',
-                          width: ScreenUtil.verticalScale(11),
-                          height: ScreenUtil.verticalScale(11),
-                          fit: BoxFit.cover,
-                        ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: ScreenUtil.verticalScale(2),
+                        fontWeight: FontWeight.bold,
                       ),
-              ),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(2),
-                      fontWeight: FontWeight.bold,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: ScreenUtil.verticalScale(1)),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(1.7),
+                    SizedBox(height: ScreenUtil.verticalScale(1)),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: ScreenUtil.verticalScale(1.7),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            SizedBox(width: 15),
-          ],
+              SizedBox(width: 15),
+              GestureDetector(
+                onTap: null,
+                child: Container(
+                  padding: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(
+                    "assets/icons/shopping-bag.svg",
+                    height: ScreenUtil.verticalScale(3),
+                    colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                  ),
+                ),
+              ),
+              SizedBox(width: 15),
+            ],
+          ),
         ),
       ),
     );
@@ -188,33 +222,10 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(4),
-                                        ),
-                                        decoration: const BoxDecoration(
-                                          color: Color(0XFFd18a9b),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: SizedBox(
-                                          width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                          height: ScreenUtil.horizontalScale(10),
-                                          child: IconButton(
-                                            padding: EdgeInsets.zero, // Removes the default padding
-                                            icon: const Icon(
-                                              Icons.keyboard_arrow_left,
-                                              color: Colors.white,
-                                            ),
-                                            onPressed: () {
-                                              // HapticFeedBack.buttonClick();
-                                              dataProvider?.collectionData =
-                                                  Collections(id: "", title: "", description: "", photo: "", equipments: []);
-                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                              mainPageProvider.changeTab(0);
-                                            },
-                                            iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
-                                          ),
-                                        ),
+                                      BackArrowWidget(
+                                        onPress: () {
+                                          Navigator.pop(context);
+                                        },
                                       ),
                                       Text(
                                         'Collection',
@@ -227,28 +238,23 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(5),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(height: ScreenUtil.horizontalScale(10)),
-                                      SizedBox(
-                                        width: ScreenUtil.horizontalScale(60),
-                                        child: Text(
-                                          collectionData.title.isNotEmpty ? collectionData.title : 'Collection Title',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: ScreenUtil.horizontalScale(8.5),
-                                            fontWeight: FontWeight.bold,
-                                            height: 1.35,
-                                          ),
+                                Center(
+                                  child: Container(
+                                    height: media.height / 5.6,
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(15), vertical: ScreenUtil.verticalScale(3)),
+                                    child: Center(
+                                      child: Text(
+                                        collectionData.title.isNotEmpty ? collectionData.title : 'Collection Title',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil.horizontalScale(6.5),
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.35,
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -285,6 +291,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                           margin: EdgeInsets.only(top: media.height / 2.8),
                           child: Container(
                             width: media.width,
+                            padding: EdgeInsets.only(top: ScreenUtil.verticalScale(2)),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
@@ -292,7 +299,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               ),
                             ),
                             child: Container(
-                              margin: EdgeInsets.only(top: media.height / 19, right: 20, left: 20),
+                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
                               child: Column(
                                 children: equipments.map((equipment) {
                                   return Column(

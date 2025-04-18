@@ -48,7 +48,7 @@ class CollectionGrid extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: ScreenUtil.horizontalScale(4.8),
+                        fontSize: ScreenUtil.horizontalScale(5),
                         fontWeight: FontWeight.bold,
                         height: 1.35,
                       ),

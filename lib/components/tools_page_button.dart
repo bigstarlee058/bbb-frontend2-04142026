@@ -52,9 +52,9 @@ class ToolsPageButton extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 19,
+                  fontSize: ScreenUtil.verticalScale(2.2),
                   fontWeight: FontWeight.bold,
                 ),
               ),

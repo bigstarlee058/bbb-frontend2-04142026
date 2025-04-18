@@ -10,7 +10,6 @@ class ButtonWidget extends StatefulWidget {
     required this.color,
     required this.onPress,
     required this.isLoading,
-    this.fontSize,
   });
 
   final String text;
@@ -18,7 +17,6 @@ class ButtonWidget extends StatefulWidget {
   final Color textColor;
   final Function()? onPress;
   final bool isLoading;
-  final double? fontSize;
 
   @override
   State<ButtonWidget> createState() => _ButtonWidgetState();
@@ -53,7 +51,7 @@ class _ButtonWidgetState extends State<ButtonWidget> {
             : Text(
                 widget.text,
                 style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(widget.fontSize ?? 2.2),
+                  fontSize: ScreenUtil.verticalScale(2.2),
                   fontWeight: FontWeight.bold,
                   color: widget.textColor,
                 ),

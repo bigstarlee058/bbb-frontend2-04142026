@@ -17,11 +17,10 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/pages/MonthView/TodayPage/circuits_view.dart';
+import 'package:bbb/pages/MonthView/TodayPage/video_slider.dart';
 import 'package:bbb/pages/MonthView/TodayPage/workout_card.dart';
-import 'package:bbb/pages/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
-import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -291,6 +290,23 @@ class _TodayPageState extends State<TodayPage> {
     super.didChangeDependencies();
   }
 
+  int getTextLineCount({
+    required String text,
+    required TextStyle style,
+    required double maxWidth,
+  }) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: null,
+    )..layout(maxWidth: maxWidth);
+
+    final double lineHeight = textPainter.preferredLineHeight;
+    final int lineCount = (textPainter.size.height / lineHeight).ceil();
+
+    return lineCount;
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -311,686 +327,477 @@ class _TodayPageState extends State<TodayPage> {
                   height: media.height,
                   child: SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
-                    child: Column(
+                    child: Stack(
                       children: [
-                        Stack(
+                        Column(
                           children: [
-                            Column(
+                            Stack(
                               children: [
-                                Stack(
-                                  children: [
-                                    Container(
-                                      height: media.height / 2,
-                                      width: media.width,
-                                      decoration: const BoxDecoration(
-                                        image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: media.height / 2,
-                                      width: media.width,
-                                      child: SafeArea(
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              margin: const EdgeInsets.only(right: 10),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                Container(
+                                  height: media.height / 2,
+                                  width: media.width,
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: media.height / 3.5,
+                                  width: media.width,
+                                  child: SafeArea(
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(right: 10),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Stack(
                                                 children: [
-                                                  Stack(
-                                                    children: [
-                                                      Container(
-                                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
-                                                        decoration: const BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
-                                                        child: SizedBox(
-                                                          width: ScreenUtil.horizontalScale(10),
-                                                          height: ScreenUtil.horizontalScale(10),
-                                                          child: IconButton(
-                                                            padding: EdgeInsets.zero,
-                                                            icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
-                                                            onPressed: () {
-                                                              // HapticFeedBack.buttonClick();
-                                                              Navigator.pop(context);
-                                                              // Navigator.pushNamed(context, '/dayOverview');
-                                                            },
-                                                            iconSize: ScreenUtil.verticalScale(4),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const CommonStreakWithNotification(routeString: "today")
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.symmetric(
-                                                horizontal: ScreenUtil.horizontalScale(8),
-                                                vertical: ScreenUtil.verticalScale(1.9),
-                                              ),
-                                              height: media.height * 0.22,
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  SizedBox(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                                      children: [
-                                                        Text(
-                                                          // "Option ${monthProvider!.alternateEquipmentType}:",
-                                                          "Option ${monthProvider!.equipmentType}:",
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: ScreenUtil.verticalScale(2),
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 4),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(bottom: 5),
-                                                          child: Text(
-                                                            // monthProvider!.alternateEquipmentType == "A"
-                                                            monthProvider!.equipmentType == "A"
-                                                                ? "Fully equipped gym"
-                                                                // : monthProvider?.alternateEquipmentType == "B"
-                                                                : monthProvider?.equipmentType == "B"
-                                                                    ? "Home gym"
-                                                                    : "Dumbbells and bands",
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Consumer<MonthProvider>(
-                                                          builder: (context, monthProvider, child) {
-                                                            return Padding(
-                                                              padding: const EdgeInsets.only(bottom: 5),
-                                                              child: Text(
-                                                                monthProvider.isPumpDay
-                                                                    ? monthProvider.pumpDayModel?.title ?? "Pump Day"
-                                                                    : currentDayTitle,
-                                                                textAlign: TextAlign.center,
-                                                                style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: ScreenUtil.horizontalScale(6),
-                                                                    fontWeight: FontWeight.bold),
-                                                              ),
-                                                            );
-                                                          },
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
                                                   Container(
-                                                    margin: EdgeInsets.symmetric(
-                                                      horizontal: ScreenUtil.horizontalScale(9),
-                                                    ),
-                                                    child: ButtonWidget(
-                                                        // text: "Watch Video Intro",
-                                                        text: "Watch Video",
-                                                        color: const Color(0xEEFFFFFF),
-                                                        onPress: () {
-                                                          Navigator.of(context).push(
-                                                            FadePageRoute(
-                                                              page: const VideoIntroWidget(vimeoId: '953289606'),
-                                                            ),
-                                                          );
+                                                    margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
+                                                    decoration: const BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                                    child: SizedBox(
+                                                      width: ScreenUtil.horizontalScale(10),
+                                                      height: ScreenUtil.horizontalScale(10),
+                                                      child: IconButton(
+                                                        padding: EdgeInsets.zero,
+                                                        icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                                                        onPressed: () {
+                                                          // HapticFeedBack.buttonClick();
+                                                          Navigator.pop(context);
+                                                          // Navigator.pushNamed(context, '/dayOverview');
                                                         },
-                                                        textColor: AppColors.primaryColor,
-                                                        isLoading: false),
+                                                        iconSize: ScreenUtil.verticalScale(4),
+                                                      ),
+                                                    ),
                                                   ),
-                                                  const SizedBox(height: 10),
                                                 ],
                                               ),
-                                            ),
-                                            // Padding(
-                                            //   padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                                            //   child: Column(
-                                            //     mainAxisAlignment: MainAxisAlignment.center,
-                                            //     children: [
-                                            //       Text(
-                                            //         "Option ${monthProvider!.alternateEquipmentType}:",
-                                            //         style: TextStyle(
-                                            //           color: Colors.white,
-                                            //           fontSize: ScreenUtil.verticalScale(2),
-                                            //         ),
-                                            //       ),
-                                            //       Text(
-                                            //         monthProvider!.alternateEquipmentType == "A"
-                                            //             ? "Fully equipped gym"
-                                            //             : monthProvider?.alternateEquipmentType == "B"
-                                            //                 ? "Home gym"
-                                            //                 : "Dumbbells and bands",
-                                            //         style: TextStyle(
-                                            //           color: Colors.white,
-                                            //           fontSize: ScreenUtil.verticalScale(2.3),
-                                            //         ),
-                                            //       ),
-                                            //       SizedBox(
-                                            //         height: ScreenUtil.verticalScale(0.5),
-                                            //       ),
-                                            //       Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                            //         return Text(
-                                            //           monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle,
-                                            //           textAlign: TextAlign.center,
-                                            //           style: TextStyle(
-                                            //             color: Colors.white,
-                                            //             height: 1.1,
-                                            //             fontSize: ScreenUtil.verticalScale(4),
-                                            //             fontWeight: FontWeight.bold,
-                                            //           ),
-                                            //         );
-                                            //       }),
-                                            //     ],
-                                            //   ),
-                                            // ),
-                                            // SizedBox(height: ScreenUtil.verticalScale(2.5)),
-                                            // Container(
-                                            //   margin: EdgeInsets.symmetric(
-                                            //     horizontal: ScreenUtil.horizontalScale(10),
-                                            //   ),
-                                            //   child: ButtonWidget(
-                                            //     text: "Watch Video Intro",
-                                            //     color: const Color(0xEEFFFFFF),
-                                            //     onPress: () {
-                                            //       Navigator.of(context).push(
-                                            //         FadePageRoute(
-                                            //           page: const VideoIntroWidget(vimeoId: '953289606'),
-                                            //         ),
-                                            //       );
-                                            //     },
-                                            //     textColor: AppColors.primaryColor,
-                                            //     isLoading: false,
-                                            //   ),
-                                            // ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: media.height / 2.64,
-                                      width: media.width,
-                                      child: Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: ClipPath(
-                                          clipper: DiagonalClipper(),
-                                          child: Container(
-                                            height: media.height / 11,
-                                            width: media.width / 6,
-                                            decoration: const BoxDecoration(color: Colors.white),
+                                              const CommonStreakWithNotification(routeString: "today")
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Container(
-                              width: media.width,
-                              margin: EdgeInsets.only(
-                                top: media.height / 2.65,
-                                bottom: ScreenUtil.verticalScale(2),
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
-                                ),
-                              ),
-                              child: Container(
-                                margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(8)),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(7),
-                                        vertical: ScreenUtil.verticalScale(1.2),
-                                      ),
-                                      child: Builder(builder: (context) {
-                                        String split = monthProvider
-                                                ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                .toString()
-                                                .split(" ")[1] ??
-                                            "";
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            if (monthProvider?.dayDataModel!.formats != null &&
-                                                monthProvider!.dayDataModel!.formats!
-                                                    .contains(split.toString().replaceAll("split", ""))) ...[
-                                              Container(
-                                                margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
-                                                child: Text(
-                                                  'Choose equipment availability',
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              SelectDropdown(
-                                                onChange: (String newValue) async {
-                                                  monthProvider?.changeEquipmentType(newValue);
-                                                  // monthProvider?.alternateEquipmentType = newValue;
-                                                  // monthProvider?.equipmentType = newValue;
-                                                  // monthProvider?.innerFilter();
-                                                  // monthProvider?.filter();
-                                                },
-                                              ),
-                                            ]
-                                          ],
-                                        );
-                                      }),
-                                    ),
-                                    totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
-                                    Container(
-                                      width: media.width,
-                                      margin: EdgeInsets.only(left: ScreenUtil.verticalScale(3)),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Today's workout",
-                                            style: TextStyle(
-                                                fontSize: ScreenUtil.horizontalScale(5.5),
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.primaryColor),
+                                        Container(
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: ScreenUtil.horizontalScale(5),
                                           ),
-                                          SizedBox(height: media.height * 0.025),
-                                          monthProvider!.isPumpDay
-                                              ? CircuitsView(
-                                                  circuit: monthProvider!.pumpDayModel!.circuits!,
-                                                  isDayCompleted: isCurrentDayCompleted,
-                                                  isDaySkipped: isCurrentDaySkipped)
-                                              : const SizedBox(),
-                                          loader
-                                              ? SizedBox()
-                                              : Column(
-                                                  children: List.generate(
-                                                    exercises.length,
-                                                    (i) {
-                                                      if (removedExercise
-                                                              .any((element) => element.exerciseId == exercises[i].exerciseId!) ||
-                                                          (!exercises[i].formats!.contains(monthProvider?.equipmentType) &&
-                                                              (exercises[i].isAddedUpdated == false ||
-                                                                  exercises[i].isAddedUpdated == null))) {
-                                                        return const SizedBox();
-                                                      }
-                                                      String split = monthProvider
-                                                              ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                              .toString()
-                                                              .split(" ")[1] ??
-                                                          "";
-
-                                                      String dataId =
-                                                          "$split-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
-
-                                                      bool isExist =
-                                                          (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
-                                                              monthProvider!.isPastWeek;
-                                                      return Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
-                                                            child: WorkoutCard(
-                                                              image: exercises[i].thumbnail ?? "unknown",
-                                                              dataId: dataId,
-                                                              isDayCompleted: isCurrentDayCompleted,
-                                                              isDaySkipped: isCurrentDaySkipped,
-                                                              exerciseId: exercises[i].exerciseId!,
-                                                              isCircuit: false,
-                                                              isCompleted: monthProvider!.exerciseHistoryModel.any((element) =>
-                                                                  element.dataId == dataId && element.status == Status.completed),
-                                                              isSkipped: (monthProvider!.exerciseHistoryModel.any((element) =>
-                                                                          element.dataId == dataId && element.status == Status.skipped) ||
-                                                                      isExist) ||
-                                                                  isCurrentDaySkipped,
-                                                              exerciseIndex: i,
-                                                              onPress: (Function()? function) async {
-                                                                await onPressed(
-                                                                  i,
-                                                                  dataId,
-                                                                  i ==
-                                                                      exercises.indexWhere(
-                                                                        (element) => element.exerciseId == exercises.last.exerciseId,
-                                                                      ),
-                                                                ).then(
-                                                                  (value) {
-                                                                    function!();
-                                                                  },
-                                                                );
-                                                              },
-                                                              openSwapModal: () async {
-                                                                await swipeExerciseDialog(i, exercises[i]);
-                                                                await swipeExerciseDialog(i, exercises[i]);
-                                                              },
-                                                              exercise: exercises[i],
-                                                              exerciseData: exercises[i].id!,
-                                                              name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
-                                                              onRemove: () => removeExercise(exercises[i].exerciseId!),
-                                                              enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
-                                                      ? false
-                                                      : monthProvider!.exerciseHistoryModel.any((element) =>
-                                                                  element.dataId == dataId && element.status == Status.completed) ||
-                                                              isExist
-                                                          ? false
-                                                          :*/
-                                                                  true,
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            height: ScreenUtil.verticalScale(3),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(height: ScreenUtil.verticalScale(1.6)),
-                                    monthProvider?.dayHistoryDetails == null ||
-                                            isCurrentDayCompleted ||
-                                            isCurrentDaySkipped ||
-                                            monthProvider!.isPastWeek
-                                        ? const SizedBox()
-                                        : Padding(
-                                            padding: const EdgeInsets.only(bottom: 5),
-                                            child: TextButton(
-                                              onPressed: () async {
-                                                await addExerciseDialog();
-                                              },
-                                              child: IntrinsicWidth(
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                          height: media.height * 0.17,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
                                                   children: [
-                                                    Icon(
-                                                      Icons.add,
-                                                      color: Colors.grey.shade600,
-                                                      size: ScreenUtil.verticalScale(3),
-                                                    ),
-                                                    SizedBox(width: 4),
                                                     Text(
-                                                      "Add Exercise",
+                                                      "Option ${monthProvider!.equipmentType}: ${monthProvider!.equipmentType == "A" ? "Fully equipped gym" : monthProvider?.equipmentType == "B" ? "Home gym" : "Dumbbells and bands"}",
                                                       style: TextStyle(
+                                                        color: Colors.white,
                                                         fontSize: ScreenUtil.verticalScale(2),
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.grey.shade600,
                                                       ),
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    Consumer<MonthProvider>(
+                                                      builder: (context, monthProvider, child) {
+                                                        return Padding(
+                                                          padding: EdgeInsets.only(
+                                                              bottom: getTextLineCount(
+                                                                          text: (monthProvider.isPumpDay
+                                                                              ? monthProvider.pumpDayModel?.title ?? "Pump Day"
+                                                                              : currentDayTitle),
+                                                                          style: TextStyle(
+                                                                              color: Colors.white,
+                                                                              fontSize: ScreenUtil.horizontalScale(6),
+                                                                              fontWeight: FontWeight.bold),
+                                                                          maxWidth: (media.width - ScreenUtil.horizontalScale(16))) >
+                                                                      1
+                                                                  ? media.height * 0.030
+                                                                  : media.height * 0.048),
+                                                          child: Text(
+                                                            (monthProvider.isPumpDay
+                                                                ? monthProvider.pumpDayModel?.title ?? "Pump Day"
+                                                                : currentDayTitle),
+                                                            textAlign: TextAlign.center,
+                                                            maxLines: 2,
+                                                            style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: ScreenUtil.horizontalScale(6.5),
+                                                                fontWeight: FontWeight.bold),
+                                                          ),
+                                                        );
+                                                      },
                                                     )
                                                   ],
                                                 ),
                                               ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: media.height / 4,
+                                  width: media.width,
+                                  child: Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: ClipPath(
+                                      clipper: DiagonalClipper(),
+                                      child: Container(
+                                        height: media.height / 11,
+                                        width: media.width / 6,
+                                        decoration: const BoxDecoration(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          width: media.width,
+                          margin: EdgeInsets.only(
+                            top: media.height / 4,
+                            bottom: ScreenUtil.verticalScale(2),
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                            ),
+                          ),
+
+                          /// NICK SUGGESTION REMOVE CONTAINER
+
+                          child: Container(
+                            margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(6.5)),
+                            child: Column(
+                              children: [
+                                VideoSlider(),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7),
+                                    vertical: ScreenUtil.verticalScale(1.2),
+                                  ).copyWith(top: ScreenUtil.horizontalScale(6)),
+                                  child: Builder(builder: (context) {
+                                    String split = monthProvider
+                                            ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                            .toString()
+                                            .split(" ")[1] ??
+                                        "";
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        if (monthProvider?.dayDataModel!.formats != null &&
+                                            monthProvider!.dayDataModel!.formats!.contains(split.toString().replaceAll("split", ""))) ...[
+                                          Container(
+                                            margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
+                                            child: Text(
+                                              'Choose equipment availability',
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
                                             ),
                                           ),
-                                    // Padding(
-                                    //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
-                                    //     child: GestureDetector(
-                                    //       onTap: () async {
-                                    //         await addExerciseDialog();
-                                    //       },
-                                    //       child: Container(
-                                    //         padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
-                                    //         decoration: BoxDecoration(
-                                    //             gradient: LinearGradient(
-                                    //                 colors: [const Color(0xFF9B3651), const Color(0xFFDB4671).withValues(alpha: 0.79)],
-                                    //                 begin: Alignment.bottomLeft,
-                                    //                 end: Alignment.bottomRight),
-                                    //             shape: BoxShape.circle),
-                                    //         child: Icon(
-                                    //           Icons.add,
-                                    //           color: Colors.white,
-                                    //           size: ScreenUtil.verticalScale(3.5),
-                                    //         ),
-                                    //       ),
-                                    //     )
-                                    //     //  ButtonWidget(
-                                    //     //   onPress: () async {
-                                    //     //     await addExerciseDialog();
-                                    //     //   },
-                                    //     //   isLoading: false,
-                                    //     //   color: Colors.grey,
-                                    //     //   textColor: Colors.white,
-                                    //     //   text: "Add Exercise",
-                                    //     // ),
-                                    //     ),
-                                    const SizedBox(height: 36),
-                                    Container(
-                                      height: 1,
-                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                                      width: media.width * 0.75,
-                                      color: Colors.black12,
-                                    ),
-                                    const SizedBox(height: 36),
-                                    Consumer<MonthProvider>(builder: (context, value, child) {
-                                      return value.dayHistoryDetails != null && value.dayHistoryDetails?.status == Status.skipped
+                                          const SizedBox(height: 10),
+                                          SelectDropdown(
+                                            onChange: (String newValue) async {
+                                              monthProvider?.changeEquipmentType(newValue);
+                                            },
+                                          ),
+                                        ]
+                                      ],
+                                    );
+                                  }),
+                                ),
+                                totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
+                                Container(
+                                  width: media.width,
+                                  margin: EdgeInsets.only(left: ScreenUtil.verticalScale(3)),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Today's workout",
+                                        style: TextStyle(
+                                            fontSize: ScreenUtil.horizontalScale(5.5),
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.primaryColor),
+                                      ),
+                                      SizedBox(height: media.height * 0.025),
+                                      monthProvider!.isPumpDay
+                                          ? CircuitsView(
+                                              circuit: monthProvider!.pumpDayModel!.circuits!,
+                                              isDayCompleted: isCurrentDayCompleted,
+                                              isDaySkipped: isCurrentDaySkipped)
+                                          : const SizedBox(),
+                                      loader
+                                          ? SizedBox()
+                                          : Column(
+                                              children: List.generate(
+                                                exercises.length,
+                                                (i) {
+                                                  if (removedExercise.any((element) => element.exerciseId == exercises[i].exerciseId!) ||
+                                                      (!exercises[i].formats!.contains(monthProvider?.equipmentType) &&
+                                                          (exercises[i].isAddedUpdated == false || exercises[i].isAddedUpdated == null))) {
+                                                    return const SizedBox();
+                                                  }
+                                                  String split = monthProvider
+                                                          ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                          .toString()
+                                                          .split(" ")[1] ??
+                                                      "";
+
+                                                  String dataId =
+                                                      "$split-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
+
+                                                  bool isExist =
+                                                      (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
+                                                          monthProvider!.isPastWeek;
+                                                  return Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
+                                                        child: WorkoutCard(
+                                                          image: exercises[i].thumbnail ?? "unknown",
+                                                          dataId: dataId,
+                                                          isDayCompleted: isCurrentDayCompleted,
+                                                          isDaySkipped: isCurrentDaySkipped,
+                                                          exerciseId: exercises[i].exerciseId!,
+                                                          isCircuit: false,
+                                                          isCompleted: monthProvider!.exerciseHistoryModel.any(
+                                                              (element) => element.dataId == dataId && element.status == Status.completed),
+                                                          isSkipped: (monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                      element.dataId == dataId && element.status == Status.skipped) ||
+                                                                  isExist) ||
+                                                              isCurrentDaySkipped,
+                                                          exerciseIndex: i,
+                                                          onPress: (Function()? function) async {
+                                                            await onPressed(
+                                                              i,
+                                                              dataId,
+                                                              i ==
+                                                                  exercises.indexWhere(
+                                                                    (element) => element.exerciseId == exercises.last.exerciseId,
+                                                                  ),
+                                                            ).then(
+                                                              (value) {
+                                                                function!();
+                                                              },
+                                                            );
+                                                          },
+                                                          openSwapModal: () async {
+                                                            await swipeExerciseDialog(i, exercises[i]);
+                                                            await swipeExerciseDialog(i, exercises[i]);
+                                                          },
+                                                          exercise: exercises[i],
+                                                          exerciseData: exercises[i].id!,
+                                                          name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
+                                                          onRemove: () => removeExercise(exercises[i].exerciseId!),
+                                                          enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
+                                                  ? false
+                                                  : monthProvider!.exerciseHistoryModel.any((element) =>
+                                                              element.dataId == dataId && element.status == Status.completed) ||
+                                                          isExist
+                                                      ? false
+                                                      :*/
+                                                              true,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: ScreenUtil.verticalScale(3),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: ScreenUtil.verticalScale(1.6)),
+                                monthProvider?.dayHistoryDetails == null ||
+                                        isCurrentDayCompleted ||
+                                        isCurrentDaySkipped ||
+                                        monthProvider!.isPastWeek
+                                    ? const SizedBox()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(bottom: 5),
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            await addExerciseDialog();
+                                          },
+                                          child: IntrinsicWidth(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.add,
+                                                  color: Colors.grey.shade600,
+                                                  size: ScreenUtil.verticalScale(3),
+                                                ),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  "Add Exercise",
+                                                  style: TextStyle(
+                                                    fontSize: ScreenUtil.verticalScale(2),
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey.shade600,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                const SizedBox(height: 36),
+                                Container(
+                                  height: 1,
+                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                                  width: media.width * 0.75,
+                                  color: Colors.black12,
+                                ),
+                                const SizedBox(height: 36),
+                                Consumer<MonthProvider>(builder: (context, value, child) {
+                                  return value.dayHistoryDetails != null && value.dayHistoryDetails?.status == Status.skipped
+                                      ? Container(
+                                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                          child: ButtonWidget(
+                                            text: "Unskip?",
+                                            textColor: Colors.white,
+                                            onPress: () async {
+                                              String type = value.isPumpDay ? "" : 'Workout Day';
+
+                                              await _skipUnskipDayData(
+                                                status: "",
+                                                type: type,
+                                                title: "",
+                                              );
+                                              isCurrentDaySkipped = false;
+                                              setState(() {});
+                                            },
+                                            color: AppColors.skipDayColor,
+                                            isLoading: false,
+                                          ),
+                                        )
+                                      : value.dayHistoryDetails == null ||
+                                              (isCurrentDaySkipped || isCurrentDayCompleted) ||
+                                              value.isPastWeek
                                           ? Container(
                                               margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                               child: ButtonWidget(
-                                                text: "Unskip?",
+                                                text: value.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
                                                 textColor: Colors.white,
-                                                onPress: () async {
-                                                  String type = value.isPumpDay ? "" : 'Workout Day';
-
-                                                  await _skipUnskipDayData(
-                                                    status: "",
-                                                    type: type,
-                                                    title: "",
-                                                  );
-                                                  isCurrentDaySkipped = false;
-                                                  setState(() {});
-                                                },
-                                                color: AppColors.skipDayColor,
+                                                onPress: null,
+                                                color: AppColors.primaryColor,
                                                 isLoading: false,
                                               ),
                                             )
-                                          : value.dayHistoryDetails == null ||
-                                                  (isCurrentDaySkipped || isCurrentDayCompleted) ||
-                                                  value.isPastWeek
-                                              ? Container(
-                                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                                  child: ButtonWidget(
-                                                    text: value.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
-                                                    textColor: Colors.white,
-                                                    onPress: null,
-                                                    color: AppColors.primaryColor,
-                                                    isLoading: false,
-                                                  ),
-                                                )
-                                              : Column(
-                                                  children: [
-                                                    value.dayHistoryDetails?.status != Status.skipped &&
-                                                            value.dayHistoryDetails?.status != Status.completed
-                                                        ? Padding(
-                                                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                            child: CustomSlideAction(
-                                                              key: key,
-                                                              height: ScreenUtil.verticalScale(7.5),
-                                                              outerColor: AppColors.primaryColor,
-                                                              innerColor: AppColors.backOffSetColor,
-                                                              sliderButtonIconPadding: ScreenUtil.verticalScale(1.3),
-                                                              submitButtonIconPadding: ScreenUtil.verticalScale(1.8),
-                                                              sliderButtonIcon: Icon(
-                                                                Icons.keyboard_arrow_right_outlined,
-                                                                color: AppColors.primaryColor,
-                                                                size: ScreenUtil.verticalScale(3.5),
-                                                              ),
-                                                              submittedButtonIcon: Icon(
-                                                                Icons.done,
-                                                                color: AppColors.primaryColor,
-                                                                size: ScreenUtil.verticalScale(2.5),
-                                                              ),
-                                                              onSubmit: () async {
-                                                                return await onSwipe(value).then(
-                                                                  (value) {
-                                                                    key.currentState?.reset();
-                                                                  },
-                                                                );
+                                          : Column(
+                                              children: [
+                                                value.dayHistoryDetails?.status != Status.skipped &&
+                                                        value.dayHistoryDetails?.status != Status.completed
+                                                    ? Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                        child: CustomSlideAction(
+                                                          key: key,
+                                                          height: ScreenUtil.verticalScale(7.5),
+                                                          outerColor: AppColors.primaryColor,
+                                                          innerColor: AppColors.backOffSetColor,
+                                                          sliderButtonIconPadding: ScreenUtil.verticalScale(1.3),
+                                                          submitButtonIconPadding: ScreenUtil.verticalScale(1.8),
+                                                          sliderButtonIcon: Icon(
+                                                            Icons.keyboard_arrow_right_outlined,
+                                                            color: AppColors.primaryColor,
+                                                            size: ScreenUtil.verticalScale(3.5),
+                                                          ),
+                                                          submittedButtonIcon: Icon(
+                                                            Icons.done,
+                                                            color: AppColors.primaryColor,
+                                                            size: ScreenUtil.verticalScale(2.5),
+                                                          ),
+                                                          onSubmit: () async {
+                                                            return await onSwipe(value).then(
+                                                              (value) {
+                                                                key.currentState?.reset();
                                                               },
-                                                              child: Text(
-                                                                "Swipe to complete",
-                                                                style: TextStyle(
-                                                                  color: Colors.white,
-                                                                  fontSize: ScreenUtil.verticalScale(2.2),
-                                                                  fontWeight: FontWeight.bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          )
-                                                        : Container(
-                                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                            child: ButtonWidget(
-                                                              text: value.dayHistoryDetails?.status == Status.completed
-                                                                  ? "Completed"
-                                                                  : value.dayHistoryDetails?.status == Status.skipped
-                                                                      ? "Skipped"
-                                                                      : "Finish the workout",
-                                                              textColor: Colors.white,
-                                                              onPress: value.dayHistoryDetails?.status == Status.completed ||
-                                                                      value.dayHistoryDetails?.status == Status.skipped
-                                                                  ? null
-                                                                  : () async {
-                                                                      HapticFeedBack.buttonClick();
-                                                                      await _saveDayData(
-                                                                          status: Status.skipped,
-                                                                          type: monthProvider!.isPumpDay
-                                                                              ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                                                              : "Workout Day",
-                                                                          status1: Status.completed);
-                                                                      if (!context.mounted) return;
-                                                                      value.updateCurrentDayTitleId(
-                                                                          value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
-                                                                      Navigator.pushNamed(context, '/dayCompleted');
-                                                                    },
-                                                              color: AppColors.primaryColor,
-                                                              isLoading: false,
+                                                            );
+                                                          },
+                                                          child: Text(
+                                                            "Swipe to complete",
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.verticalScale(2.2),
+                                                              fontWeight: FontWeight.bold,
                                                             ),
                                                           ),
-                                                    const SizedBox(height: 14),
-                                                    value.dayHistoryDetails?.status != Status.skipped &&
-                                                            value.dayHistoryDetails?.status != Status.completed
-                                                        ? Container(
-                                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                            child: ButtonWidget(
-                                                              text: "Skip the workout",
-                                                              textColor: Colors.white,
-                                                              color: AppColors.skipDayColor,
-                                                              isLoading: false,
-                                                              onPress: () async {
-                                                                AnimatedDialog.showAnimatedDialog(
-                                                                  context: context,
-                                                                  pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
-                                                                );
-                                                              },
-                                                            ),
-                                                          )
-                                                        : const SizedBox(),
-                                                  ],
-                                                );
-                                    }),
-                                    const SizedBox(
-                                      height: 90,
-                                    ),
-                                  ],
+                                                        ),
+                                                      )
+                                                    : Container(
+                                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                        child: ButtonWidget(
+                                                          text: value.dayHistoryDetails?.status == Status.completed
+                                                              ? "Completed"
+                                                              : value.dayHistoryDetails?.status == Status.skipped
+                                                                  ? "Skipped"
+                                                                  : "Finish the workout",
+                                                          textColor: Colors.white,
+                                                          onPress: value.dayHistoryDetails?.status == Status.completed ||
+                                                                  value.dayHistoryDetails?.status == Status.skipped
+                                                              ? null
+                                                              : () async {
+                                                                  HapticFeedBack.buttonClick();
+                                                                  await _saveDayData(
+                                                                      status: Status.skipped,
+                                                                      type: monthProvider!.isPumpDay
+                                                                          ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                                                          : "Workout Day",
+                                                                      status1: Status.completed);
+                                                                  if (!context.mounted) return;
+                                                                  value.updateCurrentDayTitleId(
+                                                                      value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
+                                                                  Navigator.pushNamed(context, '/dayCompleted');
+                                                                },
+                                                          color: AppColors.primaryColor,
+                                                          isLoading: false,
+                                                        ),
+                                                      ),
+                                                const SizedBox(height: 14),
+                                                value.dayHistoryDetails?.status != Status.skipped &&
+                                                        value.dayHistoryDetails?.status != Status.completed
+                                                    ? Container(
+                                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                        child: ButtonWidget(
+                                                          text: "Skip the workout",
+                                                          textColor: Colors.white,
+                                                          color: AppColors.skipDayColor,
+                                                          isLoading: false,
+                                                          onPress: () async {
+                                                            AnimatedDialog.showAnimatedDialog(
+                                                              context: context,
+                                                              pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
+                                                            );
+                                                          },
+                                                        ),
+                                                      )
+                                                    : const SizedBox(),
+                                              ],
+                                            );
+                                }),
+                                const SizedBox(
+                                  height: 90,
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: ScreenUtil.horizontalScale(15),
-                      vertical: ScreenUtil.verticalScale(2),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: ScreenUtil.verticalScale(1),
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          spreadRadius: 1,
-                          blurRadius: 6,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5.0),
-                      child: Consumer<MainPageProvider>(builder: (context, value, child) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                value.changeTab(0);
-                              },
-                              icon: SvgPicture.asset(
-                                'assets/img/1-home.svg',
-                                colorFilter:
-                                    ColorFilter.mode(value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                                width: ScreenUtil.horizontalScale(8.5),
-                                height: ScreenUtil.horizontalScale(8.5),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                value.changeTab(1);
-                              },
-                              icon: SvgPicture.asset(
-                                'assets/img/2-calendar.svg',
-                                colorFilter:
-                                    ColorFilter.mode(value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                                width: ScreenUtil.horizontalScale(8.5),
-                                height: ScreenUtil.horizontalScale(8.5),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                value.changeTab(2);
-                              },
-                              icon: SvgPicture.asset(
-                                'assets/img/3-statistics.svg',
-                                colorFilter:
-                                    ColorFilter.mode(value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                                width: ScreenUtil.horizontalScale(8.5),
-                                height: ScreenUtil.horizontalScale(8.5),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                value.changeTab(3);
-                              },
-                              icon: SvgPicture.asset(
-                                'assets/img/4-account.svg',
-                                colorFilter:
-                                    ColorFilter.mode(value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                                width: ScreenUtil.horizontalScale(9),
-                                height: ScreenUtil.horizontalScale(9),
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-                  ),
-                )
+                bottomBar()
               ],
             ),
           );
@@ -1149,386 +956,202 @@ class _TodayPageState extends State<TodayPage> {
               style: TextStyle(fontSize: ScreenUtil.horizontalScale(6), fontWeight: FontWeight.bold, color: AppColors.primaryColor),
             ),
             const SizedBox(height: 20),
-            Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-              String split =
-                  monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+            Consumer<MonthProvider>(
+              builder: (context, monthProvider, child) {
+                String split =
+                    monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ??
+                        "";
 
-              String warmUpDataId =
-                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
+                String warmUpDataId =
+                    "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
 
-              bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
+                bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
 
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(ScreenUtil.verticalScale(12)),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      spreadRadius: 1,
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(ScreenUtil.verticalScale(12)),
                     ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    monthProvider.updateWarmUp(true);
-                    monthProvider.updateIsLastExercise(false);
-                    Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
-                  },
-                  style: ElevatedButton.styleFrom(
-                      disabledBackgroundColor: const Color(0xFFF3F3F3),
-                      backgroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        spreadRadius: 1,
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      monthProvider.updateWarmUp(true);
+                      monthProvider.updateIsLastExercise(false);
+                      Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                    },
+                    style: ElevatedButton.styleFrom(
+                        disabledBackgroundColor: const Color(0xFFF3F3F3),
+                        backgroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(ScreenUtil.verticalScale(12)),
+                          ),
+                          side: const BorderSide(
+                            color: Color(0x12000000),
+                            width: 0.5,
+                          ),
+                        ),
+                        padding: EdgeInsets.zero),
+                    child: Container(
+                      width: media.width,
+                      padding: EdgeInsets.only(right: ScreenUtil.verticalScale(2)),
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(
                           Radius.circular(ScreenUtil.verticalScale(12)),
                         ),
-                        side: const BorderSide(
-                          color: Color(0x12000000),
-                          width: 0.5,
-                        ),
                       ),
-                      padding: EdgeInsets.zero),
-                  child: Container(
-                    width: media.width,
-                    padding: EdgeInsets.only(right: ScreenUtil.verticalScale(2)),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(ScreenUtil.verticalScale(12)),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Consumer<MonthProvider>(builder: (context, value, child) {
-                          return Row(
-                            children: [
-                              appShimmerImage(
-                                height: media.width / 4,
-                                width: media.width / 4,
-                                networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
-                                    ? monthProvider.warmUpModel?.thumbnail ??
-                                        "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                    : monthProvider.warmUpModel?.thumbnail ?? "unknown",
-                                fit: BoxFit.contain,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                ),
-                                child: Container(
-                                  decoration: monthProvider.exerciseHistoryModel
-                                          .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-                                      ? BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                              const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                            ],
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                          ),
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                            bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                          ),
-                                        )
-                                      : monthProvider.exerciseHistoryModel
-                                                  .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-                                              isExist
-                                          ? BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  AppColors.secondColor.withValues(alpha: 0.8),
-                                                  AppColors.secondColor.withValues(alpha: 0.8),
-                                                ],
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter,
-                                              ),
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                                bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                              ),
-                                            )
-                                          : BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                                bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                              ),
-                                            ),
-                                  child: Icon(
-                                    monthProvider.exerciseHistoryModel
-                                            .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-                                        ? Icons.check
-                                        : Icons.close,
-                                    color: monthProvider.exerciseHistoryModel
-                                                .any((element) => element.dataId == warmUpDataId && element.status == Status.completed) ||
-                                            (monthProvider.exerciseHistoryModel
-                                                    .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-                                                isExist)
-                                        ? Colors.white
-                                        : Colors.transparent,
-                                    size: 30,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Consumer<MonthProvider>(builder: (context, value, child) {
+                            return Row(
+                              children: [
+                                appShimmerImage(
+                                  height: media.width / 4,
+                                  width: media.width / 4,
+                                  networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
+                                      ? monthProvider.warmUpModel?.thumbnail ??
+                                          "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                      : monthProvider.warmUpModel?.thumbnail ?? "unknown",
+                                  fit: BoxFit.contain,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: media.width / 2.5,
-                                    child: Text(
-                                      monthProvider.warmUpModel?.title ?? "Warm IUp",
-                                      style: TextStyle(
-                                        color: AppColors.primaryColor,
-                                        fontSize: ScreenUtil.horizontalScale(3.8),
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.2,
-                                      ),
+                                  child: Container(
+                                    decoration: monthProvider.exerciseHistoryModel
+                                            .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+                                        ? BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                              ],
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                            ),
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                              bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                            ),
+                                          )
+                                        : monthProvider.exerciseHistoryModel
+                                                    .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+                                                isExist
+                                            ? BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    AppColors.secondColor.withValues(alpha: 0.8),
+                                                    AppColors.secondColor.withValues(alpha: 0.8),
+                                                  ],
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                ),
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                ),
+                                              )
+                                            : BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                ),
+                                              ),
+                                    child: Icon(
+                                      monthProvider.exerciseHistoryModel
+                                              .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+                                          ? Icons.check
+                                          : Icons.close,
+                                      color: monthProvider.exerciseHistoryModel
+                                                  .any((element) => element.dataId == warmUpDataId && element.status == Status.completed) ||
+                                              (monthProvider.exerciseHistoryModel.any(
+                                                      (element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+                                                  isExist)
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                      size: 30,
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: ScreenUtil.verticalScale(1.5),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
-                                        child: SvgPicture.asset(
-                                          "assets/icons/trend.svg",
-                                          colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                                          width: 20,
-                                        ),
-                                      ),
-                                      Text(
-                                        1 == totalWarmups ? "1 Video" : '$totalWarmups Videos',
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: media.width / 2.5,
+                                      child: Text(
+                                        monthProvider.warmUpModel?.title ?? "Warm IUp",
                                         style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: ScreenUtil.verticalScale(1.5),
+                                          color: AppColors.primaryColor,
+                                          fontSize: ScreenUtil.horizontalScale(3.8),
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.2,
                                         ),
                                       ),
-                                    ],
-                                  )
-                                ],
+                                    ),
+                                    SizedBox(
+                                      height: ScreenUtil.verticalScale(1.5),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
+                                          child: SvgPicture.asset(
+                                            "assets/icons/trend.svg",
+                                            colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                            width: 20,
+                                          ),
+                                        ),
+                                        Text(
+                                          1 == totalWarmups ? "1 Video" : '$totalWarmups Videos',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: ScreenUtil.verticalScale(1.5),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ],
+                            );
+                          }),
+                          GestureDetector(
+                            onTap: null,
+                            child: Container(
+                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                shape: BoxShape.circle,
                               ),
-                            ],
-                          );
-                        }),
-                        GestureDetector(
-                          onTap: null,
-                          child: Container(
-                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.play_arrow,
-                              color: Colors.white,
-                              size: ScreenUtil.verticalScale(3),
+                              child: Icon(
+                                Icons.play_arrow,
+                                color: Colors.white,
+                                size: ScreenUtil.verticalScale(3),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-
-              // return Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     appShimmerImage(
-              //       networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
-              //           ? monthProvider.warmUpModel?.thumbnail ??
-              //               "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-              //           : monthProvider.warmUpModel?.thumbnail ?? "unknown",
-              //       borderRadius: BorderRadius.all(
-              //         Radius.circular(ScreenUtil.verticalScale(1)),
-              //       ),
-              //       height: media.width / 3.7,
-              //       width: media.width / 3.7,
-              //       child: Container(
-              //         decoration: monthProvider.exerciseHistoryModel
-              //                 .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-              //             ? BoxDecoration(
-              //                 gradient: LinearGradient(colors: [
-              //                   const Color(0xFFAADDAA).withValues(alpha: 0.8),
-              //                   const Color(0xFFAADDAA).withValues(alpha: 0.8),
-              //                 ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-              //                 borderRadius: BorderRadius.all(
-              //                   Radius.circular(
-              //                     ScreenUtil.verticalScale(1),
-              //                   ),
-              //                 ),
-              //               )
-              //             : (monthProvider.exerciseHistoryModel
-              //                         .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-              //                     isExist)
-              //                 ? BoxDecoration(
-              //                     gradient: LinearGradient(
-              //                       colors: [
-              //                         AppColors.secondColor.withValues(alpha: 0.8),
-              //                         AppColors.secondColor.withValues(alpha: 0.8),
-              //                       ],
-              //                       begin: Alignment.topCenter,
-              //                       end: Alignment.bottomCenter,
-              //                     ),
-              //                     borderRadius: BorderRadius.all(
-              //                       Radius.circular(
-              //                         ScreenUtil.verticalScale(1),
-              //                       ),
-              //                     ),
-              //                   )
-              //                 : BoxDecoration(
-              //                     borderRadius: BorderRadius.all(
-              //                       Radius.circular(
-              //                         ScreenUtil.verticalScale(1),
-              //                       ),
-              //                     ),
-              //                   ),
-              //         child: Icon(
-              //           monthProvider.exerciseHistoryModel
-              //                   .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-              //               ? Icons.check
-              //               : Icons.close,
-              //           color: (monthProvider.exerciseHistoryModel.any((element) =>
-              //                       element.dataId == warmUpDataId &&
-              //                       (element.status == Status.completed || element.status == Status.skipped)) ||
-              //                   isExist)
-              //               ? Colors.white
-              //               : Colors.transparent,
-              //           size: 30,
-              //         ),
-              //       ),
-              //     ),
-              //     SizedBox(
-              //       width: media.width * 0.1,
-              //     ),
-              //     SizedBox(
-              //       height: media.width / 3.7,
-              //       child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         children: [
-              //           Container(
-              //             height: ScreenUtil.horizontalScale(6.5),
-              //             width: ScreenUtil.horizontalScale(6.5),
-              //             decoration: const BoxDecoration(
-              //               image: DecorationImage(
-              //                 image: AssetImage('assets/img/deadline.png'),
-              //                 fit: BoxFit.cover,
-              //                 opacity: 0.5,
-              //               ),
-              //             ),
-              //           ),
-              //           Container(
-              //             height: ScreenUtil.horizontalScale(6.2),
-              //             width: ScreenUtil.horizontalScale(6.2),
-              //             decoration: const BoxDecoration(
-              //               image: DecorationImage(
-              //                 image: AssetImage('assets/img/play.png'),
-              //                 fit: BoxFit.cover,
-              //                 opacity: 0.3,
-              //               ),
-              //             ),
-              //           ),
-              //           Container(
-              //             height: ScreenUtil.horizontalScale(6),
-              //             width: ScreenUtil.horizontalScale(6),
-              //             decoration: const BoxDecoration(
-              //               image: DecorationImage(
-              //                 image: AssetImage('assets/img/question.png'),
-              //                 fit: BoxFit.cover,
-              //                 opacity: 0.5,
-              //               ),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //     const SizedBox(width: 5),
-              //     SizedBox(
-              //       height: media.width / 3.7,
-              //       child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           Text(
-              //             '${monthProvider.warmUpModel?.length ?? ""} Min',
-              //             style: TextStyle(
-              //               color: Colors.grey,
-              //               fontSize: ScreenUtil.horizontalScale(4.5),
-              //             ),
-              //           ),
-              //           Text(
-              //             totalWarmups == 1 ? "1 Video" : '$totalWarmups Videos',
-              //             style: TextStyle(
-              //               color: Colors.grey,
-              //               fontSize: ScreenUtil.horizontalScale(4.5),
-              //             ),
-              //           ),
-              //           Text(
-              //             'Optional',
-              //             style: TextStyle(
-              //               color: Colors.grey,
-              //               fontSize: ScreenUtil.horizontalScale(4.5),
-              //             ),
-              //           )
-              //         ],
-              //       ),
-              //     )
-              //   ],
-              // );
-            }),
+                );
+              },
+            ),
             SizedBox(height: 15)
-            // Container(
-            //   margin: EdgeInsets.symmetric(
-            //     vertical: ScreenUtil.verticalScale(3),
-            //   ),
-            //   child: Consumer<MonthProvider>(
-            //     builder: (context, monthProvider, child) {
-            //       String split =
-            //           monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ??
-            //               "";
-            //
-            //       String warmUpDataId =
-            //           "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
-            //       bool isExist =
-            //           (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
-            //
-            //       return ButtonWidget(
-            //         text: monthProvider.exerciseHistoryModel
-            //                 .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-            //             ? "Completed"
-            //             : monthProvider.exerciseHistoryModel
-            //                         .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-            //                     isExist
-            //                 ? "Skipped"
-            //                 : "Start the warm-up",
-            //         textColor: Colors.white,
-            //         onPress: monthProvider.exerciseHistoryModel.any((element) =>
-            //                     element.dataId == warmUpDataId &&
-            //                     (element.status == Status.completed || element.status == Status.skipped)) ||
-            //                 isExist
-            //             ? null
-            //             : () async {
-            //                 HapticFeedBack.buttonClick();
-            //                 monthProvider.updateWarmUp(true);
-            //                 monthProvider.updateIsLastExercise(false);
-            //                 Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
-            //               },
-            //         color: AppColors.primaryColor,
-            //         isLoading: false,
-            //       );
-            //     },
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -1563,7 +1186,14 @@ class _TodayPageState extends State<TodayPage> {
                               maxWidth: ScreenUtil.horizontalScale(96),
                               maxHeight: ScreenUtil.verticalScale(62),
                             ),
-                            child: Center(child: CircularProgressIndicator(color: AppColors.primaryColor)),
+                            child: AnimatedSize(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeIn,
+                              alignment: Alignment.topCenter,
+                              child: Center(
+                                child: CircularProgressIndicator(color: AppColors.primaryColor),
+                              ),
+                            ),
                           )
                         : SizedBox(
                             width: ScreenUtil.horizontalScale(96),
@@ -1682,308 +1312,200 @@ class _TodayPageState extends State<TodayPage> {
                                     monthProvider!.addedExerciseList.any((ele) => ele.exerciseId == element.id) ||
                                     exercises.any((ele) => ele.exerciseId == element.id));
 
-                                return SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: media.width,
-                                        padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 10),
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            'Search for your exercise',
-                                            style: TextStyle(
-                                              fontSize: ScreenUtil.horizontalScale(5.5),
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryColor,
+                                return AnimatedSize(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeIn,
+                                  alignment: Alignment.topCenter,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: media.width,
+                                          padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 10),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Search for your exercise',
+                                              style: TextStyle(
+                                                fontSize: ScreenUtil.horizontalScale(5.5),
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryColor,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      SearchEquipmentField(
-                                        onChanged: (query) {
-                                          setState(() {
-                                            searchQuery = query;
-                                            currentPageAll = 0;
-                                            monthProvider?.fetchAllFilterEx(query);
-                                          });
-                                        },
-                                      ),
-                                      searchQuery.isEmpty
-                                          ? SizedBox(
-                                              height: media.width * 0,
-                                            )
-                                          : monthProvider!.allFilterExercises.isNotEmpty
-                                              ? Column(
-                                                  children: [
-                                                    ConstrainedBox(
-                                                      constraints: BoxConstraints(
-                                                        maxHeight: ScreenUtil.verticalScale(60),
-                                                      ),
-                                                      child: SingleChildScrollView(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: Column(
-                                                            children:
-                                                                buildExerciseList(monthProvider!.allFilterExercises, currentPageAll, false),
+                                        SearchEquipmentField(
+                                          onChanged: (query) {
+                                            setState(() {
+                                              searchQuery = query;
+                                              currentPageAll = 0;
+                                              monthProvider?.fetchAllFilterEx(query);
+                                            });
+                                          },
+                                        ),
+                                        searchQuery.isEmpty
+                                            ? SizedBox(
+                                                height: media.width * 0,
+                                              )
+                                            : monthProvider!.allFilterExercises.isNotEmpty
+                                                ? Column(
+                                                    children: [
+                                                      ConstrainedBox(
+                                                        constraints: BoxConstraints(
+                                                          maxHeight: ScreenUtil.verticalScale(60),
+                                                        ),
+                                                        child: SingleChildScrollView(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: Column(
+                                                              children: buildExerciseList(
+                                                                  monthProvider!.allFilterExercises, currentPageAll, false),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    // Pagination controls for all exercises
-                                                    buildPaginationControls(
-                                                      currentPageAll,
-                                                      monthProvider!.allFilterExercises.length,
-                                                      (page) {
-                                                        setState(() {
-                                                          currentPageAll = page;
-                                                        });
-                                                      },
-                                                    ),
-                                                  ],
-                                                )
-                                              : SizedBox(
-                                                  height: media.width * 0.45,
-                                                  child: const Center(
-                                                    child: Text(
-                                                      "No exercise available!",
-                                                      style: TextStyle(fontSize: 17),
+                                                      // Pagination controls for all exercises
+                                                      buildPaginationControls(
+                                                        currentPageAll,
+                                                        monthProvider!.allFilterExercises.length,
+                                                        (page) {
+                                                          setState(() {
+                                                            currentPageAll = page;
+                                                          });
+                                                        },
+                                                      ),
+                                                    ],
+                                                  )
+                                                : SizedBox(
+                                                    height: media.width * 0.45,
+                                                    child: const Center(
+                                                      child: Text(
+                                                        "No exercise available!",
+                                                        style: TextStyle(fontSize: 17),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20).copyWith(bottom: 20),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: ButtonWidget(
-                                                  text: "Cancel",
-                                                  textColor: Colors.black,
-                                                  color: const Color(0xFFDDDDDD),
-                                                  onPress: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  isLoading: false),
-                                            ),
-                                            SizedBox(width: 15),
-                                            Expanded(
-                                              child: ButtonWidget(
-                                                  text: "Confirm",
-                                                  textColor: Colors.white,
-                                                  color: AppColors.primaryColor,
-                                                  onPress: () async {
-                                                    ExerciseDataModel newDayExercise = ExerciseDataModel();
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20).copyWith(bottom: 20),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: ButtonWidget(
+                                                    text: "Cancel",
+                                                    textColor: Colors.black,
+                                                    color: const Color(0xFFDDDDDD),
+                                                    onPress: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    isLoading: false),
+                                              ),
+                                              SizedBox(width: 15),
+                                              Expanded(
+                                                child: ButtonWidget(
+                                                    text: "Confirm",
+                                                    textColor: Colors.white,
+                                                    color: AppColors.primaryColor,
+                                                    onPress: () async {
+                                                      ExerciseDataModel newDayExercise = ExerciseDataModel();
 
-                                                    if (exercises.isNotEmpty) {
-                                                      newDayExercise = ExerciseDataModel(
-                                                        isAddedUpdated: true,
-                                                        id: "",
-                                                        exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-                                                        typeId: exercises[0].typeId ?? 1,
-                                                        name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
-                                                            "Exercise ${exercises.length + 1}",
-                                                        guide: exercises[0].guide ?? "",
-                                                        sets: exercises[0].sets ?? 0,
-                                                        reps: exercises[0].reps ?? 0,
-                                                        rest: exercises[0].rest ?? 0,
-                                                        weight: exercises[0].weight ?? 0,
-                                                        formats: exercises[0].formats ?? [],
-                                                        thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
-                                                            "unknown",
-                                                        extra: exercises[0].extra ?? [],
+                                                      if (exercises.isNotEmpty) {
+                                                        newDayExercise = ExerciseDataModel(
+                                                          isAddedUpdated: true,
+                                                          id: "",
+                                                          exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                                          typeId: exercises[0].typeId ?? 1,
+                                                          name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                                              "Exercise ${exercises.length + 1}",
+                                                          guide: exercises[0].guide ?? "",
+                                                          sets: exercises[0].sets ?? 0,
+                                                          reps: exercises[0].reps ?? 0,
+                                                          rest: exercises[0].rest ?? 0,
+                                                          weight: exercises[0].weight ?? 0,
+                                                          formats: exercises[0].formats ?? [],
+                                                          thumbnail:
+                                                              monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                                  "unknown",
+                                                          extra: exercises[0].extra ?? [],
+                                                        );
+                                                      } else {
+                                                        newDayExercise = ExerciseDataModel(
+                                                          isAddedUpdated: true,
+                                                          id: "",
+                                                          exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                                          typeId: 1,
+                                                          name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                                              "Exercise ${exercises.length + 1}",
+                                                          thumbnail:
+                                                              monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                                  "unknown",
+                                                          guide: "",
+                                                          sets: 5,
+                                                          reps: 10,
+                                                          rest: 3,
+                                                          weight: 30,
+                                                          formats: ["A", "B", "C"],
+                                                          extra: [
+                                                            ExtraDataModel(
+                                                              weight: 0,
+                                                              rest: 120,
+                                                              load: 0,
+                                                              reps: 0,
+                                                              sets: 3,
+                                                              type: 3,
+                                                              id: "extraaddedexercisesetsdefaultvalueid",
+                                                            )
+                                                          ],
+                                                        );
+                                                      }
+
+                                                      String split = monthProvider
+                                                              ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                              .toString()
+                                                              .split(" ")[1] ??
+                                                          "";
+                                                      String dataId =
+                                                          "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id}";
+
+                                                      Map<String, dynamic> data = {
+                                                        "dataId": dataId,
+                                                        "split": split,
+                                                        "monthId": monthProvider?.monthDataModel?.id,
+                                                        "weekId": monthProvider?.weekDataModel?.id,
+                                                        "dayId":
+                                                            monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+                                                        "date": "${DateTime.now().toUtc()}",
+                                                        "exerciseId": monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id,
+                                                        "exerciseJson": jsonEncode(newDayExercise)
+                                                      };
+
+                                                      RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+                                                        (element) => element.dataId == dataId,
+                                                        orElse: () => RemovedExerciseModel(),
                                                       );
-                                                    } else {
-                                                      newDayExercise = ExerciseDataModel(
-                                                        isAddedUpdated: true,
-                                                        id: "",
-                                                        exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-                                                        typeId: 1,
-                                                        name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
-                                                            "Exercise ${exercises.length + 1}",
-                                                        thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
-                                                            "unknown",
-                                                        guide: "",
-                                                        sets: 5,
-                                                        reps: 10,
-                                                        rest: 3,
-                                                        weight: 30,
-                                                        formats: ["A", "B", "C"],
-                                                        extra: [
-                                                          ExtraDataModel(
-                                                            weight: 0,
-                                                            rest: 120,
-                                                            load: 0,
-                                                            reps: 0,
-                                                            sets: 3,
-                                                            type: 3,
-                                                            id: "extraaddedexercisesetsdefaultvalueid",
-                                                          )
-                                                        ],
-                                                      );
-                                                    }
+                                                      if (removedDataExit.id != null) {
+                                                        ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                                        await DatabaseHelper().deleteSingleData(
+                                                            tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
+                                                      }
 
-                                                    String split = monthProvider
-                                                            ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                            .toString()
-                                                            .split(" ")[1] ??
-                                                        "";
-                                                    String dataId =
-                                                        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id}";
-
-                                                    Map<String, dynamic> data = {
-                                                      "dataId": dataId,
-                                                      "split": split,
-                                                      "monthId": monthProvider?.monthDataModel?.id,
-                                                      "weekId": monthProvider?.weekDataModel?.id,
-                                                      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-                                                      "date": "${DateTime.now().toUtc()}",
-                                                      "exerciseId": monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id,
-                                                      "exerciseJson": jsonEncode(newDayExercise)
-                                                    };
-
-                                                    RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
-                                                      (element) => element.dataId == dataId,
-                                                      orElse: () => RemovedExerciseModel(),
-                                                    );
-                                                    if (removedDataExit.id != null) {
-                                                      ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
-                                                      await DatabaseHelper().deleteSingleData(
-                                                          tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
-                                                    }
-
-                                                    exercises.add(newDayExercise);
-                                                    ApiRepo.addExtraExercise(body: data);
-                                                    await DatabaseHelper()
-                                                        .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
-                                                    await monthProvider?.fetchExtraAddedExerciseData();
-                                                    setState(() {});
-                                                    if (!context.mounted) return;
-                                                    Navigator.pop(context);
-                                                  },
-                                                  isLoading: false),
-                                            ),
-                                            // ElevatedButton(
-                                            //   onPressed: () {
-                                            //     Navigator.pop(context);
-                                            //   },
-                                            //   style: ElevatedButton.styleFrom(
-                                            //     foregroundColor: Colors.black,
-                                            //     backgroundColor: const Color(0xFFDDDDDD),
-                                            //     shadowColor: Colors.grey,
-                                            //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                            //     textStyle: const TextStyle(
-                                            //       fontSize: 16,
-                                            //     ),
-                                            //   ),
-                                            //   child: const Text('Cancel'),
-                                            // ),
-                                            // ElevatedButton(
-                                            //   onPressed: () async {
-                                            //     ExerciseDataModel newDayExercise = ExerciseDataModel();
-                                            //
-                                            //     if (exercises.isNotEmpty) {
-                                            //       newDayExercise = ExerciseDataModel(
-                                            //         isAddedUpdated: true,
-                                            //         id: "",
-                                            //         exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-                                            //         typeId: exercises[0].typeId ?? 1,
-                                            //         name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
-                                            //             "Exercise ${exercises.length + 1}",
-                                            //         guide: exercises[0].guide ?? "",
-                                            //         sets: exercises[0].sets ?? 0,
-                                            //         reps: exercises[0].reps ?? 0,
-                                            //         rest: exercises[0].rest ?? 0,
-                                            //         weight: exercises[0].weight ?? 0,
-                                            //         formats: exercises[0].formats ?? [],
-                                            //         thumbnail:
-                                            //             monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
-                                            //         extra: exercises[0].extra ?? [],
-                                            //       );
-                                            //     } else {
-                                            //       newDayExercise = ExerciseDataModel(
-                                            //         isAddedUpdated: true,
-                                            //         id: "",
-                                            //         exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-                                            //         typeId: 1,
-                                            //         name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
-                                            //             "Exercise ${exercises.length + 1}",
-                                            //         thumbnail:
-                                            //             monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
-                                            //         guide: "",
-                                            //         sets: 5,
-                                            //         reps: 10,
-                                            //         rest: 3,
-                                            //         weight: 30,
-                                            //         formats: ["A", "B", "C"],
-                                            //         extra: [
-                                            //           ExtraDataModel(
-                                            //             weight: 0,
-                                            //             rest: 120,
-                                            //             load: 0,
-                                            //             reps: 0,
-                                            //             sets: 3,
-                                            //             type: 3,
-                                            //             id: "extraaddedexercisesetsdefaultvalueid",
-                                            //           )
-                                            //         ],
-                                            //       );
-                                            //     }
-                                            //
-                                            //     String split = monthProvider
-                                            //             ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                            //             .toString()
-                                            //             .split(" ")[1] ??
-                                            //         "";
-                                            //     String dataId =
-                                            //         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id}";
-                                            //
-                                            //     Map<String, dynamic> data = {
-                                            //       "dataId": dataId,
-                                            //       "split": split,
-                                            //       "monthId": monthProvider?.monthDataModel?.id,
-                                            //       "weekId": monthProvider?.weekDataModel?.id,
-                                            //       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-                                            //       "date": "${DateTime.now().toUtc()}",
-                                            //       "exerciseId": monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id,
-                                            //       "exerciseJson": jsonEncode(newDayExercise)
-                                            //     };
-                                            //
-                                            //     RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
-                                            //       (element) => element.dataId == dataId,
-                                            //       orElse: () => RemovedExerciseModel(),
-                                            //     );
-                                            //     if (removedDataExit.id != null) {
-                                            //       ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
-                                            //       await DatabaseHelper().deleteSingleData(
-                                            //           tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
-                                            //     }
-                                            //
-                                            //     exercises.add(newDayExercise);
-                                            //     ApiRepo.addExtraExercise(body: data);
-                                            //     await DatabaseHelper()
-                                            //         .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
-                                            //     await monthProvider?.fetchExtraAddedExerciseData();
-                                            //     setState(() {});
-                                            //     if (!context.mounted) return;
-                                            //     Navigator.pop(context);
-                                            //   },
-                                            //   style: ElevatedButton.styleFrom(
-                                            //     foregroundColor: Colors.white,
-                                            //     backgroundColor: AppColors.primaryColor,
-                                            //     shadowColor: Colors.grey,
-                                            //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                            //     textStyle: const TextStyle(
-                                            //       fontSize: 16,
-                                            //     ),
-                                            //   ),
-                                            //   child: const Text('Confirm'),
-                                            // ),
-                                          ],
+                                                      exercises.add(newDayExercise);
+                                                      ApiRepo.addExtraExercise(body: data);
+                                                      await DatabaseHelper()
+                                                          .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
+                                                      await monthProvider?.fetchExtraAddedExerciseData();
+                                                      setState(() {});
+                                                      if (!context.mounted) return;
+                                                      Navigator.pop(context);
+                                                    },
+                                                    isLoading: false),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 );
                               }),
@@ -2024,7 +1546,7 @@ class _TodayPageState extends State<TodayPage> {
             builder: (context, setState) {
               return Dialog(
                 backgroundColor: Colors.white,
-                insetPadding: const EdgeInsets.all(0),
+                insetPadding: EdgeInsets.zero,
                 child: Consumer<MonthProvider>(builder: (context, value, child) {
                   return value.exerciseLoader
                       ? ConstrainedBox(
@@ -2032,7 +1554,11 @@ class _TodayPageState extends State<TodayPage> {
                             maxWidth: ScreenUtil.horizontalScale(96),
                             maxHeight: ScreenUtil.verticalScale(45),
                           ),
-                          child: Center(child: CircularProgressIndicator(color: AppColors.primaryColor)),
+                          child: AnimatedSize(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeIn,
+                              alignment: Alignment.topCenter,
+                              child: Center(child: CircularProgressIndicator(color: AppColors.primaryColor))),
                         )
                       : SizedBox(
                           width: ScreenUtil.horizontalScale(96),
@@ -2258,335 +1784,246 @@ class _TodayPageState extends State<TodayPage> {
                                   monthProvider!.addedExerciseList.any((ele) => ele.exerciseId == element.sId) ||
                                   exercises.any((ele) => ele.exerciseId == element.sId));
 
-                              return SingleChildScrollView(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: media.width,
-                                      padding: const EdgeInsets.symmetric(horizontal: 24).copyWith(top: 20, bottom: 8),
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          'Swap exercise option',
-                                          style: TextStyle(
-                                            fontSize: ScreenUtil.horizontalScale(5.5),
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    monthProvider!.relatedExercises.isNotEmpty
-                                        ? Column(
-                                            children: [
-                                              ConstrainedBox(
-                                                constraints: BoxConstraints(
-                                                  maxHeight: ScreenUtil.verticalScale(60),
-                                                ),
-                                                child: SingleChildScrollView(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.all(8.0),
-                                                    child: Builder(
-                                                      builder: (context) {
-                                                        final seenIds = <String>{};
-                                                        final filteredList = monthProvider!.relatedExercises.where((item) {
-                                                          return seenIds.add(item.sId!);
-                                                        }).toList();
-                                                        return Column(
-                                                          children: [
-                                                            Column(
-                                                              children: buildRelatedExerciseList(filteredList, currentPageRelated),
-                                                            ),
-                                                            buildPaginationControlsRelatedExercise(
-                                                              currentPageRelated,
-                                                              monthProvider!.relatedExercises.length,
-                                                              (page) {
-                                                                setState(() {
-                                                                  currentPageRelated = page;
-                                                                });
-                                                              },
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        : const Center(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 12, bottom: 18),
-                                              child: Text(
-                                                "No exercise available!",
-                                                style: TextStyle(fontSize: 17),
-                                              ),
-                                            ),
-                                          ),
-                                    Container(
-                                      width: media.width,
-                                      padding: const EdgeInsets.only(left: 24, right: 24),
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          'Or search our library',
-                                          style: TextStyle(
+                              return AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeIn,
+                                alignment: Alignment.topCenter,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: media.width,
+                                        padding: const EdgeInsets.symmetric(horizontal: 24).copyWith(top: 20, bottom: 8),
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            'Swap exercise option',
+                                            style: TextStyle(
                                               fontSize: ScreenUtil.horizontalScale(5.5),
                                               fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryColor),
+                                              color: AppColors.primaryColor,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 5),
-                                      child: SearchEquipmentField(
-                                        onChanged: (query) {
-                                          setState(() {
-                                            searchQuery = query;
-                                            currentPageAll = 0;
-                                            monthProvider?.fetchAllFilterEx(query);
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    searchQuery.isEmpty
-                                        ? SizedBox(
-                                            height: media.width * 0.0,
-                                          )
-                                        : monthProvider!.allFilterExercises.isNotEmpty
-                                            ? Column(
-                                                children: [
-                                                  ConstrainedBox(
-                                                    constraints: BoxConstraints(
-                                                      maxHeight: ScreenUtil.verticalScale(60),
-                                                    ),
-                                                    child: SingleChildScrollView(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                        child: Column(
-                                                          children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll),
-                                                        ),
+                                      monthProvider!.relatedExercises.isNotEmpty
+                                          ? Column(
+                                              children: [
+                                                ConstrainedBox(
+                                                  constraints: BoxConstraints(
+                                                    maxHeight: ScreenUtil.verticalScale(60),
+                                                  ),
+                                                  child: SingleChildScrollView(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: Builder(
+                                                        builder: (context) {
+                                                          final seenIds = <String>{};
+                                                          final filteredList = monthProvider!.relatedExercises.where((item) {
+                                                            return seenIds.add(item.sId!);
+                                                          }).toList();
+                                                          return Column(
+                                                            children: [
+                                                              Column(
+                                                                children: buildRelatedExerciseList(filteredList, currentPageRelated),
+                                                              ),
+                                                              buildPaginationControlsRelatedExercise(
+                                                                currentPageRelated,
+                                                                monthProvider!.relatedExercises.length,
+                                                                (page) {
+                                                                  setState(() {
+                                                                    currentPageRelated = page;
+                                                                  });
+                                                                },
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
                                                       ),
                                                     ),
                                                   ),
-                                                  buildPaginationControls(
-                                                    currentPageAll,
-                                                    monthProvider!.allFilterExercises.length,
-                                                    (page) {
-                                                      setState(() {
-                                                        currentPageAll = page;
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              )
-                                            : SizedBox(
-                                                height: media.width * 0.25,
-                                                child: Center(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(bottom: 12),
-                                                    child: Text(
-                                                      "No exercise available!",
-                                                      style: TextStyle(fontSize: 17),
+                                                ),
+                                              ],
+                                            )
+                                          : const Center(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 12, bottom: 18),
+                                                child: Text(
+                                                  "No exercise available!",
+                                                  style: TextStyle(fontSize: 17),
+                                                ),
+                                              ),
+                                            ),
+                                      Container(
+                                        width: media.width,
+                                        padding: const EdgeInsets.only(left: 24, right: 24),
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            'Or search our library',
+                                            style: TextStyle(
+                                                fontSize: ScreenUtil.horizontalScale(5.5),
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryColor),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        child: SearchEquipmentField(
+                                          onChanged: (query) {
+                                            setState(() {
+                                              searchQuery = query;
+                                              currentPageAll = 0;
+                                              monthProvider?.fetchAllFilterEx(query);
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      searchQuery.isEmpty
+                                          ? SizedBox(
+                                              height: media.width * 0.0,
+                                            )
+                                          : monthProvider!.allFilterExercises.isNotEmpty
+                                              ? Column(
+                                                  children: [
+                                                    ConstrainedBox(
+                                                      constraints: BoxConstraints(
+                                                        maxHeight: ScreenUtil.verticalScale(60),
+                                                      ),
+                                                      child: SingleChildScrollView(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                          child: Column(
+                                                            children: buildExerciseList(monthProvider!.allFilterExercises, currentPageAll),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    buildPaginationControls(
+                                                      currentPageAll,
+                                                      monthProvider!.allFilterExercises.length,
+                                                      (page) {
+                                                        setState(() {
+                                                          currentPageAll = page;
+                                                        });
+                                                      },
+                                                    ),
+                                                  ],
+                                                )
+                                              : SizedBox(
+                                                  height: media.width * 0.25,
+                                                  child: Center(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(bottom: 12),
+                                                      child: Text(
+                                                        "No exercise available!",
+                                                        style: TextStyle(fontSize: 17),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20).copyWith(bottom: 20),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: ButtonWidget(
-                                                text: "Cancel",
-                                                textColor: Colors.black,
-                                                color: const Color(0xFFDDDDDD),
-                                                onPress: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                isLoading: false),
-                                          ),
-                                          SizedBox(width: 15),
-                                          Expanded(
-                                            child: ButtonWidget(
-                                                text: "Confirm",
-                                                textColor: Colors.white,
-                                                color: AppColors.primaryColor,
-                                                onPress: () async {
-                                                  RelatedExercises? relatedExerciseData;
-                                                  Exercise? exerciseDataModel;
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20).copyWith(bottom: 20),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: ButtonWidget(
+                                                  text: "Cancel",
+                                                  textColor: Colors.black,
+                                                  color: const Color(0xFFDDDDDD),
+                                                  onPress: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  isLoading: false),
+                                            ),
+                                            SizedBox(width: 15),
+                                            Expanded(
+                                              child: ButtonWidget(
+                                                  text: "Confirm",
+                                                  textColor: Colors.white,
+                                                  color: AppColors.primaryColor,
+                                                  onPress: () async {
+                                                    RelatedExercises? relatedExerciseData;
+                                                    Exercise? exerciseDataModel;
 
-                                                  if (selectRelatedExerciseSwapIndex == null) {
-                                                    exerciseDataModel = monthProvider!.allFilterExercises[selectExerciseSwapIndex!];
-                                                  } else {
-                                                    relatedExerciseData = monthProvider!.relatedExercises[selectRelatedExerciseSwapIndex!];
-                                                  }
+                                                    if (selectRelatedExerciseSwapIndex == null) {
+                                                      exerciseDataModel = monthProvider!.allFilterExercises[selectExerciseSwapIndex!];
+                                                    } else {
+                                                      relatedExerciseData =
+                                                          monthProvider!.relatedExercises[selectRelatedExerciseSwapIndex!];
+                                                    }
 
-                                                  ExerciseDataModel newDayExercise = ExerciseDataModel(
-                                                    isAddedUpdated: true,
-                                                    id: "",
-                                                    exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
-                                                    typeId: exercises[selectedIndex].typeId ?? 1,
-                                                    thumbnail: exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
-                                                    name: exerciseDataModel?.title ??
-                                                        relatedExerciseData?.title ??
-                                                        "Exercise ${exercises.length + 1}",
-                                                    guide: exercises[selectedIndex].guide ?? "",
-                                                    sets: exercises[selectedIndex].sets ?? 0,
-                                                    reps: exercises[selectedIndex].reps ?? 0,
-                                                    rest: exercises[selectedIndex].rest ?? 0,
-                                                    weight: exercises[selectedIndex].weight ?? 0,
-                                                    formats: exercises[selectedIndex].formats ?? [],
-                                                    extra: exercises[selectedIndex].extra ?? [],
-                                                  );
+                                                    ExerciseDataModel newDayExercise = ExerciseDataModel(
+                                                      isAddedUpdated: true,
+                                                      id: "",
+                                                      exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
+                                                      typeId: exercises[selectedIndex].typeId ?? 1,
+                                                      thumbnail:
+                                                          exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
+                                                      name: exerciseDataModel?.title ??
+                                                          relatedExerciseData?.title ??
+                                                          "Exercise ${exercises.length + 1}",
+                                                      guide: exercises[selectedIndex].guide ?? "",
+                                                      sets: exercises[selectedIndex].sets ?? 0,
+                                                      reps: exercises[selectedIndex].reps ?? 0,
+                                                      rest: exercises[selectedIndex].rest ?? 0,
+                                                      weight: exercises[selectedIndex].weight ?? 0,
+                                                      formats: exercises[selectedIndex].formats ?? [],
+                                                      extra: exercises[selectedIndex].extra ?? [],
+                                                    );
 
-                                                  String split = monthProvider
-                                                          ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                          .toString()
-                                                          .split(" ")[1] ??
-                                                      "";
+                                                    String split = monthProvider
+                                                            ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                            .toString()
+                                                            .split(" ")[1] ??
+                                                        "";
 
-                                                  String dataId =
-                                                      "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseDataModel?.id ?? relatedExerciseData?.sId ?? ""}";
+                                                    String dataId =
+                                                        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseDataModel?.id ?? relatedExerciseData?.sId ?? ""}";
 
-                                                  Map<String, dynamic> data = {
-                                                    "dataId": dataId,
-                                                    "split": split,
-                                                    "monthId": monthProvider?.monthDataModel?.id,
-                                                    "weekId": monthProvider?.weekDataModel?.id,
-                                                    "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-                                                    "date": "${DateTime.now().toUtc()}",
-                                                    "exerciseId": exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
-                                                    "exerciseJson": jsonEncode(newDayExercise),
-                                                    "insertIndex": selectedIndex.toString()
-                                                  };
+                                                    Map<String, dynamic> data = {
+                                                      "dataId": dataId,
+                                                      "split": split,
+                                                      "monthId": monthProvider?.monthDataModel?.id,
+                                                      "weekId": monthProvider?.weekDataModel?.id,
+                                                      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+                                                      "date": "${DateTime.now().toUtc()}",
+                                                      "exerciseId": exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
+                                                      "exerciseJson": jsonEncode(newDayExercise),
+                                                      "insertIndex": selectedIndex.toString()
+                                                    };
 
-                                                  RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
-                                                    (element) => element.dataId == dataId,
-                                                    orElse: () => RemovedExerciseModel(),
-                                                  );
+                                                    RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+                                                      (element) => element.dataId == dataId,
+                                                      orElse: () => RemovedExerciseModel(),
+                                                    );
 
-                                                  if (removedDataExit.id != null) {
-                                                    ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
-                                                    await DatabaseHelper().deleteSingleData(
-                                                        tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
-                                                  }
-                                                  exercises.removeAt(selectedIndex);
-                                                  exercises.insert(selectedIndex, newDayExercise);
-                                                  ApiRepo.addSwapExercise(body: data);
-                                                  await DatabaseHelper()
-                                                      .insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
-                                                  await monthProvider?.fetchSwapExerciseData();
-                                                  await removeExercise(exercise.exerciseId ?? "");
-                                                  setState(() {});
-                                                  if (!context.mounted) return;
-                                                  Navigator.pop(context);
-                                                },
-                                                isLoading: false),
-                                          ),
-                                          // ElevatedButton(
-                                          //   onPressed: () {
-                                          //     Navigator.pop(context);
-                                          //   },
-                                          //   style: ElevatedButton.styleFrom(
-                                          //     foregroundColor: Colors.black,
-                                          //     backgroundColor: const Color(0xFFDDDDDD),
-                                          //     shadowColor: Colors.grey,
-                                          //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                          //     textStyle: const TextStyle(
-                                          //       fontSize: 16,
-                                          //     ),
-                                          //   ),
-                                          //   child: const Text('Cancel'),
-                                          // ),
-                                          // ElevatedButton(
-                                          //   onPressed: () async {
-                                          //     RelatedExercises? relatedExerciseData;
-                                          //     Exercise? exerciseDataModel;
-                                          //
-                                          //     if (selectRelatedExerciseSwapIndex == null) {
-                                          //       exerciseDataModel = monthProvider!.allFilterExercises[selectExerciseSwapIndex!];
-                                          //     } else {
-                                          //       relatedExerciseData = monthProvider!.relatedExercises[selectRelatedExerciseSwapIndex!];
-                                          //     }
-                                          //
-                                          //     ExerciseDataModel newDayExercise = ExerciseDataModel(
-                                          //       isAddedUpdated: true,
-                                          //       id: "",
-                                          //       exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
-                                          //       typeId: exercises[selectedIndex].typeId ?? 1,
-                                          //       thumbnail: exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
-                                          //       name: exerciseDataModel?.title ??
-                                          //           relatedExerciseData?.title ??
-                                          //           "Exercise ${exercises.length + 1}",
-                                          //       guide: exercises[selectedIndex].guide ?? "",
-                                          //       sets: exercises[selectedIndex].sets ?? 0,
-                                          //       reps: exercises[selectedIndex].reps ?? 0,
-                                          //       rest: exercises[selectedIndex].rest ?? 0,
-                                          //       weight: exercises[selectedIndex].weight ?? 0,
-                                          //       formats: exercises[selectedIndex].formats ?? [],
-                                          //       extra: exercises[selectedIndex].extra ?? [],
-                                          //     );
-                                          //
-                                          //     String split = monthProvider
-                                          //             ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                          //             .toString()
-                                          //             .split(" ")[1] ??
-                                          //         "";
-                                          //
-                                          //     String dataId =
-                                          //         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseDataModel?.id ?? relatedExerciseData?.sId ?? ""}";
-                                          //
-                                          //     Map<String, dynamic> data = {
-                                          //       "dataId": dataId,
-                                          //       "split": split,
-                                          //       "monthId": monthProvider?.monthDataModel?.id,
-                                          //       "weekId": monthProvider?.weekDataModel?.id,
-                                          //       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-                                          //       "date": "${DateTime.now().toUtc()}",
-                                          //       "exerciseId": exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
-                                          //       "exerciseJson": jsonEncode(newDayExercise),
-                                          //       "insertIndex": selectedIndex.toString()
-                                          //     };
-                                          //
-                                          //     RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
-                                          //       (element) => element.dataId == dataId,
-                                          //       orElse: () => RemovedExerciseModel(),
-                                          //     );
-                                          //
-                                          //     if (removedDataExit.id != null) {
-                                          //       ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
-                                          //       await DatabaseHelper().deleteSingleData(
-                                          //           tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
-                                          //     }
-                                          //     exercises.removeAt(selectedIndex);
-                                          //     exercises.insert(selectedIndex, newDayExercise);
-                                          //     ApiRepo.addSwapExercise(body: data);
-                                          //     await DatabaseHelper().insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
-                                          //     await monthProvider?.fetchSwapExerciseData();
-                                          //     await removeExercise(exercise.exerciseId ?? "");
-                                          //     setState(() {});
-                                          //     if (!context.mounted) return;
-                                          //     Navigator.pop(context);
-                                          //   },
-                                          //   style: ElevatedButton.styleFrom(
-                                          //     foregroundColor: Colors.white,
-                                          //     backgroundColor: AppColors.primaryColor,
-                                          //     shadowColor: Colors.grey,
-                                          //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                          //     textStyle: const TextStyle(
-                                          //       fontSize: 16,
-                                          //     ),
-                                          //   ),
-                                          //   child: const Text('Confirm'),
-                                          // ),
-                                        ],
+                                                    if (removedDataExit.id != null) {
+                                                      ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                                      await DatabaseHelper().deleteSingleData(
+                                                          tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
+                                                    }
+                                                    exercises.removeAt(selectedIndex);
+                                                    exercises.insert(selectedIndex, newDayExercise);
+                                                    ApiRepo.addSwapExercise(body: data);
+                                                    await DatabaseHelper()
+                                                        .insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
+                                                    await monthProvider?.fetchSwapExerciseData();
+                                                    await removeExercise(exercise.exerciseId ?? "");
+                                                    setState(() {});
+                                                    if (!context.mounted) return;
+                                                    Navigator.pop(context);
+                                                  },
+                                                  isLoading: false),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             }),
@@ -2887,6 +2324,91 @@ class _TodayPageState extends State<TodayPage> {
     ApiRepo.updateExerciseStatus(body: apiReqBody);
     await DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
   }
+
+  Widget bottomBar() => Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: ScreenUtil.horizontalScale(15),
+            vertical: ScreenUtil.verticalScale(2),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: ScreenUtil.verticalScale(1),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                spreadRadius: 1,
+                blurRadius: 6,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
+            child: Consumer<MainPageProvider>(builder: (context, value, child) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(0);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/1-home.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(8.5),
+                      height: ScreenUtil.horizontalScale(8.5),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(1);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/2-calendar.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(8.5),
+                      height: ScreenUtil.horizontalScale(8.5),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(2);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/3-statistics.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(8.5),
+                      height: ScreenUtil.horizontalScale(8.5),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(3);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/4-account.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(9),
+                      height: ScreenUtil.horizontalScale(9),
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+        ),
+      );
 }
 
 class SearchEquipmentField extends StatelessWidget {
@@ -2927,4 +2449,89 @@ class SearchEquipmentField extends StatelessWidget {
       ),
     );
   }
+
+  Widget bottomBar() => Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: ScreenUtil.horizontalScale(15),
+            vertical: ScreenUtil.verticalScale(2),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: ScreenUtil.verticalScale(1),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                spreadRadius: 1,
+                blurRadius: 6,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
+            child: Consumer<MainPageProvider>(builder: (context, value, child) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(0);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/1-home.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(8.5),
+                      height: ScreenUtil.horizontalScale(8.5),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(1);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/2-calendar.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(8.5),
+                      height: ScreenUtil.horizontalScale(8.5),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(2);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/3-statistics.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(8.5),
+                      height: ScreenUtil.horizontalScale(8.5),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      value.changeTab(3);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/img/4-account.svg',
+                      colorFilter: ColorFilter.mode(value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                      width: ScreenUtil.horizontalScale(9),
+                      height: ScreenUtil.horizontalScale(9),
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+        ),
+      );
 }

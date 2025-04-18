@@ -31,7 +31,7 @@ class AthletesListWidget extends StatelessWidget {
               'Member',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: ScreenUtil.horizontalScale(3.6),
+                fontSize: ScreenUtil.verticalScale(1.5),
               ),
             ),
             Text(
@@ -42,7 +42,7 @@ class AthletesListWidget extends StatelessWidget {
               oneAthlete?.location ?? 'Miami FL',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: ScreenUtil.horizontalScale(4.2),
+                fontSize: ScreenUtil.verticalScale(1.5),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -66,7 +66,7 @@ class AthletesListWidget extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: ScreenUtil.verticalScale(1.5),
+                  fontSize: ScreenUtil.verticalScale(1.7),
                 ),
               ),
             )
