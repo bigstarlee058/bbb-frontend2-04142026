@@ -25,11 +25,13 @@ import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_list_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../values/app_constants.dart';
@@ -45,6 +47,7 @@ class Status {
 
 class MonthProvider extends ChangeNotifier {
   late MainPageProvider mainPageProvider;
+  late UserDataProvider userDataProvider;
 
   DayDataModel? dayDataModel;
   WeekDataModel? weekDataModel;
@@ -80,6 +83,12 @@ class MonthProvider extends ChangeNotifier {
   //   selectedSection = index;
   //   notifyListeners();
   // }
+  int selectedSection = 0;
+
+  updateSelectedSection(int index) {
+    selectedSection = index;
+    notifyListeners();
+  }
 
   updatePumpDayData(PumpDayModel value) {
     pumpDayModel = value;
@@ -446,8 +455,9 @@ class MonthProvider extends ChangeNotifier {
 
   bool loader = false;
 
-  Future<void> onInit({bool isEnabled = true}) async {
+  Future<void> onInit(context, {bool isEnabled = true}) async {
     try {
+      userDataProvider = Provider.of<UserDataProvider>(context, listen: false);
       if (isEnabled) {
         loader = true;
         notifyListeners();
@@ -1206,6 +1216,7 @@ class MonthProvider extends ChangeNotifier {
 
   List<DayHistoryModel> decodedDataAll() {
     String encodedTempData = jsonEncode(allSplitDayHistoryModel);
+
     List<DayHistoryModel> decodedData;
     try {
       decodedData = List<DayHistoryModel>.from(
@@ -1458,8 +1469,6 @@ class MonthProvider extends ChangeNotifier {
           }
         }
       }
-
-      log('monthDataModel!.weeks!.map((e) => e.restDayList,) :::::::::::::::::: ${monthDataModel!.weeks!.map((e) => e.restDayList)}');
 
       notifyListeners();
     } catch (e) {
@@ -2294,6 +2303,46 @@ class MonthProvider extends ChangeNotifier {
       "isArchived": false,
       "time": "${DateTime.now().toUtc()}"
     },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "Trial Survivor",
+      "subtitle": "14+ Days in the App",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "1 Month",
+      "subtitle": "28+ Days in the App",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "Quarter Year",
+      "subtitle": "3 + Months in the App",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "Half Year",
+      "subtitle": "6+ Months in the App",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
+    {
+      "image": "assets/img/verified (1).svg",
+      "active_image": "assets/img/verified (1).svg",
+      "title": "Yearling",
+      "subtitle": "12+ Months in the App",
+      "isArchived": false,
+      "time": "${DateTime.now().toUtc()}"
+    },
   ];
   List<AchievementsModel> achievementsModel = [];
 
@@ -2305,6 +2354,10 @@ class MonthProvider extends ChangeNotifier {
       achievementsModel = [];
     }
 
+    String accountCreatedDate = userDataProvider.userData != null ? userDataProvider.userData["createdAt"] : "";
+    DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
+    DateTime today = DateTime.now();
+    int dayDifference = today.difference(targetDate).inDays;
     for (var element in achievementsModel) {
       if (element.achievementsTitle == "Breaking the Ice") {
         items[0]["isArchived"] = true;
@@ -2369,6 +2422,26 @@ class MonthProvider extends ChangeNotifier {
       if (element.achievementsTitle == "500 and Done") {
         items[15]["isArchived"] = true;
         items[15]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "Trial Survivor") {
+        items[16]["isArchived"] = true;
+        items[16]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "1 Month") {
+        items[17]["isArchived"] = true;
+        items[17]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "Quarter Year") {
+        items[18]["isArchived"] = true;
+        items[18]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "Half Year") {
+        items[19]["isArchived"] = true;
+        items[19]["time"] = element.achievementsDate.toString();
+      }
+      if (element.achievementsTitle == "Yearling") {
+        items[20]["isArchived"] = true;
+        items[20]["time"] = element.achievementsDate.toString();
       }
     }
 
@@ -2568,6 +2641,46 @@ class MonthProvider extends ChangeNotifier {
       if (completedDays >= 500) {
         items[15]["isArchived"] = true;
         final data = UpdateAchievementsRequest(achievementsTitle: "500 and Done", achievementsSubtitle: "Completed 500 Days");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+    if (items[16]["isArchived"] == false) {
+      if (dayDifference >= 14) {
+        items[16]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "Trial Survivor", achievementsSubtitle: "14+ Days in the App");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+    if (items[17]["isArchived"] == false) {
+      if (dayDifference >= 28) {
+        items[17]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "1 Month", achievementsSubtitle: "28+ Days in the App");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+    if (items[18]["isArchived"] == false) {
+      if (dayDifference >= (28 * 3)) {
+        items[18]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "Quarter Year", achievementsSubtitle: "3 + Months in the App");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+    if (items[19]["isArchived"] == false) {
+      if (dayDifference >= (28 * 6)) {
+        items[19]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "Half Year", achievementsSubtitle: "6+ Months in the App");
+        await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+        ApiRepo.addAchievementsList(body: data.toJson1());
+      }
+    }
+    if (items[20]["isArchived"] == false) {
+      if (dayDifference >= (28 * 12)) {
+        items[20]["isArchived"] = true;
+        final data = UpdateAchievementsRequest(achievementsTitle: "Yearling", achievementsSubtitle: "12+ Months in the App");
         await DatabaseHelper().insertData(tableName: DatabaseHelper.achievementHistory, data: data.toJson());
         ApiRepo.addAchievementsList(body: data.toJson1());
       }

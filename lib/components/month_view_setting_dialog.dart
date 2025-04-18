@@ -81,9 +81,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                       padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2.5), vertical: ScreenUtil.verticalScale(1.5)),
                       child: Center(
                         child: Text(
-                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
                           maxLines: 10,
-                          textAlign: TextAlign.justify,
+                          // textAlign: TextAlign.justify,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: ScreenUtil.verticalScale(1.6), color: AppColors.blackColor, fontWeight: FontWeight.normal),

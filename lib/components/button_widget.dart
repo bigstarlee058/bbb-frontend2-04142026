@@ -1,4 +1,5 @@
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class ButtonWidget extends StatefulWidget {
@@ -34,6 +35,7 @@ class _ButtonWidgetState extends State<ButtonWidget> {
         onPressed: widget.onPress,
         style: ElevatedButton.styleFrom(
           backgroundColor: widget.color,
+          shape: Utils.buttonStyle,
           padding: EdgeInsets.symmetric(
             vertical: ScreenUtil.verticalScale(1.7),
           ),

@@ -524,7 +524,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
           color: Colors.black12,
         ),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10),
+          margin: const EdgeInsets.symmetric(horizontal: 3),
           child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

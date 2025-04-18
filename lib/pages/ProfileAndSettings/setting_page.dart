@@ -174,8 +174,8 @@ class _SettingPageState extends State<SettingPage> {
                       // ),
                       Container(
                         margin: EdgeInsets.only(
-                          left: ScreenUtil.horizontalScale(9),
-                          right: ScreenUtil.horizontalScale(9),
+                          left: ScreenUtil.horizontalScale(6),
+                          right: ScreenUtil.horizontalScale(6),
                           top: ScreenUtil.verticalScale(2),
                         ),
                         height: ScreenUtil.verticalScale(8),
@@ -212,7 +212,7 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
+                        padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(7), 0, ScreenUtil.horizontalScale(7), 0),
                         child: Divider(
                           thickness: 0.3,
                           height: 0,
@@ -220,8 +220,8 @@ class _SettingPageState extends State<SettingPage> {
                       ),
                       Container(
                         margin: EdgeInsets.only(
-                          left: ScreenUtil.horizontalScale(9),
-                          right: ScreenUtil.horizontalScale(9),
+                          left: ScreenUtil.horizontalScale(6),
+                          right: ScreenUtil.horizontalScale(6),
                           bottom: ScreenUtil.verticalScale(0.8),
                         ),
                         height: ScreenUtil.verticalScale(8),

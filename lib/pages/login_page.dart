@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
 
         // Fetch additional data for the welcome modal
         final descriptionResponse = await http.get(
-          Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'), // replace with actual endpoint
+          Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'),
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -334,7 +334,7 @@ class _LoginPageState extends State<LoginPage> {
                                     fontSize: 15,
                                     color: Color(0xFFA51E22),
                                   ),
-                                  text: "Forgot",
+                                  text: "Forgot password?",
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
                                       Navigator.push(
@@ -344,10 +344,6 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                                       );
                                     },
-                                ),
-                                const TextSpan(
-                                  style: TextStyle(fontSize: 15, color: Color(0xFF848484)),
-                                  text: " password?",
                                 ),
                               ],
                             )),

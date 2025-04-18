@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bbb/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class CustomSlideAction extends StatefulWidget {
@@ -83,7 +84,7 @@ class CustomSlideActionState extends State<CustomSlideAction> with TickerProvide
           child: Material(
             elevation: widget.elevation,
             color: widget.outerColor ?? Theme.of(context).colorScheme.secondary,
-            borderRadius: BorderRadius.circular(widget.borderRadius),
+            borderRadius: Utils.buttonRadius,
             child: submitted
                 ? Transform(
                     alignment: Alignment.center,

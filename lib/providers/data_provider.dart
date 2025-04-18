@@ -326,7 +326,6 @@ class DataProvider extends ChangeNotifier {
       'split': '5',
       'date': "${DateTime.now().toUtc()}"
     };
-    log('DateTime.now().toUtc() :::::::::::::::::: ${DateTime.now().toUtc()}');
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
     String? userIdToken = await getAuthToken();
     final response = await http.post(
@@ -334,7 +333,6 @@ class DataProvider extends ChangeNotifier {
       body: queryParams,
       headers: <String, String>{'Content-Type': 'application/x-www-form-urlencoded', 'AUTH_TOKEN': userIdToken ?? ""},
     );
-
     if (response.statusCode == 200) {
       await getMonthInfoFromJson(responseData: jsonDecode(response.body));
       notifyListeners();
@@ -349,7 +347,6 @@ class DataProvider extends ChangeNotifier {
         MonthDataModel monthDataModelSplit3 = MonthDataModel.fromJson(responseData);
         MonthDataModel monthDataModelSplit4 = MonthDataModel.fromJson(responseData);
         MonthDataModel monthDataModelSplit5 = MonthDataModel.fromJson(responseData);
-
         await monthProvider?.fetchMonthLocalData();
 
         List split3 = ["Day 1 Workout", "Rest Day 1", "Day 2 Workout", "Rest Day 2", "Day 3 Workout", "Rest Day 3", "Rest Day 4"];

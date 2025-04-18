@@ -227,7 +227,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             Container(
                               margin: EdgeInsets.symmetric(
                                 vertical: 25.0, //
-                                horizontal: ScreenUtil.horizontalScale(10),
+                                horizontal: ScreenUtil.horizontalScale(9),
                               ),
                               child: Consumer<MonthProvider>(
                                 builder: (context, monthProvider, child) {

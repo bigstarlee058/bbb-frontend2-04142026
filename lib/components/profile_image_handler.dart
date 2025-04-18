@@ -41,8 +41,8 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil.horizontalScale(25),
-      width: ScreenUtil.horizontalScale(25),
+      height: ScreenUtil.horizontalScale(23.5),
+      width: ScreenUtil.horizontalScale(23.5),
       decoration: BoxDecoration(
         color: Colors.grey.withValues(alpha: .9),
         borderRadius: BorderRadius.all(
@@ -50,6 +50,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
         ),
       ),
       child: Stack(
+        clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
           Container(
@@ -92,7 +93,8 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           ),
           Positioned(
             right: 0,
-            bottom: 0,
+            bottom: -(ScreenUtil.horizontalScale(3.5)),
+            left: 0,
             child: Visibility(
               visible: widget.showPickImageButton,
               child: GestureDetector(
@@ -101,12 +103,14 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
                   // Handle camera icon action here
                 },
                 child: CircleAvatar(
-                  radius: ScreenUtil.horizontalScale(4), // Adjust size as needed
+                  radius: ScreenUtil.horizontalScale(3.5), // Adjust size as needed
                   backgroundColor: Colors.black.withValues(alpha: .7),
-                  child: Icon(
-                    Icons.camera_alt,
-                    size: ScreenUtil.horizontalScale(5), // Adjust size as needed
-                    color: Colors.white,
+                  child: Center(
+                    child: Icon(
+                      Icons.edit,
+                      size: ScreenUtil.horizontalScale(4), // Adjust size as needed
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

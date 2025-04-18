@@ -66,7 +66,7 @@ class _DashboardPageState extends State<DashboardPage> {
       if (_currentDate.day != newDate.day) {
         setState(() {
           _currentDate = newDate;
-          monthProvider.onInit(isEnabled: false);
+          monthProvider.onInit(context, isEnabled: false);
         });
       }
     });
@@ -118,7 +118,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  void loadUserInfo() async {
+  Future<void> loadUserInfo() async {
     await userData?.loadUserInfo();
   }
 
@@ -144,7 +144,9 @@ class _DashboardPageState extends State<DashboardPage> {
     ScreenUtil.init(context);
     return Scaffold(
       // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async => await dataProvider?.fetchMonthWorkouts(3),
+      //   onPressed: () {
+      //     Navigator.push(context, MaterialPageRoute(builder: (context) => CalendarPage()));
+      //   },
       // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
@@ -250,7 +252,8 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             RefreshIndicator(
               color: AppColors.primaryColor,
-              onRefresh: () async => await _initializeFetchData().then((value) async => await monthProvider.onInit(isEnabled: false)),
+              onRefresh: () async =>
+                  await _initializeFetchData().then((value) async => await monthProvider.onInit(context, isEnabled: false)),
               child: SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
                 child: Column(
@@ -677,8 +680,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ),
                                 ),
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
-                                  vertical: ScreenUtil.verticalScale(2),
+                                  horizontal: ScreenUtil.horizontalScale(7),
+                                  vertical: ScreenUtil.verticalScale(1.5),
                                 ),
                                 child: Consumer<MonthProvider>(
                                   builder: (context, value, child) {
@@ -706,7 +709,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     }
                                     return Column(
                                       children: [
-                                        const SizedBox(height: 10),
+                                        const SizedBox(height: 15),
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
@@ -749,7 +752,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               const SizedBox(height: 10),
                               Container(
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(8),
+                                  horizontal: ScreenUtil.horizontalScale(7),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -761,6 +764,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           mainPageProvider.changeTab(1);
                                         },
                                         style: ElevatedButton.styleFrom(
+                                          shape: Utils.buttonStyle,
                                           backgroundColor: AppColors.primaryColor,
                                           padding: const EdgeInsets.symmetric(vertical: 18),
                                         ),
@@ -768,6 +772,30 @@ class _DashboardPageState extends State<DashboardPage> {
                                           'Month View',
                                           style: TextStyle(
                                             color: Colors.white,
+                                            fontSize: ScreenUtil.verticalScale(2),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: ScreenUtil.horizontalScale(3)),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          HapticFeedBack.buttonClick();
+                                          monthProvider.updateSelectedSection(2);
+                                          mainPageProvider.changeTab(1);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          shape: Utils.buttonStyle,
+                                          side: BorderSide(width: 2.0, color: AppColors.primaryColor),
+                                          backgroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 18),
+                                        ),
+                                        child: Text(
+                                          'Edit Schedule',
+                                          style: TextStyle(
+                                            color: AppColors.primaryColor,
                                             fontSize: ScreenUtil.verticalScale(2),
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -782,11 +810,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                   return Column(
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                                         child: Row(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 22, bottom: 10),
+                                              padding: EdgeInsets.only(
+                                                  bottom: ScreenUtil.verticalScale(1.4), top: ScreenUtil.verticalScale(2.3)),
                                               child: Text(
                                                 "Streak Calendar",
                                                 style: TextStyle(
@@ -804,105 +833,111 @@ class _DashboardPageState extends State<DashboardPage> {
                                   );
                                 },
                               ),
-                              Container(
-                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(top: 25, bottom: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "Recent Activity",
-                                        style: TextStyle(
-                                          color: AppColors.primaryColor,
-                                          fontSize: ScreenUtil.horizontalScale(5.2),
-                                          fontWeight: FontWeight.w700,
+                              if ((monthProvider.graphHistory.isEmpty && monthProvider.reportWeightLiftedGraphHistory.isEmpty) == false &&
+                                  monthProvider.allDayHistoryModel.any(
+                                    (element) => element.status == Status.completed && element.type!.contains("Workout Day"),
+                                  )) ...[
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Recent Activity",
+                                          style: TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: ScreenUtil.horizontalScale(5.2),
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    PopupMenuButton<String>(
-                                      color: const Color.fromARGB(255, 252, 252, 252),
-                                      elevation: 10,
-                                      shadowColor: Colors.black.withValues(alpha: 0.2),
-                                      itemBuilder: (context) {
-                                        return [
-                                          "Exercises Completed",
-                                          // "Time Spent",
-                                          "Weight Lifted",
-                                        ].map((str) {
-                                          return PopupMenuItem(
-                                              value: str,
-                                              child: Material(
-                                                elevation: 0,
-                                                color: const Color.fromARGB(255, 252, 252, 252),
-                                                child: Text(
-                                                  str,
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                      PopupMenuButton<String>(
+                                        color: const Color.fromARGB(255, 252, 252, 252),
+                                        elevation: 10,
+                                        shadowColor: Colors.black.withValues(alpha: 0.2),
+                                        itemBuilder: (context) {
+                                          return [
+                                            "Exercises Completed",
+                                            // "Time Spent",
+                                            "Weight Lifted",
+                                          ].map((str) {
+                                            return PopupMenuItem(
+                                                value: str,
+                                                child: Material(
+                                                  elevation: 0,
+                                                  color: const Color.fromARGB(255, 252, 252, 252),
+                                                  child: Text(
+                                                    str,
+                                                    style: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: ScreenUtil.verticalScale(1.5),
+                                                    ),
                                                   ),
-                                                ),
-                                              ));
-                                        }).toList();
-                                      },
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: <Widget>[
-                                          Text(
-                                            selectedChart,
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: ScreenUtil.verticalScale(1.5),
+                                                ));
+                                          }).toList();
+                                        },
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: <Widget>[
+                                            Text(
+                                              selectedChart,
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: ScreenUtil.verticalScale(1.5),
+                                              ),
                                             ),
-                                          ),
-                                          const Icon(
-                                            Icons.keyboard_arrow_down_rounded,
-                                            color: Colors.grey,
-                                          ),
-                                        ],
-                                      ),
-                                      onSelected: (v) {
-                                        setState(() {
-                                          selectedChart = v;
-                                        });
-                                      },
-                                    )
-                                  ],
+                                            const Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              color: Colors.grey,
+                                            ),
+                                          ],
+                                        ),
+                                        onSelected: (v) {
+                                          setState(() {
+                                            selectedChart = v;
+                                          });
+                                        },
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(8.5),
+                                  ),
+                                  child: selectedChart == "Exercises Completed"
+                                      ? const ExerciseCompletedGraph()
+                                      : selectedChart == "Weight Lifted"
+                                          ? const WeightLiftedGraph()
+                                          // : const TimeSpentGraph(),
+                                          : const SizedBox(),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(9),
+                                    vertical: ScreenUtil.verticalScale(1),
+                                  ),
+                                  child: ButtonWidget(
+                                    text: 'See all progress reports',
+                                    textColor: Colors.white,
+                                    color: AppColors.primaryColor,
+                                    onPress: () {
+                                      Navigator.pushNamed(context, "/graphAndReports");
+                                    },
+                                    isLoading: false,
+                                  ),
+                                ),
+                              ],
 
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
-                                ),
-                                child: selectedChart == "Exercises Completed"
-                                    ? const ExerciseCompletedGraph()
-                                    : selectedChart == "Weight Lifted"
-                                        ? const WeightLiftedGraph()
-                                        // : const TimeSpentGraph(),
-                                        : const SizedBox(),
-                              ),
-                              const SizedBox(height: 15),
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
-                                ),
-                                child: ButtonWidget(
-                                  text: 'See all progress reports',
-                                  textColor: Colors.white,
-                                  color: AppColors.primaryColor,
-                                  onPress: () {
-                                    Navigator.pushNamed(context, "/graphAndReports");
-                                  },
-                                  isLoading: false,
-                                ),
-                              ),
-                              const SizedBox(height: 15),
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4), vertical: 15),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.horizontalScale(5)),
+                                      horizontal: ScreenUtil.horizontalScale(3.5), vertical: ScreenUtil.horizontalScale(5)),
                                   decoration: BoxDecoration(
                                     color: Colors.grey[100],
                                     borderRadius: BorderRadius.circular(15),
@@ -922,8 +957,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(
-                                        height: 15,
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(2.2),
                                       ),
                                       Consumer<MonthProvider>(builder: (context, value, child) {
                                         final data = value.items.where((element) => element["isArchived"] == true).toList();
@@ -996,8 +1031,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
                               Container(
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(10),
-                                ),
+                                  horizontal: ScreenUtil.horizontalScale(9),
+                                  vertical: ScreenUtil.verticalScale(1.2),
+                                ).copyWith(bottom: 0),
                                 child: ButtonWidget(
                                   text: 'See all Achievements',
                                   textColor: Colors.white,
@@ -1025,8 +1061,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Container(
                                       width: media.width,
                                       margin: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(6),
-                                          right: ScreenUtil.horizontalScale(6),
+                                          left: ScreenUtil.horizontalScale(7),
+                                          right: ScreenUtil.horizontalScale(7),
                                           top: ScreenUtil.verticalScale(0),
                                           bottom: 20),
                                       child: Text(
@@ -1085,14 +1121,14 @@ class _DashboardPageState extends State<DashboardPage> {
                                       ? Container(
                                           width: media.width,
                                           margin: EdgeInsets.only(
-                                            top: ScreenUtil.verticalScale(8),
+                                            top: ScreenUtil.verticalScale(4),
                                             bottom: ScreenUtil.verticalScale(4),
                                           ),
                                           child: Column(
                                             children: [
                                               Container(
                                                 margin: EdgeInsets.only(
-                                                    left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), bottom: 20),
+                                                    left: ScreenUtil.horizontalScale(7), right: ScreenUtil.horizontalScale(7), bottom: 20),
                                                 width: media.width,
                                                 child: Text(
                                                   "Featured Collections",
@@ -1134,10 +1170,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Container(
                                       width: media.width,
                                       margin: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(6),
-                                          right: ScreenUtil.horizontalScale(6),
-                                          top: ScreenUtil.verticalScale(2),
-                                          bottom: 20),
+                                          left: ScreenUtil.horizontalScale(7), right: ScreenUtil.horizontalScale(7), bottom: 20),
                                       child: Text(
                                         "Meet our team",
                                         style: TextStyle(
@@ -1531,48 +1564,45 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: SizedBox(
-          child: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: TableCalendar(
-              calendarFormat: CalendarFormat.week,
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              availableGestures: AvailableGestures.none,
-              rowHeight: 40.0,
-              daysOfWeekHeight: 40,
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day);
+      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5.5)),
+      child: SizedBox(
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          child: TableCalendar(
+            calendarFormat: CalendarFormat.week,
+            startingDayOfWeek: StartingDayOfWeek.monday,
+            availableGestures: AvailableGestures.none,
+            rowHeight: ScreenUtil.verticalScale(4.55),
+            daysOfWeekHeight: ScreenUtil.verticalScale(4.55),
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2100, 12, 31),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
+            headerStyle: HeaderStyle(
+              headerPadding: const EdgeInsets.only(bottom: 2),
+              formatButtonVisible: false,
+              titleCentered: true,
+              leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+              rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+              titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+              titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+            ),
+            headerVisible: false,
+            calendarStyle: const CalendarStyle(
+              defaultTextStyle: TextStyle(fontSize: 14.0),
+              weekendTextStyle: TextStyle(fontSize: 14.0),
+              outsideTextStyle: TextStyle(fontSize: 14.0),
+            ),
+            calendarBuilders: CalendarBuilders(
+              todayBuilder: (context, day, focusedDay) => _buildDayState(day),
+              outsideBuilder: (context, date, _) {
+                return _buildDayState(date);
               },
-              headerStyle: HeaderStyle(
-                headerPadding: const EdgeInsets.only(bottom: 2),
-                formatButtonVisible: false,
-                titleCentered: true,
-                leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
-                rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
-                titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
-                titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
-              ),
-              headerVisible: false,
-              calendarStyle: const CalendarStyle(
-                defaultTextStyle: TextStyle(fontSize: 14.0),
-                weekendTextStyle: TextStyle(fontSize: 14.0),
-                outsideTextStyle: TextStyle(fontSize: 14.0),
-              ),
-              calendarBuilders: CalendarBuilders(
-                todayBuilder: (context, day, focusedDay) => _buildDayState(day),
-                outsideBuilder: (context, date, _) {
-                  return _buildDayState(date);
-                },
-                defaultBuilder: (context, date, _) {
-                  return _buildDayState(date);
-                },
-              ),
+              defaultBuilder: (context, date, _) {
+                return _buildDayState(date);
+              },
             ),
           ),
         ),
@@ -1582,7 +1612,6 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   Widget? _buildDayState(DateTime date) {
     final nowUtc = DateTime.now();
-
     if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
       DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
           .map(
@@ -1593,7 +1622,6 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             ),
           )
           .reduce((a, b) => a.isBefore(b) ? a : b);
-
       List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
       bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
 
@@ -1691,22 +1719,22 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       children: [
         isCurrentDay
             ? Positioned(
-                top: -35,
-                bottom: 0,
+                top: -ScreenUtil.verticalScale(4.55),
+                bottom: ScreenUtil.verticalScale(0.62),
                 right: 0,
                 left: 0,
                 child: Container(
-                  decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
-                  height: 150,
+                  decoration: BoxDecoration(color: circleColor, borderRadius: BorderRadius.circular(30)),
+                  height: ScreenUtil.verticalScale(17.2),
                   child: Builder(
                     builder: (context) {
                       final text = DateFormat.E().format(date);
                       return Container(
-                        padding: const EdgeInsets.all(5),
+                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.2)),
                         child: Text(
                           textAlign: TextAlign.center,
                           text,
-                          style: TextStyle(fontSize: 14.0, color: Colors.black),
+                          style: TextStyle(fontSize: 14.0, color: Colors.white),
                         ),
                       );
                     },
@@ -1718,7 +1746,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             ? Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(ScreenUtil.horizontalScale(0.2)),
-                margin: const EdgeInsets.only(bottom: 8),
+                margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: circleColor,
@@ -1736,7 +1764,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             : Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-                margin: const EdgeInsets.only(bottom: 8),
+                margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: circleColor,
@@ -1780,42 +1808,24 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       clipBehavior: Clip.none,
       children: [
         Positioned(
-          top: -35,
-          bottom: 0,
+          top: -ScreenUtil.verticalScale(4.55),
+          bottom: ScreenUtil.verticalScale(0.62),
           right: 0,
           left: 0,
           child: Container(
-            decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
-            height: 150,
-            child: Builder(
-              builder: (context) {
-                final text = DateFormat.E().format(date);
-                return Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    text,
-                    style: TextStyle(fontSize: 14.0, color: Colors.black),
-                  ),
-                );
-              },
-            ),
+            decoration: BoxDecoration(border: Border.all(color: AppColors.primaryColor), borderRadius: BorderRadius.circular(30)),
+            height: ScreenUtil.verticalScale(17.2),
           ),
         ),
         Container(
           alignment: Alignment.center,
           padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white,
-            border: Border.all(color: AppColors.primaryColor),
-          ),
+          margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
           child: Text(
             '${date.day}',
             style: const TextStyle(
               fontSize: 14.0,
-              color: AppColors.primaryColor,
+              color: Colors.black,
             ),
           ),
         ),
@@ -1827,7 +1837,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
       child: Text(
         '${date.day}',
         style: const TextStyle(
@@ -1836,5 +1846,280 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         ),
       ),
     );
+  }
+}
+
+class CalendarPage extends StatefulWidget {
+  const CalendarPage({super.key});
+
+  @override
+  State<CalendarPage> createState() => _CalendarPageState();
+}
+
+class _CalendarPageState extends State<CalendarPage> {
+  final DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  final List<DateTime> circleDates = [DateTime(2025, 4, 4)];
+
+  List<List<DateTime>> rangeList = [
+    [DateTime(2025, 4, 1), DateTime(2025, 4, 2), DateTime(2025, 4, 3)],
+    [DateTime(2025, 4, 5), DateTime(2025, 4, 6)],
+    [DateTime(2025, 4, 7), DateTime(2025, 4, 8), DateTime(2025, 4, 9)],
+    [DateTime(2025, 4, 10), DateTime(2025, 4, 11), DateTime(2025, 4, 12), DateTime(2025, 4, 13)],
+    [DateTime(2025, 4, 14)],
+    [DateTime(2025, 4, 15)],
+    [DateTime(2025, 4, 17), DateTime(2025, 4, 18)],
+    [DateTime(2025, 4, 19), DateTime(2025, 4, 20), DateTime(2025, 4, 21)],
+    [DateTime(2025, 4, 22), DateTime(2025, 4, 23)],
+    [DateTime(2025, 4, 24), DateTime(2025, 4, 25), DateTime(2025, 4, 26)],
+    [DateTime(2025, 4, 27)],
+    [DateTime(2025, 4, 28), DateTime(2025, 4, 29)],
+    [DateTime(2025, 4, 30)],
+    [DateTime(2025, 4, 4)],
+    [DateTime(2025, 4, 1), DateTime(2025, 4, 8)],
+    [DateTime(2025, 4, 12), DateTime(2025, 4, 13)],
+    [DateTime(2025, 4, 17), DateTime(2025, 4, 18)],
+    [DateTime(2025, 4, 19), DateTime(2025, 4, 20), DateTime(2025, 4, 21)],
+  ];
+
+  bool _isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TableCalendar(
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                availableGestures: AvailableGestures.horizontalSwipe,
+                rowHeight: ScreenUtil.verticalScale(5),
+                daysOfWeekHeight: ScreenUtil.verticalScale(3),
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                headerStyle: HeaderStyle(
+                  headerPadding: const EdgeInsets.only(bottom: 10),
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+                  titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+                  titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+                ),
+                calendarStyle: CalendarStyle(
+                  defaultTextStyle: TextStyle(fontSize: 14.0),
+                  weekendTextStyle: TextStyle(fontSize: 14.0),
+                  outsideTextStyle: TextStyle(fontSize: 14.0, color: Colors.grey.shade500),
+                ),
+                onRangeSelected: (start, end, focusedDay) {},
+                onDaySelected: null,
+                calendarBuilders: CalendarBuilders(
+                  todayBuilder: (context, day, date) {
+                    final isCircle = circleDates.any((d) => _isSameDate(d, date));
+                    final isRange = rangeList.any((d) => d.any((element) => _isSameDate(element, date)));
+                    if (isCircle) {
+                      return Center(
+                        child: Container(
+                          width: ScreenUtil.verticalScale(3.5),
+                          height: ScreenUtil.verticalScale(3.5),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${date.day}',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      );
+                    } else if (isRange) {
+                      final data = findDateIndex(date);
+                      return Stack(
+                        children: [
+                          if (rangeList[data!["outerIndex"]!].length > 1 && data["innerIndex"] == 0)
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              left: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          if (rangeList[data["outerIndex"]!].length > 1 && rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              right: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.7)),
+                            decoration: BoxDecoration(
+                              color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                  ? Colors.transparent
+                                  : AppColors.backOffSetColor,
+                              borderRadius: BorderRadius.horizontal(
+                                right: (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                                    ? Radius.circular(20)
+                                    : Radius.circular(0),
+                                left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                      ? AppColors.primaryColor
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle),
+                              child: Center(
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                      color:
+                                          ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                              ? Colors.white
+                                              : Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Center(
+                        child: Text('${date.day}', style: TextStyle(color: Colors.black, fontSize: 14)),
+                      );
+                    }
+                  },
+                  defaultBuilder: (context, date, _) {
+                    final isCircle = circleDates.any((d) => _isSameDate(d, date));
+                    final isRange = rangeList.any((d) => d.any((element) => _isSameDate(element, date)));
+                    if (isCircle) {
+                      return Center(
+                        child: Container(
+                          width: ScreenUtil.verticalScale(3.5),
+                          height: ScreenUtil.verticalScale(3.5),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${date.day}',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      );
+                    } else if (isRange) {
+                      final data = findDateIndex(date);
+                      return Stack(
+                        children: [
+                          if (rangeList[data!["outerIndex"]!].length > 1 && data["innerIndex"] == 0)
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              left: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          if (rangeList[data["outerIndex"]!].length > 1 && rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                            Positioned(
+                              top: ScreenUtil.verticalScale(0.7),
+                              right: ScreenUtil.verticalScale(3),
+                              child: Container(
+                                width: ScreenUtil.verticalScale(3.5),
+                                height: ScreenUtil.verticalScale(3.6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backOffSetColor,
+                                ),
+                              ),
+                            ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.7)),
+                            decoration: BoxDecoration(
+                              color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                  ? Colors.transparent
+                                  : AppColors.backOffSetColor,
+                              borderRadius: BorderRadius.horizontal(
+                                right: (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                                    ? Radius.circular(20)
+                                    : Radius.circular(0),
+                                left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                      ? AppColors.primaryColor
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle),
+                              child: Center(
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                      color:
+                                          ((data["innerIndex"] == 0) || (rangeList[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                              ? Colors.white
+                                              : Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Center(
+                        child: Text('${date.day}', style: TextStyle(color: Colors.black, fontSize: 14)),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Map<String, int>? findDateIndex(DateTime targetDate) {
+    for (int outerIndex = 0; outerIndex < rangeList.length; outerIndex++) {
+      for (int innerIndex = 0; innerIndex < rangeList[outerIndex].length; innerIndex++) {
+        DateTime date = rangeList[outerIndex][innerIndex];
+        if (date.year == targetDate.year && date.month == targetDate.month && date.day == targetDate.day) {
+          return {
+            'outerIndex': outerIndex,
+            'innerIndex': innerIndex,
+          };
+        }
+      }
+    }
+    return null;
   }
 }

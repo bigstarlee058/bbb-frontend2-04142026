@@ -1145,7 +1145,7 @@ class _TodayPageState extends State<TodayPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Warm up',
+              'Warmup',
               style: TextStyle(fontSize: ScreenUtil.horizontalScale(6), fontWeight: FontWeight.bold, color: AppColors.primaryColor),
             ),
             const SizedBox(height: 20),
@@ -1712,7 +1712,7 @@ class _TodayPageState extends State<TodayPage> {
                                       ),
                                       searchQuery.isEmpty
                                           ? SizedBox(
-                                              height: media.width * 0.45,
+                                              height: media.width * 0,
                                             )
                                           : monthProvider!.allFilterExercises.isNotEmpty
                                               ? Column(
@@ -1753,126 +1753,233 @@ class _TodayPageState extends State<TodayPage> {
                                                   ),
                                                 ),
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20).copyWith(bottom: 20),
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                foregroundColor: Colors.black,
-                                                backgroundColor: const Color(0xFFDDDDDD),
-                                                shadowColor: Colors.grey,
-                                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                                textStyle: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                              child: const Text('Cancel'),
+                                            Expanded(
+                                              child: ButtonWidget(
+                                                  text: "Cancel",
+                                                  textColor: Colors.black,
+                                                  color: const Color(0xFFDDDDDD),
+                                                  onPress: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  isLoading: false),
                                             ),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                ExerciseDataModel newDayExercise = ExerciseDataModel();
+                                            SizedBox(width: 15),
+                                            Expanded(
+                                              child: ButtonWidget(
+                                                  text: "Confirm",
+                                                  textColor: Colors.white,
+                                                  color: AppColors.primaryColor,
+                                                  onPress: () async {
+                                                    ExerciseDataModel newDayExercise = ExerciseDataModel();
 
-                                                if (exercises.isNotEmpty) {
-                                                  newDayExercise = ExerciseDataModel(
-                                                    isAddedUpdated: true,
-                                                    id: "",
-                                                    exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-                                                    typeId: exercises[0].typeId ?? 1,
-                                                    name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
-                                                        "Exercise ${exercises.length + 1}",
-                                                    guide: exercises[0].guide ?? "",
-                                                    sets: exercises[0].sets ?? 0,
-                                                    reps: exercises[0].reps ?? 0,
-                                                    rest: exercises[0].rest ?? 0,
-                                                    weight: exercises[0].weight ?? 0,
-                                                    formats: exercises[0].formats ?? [],
-                                                    thumbnail:
-                                                        monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
-                                                    extra: exercises[0].extra ?? [],
-                                                  );
-                                                } else {
-                                                  newDayExercise = ExerciseDataModel(
-                                                    isAddedUpdated: true,
-                                                    id: "",
-                                                    exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
-                                                    typeId: 1,
-                                                    name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
-                                                        "Exercise ${exercises.length + 1}",
-                                                    thumbnail:
-                                                        monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
-                                                    guide: "",
-                                                    sets: 5,
-                                                    reps: 10,
-                                                    rest: 3,
-                                                    weight: 30,
-                                                    formats: ["A", "B", "C"],
-                                                    extra: [
-                                                      ExtraDataModel(
-                                                        weight: 0,
-                                                        rest: 120,
-                                                        load: 0,
-                                                        reps: 0,
-                                                        sets: 3,
-                                                        type: 3,
-                                                        id: "extraaddedexercisesetsdefaultvalueid",
-                                                      )
-                                                    ],
-                                                  );
-                                                }
+                                                    if (exercises.isNotEmpty) {
+                                                      newDayExercise = ExerciseDataModel(
+                                                        isAddedUpdated: true,
+                                                        id: "",
+                                                        exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                                        typeId: exercises[0].typeId ?? 1,
+                                                        name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                                            "Exercise ${exercises.length + 1}",
+                                                        guide: exercises[0].guide ?? "",
+                                                        sets: exercises[0].sets ?? 0,
+                                                        reps: exercises[0].reps ?? 0,
+                                                        rest: exercises[0].rest ?? 0,
+                                                        weight: exercises[0].weight ?? 0,
+                                                        formats: exercises[0].formats ?? [],
+                                                        thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                            "unknown",
+                                                        extra: exercises[0].extra ?? [],
+                                                      );
+                                                    } else {
+                                                      newDayExercise = ExerciseDataModel(
+                                                        isAddedUpdated: true,
+                                                        id: "",
+                                                        exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                                        typeId: 1,
+                                                        name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                                            "Exercise ${exercises.length + 1}",
+                                                        thumbnail: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ??
+                                                            "unknown",
+                                                        guide: "",
+                                                        sets: 5,
+                                                        reps: 10,
+                                                        rest: 3,
+                                                        weight: 30,
+                                                        formats: ["A", "B", "C"],
+                                                        extra: [
+                                                          ExtraDataModel(
+                                                            weight: 0,
+                                                            rest: 120,
+                                                            load: 0,
+                                                            reps: 0,
+                                                            sets: 3,
+                                                            type: 3,
+                                                            id: "extraaddedexercisesetsdefaultvalueid",
+                                                          )
+                                                        ],
+                                                      );
+                                                    }
 
-                                                String split = monthProvider
-                                                        ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                        .toString()
-                                                        .split(" ")[1] ??
-                                                    "";
-                                                String dataId =
-                                                    "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id}";
+                                                    String split = monthProvider
+                                                            ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                            .toString()
+                                                            .split(" ")[1] ??
+                                                        "";
+                                                    String dataId =
+                                                        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id}";
 
-                                                Map<String, dynamic> data = {
-                                                  "dataId": dataId,
-                                                  "split": split,
-                                                  "monthId": monthProvider?.monthDataModel?.id,
-                                                  "weekId": monthProvider?.weekDataModel?.id,
-                                                  "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-                                                  "date": "${DateTime.now().toUtc()}",
-                                                  "exerciseId": monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id,
-                                                  "exerciseJson": jsonEncode(newDayExercise)
-                                                };
+                                                    Map<String, dynamic> data = {
+                                                      "dataId": dataId,
+                                                      "split": split,
+                                                      "monthId": monthProvider?.monthDataModel?.id,
+                                                      "weekId": monthProvider?.weekDataModel?.id,
+                                                      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+                                                      "date": "${DateTime.now().toUtc()}",
+                                                      "exerciseId": monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id,
+                                                      "exerciseJson": jsonEncode(newDayExercise)
+                                                    };
 
-                                                RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
-                                                  (element) => element.dataId == dataId,
-                                                  orElse: () => RemovedExerciseModel(),
-                                                );
-                                                if (removedDataExit.id != null) {
-                                                  ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
-                                                  await DatabaseHelper().deleteSingleData(
-                                                      tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
-                                                }
+                                                    RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+                                                      (element) => element.dataId == dataId,
+                                                      orElse: () => RemovedExerciseModel(),
+                                                    );
+                                                    if (removedDataExit.id != null) {
+                                                      ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                                      await DatabaseHelper().deleteSingleData(
+                                                          tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
+                                                    }
 
-                                                exercises.add(newDayExercise);
-                                                ApiRepo.addExtraExercise(body: data);
-                                                await DatabaseHelper()
-                                                    .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
-                                                await monthProvider?.fetchExtraAddedExerciseData();
-                                                setState(() {});
-                                                if (!context.mounted) return;
-                                                Navigator.pop(context);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                foregroundColor: Colors.white,
-                                                backgroundColor: AppColors.primaryColor,
-                                                shadowColor: Colors.grey,
-                                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                                textStyle: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                              child: const Text('Confirm'),
+                                                    exercises.add(newDayExercise);
+                                                    ApiRepo.addExtraExercise(body: data);
+                                                    await DatabaseHelper()
+                                                        .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
+                                                    await monthProvider?.fetchExtraAddedExerciseData();
+                                                    setState(() {});
+                                                    if (!context.mounted) return;
+                                                    Navigator.pop(context);
+                                                  },
+                                                  isLoading: false),
                                             ),
+                                            // ElevatedButton(
+                                            //   onPressed: () {
+                                            //     Navigator.pop(context);
+                                            //   },
+                                            //   style: ElevatedButton.styleFrom(
+                                            //     foregroundColor: Colors.black,
+                                            //     backgroundColor: const Color(0xFFDDDDDD),
+                                            //     shadowColor: Colors.grey,
+                                            //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
+                                            //     textStyle: const TextStyle(
+                                            //       fontSize: 16,
+                                            //     ),
+                                            //   ),
+                                            //   child: const Text('Cancel'),
+                                            // ),
+                                            // ElevatedButton(
+                                            //   onPressed: () async {
+                                            //     ExerciseDataModel newDayExercise = ExerciseDataModel();
+                                            //
+                                            //     if (exercises.isNotEmpty) {
+                                            //       newDayExercise = ExerciseDataModel(
+                                            //         isAddedUpdated: true,
+                                            //         id: "",
+                                            //         exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                            //         typeId: exercises[0].typeId ?? 1,
+                                            //         name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                            //             "Exercise ${exercises.length + 1}",
+                                            //         guide: exercises[0].guide ?? "",
+                                            //         sets: exercises[0].sets ?? 0,
+                                            //         reps: exercises[0].reps ?? 0,
+                                            //         rest: exercises[0].rest ?? 0,
+                                            //         weight: exercises[0].weight ?? 0,
+                                            //         formats: exercises[0].formats ?? [],
+                                            //         thumbnail:
+                                            //             monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
+                                            //         extra: exercises[0].extra ?? [],
+                                            //       );
+                                            //     } else {
+                                            //       newDayExercise = ExerciseDataModel(
+                                            //         isAddedUpdated: true,
+                                            //         id: "",
+                                            //         exerciseId: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id ?? "",
+                                            //         typeId: 1,
+                                            //         name: monthProvider?.allFilterExercises[selectExerciseSwapIndex!].title ??
+                                            //             "Exercise ${exercises.length + 1}",
+                                            //         thumbnail:
+                                            //             monthProvider?.allFilterExercises[selectExerciseSwapIndex!].thumbnail ?? "unknown",
+                                            //         guide: "",
+                                            //         sets: 5,
+                                            //         reps: 10,
+                                            //         rest: 3,
+                                            //         weight: 30,
+                                            //         formats: ["A", "B", "C"],
+                                            //         extra: [
+                                            //           ExtraDataModel(
+                                            //             weight: 0,
+                                            //             rest: 120,
+                                            //             load: 0,
+                                            //             reps: 0,
+                                            //             sets: 3,
+                                            //             type: 3,
+                                            //             id: "extraaddedexercisesetsdefaultvalueid",
+                                            //           )
+                                            //         ],
+                                            //       );
+                                            //     }
+                                            //
+                                            //     String split = monthProvider
+                                            //             ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                            //             .toString()
+                                            //             .split(" ")[1] ??
+                                            //         "";
+                                            //     String dataId =
+                                            //         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id}";
+                                            //
+                                            //     Map<String, dynamic> data = {
+                                            //       "dataId": dataId,
+                                            //       "split": split,
+                                            //       "monthId": monthProvider?.monthDataModel?.id,
+                                            //       "weekId": monthProvider?.weekDataModel?.id,
+                                            //       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+                                            //       "date": "${DateTime.now().toUtc()}",
+                                            //       "exerciseId": monthProvider?.allFilterExercises[selectExerciseSwapIndex!].id,
+                                            //       "exerciseJson": jsonEncode(newDayExercise)
+                                            //     };
+                                            //
+                                            //     RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+                                            //       (element) => element.dataId == dataId,
+                                            //       orElse: () => RemovedExerciseModel(),
+                                            //     );
+                                            //     if (removedDataExit.id != null) {
+                                            //       ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                            //       await DatabaseHelper().deleteSingleData(
+                                            //           tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
+                                            //     }
+                                            //
+                                            //     exercises.add(newDayExercise);
+                                            //     ApiRepo.addExtraExercise(body: data);
+                                            //     await DatabaseHelper()
+                                            //         .insertData(tableName: DatabaseHelper.extraExerciseHistory, data: data);
+                                            //     await monthProvider?.fetchExtraAddedExerciseData();
+                                            //     setState(() {});
+                                            //     if (!context.mounted) return;
+                                            //     Navigator.pop(context);
+                                            //   },
+                                            //   style: ElevatedButton.styleFrom(
+                                            //     foregroundColor: Colors.white,
+                                            //     backgroundColor: AppColors.primaryColor,
+                                            //     shadowColor: Colors.grey,
+                                            //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
+                                            //     textStyle: const TextStyle(
+                                            //       fontSize: 16,
+                                            //     ),
+                                            //   ),
+                                            //   child: const Text('Confirm'),
+                                            // ),
                                           ],
                                         ),
                                       ),
@@ -2246,7 +2353,7 @@ class _TodayPageState extends State<TodayPage> {
                                     ),
                                     searchQuery.isEmpty
                                         ? SizedBox(
-                                            height: media.width * 0.25,
+                                            height: media.width * 0.0,
                                           )
                                         : monthProvider!.allFilterExercises.isNotEmpty
                                             ? Column(
@@ -2288,106 +2395,194 @@ class _TodayPageState extends State<TodayPage> {
                                                 ),
                                               ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20).copyWith(bottom: 20),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor: Colors.black,
-                                              backgroundColor: const Color(0xFFDDDDDD),
-                                              shadowColor: Colors.grey,
-                                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                              textStyle: const TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            child: const Text('Cancel'),
+                                          Expanded(
+                                            child: ButtonWidget(
+                                                text: "Cancel",
+                                                textColor: Colors.black,
+                                                color: const Color(0xFFDDDDDD),
+                                                onPress: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                isLoading: false),
                                           ),
-                                          ElevatedButton(
-                                            onPressed: () async {
-                                              RelatedExercises? relatedExerciseData;
-                                              Exercise? exerciseDataModel;
+                                          SizedBox(width: 15),
+                                          Expanded(
+                                            child: ButtonWidget(
+                                                text: "Confirm",
+                                                textColor: Colors.white,
+                                                color: AppColors.primaryColor,
+                                                onPress: () async {
+                                                  RelatedExercises? relatedExerciseData;
+                                                  Exercise? exerciseDataModel;
 
-                                              if (selectRelatedExerciseSwapIndex == null) {
-                                                exerciseDataModel = monthProvider!.allFilterExercises[selectExerciseSwapIndex!];
-                                              } else {
-                                                relatedExerciseData = monthProvider!.relatedExercises[selectRelatedExerciseSwapIndex!];
-                                              }
+                                                  if (selectRelatedExerciseSwapIndex == null) {
+                                                    exerciseDataModel = monthProvider!.allFilterExercises[selectExerciseSwapIndex!];
+                                                  } else {
+                                                    relatedExerciseData = monthProvider!.relatedExercises[selectRelatedExerciseSwapIndex!];
+                                                  }
 
-                                              ExerciseDataModel newDayExercise = ExerciseDataModel(
-                                                isAddedUpdated: true,
-                                                id: "",
-                                                exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
-                                                typeId: exercises[selectedIndex].typeId ?? 1,
-                                                thumbnail: exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
-                                                name: exerciseDataModel?.title ??
-                                                    relatedExerciseData?.title ??
-                                                    "Exercise ${exercises.length + 1}",
-                                                guide: exercises[selectedIndex].guide ?? "",
-                                                sets: exercises[selectedIndex].sets ?? 0,
-                                                reps: exercises[selectedIndex].reps ?? 0,
-                                                rest: exercises[selectedIndex].rest ?? 0,
-                                                weight: exercises[selectedIndex].weight ?? 0,
-                                                formats: exercises[selectedIndex].formats ?? [],
-                                                extra: exercises[selectedIndex].extra ?? [],
-                                              );
+                                                  ExerciseDataModel newDayExercise = ExerciseDataModel(
+                                                    isAddedUpdated: true,
+                                                    id: "",
+                                                    exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
+                                                    typeId: exercises[selectedIndex].typeId ?? 1,
+                                                    thumbnail: exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
+                                                    name: exerciseDataModel?.title ??
+                                                        relatedExerciseData?.title ??
+                                                        "Exercise ${exercises.length + 1}",
+                                                    guide: exercises[selectedIndex].guide ?? "",
+                                                    sets: exercises[selectedIndex].sets ?? 0,
+                                                    reps: exercises[selectedIndex].reps ?? 0,
+                                                    rest: exercises[selectedIndex].rest ?? 0,
+                                                    weight: exercises[selectedIndex].weight ?? 0,
+                                                    formats: exercises[selectedIndex].formats ?? [],
+                                                    extra: exercises[selectedIndex].extra ?? [],
+                                                  );
 
-                                              String split = monthProvider
-                                                      ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                      .toString()
-                                                      .split(" ")[1] ??
-                                                  "";
+                                                  String split = monthProvider
+                                                          ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                          .toString()
+                                                          .split(" ")[1] ??
+                                                      "";
 
-                                              String dataId =
-                                                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseDataModel?.id ?? relatedExerciseData?.sId ?? ""}";
+                                                  String dataId =
+                                                      "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseDataModel?.id ?? relatedExerciseData?.sId ?? ""}";
 
-                                              Map<String, dynamic> data = {
-                                                "dataId": dataId,
-                                                "split": split,
-                                                "monthId": monthProvider?.monthDataModel?.id,
-                                                "weekId": monthProvider?.weekDataModel?.id,
-                                                "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-                                                "date": "${DateTime.now().toUtc()}",
-                                                "exerciseId": exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
-                                                "exerciseJson": jsonEncode(newDayExercise),
-                                                "insertIndex": selectedIndex.toString()
-                                              };
+                                                  Map<String, dynamic> data = {
+                                                    "dataId": dataId,
+                                                    "split": split,
+                                                    "monthId": monthProvider?.monthDataModel?.id,
+                                                    "weekId": monthProvider?.weekDataModel?.id,
+                                                    "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+                                                    "date": "${DateTime.now().toUtc()}",
+                                                    "exerciseId": exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
+                                                    "exerciseJson": jsonEncode(newDayExercise),
+                                                    "insertIndex": selectedIndex.toString()
+                                                  };
 
-                                              RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
-                                                (element) => element.dataId == dataId,
-                                                orElse: () => RemovedExerciseModel(),
-                                              );
+                                                  RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+                                                    (element) => element.dataId == dataId,
+                                                    orElse: () => RemovedExerciseModel(),
+                                                  );
 
-                                              if (removedDataExit.id != null) {
-                                                ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
-                                                await DatabaseHelper().deleteSingleData(
-                                                    tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
-                                              }
-                                              exercises.removeAt(selectedIndex);
-                                              exercises.insert(selectedIndex, newDayExercise);
-                                              ApiRepo.addSwapExercise(body: data);
-                                              await DatabaseHelper().insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
-                                              await monthProvider?.fetchSwapExerciseData();
-                                              await removeExercise(exercise.exerciseId ?? "");
-                                              setState(() {});
-                                              if (!context.mounted) return;
-                                              Navigator.pop(context);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor: Colors.white,
-                                              backgroundColor: AppColors.primaryColor,
-                                              shadowColor: Colors.grey,
-                                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
-                                              textStyle: const TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            child: const Text('Confirm'),
+                                                  if (removedDataExit.id != null) {
+                                                    ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                                    await DatabaseHelper().deleteSingleData(
+                                                        tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
+                                                  }
+                                                  exercises.removeAt(selectedIndex);
+                                                  exercises.insert(selectedIndex, newDayExercise);
+                                                  ApiRepo.addSwapExercise(body: data);
+                                                  await DatabaseHelper()
+                                                      .insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
+                                                  await monthProvider?.fetchSwapExerciseData();
+                                                  await removeExercise(exercise.exerciseId ?? "");
+                                                  setState(() {});
+                                                  if (!context.mounted) return;
+                                                  Navigator.pop(context);
+                                                },
+                                                isLoading: false),
                                           ),
+                                          // ElevatedButton(
+                                          //   onPressed: () {
+                                          //     Navigator.pop(context);
+                                          //   },
+                                          //   style: ElevatedButton.styleFrom(
+                                          //     foregroundColor: Colors.black,
+                                          //     backgroundColor: const Color(0xFFDDDDDD),
+                                          //     shadowColor: Colors.grey,
+                                          //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
+                                          //     textStyle: const TextStyle(
+                                          //       fontSize: 16,
+                                          //     ),
+                                          //   ),
+                                          //   child: const Text('Cancel'),
+                                          // ),
+                                          // ElevatedButton(
+                                          //   onPressed: () async {
+                                          //     RelatedExercises? relatedExerciseData;
+                                          //     Exercise? exerciseDataModel;
+                                          //
+                                          //     if (selectRelatedExerciseSwapIndex == null) {
+                                          //       exerciseDataModel = monthProvider!.allFilterExercises[selectExerciseSwapIndex!];
+                                          //     } else {
+                                          //       relatedExerciseData = monthProvider!.relatedExercises[selectRelatedExerciseSwapIndex!];
+                                          //     }
+                                          //
+                                          //     ExerciseDataModel newDayExercise = ExerciseDataModel(
+                                          //       isAddedUpdated: true,
+                                          //       id: "",
+                                          //       exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
+                                          //       typeId: exercises[selectedIndex].typeId ?? 1,
+                                          //       thumbnail: exerciseDataModel?.thumbnail ?? relatedExerciseData?.thumbnail ?? "unknown",
+                                          //       name: exerciseDataModel?.title ??
+                                          //           relatedExerciseData?.title ??
+                                          //           "Exercise ${exercises.length + 1}",
+                                          //       guide: exercises[selectedIndex].guide ?? "",
+                                          //       sets: exercises[selectedIndex].sets ?? 0,
+                                          //       reps: exercises[selectedIndex].reps ?? 0,
+                                          //       rest: exercises[selectedIndex].rest ?? 0,
+                                          //       weight: exercises[selectedIndex].weight ?? 0,
+                                          //       formats: exercises[selectedIndex].formats ?? [],
+                                          //       extra: exercises[selectedIndex].extra ?? [],
+                                          //     );
+                                          //
+                                          //     String split = monthProvider
+                                          //             ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                          //             .toString()
+                                          //             .split(" ")[1] ??
+                                          //         "";
+                                          //
+                                          //     String dataId =
+                                          //         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseDataModel?.id ?? relatedExerciseData?.sId ?? ""}";
+                                          //
+                                          //     Map<String, dynamic> data = {
+                                          //       "dataId": dataId,
+                                          //       "split": split,
+                                          //       "monthId": monthProvider?.monthDataModel?.id,
+                                          //       "weekId": monthProvider?.weekDataModel?.id,
+                                          //       "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+                                          //       "date": "${DateTime.now().toUtc()}",
+                                          //       "exerciseId": exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
+                                          //       "exerciseJson": jsonEncode(newDayExercise),
+                                          //       "insertIndex": selectedIndex.toString()
+                                          //     };
+                                          //
+                                          //     RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+                                          //       (element) => element.dataId == dataId,
+                                          //       orElse: () => RemovedExerciseModel(),
+                                          //     );
+                                          //
+                                          //     if (removedDataExit.id != null) {
+                                          //       ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+                                          //       await DatabaseHelper().deleteSingleData(
+                                          //           tableName: DatabaseHelper.removedExerciseHistory, id: removedDataExit.dataId!);
+                                          //     }
+                                          //     exercises.removeAt(selectedIndex);
+                                          //     exercises.insert(selectedIndex, newDayExercise);
+                                          //     ApiRepo.addSwapExercise(body: data);
+                                          //     await DatabaseHelper().insertData(tableName: DatabaseHelper.swapExerciseHistory, data: data);
+                                          //     await monthProvider?.fetchSwapExerciseData();
+                                          //     await removeExercise(exercise.exerciseId ?? "");
+                                          //     setState(() {});
+                                          //     if (!context.mounted) return;
+                                          //     Navigator.pop(context);
+                                          //   },
+                                          //   style: ElevatedButton.styleFrom(
+                                          //     foregroundColor: Colors.white,
+                                          //     backgroundColor: AppColors.primaryColor,
+                                          //     shadowColor: Colors.grey,
+                                          //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: 12),
+                                          //     textStyle: const TextStyle(
+                                          //       fontSize: 16,
+                                          //     ),
+                                          //   ),
+                                          //   child: const Text('Confirm'),
+                                          // ),
                                         ],
                                       ),
                                     ),

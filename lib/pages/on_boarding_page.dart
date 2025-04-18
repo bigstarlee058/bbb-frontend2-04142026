@@ -132,10 +132,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 
     void onPressLogin() {
       if (!isLoading) {
-        Navigator.pushNamed(
-          context,
-          AppRoutes.loginScreen,
-        );
+        Navigator.pushNamed(context, AppRoutes.loginScreen);
       }
     }
 

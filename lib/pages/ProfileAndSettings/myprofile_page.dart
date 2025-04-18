@@ -174,6 +174,23 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                           Navigator.pop(context);
                                         },
                                       ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          top: ScreenUtil.verticalScale(1),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'My Profile',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                       const CommonStreakWithNotification(routeString: '/myprofile')
                                     ],
                                   ),
@@ -185,6 +202,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(5),
+                                      ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
                                             ? ProfileImageWidget(
@@ -202,7 +222,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                             : const SizedBox(),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(5),
+                                        height: ScreenUtil.horizontalScale(7),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -211,8 +231,24 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                 userData.userName,
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(8),
+                                                  fontSize: ScreenUtil.horizontalScale(7),
                                                   fontWeight: FontWeight.bold,
+                                                  height: 1,
+                                                ),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(0.7),
+                                      ),
+                                      Consumer<UserDataProvider>(
+                                        builder: (context, userData, child) => userData.userName != ""
+                                            ? Text(
+                                                userData.userEmail,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.horizontalScale(3.5),
+                                                  fontWeight: FontWeight.normal,
                                                   height: 1,
                                                 ),
                                               )
@@ -381,7 +417,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             : Container(
                                 margin: EdgeInsets.symmetric(
                                   vertical: ScreenUtil.verticalScale(4),
-                                  horizontal: ScreenUtil.horizontalScale(10),
+                                  horizontal: ScreenUtil.horizontalScale(9),
                                 ),
                                 child: ButtonWidget(
                                   text: "Save",
@@ -412,10 +448,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }) {
     return Container(
       margin: EdgeInsets.only(
-        left: ScreenUtil.horizontalScale(12),
-        right: ScreenUtil.horizontalScale(12),
+        left: ScreenUtil.horizontalScale(7),
+        right: ScreenUtil.horizontalScale(7),
         bottom: ScreenUtil.verticalScale(0.8),
-        top: ScreenUtil.verticalScale(3.5),
+        top: ScreenUtil.verticalScale(3),
       ),
       height: ScreenUtil.verticalScale(6),
       child: Row(
@@ -483,7 +519,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

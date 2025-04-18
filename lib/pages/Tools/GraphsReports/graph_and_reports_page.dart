@@ -1,5 +1,4 @@
 import 'package:bbb/components/back_arrow_widget.dart';
-import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -76,30 +75,23 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            Stack(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Stack(
+              clipBehavior: Clip.none,
               children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: media.height / 2,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
-                        ),
-                      ],
+                Container(
+                  height: media.height / 2,
+                  width: media.width,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/img/back.jpg'),
+                      fit: BoxFit.cover,
+                      opacity: 1,
                     ),
-                  ],
+                  ),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: media.height / 3.2),
@@ -419,35 +411,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                             ),
                           ),
                         ),
-
-                        Container(
-                          width: media.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)).copyWith(bottom: 50),
-                          child: Column(
-                            children: [
-                              ButtonWidget(
-                                text: "Go Back",
-                                textColor: const Color(0x30000000),
-                                onPress: () {
-                                  Navigator.pop(context);
-                                },
-                                color: const Color(0xC8FFFFFF),
-                                isLoading: false,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                return ButtonWidget(
-                                  text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Continue Workout",
-                                  textColor: Colors.white,
-                                  onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(monthProvider, context),
-                                  color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                                  isLoading: false,
-                                );
-                              })
-                            ],
-                          ),
+                        SizedBox(
+                          height: media.height * 0.02,
                         ),
                       ],
                     ),
@@ -456,6 +421,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                 Column(
                   children: [
                     Stack(
+                      clipBehavior: Clip.none,
                       children: [
                         SizedBox(
                           height: media.height / 2,
@@ -473,14 +439,17 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      BackArrowWidget(
-                                        onPress: () {
-                                          // HapticFeedBack.buttonClick();
-                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          // mainPageProvider.changeTab(2);
-                                          Navigator.pop(context);
-                                        },
+                                      SafeArea(
+                                        child: SizedBox(width: ScreenUtil.horizontalScale(10)),
                                       ),
+                                      // BackArrowWidget(
+                                      //   onPress: () {
+                                      //     // HapticFeedBack.buttonClick();
+                                      //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      //     // mainPageProvider.changeTab(2);
+                                      //     Navigator.pop(context);
+                                      //   },
+                                      // ),
                                       Container(
                                         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
                                         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
@@ -597,8 +566,19 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 0,
+            child: BackArrowWidget(
+              onPress: () {
+                // HapticFeedBack.buttonClick();
+                // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                // mainPageProvider.changeTab(2);
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

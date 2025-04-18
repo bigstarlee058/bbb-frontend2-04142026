@@ -28,7 +28,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
         ),
         const SizedBox(height: 40),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.symmetric(horizontal: 3),
           child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Utils {
@@ -7,6 +8,10 @@ class Utils {
     DateTime localTime = utcTime.toLocal();
     return localTime;
   }
+
+  static BorderRadius buttonRadius = BorderRadius.circular(20);
+
+  static RoundedRectangleBorder buttonStyle = RoundedRectangleBorder(borderRadius: buttonRadius);
 }
 
 extension StringCasingExtension on String {
