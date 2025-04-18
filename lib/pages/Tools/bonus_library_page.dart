@@ -297,9 +297,9 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
       bottomSheet: Container(
         alignment: Alignment.center,
         color: Colors.white,
-        height: 100,
+        height: 65,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
           child: _numPages > 0
               ? NumberPaginator(
                   numberPages: _numPages,

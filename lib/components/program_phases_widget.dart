@@ -18,43 +18,43 @@ class ProgramPhasesWidget extends StatelessWidget {
           width: media.width,
           color: Colors.white, // Set the outside background color to white
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               // Top white section
               Positioned(
-                top: 0,
+                top: -ScreenUtil.verticalScale(2.8),
                 left: 0,
                 right: 0,
                 height: media.height / 8, // Adjust height of white top section
                 child: Container(
-                  color: Colors.white,
-                  child: Container(
-                    width: ScreenUtil.horizontalScale(60),
-                    margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
-                    child: Text(
-                      "Program Phases",
-                      maxLines: 2,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          color: AppColors.primaryColor,
-                          fontSize: ScreenUtil.verticalScale(2.3),
-                          fontWeight: FontWeight.bold,
-                          height: 1.35),
-                    ),
+                  width: ScreenUtil.horizontalScale(60),
+                  margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
+                  child: Text(
+                    "Program Phases",
+                    maxLines: 2,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: ScreenUtil.horizontalScale(5.2),
+                        fontWeight: FontWeight.bold,
+                        height: 1.35),
                   ),
                 ),
               ),
-              // Bottom white section
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: media.height / 8, // Adjust height of white bottom section
-                child: Container(
-                  color: Colors.white,
-                ),
-              ),
-              // Middle image section with clip path
+
+              // // Bottom white section
+              // Positioned(
+              //   bottom: 0,
+              //   left: 0,
+              //   right: 0,
+              //   height: media.height / 8, // Adjust height of white bottom section
+              //   child: Container(
+              //     color: Colors.white,
+              //   ),
+              // ),
+              // // Middle image section with clip path
               Positioned.fill(
+                top: -ScreenUtil.verticalScale(2.6),
                 child: ClipPath(
                   clipper: MiddleClipper(),
                   child: Container(
@@ -89,6 +89,25 @@ class ProgramPhasesWidget extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+              Positioned(
+                bottom: -3,
+                left: 0,
+                right: 0,
+                child: Container(
+                  width: ScreenUtil.horizontalScale(60),
+                  margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
+                  child: Text(
+                    "Member Spotlight",
+                    maxLines: 2,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: ScreenUtil.horizontalScale(5.2),
+                        fontWeight: FontWeight.bold,
+                        height: 1.35),
+                  ),
                 ),
               ),
             ],

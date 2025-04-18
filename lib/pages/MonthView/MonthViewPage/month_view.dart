@@ -333,14 +333,16 @@ class _MonthViewState extends State<MonthView> {
                                                             ],
                                                           )
                                                         : const SizedBox(),
-                                                    const SizedBox(height: 5),
-                                                    Text(
-                                                      monthProvider.monthDataModel?.title ?? "",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: ScreenUtil.horizontalScale(6),
-                                                        fontWeight: FontWeight.bold,
+                                                    Padding(
+                                                      padding: const EdgeInsets.symmetric(vertical: 5),
+                                                      child: Text(
+                                                        monthProvider.monthDataModel?.title ?? "",
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: ScreenUtil.horizontalScale(6.5),
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
                                                   ],
@@ -366,7 +368,6 @@ class _MonthViewState extends State<MonthView> {
                                                   isLoading: false,
                                                 ),
                                               ),
-                                              const SizedBox(height: 10),
                                             ],
                                           ),
                                         );

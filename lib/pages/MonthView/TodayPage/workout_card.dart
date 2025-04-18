@@ -247,11 +247,10 @@ class _WorkoutCardState extends State<WorkoutCard> {
                 borderRadius: BorderRadius.all(
                   Radius.circular(ScreenUtil.verticalScale(12)),
                 ),
-                side: const BorderSide(
-                  color: Color(0x12000000),
-                  width: 0.5,
-                ),
+                side: const BorderSide(color: Color(0x12000000), width: 0.5),
               ),
+              surfaceTintColor: Colors.transparent,
+              overlayColor: Colors.grey.shade400,
               padding: EdgeInsets.zero),
           child: Container(
             width: media.width,

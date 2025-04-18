@@ -33,7 +33,7 @@ class StaffListWidget extends StatelessWidget {
               'Team',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: ScreenUtil.horizontalScale(3.6),
+                fontSize: ScreenUtil.verticalScale(1.5),
               ),
             ),
             Text(
@@ -44,7 +44,7 @@ class StaffListWidget extends StatelessWidget {
               oneStaff?.location ?? 'Miami FL',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: ScreenUtil.horizontalScale(4.2),
+                fontSize: ScreenUtil.verticalScale(1.5),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -68,7 +68,7 @@ class StaffListWidget extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: ScreenUtil.verticalScale(1.5),
+                  fontSize: ScreenUtil.verticalScale(1.7),
                 ),
               ),
             )
