@@ -10,6 +10,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:number_paginator/number_paginator.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,13 +34,29 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final collection = ModalRoute.of(context)!.settings.arguments as Collections;
-      await loadCollectionData(collection);
+      await loadCollectionData(collection).then((_) {
+        setState(() {
+          if (dataProvider!.collectionData.equipments.isNotEmpty) {
+            final List<Equipment>? equipments =
+                dataProvider?.collectionData.equipments.map<Equipment>((e) => Equipment.fromJson(e)).toList();
+            _filteredEquipments = equipments!;
+            _numPages = (_filteredEquipments.length / _itemsPerPage).ceil();
+          } else {
+            _numPages = 1;
+          }
+        });
+      }).catchError((error) {
+        debugPrint('Error fetching admin equipment: $error');
+      });
     });
     super.initState();
   }
 
+  bool loader = false;
   Future<void> loadCollectionData(Collections collection) async {
+    setState(() => loader = true);
     await dataProvider?.fetchOneCollection(collection.id);
+    setState(() => loader = false);
   }
 
   Future<void> _launchURL(String url) async {
@@ -48,6 +65,21 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  int _currentPage = 0;
+  final int _itemsPerPage = 10;
+  int _numPages = 0;
+  List<Equipment> _filteredEquipments = [];
+
+  List<Equipment> _getPaginatedEquipments() {
+    int startIndex = _currentPage * _itemsPerPage;
+    int endIndex = startIndex + _itemsPerPage;
+
+    return _filteredEquipments.sublist(
+      startIndex,
+      endIndex > _filteredEquipments.length ? _filteredEquipments.length : endIndex,
+    );
   }
 
   Widget equipmentCard(String title, String imageurl, String description, String link) {
@@ -282,14 +314,11 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                     ),
                   ],
                 ),
-                Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                  final List<Equipment> equipments = dataProvider.collectionData.equipments
-                      .map<Equipment>((e) => Equipment.fromJson(e)) // or `e as Equipment`
-                      .toList();
-                  return equipments.isNotEmpty
-                      ? Container(
-                          margin: EdgeInsets.only(top: media.height / 2.8),
-                          child: Container(
+                Consumer<DataProvider>(
+                  builder: (context, dataProvider, child) {
+                    return dataProvider.collectionData.equipments.isNotEmpty
+                        ? Container(
+                            margin: EdgeInsets.only(top: media.height / 2.8),
                             width: media.width,
                             padding: EdgeInsets.only(top: ScreenUtil.verticalScale(2)),
                             decoration: BoxDecoration(
@@ -298,48 +327,93 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                 topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
                               ),
                             ),
-                            child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                              child: Column(
-                                children: equipments.map((equipment) {
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                              child: Consumer<DataProvider>(
+                                builder: (context, dataProvider, child) {
                                   return Column(
-                                    children: [
-                                      equipmentCard(
-                                        equipment.title,
-                                        equipment.thumbnail,
-                                        equipment.description,
-                                        equipment.link,
-                                      ),
-                                    ],
+                                    children: _getPaginatedEquipments().map((equipment) {
+                                      return Column(
+                                        children: [
+                                          equipmentCard(
+                                            equipment.title,
+                                            equipment.thumbnail,
+                                            equipment.description,
+                                            equipment.link,
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
                                   );
-                                }).toList(),
+                                },
                               ),
                             ),
-                          ),
-                        )
-                      : Container(
-                          margin: EdgeInsets.only(top: media.height / 2.8),
-                          child: Container(
-                            width: media.width,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
-                              ),
-                            ),
+                          )
+                        : Container(
+                            margin: EdgeInsets.only(top: media.height / 2.8),
                             child: Container(
-                                margin: EdgeInsets.only(top: media.height / 19, right: 20, left: 20),
-                                child: const SizedBox(
-                                  height: 100,
-                                )),
-                          ),
-                        );
-                }),
+                              width: media.width,
+                              height: media.height * 0.3,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: loader
+                                    ? CircularProgressIndicator(
+                                        color: AppColors.primaryColor,
+                                      )
+                                    : Text(
+                                        "No Collection",
+                                        style: TextStyle(fontSize: 17),
+                                      ),
+                              ),
+                            ),
+                          );
+                  },
+                ),
               ],
             ),
+            const SizedBox(
+              height: 100,
+            )
           ],
         ),
       ),
+      bottomSheet: Consumer<DataProvider>(builder: (context, dataProvider, child) {
+        return dataProvider.collectionData.equipments.isNotEmpty
+            ? Container(
+                alignment: Alignment.center,
+                color: Colors.white,
+                height: 65,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
+                  child: _numPages > 0
+                      ? NumberPaginator(
+                          numberPages: _numPages,
+                          config: const NumberPaginatorUIConfig(
+                            height: 48,
+                            buttonSelectedForegroundColor: AppColors.primaryColor,
+                            buttonUnselectedForegroundColor: Colors.grey,
+                            buttonUnselectedBackgroundColor: Colors.transparent,
+                            buttonSelectedBackgroundColor: Colors.transparent,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                            buttonTextStyle: TextStyle(fontSize: 15),
+                          ),
+                          onPageChange: (int index) {
+                            setState(() {
+                              _currentPage = index;
+                            });
+                          },
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              )
+            : SizedBox();
+      }),
     );
   }
 }

@@ -92,7 +92,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                 ),
               ),
               Positioned(
-                bottom: -3,
+                bottom: 0,
                 left: 0,
                 right: 0,
                 child: Container(

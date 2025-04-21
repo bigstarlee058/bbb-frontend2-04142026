@@ -1,5 +1,6 @@
 import 'package:bbb/providers/month_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -84,14 +85,27 @@ class _EquipmentSectionState extends State<EquipmentSection> {
   }
 
   Widget equipmentCard(String title, String description, String link, String image) {
-    return GestureDetector(
-      onTap: () {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+          disabledBackgroundColor: const Color(0xFFF3F3F3),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(ScreenUtil.verticalScale(12)),
+            ),
+            side: const BorderSide(color: Color(0x12000000), width: 0.5),
+          ),
+          surfaceTintColor: Colors.transparent,
+          overlayColor: Colors.grey.shade400,
+          padding: EdgeInsets.zero),
+      onPressed: () {
         _launchURL(link); // Launch the external URL when tapped
       },
       child: Container(
         width: ScreenUtil.horizontalScale(100),
         height: ScreenUtil.verticalScale(11),
-        margin: const EdgeInsets.symmetric(vertical: 10),
+
         // Padding around the background
         decoration: BoxDecoration(
           color: AppColors.primaryColor,
@@ -102,8 +116,8 @@ class _EquipmentSectionState extends State<EquipmentSection> {
         child: Row(
           children: [
             Container(
+              width: ScreenUtil.verticalScale(11),
               height: ScreenUtil.verticalScale(11),
-              width: ScreenUtil.verticalScale(12),
 
               // Padding around the background
               decoration: BoxDecoration(
@@ -126,54 +140,51 @@ class _EquipmentSectionState extends State<EquipmentSection> {
             const SizedBox(
               width: 10,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: ScreenUtil.horizontalScale(40),
-                  child: Text(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
                     title,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: ScreenUtil.verticalScale(2),
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                ),
-                SizedBox(
-                  width: ScreenUtil.horizontalScale(40),
-                  child: Text(
-                    description,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                    maxLines: 2,
+                  ),
+                  SizedBox(height: ScreenUtil.verticalScale(1)),
+                  Text(
+                    description,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(1.5),
-                      fontWeight: FontWeight.bold,
+                      fontSize: ScreenUtil.verticalScale(1.7),
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const Spacer(),
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: ScreenUtil.verticalScale(2.5),
-              child: Center(
-                child: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: ScreenUtil.horizontalScale(6),
-                  color: AppColors.primaryColor,
+            SizedBox(width: 15),
+            GestureDetector(
+              onTap: null,
+              child: Container(
+                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(
+                  "assets/icons/shopping-bag.svg",
+                  height: ScreenUtil.verticalScale(3),
+                  colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
                 ),
               ),
             ),
-            SizedBox(
-              width: ScreenUtil.horizontalScale(5),
-            ),
+            SizedBox(width: 15),
           ],
         ),
       ),
