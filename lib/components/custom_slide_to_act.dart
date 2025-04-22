@@ -38,7 +38,7 @@ class CustomSlideAction extends StatefulWidget {
     this.textColor,
     this.innerColor,
     this.outerColor,
-    this.borderRadius = 52,
+    this.borderRadius = 15,
     this.elevation = 6,
     this.animationDuration = const Duration(milliseconds: 300),
     this.reversed = false,
@@ -161,7 +161,7 @@ class CustomSlideActionState extends State<CustomSlideAction> with TickerProvide
                                   }
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
                                   child: Material(
                                     borderRadius: BorderRadius.circular(widget.borderRadius),
                                     color: widget.innerColor ?? Theme.of(context).primaryIconTheme.color,

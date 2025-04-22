@@ -6,8 +6,10 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/data_provider.dart';
 
@@ -25,8 +27,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
   int _numPages = 0;
   String _searchQuery = "";
   String _selectedSortBy = 'A-Z'; // Default sorting
-  List<String> _selectedEquipmentIds = [];
-  List<String> _selectedCategoryIds = [];
+  // List<String> _selectedEquipmentIds = [];
+  // List<String> _selectedCategoryIds = [];
   late MainPageProvider mainPageProvider;
   List<Equipment> _filteredEquipments = [];
 
@@ -115,7 +117,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                             ),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: media.height / 2.5,
                           width: media.width,
                           child: SafeArea(
@@ -325,78 +327,123 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
     );
   }
 
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   Widget equipmentCard(Equipment equipment) {
     var media = MediaQuery.of(context).size;
-    return Container(
-      padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(
-          Radius.circular(ScreenUtil.verticalScale(8)),
+    return GestureDetector(
+      onTap: () {
+        _launchURL(equipment.link);
+      },
+      child: Container(
+        padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(
+            Radius.circular(ScreenUtil.verticalScale(8)),
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
+          ],
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              Container(
-                height: media.width / 4,
-                width: media.width / 4,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: media.width / 4,
+                  width: media.width / 4,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: equipment.thumbnail.isNotEmpty
+                          ? NetworkImage(equipment.thumbnail.startsWith('https://storage.cloud.google.com/')
+                              ? equipment.thumbnail.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                              : equipment.thumbnail)
+                          : const AssetImage('assets/img/library_placeholder.png'),
+                      fit: BoxFit.cover,
+                      opacity: 1,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                      bottomLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+
+                // SizedBox(
+                //   width: media.width / 2.5,
+                //   child: Text(
+                //     equipment.title,
+                //     style: TextStyle(
+                //       color: AppColors.primaryColor,
+                //       fontSize: ScreenUtil.horizontalScale(4),
+                //       fontWeight: FontWeight.bold,
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    equipment.title,
+                    style: TextStyle(
+                      color: AppColors.primaryColor,
+                      fontSize: ScreenUtil.verticalScale(2),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: ScreenUtil.verticalScale(0.5)),
+                  Text(
+                    equipment.description,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: ScreenUtil.verticalScale(1.7),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: null,
+              child: Container(
+                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: equipment.thumbnail.isNotEmpty
-                        ? NetworkImage(equipment.thumbnail.startsWith('https://storage.cloud.google.com/')
-                            ? equipment.thumbnail.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                            : equipment.thumbnail)
-                        : const AssetImage('assets/img/library_placeholder.png'),
-                    fit: BoxFit.cover,
-                    opacity: 1,
-                  ),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                  ),
+                  color: AppColors.primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(
+                  "assets/icons/shopping-bag.svg",
+                  height: ScreenUtil.verticalScale(3),
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
-              const SizedBox(
-                width: 20,
-              ),
-              SizedBox(
-                width: media.width / 2.5,
-                child: Text(
-                  equipment.title,
-                  style: TextStyle(
-                    color: AppColors.primaryColor,
-                    fontSize: ScreenUtil.horizontalScale(4),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.verticalScale(0.7),
-              vertical: ScreenUtil.verticalScale(0.7),
             ),
-            decoration: const BoxDecoration(color: AppColors.primaryColor, shape: BoxShape.circle),
-            child: Icon(
-              Icons.play_arrow,
-              color: Colors.white,
-              size: ScreenUtil.verticalScale(3),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -453,13 +500,13 @@ class FilterSortButton extends StatefulWidget {
   });
 
   @override
-  _FilterSortButtonState createState() => _FilterSortButtonState();
+  State<FilterSortButton> createState() => _FilterSortButtonState();
 }
 
 class _FilterSortButtonState extends State<FilterSortButton> {
   String _selectedSortBy = 'A-Z'; // Default value for sort by
-  List<String> _selectedEquipmentIds = []; // Store selected equipment IDs
-  List<String> _selectedCategoryIds = []; // Store selected category IDs
+  // List<String> _selectedEquipmentIds = []; // Store selected equipment IDs
+  // List<String> _selectedCategoryIds = []; // Store selected category IDs
   @override
   void initState() {
     super.initState();

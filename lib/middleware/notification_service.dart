@@ -87,8 +87,6 @@ class NotificationService {
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       );
 
-      debugPrint("✅ Scheduled Sunday notification for: $nextSunday");
-
       nextSunday = nextSunday.add(const Duration(days: 7));
       notificationId++;
     }
@@ -127,7 +125,5 @@ class NotificationService {
         .catchError((error) {
       debugPrint('Error scheduling notification: $error');
     });
-
-    debugPrint("✅ Scheduled monthly reminder for: $scheduledTime");
   }
 }

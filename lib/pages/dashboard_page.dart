@@ -352,6 +352,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                         ],
                                                                       ),
                                                                       IconButton(
+                                                                        /// COMMENT THIS SIZE-BOX AND UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
                                                                         onPressed: null, icon: SizedBox(),
                                                                         // icon: Icon(
                                                                         //   Icons.notifications_none,
@@ -539,7 +540,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               isLoading: false,
                                                             )
                                                           : ButtonWidget(
-                                                              text: status == Status.started ? 'Continue Workout' : 'Start Workout',
+                                                              text: status == Status.started ? 'Continue Your Workout' : 'Start Workout',
                                                               textColor: AppColors.primaryColor,
                                                               color: status == Status.completed || status == Status.skipped
                                                                   ? Colors.white70
@@ -724,27 +725,43 @@ class _DashboardPageState extends State<DashboardPage> {
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 5),
-                                        Stack(
-                                          children: [
-                                            Container(
-                                              width: media.width,
-                                              height: ScreenUtil.verticalScale(0.5),
-                                              decoration: BoxDecoration(color: Colors.grey[300]),
-                                            ),
-                                            Container(
-                                              width: (ScreenUtil.horizontalScale(80)) / (28 / count),
-                                              height: ScreenUtil.verticalScale(0.5),
-                                              decoration: const BoxDecoration(color: AppColors.primaryColor),
-                                            ),
-                                          ],
+                                        const SizedBox(height: 10),
+                                        StepProgressBar(
+                                          totalSteps: 4,
+                                          progress: ((count * 100 ~/ 28) / 100) * 4,
                                         ),
+                                        // const SizedBox(height: 10),
+                                        // Stack(
+                                        //   children: [
+                                        //     Row(
+                                        //       children: List.generate(
+                                        //         4,
+                                        //         (index) => Expanded(
+                                        //           child: Container(
+                                        //             margin: EdgeInsets.symmetric(horizontal: 3),
+                                        //             color: Colors.grey[300],
+                                        //             height: ScreenUtil.verticalScale(0.6),
+                                        //           ),
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //     Container(
+                                        //       width: (ScreenUtil.horizontalScale(80)) / (28 / count),
+                                        //       height: ScreenUtil.verticalScale(0.6),
+                                        //       decoration: BoxDecoration(
+                                        //         gradient: LinearGradient(
+                                        //           colors: [AppColors.backOffSetColor, AppColors.primaryColor],
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //   ],
+                                        // ),
                                       ],
                                     );
                                   },
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 13),
                               Container(
                                 margin: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(7),
@@ -1069,7 +1086,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     //   ),
                                     // ),
                                     SizedBox(
-                                      height: ScreenUtil.verticalScale(3.2),
+                                      height: ScreenUtil.verticalScale(2.5),
                                     ),
                                     Consumer<DataProvider>(builder: (context, dataProvider, child) {
                                       return dataProvider.athletesData.isNotEmpty
@@ -1125,7 +1142,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 margin: EdgeInsets.only(
                                                     left: ScreenUtil.horizontalScale(7),
                                                     right: ScreenUtil.horizontalScale(7),
-                                                    bottom: ScreenUtil.verticalScale(2.5)),
+                                                    bottom: ScreenUtil.verticalScale(2.4)),
                                                 width: media.width,
                                                 child: Text(
                                                   "Featured Collections",
@@ -1169,7 +1186,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                       margin: EdgeInsets.only(
                                           left: ScreenUtil.horizontalScale(7),
                                           right: ScreenUtil.horizontalScale(7),
-                                          bottom: ScreenUtil.verticalScale(2.8)),
+                                          bottom: ScreenUtil.verticalScale(2.4)),
                                       child: Text(
                                         "Meet our team",
                                         style: TextStyle(
@@ -1718,22 +1735,21 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       children: [
         isCurrentDay
             ? Positioned(
-                top: -ScreenUtil.verticalScale(4.55),
-                bottom: ScreenUtil.verticalScale(0.62),
+                top: -ScreenUtil.verticalScale(4.05),
+                bottom: 1,
                 right: 0,
                 left: 0,
                 child: Container(
-                  decoration: BoxDecoration(color: circleColor, borderRadius: BorderRadius.circular(30)),
-                  height: ScreenUtil.verticalScale(17.2),
+                  decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
                   child: Builder(
                     builder: (context) {
                       final text = DateFormat.E().format(date);
                       return Container(
-                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.2)),
+                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.65)),
                         child: Text(
                           textAlign: TextAlign.center,
                           text,
-                          style: TextStyle(fontSize: 14.0, color: Colors.white),
+                          style: TextStyle(fontSize: 14.0, color: Colors.black),
                         ),
                       );
                     },
@@ -1807,24 +1823,39 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       clipBehavior: Clip.none,
       children: [
         Positioned(
-          top: -ScreenUtil.verticalScale(4.55),
-          bottom: ScreenUtil.verticalScale(0.62),
+          top: -ScreenUtil.verticalScale(4.05),
+          bottom: 1,
           right: 0,
           left: 0,
           child: Container(
-            decoration: BoxDecoration(border: Border.all(color: AppColors.primaryColor), borderRadius: BorderRadius.circular(30)),
-            height: ScreenUtil.verticalScale(17.2),
-          ),
+              decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
+              child: Builder(
+                builder: (context) {
+                  final text = DateFormat.E().format(date);
+                  return Container(
+                    padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.65)),
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      text,
+                      style: TextStyle(fontSize: 14.0, color: Colors.black),
+                    ),
+                  );
+                },
+              )),
         ),
         Container(
           alignment: Alignment.center,
           padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
           margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+          ),
           child: Text(
             '${date.day}',
             style: const TextStyle(
               fontSize: 14.0,
-              color: Colors.black,
+              color: AppColors.primaryColor,
             ),
           ),
         ),
@@ -1844,6 +1875,78 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           color: Colors.black,
         ),
       ),
+    );
+  }
+}
+
+class StepProgressBar extends StatelessWidget {
+  final double progress;
+  final int totalSteps;
+  const StepProgressBar({
+    super.key,
+    required this.progress,
+    this.totalSteps = 4,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final totalWidth = constraints.maxWidth;
+        final spacing = 6;
+        final stepWidth = (totalWidth - ((totalSteps - 1) * spacing)) / totalSteps;
+        final progressWidth = (progress / totalSteps) * totalWidth;
+
+        return Row(
+          children: List.generate(totalSteps, (index) {
+            double fillPercent = (progress - index).clamp(0.0, 1.0);
+            final stepOffset = index * (stepWidth + spacing);
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing / 3),
+              child: Stack(
+                children: [
+                  Container(
+                    width: stepWidth,
+                    height: ScreenUtil.verticalScale(0.8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: index == 0
+                          ? BorderRadius.horizontal(left: Radius.circular(20))
+                          : index == 3
+                              ? BorderRadius.horizontal(right: Radius.circular(20))
+                              : BorderRadius.zero,
+                    ),
+                  ),
+                  if (fillPercent > 0)
+                    ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return LinearGradient(
+                          colors: [AppColors.backOffSetColor1, AppColors.primaryColor],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ).createShader(
+                          Rect.fromLTWH(-stepOffset, 0, progressWidth, 10),
+                        );
+                      },
+                      blendMode: BlendMode.srcIn,
+                      child: Container(
+                        width: stepWidth * fillPercent,
+                        height: ScreenUtil.verticalScale(0.8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: index == 0
+                              ? BorderRadius.horizontal(left: Radius.circular(20))
+                              : index == 3
+                                  ? BorderRadius.horizontal(right: Radius.circular(20))
+                                  : BorderRadius.zero,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+        );
+      },
     );
   }
 }

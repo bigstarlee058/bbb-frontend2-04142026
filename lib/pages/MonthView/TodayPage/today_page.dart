@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -703,7 +702,7 @@ class _TodayPageState extends State<TodayPage> {
                                                         padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
                                                         child: CustomSlideAction(
                                                           key: key,
-                                                          height: ScreenUtil.verticalScale(7.5),
+                                                          height: ScreenUtil.verticalScale(7.2),
                                                           outerColor: AppColors.primaryColor,
                                                           innerColor: AppColors.backOffSetColor,
                                                           sliderButtonIconPadding: ScreenUtil.verticalScale(1.3),
@@ -2170,8 +2169,6 @@ class _TodayPageState extends State<TodayPage> {
       "averageRIR": average.toString(),
       if (data!.isNotEmpty) "startTime": data.first.startTime == null ? "${DateTime.now().toUtc()}" : data.first.startTime.toString()
     };
-
-    log('dataId :::::::::::::::::: $dataId');
 
     final apiReqBody = {
       "status": status1,

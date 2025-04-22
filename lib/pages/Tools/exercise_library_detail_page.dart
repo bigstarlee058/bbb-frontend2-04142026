@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -66,7 +65,6 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> {
       loading = true;
     });
     await dataProvider?.fetchCurrentEx(exerciseId, "exercise 95");
-    log('exerciseId :::::::::::::::::: $exerciseId');
     if (dataProvider!.currentExerciseObj.files.isNotEmpty) {
       initializeVideo(dataProvider?.currentExerciseObj.files[0]['link']);
     } else {

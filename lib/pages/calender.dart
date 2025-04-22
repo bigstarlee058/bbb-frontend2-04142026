@@ -368,6 +368,18 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // return Padding(
+    //     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+    // child: Card(
+    // color: Colors.grey.shade50,
+    // elevation: 4,
+    // shadowColor: Colors.black.withValues(alpha: 0.4),
+    // shape: RoundedRectangleBorder(
+    // borderRadius: BorderRadius.circular(10.0),
+    // ),
+    // child: Padding(
+    // padding: const EdgeInsets.symmetric(vertical: 8.0),
+    // child: SingleChildScrollView(
     return SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
       child: CCTableCalendar(
@@ -376,7 +388,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         rowHeight: ScreenUtil.verticalScale(5),
         daysOfWeekHeight: ScreenUtil.verticalScale(3),
         firstDay: DateTime.utc(2020, 1, 1),
-        lastDay: DateTime.utc(2030, 12, 31),
+        lastDay: DateTime.utc(2100, 12, 31),
         focusedDay: _focusedDay,
         selectedDayPredicate: (day) {
           return isSameDay(_selectedDay, day);

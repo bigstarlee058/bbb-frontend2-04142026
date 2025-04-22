@@ -148,6 +148,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 ],
                               ),
                             ),
+
+                            /// UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
                             // IconButton(
                             //   onPressed: () {
                             //     Navigator.pushNamed(context, '/notifications');

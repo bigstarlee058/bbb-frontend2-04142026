@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:bbb/components/haptic_feedback%20.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
@@ -69,16 +71,34 @@ class _MainPageState extends State<MainPage> {
 
     // _initializeData();
     _startPeriodicUpdate();
-
     WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async => await _initializeFetchData().then(
-        (value) async {
+      (timeStamp) async {
+        String rawMonthId = preferences.getString(SharedPreference.monthId) ?? "";
+        String rawTempData = preferences.getString("${SplitType.split3}-$rawMonthId") ?? "";
+        if (rawTempData.isEmpty) {
+          await _initializeFetchData().then(
+            (value) async {
+              if (monthProvider.monthDataModel == null) {
+                await monthProvider.onInit(context);
+              }
+            },
+          );
+        } else {
           if (monthProvider.monthDataModel == null) {
             await monthProvider.onInit(context);
           }
-        },
-      ),
+        }
+      },
     );
+    // WidgetsBinding.instance.addPostFrameCallback(
+    //   (timeStamp) async => await _initializeFetchData().then(
+    //     (value) async {
+    //       if (monthProvider.monthDataModel == null) {
+    //         await monthProvider.onInit(context);
+    //       }
+    //     },
+    //   ),
+    // );
 
     _pages = [
       const DashboardPage(),

@@ -60,6 +60,8 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
             ],
           ),
         ),
+
+        /// UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
         // IconButton(
         //   onPressed: () {
         //     Navigator.pushNamed(context, '/notifications');

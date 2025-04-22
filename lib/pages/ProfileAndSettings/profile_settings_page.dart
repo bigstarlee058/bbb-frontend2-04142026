@@ -487,6 +487,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   throw 'Could not launch $url';
                                 }
                               }),
+
+                              /// IF PUT BACK LANGUAGE SELECTION PART UNCOMMENT THIS
+
                               // SizedBox(height: ScreenUtil.horizontalScale(4.5)),
                               // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
                               SizedBox(
