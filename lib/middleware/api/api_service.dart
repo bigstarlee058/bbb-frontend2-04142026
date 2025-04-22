@@ -21,7 +21,7 @@ class ApiService extends BaseService {
     try {
       String? userIdToken = await getAuthToken();
       Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
-      debugPrint('userIdToken :::::::::::::::::: $userIdToken');
+      debugPrint('\n\n $userIdToken \n\n');
       String mainUrl = AppConstants.serverUrl + url;
 
       Response result;

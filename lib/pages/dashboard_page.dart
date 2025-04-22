@@ -352,6 +352,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                         ],
                                                                       ),
                                                                       IconButton(
+                                                                        /// COMMENT THIS SIZE-BOX AND UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
                                                                         onPressed: null, icon: SizedBox(),
                                                                         // icon: Icon(
                                                                         //   Icons.notifications_none,
@@ -539,7 +540,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               isLoading: false,
                                                             )
                                                           : ButtonWidget(
-                                                              text: status == Status.started ? 'Continue Workout' : 'Start Workout',
+                                                              text: status == Status.started ? 'Continue Your Workout' : 'Start Workout',
                                                               textColor: AppColors.primaryColor,
                                                               color: status == Status.completed || status == Status.skipped
                                                                   ? Colors.white70
@@ -1734,22 +1735,21 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       children: [
         isCurrentDay
             ? Positioned(
-                top: -ScreenUtil.verticalScale(4.55),
-                bottom: ScreenUtil.verticalScale(0.62),
+                top: -ScreenUtil.verticalScale(4.05),
+                bottom: 1,
                 right: 0,
                 left: 0,
                 child: Container(
-                  decoration: BoxDecoration(color: circleColor, borderRadius: BorderRadius.circular(30)),
-                  height: ScreenUtil.verticalScale(17.2),
+                  decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
                   child: Builder(
                     builder: (context) {
                       final text = DateFormat.E().format(date);
                       return Container(
-                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.2)),
+                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.65)),
                         child: Text(
                           textAlign: TextAlign.center,
                           text,
-                          style: TextStyle(fontSize: 14.0, color: Colors.white),
+                          style: TextStyle(fontSize: 14.0, color: Colors.black),
                         ),
                       );
                     },
@@ -1823,24 +1823,39 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       clipBehavior: Clip.none,
       children: [
         Positioned(
-          top: -ScreenUtil.verticalScale(4.55),
-          bottom: ScreenUtil.verticalScale(0.62),
+          top: -ScreenUtil.verticalScale(4.05),
+          bottom: 1,
           right: 0,
           left: 0,
           child: Container(
-            decoration: BoxDecoration(border: Border.all(color: AppColors.primaryColor), borderRadius: BorderRadius.circular(30)),
-            height: ScreenUtil.verticalScale(17.2),
-          ),
+              decoration: BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)),
+              child: Builder(
+                builder: (context) {
+                  final text = DateFormat.E().format(date);
+                  return Container(
+                    padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.65)),
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      text,
+                      style: TextStyle(fontSize: 14.0, color: Colors.black),
+                    ),
+                  );
+                },
+              )),
         ),
         Container(
           alignment: Alignment.center,
           padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
           margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+          ),
           child: Text(
             '${date.day}',
             style: const TextStyle(
               fontSize: 14.0,
-              color: Colors.black,
+              color: AppColors.primaryColor,
             ),
           ),
         ),
@@ -1905,7 +1920,7 @@ class StepProgressBar extends StatelessWidget {
                     ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return LinearGradient(
-                          colors: [AppColors.backOffSetColor, AppColors.primaryColor],
+                          colors: [AppColors.backOffSetColor1, AppColors.primaryColor],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ).createShader(

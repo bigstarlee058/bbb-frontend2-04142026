@@ -2734,7 +2734,6 @@
 //       if (data!.isNotEmpty) "startTime": data.first.startTime == null ? "${DateTime.now().toUtc()}" : data.first.startTime.toString()
 //     };
 //
-//     log('dataId :::::::::::::::::: $dataId');
 //
 //     final apiReqBody = {
 //       "status": status1,

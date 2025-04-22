@@ -277,6 +277,7 @@ class _MonthViewState extends State<MonthView> {
                                                             ],
                                                           ),
                                                           IconButton(
+                                                            /// COMMENT THIS SIZE-BOX AND UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
                                                             onPressed: null, icon: SizedBox(),
                                                             // icon: Icon(
                                                             //   Icons.notifications_none,

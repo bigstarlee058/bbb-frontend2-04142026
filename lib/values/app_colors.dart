@@ -6,6 +6,7 @@ class AppColors {
   static const blackColor = Colors.black;
   static const warmupColor = Color.fromRGBO(232, 246, 255, 1.0);
   static const backOffSetColor = Color.fromRGBO(254, 233, 232, 1.0);
+  static const backOffSetColor1 = Color.fromRGBO(240, 200, 198, 1.0);
   static const skipDayColor = Colors.blue;
   static List<Color> get primaryG => [primaryColor, primaryColor];
 }
