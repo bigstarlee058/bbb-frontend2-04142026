@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/program_info_model.dart';
-import '../pages/login_page.dart';
+import '../pages/AuthScreen/login_page.dart';
 import '../values/app_constants.dart';
 
 class ProgramInfoProvider extends ChangeNotifier {

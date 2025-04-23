@@ -448,8 +448,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }) {
     return Container(
       margin: EdgeInsets.only(
-        left: ScreenUtil.horizontalScale(7),
-        right: ScreenUtil.horizontalScale(7),
+        left: ScreenUtil.horizontalScale(7.5),
+        right: ScreenUtil.horizontalScale(7.5),
         bottom: ScreenUtil.verticalScale(0.8),
         top: ScreenUtil.verticalScale(3),
       ),
@@ -519,7 +519,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

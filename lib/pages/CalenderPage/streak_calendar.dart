@@ -5,7 +5,7 @@ import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 // import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
-import 'package:bbb/pages/calender.dart';
+import 'package:bbb/pages/CalenderPage/calender.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';

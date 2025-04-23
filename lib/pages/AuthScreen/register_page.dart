@@ -4,7 +4,7 @@ import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/email_verification_page.dart';
+import 'package:bbb/pages/AuthScreen/email_verification_page.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';

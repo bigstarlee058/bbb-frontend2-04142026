@@ -301,6 +301,12 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
                         /// BOTTOM CONTAINERS
 
+                        // Container(
+                        //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                        //   height: 500,
+                        //   child: CustomRadarChart(),
+                        // ),
+
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: 35),
                           child: IntrinsicHeight(

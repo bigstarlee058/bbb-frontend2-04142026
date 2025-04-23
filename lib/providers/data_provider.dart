@@ -258,7 +258,6 @@ class DataProvider extends ChangeNotifier {
   Future<void> fetchAdminEquipmentsData() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/equipments/admin/get?perPage=100000');
     String? userIdToken = await getAuthToken();
-    log('userIdToken :::::::::::::::::: $userIdToken');
     final response = await http.get(
       url,
       headers: <String, String>{

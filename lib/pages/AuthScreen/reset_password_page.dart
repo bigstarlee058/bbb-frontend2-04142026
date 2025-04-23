@@ -5,16 +5,9 @@ import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/utils/screen_util.dart';
-// import 'package:bbb/pages/email_verification_page.dart';
-// import 'package:bbb/pages/main_page.dart';
-// import 'package:bbb/pages/reset_password_page.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-// import 'package:google_fonts/google_fonts.dart';
-// import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
 import 'package:http/http.dart' as http;
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -166,18 +159,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
                   child: Column(
                     children: [
-                      const SizedBox(
-                        height: 55,
+                      SizedBox(
+                        height: ScreenUtil.verticalScale(3.2),
                       ),
-                      const Text(
+                      Text(
                         'Reset your password',
                         style: TextStyle(
-                          fontSize: 26,
+                          fontSize: ScreenUtil.verticalScale(3.32),
                           color: AppColors.primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
@@ -228,9 +219,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           }
                         },
                         isLoading: isLoading,
-                      ),
-                      const SizedBox(
-                        height: 10,
                       ),
                     ],
                   ),

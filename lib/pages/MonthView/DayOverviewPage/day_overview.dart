@@ -5,7 +5,7 @@ import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/pages/video_intro_page.dart';
+import 'package:bbb/pages/IntroScreen/video_intro_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';

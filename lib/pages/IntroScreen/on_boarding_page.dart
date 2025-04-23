@@ -1,7 +1,7 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/welcome_content_model.dart';
-import 'package:bbb/pages/login_page.dart';
+import 'package:bbb/pages/AuthScreen/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -11,7 +11,6 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
-import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
 class OnBoardingPage extends StatefulWidget {
@@ -114,20 +113,23 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     var media = MediaQuery.of(context).size;
 
     void onPressCreateAccount() async {
-      final Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/shop');
-
-      try {
-        if (await canLaunchUrl(url)) {
-          await launchUrl(
-            url,
-            mode: LaunchMode.externalApplication, // Ensures the URL opens in a browser
-          );
-        } else {
-          debugPrint('Cannot launch the URL, not supported or no suitable app found.');
-        }
-      } catch (e) {
-        debugPrint('Error launching URL: $e');
+      if (!isLoading) {
+        Navigator.pushNamed(context, AppRoutes.registerScreen);
       }
+      // final Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/shop');
+      //
+      // try {
+      //   if (await canLaunchUrl(url)) {
+      //     await launchUrl(
+      //       url,
+      //       mode: LaunchMode.externalApplication, // Ensures the URL opens in a browser
+      //     );
+      //   } else {
+      //     debugPrint('Cannot launch the URL, not supported or no suitable app found.');
+      //   }
+      // } catch (e) {
+      //   debugPrint('Error launching URL: $e');
+      // }
     }
 
     void onPressLogin() {
@@ -162,8 +164,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 ClipPath(
                   clipper: DiagonalClipper(),
                   child: Container(
-                    height: 70,
-                    width: 60,
+                    height: media.height / 9.8,
+                    width: media.width / 6,
                     decoration: const BoxDecoration(
                       color: Colors.white,
                     ),
@@ -182,11 +184,11 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: ScreenUtil.horizontalScale(8.3),
+                          height: ScreenUtil.horizontalScale(2),
                         ),
                         isLoading
                             ? SizedBox(
-                                height: media.height * .25,
+                                height: media.height * .28,
                               )
                             : TextSlider(
                                 slide: welcomeContentModel.slides,
@@ -256,15 +258,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   }
 }
 
-// Slider Text Widget
-
 class TextSlider extends StatefulWidget {
   final List<Slide> slide;
 
   const TextSlider({super.key, required this.slide});
 
   @override
-  _TextSliderState createState() => _TextSliderState();
+  State<TextSlider> createState() => _TextSliderState();
 }
 
 class _TextSliderState extends State<TextSlider> {
@@ -281,7 +281,9 @@ class _TextSliderState extends State<TextSlider> {
   Widget buildIndicator(int index) {
     bool isSelected = index == _currentIndex;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 4,
+      ),
       child: isSelected
           ? Container(
               height: 8, //ScreenUtil.horizontalScale(5),
@@ -301,50 +303,48 @@ class _TextSliderState extends State<TextSlider> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          // color:Colors.green,
-          height: ScreenUtil.horizontalScale(43.57),
-
-          ///35
-          child: PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            itemCount: widget.slide.length,
-            itemBuilder: (context, index) {
-              return Column(
-                children: [
-                  Text(
-                    widget.slide[index].title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 25,
-                      height: 1.0,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryColor,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil.horizontalScale(2),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                    child: Text(
-                      widget.slide[index].description,
+        SizedBox(
+          // color: Colors.green,
+          height: ScreenUtil.horizontalScale(44),
+          child: Center(
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemCount: widget.slide.length,
+              itemBuilder: (context, index) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      widget.slide[index].title,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        height: 1.5,
-                        color: Color(0xff6f6f6f),
+                      style: TextStyle(
+                        fontSize: ScreenUtil.verticalScale(2.6),
+                        height: 1.0,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryColor,
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Text(
+                        widget.slide[index].description,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: ScreenUtil.verticalScale(1.65),
+                          height: 1.5,
+                          color: Color(0xff6f6f6f),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
         Row(
@@ -356,8 +356,6 @@ class _TextSliderState extends State<TextSlider> {
         ),
         SizedBox(
           height: ScreenUtil.horizontalScale(3.5),
-
-          ///5/10
         ),
       ],
     );

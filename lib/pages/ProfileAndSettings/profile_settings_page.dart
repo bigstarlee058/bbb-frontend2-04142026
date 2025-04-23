@@ -100,22 +100,57 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      /// TEST PROFILE ONBOARDING SCREEN
       // floatingActionButton: Padding(
       //   padding: EdgeInsets.only(bottom: 75),
-      //   child: InkWell(
+      //   child: ElevatedButton(
+      //     style: ElevatedButton.styleFrom(
+      //       backgroundColor: AppColors.primaryColor,
+      //       shape: Utils.buttonStyle,
+      //       padding: EdgeInsets.symmetric(
+      //         vertical: ScreenUtil.verticalScale(1.7),
+      //       ),
+      //     ),
       //     child: Container(
       //       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-      //       decoration: BoxDecoration(color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
       //       child: Text(
       //         "Profile Onboarding",
       //         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       //       ),
       //     ),
-      //     onTap: () async {
+      //     onPressed: () async {
       //       await Navigator.push(
       //         context,
       //         MaterialPageRoute(
       //           builder: (context) => ProfileBoardingScreen(),
+      //         ),
+      //       );
+      //     },
+      //   ),
+      // ),
+      /// TEST VERSION AVAILABLE SCREEN
+      // floatingActionButton: Padding(
+      //   padding: EdgeInsets.only(bottom: 75),
+      //   child: ElevatedButton(
+      //     style: ElevatedButton.styleFrom(
+      //       backgroundColor: AppColors.primaryColor,
+      //       shape: Utils.buttonStyle,
+      //       padding: EdgeInsets.symmetric(
+      //         vertical: ScreenUtil.verticalScale(1.7),
+      //       ),
+      //     ),
+      //     child: Container(
+      //       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 05),
+      //       child: Text(
+      //         "New Version Available",
+      //         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      //       ),
+      //     ),
+      //     onPressed: () async {
+      //       await Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //           builder: (context) => VersionUpdateScreen(),
       //         ),
       //       );
       //     },

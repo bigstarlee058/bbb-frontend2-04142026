@@ -1,3 +1,5 @@
+import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -39,21 +41,9 @@ class AppTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottomPadding!),
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.1),
-              spreadRadius: 3,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: TextFormField(
+    return Stack(
+      children: [
+        TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
@@ -71,33 +61,33 @@ class AppTextFormField extends StatelessWidget {
             suffixIcon: suffixIcon,
             hintText: hintText,
             hintStyle: GoogleFonts.plusJakartaSans(
-              color: const Color(0xFFd9d9d9),
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
+              color: Colors.grey.shade400,
+              fontWeight: FontWeight.w500,
+              fontSize: ScreenUtil.verticalScale(1.82),
             ),
             floatingLabelBehavior: FloatingLabelBehavior.never,
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+            fillColor: Colors.grey.withValues(alpha: 0.032),
+            contentPadding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.85), horizontal: 20.0),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: Utils.buttonRadius,
             ),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: Utils.buttonRadius,
             ),
           ),
           cursorColor: Colors.black,
           cursorWidth: 0.5,
           onTapOutside: (event) => FocusScope.of(context).unfocus(),
           style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
             color: Colors.black,
-            fontSize: 16,
+            fontSize: ScreenUtil.verticalScale(1.82),
           ),
         ),
-      ),
+      ],
     );
   }
 }
