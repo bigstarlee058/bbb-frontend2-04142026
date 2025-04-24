@@ -4,7 +4,6 @@ import 'package:bbb/middleware/api/api_exception.dart';
 import 'package:bbb/middleware/api/base_service.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum APIType { aPost, aGet, aDelete, aPut }
@@ -21,7 +20,6 @@ class ApiService extends BaseService {
     try {
       String? userIdToken = await getAuthToken();
       Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
-      debugPrint('\n\n $userIdToken \n\n');
       String mainUrl = AppConstants.serverUrl + url;
 
       Response result;

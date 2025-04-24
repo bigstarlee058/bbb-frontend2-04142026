@@ -1,11 +1,19 @@
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
-import 'package:bbb/components/streak_calendar.dart';
 import 'package:bbb/firebase_options.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/pages/AuthScreen/email_verification_page.dart';
+import 'package:bbb/pages/AuthScreen/login_page.dart';
+import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
+import 'package:bbb/pages/AuthScreen/sign_up_screen.dart';
+import 'package:bbb/pages/CalenderPage/calendar_page.dart';
+import 'package:bbb/pages/CalenderPage/streak_calendar.dart';
 import 'package:bbb/pages/ChallengeView/joined_challeng_page.dart';
 import 'package:bbb/pages/CollectionView/collection_detail_page.dart';
+import 'package:bbb/pages/DashBoardScreen/join_the_challenge.dart';
+import 'package:bbb/pages/DashBoardScreen/meet_our_staff.dart';
+import 'package:bbb/pages/IntroScreen/on_boarding_page.dart';
 import 'package:bbb/pages/MonthView/DayCompletedPage/day_completed_page.dart';
 import 'package:bbb/pages/MonthView/DayOverviewPage/day_overview.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/excerise_page.dart';
@@ -25,15 +33,7 @@ import 'package:bbb/pages/Tools/recalculate_page.dart';
 import 'package:bbb/pages/Tools/seeall_achievement_page.dart';
 import 'package:bbb/pages/WatchTutorial/app_tutorial.dart';
 import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
-import 'package:bbb/pages/calendar_page.dart';
-import 'package:bbb/pages/email_verification_page.dart';
-import 'package:bbb/pages/join_the_challenge.dart';
-import 'package:bbb/pages/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
-import 'package:bbb/pages/meet_our_staff.dart';
-import 'package:bbb/pages/on_boarding_page.dart';
-import 'package:bbb/pages/register_page.dart';
-import 'package:bbb/pages/reset_password_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -217,7 +217,7 @@ class _MyAppState extends State<MyApp> {
             AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
             AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
             AppRoutes.loginScreen: (context) => const LoginPage(image: ''),
-            AppRoutes.registerScreen: (context) => const RegisterPage(),
+            AppRoutes.registerScreen: (context) => const SignupPage(image: ''),
             AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
             AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),
             AppRoutes.exerciseHistory: (context) => const ExerciseHistoryPage(),

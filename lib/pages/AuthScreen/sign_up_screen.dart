@@ -1,37 +1,26 @@
-import 'dart:convert';
-
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
-// import 'package:bbb/pages/email_verification_page.dart';
-import 'package:bbb/pages/main_page.dart';
-import 'package:bbb/pages/reset_password_page.dart';
-import 'package:bbb/providers/main_page_provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
-// import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/pages/AuthScreen/confirmation_screen.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-// import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatefulWidget {
+class SignupPage extends StatefulWidget {
   final String image;
 
-  const LoginPage({super.key, required this.image});
+  const SignupPage({super.key, required this.image});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController fNameController = TextEditingController();
+  TextEditingController lNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -40,127 +29,21 @@ class _LoginPageState extends State<LoginPage> {
 
   String image = '';
 
-  late MainPageProvider mainPageProvider;
-
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => updateImage());
+
     super.initState();
-
-    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-
-    _checkLoginStatus();
   }
 
-  Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
+  updateImage() async {
     if (widget.image == "") {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       image = prefs.getString("login_image") ?? '';
     } else {
       image = widget.image;
     }
-
     setState(() {});
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const MainPage(
-                  welcomeDescription: '',
-                  welcomeImageUrl: '',
-                )),
-      );
-    } else {
-      debugPrint("----TESTING BOTTOM INDEX IS 0");
-      try {
-        UserDataProvider userData;
-        userData = Provider.of<UserDataProvider>(
-          context,
-          listen: false,
-        );
-        mainPageProvider.changeTab(0);
-      } catch (e) {
-        debugPrint("----TESTING BOTTOM INDEX IS 0 ----Error in indexing login_page");
-      }
-    }
-  }
-
-  Future<void> _saveLoginState(bool isLoggedIn) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', isLoggedIn);
-  }
-
-  void signInUser(String emailAddress, String password) async {
-    if (emailAddress.isEmpty || password.isEmpty) {
-      showBottomAlert(context, 'Please fill out the inputs');
-      return;
-    }
-    try {
-      setState(() {
-        isLoading = true;
-      });
-
-      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
-
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: {
-          'username': emailAddress,
-          'password': password,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        await _saveLoginState(true);
-        String token = data['token'];
-
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('authToken', token);
-
-        // Fetch additional data for the welcome modal
-        final descriptionResponse = await http.get(
-          Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'),
-          headers: {"Authorization": "Bearer $token"},
-        );
-
-        if (descriptionResponse.statusCode == 200) {
-          final descriptionData = json.decode(descriptionResponse.body);
-
-          // Check if the welcome modal has been shown
-          bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-
-          // Navigate to MainPage, passing the welcome data if modal should be shown
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MainPage(
-                showWelcomeModal: !hasSeenWelcome,
-                welcomeDescription: descriptionData['description'] ?? "",
-                welcomeImageUrl: descriptionData['vimeoId'], // pass fetched description
-              ),
-            ),
-            (route) => false,
-          );
-        } else {
-          // Handle error if fetching description fails
-          showBottomAlert(context, 'Failed to load description');
-          debugPrint('this is login page ${descriptionResponse.statusCode}');
-        }
-      } else {
-        showBottomAlert(context, 'Login failed');
-      }
-    } catch (e) {
-      showBottomAlert(context, 'An error occurred');
-      debugPrint('this is login page $e');
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
   }
 
   @override
@@ -236,40 +119,78 @@ class _LoginPageState extends State<LoginPage> {
                       width: media.width,
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(70),
-                        ),
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(70)),
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(
-                              height: ScreenUtil.verticalScale(5),
+                              height: ScreenUtil.verticalScale(3.2),
                             ),
-                            const Text(
-                              'Sign in',
+                            Text(
+                              'Sign up',
                               style: TextStyle(
-                                fontSize: 26,
+                                fontSize: ScreenUtil.verticalScale(3.32),
                                 color: AppColors.primaryColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             SizedBox(
-                              height: ScreenUtil.verticalScale(1.7),
+                              height: ScreenUtil.verticalScale(3.2),
                             ),
+                            AppTextFormField(
+                              hintText: 'First Name',
+                              keyboardType: TextInputType.name,
+                              textInputAction: TextInputAction.next,
+                              onChanged: (value) {},
+                              controller: fNameController,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 15),
+                                child: IconButton(
+                                  onPressed: () {},
+                                  style: ButtonStyle(
+                                    minimumSize: WidgetStateProperty.all(
+                                      const Size(48, 48),
+                                    ),
+                                  ),
+                                  icon: Icon(
+                                    Icons.person,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            AppTextFormField(
+                              hintText: 'Last Name',
+                              keyboardType: TextInputType.name,
+                              textInputAction: TextInputAction.next,
+                              onChanged: (value) {},
+                              controller: lNameController,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 15),
+                                child: IconButton(
+                                  onPressed: () {},
+                                  style: ButtonStyle(
+                                    minimumSize: WidgetStateProperty.all(
+                                      const Size(48, 48),
+                                    ),
+                                  ),
+                                  icon: Icon(
+                                    Icons.person,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
                             AppTextFormField(
                               hintText: 'Your Email',
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               onChanged: (value) {},
-                              // validator: (value) {
-                              //   return value!.isEmpty
-                              //       ? 'Please, Enter Email Address'
-                              //       : AppConstants.emailRegex.hasMatch(value)
-                              //           ? null
-                              //           : 'Invalid Email Address';
-                              // },
                               controller: emailController,
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.only(right: 15),
@@ -280,25 +201,19 @@ class _LoginPageState extends State<LoginPage> {
                                       const Size(48, 48),
                                     ),
                                   ),
-                                  icon: const Icon(
-                                    Icons.person,
-                                    color: Color(0XFFd9d9d9),
+                                  icon: Icon(
+                                    Icons.email,
+                                    color: Colors.grey.shade400,
                                   ),
                                 ),
                               ),
                             ),
+                            SizedBox(height: 20),
                             AppTextFormField(
                               hintText: 'Your Password',
                               keyboardType: TextInputType.visiblePassword,
                               textInputAction: TextInputAction.done,
                               onChanged: (value) {},
-                              // validator: (value) {
-                              //   return value!.isEmpty
-                              //       ? 'Please, Enter Password'
-                              //       : value.length <= 5
-                              //           ? 'Password length must be greater than 6'
-                              //           : null;
-                              // },
                               controller: passwordController,
                               obscureText: isObscure,
                               suffixIcon: Padding(
@@ -316,56 +231,58 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   icon: Icon(
                                     isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                    color: const Color(0XFFd9d9d9),
+                                    color: Colors.grey.shade400,
                                   ),
                                 ),
                               ),
                             ),
                             SizedBox(
-                              height: ScreenUtil.verticalScale(0.8),
-                            ),
-                            Text.rich(TextSpan(
-                              style: const TextStyle(
-                                fontSize: 16,
-                              ),
-                              children: [
-                                TextSpan(
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xFFA51E22),
-                                  ),
-                                  text: "Forgot password?",
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (ctx) => const ResetPasswordScreen(),
-                                        ),
-                                      );
-                                    },
-                                ),
-                              ],
-                            )),
-                            SizedBox(
-                              height: ScreenUtil.horizontalScale(5.948),
+                              height: ScreenUtil.horizontalScale(9),
                             ),
                             ButtonWidget(
-                              text: 'Sign in',
+                              text: 'Sign up',
                               textColor: Colors.white,
                               color: AppColors.primaryColor,
                               onPress: () {
-                                if (_formKey.currentState?.validate() == true) {
-                                  signInUser(
-                                    emailController.text,
-                                    passwordController.text,
-                                  );
-                                }
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (ctx) => const ConfirmationScreen(image: ""),
+                                  ),
+                                );
                               },
                               isLoading: isLoading,
                             ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Already have an account?",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Color(0xff888888),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(65, 30),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      alignment: Alignment.center),
+                                  child: const Text(
+                                    'Sign in',
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
                             SizedBox(
-                              height: ScreenUtil.horizontalScale(14),
+                              height: ScreenUtil.horizontalScale(7.2),
                             ),
                           ],
                         ),

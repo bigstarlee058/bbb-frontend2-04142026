@@ -778,31 +778,48 @@ class _ExercisePageState extends State<ExercisePage> {
                       )),
       );
 
-  Widget warmupButton(BuildContext context) => isExercise == 1
-      ? const SizedBox(height: 0, width: 0)
-      : loading
-          ? const SizedBox(
-              height: 0,
-              width: 0,
-            )
-          : Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 35),
-              child: ButtonWidget(
-                text: "Mark Complete",
-                textColor: Colors.white,
-                onPress: () async {
-                  await _saveExerciseData(
-                    status: Status.completed,
-                    id: monthProvider!.warmUpModel!.id.toString(),
-                    type: "Warmup",
-                  );
+  Widget warmupButton(BuildContext context) {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider!.warmUpModel!.id.toString()}";
 
-                  Navigator.pop(context);
-                },
-                color: AppColors.primaryColor,
-                isLoading: false,
-              ),
-            );
+    return isExercise == 1
+        ? const SizedBox(height: 0, width: 0)
+        : loading
+            ? const SizedBox(
+                height: 0,
+                width: 0,
+              )
+            : Padding(
+                padding: const EdgeInsets.fromLTRB(30, 16, 30, 35),
+                child: monthProvider!.exerciseHistoryModel.any(
+                  (element) => element.dataId == dataId && element.status == Status.completed,
+                )
+                    ? ButtonWidget(
+                        text: "Completed",
+                        textColor: Colors.white,
+                        onPress: null,
+                        color: AppColors.primaryColor,
+                        isLoading: false,
+                      )
+                    : ButtonWidget(
+                        text: "Mark Complete",
+                        textColor: Colors.white,
+                        onPress: () async {
+                          await _saveExerciseData(
+                            status: Status.completed,
+                            id: monthProvider!.warmUpModel!.id.toString(),
+                            type: "Warmup",
+                          );
+
+                          Navigator.pop(context);
+                        },
+                        color: AppColors.primaryColor,
+                        isLoading: false,
+                      ),
+              );
+  }
 
   Widget mainContent(Size media) => Container(
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
