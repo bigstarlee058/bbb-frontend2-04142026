@@ -144,7 +144,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                       itemCount: dataList.length,
                       itemBuilder: (context, index) {
                         final note = dataList[index];
-                        return _buildNoteRow(DateFormat("dd-MM-yyyy").format(Utils.formattedDate(note.date.toString())), note.note!);
+                        return _buildNoteRow(DateFormat("MM-dd-yyyy").format(Utils.formattedDate(note.date.toString())), note.note!);
                       },
                     ),
                   ),

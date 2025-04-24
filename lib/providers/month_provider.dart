@@ -69,6 +69,7 @@ class MonthProvider extends ChangeNotifier {
   bool isCircuit = false;
   bool isLastExercise = false;
   bool settingLoader = false;
+  bool isOnMonthPage = false;
   DateTime selectedWeekDate = DateTime.now();
 
   String todayTitleId = "";
@@ -84,6 +85,11 @@ class MonthProvider extends ChangeNotifier {
   //   notifyListeners();
   // }
   int selectedSection = 0;
+
+  updateIsOnMonthPage(bool value) {
+    isOnMonthPage = value;
+    notifyListeners();
+  }
 
   updateSelectedSection(int index) {
     selectedSection = index;
@@ -155,8 +161,12 @@ class MonthProvider extends ChangeNotifier {
   // }
 
   fetchExerciseHistroy() async {
-    exerciseHistroy = await ApiRepo.fetchExerciseForTheExercise(selectedExercise!.exerciseId ?? "");
-    notifyListeners();
+    try {
+      exerciseHistroy = await ApiRepo.fetchExerciseForTheExercise(selectedExercise!.exerciseId ?? "");
+      notifyListeners();
+    } catch (e) {
+      debugPrint("FETCH HISTORY ISSUE $e");
+    }
   }
 
   Future<void> checkPumpDayAvail() async {
@@ -509,6 +519,9 @@ class MonthProvider extends ChangeNotifier {
       loader = false;
       notifyListeners();
     }
+
+    log('monthDataModel.id :::::::::::::::::: ${monthDataModel?.id}');
+    log('monthDataModel.id.week :::::::::::::::::: ${monthDataModel!.weeks?[0].id}');
   }
 
   Future<void> updateDayStatusList() async {
@@ -885,6 +898,9 @@ class MonthProvider extends ChangeNotifier {
   }
 
   Future fetchCurrentExercise(String id) async {
+    usedEquipments = [];
+    exerciseDetailModel = null;
+    notifyListeners();
     try {
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$id');
 
@@ -909,11 +925,10 @@ class MonthProvider extends ChangeNotifier {
   }
 
   void getExerciseFromJson(responseData) {
-    usedEquipments = [];
+    exerciseDetailModel = null;
     if (responseData != null) {
       exerciseDetailModel = ExerciseDetailModel.fromJson(responseData);
       usedEquipments.addAll(exerciseDetailModel!.usedEquipments!);
-      notifyListeners();
     }
     notifyListeners();
   }

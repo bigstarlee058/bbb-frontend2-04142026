@@ -17,7 +17,6 @@ class StepProgressBar extends StatelessWidget {
         final totalWidth = constraints.maxWidth;
         final spacing = 6;
         final stepWidth = (totalWidth - ((totalSteps - 1) * spacing)) / totalSteps;
-        final progressWidth = (progress / totalSteps) * totalWidth;
 
         return Row(
           children: List.generate(totalSteps, (index) {
@@ -46,9 +45,12 @@ class StepProgressBar extends StatelessWidget {
                           colors: [AppColors.backOffSetColor1, AppColors.primaryColor],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
-                        ).createShader(
-                          Rect.fromLTWH(-stepOffset, 0, progressWidth, 10),
-                        );
+                        ).createShader(Rect.fromLTWH(
+                          -index * (stepWidth + spacing),
+                          0,
+                          totalWidth,
+                          10,
+                        ));
                       },
                       blendMode: BlendMode.srcIn,
                       child: Container(

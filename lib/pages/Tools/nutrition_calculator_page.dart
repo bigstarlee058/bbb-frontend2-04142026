@@ -54,415 +54,438 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            Stack(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Column(
               children: [
-                Column(
+                Stack(
                   children: [
-                    Stack(
+                    Column(
                       children: [
-                        Container(
-                          height: media.height / 2,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 2.5,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      BackArrowWidget(
-                                        onPress: () {
-                                          // HapticFeedBack.buttonClick();
-                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          // mainPageProvider.changeTab(2);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(6)),
-                                        child: Consumer<UserDataProvider>(builder: (context, userData, child) {
-                                          return Text(
-                                            'Hi ${userData.userName}',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: ScreenUtil.horizontalScale(5.5),
-                                            ),
-                                          );
-                                        }),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/nutritionCalculator')
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(5),
-                                    vertical: ScreenUtil.horizontalScale(2),
-                                  ),
-                                  height: media.height * 0.2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: ScreenUtil.horizontalScale(50),
-                                        child: Text(
-                                          "Let's calculate your\nnutritional requirements",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: ScreenUtil.verticalScale(1.8),
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 4.59,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                        Stack(
+                          children: [
+                            Container(
+                              height: media.height / 2,
+                              width: media.width,
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage('assets/img/back.jpg'),
+                                  fit: BoxFit.cover,
+                                  opacity: 1,
                                 ),
                               ),
                             ),
-                          ),
+                            SizedBox(
+                              height: media.height / 2.5,
+                              width: media.width,
+                              child: SafeArea(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 10),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SafeArea(
+                                            child: SizedBox(width: ScreenUtil.horizontalScale(10)),
+                                          ),
+                                          // BackArrowWidget(
+                                          //   onPress: () {
+                                          //     // HapticFeedBack.buttonClick();
+                                          //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                          //     // mainPageProvider.changeTab(2);
+                                          //     Navigator.pop(context);
+                                          //   },
+                                          // ),
+                                          Container(
+                                            margin:
+                                                EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(6)),
+                                            child: Consumer<UserDataProvider>(builder: (context, userData, child) {
+                                              return Text(
+                                                'Hi ${userData.userName}',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.horizontalScale(5.5),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                          const CommonStreakWithNotification(routeString: '/nutritionCalculator')
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(5),
+                                        vertical: ScreenUtil.horizontalScale(2),
+                                      ),
+                                      height: media.height * 0.2,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: ScreenUtil.horizontalScale(50),
+                                            child: Text(
+                                              "Let's calculate your\nnutritional requirements",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: ScreenUtil.verticalScale(1.8),
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: media.height / 4.59,
+                              width: media.width,
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: ClipPath(
+                                  clipper: DiagonalClipper(),
+                                  child: Container(
+                                    height: media.height / 11,
+                                    width: media.width / 6,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: media.height / 4.6),
+                      child: Container(
+                        width: media.width,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: media.width,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(55),
+                                ),
+                              ),
+                              child: Container(
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(6.5),
+                                  vertical: ScreenUtil.horizontalScale(3),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(3)),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Your Age',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.horizontalScale(5),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 50),
+                                          Expanded(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: ScreenUtil.horizontalScale(1),
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Color(0x20888888),
+                                                    spreadRadius: 3,
+                                                    blurRadius: 10,
+                                                    offset: Offset(
+                                                      0,
+                                                      1,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: TextFormField(
+                                                controller: _ageController,
+                                                readOnly: true,
+                                                onTap: () => _selectDate(context),
+                                                decoration: InputDecoration(
+                                                  fillColor: Colors.white,
+                                                  enabledBorder: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(
+                                                      ScreenUtil.verticalScale(5),
+                                                    ),
+                                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                                  ),
+                                                  focusedBorder: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(
+                                                      ScreenUtil.verticalScale(5),
+                                                    ),
+                                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                                  ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(
+                                                      ScreenUtil.verticalScale(5),
+                                                    ),
+                                                    borderSide: const BorderSide(
+                                                      color: Colors.white,
+                                                      width: 2.0,
+                                                    ), // White border
+                                                  ),
+                                                  suffixIcon: Icon(
+                                                    Icons.keyboard_arrow_down,
+                                                    size: ScreenUtil.verticalScale(4),
+                                                    color: Colors.grey[400],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16.0),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Your Weight',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.horizontalScale(5),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 25),
+                                          Expanded(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Color(0x20888888),
+                                                    spreadRadius: 3,
+                                                    blurRadius: 10,
+                                                    offset: Offset(0, 1),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: DropdownButton<String>(
+                                                value: _selectedEquipment,
+                                                dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                                                icon: const Icon(Icons.keyboard_arrow_down_outlined),
+                                                iconSize: ScreenUtil.verticalScale(4),
+                                                iconEnabledColor: Colors.grey[400],
+                                                elevation: 12,
+                                                isExpanded: true,
+                                                style: const TextStyle(color: Colors.black, fontSize: 16),
+                                                underline: Container(),
+                                                onChanged: (String? newValue) {
+                                                  setState(() {
+                                                    _selectedEquipment = newValue!;
+                                                  });
+                                                },
+                                                items: <String>[
+                                                  '121lbs',
+                                                  '200lbs',
+                                                ].map<DropdownMenuItem<String>>((String value) {
+                                                  return DropdownMenuItem<String>(
+                                                    value: value,
+                                                    child: Row(
+                                                      children: [
+                                                        const SizedBox(width: 10),
+                                                        Text(
+                                                          value,
+                                                          style: const TextStyle(color: Colors.black54),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16.0),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Your Gender',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.horizontalScale(5),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 22),
+                                          Expanded(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(
+                                                  ScreenUtil.verticalScale(5),
+                                                ),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Color(0x20888888),
+                                                    spreadRadius: 3,
+                                                    blurRadius: 10,
+                                                    offset: Offset(0, 1),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: DropdownButton<String>(
+                                                value: _selectedGender,
+                                                dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                                                icon: const Icon(Icons.keyboard_arrow_down_outlined),
+                                                iconSize: ScreenUtil.verticalScale(4),
+                                                iconEnabledColor: Colors.grey[400],
+                                                elevation: 12,
+                                                isExpanded: true,
+                                                style: const TextStyle(color: Colors.black, fontSize: 16),
+                                                underline: Container(),
+                                                onChanged: (String? newValue) {
+                                                  setState(() {
+                                                    _selectedGender = newValue!;
+                                                  });
+                                                },
+                                                items: <String>[
+                                                  'Female',
+                                                  'Male',
+                                                ].map<DropdownMenuItem<String>>(
+                                                  (String value) {
+                                                    return DropdownMenuItem<String>(
+                                                      value: value,
+                                                      child: Row(
+                                                        children: [
+                                                          const SizedBox(width: 10),
+                                                          Text(
+                                                            value,
+                                                            style: const TextStyle(color: Colors.black54),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ).toList(),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: ScreenUtil.horizontalScale(7)),
+                                      DottedDashedLine(
+                                          height: 0,
+                                          width: media.width,
+                                          dashColor: Colors.grey.withValues(alpha: 0.3),
+                                          axis: Axis.horizontal),
+                                      SizedBox(height: ScreenUtil.horizontalScale(6)),
+                                      Text(
+                                        'Activity Level',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: ScreenUtil.horizontalScale(5),
+                                          color: AppColors.primaryColor,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Column(
+                                        children: <Widget>[
+                                          _buildActivityLevelTile(
+                                            title: 'Inactive: Never or rarely include physical activity in your day.',
+                                            value: 'Inactive',
+                                          ),
+                                          _buildActivityLevelTile(
+                                            title:
+                                                'Somewhat active: Include light activity or moderate activity about two to three times a week.',
+                                            value: 'Somewhat active',
+                                          ),
+                                          _buildActivityLevelTile(
+                                            title:
+                                                'Active: Include at least 30 minutes of moderate activity most days of the week, or 20 minutes of vigorous activity at least three days a week.',
+                                            value: 'Active',
+                                          ),
+                                          _buildActivityLevelTile(
+                                            title: 'Very active: Include large amounts of moderate or vigorous activity in your day.',
+                                            value: 'Very active',
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(7),
+                                      ),
+                                      DottedDashedLine(
+                                          height: 0,
+                                          width: media.width,
+                                          dashColor: Colors.grey.withValues(alpha: 0.3),
+                                          axis: Axis.horizontal),
+                                      SizedBox(
+                                        height: ScreenUtil.horizontalScale(7),
+                                      ),
+                                      ButtonWidget(
+                                          text: 'Calculate',
+                                          textColor: Colors.white,
+                                          color: AppColors.primaryColor,
+                                          onPress: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/recalculate',
+                                            );
+                                          },
+                                          isLoading: false),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 50)
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: media.height / 4.6),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(55),
-                            ),
-                          ),
-                          child: Container(
-                            margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(6.5),
-                              vertical: ScreenUtil.horizontalScale(3),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(3)),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Your Age',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryColor,
-                                          fontSize: ScreenUtil.horizontalScale(5),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 50),
-                                      Expanded(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(1),
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Color(0x20888888),
-                                                spreadRadius: 3,
-                                                blurRadius: 10,
-                                                offset: Offset(
-                                                  0,
-                                                  1,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          child: TextFormField(
-                                            controller: _ageController,
-                                            readOnly: true,
-                                            onTap: () => _selectDate(context),
-                                            decoration: InputDecoration(
-                                              fillColor: Colors.white,
-                                              enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                  ScreenUtil.verticalScale(5),
-                                                ),
-                                                borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                  ScreenUtil.verticalScale(5),
-                                                ),
-                                                borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                              ),
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                  ScreenUtil.verticalScale(5),
-                                                ),
-                                                borderSide: const BorderSide(
-                                                  color: Colors.white,
-                                                  width: 2.0,
-                                                ), // White border
-                                              ),
-                                              suffixIcon: Icon(
-                                                Icons.keyboard_arrow_down,
-                                                size: ScreenUtil.verticalScale(4),
-                                                color: Colors.grey[400],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Your Weight',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryColor,
-                                          fontSize: ScreenUtil.horizontalScale(5),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 25),
-                                      Expanded(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Color(0x20888888),
-                                                spreadRadius: 3,
-                                                blurRadius: 10,
-                                                offset: Offset(0, 1),
-                                              ),
-                                            ],
-                                          ),
-                                          child: DropdownButton<String>(
-                                            value: _selectedEquipment,
-                                            dropdownColor: const Color.fromARGB(255, 252, 252, 252),
-                                            icon: const Icon(Icons.keyboard_arrow_down_outlined),
-                                            iconSize: ScreenUtil.verticalScale(4),
-                                            iconEnabledColor: Colors.grey[400],
-                                            elevation: 12,
-                                            isExpanded: true,
-                                            style: const TextStyle(color: Colors.black, fontSize: 16),
-                                            underline: Container(),
-                                            onChanged: (String? newValue) {
-                                              setState(() {
-                                                _selectedEquipment = newValue!;
-                                              });
-                                            },
-                                            items: <String>[
-                                              '121lbs',
-                                              '200lbs',
-                                            ].map<DropdownMenuItem<String>>((String value) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Row(
-                                                  children: [
-                                                    const SizedBox(width: 10),
-                                                    Text(
-                                                      value,
-                                                      style: const TextStyle(color: Colors.black54),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Your Gender',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryColor,
-                                          fontSize: ScreenUtil.horizontalScale(5),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 22),
-                                      Expanded(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(0.1)),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              ScreenUtil.verticalScale(5),
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Color(0x20888888),
-                                                spreadRadius: 3,
-                                                blurRadius: 10,
-                                                offset: Offset(0, 1),
-                                              ),
-                                            ],
-                                          ),
-                                          child: DropdownButton<String>(
-                                            value: _selectedGender,
-                                            dropdownColor: const Color.fromARGB(255, 252, 252, 252),
-                                            icon: const Icon(Icons.keyboard_arrow_down_outlined),
-                                            iconSize: ScreenUtil.verticalScale(4),
-                                            iconEnabledColor: Colors.grey[400],
-                                            elevation: 12,
-                                            isExpanded: true,
-                                            style: const TextStyle(color: Colors.black, fontSize: 16),
-                                            underline: Container(),
-                                            onChanged: (String? newValue) {
-                                              setState(() {
-                                                _selectedGender = newValue!;
-                                              });
-                                            },
-                                            items: <String>[
-                                              'Female',
-                                              'Male',
-                                            ].map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                                return DropdownMenuItem<String>(
-                                                  value: value,
-                                                  child: Row(
-                                                    children: [
-                                                      const SizedBox(width: 10),
-                                                      Text(
-                                                        value,
-                                                        style: const TextStyle(color: Colors.black54),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-                                            ).toList(),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: ScreenUtil.horizontalScale(7)),
-                                  DottedDashedLine(
-                                      height: 0, width: media.width, dashColor: Colors.grey.withValues(alpha: 0.3), axis: Axis.horizontal),
-                                  SizedBox(height: ScreenUtil.horizontalScale(6)),
-                                  Text(
-                                    'Activity Level',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: ScreenUtil.horizontalScale(5),
-                                      color: AppColors.primaryColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Column(
-                                    children: <Widget>[
-                                      _buildActivityLevelTile(
-                                        title: 'Inactive: Never or rarely include physical activity in your day.',
-                                        value: 'Inactive',
-                                      ),
-                                      _buildActivityLevelTile(
-                                        title:
-                                            'Somewhat active: Include light activity or moderate activity about two to three times a week.',
-                                        value: 'Somewhat active',
-                                      ),
-                                      _buildActivityLevelTile(
-                                        title:
-                                            'Active: Include at least 30 minutes of moderate activity most days of the week, or 20 minutes of vigorous activity at least three days a week.',
-                                        value: 'Active',
-                                      ),
-                                      _buildActivityLevelTile(
-                                        title: 'Very active: Include large amounts of moderate or vigorous activity in your day.',
-                                        value: 'Very active',
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(7),
-                                  ),
-                                  DottedDashedLine(
-                                      height: 0, width: media.width, dashColor: Colors.grey.withValues(alpha: 0.3), axis: Axis.horizontal),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(7),
-                                  ),
-                                  ButtonWidget(
-                                      text: 'Calculate',
-                                      textColor: Colors.white,
-                                      color: AppColors.primaryColor,
-                                      onPress: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/recalculate',
-                                        );
-                                      },
-                                      isLoading: false),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 50)
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 0,
+            top: 4,
+            child: BackArrowWidget(
+              onPress: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

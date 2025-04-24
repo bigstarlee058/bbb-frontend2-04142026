@@ -241,6 +241,7 @@ class _MainPageState extends State<MainPage> {
                         ? () {
                             HapticFeedBack.buttonClick();
                             mainPageProvider.changeTab(1);
+                            monthProvider.updateIsOnMonthPage(true);
                           }
                         : null,
                     icon: Consumer<UserDataProvider>(

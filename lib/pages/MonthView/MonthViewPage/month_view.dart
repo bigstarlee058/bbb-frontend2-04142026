@@ -56,14 +56,13 @@ class _MonthViewState extends State<MonthView> {
         });
       }
     });
-
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";
         monthProvider?.monthLocalDataModel.sort((a, b) =>
             DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
         bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
-        if (!alreadySetUp) {
+        if (!alreadySetUp && monthProvider!.isOnMonthPage) {
           openSettingDialog();
         }
       },
@@ -82,6 +81,7 @@ class _MonthViewState extends State<MonthView> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         monthProvider?.updateSelectedSection(0);
+        monthProvider?.updateIsOnMonthPage(false);
       },
     );
     super.dispose();
@@ -619,6 +619,7 @@ class _MonthViewState extends State<MonthView> {
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && !isCompletedOrSkipped!) {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
+      monthProvider?.updateIsOnMonthPage(false);
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

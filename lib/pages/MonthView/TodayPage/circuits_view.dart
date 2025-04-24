@@ -27,9 +27,13 @@ class CircuitsView extends StatefulWidget {
 
 class _CircuitsViewState extends State<CircuitsView> {
   MonthProvider? monthProvider;
+
+  List<PageController> pageController = [];
+
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    pageController = List.generate(widget.circuit.length, (index) => PageController());
     initData();
     super.initState();
   }
@@ -94,54 +98,66 @@ class _CircuitsViewState extends State<CircuitsView> {
                           children: List.generate(
                             widget.circuit[circuitsIndex].round!,
                             (index) {
-                              return Container(
-                                height: ScreenUtil.verticalScale(4),
-                                width: ScreenUtil.verticalScale(4),
-                                margin: const EdgeInsets.only(left: 10),
-                                decoration: BoxDecoration(
-                                  color: monthProvider.dayHistoryModel.any((element) =>
-                                              element.dataId == dayDtaId &&
-                                              (element.status == Status.completed || element.status == Status.skipped)) ||
-                                          monthProvider.isPastWeek
-                                      ? AppColors.primaryColor
-                                      : data == null
-                                          ? Colors.transparent
-                                          : ((data.lastRound ?? 1) - 1) > index
-                                              ? AppColors.primaryColor
-                                              : Colors.transparent,
-                                  border: Border.all(
-                                      color:
-                                          widget.circuit[circuitsIndex].selectedDot != index ? Colors.transparent : AppColors.primaryColor),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: data == null
-                                      ? Text(
-                                          "${index + 1}",
-                                          style: TextStyle(
-                                            fontSize: ScreenUtil.horizontalScale(3),
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryColor,
-                                          ),
-                                        )
-                                      : (((data.lastRound ?? 1) - 1) > index) ||
-                                              monthProvider.dayHistoryModel.any((element) =>
-                                                  element.dataId == dayDtaId &&
-                                                  (element.status == Status.completed || element.status == Status.skipped)) ||
-                                              monthProvider.isPastWeek
-                                          ? Icon(
-                                              Icons.check,
-                                              color: Colors.white,
-                                              size: ScreenUtil.verticalScale(2.5),
-                                            )
-                                          : Text(
-                                              "${index + 1}",
-                                              style: TextStyle(
-                                                fontSize: ScreenUtil.horizontalScale(3),
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.primaryColor,
-                                              ),
+                              return GestureDetector(
+                                onTap: () {
+                                  widget.circuit[circuitsIndex].selectedDot = index;
+                                  pageController[circuitsIndex].animateToPage(
+                                    index,
+                                    duration: Duration(milliseconds: 500),
+                                    curve: Curves.easeInOut,
+                                  );
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  height: ScreenUtil.verticalScale(4),
+                                  width: ScreenUtil.verticalScale(4),
+                                  margin: const EdgeInsets.only(left: 10),
+                                  decoration: BoxDecoration(
+                                    color: monthProvider.dayHistoryModel.any((element) =>
+                                                element.dataId == dayDtaId &&
+                                                (element.status == Status.completed || element.status == Status.skipped)) ||
+                                            monthProvider.isPastWeek
+                                        ? AppColors.primaryColor
+                                        : data == null
+                                            ? Colors.transparent
+                                            : ((data.lastRound ?? 1) - 1) > index
+                                                ? AppColors.primaryColor
+                                                : Colors.transparent,
+                                    border: Border.all(
+                                        color: widget.circuit[circuitsIndex].selectedDot != index
+                                            ? Colors.transparent
+                                            : AppColors.primaryColor),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: data == null
+                                        ? Text(
+                                            "${index + 1}",
+                                            style: TextStyle(
+                                              fontSize: ScreenUtil.horizontalScale(3),
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryColor,
                                             ),
+                                          )
+                                        : (((data.lastRound ?? 1) - 1) > index) ||
+                                                monthProvider.dayHistoryModel.any((element) =>
+                                                    element.dataId == dayDtaId &&
+                                                    (element.status == Status.completed || element.status == Status.skipped)) ||
+                                                monthProvider.isPastWeek
+                                            ? Icon(
+                                                Icons.check,
+                                                color: Colors.white,
+                                                size: ScreenUtil.verticalScale(2.5),
+                                              )
+                                            : Text(
+                                                "${index + 1}",
+                                                style: TextStyle(
+                                                  fontSize: ScreenUtil.horizontalScale(3),
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.primaryColor,
+                                                ),
+                                              ),
+                                  ),
                                 ),
                               );
                             },
@@ -184,6 +200,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                           },
 
                           ///round builder
+                          pageController: pageController[circuitsIndex],
                           children: List.generate(
                             widget.circuit[circuitsIndex].round!,
                             (roundIndex) {
@@ -368,11 +385,13 @@ class _CircuitsViewState extends State<CircuitsView> {
 class ExpandablePageView extends StatefulWidget {
   final List<Widget> children;
   final Function(int value) onPageChanged;
+  final PageController pageController;
 
   const ExpandablePageView({
     super.key,
     required this.children,
     required this.onPageChanged,
+    required this.pageController,
   });
 
   @override
@@ -380,19 +399,18 @@ class ExpandablePageView extends StatefulWidget {
 }
 
 class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProviderStateMixin {
-  late PageController _pageController;
   late List<double> _heights;
   int _currentPage = 0;
-
+  PageController? _pageController;
   double get _currentHeight => _heights[_currentPage];
 
   @override
   void initState() {
     _heights = widget.children.map((e) => 0.0).toList();
     super.initState();
-    _pageController = PageController()
+    _pageController = widget.pageController
       ..addListener(() {
-        final newPage = _pageController.page?.round() ?? 0;
+        final newPage = _pageController?.page?.round() ?? 0;
         if (_currentPage != newPage) {
           setState(() => _currentPage = newPage);
           widget.onPageChanged(_currentPage);
@@ -402,7 +420,7 @@ class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProv
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pageController?.dispose();
     super.dispose();
   }
 

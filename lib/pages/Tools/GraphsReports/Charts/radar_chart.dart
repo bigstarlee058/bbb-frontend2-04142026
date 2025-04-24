@@ -14,7 +14,7 @@ class CustomRadarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadarChart(
+    return FileRadarChart(
       ticks: const [0, 50, 100, 150, 200, 250, 300, 350, 400],
       features: features,
       data: data,

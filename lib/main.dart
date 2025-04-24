@@ -40,6 +40,7 @@ import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -211,6 +212,13 @@ class _MyAppState extends State<MyApp> {
           locale: !kReleaseMode ? DevicePreview.locale(context) : null,
           builder: !kReleaseMode ? DevicePreview.appBuilder : null,
           title: 'Booty by Bret',
+          theme: ThemeData(
+            primaryColor: AppColors.primaryColor,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.transparent),
+          ),
           debugShowCheckedModeBanner: false,
           initialRoute: AppRoutes.onBoardingScreen,
           routes: {

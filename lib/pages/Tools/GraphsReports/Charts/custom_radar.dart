@@ -10,7 +10,7 @@ const defaultGraphColors = [
   Colors.orange,
 ];
 
-class RadarChart extends StatefulWidget {
+class FileRadarChart extends StatefulWidget {
   final List<int> ticks;
   final List<String> features;
   final List<List<num>> data;
@@ -22,7 +22,7 @@ class RadarChart extends StatefulWidget {
   final List<Color> graphColors;
   final int sides;
 
-  const RadarChart({
+  const FileRadarChart({
     super.key,
     required this.ticks,
     required this.features,
@@ -36,24 +36,24 @@ class RadarChart extends StatefulWidget {
     this.sides = 0,
   });
 
-  factory RadarChart.light({
+  factory FileRadarChart.light({
     required List<int> ticks,
     required List<String> features,
     required List<List<num>> data,
     bool reverseAxis = false,
     bool useSides = false,
   }) {
-    return RadarChart(ticks: ticks, features: features, data: data, reverseAxis: reverseAxis, sides: useSides ? features.length : 0);
+    return FileRadarChart(ticks: ticks, features: features, data: data, reverseAxis: reverseAxis, sides: useSides ? features.length : 0);
   }
 
-  factory RadarChart.dark({
+  factory FileRadarChart.dark({
     required List<int> ticks,
     required List<String> features,
     required List<List<num>> data,
     bool reverseAxis = false,
     bool useSides = false,
   }) {
-    return RadarChart(
+    return FileRadarChart(
         ticks: ticks,
         features: features,
         data: data,
@@ -65,10 +65,10 @@ class RadarChart extends StatefulWidget {
   }
 
   @override
-  _RadarChartState createState() => _RadarChartState();
+  State<FileRadarChart> createState() => _FileRadarChartState();
 }
 
-class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateMixin {
+class _FileRadarChartState extends State<FileRadarChart> with SingleTickerProviderStateMixin {
   double fraction = 0;
   late Animation<double> animation;
   late AnimationController animationController;
@@ -94,7 +94,7 @@ class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateM
   }
 
   @override
-  void didUpdateWidget(RadarChart oldWidget) {
+  void didUpdateWidget(FileRadarChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     animationController.reset();
     animationController.forward();
@@ -137,7 +137,7 @@ class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateM
           },
           child: CustomPaint(
             size: Size(double.infinity, double.infinity),
-            painter: RadarChartPainter(
+            painter: FileRadarChartPainter(
               widget.ticks,
               widget.features,
               widget.data,
@@ -179,7 +179,7 @@ class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateM
   }
 }
 
-class RadarChartPainter extends CustomPainter {
+class FileRadarChartPainter extends CustomPainter {
   final List<int> ticks;
   final List<String> features;
   final List<List<num>> data;
@@ -192,7 +192,7 @@ class RadarChartPainter extends CustomPainter {
   final int sides;
   final double fraction;
 
-  RadarChartPainter(
+  FileRadarChartPainter(
     this.ticks,
     this.features,
     this.data,
@@ -396,7 +396,7 @@ class RadarChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(RadarChartPainter oldDelegate) {
+  bool shouldRepaint(FileRadarChartPainter oldDelegate) {
     return oldDelegate.fraction != fraction;
   }
 }

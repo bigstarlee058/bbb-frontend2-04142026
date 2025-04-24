@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -162,29 +163,51 @@ class CustomSlideActionState extends State<CustomSlideAction> with TickerProvide
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 6),
-                                  child: Material(
-                                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                                    color: widget.innerColor ?? Theme.of(context).primaryIconTheme.color,
-                                    child: Container(
-                                      padding: EdgeInsets.all(
-                                          _progress > 0.85 ? widget.submitButtonIconPadding : widget.sliderButtonIconPadding),
-                                      child: Builder(
-                                        builder: (context) {
-                                          return _progress > 0.85
-                                              ? widget.submittedButtonIcon ??
-                                                  Icon(
-                                                    Icons.done,
-                                                    color: widget.innerColor ?? Theme.of(context).primaryIconTheme.color,
-                                                  )
-                                              : Center(
-                                                  child: widget.sliderButtonIcon ??
-                                                      Icon(
-                                                        Icons.arrow_forward,
-                                                        size: widget.sliderButtonIconSize,
-                                                        color: widget.outerColor ?? Theme.of(context).colorScheme.secondary,
-                                                      ),
-                                                );
-                                        },
+                                  child: Container(
+                                    width: ScreenUtil.verticalScale(6),
+                                    height: ScreenUtil.verticalScale(6),
+                                    child: Material(
+                                      borderRadius: BorderRadius.circular(widget.borderRadius),
+                                      color: widget.innerColor ?? Theme.of(context).primaryIconTheme.color,
+                                      child: Container(
+                                        padding: EdgeInsets.all(
+                                            _progress > 0.85 ? widget.submitButtonIconPadding : widget.sliderButtonIconPadding),
+                                        child: Builder(
+                                          builder: (context) {
+                                            return Center(
+                                              child: AnimatedSwitcher(
+                                                duration: const Duration(milliseconds: 500),
+                                                transitionBuilder: (child, animation) {
+                                                  return FadeTransition(
+                                                    opacity: animation,
+                                                    child: ScaleTransition(
+                                                      scale: animation,
+                                                      child: child,
+                                                    ),
+                                                  );
+                                                },
+                                                child:
+                                                    _progress > 0.85 ? widget.submittedButtonIcon : Center(child: widget.sliderButtonIcon),
+                                              ),
+                                            )
+
+                                                /*_progress > 0.85
+                                                ? widget.submittedButtonIcon ??
+                                                    Icon(
+                                                      Icons.done,
+                                                      color: widget.innerColor ?? Theme.of(context).primaryIconTheme.color,
+                                                    )
+                                                : Center(
+                                                    child: widget.sliderButtonIcon ??
+                                                        Icon(
+                                                          Icons.arrow_forward,
+                                                          size: widget.sliderButtonIconSize,
+                                                          color: widget.outerColor ?? Theme.of(context).colorScheme.secondary,
+                                                        ),
+                                                  )*/
+                                                ;
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ),

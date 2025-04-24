@@ -73,7 +73,7 @@ class ShareAchievementDialog extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        DateFormat('dd/MM/yyyy hh:mm a').format(Utils.formattedDate(time)),
+                        DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(time)),
                         maxLines: 1,
                         textAlign: TextAlign.center,
                         overflow: TextOverflow.ellipsis,
@@ -124,7 +124,7 @@ class ShareAchievementDialog extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          DateFormat('dd/MM/yyyy hh:mm a').format(Utils.formattedDate(time)),
+                          DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(time)),
                           maxLines: 1,
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
