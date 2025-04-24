@@ -735,6 +735,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && !isCompletedOrSkipped) {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
+      monthProvider.updateIsOnMonthPage(false);
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

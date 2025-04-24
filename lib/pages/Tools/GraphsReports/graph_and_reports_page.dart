@@ -12,13 +12,11 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
-// import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../utils/screen_util.dart';
 
 class GraphAndReportsPage extends StatefulWidget {
   const GraphAndReportsPage({super.key});
@@ -685,6 +683,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && !isCompletedOrSkipped) {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
+      monthProvider.updateIsOnMonthPage(false);
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

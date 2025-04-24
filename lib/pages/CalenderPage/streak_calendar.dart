@@ -40,10 +40,6 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     ScreenUtil.init(context);
 
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => monthProvider?.manageStreak(),
-      // ),
-      // backgroundColor: const Color.fromARGB(255, 52, 11, 11),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -176,6 +172,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                   ),
                 ),
                 Positioned(
+                  left: 0,
+                  right: 0,
                   bottom: 0,
                   child: Column(
                     children: [
@@ -296,6 +294,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                       ),
                       IconButton(
                         onPressed: () {
+                          monthProvider?.updateIsOnMonthPage(true);
                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                           value.changeTab(1);
                         },
@@ -435,6 +434,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && !isCompletedOrSkipped) {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
+      monthProvider.updateIsOnMonthPage(false);
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

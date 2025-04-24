@@ -540,7 +540,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               isLoading: false,
                                                             )
                                                           : ButtonWidget(
-                                                              text: status == Status.started ? 'Continue Your Workout' : 'Start Workout',
+                                                              text:
+                                                                  status == Status.started ? 'Continue Your Workout' : 'Start Your Workout',
                                                               textColor: AppColors.primaryColor,
                                                               color: status == Status.completed || status == Status.skipped
                                                                   ? Colors.white70
@@ -772,6 +773,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Expanded(
                                       child: ElevatedButton(
                                         onPressed: () {
+                                          monthProvider.updateIsOnMonthPage(true);
                                           HapticFeedBack.buttonClick();
                                           mainPageProvider.changeTab(1);
                                         },
@@ -794,6 +796,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Expanded(
                                       child: ElevatedButton(
                                         onPressed: () {
+                                          monthProvider.updateIsOnMonthPage(true);
                                           HapticFeedBack.buttonClick();
                                           monthProvider.updateSelectedSection(2);
                                           mainPageProvider.changeTab(1);
@@ -1332,6 +1335,7 @@ class _DashboardPageState extends State<DashboardPage> {
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && !isCompletedOrSkipped) {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
+      monthProvider.updateIsOnMonthPage(false);
 
       // showDialog(
       //   barrierDismissible: false,

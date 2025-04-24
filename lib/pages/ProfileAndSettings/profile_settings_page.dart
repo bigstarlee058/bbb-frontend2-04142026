@@ -184,38 +184,27 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        height: 15,
-                                        width: media.width / 5,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                          top: ScreenUtil.verticalScale(1),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Profile',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: "setting")
-                                    ],
+                                AppBar(
+                                  backgroundColor: Colors.transparent,
+                                  leading: SizedBox(),
+                                  centerTitle: true,
+                                  title: Text(
+                                    'Profile',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.verticalScale(2.5),
+                                    ),
                                   ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: "setting"),
+                                    )
+                                  ],
                                 ),
                                 Container(
+                                  // color: Colors.red,
+                                  height: media.height / 2.91,
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(10),
                                   ),
@@ -223,7 +212,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(4),
+                                        height: ScreenUtil.verticalScale(1.5),
                                       ),
                                       GestureDetector(
                                         onTap: _pickAndUploadImage,
@@ -263,7 +252,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(3),
+                                        height: ScreenUtil.verticalScale(1),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -280,7 +269,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             : const SizedBox(),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(0.7),
+                                        height: ScreenUtil.verticalScale(0.5),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -295,9 +284,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                               )
                                             : const SizedBox(),
                                       ),
-                                      SizedBox(
-                                        height: ScreenUtil.horizontalScale(9),
-                                      ),
+                                      Spacer(),
                                       Padding(
                                         padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
                                         child: Row(
@@ -445,7 +432,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             ),
                                           ],
                                         ),
-                                      )
+                                      ),
+                                      Spacer(),
                                     ],
                                   ),
                                 ),
@@ -453,7 +441,97 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                      ],
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    top: media.height / 2.25,
+                    bottom: ScreenUtil.verticalScale(10),
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: media.width,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(7),
+                                vertical: ScreenUtil.verticalScale(2.5),
+                              ),
+                              child: Column(
+                                children: [
+                                  settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
+                                      () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(4.5),
+                                  ),
+
+                                  settingsButton('My Profile', Icons.person, () => Navigator.pushNamed(context, '/myprofile')),
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(4.5),
+                                  ),
+                                  settingsButton('Settings', Icons.settings, () => Navigator.pushNamed(context, '/SettingPage')),
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(4.5),
+                                  ),
+                                  settingsButton('Subscription', Icons.refresh, () async {
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    String? token = prefs.getString('authToken');
+
+                                    Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/?token=$token');
+
+                                    if (await canLaunchUrl(url)) {
+                                      await launchUrl(url);
+                                    } else {
+                                      throw 'Could not launch $url';
+                                    }
+                                  }),
+
+                                  /// IF PUT BACK LANGUAGE SELECTION PART UNCOMMENT THIS
+
+                                  // SizedBox(height: ScreenUtil.horizontalScale(4.5)),
+                                  // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(4.5),
+                                  ),
+                                  settingsButton('Support', Icons.handshake, () {
+                                    toSupportPage();
+                                  }),
+                                  // SizedBox(
+                                  //   height: ScreenUtil.horizontalScale(4.5),
+                                  // ),
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(4.5),
+                                  ),
+                                  settingsButton('Legal', Icons.description, () => {}),
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(4.5),
+                                  ),
+                                  settingsButton('Log Out', Icons.logout, () {
+                                    _handleLogout(context);
+                                  }),
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        top: -(media.height / 2.25),
+                        child: SizedBox(
                           height: media.height / 2.25,
                           width: media.width,
                           child: Align(
@@ -470,90 +548,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(
-                    top: media.height / 2.25,
-                    bottom: ScreenUtil.verticalScale(10),
-                  ),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
                       ),
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(7),
-                            vertical: ScreenUtil.verticalScale(2.5),
-                          ),
-                          child: Column(
-                            children: [
-                              settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
-                                  () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(4.5),
-                              ),
-
-                              settingsButton('My Profile', Icons.person, () => Navigator.pushNamed(context, '/myprofile')),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(4.5),
-                              ),
-                              settingsButton('Settings', Icons.settings, () => Navigator.pushNamed(context, '/SettingPage')),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(4.5),
-                              ),
-                              settingsButton('Subscription', Icons.refresh, () async {
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                String? token = prefs.getString('authToken');
-
-                                Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/?token=$token');
-
-                                if (await canLaunchUrl(url)) {
-                                  await launchUrl(url);
-                                } else {
-                                  throw 'Could not launch $url';
-                                }
-                              }),
-
-                              /// IF PUT BACK LANGUAGE SELECTION PART UNCOMMENT THIS
-
-                              // SizedBox(height: ScreenUtil.horizontalScale(4.5)),
-                              // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(4.5),
-                              ),
-                              settingsButton('Support', Icons.handshake, () {
-                                toSupportPage();
-                              }),
-                              // SizedBox(
-                              //   height: ScreenUtil.horizontalScale(4.5),
-                              // ),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(4.5),
-                              ),
-                              settingsButton('Legal', Icons.description, () => {}),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(4.5),
-                              ),
-                              settingsButton('Log Out', Icons.logout, () {
-                                _handleLogout(context);
-                              }),
-                              SizedBox(
-                                height: ScreenUtil.horizontalScale(5),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ],

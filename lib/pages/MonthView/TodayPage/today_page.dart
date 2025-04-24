@@ -707,15 +707,15 @@ class _TodayPageState extends State<TodayPage> {
                                                           innerColor: AppColors.backOffSetColor,
                                                           sliderButtonIconPadding: ScreenUtil.verticalScale(1.3),
                                                           submitButtonIconPadding: ScreenUtil.verticalScale(1.8),
-                                                          sliderButtonIcon: Icon(
-                                                            Icons.keyboard_arrow_right_outlined,
+                                                          sliderButtonIcon: Image.asset(
+                                                            "assets/icons/chevron.png",
                                                             color: AppColors.primaryColor,
-                                                            size: ScreenUtil.verticalScale(3.5),
+                                                            height: ScreenUtil.verticalScale(2),
                                                           ),
-                                                          submittedButtonIcon: Icon(
-                                                            Icons.done,
+                                                          submittedButtonIcon: Image.asset(
+                                                            "assets/icons/check.png",
                                                             color: AppColors.primaryColor,
-                                                            size: ScreenUtil.verticalScale(2.5),
+                                                            height: ScreenUtil.verticalScale(2),
                                                           ),
                                                           onSubmit: () async {
                                                             return await onSwipe(value).then(
@@ -987,19 +987,19 @@ class _TodayPageState extends State<TodayPage> {
                       Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
                     },
                     style: ElevatedButton.styleFrom(
-                        disabledBackgroundColor: const Color(0xFFF3F3F3),
-                        backgroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(ScreenUtil.verticalScale(12)),
-                          ),
-                          side: const BorderSide(
-                            color: Color(0x12000000),
-                            width: 0.5,
-                          ),
+                      disabledBackgroundColor: const Color(0xFFF3F3F3),
+                      backgroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(ScreenUtil.verticalScale(12)),
                         ),
-                        padding: EdgeInsets.zero),
+                        side: const BorderSide(color: Color(0x12000000), width: 0.5),
+                      ),
+                      surfaceTintColor: Colors.transparent,
+                      overlayColor: Colors.grey.shade400,
+                      padding: EdgeInsets.zero,
+                    ),
                     child: Container(
                       width: media.width,
                       padding: EdgeInsets.only(right: ScreenUtil.verticalScale(2)),
@@ -2366,6 +2366,7 @@ class _TodayPageState extends State<TodayPage> {
                   ),
                   IconButton(
                     onPressed: () {
+                      monthProvider?.updateIsOnMonthPage(true);
                       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                       value.changeTab(1);
                     },
@@ -2446,89 +2447,4 @@ class SearchEquipmentField extends StatelessWidget {
       ),
     );
   }
-
-  Widget bottomBar() => Positioned(
-        bottom: 0,
-        left: 0,
-        right: 0,
-        child: Container(
-          margin: EdgeInsets.symmetric(
-            horizontal: ScreenUtil.horizontalScale(15),
-            vertical: ScreenUtil.verticalScale(2),
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: ScreenUtil.verticalScale(1),
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                spreadRadius: 1,
-                blurRadius: 6,
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0),
-            child: Consumer<MainPageProvider>(builder: (context, value, child) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                      value.changeTab(0);
-                    },
-                    icon: SvgPicture.asset(
-                      'assets/img/1-home.svg',
-                      colorFilter: ColorFilter.mode(value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                      width: ScreenUtil.horizontalScale(8.5),
-                      height: ScreenUtil.horizontalScale(8.5),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                      value.changeTab(1);
-                    },
-                    icon: SvgPicture.asset(
-                      'assets/img/2-calendar.svg',
-                      colorFilter: ColorFilter.mode(value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                      width: ScreenUtil.horizontalScale(8.5),
-                      height: ScreenUtil.horizontalScale(8.5),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                      value.changeTab(2);
-                    },
-                    icon: SvgPicture.asset(
-                      'assets/img/3-statistics.svg',
-                      colorFilter: ColorFilter.mode(value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                      width: ScreenUtil.horizontalScale(8.5),
-                      height: ScreenUtil.horizontalScale(8.5),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                      value.changeTab(3);
-                    },
-                    icon: SvgPicture.asset(
-                      'assets/img/4-account.svg',
-                      colorFilter: ColorFilter.mode(value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
-                      width: ScreenUtil.horizontalScale(9),
-                      height: ScreenUtil.horizontalScale(9),
-                    ),
-                  ),
-                ],
-              );
-            }),
-          ),
-        ),
-      );
 }
