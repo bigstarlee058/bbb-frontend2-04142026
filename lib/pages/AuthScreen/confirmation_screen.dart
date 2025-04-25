@@ -89,28 +89,31 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             ],
           ),
           Positioned(
-              bottom: -1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ClipPath(
-                    clipper: DiagonalClipper(),
-                    child: Container(
-                      height: media.height / 9.8,
-                      width: media.width / 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+              bottom: -1.3,
+              child: Container(
+                width: media.width,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(ScreenUtil.verticalScale(8))),
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      right: 0,
+                      top: -(media.height / 9.8) + 0.3,
+                      child: ClipPath(
+                        clipper: DiagonalClipper(),
+                        child: Container(
+                          height: media.height / 9.8,
+                          width: media.width / 6,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    width: media.width,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(70)),
-                    ),
-                    child: Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +155,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             child: ButtonWidget(
                               text: "Back to Login",
                               textColor: Colors.white,
-                              onPress: () {},
+                              onPress: () {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
                               color: AppColors.primaryColor,
                               isLoading: false,
                             ),
@@ -163,8 +169,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         ],
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ))
         ],
       ),

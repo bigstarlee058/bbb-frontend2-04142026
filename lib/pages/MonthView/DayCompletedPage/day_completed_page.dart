@@ -228,7 +228,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                  topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                 ),
               ),
               child: Container(

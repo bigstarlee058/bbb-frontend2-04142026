@@ -156,8 +156,8 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                       margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
                       decoration: const BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
                       child: SizedBox(
-                        width: ScreenUtil.horizontalScale(10),
-                        height: ScreenUtil.horizontalScale(10),
+                        width: ScreenUtil.verticalScale(4.65),
+                        height: ScreenUtil.verticalScale(4.65),
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           icon: Icon(

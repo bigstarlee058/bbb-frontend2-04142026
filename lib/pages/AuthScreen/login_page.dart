@@ -220,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
             Positioned(
-                bottom: -1,
+                bottom: -0.7,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -237,10 +237,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     Container(
                       width: media.width,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(70),
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                         ),
                       ),
                       child: Padding(

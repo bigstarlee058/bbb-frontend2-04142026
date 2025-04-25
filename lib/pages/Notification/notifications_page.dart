@@ -177,8 +177,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                               shape: BoxShape.circle,
                                             ),
                                             child: SizedBox(
-                                              width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                              height: ScreenUtil.horizontalScale(10),
+                                              width: ScreenUtil.verticalScale(4.65),
+                                              height: ScreenUtil.verticalScale(4.65),
                                               child: IconButton(
                                                 padding: EdgeInsets.zero, // Removes the default padding
                                                 icon: const Icon(
@@ -244,7 +244,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
                           ),
                           child: Container(
@@ -272,7 +272,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
                           ),
                           child: Container(

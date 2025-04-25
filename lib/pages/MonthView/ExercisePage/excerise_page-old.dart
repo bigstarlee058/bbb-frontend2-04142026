@@ -598,8 +598,8 @@ class _ExercisePageState extends State<ExercisePage> {
                                               shape: BoxShape.circle,
                                             ),
                                             child: SizedBox(
-                                              width: ScreenUtil.horizontalScale(10),
-                                              height: ScreenUtil.horizontalScale(10),
+                                              width: ScreenUtil.verticalScale(4.65),
+                                              height: ScreenUtil.verticalScale(4.65),
                                               child: IconButton(
                                                 padding: EdgeInsets.zero,
                                                 icon: const Icon(
@@ -773,10 +773,10 @@ class _ExercisePageState extends State<ExercisePage> {
                           key: _containerKey,
                           height: media.height * 0.12,
                           width: media.width,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(70),
+                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
                           ),
                           child: Column(

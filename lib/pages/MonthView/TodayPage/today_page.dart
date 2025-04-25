@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bbb/components/animated_dialog.dart';
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
@@ -307,6 +308,12 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   @override
+  void dispose() {
+    monthProvider?.clearWarmupModel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
@@ -345,37 +352,47 @@ class _TodayPageState extends State<TodayPage> {
                                   child: SafeArea(
                                     child: Column(
                                       children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(right: 10),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Stack(
-                                                children: [
-                                                  Container(
-                                                    margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
-                                                    decoration: const BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
-                                                    child: SizedBox(
-                                                      width: ScreenUtil.horizontalScale(10),
-                                                      height: ScreenUtil.horizontalScale(10),
-                                                      child: IconButton(
-                                                        padding: EdgeInsets.zero,
-                                                        icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
-                                                        onPressed: () {
-                                                          // HapticFeedBack.buttonClick();
-                                                          Navigator.pop(context);
-                                                          // Navigator.pushNamed(context, '/dayOverview');
-                                                        },
-                                                        iconSize: ScreenUtil.verticalScale(4),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const CommonStreakWithNotification(routeString: "today")
-                                            ],
+                                        AppBar(
+                                          toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                          backgroundColor: Colors.transparent,
+                                          leading: BackArrowWidget(
+                                            onPress: () {
+                                              Navigator.pop(context);
+                                            },
                                           ),
+                                          actions: [
+                                            Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: const CommonStreakWithNotification(routeString: "today"))
+                                          ],
                                         ),
+                                        // Container(
+                                        //   margin: const EdgeInsets.only(right: 10),
+                                        //   child: Row(
+                                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        //     children: [
+                                        //       Container(
+                                        //         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
+                                        //         decoration: const BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                        //         child: SizedBox(
+                                        //           width: ScreenUtil.verticalScale(4.65),
+                                        //           height: ScreenUtil.verticalScale(4.65),
+                                        //           child: IconButton(
+                                        //             padding: EdgeInsets.zero,
+                                        //             icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                                        //             onPressed: () {
+                                        //               // HapticFeedBack.buttonClick();
+                                        //               Navigator.pop(context);
+                                        //               // Navigator.pushNamed(context, '/dayOverview');
+                                        //             },
+                                        //             iconSize: ScreenUtil.verticalScale(4),
+                                        //           ),
+                                        //         ),
+                                        //       ),
+                                        //       const CommonStreakWithNotification(routeString: "today")
+                                        //     ],
+                                        //   ),
+                                        // ),
                                         Container(
                                           margin: EdgeInsets.symmetric(
                                             horizontal: ScreenUtil.horizontalScale(5),
@@ -437,7 +454,31 @@ class _TodayPageState extends State<TodayPage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          width: media.width,
+                          margin: EdgeInsets.only(
+                            top: media.height / 4,
+                            bottom: ScreenUtil.verticalScale(2),
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                            ),
+                          ),
+
+                          /// NICK SUGGESTION REMOVE CONTAINER
+
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Positioned(
+                                top: -media.height / 4,
+                                child: SizedBox(
                                   height: media.height / 4,
                                   width: media.width,
                                   child: Align(
@@ -452,344 +493,331 @@ class _TodayPageState extends State<TodayPage> {
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Container(
-                          width: media.width,
-                          margin: EdgeInsets.only(
-                            top: media.height / 4,
-                            bottom: ScreenUtil.verticalScale(2),
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
-                            ),
-                          ),
-
-                          /// NICK SUGGESTION REMOVE CONTAINER
-
-                          child: Container(
-                            margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(6.5)),
-                            child: Column(
-                              children: [
-                                VideoSlider(),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(7),
-                                    vertical: ScreenUtil.verticalScale(1.2),
-                                  ).copyWith(top: ScreenUtil.horizontalScale(6)),
-                                  child: Builder(builder: (context) {
-                                    String split = monthProvider
-                                            ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                            .toString()
-                                            .split(" ")[1] ??
-                                        "";
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        if (monthProvider?.dayDataModel!.formats != null &&
-                                            monthProvider!.dayDataModel!.formats!.contains(split.toString().replaceAll("split", ""))) ...[
-                                          Container(
-                                            margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
-                                            child: Text(
-                                              'Choose equipment availability',
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          SelectDropdown(
-                                            onChange: (String newValue) async {
-                                              monthProvider?.changeEquipmentType(newValue);
-                                            },
-                                          ),
-                                        ]
-                                      ],
-                                    );
-                                  }),
-                                ),
-                                totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
-                                Container(
-                                  width: media.width,
-                                  margin: EdgeInsets.only(left: ScreenUtil.verticalScale(3)),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Today's workout",
-                                        style: TextStyle(
-                                            fontSize: ScreenUtil.horizontalScale(5.5),
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryColor),
-                                      ),
-                                      SizedBox(height: media.height * 0.025),
-                                      monthProvider!.isPumpDay
-                                          ? CircuitsView(
-                                              circuit: monthProvider!.pumpDayModel!.circuits!,
-                                              isDayCompleted: isCurrentDayCompleted,
-                                              isDaySkipped: isCurrentDaySkipped)
-                                          : const SizedBox(),
-                                      loader
-                                          ? SizedBox()
-                                          : Column(
-                                              children: List.generate(
-                                                exercises.length,
-                                                (i) {
-                                                  if (removedExercise.any((element) => element.exerciseId == exercises[i].exerciseId!) ||
-                                                      (!exercises[i].formats!.contains(monthProvider?.equipmentType) &&
-                                                          (exercises[i].isAddedUpdated == false || exercises[i].isAddedUpdated == null))) {
-                                                    return const SizedBox();
-                                                  }
-                                                  String split = monthProvider
-                                                          ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                          .toString()
-                                                          .split(" ")[1] ??
-                                                      "";
-
-                                                  String dataId =
-                                                      "$split-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
-
-                                                  bool isExist =
-                                                      (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
-                                                          monthProvider!.isPastWeek;
-                                                  return Column(
-                                                    children: [
-                                                      Padding(
-                                                        padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
-                                                        child: WorkoutCard(
-                                                          image: exercises[i].thumbnail ?? "unknown",
-                                                          dataId: dataId,
-                                                          isDayCompleted: isCurrentDayCompleted,
-                                                          isDaySkipped: isCurrentDaySkipped,
-                                                          exerciseId: exercises[i].exerciseId!,
-                                                          isCircuit: false,
-                                                          isCompleted: monthProvider!.exerciseHistoryModel.any(
-                                                              (element) => element.dataId == dataId && element.status == Status.completed),
-                                                          isSkipped: (monthProvider!.exerciseHistoryModel.any((element) =>
-                                                                      element.dataId == dataId && element.status == Status.skipped) ||
-                                                                  isExist) ||
-                                                              isCurrentDaySkipped,
-                                                          exerciseIndex: i,
-                                                          onPress: (Function()? function) async {
-                                                            await onPressed(
-                                                              i,
-                                                              dataId,
-                                                              i ==
-                                                                  exercises.indexWhere(
-                                                                    (element) => element.exerciseId == exercises.last.exerciseId,
-                                                                  ),
-                                                            ).then(
-                                                              (value) {
-                                                                function!();
-                                                              },
-                                                            );
-                                                          },
-                                                          openSwapModal: () async {
-                                                            await swipeExerciseDialog(i, exercises[i]);
-                                                            await swipeExerciseDialog(i, exercises[i]);
-                                                          },
-                                                          exercise: exercises[i],
-                                                          exerciseData: exercises[i].id!,
-                                                          name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
-                                                          onRemove: () => removeExercise(exercises[i].exerciseId!),
-                                                          enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
-                                                  ? false
-                                                  : monthProvider!.exerciseHistoryModel.any((element) =>
-                                                              element.dataId == dataId && element.status == Status.completed) ||
-                                                          isExist
-                                                      ? false
-                                                      :*/
-                                                              true,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: ScreenUtil.verticalScale(3),
-                                                      ),
-                                                    ],
-                                                  );
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(6.5)),
+                                child: Column(
+                                  children: [
+                                    VideoSlider(),
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(7),
+                                        vertical: ScreenUtil.verticalScale(1.2),
+                                      ).copyWith(top: ScreenUtil.horizontalScale(6)),
+                                      child: Builder(builder: (context) {
+                                        String split = monthProvider
+                                                ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            if (monthProvider?.dayDataModel!.formats != null &&
+                                                monthProvider!.dayDataModel!.formats!
+                                                    .contains(split.toString().replaceAll("split", ""))) ...[
+                                              Container(
+                                                margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
+                                                child: Text(
+                                                  'Choose equipment availability',
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              SelectDropdown(
+                                                onChange: (String newValue) async {
+                                                  monthProvider?.changeEquipmentType(newValue);
                                                 },
                                               ),
-                                            ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: ScreenUtil.verticalScale(1.6)),
-                                monthProvider?.dayHistoryDetails == null ||
-                                        isCurrentDayCompleted ||
-                                        isCurrentDaySkipped ||
-                                        monthProvider!.isPastWeek
-                                    ? const SizedBox()
-                                    : Padding(
-                                        padding: const EdgeInsets.only(bottom: 5),
-                                        child: TextButton(
-                                          onPressed: () async {
-                                            await addExerciseDialog();
-                                          },
-                                          child: IntrinsicWidth(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.add,
-                                                  color: Colors.grey.shade600,
-                                                  size: ScreenUtil.verticalScale(3),
-                                                ),
-                                                SizedBox(width: 4),
-                                                Text(
-                                                  "Add Exercise",
-                                                  style: TextStyle(
-                                                    fontSize: ScreenUtil.verticalScale(2),
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey.shade600,
-                                                  ),
-                                                )
-                                              ],
-                                            ),
+                                            ]
+                                          ],
+                                        );
+                                      }),
+                                    ),
+                                    totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
+                                    Container(
+                                      width: media.width,
+                                      margin: EdgeInsets.only(left: ScreenUtil.verticalScale(3)),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Today's workout",
+                                            style: TextStyle(
+                                                fontSize: ScreenUtil.horizontalScale(5.5),
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryColor),
                                           ),
-                                        ),
-                                      ),
-                                const SizedBox(height: 36),
-                                Container(
-                                  height: 1,
-                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                                  width: media.width * 0.75,
-                                  color: Colors.black12,
-                                ),
-                                const SizedBox(height: 36),
-                                Consumer<MonthProvider>(builder: (context, value, child) {
-                                  return value.dayHistoryDetails != null && value.dayHistoryDetails?.status == Status.skipped
-                                      ? Container(
-                                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
-                                          child: ButtonWidget(
-                                            text: "Unskip?",
-                                            textColor: Colors.white,
-                                            onPress: () async {
-                                              String type = value.isPumpDay ? "" : 'Workout Day';
+                                          SizedBox(height: media.height * 0.025),
+                                          monthProvider!.isPumpDay
+                                              ? CircuitsView(
+                                                  circuit: monthProvider!.pumpDayModel!.circuits!,
+                                                  isDayCompleted: isCurrentDayCompleted,
+                                                  isDaySkipped: isCurrentDaySkipped)
+                                              : const SizedBox(),
+                                          loader
+                                              ? SizedBox()
+                                              : Column(
+                                                  children: List.generate(
+                                                    exercises.length,
+                                                    (i) {
+                                                      if (removedExercise
+                                                              .any((element) => element.exerciseId == exercises[i].exerciseId!) ||
+                                                          (!exercises[i].formats!.contains(monthProvider?.equipmentType) &&
+                                                              (exercises[i].isAddedUpdated == false ||
+                                                                  exercises[i].isAddedUpdated == null))) {
+                                                        return const SizedBox();
+                                                      }
+                                                      String split = monthProvider
+                                                              ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                              .toString()
+                                                              .split(" ")[1] ??
+                                                          "";
 
-                                              await _skipUnskipDayData(
-                                                status: "",
-                                                type: type,
-                                                title: "",
-                                              );
-                                              isCurrentDaySkipped = false;
-                                              setState(() {});
-                                            },
-                                            color: AppColors.skipDayColor,
-                                            isLoading: false,
+                                                      String dataId =
+                                                          "$split-${monthProvider!.monthDataModel?.id}-${monthProvider!.weekDataModel?.id}-${monthProvider!.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercises[i].exerciseId}";
+
+                                                      bool isExist =
+                                                          (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
+                                                              monthProvider!.isPastWeek;
+                                                      return Column(
+                                                        children: [
+                                                          Padding(
+                                                            padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
+                                                            child: WorkoutCard(
+                                                              image: exercises[i].thumbnail ?? "unknown",
+                                                              dataId: dataId,
+                                                              isDayCompleted: isCurrentDayCompleted,
+                                                              isDaySkipped: isCurrentDaySkipped,
+                                                              exerciseId: exercises[i].exerciseId!,
+                                                              isCircuit: false,
+                                                              isCompleted: monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                  element.dataId == dataId && element.status == Status.completed),
+                                                              isSkipped: (monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                          element.dataId == dataId && element.status == Status.skipped) ||
+                                                                      isExist) ||
+                                                                  isCurrentDaySkipped,
+                                                              exerciseIndex: i,
+                                                              onPress: (Function()? function) async {
+                                                                await onPressed(
+                                                                  i,
+                                                                  dataId,
+                                                                  i ==
+                                                                      exercises.indexWhere(
+                                                                        (element) => element.exerciseId == exercises.last.exerciseId,
+                                                                      ),
+                                                                ).then(
+                                                                  (value) {
+                                                                    function!();
+                                                                  },
+                                                                );
+                                                              },
+                                                              openSwapModal: () async {
+                                                                await swipeExerciseDialog(i, exercises[i]);
+                                                                await swipeExerciseDialog(i, exercises[i]);
+                                                              },
+                                                              exercise: exercises[i],
+                                                              exerciseData: exercises[i].id!,
+                                                              name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
+                                                              onRemove: () => removeExercise(exercises[i].exerciseId!),
+                                                              enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
+                                                      ? false
+                                                      : monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                  element.dataId == dataId && element.status == Status.completed) ||
+                                                              isExist
+                                                          ? false
+                                                          :*/
+                                                                  true,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: ScreenUtil.verticalScale(3),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: ScreenUtil.verticalScale(1.6)),
+                                    monthProvider?.dayHistoryDetails == null ||
+                                            isCurrentDayCompleted ||
+                                            isCurrentDaySkipped ||
+                                            monthProvider!.isPastWeek
+                                        ? const SizedBox()
+                                        : Padding(
+                                            padding: const EdgeInsets.only(bottom: 5),
+                                            child: TextButton(
+                                              onPressed: () async {
+                                                await addExerciseDialog();
+                                              },
+                                              child: IntrinsicWidth(
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.add,
+                                                      color: Colors.grey.shade600,
+                                                      size: ScreenUtil.verticalScale(3),
+                                                    ),
+                                                    SizedBox(width: 4),
+                                                    Text(
+                                                      "Add Exercise",
+                                                      style: TextStyle(
+                                                        fontSize: ScreenUtil.verticalScale(2),
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.grey.shade600,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        )
-                                      : value.dayHistoryDetails == null ||
-                                              (isCurrentDaySkipped || isCurrentDayCompleted) ||
-                                              value.isPastWeek
+                                    const SizedBox(height: 36),
+                                    Container(
+                                      height: 1,
+                                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                                      width: media.width * 0.75,
+                                      color: Colors.black12,
+                                    ),
+                                    const SizedBox(height: 36),
+                                    Consumer<MonthProvider>(builder: (context, value, child) {
+                                      return value.dayHistoryDetails != null && value.dayHistoryDetails?.status == Status.skipped
                                           ? Container(
                                               margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                               child: ButtonWidget(
-                                                text: value.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
+                                                text: "Unskip?",
                                                 textColor: Colors.white,
-                                                onPress: null,
-                                                color: AppColors.primaryColor,
+                                                onPress: () async {
+                                                  String type = value.isPumpDay ? "" : 'Workout Day';
+
+                                                  await _skipUnskipDayData(
+                                                    status: "",
+                                                    type: type,
+                                                    title: "",
+                                                  );
+                                                  isCurrentDaySkipped = false;
+                                                  setState(() {});
+                                                },
+                                                color: AppColors.skipDayColor,
                                                 isLoading: false,
                                               ),
                                             )
-                                          : Column(
-                                              children: [
-                                                value.dayHistoryDetails?.status != Status.skipped &&
-                                                        value.dayHistoryDetails?.status != Status.completed
-                                                    ? Padding(
-                                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                        child: CustomSlideAction(
-                                                          key: key,
-                                                          height: ScreenUtil.verticalScale(7.2),
-                                                          outerColor: AppColors.primaryColor,
-                                                          innerColor: AppColors.backOffSetColor,
-                                                          sliderButtonIconPadding: ScreenUtil.verticalScale(1.3),
-                                                          submitButtonIconPadding: ScreenUtil.verticalScale(1.8),
-                                                          sliderButtonIcon: Image.asset(
-                                                            "assets/icons/chevron.png",
-                                                            color: AppColors.primaryColor,
-                                                            height: ScreenUtil.verticalScale(2),
-                                                          ),
-                                                          submittedButtonIcon: Image.asset(
-                                                            "assets/icons/check.png",
-                                                            color: AppColors.primaryColor,
-                                                            height: ScreenUtil.verticalScale(2),
-                                                          ),
-                                                          onSubmit: () async {
-                                                            return await onSwipe(value).then(
-                                                              (value) {
-                                                                key.currentState?.reset();
+                                          : value.dayHistoryDetails == null ||
+                                                  (isCurrentDaySkipped || isCurrentDayCompleted) ||
+                                                  value.isPastWeek
+                                              ? Container(
+                                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                                  child: ButtonWidget(
+                                                    text: value.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped",
+                                                    textColor: Colors.white,
+                                                    onPress: null,
+                                                    color: AppColors.primaryColor,
+                                                    isLoading: false,
+                                                  ),
+                                                )
+                                              : Column(
+                                                  children: [
+                                                    value.dayHistoryDetails?.status != Status.skipped &&
+                                                            value.dayHistoryDetails?.status != Status.completed
+                                                        ? Padding(
+                                                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                            child: CustomSlideAction(
+                                                              key: key,
+                                                              height: ScreenUtil.verticalScale(7.2),
+                                                              outerColor: AppColors.primaryColor,
+                                                              innerColor: AppColors.backOffSetColor,
+                                                              sliderButtonIconPadding: ScreenUtil.verticalScale(1.3),
+                                                              submitButtonIconPadding: ScreenUtil.verticalScale(1.8),
+                                                              sliderButtonIcon: Image.asset(
+                                                                "assets/icons/chevron.png",
+                                                                color: AppColors.primaryColor,
+                                                                height: ScreenUtil.verticalScale(2),
+                                                              ),
+                                                              submittedButtonIcon: Image.asset(
+                                                                "assets/icons/check.png",
+                                                                color: AppColors.primaryColor,
+                                                                height: ScreenUtil.verticalScale(2),
+                                                              ),
+                                                              onSubmit: () async {
+                                                                return await onSwipe(value).then(
+                                                                  (value) {
+                                                                    key.currentState?.reset();
+                                                                  },
+                                                                );
                                                               },
-                                                            );
-                                                          },
-                                                          child: Text(
-                                                            "Swipe to complete",
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2.2),
-                                                              fontWeight: FontWeight.bold,
+                                                              child: Text(
+                                                                "Swipe to complete",
+                                                                style: TextStyle(
+                                                                  color: Colors.white,
+                                                                  fontSize: ScreenUtil.verticalScale(2.2),
+                                                                  fontWeight: FontWeight.bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(
+                                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                            child: ButtonWidget(
+                                                              text: value.dayHistoryDetails?.status == Status.completed
+                                                                  ? "Completed"
+                                                                  : value.dayHistoryDetails?.status == Status.skipped
+                                                                      ? "Skipped"
+                                                                      : "Finish the workout",
+                                                              textColor: Colors.white,
+                                                              onPress: value.dayHistoryDetails?.status == Status.completed ||
+                                                                      value.dayHistoryDetails?.status == Status.skipped
+                                                                  ? null
+                                                                  : () async {
+                                                                      HapticFeedBack.buttonClick();
+                                                                      await _saveDayData(
+                                                                          status: Status.skipped,
+                                                                          type: monthProvider!.isPumpDay
+                                                                              ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                                                              : "Workout Day",
+                                                                          status1: Status.completed);
+                                                                      if (!context.mounted) return;
+                                                                      value.updateCurrentDayTitleId(
+                                                                          value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
+                                                                      Navigator.pushNamed(context, '/dayCompleted');
+                                                                    },
+                                                              color: AppColors.primaryColor,
+                                                              isLoading: false,
                                                             ),
                                                           ),
-                                                        ),
-                                                      )
-                                                    : Container(
-                                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                        child: ButtonWidget(
-                                                          text: value.dayHistoryDetails?.status == Status.completed
-                                                              ? "Completed"
-                                                              : value.dayHistoryDetails?.status == Status.skipped
-                                                                  ? "Skipped"
-                                                                  : "Finish the workout",
-                                                          textColor: Colors.white,
-                                                          onPress: value.dayHistoryDetails?.status == Status.completed ||
-                                                                  value.dayHistoryDetails?.status == Status.skipped
-                                                              ? null
-                                                              : () async {
-                                                                  HapticFeedBack.buttonClick();
-                                                                  await _saveDayData(
-                                                                      status: Status.skipped,
-                                                                      type: monthProvider!.isPumpDay
-                                                                          ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                                                          : "Workout Day",
-                                                                      status1: Status.completed);
-                                                                  if (!context.mounted) return;
-                                                                  value.updateCurrentDayTitleId(
-                                                                      value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
-                                                                  Navigator.pushNamed(context, '/dayCompleted');
-                                                                },
-                                                          color: AppColors.primaryColor,
-                                                          isLoading: false,
-                                                        ),
-                                                      ),
-                                                const SizedBox(height: 14),
-                                                value.dayHistoryDetails?.status != Status.skipped &&
-                                                        value.dayHistoryDetails?.status != Status.completed
-                                                    ? Container(
-                                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
-                                                        child: ButtonWidget(
-                                                          text: "Skip the workout",
-                                                          textColor: Colors.white,
-                                                          color: AppColors.skipDayColor,
-                                                          isLoading: false,
-                                                          onPress: () async {
-                                                            AnimatedDialog.showAnimatedDialog(
-                                                              context: context,
-                                                              pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
-                                                            );
-                                                          },
-                                                        ),
-                                                      )
-                                                    : const SizedBox(),
-                                              ],
-                                            );
-                                }),
-                                const SizedBox(
-                                  height: 90,
+                                                    const SizedBox(height: 14),
+                                                    value.dayHistoryDetails?.status != Status.skipped &&
+                                                            value.dayHistoryDetails?.status != Status.completed
+                                                        ? Container(
+                                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3.2)),
+                                                            child: ButtonWidget(
+                                                              text: "Skip the workout",
+                                                              textColor: Colors.white,
+                                                              color: AppColors.skipDayColor,
+                                                              isLoading: false,
+                                                              onPress: () async {
+                                                                AnimatedDialog.showAnimatedDialog(
+                                                                  context: context,
+                                                                  pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
+                                                                );
+                                                              },
+                                                            ),
+                                                          )
+                                                        : const SizedBox(),
+                                                  ],
+                                                );
+                                    }),
+                                    const SizedBox(
+                                      height: 90,
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

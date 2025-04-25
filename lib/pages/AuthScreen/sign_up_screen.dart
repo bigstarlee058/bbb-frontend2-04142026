@@ -100,7 +100,7 @@ class _SignupPageState extends State<SignupPage> {
               ],
             ),
             Positioned(
-                bottom: -1,
+                bottom: -1.3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -117,9 +117,9 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     Container(
                       width: media.width,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(70)),
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(ScreenUtil.verticalScale(8))),
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),

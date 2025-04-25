@@ -1,4 +1,5 @@
 import 'package:bbb/components/animated_dialog.dart';
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
@@ -135,7 +136,23 @@ class _MonthViewState extends State<MonthView> {
                               children: [
                                 Consumer<ScrollProvider>(
                                   builder: (context, scrollProvider, child) {
-                                    return Container(
+                                    return AppBar(
+                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                      backgroundColor: Colors.transparent,
+                                      centerTitle: true,
+                                      leading: BackArrowWidget(
+                                        onPress: () {
+                                          monthProvider?.mainPageProvider.changeTab(0);
+                                        },
+                                      ),
+                                      actions: [
+                                        Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: const CommonStreakWithNotification(routeString: "month"))
+                                      ],
+                                    );
+
+                                    Container(
                                       margin: const EdgeInsets.only(right: 10),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,8 +166,8 @@ class _MonthViewState extends State<MonthView> {
                                               shape: BoxShape.circle,
                                             ),
                                             child: SizedBox(
-                                              width: ScreenUtil.horizontalScale(10),
-                                              height: ScreenUtil.horizontalScale(10),
+                                              width: ScreenUtil.verticalScale(4.65),
+                                              height: ScreenUtil.verticalScale(4.65),
                                               child: IconButton(
                                                 padding: EdgeInsets.zero,
                                                 icon: const Icon(
@@ -215,7 +232,31 @@ class _MonthViewState extends State<MonthView> {
                                     children: [
                                       Consumer<ScrollProvider>(
                                         builder: (context, scrollProvider, child) {
-                                          return Container(
+                                          return Column(
+                                            children: [
+                                              scrollProvider.scrollOffset1 >= 0.0
+                                                  ? AppBar(
+                                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                                      backgroundColor: Colors.transparent,
+                                                      leading: BackArrowWidget(
+                                                        onPress: () {
+                                                          monthProvider?.mainPageProvider.changeTab(0);
+                                                        },
+                                                      ),
+                                                      actions: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(right: 10),
+                                                          child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                                        )
+                                                      ],
+                                                    )
+                                                  : SizedBox(),
+                                              SizedBox(
+                                                height: scrollProvider.scrollOffset1 >= 0.0 ? 0 : ScreenUtil.verticalScale(5.5),
+                                              )
+                                            ],
+                                          );
+                                          Container(
                                             margin: const EdgeInsets.only(right: 10),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -230,8 +271,8 @@ class _MonthViewState extends State<MonthView> {
                                                           shape: BoxShape.circle,
                                                         ),
                                                         child: SizedBox(
-                                                          width: ScreenUtil.horizontalScale(10),
-                                                          height: ScreenUtil.horizontalScale(10),
+                                                          width: ScreenUtil.verticalScale(4.65),
+                                                          height: ScreenUtil.verticalScale(4.65),
                                                           child: IconButton(
                                                             padding: EdgeInsets.zero,
                                                             icon: const Icon(
@@ -439,7 +480,7 @@ class _MonthViewState extends State<MonthView> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
                           ),
                           child: Column(

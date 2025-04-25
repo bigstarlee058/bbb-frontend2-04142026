@@ -50,37 +50,64 @@ class _ToolsPageState extends State<ToolsPage> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        height: 15,
-                                        width: media.width / 5,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                          top: ScreenUtil.verticalScale(1),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Tools',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: "tool"),
-                                    ],
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                  backgroundColor: Colors.transparent,
+                                  centerTitle: true,
+                                  // leading: BackArrowWidget(
+                                  //   onPress: () {
+                                  //     // HapticFeedBack.buttonClick();
+                                  //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                  //     // mainPageProvider.changeTab(2);
+                                  //     Navigator.pop(context);
+                                  //   },
+                                  // ),
+                                  leading: SizedBox(),
+                                  title: Text(
+                                    'Tools',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                                    ),
                                   ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                    )
+                                  ],
                                 ),
+                                // Container(
+                                //   margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     crossAxisAlignment: CrossAxisAlignment.start,
+                                //     children: [
+                                //       SizedBox(
+                                //         height: 15,
+                                //         width: media.width / 5,
+                                //       ),
+                                //       Padding(
+                                //         padding: EdgeInsets.only(
+                                //           top: ScreenUtil.verticalScale(1),
+                                //         ),
+                                //         child: Row(
+                                //           mainAxisAlignment: MainAxisAlignment.center,
+                                //           children: [
+                                //             Text(
+                                //               'Tools',
+                                //               style: TextStyle(
+                                //                 color: Colors.white,
+                                //                 fontSize: ScreenUtil.verticalScale(2.5),
+                                //               ),
+                                //             ),
+                                //           ],
+                                //         ),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: "tool"),
+                                //     ],
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -116,7 +143,7 @@ class _ToolsPageState extends State<ToolsPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
                     child: Column(

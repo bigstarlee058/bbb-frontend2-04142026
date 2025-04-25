@@ -161,16 +161,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 SizedBox(
                   height: ScreenUtil.horizontalScale(10),
                 ),
-                ClipPath(
-                  clipper: DiagonalClipper(),
-                  child: Container(
-                    height: media.height / 9.8,
-                    width: media.width / 6,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
                 Container(
                   width: media.width,
                   decoration: BoxDecoration(
@@ -179,62 +169,81 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
                     ),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: ScreenUtil.horizontalScale(2),
-                        ),
-                        isLoading
-                            ? SizedBox(
-                                height: media.height * .28,
-                              )
-                            : TextSlider(
-                                slide: welcomeContentModel.slides,
-                              ),
-                        ButtonWidget(
-                          text: 'Sign in',
-                          textColor: Colors.white,
-                          color: AppColors.primaryColor,
-                          onPress: onPressLogin,
-                          isLoading: false,
-                        ),
-                        const SizedBox(
-                          height: 6,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Don't have an account? ",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xff888888),
-                              ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        right: 0,
+                        top: -(media.height / 9.8) + 0.3,
+                        child: ClipPath(
+                          clipper: DiagonalClipper(),
+                          child: Container(
+                            height: media.height / 9.8,
+                            width: media.width / 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
                             ),
-                            TextButton(
-                              onPressed: onPressCreateAccount,
-                              style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  minimumSize: const Size(65, 30),
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  alignment: Alignment.center),
-                              child: const Text(
-                                'Sign up',
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: ScreenUtil.horizontalScale(2),
+                            ),
+                            isLoading
+                                ? SizedBox(
+                                    height: media.height * .28,
+                                  )
+                                : TextSlider(
+                                    slide: welcomeContentModel.slides,
+                                  ),
+                            ButtonWidget(
+                              text: 'Sign in',
+                              textColor: Colors.white,
+                              color: AppColors.primaryColor,
+                              onPress: onPressLogin,
+                              isLoading: false,
+                            ),
+                            const SizedBox(
+                              height: 6,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Don't have an account? ",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Color(0xff888888),
+                                  ),
                                 ),
-                              ),
-                            )
+                                TextButton(
+                                  onPressed: onPressCreateAccount,
+                                  style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(65, 30),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      alignment: Alignment.center),
+                                  child: const Text(
+                                    'Sign up',
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: ScreenUtil.horizontalScale(7.2),
+                            ),
                           ],
                         ),
-                        SizedBox(
-                          height: ScreenUtil.horizontalScale(7.2),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],

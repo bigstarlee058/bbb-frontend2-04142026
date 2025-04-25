@@ -185,6 +185,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             child: Column(
                               children: [
                                 AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
                                   backgroundColor: Colors.transparent,
                                   leading: SizedBox(),
                                   centerTitle: true,
@@ -458,7 +459,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
                         ),
                         child: Column(
@@ -530,7 +531,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         ),
                       ),
                       Positioned(
-                        top: -(media.height / 2.25),
+                        top: -(media.height / 2.25) + 0.3,
                         child: SizedBox(
                           height: media.height / 2.25,
                           width: media.width,

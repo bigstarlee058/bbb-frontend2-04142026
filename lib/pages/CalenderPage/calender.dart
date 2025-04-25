@@ -108,13 +108,14 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         calendarStyle: CalendarStyle(
           defaultTextStyle: TextStyle(fontSize: 14.0),
           weekendTextStyle: TextStyle(fontSize: 14.0),
+          outsideDecoration: BoxDecoration(color: Colors.transparent),
           outsideTextStyle: TextStyle(fontSize: 14.0, color: Colors.grey.shade500),
         ),
         onRangeSelected: (start, end, focusedDay) {},
         onDaySelected: null,
         calendarBuilders: CalendarBuilders(
           todayBuilder: (context, day, date) {
-            return _buildDayState(date);
+            return _buildDayState(date) ?? _buildCurrentWorkoutDay(date, day: DateTime.now().day);
           },
           outsideBuilder: (context, day, date) {
             return _buildDayState(day);
@@ -354,6 +355,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
               return _buildCustomDayCircle(date, AppColors.primaryColor);
             } else if (day.status == Status.skipped) {
               return _buildCustomDayCircle(date, Colors.blue);
+            } else {
+              return _buildNormalDay(date);
             }
           }
           return _buildCurrentWorkoutDay(date);
@@ -412,7 +415,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     );
   }
 
-  Widget _buildCurrentWorkoutDay(DateTime date) {
+  Widget _buildCurrentWorkoutDay(DateTime date, {int? day}) {
     return Container(
       alignment: Alignment.center,
       width: ScreenUtil.verticalScale(3.2),
@@ -424,7 +427,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         border: Border.all(color: AppColors.primaryColor),
       ),
       child: Text(
-        '${date.day}',
+        day != null ? "$day" : '${date.day}',
         style: const TextStyle(
           fontSize: 14.0,
           color: AppColors.primaryColor,

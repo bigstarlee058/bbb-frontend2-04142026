@@ -159,42 +159,65 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: EdgeInsets.only(
-                                    right: ScreenUtil.horizontalScale(3),
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                  backgroundColor: Colors.transparent,
+                                  centerTitle: true,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      Navigator.pop(context);
+                                    },
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      BackArrowWidget(
-                                        onPress: () {
-                                          // HapticFeedBack.buttonClick();
-                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          // mainPageProvider.changeTab(3);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                          top: ScreenUtil.verticalScale(1),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'My Profile',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/myprofile')
-                                    ],
+                                  title: Text(
+                                    'My Profile',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                                    ),
                                   ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                    )
+                                  ],
                                 ),
+                                // Container(
+                                //   margin: EdgeInsets.only(
+                                //     right: ScreenUtil.horizontalScale(3),
+                                //   ),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       BackArrowWidget(
+                                //         onPress: () {
+                                //           // HapticFeedBack.buttonClick();
+                                //           // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                //           // mainPageProvider.changeTab(3);
+                                //           Navigator.pop(context);
+                                //         },
+                                //       ),
+                                //       Padding(
+                                //         padding: EdgeInsets.only(
+                                //           top: ScreenUtil.verticalScale(1),
+                                //         ),
+                                //         child: Row(
+                                //           mainAxisAlignment: MainAxisAlignment.center,
+                                //           children: [
+                                //             Text(
+                                //               'My Profile',
+                                //               style: TextStyle(
+                                //                 color: Colors.white,
+                                //                 fontSize: ScreenUtil.verticalScale(2.5),
+                                //               ),
+                                //             ),
+                                //           ],
+                                //         ),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: '/myprofile')
+                                //     ],
+                                //   ),
+                                // ),
                                 Container(
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(10),
@@ -262,7 +285,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 2.64,
+                          height: media.height / 2.647,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -292,7 +315,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
                     child: Column(

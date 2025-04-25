@@ -68,6 +68,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                 child: Column(
                                   children: [
                                     AppBar(
+                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
                                       centerTitle: true,
                                       backgroundColor: Colors.transparent,
                                       // leading: BackArrowWidget(
@@ -90,14 +91,28 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                         )
                                       ],
                                     ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      "Here's a look at your\nachievements",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: ScreenUtil.verticalScale(1.9),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(5),
                                       ),
-                                      textAlign: TextAlign.center,
+                                      height: media.height * 0.11,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: ScreenUtil.horizontalScale(50),
+                                            child: Text(
+                                              "Here's a look at your\nachievements",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: ScreenUtil.verticalScale(2),
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -131,7 +146,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
                         ),
                         child: Container(
@@ -161,7 +176,6 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
           ),
           Positioned(
             left: 0,
-            top: 4,
             child: BackArrowWidget(
               onPress: () {
                 Navigator.pop(context);

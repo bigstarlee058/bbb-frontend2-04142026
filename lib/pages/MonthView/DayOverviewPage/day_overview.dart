@@ -172,8 +172,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: SizedBox(
-                                                    width: ScreenUtil.horizontalScale(10),
-                                                    height: ScreenUtil.horizontalScale(10),
+                                                    width: ScreenUtil.verticalScale(4.65),
+                                                    height: ScreenUtil.verticalScale(4.65),
                                                     child: IconButton(
                                                       padding: EdgeInsets.zero,
                                                       icon: const Icon(
@@ -372,8 +372,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: SizedBox(
-                                                    width: ScreenUtil.horizontalScale(10),
-                                                    height: ScreenUtil.horizontalScale(10),
+                                                    width: ScreenUtil.verticalScale(4.65),
+                                                    height: ScreenUtil.verticalScale(4.65),
                                                     child: IconButton(
                                                       padding: EdgeInsets.zero,
                                                       icon: const Icon(
@@ -581,7 +581,7 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                         ),
                       ),
                       child: Container(

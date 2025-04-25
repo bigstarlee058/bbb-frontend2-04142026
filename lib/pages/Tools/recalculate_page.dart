@@ -167,10 +167,10 @@ class _RecalculatePageState extends State<RecalculatePage> {
                       margin: EdgeInsets.only(top: media.height / 2.87),
                       child: Container(
                         width: media.width,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(70),
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
                         ),
                         child: Column(
@@ -359,7 +359,6 @@ class _RecalculatePageState extends State<RecalculatePage> {
           ),
           Positioned(
             left: 0,
-            top: 4,
             child: BackArrowWidget(
               onPress: () {
                 Navigator.pop(context);

@@ -1,3 +1,4 @@
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -67,58 +68,75 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                           width: media.width,
                           child: Column(
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                      left: ScreenUtil.horizontalScale(4),
-                                    ),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0XFFd18a9b),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: SizedBox(
-                                      width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                      height: ScreenUtil.horizontalScale(10),
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero, // Removes the default padding
-                                        icon: const Icon(
-                                          Icons.keyboard_arrow_left,
-                                          color: Colors.white,
-                                        ),
-                                        onPressed: () {
-                                          // HapticFeedBack.buttonClick();
-                                          Navigator.pop(context);
-                                        },
-                                        iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
-                                      ),
-                                    ),
+                              AppBar(
+                                toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                backgroundColor: Colors.transparent,
+                                centerTitle: true,
+                                leading: BackArrowWidget(
+                                  onPress: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                title: Text(
+                                  'Streaks',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: ScreenUtil.horizontalScale(5.5),
                                   ),
-                                  Expanded(
-                                    child: Center(
-                                      child: Text(
-                                        "Streaks",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.verticalScale(3),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                      right: ScreenUtil.horizontalScale(4),
-                                    ),
-                                    child: SizedBox(
-                                      width: ScreenUtil.horizontalScale(10),
-                                      height: ScreenUtil.horizontalScale(10),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //   children: [
+                              //     Container(
+                              //       margin: EdgeInsets.only(
+                              //         left: ScreenUtil.horizontalScale(4),
+                              //       ),
+                              //       decoration: const BoxDecoration(
+                              //         color: Color(0XFFd18a9b),
+                              //         shape: BoxShape.circle,
+                              //       ),
+                              //       child: SizedBox(
+                              //         width: ScreenUtil.horizontalScale(10), // Size of the circle
+                              //         height: ScreenUtil.horizontalScale(10),
+                              //         child: IconButton(
+                              //           padding: EdgeInsets.zero, // Removes the default padding
+                              //           icon: const Icon(
+                              //             Icons.keyboard_arrow_left,
+                              //             color: Colors.white,
+                              //           ),
+                              //           onPressed: () {
+                              //             // HapticFeedBack.buttonClick();
+                              //             Navigator.pop(context);
+                              //           },
+                              //           iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     Expanded(
+                              //       child: Center(
+                              //         child: Text(
+                              //           "Streaks",
+                              //           style: TextStyle(
+                              //             color: Colors.white,
+                              //             fontSize: ScreenUtil.verticalScale(3),
+                              //             fontWeight: FontWeight.bold,
+                              //             height: 1,
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     Container(
+                              //       margin: EdgeInsets.only(
+                              //         right: ScreenUtil.horizontalScale(4),
+                              //       ),
+                              //       child: SizedBox(
+                              //         width: ScreenUtil.horizontalScale(10),
+                              //         height: ScreenUtil.horizontalScale(10),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
                               SizedBox(
                                 height: media.height / 4.9,
                                 width: media.width,
@@ -199,7 +217,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
                         ),
                         child: Column(

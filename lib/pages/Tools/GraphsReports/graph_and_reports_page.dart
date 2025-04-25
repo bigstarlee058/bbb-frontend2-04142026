@@ -11,7 +11,6 @@ import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -98,7 +97,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
                     child: Column(
@@ -297,11 +296,9 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                         //   child: const ReportTimeSpentGraph()
                         // ),
 
-                        /// BOTTOM CONTAINERS
-
                         // Container(
                         //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                        //   height: 500,
+                        //   height: 1000,
                         //   child: CustomRadarChart(),
                         // ),
 
@@ -437,62 +434,100 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SafeArea(
-                                        child: SizedBox(width: ScreenUtil.horizontalScale(10)),
-                                      ),
-                                      // BackArrowWidget(
-                                      //   onPress: () {
-                                      //     // HapticFeedBack.buttonClick();
-                                      //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                      //     // mainPageProvider.changeTab(2);
-                                      //     Navigator.pop(context);
-                                      //   },
-                                      // ),
-                                      Container(
-                                        margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
-                                        child: Consumer<UserDataProvider>(builder: (context, userData, child) {
-                                          return Text(
-                                            // 'Hi, Nick',
-                                            'Hi ${userData.userName}',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: ScreenUtil.horizontalScale(5.5),
-                                            ),
-                                          );
-                                        }),
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/graphAndReports')
-                                    ],
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                  backgroundColor: Colors.transparent,
+                                  centerTitle: true,
+                                  // leading: BackArrowWidget(
+                                  //   onPress: () {
+                                  //     // HapticFeedBack.buttonClick();
+                                  //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                  //     // mainPageProvider.changeTab(2);
+                                  //     Navigator.pop(context);
+                                  //   },
+                                  // ),
+                                  leading: SizedBox(),
+                                  title: Text(
+                                    'Graphs & Report',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                                    ),
                                   ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                    )
+                                  ],
                                 ),
+                                // Container(
+                                //   margin: const EdgeInsets.only(right: 10),
+                                //   child: Row(
+                                //     crossAxisAlignment: CrossAxisAlignment.start,
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       SafeArea(
+                                //         child: SizedBox(width: ScreenUtil.horizontalScale(10)),
+                                //       ),
+                                //       // BackArrowWidget(
+                                //       //   onPress: () {
+                                //       //     // HapticFeedBack.buttonClick();
+                                //       //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                //       //     // mainPageProvider.changeTab(2);
+                                //       //     Navigator.pop(context);
+                                //       //   },
+                                //       // ),
+                                //       Container(
+                                //         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
+                                //         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
+                                //           return Text(
+                                //             // 'Hi, Nick',
+                                //             'Hi ${userData.userName}',
+                                //             style: TextStyle(
+                                //               color: Colors.white,
+                                //               fontSize: ScreenUtil.horizontalScale(5.5),
+                                //             ),
+                                //           );
+                                //         }),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: '/graphAndReports')
+                                //     ],
+                                //   ),
+                                // ),
                                 Container(
                                   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       Column(children: [
-                                        const SizedBox(height: 4),
                                         SizedBox(
-                                          width: media.width * 0.4,
-                                          child: Text(
-                                            "Here's some fun graphs for you",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: ScreenUtil.horizontalScale(4.5),
-                                            ),
-                                            textAlign: TextAlign.center,
+                                          height: ScreenUtil.verticalScale(0.6),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: ScreenUtil.horizontalScale(5),
+                                          ),
+                                          height: media.height * 0.08,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Here's some fun graphs for you",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        SizedBox(
-                                          height: ScreenUtil.horizontalScale(4),
-                                        ),
                                       ]),
+                                      SizedBox(
+                                        height: media.height * 0.01,
+                                      ),
                                       Container(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: ScreenUtil.horizontalScale(3),
@@ -575,9 +610,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
             left: 0,
             child: BackArrowWidget(
               onPress: () {
-                // HapticFeedBack.buttonClick();
-                // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                // mainPageProvider.changeTab(2);
                 Navigator.pop(context);
               },
             ),

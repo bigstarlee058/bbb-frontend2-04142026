@@ -291,8 +291,10 @@ class _ExercisePageState extends State<ExercisePage> {
       //   loading = false;
       //   videoNotInitialized = false;
       // }
-      exerciseDesc = monthProvider!.exerciseDetailModel?.description ?? "";
-      exerciseName = monthProvider!.exerciseDetailModel?.title ?? "";
+      if (monthProvider!.exerciseDetailModel != null) {
+        exerciseDesc = monthProvider!.exerciseDetailModel?.description ?? "";
+        exerciseName = monthProvider!.exerciseDetailModel?.title ?? "";
+      }
     } else {
       // if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
       //   initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
@@ -300,33 +302,35 @@ class _ExercisePageState extends State<ExercisePage> {
       //   loading = false;
       //   videoNotInitialized = false;
       // }
-      exerciseDesc = monthProvider!.warmUpModel!.description ?? "";
-      exerciseName = monthProvider!.warmUpModel!.title ?? "";
+      exerciseDesc = monthProvider!.warmUpModel?.description ?? "";
+      exerciseName = monthProvider!.warmUpModel?.title ?? "";
     }
 
     monthProvider?.fetchExerciseHistoryLocalData();
     monthProvider?.fetchExerciseStatusLocalData();
 
     if (monthProvider?.isWarmup == false) {
-      String exId = (isPumpDay ?? monthProvider!.isPumpDay) && (isCircuit ?? monthProvider!.isCircuit)
-          ? "${monthProvider?.exerciseDetailModel?.sId.toString()}-${(circuitIndex ?? monthProvider?.circuitIndex)}"
-          : monthProvider!.exerciseDetailModel!.sId.toString();
+      if (monthProvider?.exerciseDetailModel != null) {
+        String exId = (isPumpDay ?? monthProvider!.isPumpDay) && (isCircuit ?? monthProvider!.isCircuit)
+            ? "${monthProvider?.exerciseDetailModel?.sId.toString()}-${(circuitIndex ?? monthProvider?.circuitIndex)}"
+            : monthProvider!.exerciseDetailModel!.sId.toString();
 
-      String split =
-          monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+        String split =
+            monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
 
-      String dataId =
-          "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
+        String dataId =
+            "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
 
-      fetchExtraSetLocalData(dataId);
+        fetchExtraSetLocalData(dataId);
 
-      await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
-      isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-      isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
-      isCurrentExerciseCompleted = monthProvider?.exerciseHistoryDetails?.status == Status.completed;
-      isCurrentExerciseSkipped = monthProvider?.exerciseHistoryDetails?.status == Status.skipped;
-      isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);
-      findIsAtLeastOnSet();
+        await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
+        isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
+        isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
+        isCurrentExerciseCompleted = monthProvider?.exerciseHistoryDetails?.status == Status.completed;
+        isCurrentExerciseSkipped = monthProvider?.exerciseHistoryDetails?.status == Status.skipped;
+        isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);
+        findIsAtLeastOnSet();
+      }
     }
     setState(() => loading = false);
     videoInitialize();
@@ -491,7 +495,9 @@ class _ExercisePageState extends State<ExercisePage> {
         final extraItem = element;
         count = int.parse(extraItem.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
       }
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -640,8 +646,8 @@ class _ExercisePageState extends State<ExercisePage> {
                     shape: BoxShape.circle,
                   ),
                   child: SizedBox(
-                    width: ScreenUtil.horizontalScale(10),
-                    height: ScreenUtil.horizontalScale(10),
+                    width: ScreenUtil.verticalScale(4.65),
+                    height: ScreenUtil.verticalScale(4.65),
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       icon: const Icon(
@@ -1248,16 +1254,20 @@ class _ExercisePageState extends State<ExercisePage> {
                                                   count++;
                                                 }
                                               }
+                                              List<ExerciseDataModel> exerciseList = [];
 
-                                              if (monthProvider.dayDataModel?.exercises?.length != count &&
-                                                  monthProvider.dayDataModel?.exercises?.length != monthProvider.selectedExIndex + 1) {
+                                              exerciseList.addAll(monthProvider.dayDataModel!.exercises!
+                                                  .where((element) => element.formats!.contains(monthProvider.equipmentType)));
+
+                                              if (exerciseList.length != count &&
+                                                  exerciseList.length != monthProvider.selectedExIndex + 1) {
                                                 Navigator.pop(context);
 
                                                 await Future.delayed(const Duration(milliseconds: 100));
 
                                                 int skipIndex = monthProvider.selectedExIndex + 1;
-                                                for (int i = skipIndex; i < monthProvider.dayDataModel!.exercises!.length; i++) {
-                                                  var elementI = monthProvider.dayDataModel!.exercises![i];
+                                                for (int i = skipIndex; i < exerciseList.length; i++) {
+                                                  var elementI = exerciseList[i];
                                                   String dataId =
                                                       "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
                                                   bool val = monthProvider.exerciseHistoryModel
@@ -1267,8 +1277,8 @@ class _ExercisePageState extends State<ExercisePage> {
                                                     monthProvider.updateWarmUp(false);
 
                                                     bool isLast = i ==
-                                                        monthProvider.dayDataModel!.exercises?.indexWhere((element) =>
-                                                            element.exerciseId == monthProvider.dayDataModel!.exercises?.last.exerciseId);
+                                                        exerciseList
+                                                            .indexWhere((element) => element.exerciseId == exerciseList.last.exerciseId);
                                                     monthProvider.updateIsLastExercise(isLast);
 
                                                     await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");

@@ -143,6 +143,9 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => monthProvider.getLiftedWeightGraphData(),
+      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -186,57 +189,63 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: SafeArea(
                             child: Consumer<ScrollProvider>(
                               builder: (context, scrollProvider, child) {
-                                return Container(
-                                  margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
+                                return Consumer<UserDataProvider>(builder: (context, userData, child) {
+                                  return AppBar(
+                                    toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                    backgroundColor: Colors.transparent,
+                                    centerTitle: false,
+                                    leading: SizedBox(),
+                                    titleSpacing: ScreenUtil.horizontalScale(6),
+                                    leadingWidth: 0,
+                                    title: Text(
+                                      'Hi ${userData.userName}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: ScreenUtil.horizontalScale(5.5),
+                                      ),
+                                    ),
+                                    actions: [
                                       Padding(
-                                        padding: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(8),
-                                          top: ScreenUtil.verticalScale(0),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Consumer<UserDataProvider>(
-                                              builder: (context, userData, child) => userData.userName != ""
-                                                  ? Text(
-                                                      // 'Hi Nick'
-                                                      'Hi ${userData.userName}',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: ScreenUtil.verticalScale(2.9),
-                                                        height: 2,
-                                                      ),
-                                                    )
-                                                  : const SizedBox(),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                  left: ScreenUtil.horizontalScale(0),
-                                                  right: ScreenUtil.horizontalScale(0),
-                                                  top: ScreenUtil.verticalScale(0),
-                                                ),
-                                                child: const CommonStreakWithNotification(routeString: "dashboard"),
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                        padding: const EdgeInsets.only(right: 10),
+                                        child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                      )
                                     ],
-                                  ),
-                                );
+                                  );
+                                });
+                                // Container(
+                                //   margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     crossAxisAlignment: CrossAxisAlignment.start,
+                                //     children: [
+                                //       Padding(
+                                //         padding: EdgeInsets.only(
+                                //           left: ScreenUtil.horizontalScale(8),
+                                //           top: ScreenUtil.verticalScale(0),
+                                //         ),
+                                //         child: Row(
+                                //           mainAxisAlignment: MainAxisAlignment.center,
+                                //           children: [
+                                //             Consumer<UserDataProvider>(
+                                //               builder: (context, userData, child) => userData.userName != ""
+                                //                   ? Text(
+                                //                       // 'Hi Nick'
+                                //                       'Hi ${userData.userName}',
+                                //                       style: TextStyle(
+                                //                         color: Colors.white,
+                                //                         fontSize: ScreenUtil.verticalScale(2.9),
+                                //                         height: 2,
+                                //                       ),
+                                //                     )
+                                //                   : const SizedBox(),
+                                //             ),
+                                //           ],
+                                //         ),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: "dashboard"),
+                                //     ],
+                                //   ),
+                                // );
                               },
                             ),
                           ),
@@ -247,8 +256,10 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             RefreshIndicator(
               color: AppColors.primaryColor,
-              onRefresh: () async =>
-                  await _initializeFetchData().then((value) async => await monthProvider.onInit(context, isEnabled: false)),
+              onRefresh: () async => await _initializeFetchData().then((value) async {
+                if (!context.mounted) return;
+                await monthProvider.onInit(context, isEnabled: false);
+              }),
               child: SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
                 child: Column(
@@ -281,95 +292,111 @@ class _DashboardPageState extends State<DashboardPage> {
                                       children: [
                                         Consumer<ScrollProvider>(
                                           builder: (context, scrollProvider, child) {
-                                            return Container(
-                                              margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                      left: ScreenUtil.horizontalScale(8),
-                                                      top: ScreenUtil.verticalScale(0),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-                                                        Consumer<UserDataProvider>(
-                                                            builder: (context, userData, child) => userData.userName != ""
-                                                                ? Text(
-                                                                    // 'Hi Nick'
-                                                                    scrollProvider.scrollOffset >= 0.0 ? 'Hi ${userData.userName}' : "",
-                                                                    style: TextStyle(
-                                                                      color: Colors.white,
-                                                                      fontSize: ScreenUtil.verticalScale(2.9),
-                                                                      height: 2,
-                                                                    ),
-                                                                  )
-                                                                : const SizedBox()),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Padding(
-                                                            padding: EdgeInsets.only(
-                                                              left: ScreenUtil.horizontalScale(0),
-                                                              right: ScreenUtil.horizontalScale(0),
-                                                              top: ScreenUtil.verticalScale(0),
+                                            return Column(
+                                              children: [
+                                                scrollProvider.scrollOffset >= 0.0
+                                                    ? Consumer<UserDataProvider>(
+                                                        builder: (context, userData, child) {
+                                                          return AppBar(
+                                                            toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                                            backgroundColor: Colors.transparent,
+                                                            centerTitle: false,
+                                                            leading: SizedBox(),
+                                                            titleSpacing: ScreenUtil.horizontalScale(6),
+                                                            leadingWidth: 0,
+                                                            title: Text(
+                                                              'Hi ${userData.userName}',
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: ScreenUtil.horizontalScale(5.5),
+                                                              ),
                                                             ),
-                                                            child: scrollProvider.scrollOffset >= 0.0
-                                                                ? const CommonStreakWithNotification(routeString: "dashboard")
-                                                                : Row(
-                                                                    children: [
-                                                                      Row(
-                                                                        children: [
-                                                                          Container(
-                                                                            alignment: Alignment.center,
-                                                                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
-                                                                            decoration: BoxDecoration(
-                                                                              color: Colors.transparent,
-                                                                              shape: BoxShape.circle,
-                                                                              border: Border.all(color: Colors.transparent),
-                                                                            ),
-                                                                            child: Text(
-                                                                              '',
-                                                                              style: TextStyle(
-                                                                                color: Colors.transparent,
-                                                                                fontSize: ScreenUtil.verticalScale(0.8),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Icon(
-                                                                            Icons.local_fire_department_outlined,
-                                                                            color: Colors.transparent,
-                                                                            size: ScreenUtil.verticalScale(3),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                      IconButton(
-                                                                        /// COMMENT THIS SIZE-BOX AND UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
-                                                                        onPressed: null, icon: SizedBox(),
-                                                                        // icon: Icon(
-                                                                        //   Icons.notifications_none,
-                                                                        //   color: Colors.transparent,
-                                                                        //   size: ScreenUtil.verticalScale(3),
-                                                                        // ),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
+                                                            actions: [
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(right: 10),
+                                                                child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                                              )
+                                                            ],
+                                                          );
+                                                        },
+                                                      )
+                                                    : SizedBox(),
+                                                SizedBox(
+                                                  height: scrollProvider.scrollOffset >= 0.0 ? 0 : ScreenUtil.verticalScale(5.5),
+                                                )
+                                              ],
                                             );
+                                            // Container(
+                                            //   margin: const EdgeInsets.only(right: 10, bottom: 0),
+                                            //   child: Row(
+                                            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            //     crossAxisAlignment: CrossAxisAlignment.start,
+                                            //     children: [
+                                            //       Padding(
+                                            //         padding: EdgeInsets.only(
+                                            //           left: ScreenUtil.horizontalScale(8),
+                                            //           top: ScreenUtil.verticalScale(0),
+                                            //         ),
+                                            //         child: Row(
+                                            //           mainAxisAlignment: MainAxisAlignment.center,
+                                            //           children: [
+                                            //             Consumer<UserDataProvider>(
+                                            //                 builder: (context, userData, child) => userData.userName != ""
+                                            //                     ? Text(
+                                            //                         scrollProvider.scrollOffset >= 0.0 ? 'Hi ${userData.userName}' : "",
+                                            //                         style: TextStyle(
+                                            //                           color: Colors.white,
+                                            //                           fontSize: ScreenUtil.verticalScale(2.9),
+                                            //                           height: 2,
+                                            //                         ),
+                                            //                       )
+                                            //                     : const SizedBox()),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            //       scrollProvider.scrollOffset >= 0.0
+                                            //           ? const CommonStreakWithNotification(routeString: "dashboard")
+                                            //           : Row(
+                                            //               children: [
+                                            //                 Row(
+                                            //                   children: [
+                                            //                     Container(
+                                            //                       alignment: Alignment.center,
+                                            //                       padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                                            //                       decoration: BoxDecoration(
+                                            //                         color: Colors.transparent,
+                                            //                         shape: BoxShape.circle,
+                                            //                         border: Border.all(color: Colors.transparent),
+                                            //                       ),
+                                            //                       child: Text(
+                                            //                         '',
+                                            //                         style: TextStyle(
+                                            //                           color: Colors.transparent,
+                                            //                           fontSize: ScreenUtil.verticalScale(0.8),
+                                            //                         ),
+                                            //                       ),
+                                            //                     ),
+                                            //                     Icon(
+                                            //                       Icons.local_fire_department_outlined,
+                                            //                       color: Colors.transparent,
+                                            //                       size: ScreenUtil.verticalScale(3),
+                                            //                     )
+                                            //                   ],
+                                            //                 ),
+                                            //                 IconButton(
+                                            //                   /// COMMENT THIS SIZE-BOX AND UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
+                                            //                   onPressed: null, icon: SizedBox(),
+                                            //                   // icon: Icon(
+                                            //                   //   Icons.notifications_none,
+                                            //                   //   color: Colors.transparent,
+                                            //                   //   size: ScreenUtil.verticalScale(3),
+                                            //                   // ),
+                                            //                 )
+                                            //               ],
+                                            //             ),
+                                            //     ],
+                                            //   ),
+                                            // );
                                           },
                                         ),
                                         Consumer<MonthProvider>(
@@ -664,7 +691,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                                topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                               ),
                             ),
                             child: Column(children: [
@@ -827,6 +854,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                       Padding(
                                         padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                                         child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Padding(
                                               padding: EdgeInsets.only(
@@ -1147,14 +1175,16 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     right: ScreenUtil.horizontalScale(7),
                                                     bottom: ScreenUtil.verticalScale(2.4)),
                                                 width: media.width,
-                                                child: Text(
-                                                  "Featured Collections",
-                                                  style: TextStyle(
-                                                    color: AppColors.primaryColor,
-                                                    fontSize: ScreenUtil.horizontalScale(5.2),
-                                                    fontWeight: FontWeight.w800,
+                                                child: Center(
+                                                  child: Text(
+                                                    "Featured Collections",
+                                                    style: TextStyle(
+                                                      color: AppColors.primaryColor,
+                                                      fontSize: ScreenUtil.horizontalScale(5.2),
+                                                      fontWeight: FontWeight.w800,
+                                                    ),
+                                                    textAlign: TextAlign.start,
                                                   ),
-                                                  textAlign: TextAlign.start,
                                                 ),
                                               ),
                                               CarouselSlider.builder(
@@ -1190,14 +1220,16 @@ class _DashboardPageState extends State<DashboardPage> {
                                           left: ScreenUtil.horizontalScale(7),
                                           right: ScreenUtil.horizontalScale(7),
                                           bottom: ScreenUtil.verticalScale(2.4)),
-                                      child: Text(
-                                        "Meet our team",
-                                        style: TextStyle(
-                                          color: AppColors.primaryColor,
-                                          fontSize: ScreenUtil.horizontalScale(5.2),
-                                          fontWeight: FontWeight.w800,
+                                      child: Center(
+                                        child: Text(
+                                          "Meet our team",
+                                          style: TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: ScreenUtil.horizontalScale(5.2),
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                          textAlign: TextAlign.start,
                                         ),
-                                        textAlign: TextAlign.start,
                                       ),
                                     ),
                                     Consumer<DataProvider>(
