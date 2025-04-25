@@ -28,16 +28,19 @@ class ProgramPhasesWidget extends StatelessWidget {
                 height: media.height / 8, // Adjust height of white top section
                 child: Container(
                   width: ScreenUtil.horizontalScale(60),
-                  margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
-                  child: Text(
-                    "Program Phases",
-                    maxLines: 2,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        color: AppColors.primaryColor,
-                        fontSize: ScreenUtil.horizontalScale(5.2),
-                        fontWeight: FontWeight.bold,
-                        height: 1.35),
+                  // margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      "Program Phases",
+                      maxLines: 2,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: ScreenUtil.horizontalScale(5.2),
+                          fontWeight: FontWeight.bold,
+                          height: 1.35),
+                    ),
                   ),
                 ),
               ),
@@ -97,16 +100,19 @@ class ProgramPhasesWidget extends StatelessWidget {
                 right: 0,
                 child: Container(
                   width: ScreenUtil.horizontalScale(60),
-                  margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
-                  child: Text(
-                    "Member Spotlight",
-                    maxLines: 2,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        color: AppColors.primaryColor,
-                        fontSize: ScreenUtil.horizontalScale(5.2),
-                        fontWeight: FontWeight.bold,
-                        height: 1.35),
+                  // margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      "Member Spotlight",
+                      maxLines: 2,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: ScreenUtil.horizontalScale(5.2),
+                          fontWeight: FontWeight.bold,
+                          height: 1.35),
+                    ),
                   ),
                 ),
               ),

@@ -213,6 +213,7 @@ class _MyAppState extends State<MyApp> {
           builder: !kReleaseMode ? DevicePreview.appBuilder : null,
           title: 'Booty by Bret',
           theme: ThemeData(
+            appBarTheme: AppBarTheme(titleTextStyle: TextStyle(fontWeight: FontWeight.w400)),
             primaryColor: AppColors.primaryColor,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,

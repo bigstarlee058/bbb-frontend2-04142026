@@ -75,7 +75,8 @@ class _MainPageState extends State<MainPage> {
       (timeStamp) async {
         String rawMonthId = preferences.getString(SharedPreference.monthId) ?? "";
         String rawTempData = preferences.getString("${SplitType.split3}-$rawMonthId") ?? "";
-        if (rawTempData.isEmpty) {
+        String rawTempRestDay = preferences.getString("REST-$rawMonthId") ?? "";
+        if (rawTempData.isEmpty || rawTempRestDay.isEmpty) {
           await _initializeFetchData().then(
             (value) async {
               if (monthProvider.monthDataModel == null) {

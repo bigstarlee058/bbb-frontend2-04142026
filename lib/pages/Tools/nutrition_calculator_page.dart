@@ -2,7 +2,6 @@ import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/providers/main_page_provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -83,47 +82,73 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                               child: SafeArea(
                                 child: Column(
                                   children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(right: 10),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          SafeArea(
-                                            child: SizedBox(width: ScreenUtil.horizontalScale(10)),
-                                          ),
-                                          // BackArrowWidget(
-                                          //   onPress: () {
-                                          //     // HapticFeedBack.buttonClick();
-                                          //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          //     // mainPageProvider.changeTab(2);
-                                          //     Navigator.pop(context);
-                                          //   },
-                                          // ),
-                                          Container(
-                                            margin:
-                                                EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(6)),
-                                            child: Consumer<UserDataProvider>(builder: (context, userData, child) {
-                                              return Text(
-                                                'Hi ${userData.userName}',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(5.5),
-                                                ),
-                                              );
-                                            }),
-                                          ),
-                                          const CommonStreakWithNotification(routeString: '/nutritionCalculator')
-                                        ],
+                                    AppBar(
+                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                      backgroundColor: Colors.transparent,
+                                      centerTitle: true,
+                                      // leading: BackArrowWidget(
+                                      //   onPress: () {
+                                      //     // HapticFeedBack.buttonClick();
+                                      //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      //     // mainPageProvider.changeTab(2);
+                                      //     Navigator.pop(context);
+                                      //   },
+                                      // ),
+                                      leading: SizedBox(),
+                                      title: Text(
+                                        'Nutrition Calculator',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil.horizontalScale(5.5),
+                                        ),
                                       ),
+                                      actions: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 10),
+                                          child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                        )
+                                      ],
                                     ),
+                                    // Container(
+                                    //   margin: const EdgeInsets.only(right: 10),
+                                    //   child: Row(
+                                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    //     children: [
+                                    //       SafeArea(
+                                    //         child: SizedBox(width: ScreenUtil.horizontalScale(10)),
+                                    //       ),
+                                    //       // BackArrowWidget(
+                                    //       //   onPress: () {
+                                    //       //     // HapticFeedBack.buttonClick();
+                                    //       //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                    //       //     // mainPageProvider.changeTab(2);
+                                    //       //     Navigator.pop(context);
+                                    //       //   },
+                                    //       // ),
+                                    //       Container(
+                                    //         margin:
+                                    //             EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(6)),
+                                    //         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
+                                    //           return Text(
+                                    //             'Hi ${userData.userName}',
+                                    //             style: TextStyle(
+                                    //               color: Colors.white,
+                                    //               fontSize: ScreenUtil.horizontalScale(5.5),
+                                    //             ),
+                                    //           );
+                                    //         }),
+                                    //       ),
+                                    //       const CommonStreakWithNotification(routeString: '/nutritionCalculator')
+                                    //     ],
+                                    //   ),
+                                    // ),
                                     Container(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: ScreenUtil.horizontalScale(5),
-                                        vertical: ScreenUtil.horizontalScale(2),
                                       ),
-                                      height: media.height * 0.2,
+                                      height: media.height * 0.11,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           SizedBox(
@@ -132,7 +157,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                               "Let's calculate your\nnutritional requirements",
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(1.8),
+                                                fontSize: ScreenUtil.verticalScale(2),
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
@@ -478,7 +503,6 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
           ),
           Positioned(
             left: 0,
-            top: 4,
             child: BackArrowWidget(
               onPress: () {
                 Navigator.pop(context);

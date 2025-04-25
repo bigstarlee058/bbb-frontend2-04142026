@@ -114,10 +114,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 Container(
                   width: media.width,
                   height: media.height / 2.25,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                     borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(70),
+                      bottomRight: Radius.circular(ScreenUtil.verticalScale(8)),
                     ),
                   ),
                 ),
@@ -139,10 +139,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               child: Container(
                 width: media.width,
                 height: media.height / 1.8,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                   borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(70),
+                    bottomRight: Radius.circular(ScreenUtil.verticalScale(8)),
                   ),
                 ),
               ),
@@ -152,10 +152,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               child: Container(
                 width: media.width,
                 height: media.height / 1.79,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
+                    topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                   ),
                 ),
                 child: Padding(

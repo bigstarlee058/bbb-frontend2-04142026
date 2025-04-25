@@ -168,7 +168,7 @@ class _LanguagePageState extends State<LanguagePage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
                     child: Column(

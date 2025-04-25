@@ -78,25 +78,44 @@ class _SettingPageState extends State<SettingPage> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: EdgeInsets.only(
-                                    right: ScreenUtil.horizontalScale(3),
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                  backgroundColor: Colors.transparent,
+                                  centerTitle: true,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      // HapticFeedBack.buttonClick();
+                                      // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                      // mainPageProvider.changeTab(2);
+                                      Navigator.pop(context);
+                                    },
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      BackArrowWidget(
-                                        onPress: () {
-                                          // HapticFeedBack.buttonClick();
-                                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                          // mainPageProvider.changeTab(3);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      const CommonStreakWithNotification(routeString: '/myprofile')
-                                    ],
-                                  ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                    )
+                                  ],
                                 ),
+                                // Container(
+                                //   margin: EdgeInsets.only(
+                                //     right: ScreenUtil.horizontalScale(3),
+                                //   ),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       BackArrowWidget(
+                                //         onPress: () {
+                                //           // HapticFeedBack.buttonClick();
+                                //           // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                //           // mainPageProvider.changeTab(3);
+                                //           Navigator.pop(context);
+                                //         },
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: '/myprofile')
+                                //     ],
+                                //   ),
+                                // ),
                                 Container(
                                   margin: EdgeInsets.symmetric(
                                       horizontal: ScreenUtil.horizontalScale(10), vertical: ScreenUtil.verticalScale(10)),
@@ -143,7 +162,7 @@ class _SettingPageState extends State<SettingPage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
                   ),
                   child: Column(

@@ -126,6 +126,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                 child: Column(
                                   children: [
                                     AppBar(
+                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
                                       centerTitle: true,
                                       backgroundColor: Colors.transparent,
                                       // leading: BackArrowWidget(
@@ -237,10 +238,10 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                       margin: EdgeInsets.only(top: media.height / 3.2),
                       child: Container(
                         width: media.width,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(70),
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
                         ),
                         child: Column(
@@ -302,7 +303,6 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
           ),
           Positioned(
             left: 0,
-            top: 4,
             child: BackArrowWidget(
               onPress: () {
                 Navigator.pop(context);

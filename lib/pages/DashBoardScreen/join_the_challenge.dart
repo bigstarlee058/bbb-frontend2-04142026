@@ -130,8 +130,8 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                                               shape: BoxShape.circle,
                                             ),
                                             child: SizedBox(
-                                              width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                              height: ScreenUtil.horizontalScale(10),
+                                              width: ScreenUtil.verticalScale(4.65),
+                                              height: ScreenUtil.verticalScale(4.65),
                                               child: IconButton(
                                                 padding: EdgeInsets.zero, // Removes the default padding
                                                 icon: const Icon(
@@ -199,7 +199,7 @@ class _JoinTheChallengePageState extends State<JoinTheChallengePage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(6)),
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
                     child: Container(

@@ -252,6 +252,11 @@ class MonthProvider extends ChangeNotifier {
 
   bool isFilterLoading = false;
 
+  clearWarmupModel() {
+    warmUpModel = null;
+    isWarmup = false;
+  }
+
   updateLocalData() async {
     findWeekStatuses();
     await fetchToday();
@@ -519,9 +524,6 @@ class MonthProvider extends ChangeNotifier {
       loader = false;
       notifyListeners();
     }
-
-    log('monthDataModel.id :::::::::::::::::: ${monthDataModel?.id}');
-    log('monthDataModel.id.week :::::::::::::::::: ${monthDataModel!.weeks?[0].id}');
   }
 
   Future<void> updateDayStatusList() async {
@@ -1645,7 +1647,6 @@ class MonthProvider extends ChangeNotifier {
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
     DateTime today = DateTime.now().toUtc();
     DateTime sixDaysAgo = today.subtract(const Duration(days: 6));
-
     List<DayHistoryModel> filteredData = allDayHistoryModel.where((entry) {
       if (entry.status != Status.completed) {
         return false;
@@ -1852,11 +1853,11 @@ class MonthProvider extends ChangeNotifier {
     try {
       for (var element in filteredData) {
         if (element.status == Status.completed) {
-          DateTime dateDateTime = element.date!;
-          String date = dateDateTime.toIso8601String().split('T')[0];
+          DateTime dateTime = element.date!;
+          DateTime localTime = Utils.formattedDate("$dateTime");
+          String date = localTime.toIso8601String().split('T')[0];
           int completedExercise = int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
-          String day = weekdays[dateDateTime.weekday] ?? "";
-
+          String day = weekdays[localTime.weekday] ?? "";
           if (combinedData.containsKey(date)) {
             combinedData[date]!['completedExercise'] += completedExercise;
           } else {
@@ -1970,10 +1971,13 @@ class MonthProvider extends ChangeNotifier {
 
     for (var element in filteredData) {
       if (element.status == Status.completed) {
-        DateTime dateDateTime = element.date!;
-        String date = dateDateTime.toIso8601String().split('T')[0];
+        DateTime dateTime = element.date!;
+
+        DateTime localTime = Utils.formattedDate("$dateTime");
+
+        String date = localTime.toIso8601String().split('T')[0];
         double totalWeight = double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
-        String day = weekdays[dateDateTime.weekday] ?? "";
+        String day = weekdays[localTime.weekday] ?? "";
         if (combinedData.containsKey(date)) {
           combinedData[date]!['totalWeight'] += totalWeight;
         } else {
@@ -2097,8 +2101,11 @@ class MonthProvider extends ChangeNotifier {
     for (var element in filteredData) {
       if (element.status == Status.completed) {
         try {
-          DateTime dateDateTime = element.date!;
-          String date = dateDateTime.toIso8601String().split('T')[0];
+          DateTime dateTime = element.date!;
+
+          DateTime localTime = Utils.formattedDate("$dateTime");
+
+          String date = localTime.toIso8601String().split('T')[0];
 
           DateTime aDate = element.startTime!;
           DateTime localTimeADate = Utils.formattedDate("$aDate");
@@ -2107,7 +2114,7 @@ class MonthProvider extends ChangeNotifier {
 
           int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
 
-          String day = weekdays[dateDateTime.weekday] ?? "";
+          String day = weekdays[localTime.weekday] ?? "";
           if (combinedData.containsKey(date)) {
             combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
           } else {

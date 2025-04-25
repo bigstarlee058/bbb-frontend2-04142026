@@ -727,8 +727,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.disabledBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.disabledDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.disabledTextStyle),
@@ -737,8 +737,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.selectedBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.selectedDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.selectedTextStyle),
@@ -747,8 +747,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.rangeStartBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.rangeStartDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.rangeStartTextStyle),
@@ -757,8 +757,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.rangeEndBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.rangeEndDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.rangeEndTextStyle),
@@ -767,8 +767,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.todayBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.todayDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.todayTextStyle),
@@ -777,8 +777,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.holidayBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.holidayDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.holidayTextStyle),
@@ -787,8 +787,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.withinRangeBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.withinRangeDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.withinRangeTextStyle),
@@ -797,8 +797,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.outsideBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: calendarStyle.outsideDecoration,
             alignment: alignment,
             child: Text(text, style: calendarStyle.outsideTextStyle),
@@ -807,8 +807,8 @@ class CellContent extends StatelessWidget {
       cell = calendarBuilders.defaultBuilder?.call(context, day, focusedDay) ??
           AnimatedContainer(
             duration: duration,
-            margin: margin,
-            padding: padding,
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             decoration: isWeekend ? calendarStyle.weekendDecoration : calendarStyle.defaultDecoration,
             alignment: alignment,
             child: Text(
