@@ -526,14 +526,14 @@ class _ExercisePageState extends State<ExercisePage> {
                 color: AppColors.primaryColor,
               ),
             )
-          : monthProvider!.exerciseDetailModel == null
+          : monthProvider!.exerciseDetailModel == null || (isExercise == 0 && monthProvider?.warmUpModel == null)
               ? Column(
                   children: [
                     backButton(media, context),
                     Expanded(
                       child: Center(
                         child: Text(
-                          "No exercise data found!",
+                          "No data found!",
                           style: TextStyle(fontSize: 17),
                         ),
                       ),
@@ -814,7 +814,7 @@ class _ExercisePageState extends State<ExercisePage> {
 
     return isExercise == 1
         ? const SizedBox(height: 0, width: 0)
-        : loading
+        : loading || monthProvider?.warmUpModel == null
             ? const SizedBox(
                 height: 0,
                 width: 0,

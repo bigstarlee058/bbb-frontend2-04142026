@@ -95,10 +95,15 @@ class CustomSlideActionState extends State<CustomSlideAction> with TickerProvide
                         clipBehavior: Clip.antiAlias,
                         children: <Widget>[
                           widget.submittedIcon ??
-                              Icon(
-                                Icons.done,
+                              Image.asset(
+                                "assets/icons/check.png",
                                 color: widget.innerColor ?? Theme.of(context).primaryIconTheme.color,
+                                height: ScreenUtil.verticalScale(2),
                               ),
+                          // Icon(
+                          //   Icons.done,
+                          //   color: widget.innerColor ?? Theme.of(context).primaryIconTheme.color,
+                          // ),
                           Positioned.fill(
                             right: 0,
                             child: Transform(

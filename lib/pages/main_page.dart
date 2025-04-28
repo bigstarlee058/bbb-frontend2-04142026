@@ -71,35 +71,35 @@ class _MainPageState extends State<MainPage> {
 
     // _initializeData();
     _startPeriodicUpdate();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async {
-        String rawMonthId = preferences.getString(SharedPreference.monthId) ?? "";
-        String rawTempData = preferences.getString("${SplitType.split3}-$rawMonthId") ?? "";
-        String rawTempRestDay = preferences.getString("REST-$rawMonthId") ?? "";
-        if (rawTempData.isEmpty || rawTempRestDay.isEmpty) {
-          await _initializeFetchData().then(
-            (value) async {
-              if (monthProvider.monthDataModel == null) {
-                await monthProvider.onInit(context);
-              }
-            },
-          );
-        } else {
-          if (monthProvider.monthDataModel == null) {
-            await monthProvider.onInit(context);
-          }
-        }
-      },
-    );
     // WidgetsBinding.instance.addPostFrameCallback(
-    //   (timeStamp) async => await _initializeFetchData().then(
-    //     (value) async {
+    //   (timeStamp) async {
+    //     String rawMonthId = preferences.getString(SharedPreference.monthId) ?? "";
+    //     String rawTempData = preferences.getString("${SplitType.split3}-$rawMonthId") ?? "";
+    //     String rawTempRestDay = preferences.getString("REST-$rawMonthId") ?? "";
+    //     if (rawTempData.isEmpty || rawTempRestDay.isEmpty) {
+    //       await _initializeFetchData().then(
+    //         (value) async {
+    //           if (monthProvider.monthDataModel == null) {
+    //             await monthProvider.onInit(context);
+    //           }
+    //         },
+    //       );
+    //     } else {
     //       if (monthProvider.monthDataModel == null) {
     //         await monthProvider.onInit(context);
     //       }
-    //     },
-    //   ),
+    //     }
+    //   },
     // );
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async => await _initializeFetchData().then(
+        (value) async {
+          if (monthProvider.monthDataModel == null) {
+            await monthProvider.onInit(context);
+          }
+        },
+      ),
+    );
 
     _pages = [
       const DashboardPage(),

@@ -133,7 +133,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                 child: Column(
                                   children: [
                                     AppBar(
-                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
                                       backgroundColor: Colors.transparent,
                                       centerTitle: true,
                                       // leading: BackArrowWidget(

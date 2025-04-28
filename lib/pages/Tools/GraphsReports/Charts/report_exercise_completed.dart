@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:bbb/providers/month_provider.dart';
@@ -165,7 +166,8 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
     List titles = monthProvider.reportExerciseCompletedGraphHistory.asMap().entries.map((e) {
       return e.value['day'];
     }).toList();
-
+    log('titles :::::::::::::::::: ${titles}');
+    log('monthProvider.reportExerciseCompletedWeek :::::::::::::::::: ${monthProvider.reportExerciseCompletedWeek}');
     final isd = int.parse(monthProvider.reportExerciseCompletedWeek.toString().replaceAll("Week ", ""));
     DateTime today = DateTime.now();
     String todayDayName = DateFormat('EEE').format(today);

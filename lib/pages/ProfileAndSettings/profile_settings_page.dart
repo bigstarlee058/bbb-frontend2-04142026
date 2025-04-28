@@ -185,7 +185,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
                                   backgroundColor: Colors.transparent,
                                   leading: SizedBox(),
                                   centerTitle: true,
@@ -205,7 +205,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                 ),
                                 Container(
                                   // color: Colors.red,
-                                  height: media.height / 2.91,
+                                  height: media.height / 3,
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(10),
                                   ),
@@ -213,7 +213,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        height: ScreenUtil.verticalScale(1.5),
+                                        height: ScreenUtil.verticalScale(1),
                                       ),
                                       GestureDetector(
                                         onTap: _pickAndUploadImage,
@@ -221,8 +221,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           builder: (context, userData, child) =>
                                               userData.userData['detail'] != null && userData.userData['detail']['avatarUrl'] != ""
                                                   ? Container(
-                                                      height: ScreenUtil.horizontalScale(23.5),
-                                                      width: ScreenUtil.horizontalScale(23.5),
+                                                      height: ScreenUtil.horizontalScale(22.5),
+                                                      width: ScreenUtil.horizontalScale(22.5),
                                                       decoration: BoxDecoration(
                                                         color: Colors.grey.withValues(alpha: .9),
                                                         borderRadius: BorderRadius.all(
@@ -253,7 +253,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.verticalScale(1),
+                                        height: ScreenUtil.verticalScale(0.8),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -270,7 +270,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             : const SizedBox(),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.verticalScale(0.5),
+                                        height: ScreenUtil.verticalScale(0.3),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -448,7 +448,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                    top: media.height / 2.25,
+                    top: media.height / 2.28,
                     bottom: ScreenUtil.verticalScale(10),
                   ),
                   child: Stack(

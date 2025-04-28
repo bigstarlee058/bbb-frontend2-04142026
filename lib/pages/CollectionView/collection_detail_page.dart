@@ -187,14 +187,14 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
               GestureDetector(
                 onTap: null,
                 child: Container(
-                  padding: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
+                  padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
                     "assets/icons/shopping-bag.svg",
-                    height: ScreenUtil.verticalScale(3),
+                    height: ScreenUtil.verticalScale(2.5),
                     colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
                   ),
                 ),

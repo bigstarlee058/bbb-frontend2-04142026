@@ -100,13 +100,14 @@ class _CircuitsViewState extends State<CircuitsView> {
                             (index) {
                               return GestureDetector(
                                 onTap: () {
-                                  widget.circuit[circuitsIndex].selectedDot = index;
+                                  // widget.circuit[circuitsIndex].selectedDot = index;
+                                  // pageController[circuitsIndex].jumpToPage(index);
                                   pageController[circuitsIndex].animateToPage(
                                     index,
-                                    duration: Duration(milliseconds: 500),
+                                    duration: Duration(milliseconds: 200),
                                     curve: Curves.easeInOut,
                                   );
-                                  setState(() {});
+                                  // setState(() {});
                                 },
                                 child: Container(
                                   height: ScreenUtil.verticalScale(4),

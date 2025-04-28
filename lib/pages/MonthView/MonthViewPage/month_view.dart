@@ -137,7 +137,7 @@ class _MonthViewState extends State<MonthView> {
                                 Consumer<ScrollProvider>(
                                   builder: (context, scrollProvider, child) {
                                     return AppBar(
-                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
                                       backgroundColor: Colors.transparent,
                                       centerTitle: true,
                                       leading: BackArrowWidget(
@@ -236,7 +236,7 @@ class _MonthViewState extends State<MonthView> {
                                             children: [
                                               scrollProvider.scrollOffset1 >= 0.0
                                                   ? AppBar(
-                                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
                                                       backgroundColor: Colors.transparent,
                                                       leading: BackArrowWidget(
                                                         onPress: () {
@@ -252,7 +252,7 @@ class _MonthViewState extends State<MonthView> {
                                                     )
                                                   : SizedBox(),
                                               SizedBox(
-                                                height: scrollProvider.scrollOffset1 >= 0.0 ? 0 : ScreenUtil.verticalScale(5.5),
+                                                height: scrollProvider.scrollOffset1 >= 0.0 ? 0 : ScreenUtil.verticalScale(5.1),
                                               )
                                             ],
                                           );
@@ -334,7 +334,7 @@ class _MonthViewState extends State<MonthView> {
                                         },
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.verticalScale(2),
+                                        height: ScreenUtil.verticalScale(.3),
                                       ),
                                       Consumer<MonthProvider>(builder: (context, monthProvider, child) {
                                         return Container(

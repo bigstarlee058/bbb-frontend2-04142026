@@ -82,7 +82,7 @@ Widget appShimmerImage(
               width: width,
               decoration: BoxDecoration(
                 borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
-                image: DecorationImage(image: AssetImage("assets/img/warm-up-placeholder.png"), fit: fit),
+                image: DecorationImage(image: AssetImage("assets/img/library_placeholder.png"), fit: fit),
               ),
             );
     },

@@ -68,7 +68,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                 child: Column(
                                   children: [
                                     AppBar(
-                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
                                       centerTitle: true,
                                       backgroundColor: Colors.transparent,
                                       // leading: BackArrowWidget(
@@ -95,7 +95,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                       padding: EdgeInsets.symmetric(
                                         horizontal: ScreenUtil.horizontalScale(5),
                                       ),
-                                      height: media.height * 0.11,
+                                      height: media.height * 0.097,
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         crossAxisAlignment: CrossAxisAlignment.center,

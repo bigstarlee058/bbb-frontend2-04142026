@@ -126,7 +126,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                 child: Column(
                                   children: [
                                     AppBar(
-                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
                                       centerTitle: true,
                                       backgroundColor: Colors.transparent,
                                       // leading: BackArrowWidget(
@@ -444,14 +444,14 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
             GestureDetector(
               onTap: null,
               child: Container(
-                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
+                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
                 decoration: BoxDecoration(
                   color: AppColors.primaryColor,
                   shape: BoxShape.circle,
                 ),
                 child: SvgPicture.asset(
                   "assets/icons/shopping-bag.svg",
-                  height: ScreenUtil.verticalScale(3),
+                  height: ScreenUtil.verticalScale(2.5),
                   colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
