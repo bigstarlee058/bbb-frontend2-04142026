@@ -353,7 +353,7 @@ class _TodayPageState extends State<TodayPage> {
                                     child: Column(
                                       children: [
                                         AppBar(
-                                          toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                          toolbarHeight: ScreenUtil.verticalScale(5.1),
                                           backgroundColor: Colors.transparent,
                                           leading: BackArrowWidget(
                                             onPress: () {
@@ -1050,7 +1050,7 @@ class _TodayPageState extends State<TodayPage> {
                                       ? monthProvider.warmUpModel?.thumbnail ??
                                           "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                       : monthProvider.warmUpModel?.thumbnail ?? "unknown",
-                                  fit: BoxFit.contain,
+                                  fit: BoxFit.cover,
                                   borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
                                     bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
@@ -1119,15 +1119,23 @@ class _TodayPageState extends State<TodayPage> {
                                   children: [
                                     SizedBox(
                                       width: media.width / 2.5,
-                                      child: Text(
-                                        monthProvider.warmUpModel?.title ?? "Warm IUp",
-                                        style: TextStyle(
-                                          color: AppColors.primaryColor,
-                                          fontSize: ScreenUtil.horizontalScale(3.8),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.2,
-                                        ),
-                                      ),
+                                      child: Builder(builder: (context) {
+                                        final warmups = monthProvider.isPumpDay
+                                            ? monthProvider.pumpDayModel?.warmups
+                                            : monthProvider.dayDataModel?.warmups;
+
+                                        return Text(
+                                          (monthProvider.warmUpModel?.title ?? (warmups!.isNotEmpty ? warmups.first.title : "Warm IUp")) ??
+                                              "Warm IUp",
+                                          maxLines: 2,
+                                          style: TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: ScreenUtil.horizontalScale(3.8),
+                                            fontWeight: FontWeight.bold,
+                                            height: 1.2,
+                                          ),
+                                        );
+                                      }),
                                     ),
                                     SizedBox(
                                       height: ScreenUtil.verticalScale(1.5),

@@ -83,7 +83,7 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                 child: Column(
                                   children: [
                                     AppBar(
-                                      toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
                                       backgroundColor: Colors.transparent,
                                       centerTitle: true,
                                       // leading: BackArrowWidget(
@@ -146,21 +146,18 @@ class _NutritionCalculatorPageState extends State<NutritionCalculatorPage> {
                                       padding: EdgeInsets.symmetric(
                                         horizontal: ScreenUtil.horizontalScale(5),
                                       ),
-                                      height: media.height * 0.11,
+                                      height: media.height * 0.097,
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          SizedBox(
-                                            width: ScreenUtil.horizontalScale(50),
-                                            child: Text(
-                                              "Let's calculate your\nnutritional requirements",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2),
-                                              ),
-                                              textAlign: TextAlign.center,
+                                          Text(
+                                            "Let's calculate your\nnutritional requirements",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(2),
                                             ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ],
                                       ),

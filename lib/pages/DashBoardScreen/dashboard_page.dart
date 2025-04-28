@@ -191,7 +191,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               builder: (context, scrollProvider, child) {
                                 return Consumer<UserDataProvider>(builder: (context, userData, child) {
                                   return AppBar(
-                                    toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                    toolbarHeight: ScreenUtil.verticalScale(5.1),
                                     backgroundColor: Colors.transparent,
                                     centerTitle: false,
                                     leading: SizedBox(),
@@ -298,7 +298,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     ? Consumer<UserDataProvider>(
                                                         builder: (context, userData, child) {
                                                           return AppBar(
-                                                            toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                                            toolbarHeight: ScreenUtil.verticalScale(5.1),
                                                             backgroundColor: Colors.transparent,
                                                             centerTitle: false,
                                                             leading: SizedBox(),
@@ -322,7 +322,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       )
                                                     : SizedBox(),
                                                 SizedBox(
-                                                  height: scrollProvider.scrollOffset >= 0.0 ? 0 : ScreenUtil.verticalScale(5.5),
+                                                  height: scrollProvider.scrollOffset >= 0.0 ? 0 : ScreenUtil.verticalScale(5.1),
                                                 )
                                               ],
                                             );
@@ -876,104 +876,115 @@ class _DashboardPageState extends State<DashboardPage> {
                                   );
                                 },
                               ),
-                              if ((monthProvider.graphHistory.isEmpty && monthProvider.reportWeightLiftedGraphHistory.isEmpty) == false &&
-                                  monthProvider.allDayHistoryModel.any(
-                                    (element) => element.status == Status.completed && element.type!.contains("Workout Day"),
-                                  )) ...[
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                      horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "Recent Activity",
-                                          style: TextStyle(
-                                            color: AppColors.primaryColor,
-                                            fontSize: ScreenUtil.horizontalScale(5.2),
-                                            fontWeight: FontWeight.w700,
+                              Consumer<MonthProvider>(
+                                builder: (context, value, child) {
+                                  if ((monthProvider.graphHistory.isEmpty && monthProvider.reportWeightLiftedGraphHistory.isEmpty) ==
+                                          false &&
+                                      monthProvider.allDayHistoryModel.any(
+                                        (element) => element.status == Status.completed && element.type!.contains("Workout Day"),
+                                      )) {
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  "Recent Activity",
+                                                  style: TextStyle(
+                                                    color: AppColors.primaryColor,
+                                                    fontSize: ScreenUtil.horizontalScale(5.2),
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ),
+                                              PopupMenuButton<String>(
+                                                color: const Color.fromARGB(255, 252, 252, 252),
+                                                elevation: 10,
+                                                shadowColor: Colors.black.withValues(alpha: 0.2),
+                                                itemBuilder: (context) {
+                                                  return [
+                                                    "Exercises Completed",
+                                                    // "Time Spent",
+                                                    "Weight Lifted",
+                                                  ].map((str) {
+                                                    return PopupMenuItem(
+                                                        value: str,
+                                                        child: Material(
+                                                          elevation: 0,
+                                                          color: const Color.fromARGB(255, 252, 252, 252),
+                                                          child: Text(
+                                                            str,
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: ScreenUtil.verticalScale(1.5),
+                                                            ),
+                                                          ),
+                                                        ));
+                                                  }).toList();
+                                                },
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      selectedChart,
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: ScreenUtil.verticalScale(1.5),
+                                                      ),
+                                                    ),
+                                                    const Icon(
+                                                      Icons.keyboard_arrow_down_rounded,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ],
+                                                ),
+                                                onSelected: (v) {
+                                                  setState(() {
+                                                    selectedChart = v;
+                                                  });
+                                                },
+                                              )
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                      PopupMenuButton<String>(
-                                        color: const Color.fromARGB(255, 252, 252, 252),
-                                        elevation: 10,
-                                        shadowColor: Colors.black.withValues(alpha: 0.2),
-                                        itemBuilder: (context) {
-                                          return [
-                                            "Exercises Completed",
-                                            // "Time Spent",
-                                            "Weight Lifted",
-                                          ].map((str) {
-                                            return PopupMenuItem(
-                                                value: str,
-                                                child: Material(
-                                                  elevation: 0,
-                                                  color: const Color.fromARGB(255, 252, 252, 252),
-                                                  child: Text(
-                                                    str,
-                                                    style: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize: ScreenUtil.verticalScale(1.5),
-                                                    ),
-                                                  ),
-                                                ));
-                                          }).toList();
-                                        },
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: <Widget>[
-                                            Text(
-                                              selectedChart,
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: ScreenUtil.verticalScale(1.5),
-                                              ),
-                                            ),
-                                            const Icon(
-                                              Icons.keyboard_arrow_down_rounded,
-                                              color: Colors.grey,
-                                            ),
-                                          ],
+                                        Container(
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: ScreenUtil.horizontalScale(8.5),
+                                          ),
+                                          child: selectedChart == "Exercises Completed"
+                                              ? const ExerciseCompletedGraph()
+                                              : selectedChart == "Weight Lifted"
+                                                  ? const WeightLiftedGraph()
+                                                  // : const TimeSpentGraph(),
+                                                  : const SizedBox(),
                                         ),
-                                        onSelected: (v) {
-                                          setState(() {
-                                            selectedChart = v;
-                                          });
-                                        },
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(8.5),
-                                  ),
-                                  child: selectedChart == "Exercises Completed"
-                                      ? const ExerciseCompletedGraph()
-                                      : selectedChart == "Weight Lifted"
-                                          ? const WeightLiftedGraph()
-                                          // : const TimeSpentGraph(),
-                                          : const SizedBox(),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(9),
-                                    vertical: ScreenUtil.verticalScale(1),
-                                  ),
-                                  child: ButtonWidget(
-                                    text: 'See all progress reports',
-                                    textColor: Colors.white,
-                                    color: AppColors.primaryColor,
-                                    onPress: () {
-                                      Navigator.pushNamed(context, "/graphAndReports");
-                                    },
-                                    isLoading: false,
-                                  ),
-                                ),
-                              ],
+                                        Container(
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: ScreenUtil.horizontalScale(9),
+                                            vertical: ScreenUtil.verticalScale(1),
+                                          ),
+                                          child: ButtonWidget(
+                                            text: 'See all progress reports',
+                                            textColor: Colors.white,
+                                            color: AppColors.primaryColor,
+                                            onPress: () {
+                                              Navigator.pushNamed(context, "/graphAndReports");
+                                            },
+                                            isLoading: false,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    return SizedBox();
+                                  }
+                                },
+                              ),
 
                               Padding(
                                 padding: EdgeInsets.symmetric(

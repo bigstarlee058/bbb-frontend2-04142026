@@ -6,6 +6,7 @@ import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/exerciselibrary.dart';
+import 'package:bbb/pages/Tools/GraphsReports/Charts/radar_chart.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -296,11 +297,11 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                         //   child: const ReportTimeSpentGraph()
                         // ),
 
-                        // Container(
-                        //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                        //   height: 1000,
-                        //   child: CustomRadarChart(),
-                        // ),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                          height: 450,
+                          child: CustomRadarChart(),
+                        ),
 
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: 35),
@@ -435,7 +436,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
                                   backgroundColor: Colors.transparent,
                                   centerTitle: true,
                                   // leading: BackArrowWidget(

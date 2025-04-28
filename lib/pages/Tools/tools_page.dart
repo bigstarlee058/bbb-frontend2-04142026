@@ -51,7 +51,7 @@ class _ToolsPageState extends State<ToolsPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.45),
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
                                   backgroundColor: Colors.transparent,
                                   centerTitle: true,
                                   // leading: BackArrowWidget(
@@ -113,7 +113,7 @@ class _ToolsPageState extends State<ToolsPage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 7.9,
+                          height: media.height / 6.99,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -135,7 +135,7 @@ class _ToolsPageState extends State<ToolsPage> {
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                    top: media.height / 8,
+                    top: media.height / 7,
                     bottom: ScreenUtil.verticalScale(15),
                   ),
                   child: Container(
