@@ -3,6 +3,7 @@ import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/welcome_content_model.dart';
 import 'package:bbb/pages/AuthScreen/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
+import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
@@ -82,7 +83,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 
       if (descriptionResponse.statusCode == 200) {
         welcomeContentModel = welcomeContentModelFromJson(descriptionResponse.body);
-
+        final image = CustomCacheManager().cacheImage(welcomeContentModel.imgUrl);
         prefs.setString("login_image", welcomeContentModel.imgUrl);
         // bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
       } else {
@@ -144,9 +145,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         children: [
           _isVideoInitialized
               ? SizedBox.expand(child: VideoPlayer(_videoController))
-              : SizedBox(width: ScreenUtil.horizontalScale(100), child: Image.asset("assets/img/welcome_placeholder.png")),
+              : SizedBox(
+                  width: ScreenUtil.horizontalScale(100),
+                  child: Image.asset(
+                    "assets/img/back.jpg",
+                    fit: BoxFit.cover,
+                  )),
           Align(
-            alignment: Alignment.bottomCenter,
+            alignment: Alignment.center,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
@@ -159,94 +165,99 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   ),
                 ),
                 SizedBox(
-                  height: ScreenUtil.horizontalScale(10),
-                ),
-                Container(
-                  width: media.width,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                    ),
-                  ),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        right: 0,
-                        top: -(media.height / 9.8) + 0.3,
-                        child: ClipPath(
-                          clipper: DiagonalClipper(),
-                          child: Container(
-                            height: media.height / 9.8,
-                            width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: ScreenUtil.horizontalScale(2),
-                            ),
-                            isLoading
-                                ? SizedBox(
-                                    height: media.height * .28,
-                                  )
-                                : TextSlider(
-                                    slide: welcomeContentModel.slides,
-                                  ),
-                            ButtonWidget(
-                              text: 'Sign in',
-                              textColor: Colors.white,
-                              color: AppColors.primaryColor,
-                              onPress: onPressLogin,
-                              isLoading: false,
-                            ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Don't have an account? ",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xff888888),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: onPressCreateAccount,
-                                  style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: const Size(65, 30),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      alignment: Alignment.center),
-                                  child: const Text(
-                                    'Sign up',
-                                    style: TextStyle(
-                                      color: AppColors.primaryColor,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: ScreenUtil.horizontalScale(7.2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  height: ScreenUtil.horizontalScale(media.height / 10),
                 ),
               ],
+            ),
+          ),
+          Positioned(
+            bottom: -1,
+            left: 0,
+            right: 0,
+            child: Container(
+              width: media.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                ),
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    right: 0,
+                    top: -(media.height / 9.8) + 0.3,
+                    child: ClipPath(
+                      clipper: DiagonalClipper(),
+                      child: Container(
+                        height: media.height / 9.8,
+                        width: media.width / 6,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: ScreenUtil.horizontalScale(2),
+                        ),
+                        isLoading
+                            ? SizedBox(
+                                height: media.height * .28,
+                              )
+                            : TextSlider(
+                                slide: welcomeContentModel.slides,
+                              ),
+                        ButtonWidget(
+                          text: 'Sign in',
+                          textColor: Colors.white,
+                          color: AppColors.primaryColor,
+                          onPress: onPressLogin,
+                          isLoading: false,
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Don't have an account? ",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xff888888),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: onPressCreateAccount,
+                              style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(65, 30),
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  alignment: Alignment.center),
+                              child: const Text(
+                                'Sign up',
+                                style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil.horizontalScale(7.2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           )
         ],

@@ -188,7 +188,15 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> checkForPumpDay() async {
     await checkPumpDayAvail();
-    await getAllPumpDayForThisWeek();
+    await getAllPumpDayForThisWeek().then(
+      (value) {
+        if (pumpDays.isEmpty) {
+          changeIsPumpDayAvail(false);
+          changeIsPumpDay(false);
+        }
+      },
+    );
+
     notifyListeners();
   }
 
@@ -216,7 +224,9 @@ class MonthProvider extends ChangeNotifier {
 
       for (var i = 0; i < (monthDataModel?.weeks?[week! - 1].pumpDayIds?.length ?? 0); i++) {
         var value = await fetchPumpDay(monthDataModel!.weeks![week! - 1].pumpDayIds![i]);
-        pumpDays.add(value);
+        if (value != null) {
+          pumpDays.add(value);
+        }
       }
 
       this.pumpDays = pumpDays;
@@ -585,10 +595,9 @@ class MonthProvider extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  Future<PumpDayModel> fetchPumpDay(String id) async {
+  Future<PumpDayModel?> fetchPumpDay(String id) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/pump-days/get/$id');
     String? userIdToken = await getAuthToken();
-
     try {
       final response = await http.get(
         url,
@@ -600,12 +609,12 @@ class MonthProvider extends ChangeNotifier {
         PumpDayModel pumpDayModel = PumpDayModel.fromJson(responseData);
         return pumpDayModel;
       } else {
-        throw Exception('Failed to load fetchPumpDay');
+        return null;
       }
     } catch (e, stackTrace) {
       debugPrint("Error in fetchPumpDay: $e");
       debugPrint("StackTrace: $stackTrace");
-      throw Exception('Failed to load fetchPumpDay');
+      return null;
     }
   }
 

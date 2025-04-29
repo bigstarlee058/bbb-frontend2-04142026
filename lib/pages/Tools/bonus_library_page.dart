@@ -106,7 +106,7 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                         Stack(
                           children: [
                             Container(
-                              height: media.height / 2,
+                              height: media.height / 1,
                               width: media.width,
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
@@ -117,10 +117,11 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                               ),
                             ),
                             SizedBox(
-                              height: media.height / 3.2,
+                              height: media.height / 2,
                               width: media.width,
                               child: SafeArea(
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.max,
                                   children: [
                                     AppBar(
                                       toolbarHeight: ScreenUtil.verticalScale(5.1),
@@ -234,6 +235,7 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                     Container(
                       margin: EdgeInsets.only(top: media.height / 3.2),
                       child: Container(
+                        height: media.height,
                         width: media.width,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -241,55 +243,57 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                             topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
                         ),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: media.width,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(55),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Container(
+                                width: media.width,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(55),
+                                  ),
+                                ),
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(6),
+                                    vertical: ScreenUtil.verticalScale(2),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(2),
+                                      ),
+                                      dataProvider == null || dataProvider!.adminBonusesData.isEmpty || _filteredBonuses.isEmpty
+                                          ? SizedBox(
+                                              height: ScreenUtil.verticalScale(10),
+                                            )
+                                          : Column(
+                                              children: _getPaginatedBonuses().map((bonus) {
+                                                return Column(
+                                                  children: [
+                                                    bonusCard(
+                                                      bonus, // Dynamically display bonus
+                                                    ),
+                                                    SizedBox(
+                                                      height: ScreenUtil.verticalScale(2),
+                                                    ),
+                                                  ],
+                                                );
+                                              }).toList(),
+                                            ),
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(2),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              child: Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(6),
-                                  vertical: ScreenUtil.verticalScale(2),
-                                ),
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      height: ScreenUtil.verticalScale(2),
-                                    ),
-                                    dataProvider == null || dataProvider!.adminBonusesData.isEmpty || _filteredBonuses.isEmpty
-                                        ? SizedBox(
-                                            height: ScreenUtil.verticalScale(10),
-                                          )
-                                        : Column(
-                                            children: _getPaginatedBonuses().map((bonus) {
-                                              return Column(
-                                                children: [
-                                                  bonusCard(
-                                                    bonus, // Dynamically display bonus
-                                                  ),
-                                                  SizedBox(
-                                                    height: ScreenUtil.verticalScale(2),
-                                                  ),
-                                                ],
-                                              );
-                                            }).toList(),
-                                          ),
-                                    SizedBox(
-                                      height: ScreenUtil.verticalScale(2),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 50,
-                            )
-                          ],
+                              const SizedBox(
+                                height: 50,
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

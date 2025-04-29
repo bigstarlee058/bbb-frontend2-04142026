@@ -2,10 +2,12 @@ abstract class BaseService<T> {
   static const fetchExerciseHistory = "/api/exercise-history/fetch";
   static const addExerciseHistory = "/api/exercise-history/add";
   static const updateExerciseHistory = "/api/exercise-history/update";
+  static const deleteExerciseHistory = "/api/exercise-history/delete";
 
   static const fetchExerciseStatus = "/api/exercise-status/fetch";
   static const addExerciseStatus = "/api/exercise-status/add";
   static const updateExerciseStatus = "/api/exercise-status/update";
+  static const deleteExerciseStatus = "/api/exercise-status/delete";
 
   static const fetchDayStatus = "/api/day-status/fetch";
   static const addDayStatus = "/api/day-status/add";
@@ -37,7 +39,9 @@ abstract class BaseService<T> {
   static const fetchDayStatusList = "/api/day-status-list/fetch";
 
   static const fetchMonthEnrollment = "/api/months-enrollment/fetch";
+  static const deleteMonthEnrollment = "/api/months-enrollment/delete";
 
   static const addAchievementsList = "/api/achievements/add";
   static const fetchAchievementsList = "/api/achievements/fetch";
+  static const deleteAchievementsList = "/api/achievements/delete";
 }

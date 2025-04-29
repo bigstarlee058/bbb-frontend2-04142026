@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -7,11 +8,13 @@ import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -34,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isObscure = true;
   bool isLoading = false;
-
+  ImageProvider? imageProvider;
   String image = '';
 
   late MainPageProvider mainPageProvider;
@@ -57,6 +60,20 @@ class _LoginPageState extends State<LoginPage> {
       image = widget.image;
     }
 
+    if (image.startsWith('http')) {
+      // Adjust cloud storage URL if needed
+      final adjustedUrl = image.startsWith('https://storage.cloud.google.com/')
+          ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          : image;
+
+      imageProvider = CachedNetworkImageProvider(
+        adjustedUrl,
+        cacheManager: CustomCacheManager(),
+      );
+    } else {
+      // It's a local file path
+      imageProvider = FileImage(File(image));
+    }
     setState(() {});
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
@@ -185,12 +202,12 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: image.isNotEmpty
-                          ? NetworkImage(
+                          ? CachedNetworkImageProvider(
                               image.startsWith('https://storage.cloud.google.com/')
                                   ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                   : image,
-                            )
-                          : const AssetImage('assets/img/card.png'),
+                              cacheManager: CustomCacheManager())
+                          : const AssetImage('assets/img/back.jpg'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -206,7 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       Center(
                         child: Container(
-                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(15)),
+                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(23)),
                           height: media.height / 7,
                           width: media.width,
                           decoration: const BoxDecoration(
@@ -285,7 +302,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   icon: Icon(
-                                    Icons.person,
+                                    Icons.email,
                                     color: Colors.grey.shade400,
                                   ),
                                 ),
@@ -343,7 +360,9 @@ class _LoginPageState extends State<LoginPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (ctx) => const ResetPasswordScreen(),
+                                          builder: (ctx) => const ResetPasswordScreen(
+                                            image: '',
+                                          ),
                                         ),
                                       );
                                     },

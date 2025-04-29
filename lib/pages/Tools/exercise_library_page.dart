@@ -116,7 +116,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                         Stack(
                           children: <Widget>[
                             Container(
-                              height: media.height / 2,
+                              height: media.height / 1,
                               width: media.width,
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
@@ -274,8 +274,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                   vertical: ScreenUtil.verticalScale(2),
                                 ),
                                 child: dataProvider == null || dataProvider!.adminExercises.isEmpty || _filteredExercises.isEmpty
-                                    ? SizedBox(
-                                        height: ScreenUtil.verticalScale(10),
+                                    ? Container(
+                                        color: Colors.white,
+                                        height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
                                       )
                                     : Column(
                                         children: [

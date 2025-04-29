@@ -234,7 +234,7 @@ class _MyAppState extends State<MyApp> {
             AppRoutes.exerciseLibraryScreen: (context) => const ExerciseLibraryPage(),
             AppRoutes.equipmentLibraryScreen: (context) => const EquipmentLibraryPage(),
             AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
-            AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(),
+            AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(image: ''),
             AppRoutes.emailVerificationScreen: (context) => const EmailVerificationScreen(),
             AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
             AppRoutes.todayScreen: (context) => const TodayPage(),

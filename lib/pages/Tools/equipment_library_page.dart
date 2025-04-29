@@ -109,7 +109,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                         Stack(
                           children: [
                             Container(
-                              height: media.height / 2,
+                              height: media.height / 1,
                               width: media.width,
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
@@ -265,8 +265,9 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                       height: ScreenUtil.verticalScale(2),
                                     ),
                                     dataProvider == null || dataProvider!.adminEquipmentsData.isEmpty || _filteredEquipments.isEmpty
-                                        ? SizedBox(
-                                            height: ScreenUtil.verticalScale(10),
+                                        ? Container(
+                                            color: Colors.white,
+                                            height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
                                           )
                                         : Column(
                                             children: _getPaginatedEquipments().map((equipment) {
@@ -290,7 +291,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                               ),
                             ),
                             const SizedBox(
-                              height: 100,
+                              height: 50,
                             )
                           ],
                         ),
@@ -444,14 +445,14 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
             GestureDetector(
               onTap: null,
               child: Container(
-                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
+                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.85)),
                 decoration: BoxDecoration(
                   color: AppColors.primaryColor,
                   shape: BoxShape.circle,
                 ),
                 child: SvgPicture.asset(
                   "assets/icons/shopping-bag.svg",
-                  height: ScreenUtil.verticalScale(2.5),
+                  height: ScreenUtil.verticalScale(2.3),
                   colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),

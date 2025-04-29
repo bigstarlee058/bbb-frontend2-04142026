@@ -62,10 +62,11 @@ class ProgramPhasesWidget extends StatelessWidget {
                   clipper: MiddleClipper(),
                   child: Container(
                     decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: const AssetImage('assets/img/pp_4.png'),
-                        fit: BoxFit.cover,
-                      ),
+                      color: Colors.grey[100],
+                      // image: DecorationImage(
+                      //   image: const AssetImage('assets/img/pp_4.png'),
+                      //   fit: BoxFit.cover,
+                      // ),
                     ),
                   ),
                 ),

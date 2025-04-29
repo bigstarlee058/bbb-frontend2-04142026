@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -97,20 +99,21 @@ class _WeekCalenderState extends State<WeekCalender> {
       }
 
       DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
+
       if (date.isBefore(futureDay)) {
-        if (widget.monthProvider.dayStatusList.isNotEmpty) {
-          for (var day in widget.monthProvider.dayStatusList) {
-            final workoutDate = day.date;
-            DateTime localTime = Utils.formattedDate("$workoutDate");
-            if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
-              if (day.status == Status.completed) {
-                return _buildCustomDayCircle(date, AppColors.primaryColor);
-              } else if (day.status == Status.skipped) {
-                return _buildCustomDayCircle(date, Colors.blue);
-              }
-            }
-          }
-        }
+        // if (widget.monthProvider.dayStatusList.isNotEmpty) {
+        //   for (var day in data) {
+        //     final workoutDate = day.date;
+        //     DateTime localTime = Utils.formattedDate("$workoutDate");
+        //     if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+        //       if (day.status == Status.completed) {
+        //         return _buildCustomDayCircle(date, AppColors.primaryColor);
+        //       } else if (day.status == Status.skipped) {
+        //         return _buildCustomDayCircle(date, Colors.blue);
+        //       }
+        //     }
+        //   }
+        // }
 
         for (var day in data) {
           final workoutDate = day.endTime!;
@@ -128,6 +131,7 @@ class _WeekCalenderState extends State<WeekCalender> {
       }
 
       if (isCurrentDay) {
+        log('isCurrentDay :::::::::::::::::: $isCurrentDay');
         for (var day in data) {
           final workoutDate = day.endTime!;
           DateTime localTime = Utils.formattedDate("$workoutDate");

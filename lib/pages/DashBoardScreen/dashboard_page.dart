@@ -163,7 +163,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 return Opacity(
                   opacity: scrollProvider.scrollOffset <= 0.0 ? 1 : 0,
                   child: Container(
-                    height: media.height / 2,
+                    height: media.height / 1,
                     width: media.width,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
@@ -275,7 +275,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     return Opacity(
                                       opacity: scrollProvider.scrollOffset > 0.0 ? 1 : 0,
                                       child: Container(
-                                        height: media.height / 2,
+                                        height: media.height / 1,
                                         width: media.width,
                                         decoration: const BoxDecoration(
                                           image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),

@@ -4,7 +4,6 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -120,26 +119,37 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(6)),
+                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
                             child: Stack(
                               clipBehavior: Clip.none,
                               children: [
                                 Lottie.asset('assets/img/mail.json'),
                                 Positioned(
-                                  bottom: -ScreenUtil.verticalScale(6),
+                                  bottom: -ScreenUtil.verticalScale(5.5),
                                   left: 0,
                                   right: 0,
                                   child: Column(
                                     children: [
                                       Text(
                                         'CONFIRM YOUR EMAIL',
-                                        style: GoogleFonts.bebasNeue(color: AppColors.primaryColor, fontSize: ScreenUtil.verticalScale(4)),
+                                        style: TextStyle(
+                                          fontSize: ScreenUtil.verticalScale(3.32),
+                                          color: AppColors.primaryColor,
+                                          height: 1.5,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                      Text(
-                                        'A verification email has been sent to your inbox. Please click the link in the email to confirm your account.',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.plusJakartaSans(
-                                            color: Colors.grey.shade600, fontSize: ScreenUtil.verticalScale(1.8)),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
+                                        child: Text(
+                                          'A verification email has been sent to your inbox. Please click the link in the email to confirm your account.',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: ScreenUtil.verticalScale(1.7),
+                                            height: 1.5,
+                                            color: Color(0xff6f6f6f),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -148,7 +158,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: ScreenUtil.horizontalScale(29.5),
+                            height: ScreenUtil.horizontalScale(23),
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
