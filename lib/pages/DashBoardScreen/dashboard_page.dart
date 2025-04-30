@@ -163,7 +163,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 return Opacity(
                   opacity: scrollProvider.scrollOffset <= 0.0 ? 1 : 0,
                   child: Container(
-                    height: media.height / 2,
+                    height: media.height / 1,
                     width: media.width,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
@@ -275,7 +275,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     return Opacity(
                                       opacity: scrollProvider.scrollOffset > 0.0 ? 1 : 0,
                                       child: Container(
-                                        height: media.height / 2,
+                                        height: media.height / 1,
                                         width: media.width,
                                         decoration: const BoxDecoration(
                                           image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
@@ -825,7 +825,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         onPressed: () {
                                           monthProvider.updateIsOnMonthPage(true);
                                           HapticFeedBack.buttonClick();
-                                          monthProvider.updateSelectedSection(2);
+                                          monthProvider.updateSelectedSection(1);
                                           mainPageProvider.changeTab(1);
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -863,7 +863,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 "Streak Calendar",
                                                 style: TextStyle(
                                                   color: AppColors.primaryColor,
-                                                  fontSize: ScreenUtil.horizontalScale(5.2),
+                                                  fontSize: ScreenUtil.horizontalScale(5),
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ),
@@ -871,37 +871,50 @@ class _DashboardPageState extends State<DashboardPage> {
                                           ],
                                         ),
                                       ),
-                                      WeekCalender(monthProvider: monthProvider),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(context, '/streak-calendar');
+                                        },
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          child: WeekCalender(monthProvider: monthProvider),
+                                        ),
+                                      ),
                                     ],
                                   );
                                 },
                               ),
                               Consumer<MonthProvider>(
                                 builder: (context, value, child) {
-                                  if ((monthProvider.graphHistory.isEmpty && monthProvider.reportWeightLiftedGraphHistory.isEmpty) ==
-                                          false &&
-                                      monthProvider.allDayHistoryModel.any(
-                                        (element) => element.status == Status.completed && element.type!.contains("Workout Day"),
-                                      )) {
+                                  final listA = monthProvider.graphHistory.map((e) => e["totalCompletedExercise"].value > 0).toList();
+                                  final listB = monthProvider.graphHistory.map((e) => e["totalWeight"].value > 0).toList();
+                                  final isAvailable = listA.any((element) => element == true) || listB.any((element) => element == true);
+                                  if (isAvailable) {
                                     return Column(
                                       children: [
+                                        SizedBox(height: ScreenUtil.verticalScale(1.9)),
                                         Container(
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  "Recent Activity",
-                                                  style: TextStyle(
-                                                    color: AppColors.primaryColor,
-                                                    fontSize: ScreenUtil.horizontalScale(5.2),
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
+                                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                          child: Text(
+                                            // "Recent Activity",
+                                            "Current Week Activity",
+                                            style: TextStyle(
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.horizontalScale(5),
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                bottom: ScreenUtil.verticalScale(1),
+                                                top: ScreenUtil.verticalScale(1.5),
                                               ),
-                                              PopupMenuButton<String>(
+                                              child: PopupMenuButton<String>(
                                                 color: const Color.fromARGB(255, 252, 252, 252),
                                                 elevation: 10,
                                                 shadowColor: Colors.black.withValues(alpha: 0.2),
@@ -948,8 +961,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     selectedChart = v;
                                                   });
                                                 },
-                                              )
-                                            ],
+                                              ),
+                                            ),
                                           ),
                                         ),
                                         Container(
@@ -1006,7 +1019,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: AppColors.primaryColor,
-                                            fontSize: ScreenUtil.horizontalScale(5.2),
+                                            fontSize: ScreenUtil.horizontalScale(5),
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -1191,7 +1204,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     "Featured Collections",
                                                     style: TextStyle(
                                                       color: AppColors.primaryColor,
-                                                      fontSize: ScreenUtil.horizontalScale(5.2),
+                                                      fontSize: ScreenUtil.horizontalScale(5),
                                                       fontWeight: FontWeight.w800,
                                                     ),
                                                     textAlign: TextAlign.start,
@@ -1236,7 +1249,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           "Meet our team",
                                           style: TextStyle(
                                             color: AppColors.primaryColor,
-                                            fontSize: ScreenUtil.horizontalScale(5.2),
+                                            fontSize: ScreenUtil.horizontalScale(5),
                                             fontWeight: FontWeight.w800,
                                           ),
                                           textAlign: TextAlign.start,

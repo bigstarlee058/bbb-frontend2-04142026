@@ -42,7 +42,7 @@ class JoinChallengeWidget extends StatelessWidget {
           // ),
           // // Middle image section with clip path
           Positioned.fill(
-            top: -20,
+            top: 0,
             child: ClipPath(
               clipper: MiddleClipper(),
               child: Container(

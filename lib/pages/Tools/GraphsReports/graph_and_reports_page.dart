@@ -81,7 +81,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  height: media.height / 2,
+                  height: media.height / 1,
                   width: media.width,
                   decoration: const BoxDecoration(
                     image: DecorationImage(

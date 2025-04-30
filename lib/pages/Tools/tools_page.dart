@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/tools_page_button.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -34,7 +36,7 @@ class _ToolsPageState extends State<ToolsPage> {
                     Stack(
                       children: [
                         Container(
-                          height: media.height / 2,
+                          height: media.height / 1,
                           width: media.width,
                           decoration: const BoxDecoration(
                             image: DecorationImage(
@@ -113,7 +115,7 @@ class _ToolsPageState extends State<ToolsPage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 6.99,
+                          height: Platform.isAndroid ? media.height / 8.39 : media.height / 6.99,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -135,7 +137,7 @@ class _ToolsPageState extends State<ToolsPage> {
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                    top: media.height / 7,
+                    top: Platform.isAndroid ? media.height / 8.5 : media.height / 7,
                     bottom: ScreenUtil.verticalScale(15),
                   ),
                   child: Container(

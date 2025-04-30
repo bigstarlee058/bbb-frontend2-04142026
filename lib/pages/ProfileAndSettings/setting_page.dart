@@ -52,7 +52,8 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
+        // physics: const ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         child: Column(
           children: [
             Stack(
@@ -62,7 +63,7 @@ class _SettingPageState extends State<SettingPage> {
                     Stack(
                       children: [
                         Container(
-                          height: media.height / 2,
+                          height: media.height / 1,
                           width: media.width,
                           decoration: const BoxDecoration(
                             image: DecorationImage(
@@ -77,6 +78,7 @@ class _SettingPageState extends State<SettingPage> {
                           width: media.width,
                           child: SafeArea(
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 AppBar(
                                   toolbarHeight: ScreenUtil.verticalScale(5.1),
@@ -159,6 +161,7 @@ class _SettingPageState extends State<SettingPage> {
                 Container(
                   margin: EdgeInsets.only(top: media.height / 2.65, bottom: ScreenUtil.verticalScale(15)),
                   width: media.width,
+                  height: ScreenUtil.verticalScale((media.height - media.height / 2)),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(

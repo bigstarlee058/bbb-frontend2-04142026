@@ -34,39 +34,42 @@ class _InformationSectionState extends State<InformationSection> {
       children: [
         Consumer<ProgramInfoProvider>(
           builder: (context, value, child) {
-            return value.loading
-                ? SizedBox(
-                    height: media.height / 3,
-                    child: const Center(
-                      child: CircularProgressIndicator(color: AppColors.primaryColor),
-                    ),
-                  )
-                : value.programInfoModel == null
-                    ? SizedBox(
-                        height: media.height / 3,
-                        child: Center(
-                          child: Text(
-                            "No program info available!",
-                            style: TextStyle(fontSize: 16),
+            return Container(
+              constraints: BoxConstraints(
+                minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12)),
+              ),
+              color: Colors.white,
+              child: value.loading
+                  ? SizedBox(
+                      height: media.height / 3,
+                      child: const Center(
+                        child: CircularProgressIndicator(color: AppColors.primaryColor),
+                      ),
+                    )
+                  : value.programInfoModel == null
+                      ? SizedBox(
+                          height: media.height / 3,
+                          child: Center(
+                            child: Text(
+                              "No program info available!",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        )
+                      : Padding(
+                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                          child: ExpansionTileGroup(
+                            spaceBetweenItem: 15,
+                            children: List.generate(
+                              value.programInfoModel!.sections.length,
+                              (index) {
+                                return buildExpansionTileItem(index, value.programInfoModel!.sections[index]);
+                              },
+                            ),
                           ),
                         ),
-                      )
-                    : Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                        child: ExpansionTileGroup(
-                          spaceBetweenItem: 15,
-                          children: List.generate(
-                            value.programInfoModel!.sections.length,
-                            (index) {
-                              return buildExpansionTileItem(index, value.programInfoModel!.sections[index]);
-                            },
-                          ),
-                        ),
-                      );
+            );
           },
-        ),
-        SizedBox(
-          height: ScreenUtil.verticalScale(4),
         ),
       ],
     );

@@ -51,7 +51,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                         Stack(
                           children: [
                             Container(
-                              height: media.height / 2,
+                              height: media.height / 1,
                               width: media.width,
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
@@ -81,7 +81,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                         'Achievements',
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(5),
+                                          fontSize: ScreenUtil.horizontalScale(5.5),
                                         ),
                                       ),
                                       actions: [

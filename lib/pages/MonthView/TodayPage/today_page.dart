@@ -340,7 +340,7 @@ class _TodayPageState extends State<TodayPage> {
                             Stack(
                               children: [
                                 Container(
-                                  height: media.height / 2,
+                                  height: media.height,
                                   width: media.width,
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
@@ -545,9 +545,10 @@ class _TodayPageState extends State<TodayPage> {
                                           Text(
                                             "Today's workout",
                                             style: TextStyle(
-                                                fontSize: ScreenUtil.horizontalScale(5.5),
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.primaryColor),
+                                              fontSize: ScreenUtil.horizontalScale(5.5),
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryColor,
+                                            ),
                                           ),
                                           SizedBox(height: media.height * 0.025),
                                           monthProvider!.isPumpDay
@@ -1123,10 +1124,12 @@ class _TodayPageState extends State<TodayPage> {
                                         final warmups = monthProvider.isPumpDay
                                             ? monthProvider.pumpDayModel?.warmups
                                             : monthProvider.dayDataModel?.warmups;
-
                                         return Text(
-                                          (monthProvider.warmUpModel?.title ?? (warmups!.isNotEmpty ? warmups.first.title : "Warm IUp")) ??
-                                              "Warm IUp",
+                                          (monthProvider.warmUpModel?.title ??
+                                                  (warmups!.isNotEmpty
+                                                      ? (warmups.first.title!.isNotEmpty ? warmups.first.title : "Warm Up")
+                                                      : "Warm Up")) ??
+                                              "Warm Up",
                                           maxLines: 2,
                                           style: TextStyle(
                                             color: AppColors.primaryColor,

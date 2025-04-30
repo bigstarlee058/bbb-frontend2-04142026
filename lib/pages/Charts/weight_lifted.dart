@@ -5,6 +5,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class WeightLiftedGraph extends StatefulWidget {
@@ -157,44 +158,48 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
     List titles = monthProvider.graphHistory.asMap().entries.map((e) {
       return e.value['day'];
     }).toList();
+    DateTime today = DateTime.now();
+    String todayDayName = DateFormat('EEE').format(today);
+    int index = -1;
+
+    index = titles.indexWhere((element) => element == todayDayName);
+    var todayStyle = const TextStyle(
+      color: AppColors.primaryColor,
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+    );
 
     var style = const TextStyle(
       color: Colors.grey,
       fontWeight: FontWeight.w500,
       fontSize: 12,
     );
+
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = Text(titles[0], style: style);
+        text = Text(titles[0], style: index == 0 ? todayStyle : style);
         break;
       case 1:
-        text = Text(titles[1], style: style);
+        text = Text(titles[1], style: index == 1 ? todayStyle : style);
         break;
       case 2:
-        text = Text(titles[2], style: style);
+        text = Text(titles[2], style: index == 2 ? todayStyle : style);
         break;
       case 3:
-        text = Text(titles[3], style: style);
+        text = Text(titles[3], style: index == 3 ? todayStyle : style);
         break;
       case 4:
-        text = Text(titles[4], style: style);
+        text = Text(titles[4], style: index == 4 ? todayStyle : style);
         break;
       case 5:
-        text = Text(titles[5], style: style);
+        text = Text(titles[5], style: index == 5 ? todayStyle : style);
         break;
       case 6:
-        text = Text(
-          titles[6],
-          style: const TextStyle(
-            color: AppColors.primaryColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-        );
+        text = Text(titles[6], style: index == 6 ? todayStyle : style);
         break;
       default:
-        text = Text('', style: style);
+        text = Text('', style: index == 0 ? todayStyle : style);
         break;
     }
     return SideTitleWidget(
@@ -204,6 +209,58 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
       child: text,
     );
   }
+
+  // Widget getTitles(double value, TitleMeta meta, MonthProvider monthProvider) {
+  //   List titles = monthProvider.graphHistory.asMap().entries.map((e) {
+  //     return e.value['day'];
+  //   }).toList();
+  //
+  //   var style = const TextStyle(
+  //     color: Colors.grey,
+  //     fontWeight: FontWeight.w500,
+  //     fontSize: 12,
+  //   );
+  //   Widget text;
+  //   switch (value.toInt()) {
+  //     case 0:
+  //       text = Text(titles[0], style: style);
+  //       break;
+  //     case 1:
+  //       text = Text(titles[1], style: style);
+  //       break;
+  //     case 2:
+  //       text = Text(titles[2], style: style);
+  //       break;
+  //     case 3:
+  //       text = Text(titles[3], style: style);
+  //       break;
+  //     case 4:
+  //       text = Text(titles[4], style: style);
+  //       break;
+  //     case 5:
+  //       text = Text(titles[5], style: style);
+  //       break;
+  //     case 6:
+  //       text = Text(
+  //         titles[6],
+  //         style: const TextStyle(
+  //           color: AppColors.primaryColor,
+  //           fontWeight: FontWeight.bold,
+  //           fontSize: 12,
+  //         ),
+  //       );
+  //       break;
+  //     default:
+  //       text = Text('', style: style);
+  //       break;
+  //   }
+  //   return SideTitleWidget(
+  //     // axisSide: meta.axisSide,
+  //     meta: meta,
+  //     space: 9,
+  //     child: text,
+  //   );
+  // }
 
   Widget getLeftTitles(double value, TitleMeta meta) {
     const style = TextStyle(

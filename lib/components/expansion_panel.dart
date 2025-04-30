@@ -1,4 +1,5 @@
 import 'package:bbb/components/expand_icon.dart';
+import 'package:bbb/utils/screen_util.dart';
 import 'package:flutter/material.dart' hide ExpandIcon;
 
 const double _kPanelHeaderCollapsedHeight = kMinInteractiveDimension;
@@ -240,6 +241,9 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
           ),
           child.sideIcon ?? SizedBox(),
           expandIconPadded,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(6),
+          )
         ],
       );
       if (child.canTapOnHeader) {

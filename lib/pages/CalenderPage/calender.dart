@@ -211,22 +211,23 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
 
       DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
-
       if (date.isBefore(futureDay)) {
         for (var day in data) {
           final workoutDate = day.endTime!;
           DateTime localTime = Utils.formattedDate("$workoutDate");
           if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
-            final isCircle = data.any((d) => d.status == Status.skipped && _isSameDate(d.endTime ?? d.startTime!, date));
+            final isCircleP = data.any((d) => d.status == Status.completed && _isSameDate(localTime, date));
+            final isCircleB = data.any((d) => d.status == Status.skipped && _isSameDate(localTime, date));
             final isRange = data11.any((d) => d.any((element) => _isSameDate(element.endTime ?? element.startTime!, date)));
-            if (isCircle) {
+
+            if (isCircleP || isCircleB) {
               return Center(
                 child: Container(
                   width: ScreenUtil.verticalScale(3.2),
                   height: ScreenUtil.verticalScale(3.2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.blue,
+                    color: isCircleP ? AppColors.primaryColor : Colors.blue,
                   ),
                   alignment: Alignment.center,
                   child: Text(

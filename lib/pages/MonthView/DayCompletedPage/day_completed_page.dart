@@ -99,7 +99,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
           Stack(
             children: [
               Container(
-                height: media.height / 2,
+                height: media.height,
                 width: media.width,
                 decoration: const BoxDecoration(
                   image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),

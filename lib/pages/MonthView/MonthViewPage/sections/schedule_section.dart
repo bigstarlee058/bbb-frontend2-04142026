@@ -14,6 +14,8 @@ class ScheduleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -23,12 +25,14 @@ class ScheduleSection extends StatelessWidget {
 
             String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
 
-            return value.isFilterLoading
-                ? const SizedBox()
-                : value.weeksDataList.isNotEmpty
-                    ? Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-                        child: Column(
+            return Container(
+              constraints: BoxConstraints(
+                minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12)),
+              ),
+              child: value.isFilterLoading
+                  ? const SizedBox()
+                  : value.weeksDataList.isNotEmpty
+                      ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ListView.builder(
@@ -61,28 +65,29 @@ class ScheduleSection extends StatelessWidget {
                                 );
                               },
                             ),
+                            const SizedBox(height: 20),
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(9),
+                              ),
+                              child: Consumer<MonthProvider>(
+                                builder: (context, value, child) => ButtonWidget(
+                                  text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
+                                  textColor: Colors.white,
+                                  onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress,
+                                  color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
+                                  isLoading: false,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: ScreenUtil.verticalScale(15))
                           ],
+                        )
+                      : const Center(
+                          child: Text("No workout data available"),
                         ),
-                      )
-                    : const Center(
-                        child: Text("No workout data available"),
-                      );
+            );
           },
-        ),
-        const SizedBox(height: 15),
-        Container(
-          margin: EdgeInsets.symmetric(
-            horizontal: ScreenUtil.horizontalScale(9),
-          ),
-          child: Consumer<MonthProvider>(
-            builder: (context, value, child) => ButtonWidget(
-              text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
-              textColor: Colors.white,
-              onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress,
-              color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-              isLoading: false,
-            ),
-          ),
         ),
       ],
     );
