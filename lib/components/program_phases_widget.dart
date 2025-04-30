@@ -37,7 +37,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           color: AppColors.primaryColor,
-                          fontSize: ScreenUtil.horizontalScale(5.2),
+                          fontSize: ScreenUtil.horizontalScale(5),
                           fontWeight: FontWeight.bold,
                           height: 1.35),
                     ),
@@ -110,7 +110,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           color: AppColors.primaryColor,
-                          fontSize: ScreenUtil.horizontalScale(5.2),
+                          fontSize: ScreenUtil.horizontalScale(5),
                           fontWeight: FontWeight.bold,
                           height: 1.35),
                     ),

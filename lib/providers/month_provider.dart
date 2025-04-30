@@ -173,9 +173,11 @@ class MonthProvider extends ChangeNotifier {
     try {
       final dataList = dayHistoryModel.where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty);
 
+      int pumpDayCount = monthDataModel?.weeks?[week! - 1].pumpDayIds?.length ?? 0;
+
       changeIsPumpDay(false);
 
-      if (dataList.isEmpty || dataList.length < 2) {
+      if (dataList.isEmpty || dataList.length < pumpDayCount) {
         changeIsPumpDayAvail(true);
       } else {
         changeIsPumpDayAvail(false);

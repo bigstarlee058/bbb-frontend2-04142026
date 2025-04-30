@@ -86,7 +86,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       Center(
                         child: Container(
-                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(15)),
+                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(0)),
                           height: media.height / 7,
                           width: media.width,
                           decoration: const BoxDecoration(

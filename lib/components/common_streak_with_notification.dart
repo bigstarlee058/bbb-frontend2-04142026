@@ -48,6 +48,7 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
                   '${streak.streak}',
                   style: TextStyle(
                     color: Colors.white,
+                    fontWeight: FontWeight.w600,
                     fontSize: ScreenUtil.verticalScale(0.8),
                   ),
                 ),

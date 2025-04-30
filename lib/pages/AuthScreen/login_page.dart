@@ -207,7 +207,12 @@ class _LoginPageState extends State<LoginPage> {
                                   ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                   : image,
                               cacheManager: CustomCacheManager())
-                          : const AssetImage('assets/img/back.jpg'),
+                          // NetworkImage(
+                          //         image.startsWith('https://storage.cloud.google.com/')
+                          //             ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                          //             : image,
+                          //       )
+                          : const AssetImage('assets/img/card.png'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -223,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       Center(
                         child: Container(
-                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(23)),
+                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(15)),
                           height: media.height / 7,
                           width: media.width,
                           decoration: const BoxDecoration(

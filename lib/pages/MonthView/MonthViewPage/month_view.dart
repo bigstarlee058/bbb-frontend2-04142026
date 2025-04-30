@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -63,6 +65,7 @@ class _MonthViewState extends State<MonthView> {
         monthProvider?.monthLocalDataModel.sort((a, b) =>
             DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
         bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
+        log(' monthProvider!.isOnMonthPage :::::::::::::::::: ${monthProvider!.isOnMonthPage}');
         if (!alreadySetUp && monthProvider!.isOnMonthPage) {
           openSettingDialog();
         }
@@ -151,41 +154,6 @@ class _MonthViewState extends State<MonthView> {
                                             child: const CommonStreakWithNotification(routeString: "month"))
                                       ],
                                     );
-
-                                    Container(
-                                      margin: const EdgeInsets.only(right: 10),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                              left: ScreenUtil.horizontalScale(4),
-                                            ),
-                                            decoration: const BoxDecoration(
-                                              color: Color(0XFFd18a9b),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: SizedBox(
-                                              width: ScreenUtil.verticalScale(4.65),
-                                              height: ScreenUtil.verticalScale(4.65),
-                                              child: IconButton(
-                                                padding: EdgeInsets.zero,
-                                                icon: const Icon(
-                                                  Icons.keyboard_arrow_left,
-                                                  color: Colors.white,
-                                                ),
-                                                onPressed: () {
-                                                  // HapticFeedBack.buttonClick();
-                                                  monthProvider?.mainPageProvider.changeTab(0);
-                                                },
-                                                iconSize: ScreenUtil.verticalScale(4),
-                                              ),
-                                            ),
-                                          ),
-                                          const CommonStreakWithNotification(routeString: "month")
-                                        ],
-                                      ),
-                                    );
                                   },
                                 ),
                               ],
@@ -255,81 +223,6 @@ class _MonthViewState extends State<MonthView> {
                                                 height: scrollProvider.scrollOffset1 >= 0.0 ? 0 : ScreenUtil.verticalScale(5.1),
                                               )
                                             ],
-                                          );
-                                          Container(
-                                            margin: const EdgeInsets.only(right: 10),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                scrollProvider.scrollOffset1 >= 0.0
-                                                    ? Container(
-                                                        margin: EdgeInsets.only(
-                                                          left: ScreenUtil.horizontalScale(4),
-                                                        ),
-                                                        decoration: const BoxDecoration(
-                                                          color: Color(0XFFd18a9b),
-                                                          shape: BoxShape.circle,
-                                                        ),
-                                                        child: SizedBox(
-                                                          width: ScreenUtil.verticalScale(4.65),
-                                                          height: ScreenUtil.verticalScale(4.65),
-                                                          child: IconButton(
-                                                            padding: EdgeInsets.zero,
-                                                            icon: const Icon(
-                                                              Icons.keyboard_arrow_left,
-                                                              color: Colors.white,
-                                                            ),
-                                                            onPressed: () {
-                                                              // HapticFeedBack.buttonClick();
-                                                              monthProvider?.mainPageProvider.changeTab(0);
-                                                            },
-                                                            iconSize: ScreenUtil.verticalScale(4),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : SizedBox(),
-                                                scrollProvider.scrollOffset1 >= 0.0
-                                                    ? const CommonStreakWithNotification(routeString: "month")
-                                                    : Row(
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              Container(
-                                                                alignment: Alignment.center,
-                                                                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.transparent,
-                                                                  shape: BoxShape.circle,
-                                                                  border: Border.all(color: Colors.transparent),
-                                                                ),
-                                                                child: Text(
-                                                                  '',
-                                                                  style: TextStyle(
-                                                                    color: Colors.transparent,
-                                                                    fontSize: ScreenUtil.verticalScale(0.8),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Icon(
-                                                                Icons.local_fire_department_outlined,
-                                                                color: Colors.transparent,
-                                                                size: ScreenUtil.verticalScale(3),
-                                                              )
-                                                            ],
-                                                          ),
-                                                          IconButton(
-                                                            /// COMMENT THIS SIZE-BOX AND UNCOMMENT ICON BUTTON IF PUT NOTIFICATION ICON BACK
-                                                            onPressed: null, icon: SizedBox(),
-                                                            // icon: Icon(
-                                                            //   Icons.notifications_none,
-                                                            //   color: Colors.transparent,
-                                                            //   size: ScreenUtil.verticalScale(3),
-                                                            // ),
-                                                          )
-                                                        ],
-                                                      )
-                                              ],
-                                            ),
                                           );
                                         },
                                       ),
@@ -471,22 +364,20 @@ class _MonthViewState extends State<MonthView> {
                         ],
                       ),
                       Container(
-                        margin: EdgeInsets.only(
-                          top: media.height / 2.55,
-                          bottom: ScreenUtil.verticalScale(15),
-                        ),
-                        child: Container(
-                          width: media.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                            ),
+                        width: media.width,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
-                          child: Column(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.symmetric(
+                        ),
+                        margin: EdgeInsets.only(top: media.height / 2.55),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: media.height * 0.12,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(6),
                                   vertical: ScreenUtil.verticalScale(2.5),
                                 ),
@@ -514,8 +405,8 @@ class _MonthViewState extends State<MonthView> {
                                                     index == 0
                                                         ? "Schedule"
                                                         : index == 1
-                                                            ? "Information"
-                                                            : "Settings",
+                                                            ? "Options"
+                                                            : "Information",
                                                     style: TextStyle(
                                                       color: index == controller.selectedSection ? Colors.white : Colors.black,
                                                       fontSize: ScreenUtil.verticalScale(1.75),
@@ -532,28 +423,27 @@ class _MonthViewState extends State<MonthView> {
                                   ],
                                 ),
                               ),
-                              Consumer<MonthProvider>(
-                                builder: (context, monthProvider, child) {
-                                  return Column(
-                                    children: [
-                                      if (!monthProvider.loader) ...[
-                                        Visibility(
-                                            visible: monthProvider.selectedSection == 0,
-                                            child: ScheduleSection(
-                                                monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
-                                        Visibility(
-                                            visible: monthProvider.selectedSection == 1,
-                                            child: InformationSection(programInfoProvider: provider)),
-                                        Visibility(
-                                            visible: monthProvider.selectedSection == 2,
-                                            child: SettingSection(monthProvider: monthProvider)),
-                                      ]
-                                    ],
-                                  );
-                                },
-                              )
-                            ],
-                          ),
+                            ),
+                            Consumer<MonthProvider>(
+                              builder: (context, monthProvider, child) {
+                                return Column(
+                                  children: [
+                                    if (!monthProvider.loader) ...[
+                                      Visibility(
+                                          visible: monthProvider.selectedSection == 0,
+                                          child:
+                                              ScheduleSection(monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
+                                      Visibility(
+                                          visible: monthProvider.selectedSection == 1, child: SettingSection(monthProvider: monthProvider)),
+                                      Visibility(
+                                          visible: monthProvider.selectedSection == 2,
+                                          child: InformationSection(programInfoProvider: provider)),
+                                    ]
+                                  ],
+                                );
+                              },
+                            )
+                          ],
                         ),
                       ),
                     ],

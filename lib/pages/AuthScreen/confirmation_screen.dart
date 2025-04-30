@@ -54,10 +54,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                   image: DecorationImage(
                     image: image.isNotEmpty
                         ? NetworkImage(
-                            image.startsWith('https://storage.cloud.google.com/')
-                                ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                : image,
-                          )
+                      image.startsWith('https://storage.cloud.google.com/')
+                          ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                          : image,
+                    )
                         : const AssetImage('assets/img/card.png'),
                     fit: BoxFit.cover,
                   ),
@@ -74,7 +74,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     ),
                     Center(
                       child: Container(
-                        margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(15)),
+                        margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(0)),
                         height: media.height / 7,
                         width: media.width,
                         decoration: const BoxDecoration(
