@@ -73,549 +73,508 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  height: media.height / 1,
-                  width: media.width,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/img/back.jpg'),
-                      fit: BoxFit.cover,
-                      opacity: 1,
-                    ),
+      body: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              height: media.height / 1,
+              width: media.width,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/img/back.jpg'),
+                  fit: BoxFit.cover,
+                  opacity: 1,
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: media.height / 3.2),
+              child: Container(
+                width: media.width,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: media.height / 3.2),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                child: Column(
+                  children: [
+                    /// EXERCISE COMPLETED
+
+                    SizedBox(height: ScreenUtil.horizontalScale(7)),
+                    Container(
+                      margin: EdgeInsets.symmetric(
+                        vertical: ScreenUtil.verticalScale(1.5),
+                        horizontal: ScreenUtil.horizontalScale(8),
                       ),
-                    ),
-                    child: Column(
-                      children: [
-                        /// EXERCISE COMPLETED
-
-                        SizedBox(height: ScreenUtil.horizontalScale(7)),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: ScreenUtil.verticalScale(1.5),
-                            horizontal: ScreenUtil.horizontalScale(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Exercises Completed",
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: ScreenUtil.verticalScale(2.3),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Container(
-                                height: ScreenUtil.verticalScale(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                    ScreenUtil.verticalScale(2),
-                                  ),
-                                ),
-                                child: Consumer<MonthProvider>(
-                                  builder: (context, monthProvider, child) {
-                                    return DropdownButtonHideUnderline(
-                                      child: DropdownButton(
-                                        value: monthProvider.reportExerciseCompletedWeek,
-                                        items: ["Week 1", "Week 2", "Week 3", "Week 4"]
-                                            .map(
-                                              (name) => DropdownMenuItem(
-                                                value: name,
-                                                child: Text(
-                                                  name,
-                                                  style: TextStyle(
-                                                    color: const Color(0xA09F9F9F),
-                                                    fontSize: ScreenUtil.horizontalScale(
-                                                      3,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                        onChanged: monthProvider.changeWeekExerciseCompleted,
-                                        icon: Icon(
-                                          Icons.expand_more,
-                                          color: const Color(0xA09F9F9F),
-                                          size: ScreenUtil.verticalScale(3),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: ScreenUtil.horizontalScale(2)),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(8),
-                          ),
-                          // child: BarChartWidget(),
-                          child: const ReportExerciseCompletedGraph(),
-                        ),
-
-                        /// WEIGHT LIFTED
-
-                        SizedBox(height: ScreenUtil.horizontalScale(4)),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Weight Lifted",
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: ScreenUtil.verticalScale(2.3),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Container(
-                                height: ScreenUtil.verticalScale(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
-                                ),
-                                child: Consumer<MonthProvider>(
-                                  builder: (context, monthProvider, child) {
-                                    return DropdownButtonHideUnderline(
-                                      child: DropdownButton(
-                                        value: monthProvider.reportWeightLifted,
-                                        items: ["Week 1", "Week 2", "Week 3", "Week 4"]
-                                            .map(
-                                              (name) => DropdownMenuItem(
-                                                value: name,
-                                                child: Text(
-                                                  name,
-                                                  style: TextStyle(
-                                                    color: const Color(0xA09F9F9F),
-                                                    fontSize: ScreenUtil.verticalScale(1.5),
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                        onChanged: monthProvider.changeWeekWeightLifted,
-                                        icon: const Icon(
-                                          Icons.expand_more,
-                                          color: Color(0xA09F9F9F),
-                                          size: 25,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: ScreenUtil.horizontalScale(2)),
-                        Container(
-                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                            child: const ReportWeightLiftedGraph()),
-
-                        /// TIME SPENT
-
-                        // SizedBox(height: ScreenUtil.horizontalScale(4)),
-                        // Container(
-                        //   margin: EdgeInsets.symmetric(
-                        //     vertical: ScreenUtil.verticalScale(1.5),
-                        //     horizontal: ScreenUtil.horizontalScale(8),
-                        //   ),
-                        //   width: media.width,
-                        //   child: Row(
-                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //     children: [
-                        //       Text(
-                        //         'Time Spent',
-                        //         style: TextStyle(
-                        //           color: AppColors.primaryColor,
-                        //           fontSize: ScreenUtil.horizontalScale(5),
-                        //           fontWeight: FontWeight.bold,
-                        //         ),
-                        //       ),
-                        //       Container(
-                        //         height: ScreenUtil.verticalScale(4),
-                        //         decoration: BoxDecoration(
-                        //           color: Colors.white,
-                        //           borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
-                        //         ),
-                        //         child: Consumer<MonthProvider>(
-                        //           builder: (context, monthProvider, child) {
-                        //             return DropdownButtonHideUnderline(
-                        //               child: DropdownButton(
-                        //                 value: monthProvider.reportTimeSpent,
-                        //                 items: ["Week 1", "Week 2", "Week 3", "Week 4"]
-                        //                     .map((name) => DropdownMenuItem(
-                        //                           value: name,
-                        //                           child: Text(
-                        //                             name,
-                        //                             style: TextStyle(
-                        //                               color: const Color(0xA09F9F9F),
-                        //                               fontSize: ScreenUtil.verticalScale(1.5),
-                        //                             ),
-                        //                           ),
-                        //                         ))
-                        //                     .toList(),
-                        //                 onChanged: monthProvider.changeWeekTimeSpent,
-                        //                 icon: const Icon(
-                        //                   Icons.expand_more,
-                        //                   color: Color(0xA09F9F9F),
-                        //                   size: 25,
-                        //                 ),
-                        //               ),
-                        //             );
-                        //           },
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // SizedBox(height: ScreenUtil.horizontalScale(2)),
-                        // Container(
-                        //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                        //   child: const ReportTimeSpentGraph()
-                        // ),
-
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                          height: 450,
-                          child: CustomRadarChart(),
-                        ),
-
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: 35),
-                          child: IntrinsicHeight(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: ScreenUtil.horizontalScale(3),
-                                      right: ScreenUtil.horizontalScale(5),
-                                      top: ScreenUtil.verticalScale(2),
-                                      bottom: ScreenUtil.verticalScale(2),
-                                    ),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          spreadRadius: 2,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Total Weight\nLifted',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.horizontalScale(3.6)),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Consumer<MonthProvider>(
-                                          builder: (context, monthProvider, child) {
-                                            return Text(
-                                              '${monthProvider.totalWeightLiftedInAWeek.toStringAsFixed(0)} lbs',
-                                              style: TextStyle(
-                                                color: const Color(0xFFDD1166),
-                                                fontSize: ScreenUtil.horizontalScale(4.5),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: ScreenUtil.horizontalScale(3),
-                                      right: ScreenUtil.horizontalScale(5),
-                                      top: ScreenUtil.verticalScale(2),
-                                      bottom: ScreenUtil.verticalScale(2),
-                                    ),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          spreadRadius: 2,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Total completed\nExercises',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: ScreenUtil.horizontalScale(3.6),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Consumer<MonthProvider>(
-                                          builder: (context, monthProvider, child) {
-                                            return Text(
-                                              monthProvider.totalExerciseCompletedInAWeek.toStringAsFixed(0),
-                                              style: TextStyle(
-                                                color: const Color(0xFFDD1166),
-                                                fontSize: ScreenUtil.horizontalScale(4.5),
-                                              ),
-                                            );
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Exercises Completed",
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontSize: ScreenUtil.verticalScale(2.3),
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: media.height * 0.02,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Column(
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        SizedBox(
-                          height: media.height / 2,
-                          width: media.width,
-                        ),
-                        SizedBox(
-                          height: media.height,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                  backgroundColor: Colors.transparent,
-                                  centerTitle: true,
-                                  // leading: BackArrowWidget(
-                                  //   onPress: () {
-                                  //     // HapticFeedBack.buttonClick();
-                                  //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                  //     // mainPageProvider.changeTab(2);
-                                  //     Navigator.pop(context);
-                                  //   },
-                                  // ),
-                                  leading: SizedBox(),
-                                  title: Text(
-                                    'Graphs & Report',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                          Container(
+                            height: ScreenUtil.verticalScale(4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(
+                                ScreenUtil.verticalScale(2),
+                              ),
+                            ),
+                            child: Consumer<MonthProvider>(
+                              builder: (context, monthProvider, child) {
+                                return DropdownButtonHideUnderline(
+                                  child: DropdownButton(
+                                    value: monthProvider.reportExerciseCompletedWeek,
+                                    items: ["Week 1", "Week 2", "Week 3", "Week 4"]
+                                        .map(
+                                          (name) => DropdownMenuItem(
+                                            value: name,
+                                            child: Text(
+                                              name,
+                                              style: TextStyle(
+                                                color: const Color(0xA09F9F9F),
+                                                fontSize: ScreenUtil.horizontalScale(
+                                                  3,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: monthProvider.changeWeekExerciseCompleted,
+                                    icon: Icon(
+                                      Icons.expand_more,
+                                      color: const Color(0xA09F9F9F),
+                                      size: ScreenUtil.verticalScale(3),
                                     ),
                                   ),
-                                  actions: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: ScreenUtil.horizontalScale(2)),
+                    Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: ScreenUtil.horizontalScale(8),
+                      ),
+                      // child: BarChartWidget(),
+                      child: const ReportExerciseCompletedGraph(),
+                    ),
+
+                    /// WEIGHT LIFTED
+
+                    SizedBox(height: ScreenUtil.horizontalScale(4)),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Weight Lifted",
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontSize: ScreenUtil.verticalScale(2.3),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Container(
+                            height: ScreenUtil.verticalScale(4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
+                            ),
+                            child: Consumer<MonthProvider>(
+                              builder: (context, monthProvider, child) {
+                                return DropdownButtonHideUnderline(
+                                  child: DropdownButton(
+                                    value: monthProvider.reportWeightLifted,
+                                    items: ["Week 1", "Week 2", "Week 3", "Week 4"]
+                                        .map(
+                                          (name) => DropdownMenuItem(
+                                            value: name,
+                                            child: Text(
+                                              name,
+                                              style: TextStyle(
+                                                color: const Color(0xA09F9F9F),
+                                                fontSize: ScreenUtil.verticalScale(1.5),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: monthProvider.changeWeekWeightLifted,
+                                    icon: const Icon(
+                                      Icons.expand_more,
+                                      color: Color(0xA09F9F9F),
+                                      size: 25,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: ScreenUtil.horizontalScale(2)),
+                    Container(
+                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)), child: const ReportWeightLiftedGraph()),
+
+                    /// TIME SPENT
+
+                    // SizedBox(height: ScreenUtil.horizontalScale(4)),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(
+                    //     vertical: ScreenUtil.verticalScale(1.5),
+                    //     horizontal: ScreenUtil.horizontalScale(8),
+                    //   ),
+                    //   width: media.width,
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       Text(
+                    //         'Time Spent',
+                    //         style: TextStyle(
+                    //           color: AppColors.primaryColor,
+                    //           fontSize: ScreenUtil.horizontalScale(5),
+                    //           fontWeight: FontWeight.bold,
+                    //         ),
+                    //       ),
+                    //       Container(
+                    //         height: ScreenUtil.verticalScale(4),
+                    //         decoration: BoxDecoration(
+                    //           color: Colors.white,
+                    //           borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
+                    //         ),
+                    //         child: Consumer<MonthProvider>(
+                    //           builder: (context, monthProvider, child) {
+                    //             return DropdownButtonHideUnderline(
+                    //               child: DropdownButton(
+                    //                 value: monthProvider.reportTimeSpent,
+                    //                 items: ["Week 1", "Week 2", "Week 3", "Week 4"]
+                    //                     .map((name) => DropdownMenuItem(
+                    //                           value: name,
+                    //                           child: Text(
+                    //                             name,
+                    //                             style: TextStyle(
+                    //                               color: const Color(0xA09F9F9F),
+                    //                               fontSize: ScreenUtil.verticalScale(1.5),
+                    //                             ),
+                    //                           ),
+                    //                         ))
+                    //                     .toList(),
+                    //                 onChanged: monthProvider.changeWeekTimeSpent,
+                    //                 icon: const Icon(
+                    //                   Icons.expand_more,
+                    //                   color: Color(0xA09F9F9F),
+                    //                   size: 25,
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           },
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(height: ScreenUtil.horizontalScale(2)),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                    //   child: const ReportTimeSpentGraph()
+                    // ),
+
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                      height: 450,
+                      child: CustomRadarChart(),
+                    ),
+
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: 35),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.only(
+                                  left: ScreenUtil.horizontalScale(3),
+                                  right: ScreenUtil.horizontalScale(5),
+                                  top: ScreenUtil.verticalScale(2),
+                                  bottom: ScreenUtil.verticalScale(2),
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      spreadRadius: 2,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Total Weight\nLifted',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.horizontalScale(3.6)),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Consumer<MonthProvider>(
+                                      builder: (context, monthProvider, child) {
+                                        return Text(
+                                          '${monthProvider.totalWeightLiftedInAWeek.toStringAsFixed(0)} lbs',
+                                          style: TextStyle(
+                                            color: const Color(0xFFDD1166),
+                                            fontSize: ScreenUtil.horizontalScale(4.5),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.only(
+                                  left: ScreenUtil.horizontalScale(3),
+                                  right: ScreenUtil.horizontalScale(5),
+                                  top: ScreenUtil.verticalScale(2),
+                                  bottom: ScreenUtil.verticalScale(2),
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      spreadRadius: 2,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Total completed\nExercises',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: ScreenUtil.horizontalScale(3.6),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Consumer<MonthProvider>(
+                                      builder: (context, monthProvider, child) {
+                                        return Text(
+                                          monthProvider.totalExerciseCompletedInAWeek.toStringAsFixed(0),
+                                          style: TextStyle(
+                                            color: const Color(0xFFDD1166),
+                                            fontSize: ScreenUtil.horizontalScale(4.5),
+                                          ),
+                                        );
+                                      },
                                     )
                                   ],
                                 ),
-                                // Container(
-                                //   margin: const EdgeInsets.only(right: 10),
-                                //   child: Row(
-                                //     crossAxisAlignment: CrossAxisAlignment.start,
-                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                //     children: [
-                                //       SafeArea(
-                                //         child: SizedBox(width: ScreenUtil.horizontalScale(10)),
-                                //       ),
-                                //       // BackArrowWidget(
-                                //       //   onPress: () {
-                                //       //     // HapticFeedBack.buttonClick();
-                                //       //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                //       //     // mainPageProvider.changeTab(2);
-                                //       //     Navigator.pop(context);
-                                //       //   },
-                                //       // ),
-                                //       Container(
-                                //         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(8), top: ScreenUtil.horizontalScale(8)),
-                                //         child: Consumer<UserDataProvider>(builder: (context, userData, child) {
-                                //           return Text(
-                                //             // 'Hi, Nick',
-                                //             'Hi ${userData.userName}',
-                                //             style: TextStyle(
-                                //               color: Colors.white,
-                                //               fontSize: ScreenUtil.horizontalScale(5.5),
-                                //             ),
-                                //           );
-                                //         }),
-                                //       ),
-                                //       const CommonStreakWithNotification(routeString: '/graphAndReports')
-                                //     ],
-                                //   ),
-                                // ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Column(children: [
-                                        SizedBox(
-                                          height: ScreenUtil.verticalScale(0.6),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: media.height * 0.02,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Column(
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    SizedBox(
+                      height: media.height / 2,
+                      width: media.width,
+                    ),
+                    SizedBox(
+                      height: media.height,
+                      width: media.width,
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            AppBar(
+                              toolbarHeight: ScreenUtil.verticalScale(5.1),
+                              backgroundColor: Colors.transparent,
+                              centerTitle: true,
+                              leading: BackArrowWidget(
+                                onPress: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+
+                              /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                              // Positioned(
+                              //   left: 0,
+                              //   child: BackArrowWidget(
+                              //     onPress: () {
+                              //       Navigator.pop(context);
+                              //     },
+                              //   ),
+                              // leading: SizedBox(),
+                              title: Text(
+                                'Graphs & Report',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: ScreenUtil.horizontalScale(5.5),
+                                ),
+                              ),
+                              actions: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                )
+                              ],
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Column(children: [
+                                    SizedBox(
+                                      height: ScreenUtil.verticalScale(0.6),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(5),
+                                      ),
+                                      height: media.height * 0.08,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Here's some fun graphs for you",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(2),
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
-                                          height: media.height * 0.08,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                        ],
+                                      ),
+                                    ),
+                                  ]),
+                                  SizedBox(
+                                    height: media.height * 0.01,
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(3),
+                                      vertical: ScreenUtil.horizontalScale(1),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          spreadRadius: 2,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SearchExerciseField(
+                                          controller: _controller,
+                                          onChanged: _filterItems,
+                                        ),
+                                        if (isDropdownOpen)
+                                          Column(
                                             children: [
-                                              Text(
-                                                "Here's some fun graphs for you",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.verticalScale(2),
-                                                ),
-                                                textAlign: TextAlign.center,
+                                              ListView(
+                                                shrinkWrap: true, // Allows ListView to take only the space it needs
+                                                physics: const AlwaysScrollableScrollPhysics(), // Disable scrolling if needed
+                                                children: filteredItems.map((item) {
+                                                  return ListTile(
+                                                    title: Text(
+                                                      item,
+                                                      style: const TextStyle(fontSize: 16), // Adjust font size as needed
+                                                      maxLines: 3, // Limit to 3 lines; adjust as needed
+                                                      overflow: TextOverflow.ellipsis, // Show ellipsis if text is too long
+                                                    ),
+                                                    onTap: () => _selectItem(item),
+                                                  );
+                                                }).toList(),
                                               ),
                                             ],
                                           ),
-                                        ),
-                                      ]),
-                                      SizedBox(
-                                        height: media.height * 0.01,
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(3),
-                                          vertical: ScreenUtil.horizontalScale(1),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              spreadRadius: 2,
-                                              blurRadius: 10,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SearchExerciseField(
-                                              controller: _controller,
-                                              onChanged: _filterItems,
-                                            ),
-                                            if (isDropdownOpen)
-                                              Column(
-                                                children: [
-                                                  ListView(
-                                                    shrinkWrap: true, // Allows ListView to take only the space it needs
-                                                    physics: const AlwaysScrollableScrollPhysics(), // Disable scrolling if needed
-                                                    children: filteredItems.map((item) {
-                                                      return ListTile(
-                                                        title: Text(
-                                                          item,
-                                                          style: const TextStyle(fontSize: 16), // Adjust font size as needed
-                                                          maxLines: 3, // Limit to 3 lines; adjust as needed
-                                                          overflow: TextOverflow.ellipsis, // Show ellipsis if text is too long
-                                                        ),
-                                                        onTap: () => _selectItem(item),
-                                                      );
-                                                    }).toList(),
-                                                  ),
-                                                ],
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 3.19,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                ],
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: media.height / 3.19,
+                      width: media.width,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: ClipPath(
+                          clipper: DiagonalClipper(),
+                          child: Container(
+                            height: media.height / 11,
+                            width: media.width / 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-          ),
-          Positioned(
-            left: 0,
-            child: BackArrowWidget(
-              onPress: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -104,20 +104,20 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: ScreenUtil.verticalScale(1)),
+                      SizedBox(height: ScreenUtil.verticalScale(5)),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          SizedBox(width: ScreenUtil.horizontalScale(3)),
                           IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
                           ),
-                          SizedBox(width: ScreenUtil.horizontalScale(2)),
                         ],
                       ),
-                      SizedBox(height: ScreenUtil.verticalScale(0.5)),
+                      SizedBox(height: ScreenUtil.verticalScale(2)),
                       Stack(
                         children: [
                           GestureDetector(

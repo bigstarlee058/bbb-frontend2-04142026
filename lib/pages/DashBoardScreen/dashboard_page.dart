@@ -860,7 +860,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                               padding: EdgeInsets.only(
                                                   bottom: ScreenUtil.verticalScale(1.4), top: ScreenUtil.verticalScale(2.3)),
                                               child: Text(
-                                                "Streak Calendar",
+                                                "Current Week Activity",
                                                 style: TextStyle(
                                                   color: AppColors.primaryColor,
                                                   fontSize: ScreenUtil.horizontalScale(5),
@@ -892,29 +892,23 @@ class _DashboardPageState extends State<DashboardPage> {
                                   if (isAvailable) {
                                     return Column(
                                       children: [
-                                        SizedBox(height: ScreenUtil.verticalScale(1.9)),
                                         Container(
-                                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                                          child: Text(
-                                            // "Recent Activity",
-                                            "Current Week Activity",
-                                            style: TextStyle(
-                                              color: AppColors.primaryColor,
-                                              fontSize: ScreenUtil.horizontalScale(5),
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                                          child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                bottom: ScreenUtil.verticalScale(1),
-                                                top: ScreenUtil.verticalScale(1.5),
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  "Recent Activity",
+                                                  style: TextStyle(
+                                                    color: AppColors.primaryColor,
+                                                    fontSize: ScreenUtil.horizontalScale(5.2),
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
                                               ),
-                                              child: PopupMenuButton<String>(
+                                              PopupMenuButton<String>(
                                                 color: const Color.fromARGB(255, 252, 252, 252),
                                                 elevation: 10,
                                                 shadowColor: Colors.black.withValues(alpha: 0.2),
@@ -961,14 +955,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     selectedChart = v;
                                                   });
                                                 },
-                                              ),
-                                            ),
+                                              )
+                                            ],
                                           ),
                                         ),
                                         Container(
-                                          margin: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(8.5),
-                                          ),
+                                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8.5)).copyWith(top: 6),
                                           child: selectedChart == "Exercises Completed"
                                               ? const ExerciseCompletedGraph()
                                               : selectedChart == "Weight Lifted"

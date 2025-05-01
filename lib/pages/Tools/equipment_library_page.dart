@@ -96,221 +96,193 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
     // List<Equipment> paginatedEquipments = _getPaginatedEquipments();
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Column(
+      body: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Column(
+          children: [
+            Stack(
               children: [
-                Stack(
+                Column(
                   children: [
-                    Column(
+                    Stack(
                       children: [
-                        Stack(
-                          children: [
-                            Container(
-                              height: media.height / 1,
-                              width: media.width,
-                              decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage('assets/img/back.jpg'),
-                                  fit: BoxFit.cover,
-                                  opacity: 1,
-                                ),
-                              ),
+                        Container(
+                          height: media.height / 1,
+                          width: media.width,
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/img/back.jpg'),
+                              fit: BoxFit.cover,
+                              opacity: 1,
                             ),
-                            SizedBox(
-                              height: media.height / 2.5,
-                              width: media.width,
-                              child: SafeArea(
-                                child: Column(
-                                  children: [
-                                    AppBar(
-                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                      centerTitle: true,
-                                      backgroundColor: Colors.transparent,
-                                      // leading: BackArrowWidget(
-                                      //   onPress: () {
-                                      //     // HapticFeedBack.buttonClick();
-                                      //     // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                      //     // mainPageProvider.changeTab(2);
-                                      //     Navigator.pop(context);
-                                      //   },
-                                      // ),
-                                      leading: SizedBox(),
-                                      title: Text(
-                                        'Apparel & Equipment',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(5),
-                                        ),
-                                      ),
-                                      actions: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
-                                        )
-                                      ],
-                                    ),
-                                    // Container(
-                                    //   margin: const EdgeInsets.only(right: 10),
-                                    //   child: Row(
-                                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    //     children: [
-                                    //       BackArrowWidget(
-                                    //         onPress: () {
-                                    //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                    //           mainPageProvider.changeTab(2);
-                                    //         },
-                                    //       ),
-                                    //       Text(
-                                    //         'Apparel & Equipment',
-                                    //         style: TextStyle(
-                                    //           color: Colors.white,
-                                    //           fontSize: ScreenUtil.horizontalScale(5),
-                                    //         ),
-                                    //       ),
-                                    //       const CommonStreakWithNotification(routeString: '/equipmentLibrary')
-                                    //     ],
-                                    //   ),
-                                    // ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(7),
-                                      ),
-                                      height: media.height * 0.19,
-                                      child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            SizedBox(
-                                              height: ScreenUtil.horizontalScale(1),
-                                            ),
-                                            SearchEquipmentField(
-                                              onChanged: (query) {
-                                                setState(() {
-                                                  _searchQuery = query; // Update the search query
-                                                  _currentPage = 0;
-                                                  _applyFilters(); // Reset pagination when searching
-                                                });
-                                              },
-                                            ),
-                                            SizedBox(
-                                              height: ScreenUtil.horizontalScale(3),
-                                            ),
-                                            FilterSortButton(
-                                              selectedSortBy: _selectedSortBy,
-                                              onApplyFilters: (String sortBy) {
-                                                setState(() {
-                                                  _selectedSortBy = sortBy;
-                                                });
-                                                _applyFilters(); // Apply the filters and sorting
-                                              },
-                                            ),
-                                          ]),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: media.height / 3.19,
-                              width: media.width,
-                              child: Align(
-                                alignment: Alignment.bottomRight,
-                                child: ClipPath(
-                                  clipper: DiagonalClipper(),
-                                  child: Container(
-                                    height: media.height / 11,
-                                    width: media.width / 6,
-                                    decoration: const BoxDecoration(
+                          ),
+                        ),
+                        SizedBox(
+                          height: media.height / 2.5,
+                          width: media.width,
+                          child: SafeArea(
+                            child: Column(
+                              children: [
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  centerTitle: true,
+                                  backgroundColor: Colors.transparent,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+
+                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                                  // Positioned(
+                                  //   left: 0,
+                                  //   child: BackArrowWidget(
+                                  //     onPress: () {
+                                  //       Navigator.pop(context);
+                                  //     },
+                                  //   ),
+                                  // leading: SizedBox(),
+                                  title: Text(
+                                    'Apparel & Equipment',
+                                    style: TextStyle(
                                       color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5),
                                     ),
                                   ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                    )
+                                  ],
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7),
+                                  ),
+                                  height: media.height * 0.19,
+                                  child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: ScreenUtil.horizontalScale(1),
+                                        ),
+                                        SearchEquipmentField(
+                                          onChanged: (query) {
+                                            setState(() {
+                                              _searchQuery = query; // Update the search query
+                                              _currentPage = 0;
+                                              _applyFilters(); // Reset pagination when searching
+                                            });
+                                          },
+                                        ),
+                                        SizedBox(
+                                          height: ScreenUtil.horizontalScale(3),
+                                        ),
+                                        FilterSortButton(
+                                          selectedSortBy: _selectedSortBy,
+                                          onApplyFilters: (String sortBy) {
+                                            setState(() {
+                                              _selectedSortBy = sortBy;
+                                            });
+                                            _applyFilters(); // Apply the filters and sorting
+                                          },
+                                        ),
+                                      ]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: media.height / 3.19,
+                          width: media.width,
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: ClipPath(
+                              clipper: DiagonalClipper(),
+                              child: Container(
+                                height: media.height / 11,
+                                width: media.width / 6,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: media.height / 3.2),
-                      child: Container(
-                        width: media.width,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: media.width,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(55),
-                                ),
-                              ),
-                              child: Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(6),
-                                  vertical: ScreenUtil.verticalScale(2),
-                                ),
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      height: ScreenUtil.verticalScale(2),
-                                    ),
-                                    dataProvider == null || dataProvider!.adminEquipmentsData.isEmpty || _filteredEquipments.isEmpty
-                                        ? Container(
-                                            color: Colors.white,
-                                            height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
-                                          )
-                                        : Column(
-                                            children: _getPaginatedEquipments().map((equipment) {
-                                              return Column(
-                                                children: [
-                                                  equipmentCard(
-                                                    equipment, // Dynamically display equipment
-                                                  ),
-                                                  SizedBox(
-                                                    height: ScreenUtil.verticalScale(2),
-                                                  ),
-                                                ],
-                                              );
-                                            }).toList(),
-                                          ),
-                                    SizedBox(
-                                      height: ScreenUtil.verticalScale(2),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 50,
-                            )
-                          ],
-                        ),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: media.height / 3.2),
+                  child: Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
-                  ],
+                    child: Column(
+                      children: [
+                        Container(
+                          width: media.width,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(55),
+                            ),
+                          ),
+                          child: Container(
+                            margin: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(6),
+                              vertical: ScreenUtil.verticalScale(2),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(2),
+                                ),
+                                dataProvider == null || dataProvider!.adminEquipmentsData.isEmpty || _filteredEquipments.isEmpty
+                                    ? Container(
+                                        color: Colors.white,
+                                        height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
+                                      )
+                                    : Column(
+                                        children: _getPaginatedEquipments().map((equipment) {
+                                          return Column(
+                                            children: [
+                                              equipmentCard(
+                                                equipment, // Dynamically display equipment
+                                              ),
+                                              SizedBox(
+                                                height: ScreenUtil.verticalScale(2),
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ),
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 50,
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-          Positioned(
-            left: 0,
-            child: BackArrowWidget(
-              onPress: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomSheet: Container(
         alignment: Alignment.center,

@@ -136,12 +136,10 @@ class _ToolsPageState extends State<ToolsPage> {
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(
-                    top: Platform.isAndroid ? media.height / 8.5 : media.height / 7,
-                    bottom: ScreenUtil.verticalScale(15),
-                  ),
+                  margin: EdgeInsets.only(top: Platform.isAndroid ? media.height / 8.5 : media.height / 7),
                   child: Container(
                     width: media.width,
+                    height: (media.height - (Platform.isAndroid ? media.height / 8.5 : media.height / 7)),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -186,14 +184,16 @@ class _ToolsPageState extends State<ToolsPage> {
                                   icon: 'assets/img/verified (1).svg',
                                   url: '/seeAllAchievementPage',
                                 ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(1.3),
-                                ),
-                                const ToolsPageButton(
-                                  title: 'Nutrition Calculator',
-                                  icon: 'assets/icons/nutrition.svg',
-                                  url: '/nutritionCalculator',
-                                ),
+
+                                /// TEMP HIDE
+                                // SizedBox(
+                                //   height: ScreenUtil.verticalScale(1.3),
+                                // ),
+                                // const ToolsPageButton(
+                                //   title: 'Nutrition Calculator',
+                                //   icon: 'assets/icons/nutrition.svg',
+                                //   url: '/nutritionCalculator',
+                                // ),
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(1.3),
                                 ),
@@ -202,14 +202,16 @@ class _ToolsPageState extends State<ToolsPage> {
                                   icon: 'assets/icons/apparel.svg',
                                   url: '/equipmentLibrary',
                                 ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(1.3),
-                                ),
-                                const ToolsPageButton(
-                                  title: 'Bonuses',
-                                  icon: 'assets/icons/bonuses.svg',
-                                  url: '/bonusLibrary',
-                                ),
+
+                                /// TEMP HIDE
+                                // SizedBox(
+                                //   height: ScreenUtil.verticalScale(1.3),
+                                // ),
+                                // const ToolsPageButton(
+                                //   title: 'Bonuses',
+                                //   icon: 'assets/icons/bonuses.svg',
+                                //   url: '/bonusLibrary',
+                                // ),
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(1.3),
                                 ),
