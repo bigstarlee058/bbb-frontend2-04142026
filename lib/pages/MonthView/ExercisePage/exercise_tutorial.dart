@@ -104,17 +104,17 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: ScreenUtil.verticalScale(5)),
+                      SizedBox(height: ScreenUtil.verticalScale(2)),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          SizedBox(width: ScreenUtil.horizontalScale(3)),
                           IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
                           ),
+                          SizedBox(width: ScreenUtil.horizontalScale(3)),
                         ],
                       ),
                       SizedBox(height: ScreenUtil.verticalScale(2)),
@@ -256,17 +256,15 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                       ),
                       Container(
                         margin: EdgeInsets.only(
-                            left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), top: 15.0, bottom: 10.0),
+                            left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), top: 15.0, bottom: 5.0),
                         alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: EdgeInsets.all(0.0),
-                          child: Text(
-                            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                            ),
+                        child: Text(
+                          "Lorem Ipsum is simply dummy text of the printing and industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: ScreenUtil.verticalScale(1.75),
+                            height: 1.5,
+                            color: Colors.grey.shade700,
                           ),
                         ),
                       ),
@@ -285,8 +283,8 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                             ),
                             Text(
                               "Do not show again.",
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: ScreenUtil.verticalScale(1.8),
                                 color: Colors.black,
                               ),
                             )
@@ -297,8 +295,8 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> {
                       Container(
                         margin: EdgeInsets.only(
                           bottom: ScreenUtil.verticalScale(3),
-                          left: ScreenUtil.horizontalScale(10),
-                          right: ScreenUtil.horizontalScale(10),
+                          left: ScreenUtil.horizontalScale(5),
+                          right: ScreenUtil.horizontalScale(5),
                         ),
                         child: ButtonWidget(
                           text: "Close",

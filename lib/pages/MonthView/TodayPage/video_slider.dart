@@ -21,7 +21,7 @@ class _VideoSliderState extends State<VideoSlider> {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+            topLeft: Radius.circular(ScreenUtil.verticalScale(4)),
           ),
           child: SizedBox(
             height: 200,
@@ -34,7 +34,7 @@ class _VideoSliderState extends State<VideoSlider> {
               },
               itemBuilder: (context, index) => Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
                   image: DecorationImage(
                     fit: BoxFit.cover,
                     image: AssetImage("assets/img/pp_4.png"),

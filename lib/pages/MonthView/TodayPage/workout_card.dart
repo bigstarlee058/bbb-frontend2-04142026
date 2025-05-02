@@ -21,6 +21,7 @@ class WorkoutCard extends StatefulWidget {
     super.key,
     required this.isCompleted,
     required this.isSkipped,
+    required this.isEditMode,
     required this.exerciseIndex,
     this.onPress,
     required this.openSwapModal,
@@ -39,6 +40,7 @@ class WorkoutCard extends StatefulWidget {
   });
 
   final bool isSkipped;
+  final bool isEditMode;
   final bool isCompleted;
   final int exerciseIndex;
   final void Function(Function())? onPress;
@@ -166,54 +168,55 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
     return Slidable(
       enabled: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted ? false : true,
-      endActionPane: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted
-          ? null
-          : widget.enabled
-              ? ActionPane(
-                  extentRatio: 0.35,
-                  motion: const ScrollMotion(),
-                  children: [
-                    SizedBox(
-                      width: ScreenUtil.horizontalScale(5),
-                    ),
-                    SizedBox(
-                      height: ScreenUtil.verticalScale(4),
-                      width: ScreenUtil.verticalScale(4),
-                      child: Row(
-                        children: [
-                          SlidableAction(
-                            onPressed: (context) => widget.openSwapModal!(),
-                            icon: Icons.swap_horiz,
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.all(0),
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: ScreenUtil.horizontalScale(5),
-                    ),
-                    SizedBox(
-                      height: ScreenUtil.verticalScale(4),
-                      width: ScreenUtil.verticalScale(4),
-                      child: Row(
-                        children: [
-                          SlidableAction(
-                            onPressed: (context) => widget.onRemove(),
-                            icon: Icons.close,
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.all(0),
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              : null,
+      endActionPane: null,
+      // widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted
+      //     ? null
+      //     : widget.enabled
+      //         ? ActionPane(
+      //             extentRatio: 0.35,
+      //             motion: const ScrollMotion(),
+      //             children: [
+      //               SizedBox(
+      //                 width: ScreenUtil.horizontalScale(5),
+      //               ),
+      //               SizedBox(
+      //                 height: ScreenUtil.verticalScale(4),
+      //                 width: ScreenUtil.verticalScale(4),
+      //                 child: Row(
+      //                   children: [
+      //                     SlidableAction(
+      //                       onPressed: (context) => widget.openSwapModal!(),
+      //                       icon: Icons.swap_horiz,
+      //                       backgroundColor: Colors.blue,
+      //                       foregroundColor: Colors.white,
+      //                       padding: const EdgeInsets.all(0),
+      //                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //               SizedBox(
+      //                 width: ScreenUtil.horizontalScale(5),
+      //               ),
+      //               SizedBox(
+      //                 height: ScreenUtil.verticalScale(4),
+      //                 width: ScreenUtil.verticalScale(4),
+      //                 child: Row(
+      //                   children: [
+      //                     SlidableAction(
+      //                       onPressed: (context) => widget.onRemove(),
+      //                       icon: Icons.close,
+      //                       backgroundColor: Colors.red,
+      //                       foregroundColor: Colors.white,
+      //                       padding: const EdgeInsets.all(0),
+      //                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //             ],
+      //           )
+      //         : null,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(
@@ -261,29 +264,42 @@ class _WorkoutCardState extends State<WorkoutCard> {
                 Radius.circular(ScreenUtil.verticalScale(12)),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Consumer<MonthProvider>(builder: (context, value, child) {
-                  return Row(
-                    children: [
-                      appShimmerImage(
-                        height: media.width / 4,
-                        width: media.width / 4,
-                        networkImageUrl: widget.isCircuit ? gImageUrl : widget.image,
-                        fit: BoxFit.contain,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                        ),
-                        child: Container(
-                          decoration: widget.isCompleted
+            child: Consumer<MonthProvider>(builder: (context, value, child) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  appShimmerImage(
+                    height: media.width / 4,
+                    width: media.width / 4,
+                    networkImageUrl: widget.isCircuit ? gImageUrl : widget.image,
+                    fit: BoxFit.cover,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                      bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                    ),
+                    child: Container(
+                      decoration: widget.isCompleted
+                          ? BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                              ),
+                            )
+                          : widget.isSkipped
                               ? BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                      const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                      AppColors.secondColor.withValues(alpha: 0.8),
+                                      AppColors.secondColor.withValues(alpha: 0.8),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
@@ -293,107 +309,128 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                     bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
                                   ),
                                 )
-                              : widget.isSkipped
-                                  ? BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppColors.secondColor.withValues(alpha: 0.8),
-                                          AppColors.secondColor.withValues(alpha: 0.8),
-                                        ],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                      ),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                        bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                      ),
-                                    )
-                                  : BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                        bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                      ),
-                                    ),
-                          child: Icon(
-                            widget.isCompleted ? Icons.check : Icons.close,
-                            color: widget.isCompleted || widget.isSkipped ? Colors.white : Colors.transparent,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: media.width / 2.5,
-                            child: Text(
-                              widget.name,
-                              style: TextStyle(
-                                color: (widget.exercise.isAddedUpdated ?? false) ? AppColors.skipDayColor : AppColors.primaryColor,
-                                fontSize: widget.isCircuit ? ScreenUtil.horizontalScale(3) : ScreenUtil.horizontalScale(3.8),
-                                fontWeight: FontWeight.bold,
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: ScreenUtil.verticalScale(1.5),
-                          ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
-                                child: SvgPicture.asset(
-                                  "assets/icons/trend.svg",
-                                  colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                                  width: 20,
+                              : BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "$totalSets working set${totalSets > 1 ? "s" : ""}",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
-                  );
-                }),
-                if (widget.enabled) ...[
-                  GestureDetector(
-                    onTap: widget.enabled
-                        ? () async {
-                            await getTotalSets();
-                            final provider = Provider.of<MonthProvider>(context, listen: false);
-                            widget.onPress!(
-                              () async => await getTotalSets(),
-                            );
-                            provider.updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal);
-                          }
-                        : null,
-                    child: Container(
-                      padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                      decoration: BoxDecoration(
-                        color: (widget.exercise.isAddedUpdated ?? false) ? AppColors.skipDayColor : AppColors.primaryColor,
-                        shape: BoxShape.circle,
-                      ),
                       child: Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                        size: ScreenUtil.verticalScale(3),
+                        widget.isCompleted ? Icons.check : Icons.close,
+                        color: widget.isCompleted || widget.isSkipped ? Colors.white : Colors.transparent,
+                        size: 30,
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          widget.name,
+                          style: TextStyle(
+                              color: (widget.exercise.isAddedUpdated ?? false) ? AppColors.skipDayColor : AppColors.primaryColor,
+                              fontSize: widget.isCircuit ? ScreenUtil.horizontalScale(3) : ScreenUtil.horizontalScale(3.8),
+                              fontWeight: FontWeight.bold,
+                              height: 1.2),
+                        ),
+                        SizedBox(
+                          height: ScreenUtil.verticalScale(1.5),
+                        ),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
+                              child: SvgPicture.asset(
+                                "assets/icons/trend.svg",
+                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                width: 20,
+                              ),
+                            ),
+                            Text(
+                              "$totalSets working set${totalSets > 1 ? "s" : ""}",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  if (widget.enabled && !widget.isEditMode) ...[
+                    GestureDetector(
+                      onTap: widget.enabled
+                          ? () async {
+                              await getTotalSets();
+                              final provider = Provider.of<MonthProvider>(context, listen: false);
+                              widget.onPress!(
+                                () async => await getTotalSets(),
+                              );
+                              provider.updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal);
+                            }
+                          : null,
+                      child: Container(
+                        padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)).copyWith(right: 5),
+                        decoration: BoxDecoration(
+                          color: (widget.exercise.isAddedUpdated ?? false) ? AppColors.skipDayColor : AppColors.primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.play_arrow,
+                          color: Colors.white,
+                          size: ScreenUtil.verticalScale(3),
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (widget.isEditMode && !widget.isCircuit) ...[
+                    Row(
+                      children: [
+                        SizedBox(width: 5),
+                        GestureDetector(
+                          onTap: () => widget.onRemove(),
+                          child: Container(
+                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: ScreenUtil.verticalScale(2.5),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => widget.openSwapModal!(),
+                          child: Container(
+                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.swap_horiz,
+                              color: Colors.white,
+                              size: ScreenUtil.verticalScale(2.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ]
                 ],
-              ],
-            ),
+              );
+            }),
           ),
         ),
       ),

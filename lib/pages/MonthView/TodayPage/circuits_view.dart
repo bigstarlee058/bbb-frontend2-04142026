@@ -13,12 +13,13 @@ class CircuitsView extends StatefulWidget {
   final List<PumpCircuit> circuit;
   final bool isDayCompleted;
   final bool isDaySkipped;
+  final bool isEditable;
 
   const CircuitsView({
     super.key,
     required this.circuit,
     required this.isDayCompleted,
-    required this.isDaySkipped,
+    required this.isDaySkipped, required this.isEditable,
   });
 
   @override
@@ -253,6 +254,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         }
 
                                         return WorkoutCard(
+                                          isEditMode: widget.isEditable,
                                           image: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].thumbnail ?? "unknown",
                                           dataId: dataId,
                                           isDayCompleted: widget.isDayCompleted,

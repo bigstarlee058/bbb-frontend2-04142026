@@ -24,6 +24,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
 
   bool videoNotInitialized = false;
   String tutorialDesc = "";
+  String tutorialTitle = "";
   DataProvider? dataProvider;
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
@@ -41,16 +42,20 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
     setState(() {
       loading = true;
     });
-    await dataProvider?.fetchTutorialData();
-    if (dataProvider!.tutorialData.files.isNotEmpty) {
-      initializeVideo(dataProvider?.tutorialData.files[0]['link']);
+
+    if (dataProvider?.getChooseWorkoutModel == null) {
+      await dataProvider?.getChooseWorkoutData();
+    }
+    if (dataProvider!.getChooseWorkoutModel!.files!.isNotEmpty) {
+      initializeVideo(dataProvider!.getChooseWorkoutModel!.files![0].link ?? "");
     } else {
       loading = false;
       videoNotInitialized = true;
       setState(() {});
     }
 
-    tutorialDesc = dataProvider?.tutorialData.description ?? "";
+    tutorialDesc = dataProvider!.getChooseWorkoutModel?.description ?? "";
+    tutorialTitle = dataProvider!.getChooseWorkoutModel?.title ?? "";
   }
 
   Future<void> initializeVideo(String url) async {
@@ -198,7 +203,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                             },
                             child: Column(
                               children: [
-                                dataProvider!.tutorialData.files.isNotEmpty && !videoNotInitialized
+                                dataProvider!.getChooseWorkoutModel!.files!.isNotEmpty && !videoNotInitialized
                                     ? SizedBox(
                                         height: videoSize.height - 18,
                                         width: videoSize.width - 6,
@@ -328,39 +333,41 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                         margin: EdgeInsets.only(
                             left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), top: 15.0, bottom: 10.0),
                         alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: EdgeInsets.all(0.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Lorem Ipsum title",
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Text(
+                                tutorialTitle,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
-                                  fontSize: ScreenUtil.horizontalScale(5.5),
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: ScreenUtil.verticalScale(2.2),
+                                  height: 1.0,
+                                  fontWeight: FontWeight.w700,
                                   color: AppColors.primaryColor,
                                 ),
                               ),
-                              SizedBox(height: 14),
-                              Text(
-                                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                ),
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              tutorialDesc,
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: ScreenUtil.verticalScale(1.7),
+                                height: 1.5,
+                                color: Color(0xff6f6f6f),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: ScreenUtil.verticalScale(1)),
+                      SizedBox(height: ScreenUtil.verticalScale(1.2)),
                       Container(
                         margin: EdgeInsets.only(
                           bottom: ScreenUtil.verticalScale(3),
-                          left: ScreenUtil.horizontalScale(10),
-                          right: ScreenUtil.horizontalScale(10),
+                          left: ScreenUtil.horizontalScale(5),
+                          right: ScreenUtil.horizontalScale(5),
                         ),
                         child: ButtonWidget(
                           text: "Close",

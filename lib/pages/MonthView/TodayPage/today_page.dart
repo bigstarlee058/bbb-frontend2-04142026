@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -37,7 +38,7 @@ class TodayPage extends StatefulWidget {
   State<TodayPage> createState() => _TodayPageState();
 }
 
-class _TodayPageState extends State<TodayPage> {
+class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMixin {
   final today = DateTime.now();
   MonthProvider? monthProvider;
   String searchQuery = "";
@@ -53,6 +54,25 @@ class _TodayPageState extends State<TodayPage> {
   final GlobalKey<CustomSlideActionState> key = GlobalKey();
 
   bool isInit = true;
+
+  bool isEditMode = false;
+
+  Color _currentColor = Colors.white;
+
+  void _changeColor() {
+    setState(() {
+      _currentColor = _currentColor == Colors.white ? Colors.red : Colors.white;
+    });
+  }
+
+  @override
+  void initState() {
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await initData());
+    super.initState();
+  }
 
   Future<void> initData() async {
     mainPageProvider?.changeTab(1);
@@ -96,46 +116,6 @@ class _TodayPageState extends State<TodayPage> {
 
     isInit = false;
     setState(() {});
-  }
-
-  @override
-  void initState() {
-    monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await initData());
-
-    // WidgetsBinding.instance.addPostFrameCallback(
-    //   (timeStamp) async {
-    //     mainPageProvider?.changeTab(1);
-    //
-    //     await fetchExtraAddedExercise().then(
-    //       (value) {
-    //         int nextWorkOutIndex =
-    //             monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1].toString().contains("Workout")
-    //                 ? int.parse(monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1]
-    //                         .toString()
-    //                         .replaceAll("Day ", "")
-    //                         .replaceAll(" Workout", "")) -
-    //                     1
-    //                 : 0;
-    //         currentDayTitle = monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1].toString().contains("Workout")
-    //             ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
-    //             : monthProvider!.weekDataModel!.dayList![monthProvider!.overviewCurrentDay - 1];
-    //         fetchWarmupData();
-    //         monthProvider?.fetchExerciseStatusLocalData();
-    //         fetchRemovedExerciseLocalData();
-    //         isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-    //         isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
-    //             monthProvider?.dayHistoryDetails == null ||
-    //             (monthProvider!.actualWeek! > 4 && monthProvider?.dayHistoryDetails?.status == Status.started);
-    //
-    //         monthProvider?.fetchAllExercise();
-    //       },
-    //     );
-    //   },
-    // );
-    super.initState();
   }
 
   Future<void> fetchExtraAddedExercise() async {
@@ -307,6 +287,12 @@ class _TodayPageState extends State<TodayPage> {
     return lineCount;
   }
 
+  void toggleEditMode() {
+    setState(() {
+      isEditMode = !isEditMode;
+    });
+  }
+
   @override
   void dispose() {
     monthProvider?.clearWarmupModel();
@@ -318,6 +304,8 @@ class _TodayPageState extends State<TodayPage> {
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
+    sqrt(pow(media.width, 2) + pow(media.height, 2));
+
     return isInit
         ? Container(
             color: Colors.white,
@@ -353,6 +341,7 @@ class _TodayPageState extends State<TodayPage> {
                                     child: Column(
                                       children: [
                                         AppBar(
+                                          titleSpacing: -5,
                                           toolbarHeight: ScreenUtil.verticalScale(5.1),
                                           backgroundColor: Colors.transparent,
                                           leading: BackArrowWidget(
@@ -360,39 +349,52 @@ class _TodayPageState extends State<TodayPage> {
                                               Navigator.pop(context);
                                             },
                                           ),
+                                          title: Container(
+                                            margin: EdgeInsets.only(
+                                              left: ScreenUtil.horizontalScale(4),
+                                            ),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: SizedBox(
+                                              width: ScreenUtil.verticalScale(4.65),
+                                              height: ScreenUtil.verticalScale(4.65),
+                                              child: IconButton(
+                                                padding: EdgeInsets.zero,
+                                                icon: AnimatedSwitcher(
+                                                  transitionBuilder: (child, animation) {
+                                                    return ScaleTransition(
+                                                      scale: animation,
+                                                      child: child,
+                                                    );
+                                                  },
+                                                  duration: const Duration(milliseconds: 500),
+                                                  child: Icon(
+                                                    isEditMode ? Icons.close : Icons.edit,
+                                                    // color: Color(0XFFd18a9b),
+                                                    color: AppColors.primaryColor,
+                                                    size: ScreenUtil.verticalScale(isEditMode ? 2.5 : 2.3),
+                                                  ),
+                                                ),
+                                                onPressed: toggleEditMode,
+                                              ),
+                                            ),
+                                          ),
                                           actions: [
                                             Padding(
-                                                padding: const EdgeInsets.only(right: 10),
-                                                child: const CommonStreakWithNotification(routeString: "today"))
+                                                padding: EdgeInsets.only(right: isEditMode ? 20 : 10),
+                                                child: isEditMode
+                                                    ? Text(
+                                                        "Edit Mode",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.verticalScale(2),
+                                                            fontWeight: FontWeight.w600),
+                                                      )
+                                                    : const CommonStreakWithNotification(routeString: "today"))
                                           ],
                                         ),
-                                        // Container(
-                                        //   margin: const EdgeInsets.only(right: 10),
-                                        //   child: Row(
-                                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        //     children: [
-                                        //       Container(
-                                        //         margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
-                                        //         decoration: const BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
-                                        //         child: SizedBox(
-                                        //           width: ScreenUtil.verticalScale(4.65),
-                                        //           height: ScreenUtil.verticalScale(4.65),
-                                        //           child: IconButton(
-                                        //             padding: EdgeInsets.zero,
-                                        //             icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
-                                        //             onPressed: () {
-                                        //               // HapticFeedBack.buttonClick();
-                                        //               Navigator.pop(context);
-                                        //               // Navigator.pushNamed(context, '/dayOverview');
-                                        //             },
-                                        //             iconSize: ScreenUtil.verticalScale(4),
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //       const CommonStreakWithNotification(routeString: "today")
-                                        //     ],
-                                        //   ),
-                                        // ),
                                         Container(
                                           margin: EdgeInsets.symmetric(
                                             horizontal: ScreenUtil.horizontalScale(5),
@@ -458,14 +460,15 @@ class _TodayPageState extends State<TodayPage> {
                             ),
                           ],
                         ),
-                        Container(
+                        AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
                           width: media.width,
                           margin: EdgeInsets.only(
                             top: media.height / 4,
                             bottom: ScreenUtil.verticalScale(2),
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isEditMode ? Color(0xffbfdaf1) : Colors.white,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
@@ -477,7 +480,7 @@ class _TodayPageState extends State<TodayPage> {
                             clipBehavior: Clip.none,
                             children: [
                               Positioned(
-                                top: -media.height / 4,
+                                top: -(media.height / 4) + 0.3,
                                 child: SizedBox(
                                   height: media.height / 4,
                                   width: media.width,
@@ -485,10 +488,11 @@ class _TodayPageState extends State<TodayPage> {
                                     alignment: Alignment.bottomRight,
                                     child: ClipPath(
                                       clipper: DiagonalClipper(),
-                                      child: Container(
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 300),
                                         height: media.height / 11,
                                         width: media.width / 6,
-                                        decoration: const BoxDecoration(color: Colors.white),
+                                        color: isEditMode ? Color(0xffbfdaf1) : Colors.white,
                                       ),
                                     ),
                                   ),
@@ -499,43 +503,50 @@ class _TodayPageState extends State<TodayPage> {
                                 child: Column(
                                   children: [
                                     VideoSlider(),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(7),
-                                        vertical: ScreenUtil.verticalScale(1.2),
-                                      ).copyWith(top: ScreenUtil.horizontalScale(6)),
-                                      child: Builder(builder: (context) {
-                                        String split = monthProvider
-                                                ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-                                                .toString()
-                                                .split(" ")[1] ??
-                                            "";
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            if (monthProvider?.dayDataModel!.formats != null &&
-                                                monthProvider!.dayDataModel!.formats!
-                                                    .contains(split.toString().replaceAll("split", ""))) ...[
-                                              Container(
-                                                margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
-                                                child: Text(
-                                                  'Choose equipment availability',
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              SelectDropdown(
-                                                onChange: (String newValue) async {
-                                                  monthProvider?.changeEquipmentType(newValue);
-                                                },
-                                              ),
-                                            ]
-                                          ],
-                                        );
-                                      }),
-                                    ),
-                                    totalWarmups == 0 ? const SizedBox() : warmUpSection(media),
+                                    isEditMode
+                                        ? Container(
+                                            margin: EdgeInsets.symmetric(
+                                              horizontal: ScreenUtil.horizontalScale(7),
+                                              vertical: ScreenUtil.verticalScale(1.2),
+                                            ).copyWith(top: ScreenUtil.horizontalScale(6)),
+                                            child: Builder(builder: (context) {
+                                              String split = monthProvider
+                                                      ?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                                                      .toString()
+                                                      .split(" ")[1] ??
+                                                  "";
+
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  if (monthProvider!.isPumpDay
+                                                      ? (monthProvider?.pumpDayModel!.formats != null &&
+                                                          monthProvider!.pumpDayModel!.formats!
+                                                              .contains(split.toString().replaceAll("split", "")))
+                                                      : (monthProvider?.dayDataModel!.formats != null &&
+                                                          monthProvider!.dayDataModel!.formats!
+                                                              .contains(split.toString().replaceAll("split", "")))) ...[
+                                                    Container(
+                                                      margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
+                                                      child: Text(
+                                                        'Choose equipment availability',
+                                                        textAlign: TextAlign.left,
+                                                        style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    SelectDropdown(
+                                                      onChange: (String newValue) async {
+                                                        monthProvider?.changeEquipmentType(newValue);
+                                                      },
+                                                    ),
+                                                  ]
+                                                ],
+                                              );
+                                            }),
+                                          )
+                                        : SizedBox(),
+                                    totalWarmups == 0 ? const SizedBox(height: 15) : warmUpSection(media),
                                     Container(
                                       width: media.width,
                                       margin: EdgeInsets.only(left: ScreenUtil.verticalScale(3)),
@@ -553,6 +564,7 @@ class _TodayPageState extends State<TodayPage> {
                                           SizedBox(height: media.height * 0.025),
                                           monthProvider!.isPumpDay
                                               ? CircuitsView(
+                                                  isEditable: isEditMode,
                                                   circuit: monthProvider!.pumpDayModel!.circuits!,
                                                   isDayCompleted: isCurrentDayCompleted,
                                                   isDaySkipped: isCurrentDaySkipped)
@@ -587,6 +599,7 @@ class _TodayPageState extends State<TodayPage> {
                                                           Padding(
                                                             padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                                                             child: WorkoutCard(
+                                                              isEditMode: isEditMode,
                                                               image: exercises[i].thumbnail ?? "unknown",
                                                               dataId: dataId,
                                                               isDayCompleted: isCurrentDayCompleted,
@@ -616,19 +629,18 @@ class _TodayPageState extends State<TodayPage> {
                                                               },
                                                               openSwapModal: () async {
                                                                 await swipeExerciseDialog(i, exercises[i]);
-                                                                await swipeExerciseDialog(i, exercises[i]);
                                                               },
                                                               exercise: exercises[i],
                                                               exerciseData: exercises[i].id!,
                                                               name: exercises[i].name!.isEmpty ? "Exercise ${i + 1}" : exercises[i].name!,
                                                               onRemove: () => removeExercise(exercises[i].exerciseId!),
                                                               enabled: /*isCurrentDayCompleted || isCurrentDaySkipped
-                                                      ? false
-                                                      : monthProvider!.exerciseHistoryModel.any((element) =>
-                                                                  element.dataId == dataId && element.status == Status.completed) ||
-                                                              isExist
-                                                          ? false
-                                                          :*/
+                                                    ? false
+                                                    : monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                element.dataId == dataId && element.status == Status.completed) ||
+                                                            isExist
+                                                        ? false
+                                                        :*/
                                                                   true,
                                                             ),
                                                           ),
@@ -1181,21 +1193,23 @@ class _TodayPageState extends State<TodayPage> {
                               ],
                             );
                           }),
-                          GestureDetector(
-                            onTap: null,
-                            child: Container(
-                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.play_arrow,
-                                color: Colors.white,
-                                size: ScreenUtil.verticalScale(3),
-                              ),
-                            ),
-                          ),
+                          isEditMode
+                              ? SizedBox()
+                              : GestureDetector(
+                                  onTap: null,
+                                  child: Container(
+                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                      size: ScreenUtil.verticalScale(3),
+                                    ),
+                                  ),
+                                ),
                         ],
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:app_links/app_links.dart';
 import 'package:bbb/firebase_options.dart';
@@ -28,6 +29,7 @@ import 'package:bbb/pages/Tools/equipment_library_page.dart';
 import 'package:bbb/pages/Tools/exercise_history.dart';
 import 'package:bbb/pages/Tools/exercise_library_detail_page.dart';
 import 'package:bbb/pages/Tools/exercise_library_page.dart';
+import 'package:bbb/pages/Tools/faqs_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
 import 'package:bbb/pages/Tools/seeall_achievement_page.dart';
@@ -255,9 +257,117 @@ class _MyAppState extends State<MyApp> {
             AppRoutes.appTutorialScreen: (context) => const AppTutorial(),
             AppRoutes.settingPage: (context) => const SettingPage(),
             AppRoutes.seeAllAchievementPage: (context) => const SeeAllAchievementPage(),
+            AppRoutes.faqsPage: (context) => const FAQsPage(),
           },
         ),
       ),
     );
+  }
+}
+
+class EditModeScreen extends StatefulWidget {
+  @override
+  _EditModeScreenState createState() => _EditModeScreenState();
+}
+
+class _EditModeScreenState extends State<EditModeScreen> with SingleTickerProviderStateMixin {
+  bool isEditMode = false;
+  late AnimationController _controller;
+  late Animation<double> _radiusAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _radiusAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  void toggleEditMode() {
+    setState(() {
+      isEditMode = !isEditMode;
+      isEditMode ? _controller.forward() : _controller.reverse();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+    final maxRadius = sqrt(pow(screenSize.width, 2) + pow(screenSize.height, 2));
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit Mode Demo'),
+        actions: [
+          IconButton(
+            icon: Icon(isEditMode ? Icons.close : Icons.edit),
+            onPressed: toggleEditMode,
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(color: Colors.white), // Default background
+          AnimatedBuilder(
+            animation: _radiusAnimation,
+            builder: (_, __) {
+              return ClipPath(
+                clipper: CircularRevealClipper(
+                  fraction: _radiusAnimation.value,
+                  maxRadius: maxRadius,
+                ),
+                child: Container(color: Colors.grey[200]),
+              );
+            },
+          ),
+          Column(
+            children: [
+              Container(
+                height: screenSize.height * 0.25,
+                color: Colors.blue[100],
+                width: double.infinity,
+                child: Center(child: Text("Top Image Placeholder")),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (_, index) => ListTile(
+                    title: Text("Exercise ${index + 1}"),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CircularRevealClipper extends CustomClipper<Path> {
+  final double fraction;
+  final double maxRadius;
+
+  CircularRevealClipper({required this.fraction, required this.maxRadius});
+
+  @override
+  Path getClip(Size size) {
+    final radius = maxRadius * fraction;
+    return Path()..addOval(Rect.fromCircle(center: Offset(0, 0), radius: radius));
+  }
+
+  @override
+  bool shouldReclip(covariant CircularRevealClipper oldClipper) {
+    return fraction != oldClipper.fraction;
   }
 }

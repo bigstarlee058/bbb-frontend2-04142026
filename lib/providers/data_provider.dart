@@ -20,10 +20,13 @@ import 'package:bbb/models/SyncDataResponseModel/swap_exercise_data_model.dart';
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/models/category.dart';
 import 'package:bbb/models/challenges.dart';
+import 'package:bbb/models/choose_equipment_data_model.dart';
+import 'package:bbb/models/choose_workout_data_model.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/models/equipmenttitle.dart';
 import 'package:bbb/models/exerciselibrary.dart';
+import 'package:bbb/models/faqs_model.dart';
 import 'package:bbb/models/staffs.dart';
 import 'package:bbb/models/tutorials.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -53,6 +56,11 @@ class DataProvider extends ChangeNotifier {
   bool equipmentCheckpointState = false;
   bool bonusCheckpointState = false;
   bool workoutCheckpointState = false;
+
+  GetChooseWorkoutModel? getChooseWorkoutModel;
+  GetChooseEquipmentModel? getChooseEquipmentModel;
+  List<FaQsModel> faQsModel = [];
+  bool faqLoader = false;
 
   Collections collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
   Exercise currentExerciseObj = Exercise(
@@ -153,6 +161,91 @@ class DataProvider extends ChangeNotifier {
       }
     } catch (e) {
       throw Exception('Failed to load staff data');
+    }
+  }
+
+  Future<void> getChooseWorkoutData() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/popupworkout/get_popupworkout');
+    String? userIdToken = await getAuthToken();
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+
+        if (data != null) {
+          getChooseWorkoutModel = GetChooseWorkoutModel.fromJson(data);
+        }
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get choose workout data');
+      }
+    } catch (e) {
+      throw Exception('Failed to get choose workout data');
+    }
+  }
+
+  Future<void> getChooseEquipmentData() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/popupequipment/get_popupequipment');
+    String? userIdToken = await getAuthToken();
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+
+        if (data != null) {
+          getChooseEquipmentModel = GetChooseEquipmentModel.fromJson(data);
+        }
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get choose equipment data');
+      }
+    } catch (e) {
+      throw Exception('Failed to get choose equipment data');
+    }
+  }
+
+  Future<void> getFAQs() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/faqs');
+    String? userIdToken = await getAuthToken();
+    try {
+      faqLoader = true;
+      notifyListeners();
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        if (data != null) {
+          // faQsModel = FaQsModel.fromJson(data);
+          faQsModel = List<FaQsModel>.from(data.map((x) => FaQsModel.fromJson(x)));
+        }
+        faqLoader = false;
+        notifyListeners();
+      } else {
+        faqLoader = false;
+        notifyListeners();
+        throw Exception('Failed to get FAQs data');
+      }
+    } catch (e) {
+      faqLoader = false;
+      notifyListeners();
+      throw Exception('Failed to get FAQs data');
     }
   }
 
