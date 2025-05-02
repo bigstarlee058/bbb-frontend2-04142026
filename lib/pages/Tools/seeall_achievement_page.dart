@@ -38,151 +38,148 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Column(
+      body: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Column(
+          children: [
+            Stack(
               children: [
-                Stack(
+                Column(
                   children: [
-                    Column(
+                    Stack(
                       children: [
-                        Stack(
-                          children: [
-                            Container(
-                              height: media.height / 1,
-                              width: media.width,
-                              decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage('assets/img/back.jpg'),
-                                  fit: BoxFit.cover,
-                                  opacity: 1,
-                                ),
-                              ),
+                        Container(
+                          height: media.height / 1,
+                          width: media.width,
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/img/back.jpg'),
+                              fit: BoxFit.cover,
+                              opacity: 1,
                             ),
-                            SizedBox(
-                              height: media.height / 2.5,
-                              width: media.width,
-                              child: SafeArea(
-                                child: Column(
-                                  children: [
-                                    AppBar(
-                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                      centerTitle: true,
-                                      backgroundColor: Colors.transparent,
-                                      // leading: BackArrowWidget(
-                                      //   onPress: () {
-                                      //     Navigator.pop(context);
-                                      //   },
-                                      // ),
-                                      leading: SizedBox(),
-                                      title: Text(
-                                        'Achievements',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(5.5),
-                                        ),
-                                      ),
-                                      actions: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
-                                        )
-                                      ],
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(5),
-                                      ),
-                                      height: media.height * 0.097,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: ScreenUtil.horizontalScale(50),
-                                            child: Text(
-                                              "Here's a look at your\nachievements",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2),
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: media.height / 4.59,
-                              width: media.width,
-                              child: Align(
-                                alignment: Alignment.bottomRight,
-                                child: ClipPath(
-                                  clipper: DiagonalClipper(),
-                                  child: Container(
-                                    height: media.height / 11,
-                                    width: media.width / 6,
-                                    decoration: const BoxDecoration(
+                          ),
+                        ),
+                        SizedBox(
+                          height: media.height / 2.5,
+                          width: media.width,
+                          child: SafeArea(
+                            child: Column(
+                              children: [
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  centerTitle: true,
+                                  backgroundColor: Colors.transparent,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+
+                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                                  // Positioned(
+                                  //   left: 0,
+                                  //   child: BackArrowWidget(
+                                  //     onPress: () {
+                                  //       Navigator.pop(context);
+                                  //     },
+                                  //   ),
+                                  // leading: SizedBox(),
+                                  title: Text(
+                                    'Achievements',
+                                    style: TextStyle(
                                       color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
                                     ),
                                   ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                    )
+                                  ],
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(5),
+                                  ),
+                                  height: media.height * 0.097,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: ScreenUtil.horizontalScale(50),
+                                        child: Text(
+                                          "Here's a look at your\nachievements",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: ScreenUtil.verticalScale(2),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: media.height / 4.59,
+                          width: media.width,
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: ClipPath(
+                              clipper: DiagonalClipper(),
+                              child: Container(
+                                height: media.height / 11,
+                                width: media.width / 6,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: media.height / 4.6),
-                      child: Container(
-                        width: media.width,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                          ),
-                        ),
-                        child: Container(
-                          width: media.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
-                          child: GridView.builder(
-                            padding: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: ScreenUtil.horizontalScale(1),
-                                mainAxisSpacing: ScreenUtil.horizontalScale(1),
-                                childAspectRatio: 0.8),
-                            itemCount: monthProvider?.items.length,
-                            itemBuilder: (context, index) {
-                              return _buildGridItem(monthProvider!.items[index], index);
-                            },
-                          ),
-                        ),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: media.height / 4.6),
+                  child: Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
-                  ],
+                    child: Container(
+                      width: media.width,
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
+                      child: GridView.builder(
+                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: ScreenUtil.horizontalScale(1),
+                            mainAxisSpacing: ScreenUtil.horizontalScale(1),
+                            childAspectRatio: 0.8),
+                        itemCount: monthProvider?.items.length,
+                        itemBuilder: (context, index) {
+                          return _buildGridItem(monthProvider!.items[index], index);
+                        },
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-          Positioned(
-            left: 0,
-            child: BackArrowWidget(
-              onPress: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

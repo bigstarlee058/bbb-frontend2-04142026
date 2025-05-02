@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -131,7 +129,6 @@ class _WeekCalenderState extends State<WeekCalender> {
       }
 
       if (isCurrentDay) {
-        log('isCurrentDay :::::::::::::::::: $isCurrentDay');
         for (var day in data) {
           final workoutDate = day.endTime!;
           DateTime localTime = Utils.formattedDate("$workoutDate");
@@ -162,21 +159,8 @@ class _WeekCalenderState extends State<WeekCalender> {
       }
     }
 
-    return null;
+    return _buildNormalDay(date);
   }
-
-  // Widget _buildCustomDayCircle(DateTime date, Color circleColor) {
-  //   return Container(
-  //     alignment: Alignment.center,
-  //     padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-  //     margin: const EdgeInsets.only(bottom: 6),
-  //     decoration: BoxDecoration(
-  //       shape: BoxShape.circle,
-  //       color: circleColor,
-  //     ),
-  //     child: circleColor == Colors.blue ? Icon(Icons.close, color: Colors.white) : Icon(Icons.check, color: Colors.white),
-  //   );
-  // }
 
   Widget _buildCustomDayCircle(DateTime date, Color circleColor) {
     bool isCurrentDay = date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day;
@@ -247,28 +231,6 @@ class _WeekCalenderState extends State<WeekCalender> {
     );
   }
 
-  // Widget _buildCurrentWorkoutDay(DateTime date) {
-  //   return Container(
-  //     alignment: Alignment.center,
-  //     padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-  //     margin: const EdgeInsets.only(bottom: 6),
-  //     decoration: BoxDecoration(
-  //       shape: BoxShape.circle,
-  //       color: Colors.white,
-  //       border: Border.all(color: AppColors.primaryColor),
-  //     ),
-  //     child: Center(
-  //       child: Text(
-  //         '${date.day}',
-  //         style: const TextStyle(
-  //           fontSize: 14.0,
-  //           color: AppColors.primaryColor,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildCurrentWorkoutDay(DateTime date) {
     return Stack(
       clipBehavior: Clip.none,
@@ -319,6 +281,10 @@ class _WeekCalenderState extends State<WeekCalender> {
       alignment: Alignment.center,
       padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
       margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+      ),
       child: Text(
         '${date.day}',
         style: const TextStyle(

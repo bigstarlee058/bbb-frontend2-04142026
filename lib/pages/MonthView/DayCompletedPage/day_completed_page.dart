@@ -32,6 +32,16 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   String time = "";
   bool loader = true;
 
+  List<String> getLast7DayNames() {
+    List<String> dayNames = [];
+    for (int i = 0; i < 7; i++) {
+      DateTime date = DateTime.now().subtract(Duration(days: i));
+      String dayName = DateFormat('EEE').format(date);
+      dayNames.add(dayName);
+    }
+    return dayNames;
+  }
+
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
@@ -43,6 +53,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
 
   List<DateTime> dateList = [];
   List<String> formattedDates = [];
+  List<String> last7Days = [];
 
   onInit() async {
     time = "";
@@ -53,6 +64,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
     dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
     formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
+    last7Days = getLast7DayNames();
 
     DayHistoryModel? data1 = monthProvider?.allDayHistoryModel.firstWhere(
       (element) {
@@ -248,12 +260,14 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                           formattedDates[index] &&
                                       element.status == Status.completed)
                                   ? IconDataWithDot(
+                                      day: last7Days[6 - index],
                                       icon: Icons.check,
                                       iconColor: Colors.white,
                                       backgroundColor: AppColors.primaryColor,
                                       showDot: true,
                                       dotColor: Colors.transparent)
                                   : IconDataWithDot(
+                                      day: last7Days[6 - index],
                                       icon: Icons.close,
                                       iconColor: Colors.white,
                                       backgroundColor: Colors.blue,
@@ -264,7 +278,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: ScreenUtil.horizontalScale(2)),
+                    SizedBox(height: ScreenUtil.verticalScale(3)),
                     Text(
                       "Here's an overview of your today's workout.",
                       style: TextStyle(
@@ -281,7 +295,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: ScreenUtil.horizontalScale(5)),
+                    SizedBox(height: ScreenUtil.verticalScale(3)),
                     Container(
                       width: MediaQuery.of(context).size.width,
                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
@@ -1020,9 +1034,11 @@ class IconDataWithDot {
   final Color? borderColor;
   final bool showDot;
   final Color? dotColor;
+  final String? day;
 
   IconDataWithDot({
     required this.icon,
+    required this.day,
     required this.iconColor,
     required this.backgroundColor,
     required this.dotColor,
@@ -1074,6 +1090,7 @@ class IconWithDot extends StatelessWidget {
               color: iconData.dotColor ?? Colors.red[700],
             ),
           ),
+        Text(iconData.day ?? ""),
       ],
     );
   }

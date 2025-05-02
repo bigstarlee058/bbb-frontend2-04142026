@@ -990,8 +990,12 @@ class _TodayPageState extends State<TodayPage> {
                     monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ??
                         "";
 
+                String warmUpId = monthProvider.monthDataModel?.weeks![monthProvider.overviewCurrentWeek - 1]
+                        .days?[monthProvider.overviewCurrentDay - 1].warmups?.first.warmupId ??
+                    "";
+
                 String warmUpDataId =
-                    "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${monthProvider.warmUpModel?.id}";
+                    "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$warmUpId";
 
                 bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != warmUpDataId)) && monthProvider.isPastWeek;
 
@@ -1044,73 +1048,83 @@ class _TodayPageState extends State<TodayPage> {
                           Consumer<MonthProvider>(builder: (context, value, child) {
                             return Row(
                               children: [
-                                appShimmerImage(
-                                  height: media.width / 4,
-                                  width: media.width / 4,
-                                  networkImageUrl: "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
-                                      ? monthProvider.warmUpModel?.thumbnail ??
-                                          "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                      : monthProvider.warmUpModel?.thumbnail ?? "unknown",
-                                  fit: BoxFit.cover,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                  ),
-                                  child: Container(
-                                    decoration: monthProvider.exerciseHistoryModel
-                                            .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-                                        ? BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                                const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                              ],
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                            ),
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                              bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                            ),
-                                          )
-                                        : monthProvider.exerciseHistoryModel
-                                                    .any((element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-                                                isExist
-                                            ? BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    AppColors.secondColor.withValues(alpha: 0.8),
-                                                    AppColors.secondColor.withValues(alpha: 0.8),
-                                                  ],
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                ),
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                                ),
-                                              )
-                                            : BoxDecoration(
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                                ),
-                                              ),
-                                    child: Icon(
-                                      monthProvider.exerciseHistoryModel
-                                              .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
-                                          ? Icons.check
-                                          : Icons.close,
-                                      color: monthProvider.exerciseHistoryModel
-                                                  .any((element) => element.dataId == warmUpDataId && element.status == Status.completed) ||
-                                              (monthProvider.exerciseHistoryModel.any(
-                                                      (element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
-                                                  isExist)
-                                          ? Colors.white
-                                          : Colors.transparent,
-                                      size: 30,
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Positioned(
+                                      child: appShimmerImage(
+                                        height: media.width / 4,
+                                        width: media.width / 4,
+                                        networkImageUrl:
+                                            "${monthProvider.warmUpModel?.thumbnail}".startsWith('https://storage.cloud.google.com/')
+                                                ? monthProvider.warmUpModel?.thumbnail ??
+                                                    "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                                : monthProvider.warmUpModel?.thumbnail ?? "unknown",
+                                        fit: BoxFit.cover,
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                          bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Container(
+                                      height: media.width / 4,
+                                      width: media.width / 4,
+                                      decoration: monthProvider.exerciseHistoryModel
+                                              .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+                                          ? BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                                ],
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                              ),
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                              ),
+                                            )
+                                          : monthProvider.exerciseHistoryModel.any(
+                                                      (element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+                                                  isExist
+                                              ? BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      AppColors.secondColor.withValues(alpha: 0.8),
+                                                      AppColors.secondColor.withValues(alpha: 0.8),
+                                                    ],
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomCenter,
+                                                  ),
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                  ),
+                                                )
+                                              : BoxDecoration(
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                                  ),
+                                                ),
+                                      child: Icon(
+                                        monthProvider.exerciseHistoryModel
+                                                .any((element) => element.dataId == warmUpDataId && element.status == Status.completed)
+                                            ? Icons.check
+                                            : Icons.close,
+                                        color: monthProvider.exerciseHistoryModel.any(
+                                                    (element) => element.dataId == warmUpDataId && element.status == Status.completed) ||
+                                                (monthProvider.exerciseHistoryModel.any(
+                                                        (element) => element.dataId == warmUpDataId && element.status == Status.skipped) ||
+                                                    isExist)
+                                            ? Colors.white
+                                            : Colors.transparent,
+                                        size: 30,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(
                                   width: 10,

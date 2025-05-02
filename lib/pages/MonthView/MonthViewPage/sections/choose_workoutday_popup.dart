@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -9,84 +8,152 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class ChooseWorkoutDayDialog extends StatefulWidget {
-  const ChooseWorkoutDayDialog(
-      {super.key,
-      required this.loading,
-      required this.dataProvider,
-      required this.videoNotInitialized,
-      required this.videoPlayerController,
-      required this.chewieController,
-      required this.videoSize});
-
-  final bool loading;
-  final DataProvider dataProvider;
-  final bool videoNotInitialized;
-  final VideoPlayerController videoPlayerController;
-  final ChewieController chewieController;
-  final Size videoSize;
+  const ChooseWorkoutDayDialog({super.key});
 
   @override
   State<ChooseWorkoutDayDialog> createState() => _ChooseWorkoutDayDialogState();
 }
 
 class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
+  bool loading = false;
+  bool isZoom = false;
+
+  bool videoNotInitialized = false;
+  String tutorialDesc = "";
+  DataProvider? dataProvider;
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
+  late Size videoSize;
+  Timer? _hideControlsTimer;
+
   @override
   void initState() {
-    widget.videoPlayerController.play();
-    widget.videoPlayerController.addListener(() async {
-      if (widget.videoPlayerController.value.position >= widget.videoPlayerController.value.duration) {
-        AudioManager.abandonAudioFocus();
-      } else {
-        AudioManager.requestAudioFocus();
-      }
-      setState(() {});
-    });
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    fetchTutorialData();
     super.initState();
   }
 
-  Timer? _hideControlsTimer1;
-  bool showControls1 = true;
-  bool isFullscreen1 = false;
-  bool dontShowAgain1 = false;
-  bool isZoom1 = false;
+  void fetchTutorialData() async {
+    setState(() {
+      loading = true;
+    });
+    await dataProvider?.fetchTutorialData();
+    if (dataProvider!.tutorialData.files.isNotEmpty) {
+      initializeVideo(dataProvider?.tutorialData.files[0]['link']);
+    } else {
+      loading = false;
+      videoNotInitialized = true;
+      setState(() {});
+    }
 
-  void hideControls1() {
-    _hideControlsTimer1 = Timer(const Duration(seconds: 5), () {
+    tutorialDesc = dataProvider?.tutorialData.description ?? "";
+  }
+
+  Future<void> initializeVideo(String url) async {
+    try {
+      // Initialize the video player controller
+      _videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+
+      await _videoPlayerController.initialize().then(
+        (value) {
+          AudioManager.requestAudioFocus();
+        },
+      );
+      // Initialize the ChewieController with custom controls
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        autoPlay: true,
+        looping: false,
+        showControls: false,
+        aspectRatio: _videoPlayerController.value.aspectRatio,
+        // Disable default controls// Use custom controls here
+      );
+
+      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+        hideControls();
+        videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
+        setState(() {});
+      }
+      _videoPlayerController.addListener(() async {
+        if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+          AudioManager.abandonAudioFocus();
+        } else {
+          AudioManager.requestAudioFocus();
+        }
+        setState(() {});
+      });
+
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        videoNotInitialized = true;
+        loading = false;
+      });
+      debugPrint("VIDEO NOT INITIALIZED: $e");
+    }
+  }
+
+  bool showControls = true;
+  bool isFullscreen = false;
+
+  void hideControls() {
+    _hideControlsTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
-          showControls1 = false;
+          showControls = false;
         });
       }
     });
   }
 
-  void showControlsOnTap1() {
+  void showControlsOnTap() {
     setState(() {
-      showControls1 = !showControls1;
+      showControls = !showControls;
     });
-    _hideControlsTimer1?.cancel();
+    _hideControlsTimer?.cancel(); // Cancel any active timer
+    // hideControls(); // Start the timer again to hide the controls after 3 seconds
   }
 
-  void toggleFullscreen1() {
+  void toggleFullscreen() {
     setState(() {
-      isFullscreen1 = !isFullscreen1;
+      isFullscreen = !isFullscreen;
     });
-    if (isFullscreen1) {
+    if (isFullscreen) {
       SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
     } else {
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
   }
 
-  updateDonTShowAgain(value) async {
-    dontShowAgain1 = value;
-    if (value == true) {
-      await preferences.putString(SharedPreference.exerciseTutorial, value.toString());
+  Size calculateVideoSize({
+    required BuildContext context,
+    required double aspectRatio, // Aspect ratio of the video (width/height)
+  }) {
+    // Maximum allowable width and height based on screen dimensions
+    double maxWidth = ScreenUtil.horizontalScale(90);
+
+    // Calculate height dynamically based on width and aspect ratio
+    double calculatedHeight = maxWidth / aspectRatio;
+
+    return Size(maxWidth, calculatedHeight);
+  }
+
+  @override
+  void dispose() {
+    if (_chewieController != null) {
+      _chewieController!.dispose();
     }
-    setState(() {});
+    _videoPlayerController.dispose();
+    AudioManager.abandonAudioFocus();
+
+    super.dispose();
   }
 
   @override
@@ -100,7 +167,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
             borderRadius: BorderRadius.circular(30),
             color: const Color(0xFFFFFFFF),
           ),
-          child: widget.loading
+          child: loading
               ? const Center(
                   child: CircularProgressIndicator(
                     color: AppColors.primaryColor,
@@ -109,7 +176,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: ScreenUtil.verticalScale(1)),
+                      SizedBox(height: ScreenUtil.verticalScale(2)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -119,25 +186,25 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                               Navigator.of(context).pop();
                             },
                           ),
-                          SizedBox(width: ScreenUtil.horizontalScale(2)),
+                          SizedBox(width: ScreenUtil.horizontalScale(3)),
                         ],
                       ),
-                      SizedBox(height: ScreenUtil.verticalScale(0.5)),
+                      SizedBox(height: ScreenUtil.verticalScale(2)),
                       Stack(
                         children: [
                           GestureDetector(
                             onTap: () {
-                              showControlsOnTap1();
+                              showControlsOnTap();
                             },
                             child: Column(
                               children: [
-                                widget.dataProvider.tutorialData.files.isNotEmpty && !widget.videoNotInitialized
+                                dataProvider!.tutorialData.files.isNotEmpty && !videoNotInitialized
                                     ? SizedBox(
-                                        height: widget.videoSize.height - 18,
-                                        width: widget.videoSize.width - 6,
+                                        height: videoSize.height - 18,
+                                        width: videoSize.width - 6,
                                         child: Center(
                                           child: Chewie(
-                                            controller: widget.chewieController,
+                                            controller: _chewieController!,
                                           ),
                                         ),
                                       )
@@ -153,14 +220,14 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                               ],
                             ),
                           ),
-                          widget.videoNotInitialized
+                          videoNotInitialized
                               ? const SizedBox()
                               : Positioned(
-                                  bottom: widget.videoSize.height / 2.5,
+                                  bottom: videoSize.height / 2.5,
                                   left: 15,
                                   right: 15,
                                   child: Visibility(
-                                    visible: showControls1,
+                                    visible: showControls,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
@@ -172,26 +239,24 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
-                                            widget.videoPlayerController.seekTo(
-                                              widget.videoPlayerController.value.position - const Duration(seconds: 10),
+                                            _videoPlayerController.seekTo(
+                                              _videoPlayerController.value.position - const Duration(seconds: 10),
                                             );
                                           },
                                         ),
                                         IconButton(
                                           iconSize: 60,
                                           icon: Icon(
-                                            widget.videoPlayerController.value.isPlaying
-                                                ? Icons.pause_circle_filled
-                                                : Icons.play_circle_filled,
+                                            _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
                                             setState(() {
-                                              if (widget.videoPlayerController.value.isPlaying) {
-                                                widget.videoPlayerController.pause();
+                                              if (_videoPlayerController.value.isPlaying) {
+                                                _videoPlayerController.pause();
                                                 AudioManager.abandonAudioFocus();
                                               } else {
-                                                widget.videoPlayerController.play();
+                                                _videoPlayerController.play();
                                                 AudioManager.requestAudioFocus();
                                               }
                                             });
@@ -205,8 +270,8 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
-                                            widget.videoPlayerController.seekTo(
-                                              widget.videoPlayerController.value.position + const Duration(seconds: 10),
+                                            _videoPlayerController.seekTo(
+                                              _videoPlayerController.value.position + const Duration(seconds: 10),
                                             );
                                           },
                                         ),
@@ -218,7 +283,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                             bottom: -5,
                             left: 20,
                             right: 20,
-                            child: !widget.videoNotInitialized && widget.chewieController.videoPlayerController.value.isInitialized == true
+                            child: !videoNotInitialized && _chewieController?.videoPlayerController.value.isInitialized == true
                                 ? Column(
                                     children: [
                                       Container(
@@ -229,22 +294,22 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                                               child: SliderTheme(
                                                 data: SliderTheme.of(context).copyWith(
                                                   thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
-                                                  trackHeight: isZoom1 ? 7 : 4,
+                                                  trackHeight: isZoom ? 7 : 4,
                                                   trackShape: RectangularSliderTrackShape(),
                                                   overlayShape: SliderComponentShape.noOverlay,
                                                 ),
                                                 child: Slider(
                                                   activeColor: Colors.red,
-                                                  value: widget.videoPlayerController.value.position.inSeconds.toDouble(),
-                                                  max: widget.videoPlayerController.value.duration.inSeconds.toDouble(),
+                                                  value: _videoPlayerController.value.position.inSeconds.toDouble(),
+                                                  max: _videoPlayerController.value.duration.inSeconds.toDouble(),
                                                   onChangeStart: (value) {
-                                                    setState(() => isZoom1 = true);
+                                                    setState(() => isZoom = true);
                                                   },
                                                   onChangeEnd: (value) {
-                                                    setState(() => isZoom1 = false);
+                                                    setState(() => isZoom = false);
                                                   },
                                                   onChanged: (value) {
-                                                    widget.videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                                                    _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
                                                     setState(() {});
                                                   },
                                                 ),
@@ -265,37 +330,29 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> {
                         alignment: Alignment.topLeft,
                         child: Padding(
                           padding: EdgeInsets.all(0.0),
-                          child: Text(
-                            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.horizontalScale(3),
-                        ),
-                        child: Row(
-                          children: [
-                            Checkbox(
-                              activeColor: AppColors.primaryColor,
-                              value: dontShowAgain1,
-                              onChanged: (value) async {
-                                await updateDonTShowAgain(value);
-                              },
-                            ),
-                            Text(
-                              "Do not show again.",
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Lorem Ipsum title",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.horizontalScale(5.5),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
+                                ),
                               ),
-                            )
-                          ],
+                              SizedBox(height: 14),
+                              Text(
+                                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                                textAlign: TextAlign.start,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(height: ScreenUtil.verticalScale(1)),

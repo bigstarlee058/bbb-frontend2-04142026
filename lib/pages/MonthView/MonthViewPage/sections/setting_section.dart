@@ -1,4 +1,6 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/choose_equipment_popup.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/choose_workoutday_popup.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -36,7 +38,7 @@ class _SettingSectionState extends State<SettingSection> {
             ? 1
             : 2;
 
-    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await fetchTutorialData());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await dataProvider?.fetchTutorialData());
     super.initState();
   }
 
@@ -49,163 +51,6 @@ class _SettingSectionState extends State<SettingSection> {
     equipments = index;
     setState(() {});
   }
-
-  // bool loading1 = false;
-  // bool videoNotInitialized1 = false;
-  // late VideoPlayerController _videoPlayerController1;
-  // ChewieController? _chewieController1;
-  // late Size videoSize1;
-  //
-  // Future<void> fetchTutorialData() async {
-  //   setState(() {
-  //     loading1 = true;
-  //   });
-  //   await dataProvider?.fetchTutorialData().then(
-  //     (value) async {
-  //       if (dataProvider!.tutorialData.files.isNotEmpty) {
-  //         await initializeVideo1(dataProvider?.tutorialData.files[0]['link']);
-  //         await initializeVideo2(dataProvider?.tutorialData.files[0]['link']);
-  //       } else {
-  //         loading1 = false;
-  //         videoNotInitialized1 = true;
-  //         loading2 = false;
-  //         videoNotInitialized2 = true;
-  //         setState(() {});
-  //       }
-  //     },
-  //   );
-  // }
-  //
-  // Future<void> initializeVideo1(String url) async {
-  //   try {
-  //     _videoPlayerController1 =
-  //         VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
-  //     await _videoPlayerController1.initialize();
-  //     _chewieController1 = ChewieController(
-  //       videoPlayerController: _videoPlayerController1,
-  //       autoPlay: false,
-  //       looping: false,
-  //       showControls: false,
-  //       aspectRatio: _videoPlayerController1.value.aspectRatio,
-  //     );
-  //
-  //     if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
-  //       videoSize1 = calculateVideoSize1(aspectRatio: _chewieController1!.aspectRatio!, context: context);
-  //       setState(() {});
-  //     }
-  //
-  //     setState(() => loading1 = false);
-  //   } catch (e) {
-  //     setState(() {
-  //       videoNotInitialized1 = true;
-  //       loading1 = false;
-  //     });
-  //     debugPrint("VIDEO NOT INITIALIZED: $e");
-  //   }
-  // }
-  //
-  // Size calculateVideoSize1({required BuildContext context, required double aspectRatio}) {
-  //   double maxWidth = ScreenUtil.horizontalScale(90);
-  //   double calculatedHeight = maxWidth / aspectRatio;
-  //   return Size(maxWidth, calculatedHeight);
-  // }
-  //
-  // bool loading2 = false;
-  // bool videoNotInitialized2 = false;
-  // late VideoPlayerController _videoPlayerController2;
-  // ChewieController? _chewieController2;
-  // late Size videoSize2;
-  //
-  // Future<void> initializeVideo2(String url) async {
-  //   try {
-  //     _videoPlayerController2 =
-  //         VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
-  //     await _videoPlayerController2.initialize();
-  //     _chewieController2 = ChewieController(
-  //       videoPlayerController: _videoPlayerController2,
-  //       autoPlay: false,
-  //       looping: false,
-  //       showControls: false,
-  //       aspectRatio: _videoPlayerController2.value.aspectRatio,
-  //     );
-  //
-  //     if (_chewieController2 != null && _chewieController2!.videoPlayerController.value.isInitialized) {
-  //       videoSize1 = calculateVideoSize2(aspectRatio: _chewieController2!.aspectRatio!, context: context);
-  //       setState(() {});
-  //     }
-  //
-  //     setState(() => loading1 = false);
-  //   } catch (e) {
-  //     setState(() {
-  //       videoNotInitialized2 = true;
-  //       loading1 = false;
-  //     });
-  //     debugPrint("VIDEO NOT INITIALIZED: $e");
-  //   }
-  // }
-  //
-  // Size calculateVideoSize2({required BuildContext context, required double aspectRatio}) {
-  //   double maxWidth = ScreenUtil.horizontalScale(90);
-  //   double calculatedHeight = maxWidth / aspectRatio;
-  //   return Size(maxWidth, calculatedHeight);
-  // }
-  // Future<dynamic> chooseWorkoutDay(BuildContext context) => showDialog(
-  //       barrierDismissible: true,
-  //       context: context,
-  //       builder: (context) {
-  //         return Dialog(
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(30),
-  //           ),
-  //           insetPadding: EdgeInsets.symmetric(horizontal: 25),
-  //           child: ChooseWorkoutDayDialog(
-  //             loading: loading1,
-  //             dataProvider: dataProvider!,
-  //             chewieController: _chewieController1!,
-  //             videoNotInitialized: videoNotInitialized1,
-  //             videoPlayerController: _videoPlayerController1,
-  //             videoSize: videoSize1,
-  //           ),
-  //         );
-  //       },
-  //     ).then(
-  //       (value) {
-  //         if (_chewieController1 != null) {
-  //           _chewieController1!.dispose();
-  //         }
-  //         _videoPlayerController1.dispose();
-  //         AudioManager.abandonAudioFocus();
-  //       },
-  //     );
-  //
-  // Future<dynamic> chooseEquipment(BuildContext context) => showDialog(
-  //       barrierDismissible: true,
-  //       context: context,
-  //       builder: (context) {
-  //         return Dialog(
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(30),
-  //           ),
-  //           insetPadding: EdgeInsets.symmetric(horizontal: 25),
-  //           child: ChooseEquipmentDialog(
-  //             loading: loading2,
-  //             dataProvider: dataProvider!,
-  //             chewieController: _chewieController2!,
-  //             videoNotInitialized: videoNotInitialized2,
-  //             videoPlayerController: _videoPlayerController2,
-  //             videoSize: videoSize2,
-  //           ),
-  //         );
-  //       },
-  //     ).then(
-  //       (value) {
-  //         if (_chewieController2 != null) {
-  //           _chewieController2!.dispose();
-  //         }
-  //         _videoPlayerController2.dispose();
-  //         AudioManager.abandonAudioFocus();
-  //       },
-  //     );
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +78,19 @@ class _SettingSectionState extends State<SettingSection> {
                 SizedBox(width: 4),
                 GestureDetector(
                   onTap: () {
-                    // chooseWorkoutDay(context);
+                    showDialog(
+                      barrierDismissible: true,
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          insetPadding: EdgeInsets.symmetric(horizontal: 25),
+                          child: ChooseWorkoutDayDialog(),
+                        );
+                      },
+                    );
                   },
                   child: Center(
                     child: Icon(
@@ -464,7 +321,19 @@ class _SettingSectionState extends State<SettingSection> {
                 SizedBox(width: 4),
                 GestureDetector(
                   onTap: () {
-                    // chooseEquipment(context);
+                    showDialog(
+                      barrierDismissible: true,
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          insetPadding: EdgeInsets.symmetric(horizontal: 25),
+                          child: ChooseEquipmentDialog(),
+                        );
+                      },
+                    );
                   },
                   child: Center(
                     child: Icon(

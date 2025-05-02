@@ -6,6 +6,7 @@ import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 // import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
@@ -139,7 +140,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           child: Row(
             children: [
               Text(
-                widget.title != "" ? widget.title : "Week",
+                widget.title != "" ? (widget.title.toString().toLowerCase().capitalizeFirst()) : "Week",
                 // style: GoogleFonts.plusJakartaSans(
                 //   color: Colors.black,
                 //   fontSize: ScreenUtil.verticalScale(1.8),
@@ -640,7 +641,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
 
       return Slidable(
-        enabled: (matchingElement.type ?? "").contains("Pump Day"),
+        enabled: (matchingElement.type ?? "").contains("Pump Day") &&
+            monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek &&
+            ((monthProvider.allSplitDayHistoryModel
+                    .any((e) => (e.status == Status.completed || e.status == Status.skipped) && e.dataId == dataId) ==
+                false)),
         endActionPane: ActionPane(
           extentRatio: 0.35,
           motion: const ScrollMotion(),

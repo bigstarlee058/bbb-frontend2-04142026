@@ -114,11 +114,14 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         onRangeSelected: (start, end, focusedDay) {},
         onDaySelected: null,
         calendarBuilders: CalendarBuilders(
+          disabledBuilder: (context, day, focusedDay) {
+            return _buildDayState(day);
+          },
           todayBuilder: (context, day, date) {
-            return _buildDayState(date) ?? _buildCurrentWorkoutDay(date, day: DateTime.now().day);
+            return _buildDayState(day) ?? _buildCurrentWorkoutDay(day, day: DateTime.now().day);
           },
           outsideBuilder: (context, day, date) {
-            return _buildDayState(day);
+            return _buildDayState(day, isOutSide: true);
           },
           defaultBuilder: (context, date, _) {
             return _buildDayState(date);
@@ -136,7 +139,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     for (int outerIndex = 0; outerIndex < rangeList.length; outerIndex++) {
       for (int innerIndex = 0; innerIndex < rangeList[outerIndex].length; innerIndex++) {
         DateTime date = rangeList[outerIndex][innerIndex].endTime ?? rangeList[outerIndex][innerIndex].startTime!;
-        if (date.year == targetDate.year && date.month == targetDate.month && date.day == targetDate.day) {
+        DateTime localDate = Utils.formattedDate("$date");
+
+        if (localDate.year == targetDate.year && localDate.month == targetDate.month && localDate.day == targetDate.day) {
           return {
             'outerIndex': outerIndex,
             'innerIndex': innerIndex,
@@ -147,32 +152,72 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return null;
   }
 
+  // List<List<DayHistoryModel>> groupCompletedByConsecutiveDates(List<DayHistoryModel> dataList) {
+  //   List<DayHistoryModel> completedList = dataList.where((e) => e.status == Status.completed).toList();
+  //
+  //   log('completedList :::::::::::::::::: ${jsonEncode(completedList)}');
+  //   completedList.sort((a, b) {
+  //     final aDate = a.endTime ?? a.startTime!;
+  //     final bDate = b.endTime ?? b.startTime!;
+  //     return DateTime(aDate.year, aDate.month, aDate.day).compareTo(DateTime(bDate.year, bDate.month, bDate.day));
+  //   });
+  //
+  //   List<List<DayHistoryModel>> grouped = [];
+  //   List<DayHistoryModel> currentGroup = [];
+  //
+  //   for (int i = 0; i < completedList.length; i++) {
+  //     final current = completedList[i];
+  //     final currentDate = current.endTime ?? current.startTime!;
+  //     DateTime localTime = Utils.formattedDate("$currentDate");
+  //
+  //     final currentDay = DateTime(localTime.year, localTime.month, localTime.day);
+  //     if (currentGroup.isEmpty) {
+  //       currentGroup.add(current);
+  //     } else {
+  //       final lastDate = currentGroup.last.endTime ?? currentGroup.last.startTime!;
+  //       final lastDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
+  //
+  //       if (currentDay.difference(lastDay).inDays == 1) {
+  //         currentGroup.add(current);
+  //       } else {
+  //         grouped.add(List<DayHistoryModel>.from(currentGroup));
+  //         currentGroup = [current];
+  //       }
+  //     }
+  //   }
+  //
+  //   if (currentGroup.isNotEmpty) {
+  //     grouped.add(currentGroup);
+  //   }
+  //
+  //   return grouped;
+  // }
   List<List<DayHistoryModel>> groupCompletedByConsecutiveDates(List<DayHistoryModel> dataList) {
     List<DayHistoryModel> completedList = dataList.where((e) => e.status == Status.completed).toList();
+
     completedList.sort((a, b) {
-      final aDate = a.endTime ?? a.startTime!;
-      final bDate = b.endTime ?? b.startTime!;
+      final aDate = (a.endTime ?? a.startTime)!;
+      final bDate = (b.endTime ?? b.startTime)!;
       return DateTime(aDate.year, aDate.month, aDate.day).compareTo(DateTime(bDate.year, bDate.month, bDate.day));
     });
 
     List<List<DayHistoryModel>> grouped = [];
     List<DayHistoryModel> currentGroup = [];
 
-    for (int i = 0; i < completedList.length; i++) {
-      final current = completedList[i];
-      final currentDate = current.endTime ?? current.startTime!;
-      final currentDay = DateTime(currentDate.year, currentDate.month, currentDate.day);
+    DateTime normalizeDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
+    for (var i = 0; i < completedList.length; i++) {
+      final current = completedList[i];
+      final currentDate = normalizeDate(Utils.formattedDate("${current.endTime ?? current.startTime!}"));
       if (currentGroup.isEmpty) {
         currentGroup.add(current);
       } else {
-        final lastDate = currentGroup.last.endTime ?? currentGroup.last.startTime!;
-        final lastDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
-
-        if (currentDay.difference(lastDay).inDays == 1) {
+        final last = currentGroup.last;
+        final lastDate = normalizeDate(Utils.formattedDate("${last.endTime ?? last.startTime!}"));
+        if (currentDate.difference(lastDate).inDays == 1) {
           currentGroup.add(current);
         } else {
-          grouped.add(List<DayHistoryModel>.from(currentGroup));
+          grouped.add(List.from(currentGroup));
           currentGroup = [current];
         }
       }
@@ -185,8 +230,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return grouped;
   }
 
-  Widget? _buildDayState(DateTime date) {
-    final nowUtc = DateTime.now();
+  Widget? _buildDayState(DateTime date, {isOutSide = false}) {
+    final now = DateTime.now();
 
     if (monthProvider!.monthLocalDataModel.isNotEmpty) {
       DateTime oldestStartDate = monthProvider!.monthLocalDataModel.map(
@@ -200,27 +245,26 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       ).reduce((a, b) => a.isBefore(b) ? a : b);
       List<DayHistoryModel> data = monthProvider!.decodedDataAll();
       final data11 = groupCompletedByConsecutiveDates(data);
-      bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
+      bool isCurrentDay = date.year == now.year && date.month == now.month && date.day == now.day;
 
       if (data11.isEmpty) {
         if (isCurrentDay) {
           return _buildCurrentWorkoutDay(date);
-        } else if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
+        } else if (oldestStartDate.isBefore(date) && now.isAfter(date)) {
           return _buildCustomDayCircle(date, Colors.blue);
         }
       }
-
-      DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
+      DateTime futureDay = DateTime(now.year, now.month, now.day).add(Duration(days: 1));
       if (date.isBefore(futureDay)) {
         for (var day in data) {
           final workoutDate = day.endTime!;
           DateTime localTime = Utils.formattedDate("$workoutDate");
           if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
-            final isCircleP = data.any((d) => d.status == Status.completed && _isSameDate(localTime, date));
-            final isCircleB = data.any((d) => d.status == Status.skipped && _isSameDate(localTime, date));
-            final isRange = data11.any((d) => d.any((element) => _isSameDate(element.endTime ?? element.startTime!, date)));
+            final isRange = data11.length == 1 ? false : data11.any((d) => d.any((element) => _isSameDate(localTime, date)));
+            final isCircleP = !isRange ? data.any((d) => d.status == Status.completed && _isSameDate(localTime, date)) : false;
+            final isCircleB = !isRange ? data.any((d) => d.status == Status.skipped && _isSameDate(localTime, date)) : false;
 
-            if (isCircleP || isCircleB) {
+            if ((isCircleP || isCircleB) && !isRange) {
               return Center(
                 child: Container(
                   width: ScreenUtil.verticalScale(3.2),
@@ -241,38 +285,27 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
               final data = findDateIndex(date, data11);
 
+              if (data == null) {
+                return Center(
+                  child: Container(
+                    width: ScreenUtil.verticalScale(3.2),
+                    height: ScreenUtil.verticalScale(3.2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCircleP ? AppColors.primaryColor : Colors.blue,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ),
+                );
+              }
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  /*if (date.weekday == 1)
-                    Positioned(
-                      top: 0,
-                      bottom: 0,
-                      left: -40,
-                      child: Container(
-                        width: ScreenUtil.horizontalScale(13),
-                        height: ScreenUtil.verticalScale(3.2),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                    ),
-                  if (date.weekday == 7)
-                    Positioned(
-                      // top: ScreenUtil.verticalScale(0.7),
-                      top: 0,
-                      bottom: 0,
-                      left: 40,
-                      right: 0,
-                      child: Container(
-                        width: ScreenUtil.horizontalScale(13),
-                        height: ScreenUtil.verticalScale(3.2),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                    ),*/
-                  if (data11[data!["outerIndex"]!].length > 1 && data["innerIndex"] == 0)
+                  if (data11[data["outerIndex"]!].length > 1 && data["innerIndex"] == 0)
                     Positioned(
                       top: ScreenUtil.verticalScale(0.7),
                       left: ScreenUtil.horizontalScale(size > 600 ? 4.5 : 3.5),
@@ -339,9 +372,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                 ],
               );
             } else {
-              return Center(
-                child: Text('${date.day}', style: TextStyle(color: Colors.black, fontSize: 14)),
-              );
+              return _buildNormalDay(date);
             }
           }
         }
@@ -364,7 +395,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         }
       }
 
-      if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
+      if (oldestStartDate.isBefore(date) && now.isAfter(date)) {
         if (DateTime(futureDay.year, futureDay.month, futureDay.day) != DateTime(date.year, date.month, date.day)) {
           return _buildCustomDayCircle(date, Colors.blue);
         }
@@ -379,18 +410,27 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
     }
 
-    return null;
+    return _buildNormalDay(date, isOutSide: isOutSide);
   }
 
-  Widget _buildNormalDay(DateTime date) {
+  Widget _buildNormalDay(DateTime date, {bool isOutSide = false}) {
     return Container(
       alignment: Alignment.center,
+      width: ScreenUtil.verticalScale(3.2),
+      height: ScreenUtil.verticalScale(3.2),
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.transparent,
+      ),
       padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-      child: Text(
-        '${date.day}',
-        style: const TextStyle(
-          fontSize: 14.0,
-          color: Colors.black,
+      child: Center(
+        child: Text(
+          '${date.day}',
+          style: TextStyle(
+            fontSize: 14.0,
+            color: isOutSide ? Colors.grey : Colors.black,
+          ),
         ),
       ),
     );
