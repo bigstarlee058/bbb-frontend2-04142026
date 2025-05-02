@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -65,7 +63,6 @@ class _MonthViewState extends State<MonthView> {
         monthProvider?.monthLocalDataModel.sort((a, b) =>
             DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
         bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
-        log(' monthProvider!.isOnMonthPage :::::::::::::::::: ${monthProvider!.isOnMonthPage}');
         if (!alreadySetUp && monthProvider!.isOnMonthPage) {
           openSettingDialog();
         }

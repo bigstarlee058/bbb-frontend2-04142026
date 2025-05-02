@@ -33,4 +33,5 @@ class AppRoutes {
   static const String collectionDetailScreen = '/collectionDetail';
   static const String settingPage = '/SettingPage';
   static const String seeAllAchievementPage = '/seeAllAchievementPage';
+  static const String faqsPage = '/faqs';
 }

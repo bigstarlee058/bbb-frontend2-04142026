@@ -139,7 +139,7 @@ class _ToolsPageState extends State<ToolsPage> {
                   margin: EdgeInsets.only(top: Platform.isAndroid ? media.height / 8.5 : media.height / 7),
                   child: Container(
                     width: media.width,
-                    height: (media.height - (Platform.isAndroid ? media.height / 8.5 : media.height / 7)),
+                    constraints: BoxConstraints(minHeight: (media.height - (Platform.isAndroid ? media.height / 8.5 : media.height / 7))),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -203,6 +203,15 @@ class _ToolsPageState extends State<ToolsPage> {
                                   url: '/equipmentLibrary',
                                 ),
 
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(1.3),
+                                ),
+                                const ToolsPageButton(
+                                  title: 'FAQs',
+                                  icon: 'assets/icons/faqs.svg',
+                                  url: '/faqs',
+                                ),
+
                                 /// TEMP HIDE
                                 // SizedBox(
                                 //   height: ScreenUtil.verticalScale(1.3),
@@ -213,7 +222,7 @@ class _ToolsPageState extends State<ToolsPage> {
                                 //   url: '/bonusLibrary',
                                 // ),
                                 SizedBox(
-                                  height: ScreenUtil.verticalScale(1.3),
+                                  height: ScreenUtil.verticalScale(12),
                                 ),
                               ],
                             ),

@@ -1,14 +1,14 @@
 // To parse this JSON data, do
 //
-//     final getOptionInfo = getOptionInfoFromJson(jsonString);
+//     final getChooseEquipmentModel = getChooseEquipmentModelFromJson(jsonString);
 
 import 'dart:convert';
 
-GetOptionInfo getOptionInfoFromJson(String str) => GetOptionInfo.fromJson(json.decode(str));
+GetChooseEquipmentModel getChooseEquipmentModelFromJson(String str) => GetChooseEquipmentModel.fromJson(json.decode(str));
 
-String getOptionInfoToJson(GetOptionInfo data) => json.encode(data.toJson());
+String getChooseEquipmentModelToJson(GetChooseEquipmentModel data) => json.encode(data.toJson());
 
-class GetOptionInfo {
+class GetChooseEquipmentModel {
   String? id;
   int? v;
   DateTime? createdAt;
@@ -18,7 +18,7 @@ class GetOptionInfo {
   String? vimeoId;
   List<FileElement>? files;
 
-  GetOptionInfo({
+  GetChooseEquipmentModel({
     this.id,
     this.v,
     this.createdAt,
@@ -29,7 +29,7 @@ class GetOptionInfo {
     this.files,
   });
 
-  factory GetOptionInfo.fromJson(Map<String, dynamic> json) => GetOptionInfo(
+  factory GetChooseEquipmentModel.fromJson(Map<String, dynamic> json) => GetChooseEquipmentModel(
         id: json["_id"],
         v: json["__v"],
         createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),

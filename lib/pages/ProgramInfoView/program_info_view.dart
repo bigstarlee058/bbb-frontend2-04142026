@@ -190,6 +190,7 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                         // onExpansionItemChanged: (id, value) {
                                         //   setState(() {
                                         //     _expandedStates[id] = value;
+                                        //     _expandedStates[id] = value;
                                         //   });
                                         // },
                                         children: List.generate(
