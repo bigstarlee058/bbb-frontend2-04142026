@@ -412,24 +412,28 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future fetchMonthWorkouts(int month) async {
-    final Map<String, String> queryParams = {
-      'month': month.toString(),
-      'equipment': '0',
-      'split': '5',
-      'date': "${DateTime.now().toUtc()}"
-    };
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
-    String? userIdToken = await getAuthToken();
-    final response = await http.post(
-      url,
-      body: queryParams,
-      headers: <String, String>{'Content-Type': 'application/x-www-form-urlencoded', 'AUTH_TOKEN': userIdToken ?? ""},
-    );
-    if (response.statusCode == 200) {
-      await getMonthInfoFromJson(responseData: jsonDecode(response.body));
-      notifyListeners();
-    } else {
-      await getMonthInfoFromJson();
+    try {
+      final Map<String, String> queryParams = {
+        'month': month.toString(),
+        'equipment': '0',
+        'split': '5',
+        'date': "${DateTime.now().toUtc()}"
+      };
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
+      String? userIdToken = await getAuthToken();
+      final response = await http.post(
+        url,
+        body: queryParams,
+        headers: <String, String>{'Content-Type': 'application/x-www-form-urlencoded', 'AUTH_TOKEN': userIdToken ?? ""},
+      );
+      if (response.statusCode == 200) {
+        await getMonthInfoFromJson(responseData: jsonDecode(response.body));
+        notifyListeners();
+      } else {
+        await getMonthInfoFromJson();
+      }
+    } catch (e) {
+      log("issue in month view loading=> $e");
     }
   }
 

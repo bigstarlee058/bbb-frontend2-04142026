@@ -161,7 +161,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       spaceLength: 8,
                       strokeCap: StrokeCap.square,
                       dashLength: 1,
-                      top: BorderSide(color: Colors.grey, width: 1.6),
+                      top: BorderSide(color: Colors.grey.shade400, width: 1.5),
                     ),
                   ),
                 ),

@@ -247,8 +247,25 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               ),
                               child: Consumer<MonthProvider>(
                                 builder: (context, monthProvider, child) {
+                                  String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
+                                          .toString()
+                                          .split(" ")[1] ??
+                                      "";
+                                  String dataId =
+                                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
+
+                                  final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
+                                  String status = "";
+                                  if (data.isNotEmpty) {
+                                    status = data.first.status ?? "";
+                                  }
+
                                   return ButtonWidget(
-                                    text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
+                                    text: monthProvider.todayTitleId.isEmpty
+                                        ? "Completed"
+                                        : status == Status.started
+                                            ? 'Continue Your Workout'
+                                            : 'Start Your Workout',
                                     textColor: Colors.white,
                                     onPress:
                                         monthProvider.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(monthProvider, context),

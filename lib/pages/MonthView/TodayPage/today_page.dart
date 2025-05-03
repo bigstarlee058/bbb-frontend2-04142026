@@ -344,43 +344,46 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                           titleSpacing: -5,
                                           toolbarHeight: ScreenUtil.verticalScale(5.1),
                                           backgroundColor: Colors.transparent,
+                                          centerTitle: false,
                                           leading: BackArrowWidget(
                                             onPress: () {
                                               Navigator.pop(context);
                                             },
                                           ),
-                                          title: Container(
-                                            margin: EdgeInsets.only(
-                                              left: ScreenUtil.horizontalScale(4),
-                                            ),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: SizedBox(
-                                              width: ScreenUtil.verticalScale(4.65),
-                                              height: ScreenUtil.verticalScale(4.65),
-                                              child: IconButton(
-                                                padding: EdgeInsets.zero,
-                                                icon: AnimatedSwitcher(
-                                                  transitionBuilder: (child, animation) {
-                                                    return ScaleTransition(
-                                                      scale: animation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                  duration: const Duration(milliseconds: 500),
-                                                  child: Icon(
-                                                    isEditMode ? Icons.close : Icons.edit,
-                                                    // color: Color(0XFFd18a9b),
-                                                    color: AppColors.primaryColor,
-                                                    size: ScreenUtil.verticalScale(isEditMode ? 2.5 : 2.3),
+                                          title: isCurrentDayCompleted || isCurrentDaySkipped
+                                              ? SizedBox()
+                                              : Container(
+                                                  margin: EdgeInsets.only(
+                                                    left: ScreenUtil.horizontalScale(4),
+                                                  ),
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.white,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: SizedBox(
+                                                    width: ScreenUtil.verticalScale(4.65),
+                                                    height: ScreenUtil.verticalScale(4.65),
+                                                    child: IconButton(
+                                                      padding: EdgeInsets.zero,
+                                                      icon: AnimatedSwitcher(
+                                                        transitionBuilder: (child, animation) {
+                                                          return ScaleTransition(
+                                                            scale: animation,
+                                                            child: child,
+                                                          );
+                                                        },
+                                                        duration: const Duration(milliseconds: 500),
+                                                        child: Icon(
+                                                          isEditMode ? Icons.close : Icons.edit,
+                                                          // color: Color(0XFFd18a9b),
+                                                          color: AppColors.primaryColor,
+                                                          size: ScreenUtil.verticalScale(isEditMode ? 2.5 : 2.3),
+                                                        ),
+                                                      ),
+                                                      onPressed: toggleEditMode,
+                                                    ),
                                                   ),
                                                 ),
-                                                onPressed: toggleEditMode,
-                                              ),
-                                            ),
-                                          ),
                                           actions: [
                                             Padding(
                                                 padding: EdgeInsets.only(right: isEditMode ? 20 : 10),
