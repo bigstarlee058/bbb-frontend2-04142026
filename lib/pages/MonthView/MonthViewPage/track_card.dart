@@ -108,6 +108,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(0)),
               child: ExpansionPanelList(
+                sidePadding: true,
                 animationDuration: Duration(milliseconds: 300),
                 expandIconColor: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
                 materialGapSize: 10,

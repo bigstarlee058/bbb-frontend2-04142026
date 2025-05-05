@@ -85,6 +85,12 @@ class MonthProvider extends ChangeNotifier {
   //   notifyListeners();
   // }
   int selectedSection = 0;
+  bool scrollToRestDay = false;
+
+  updateScrollToRestDay(bool value) {
+    scrollToRestDay = value;
+    notifyListeners();
+  }
 
   updateIsOnMonthPage(bool value) {
     isOnMonthPage = value;
@@ -481,15 +487,16 @@ class MonthProvider extends ChangeNotifier {
   }
 
   bool loader = false;
+  bool loader1 = false;
 
   Future<void> onInit(context, {bool isEnabled = true}) async {
     try {
+      loader1 = true;
       userDataProvider = Provider.of<UserDataProvider>(context, listen: false);
       if (isEnabled) {
         loader = true;
-        notifyListeners();
       }
-
+      notifyListeners();
       String split = (preferences.getString(SharedPreference.split) ?? "").replaceAll("split", "");
       await changeDaySplit(split);
       splitType ??= SplitType.split3;
@@ -534,6 +541,7 @@ class MonthProvider extends ChangeNotifier {
       debugPrint("StackTrace: $stackTrace");
     } finally {
       loader = false;
+      loader1 = false;
       notifyListeners();
     }
   }
@@ -562,7 +570,7 @@ class MonthProvider extends ChangeNotifier {
 
         notifyListeners();
       } else {
-        throw Exception('Failed to load fetchWarmUp');
+        log('Failed to load fetchWarmUp');
       }
     } catch (e, stackTrace) {
       debugPrint("Error in fetchWarmUp: $e");
@@ -634,6 +642,8 @@ class MonthProvider extends ChangeNotifier {
 
       findSplitTypeList();
       await getRestDayData();
+
+      notifyListeners();
     } catch (e, stackTrace) {
       debugPrint("Error in getSplitData: $e");
       debugPrint("StackTrace: $stackTrace");

@@ -567,7 +567,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                             )
                                                           : ButtonWidget(
                                                               text: title.contains("Rest Day")
-                                                                  ? "Complete Rest Day"
+                                                                  ? "Mark Complete"
                                                                   : status == Status.started
                                                                       ? 'Continue Your Workout'
                                                                       : 'Start Your Workout',
@@ -803,6 +803,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                       child: ElevatedButton(
                                         onPressed: () {
                                           monthProvider.updateIsOnMonthPage(true);
+                                          monthProvider.updateScrollToRestDay(false);
+
                                           HapticFeedBack.buttonClick();
                                           mainPageProvider.changeTab(1);
                                         },
@@ -826,6 +828,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                       child: ElevatedButton(
                                         onPressed: () {
                                           monthProvider.updateIsOnMonthPage(true);
+                                          monthProvider.updateScrollToRestDay(false);
+
                                           HapticFeedBack.buttonClick();
                                           monthProvider.updateSelectedSection(1);
                                           mainPageProvider.changeTab(1);
@@ -1386,12 +1390,13 @@ class _DashboardPageState extends State<DashboardPage> {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
       monthProvider.updateIsOnMonthPage(false);
+      monthProvider.updateScrollToRestDay(true);
 
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,
       //   builder: (c1) {
-      //     return skipWorkoutDialog(context, c1);
+      //     return skipWorkoutDialog(context, c1);`
       //   },
       // );
     } else {

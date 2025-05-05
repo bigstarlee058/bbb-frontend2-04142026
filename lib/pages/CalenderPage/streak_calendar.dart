@@ -263,9 +263,11 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                   return ButtonWidget(
                                     text: monthProvider.todayTitleId.isEmpty
                                         ? "Completed"
-                                        : status == Status.started
-                                            ? 'Continue Your Workout'
-                                            : 'Start Your Workout',
+                                        : (!monthProvider.isPumpDayAvailable && monthProvider.todayTitleId.contains("Rest Day"))
+                                            ? "Mark Complete"
+                                            : status == Status.started
+                                                ? 'Continue Your Workout'
+                                                : 'Start Your Workout',
                                     textColor: Colors.white,
                                     onPress:
                                         monthProvider.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(monthProvider, context),
@@ -330,6 +332,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                       IconButton(
                         onPressed: () {
                           monthProvider?.updateIsOnMonthPage(true);
+                          monthProvider?.updateScrollToRestDay(false);
+
                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                           value.changeTab(1);
                         },
@@ -470,6 +474,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
       monthProvider.updateIsOnMonthPage(false);
+      monthProvider.updateScrollToRestDay(true);
+
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

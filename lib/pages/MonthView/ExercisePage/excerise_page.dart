@@ -95,9 +95,12 @@ class _ExercisePageState extends State<ExercisePage> {
 
   Future<void> initializeVideo1(String url) async {
     try {
-      _videoPlayerController1 =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController1 = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
       await _videoPlayerController1.initialize();
+
       _chewieController1 = ChewieController(
         videoPlayerController: _videoPlayerController1,
         autoPlay: false,
@@ -108,7 +111,9 @@ class _ExercisePageState extends State<ExercisePage> {
 
       if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
         videoSize1 = calculateVideoSize1(aspectRatio: _chewieController1!.aspectRatio!, context: context);
-        setState(() {});
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {});
+        });
       }
 
       _videoPlayerController1.addListener(() async {
@@ -117,14 +122,23 @@ class _ExercisePageState extends State<ExercisePage> {
         } else {
           AudioManager.requestAudioFocus();
         }
-        setState(() {});
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() {});
+        });
       });
 
-      setState(() => loading1 = false);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => loading1 = false);
+      });
     } catch (e) {
-      setState(() {
-        videoNotInitialized1 = true;
-        loading1 = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            videoNotInitialized1 = true;
+            loading1 = false;
+          });
+        }
       });
       debugPrint("VIDEO NOT INITIALIZED: $e");
     }
@@ -484,6 +498,9 @@ class _ExercisePageState extends State<ExercisePage> {
       AudioManager.abandonAudioFocus();
 
       await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO");
+
+      monthProvider?.selectedExercise == null;
+      monthProvider?.exerciseDetailModel == null;
     });
 
     super.dispose();

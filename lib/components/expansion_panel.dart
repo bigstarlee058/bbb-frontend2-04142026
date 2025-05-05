@@ -77,6 +77,7 @@ class ExpansionPanelRadio extends ExpansionPanel {
 class ExpansionPanelList extends StatefulWidget {
   const ExpansionPanelList({
     super.key,
+    required this.sidePadding,
     this.children = const <ExpansionPanel>[],
     this.expansionCallback,
     this.animationDuration = kThemeAnimationDuration,
@@ -90,6 +91,7 @@ class ExpansionPanelList extends StatefulWidget {
 
   const ExpansionPanelList.radio({
     super.key,
+    this.sidePadding = true,
     this.children = const <ExpansionPanelRadio>[],
     this.expansionCallback,
     this.animationDuration = kThemeAnimationDuration,
@@ -103,6 +105,7 @@ class ExpansionPanelList extends StatefulWidget {
 
   final List<ExpansionPanel> children;
   final ExpansionPanelCallback? expansionCallback;
+  final bool sidePadding;
   final Duration animationDuration;
   final bool _allowOnlyOnePanelOpen;
   final Object? initialOpenPanelValue;
@@ -242,7 +245,7 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
           child.sideIcon ?? SizedBox(),
           expandIconPadded,
           SizedBox(
-            width: ScreenUtil.horizontalScale(6),
+            width: widget.sidePadding ? ScreenUtil.horizontalScale(6) : 0,
           )
         ],
       );

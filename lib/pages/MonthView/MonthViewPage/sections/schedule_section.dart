@@ -88,9 +88,11 @@ class ScheduleSection extends StatelessWidget {
                                   return ButtonWidget(
                                     text: monthProvider.todayTitleId.isEmpty
                                         ? "Completed"
-                                        : status == Status.started
-                                            ? 'Continue Your Workout'
-                                            : 'Start Your Workout',
+                                        : (!monthProvider.isPumpDayAvailable && monthProvider.todayTitleId.contains("Rest Day"))
+                                            ? "Mark Complete"
+                                            : status == Status.started
+                                                ? 'Continue Your Workout'
+                                                : 'Start Your Workout',
                                     textColor: Colors.white,
                                     onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress,
                                     color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
