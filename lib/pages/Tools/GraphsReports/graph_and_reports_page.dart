@@ -676,6 +676,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
       monthProvider.updateIsOnMonthPage(false);
+      monthProvider.updateScrollToRestDay(true);
+
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

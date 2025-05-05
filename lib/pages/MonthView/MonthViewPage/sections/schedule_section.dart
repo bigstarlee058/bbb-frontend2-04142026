@@ -71,13 +71,34 @@ class ScheduleSection extends StatelessWidget {
                                 horizontal: ScreenUtil.horizontalScale(9),
                               ),
                               child: Consumer<MonthProvider>(
-                                builder: (context, value, child) => ButtonWidget(
-                                  text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
-                                  textColor: Colors.white,
-                                  onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress,
-                                  color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                                  isLoading: false,
-                                ),
+                                builder: (context, monthProvider, child) {
+                                  String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
+                                          .toString()
+                                          .split(" ")[1] ??
+                                      "";
+                                  String dataId =
+                                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
+
+                                  final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
+                                  String status = "";
+                                  if (data.isNotEmpty) {
+                                    status = data.first.status ?? "";
+                                  }
+
+                                  return ButtonWidget(
+                                    text: monthProvider.todayTitleId.isEmpty
+                                        ? "Completed"
+                                        : (!monthProvider.isPumpDayAvailable && monthProvider.todayTitleId.contains("Rest Day"))
+                                            ? "Mark Complete"
+                                            : status == Status.started
+                                                ? 'Continue Your Workout'
+                                                : 'Start Your Workout',
+                                    textColor: Colors.white,
+                                    onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress,
+                                    color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
+                                    isLoading: false,
+                                  );
+                                },
                               ),
                             ),
                             SizedBox(height: ScreenUtil.verticalScale(15))

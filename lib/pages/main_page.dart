@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:bbb/components/haptic_feedback%20.dart';
-import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/DashBoardScreen/dashboard_page.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
@@ -243,6 +241,7 @@ class _MainPageState extends State<MainPage> {
                             HapticFeedBack.buttonClick();
                             mainPageProvider.changeTab(1);
                             monthProvider.updateIsOnMonthPage(true);
+                            monthProvider.updateScrollToRestDay(false);
                           }
                         : null,
                     icon: Consumer<UserDataProvider>(

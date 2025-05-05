@@ -247,8 +247,27 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               ),
                               child: Consumer<MonthProvider>(
                                 builder: (context, monthProvider, child) {
+                                  String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
+                                          .toString()
+                                          .split(" ")[1] ??
+                                      "";
+                                  String dataId =
+                                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
+
+                                  final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
+                                  String status = "";
+                                  if (data.isNotEmpty) {
+                                    status = data.first.status ?? "";
+                                  }
+
                                   return ButtonWidget(
-                                    text: monthProvider.todayTitleId.isEmpty ? "Completed" : "Start Your Workout",
+                                    text: monthProvider.todayTitleId.isEmpty
+                                        ? "Completed"
+                                        : (!monthProvider.isPumpDayAvailable && monthProvider.todayTitleId.contains("Rest Day"))
+                                            ? "Mark Complete"
+                                            : status == Status.started
+                                                ? 'Continue Your Workout'
+                                                : 'Start Your Workout',
                                     textColor: Colors.white,
                                     onPress:
                                         monthProvider.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(monthProvider, context),
@@ -313,6 +332,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                       IconButton(
                         onPressed: () {
                           monthProvider?.updateIsOnMonthPage(true);
+                          monthProvider?.updateScrollToRestDay(false);
+
                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                           value.changeTab(1);
                         },
@@ -453,6 +474,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
       monthProvider.updateIsOnMonthPage(false);
+      monthProvider.updateScrollToRestDay(true);
+
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

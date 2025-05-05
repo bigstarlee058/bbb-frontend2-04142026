@@ -40,6 +40,7 @@ class _MonthViewState extends State<MonthView> {
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
   late ProgramInfoProvider provider;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -57,19 +58,50 @@ class _MonthViewState extends State<MonthView> {
         });
       }
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToMiddle();
+    });
+
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";
-        monthProvider?.monthLocalDataModel.sort((a, b) =>
-            DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
-        bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
-        if (!alreadySetUp && monthProvider!.isOnMonthPage) {
-          openSettingDialog();
-        }
+        await monthProvider?.fetchMonthLocalData().then(
+          (value) async {
+            await Future.delayed(Duration(seconds: 2)).then(
+              (value) {
+                monthProvider?.monthLocalDataModel.sort((a, b) => DateTime.parse(b.monthStartDate ?? "${DateTime.now()}")
+                    .compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
+                bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
+                if (!alreadySetUp && monthProvider!.isOnMonthPage) {
+                  openSettingDialog();
+                }
+              },
+            );
+          },
+        );
       },
     );
 
     super.initState();
+  }
+
+  void scrollToMiddle() {
+    if (monthProvider!.scrollToRestDay) {
+      final middleOffset = _scrollController.position.maxScrollExtent /
+          ((monthProvider?.week) == 1
+              ? 1.66
+              : (monthProvider?.week) == 2
+                  ? 1.51
+                  : (monthProvider?.week) == 3
+                      ? 1.37
+                      : 1.255);
+      _scrollController.animateTo(
+        middleOffset,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   openSettingDialog() {
@@ -83,6 +115,7 @@ class _MonthViewState extends State<MonthView> {
       (timeStamp) {
         monthProvider?.updateSelectedSection(0);
         monthProvider?.updateIsOnMonthPage(false);
+        monthProvider?.updateScrollToRestDay(false);
       },
     );
     super.dispose();
@@ -167,6 +200,7 @@ class _MonthViewState extends State<MonthView> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
+                controller: _scrollController,
                 physics: BouncingScrollPhysics(),
                 children: [
                   Stack(
@@ -423,20 +457,27 @@ class _MonthViewState extends State<MonthView> {
                             ),
                             Consumer<MonthProvider>(
                               builder: (context, monthProvider, child) {
-                                return Column(
-                                  children: [
-                                    if (!monthProvider.loader) ...[
-                                      Visibility(
-                                          visible: monthProvider.selectedSection == 0,
-                                          child:
-                                              ScheduleSection(monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
-                                      Visibility(
-                                          visible: monthProvider.selectedSection == 1, child: SettingSection(monthProvider: monthProvider)),
-                                      Visibility(
-                                          visible: monthProvider.selectedSection == 2,
-                                          child: InformationSection(programInfoProvider: provider)),
-                                    ]
-                                  ],
+                                return Container(
+                                  color: Colors.white,
+                                  constraints: BoxConstraints(
+                                    minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12)),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      if (!monthProvider.loader) ...[
+                                        Visibility(
+                                            visible: monthProvider.selectedSection == 0,
+                                            child: ScheduleSection(
+                                                monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
+                                        Visibility(
+                                            visible: monthProvider.selectedSection == 1,
+                                            child: SettingSection(monthProvider: monthProvider)),
+                                        Visibility(
+                                            visible: monthProvider.selectedSection == 2,
+                                            child: InformationSection(programInfoProvider: provider)),
+                                      ]
+                                    ],
+                                  ),
                                 );
                               },
                             )
@@ -548,6 +589,8 @@ class _MonthViewState extends State<MonthView> {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
       monthProvider?.updateIsOnMonthPage(false);
+      monthProvider?.updateScrollToRestDay(true);
+
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,

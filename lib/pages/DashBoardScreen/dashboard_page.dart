@@ -496,6 +496,23 @@ class _DashboardPageState extends State<DashboardPage> {
                                                   todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
                                                 }
                                               }
+                                              DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
+                                                (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                                orElse: () => DayHistoryModel(),
+                                              );
+
+                                              String title = matchingElement.id != null
+                                                  ? matchingElement.title ?? "Pump Day"
+                                                  : !monthData.isPumpDayAvailable
+                                                      ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0] ??
+                                                          ""
+                                                      : !isRestDay
+                                                          ? monthData.monthDataModel!.weeks![monthData.week! - 1].days![nextWorkOutIndex]
+                                                                  .title ??
+                                                              ""
+                                                          : monthData.pumpDays.isEmpty
+                                                              ? "Pump Day"
+                                                              : todayTitleName;
 
                                               return Container(
                                                 margin: EdgeInsets.symmetric(
@@ -520,33 +537,15 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     SizedBox(
                                                       child: Column(
                                                         children: [
-                                                          Builder(builder: (context) {
-                                                            DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
-                                                              (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                              orElse: () => DayHistoryModel(),
-                                                            );
-                                                            return Text(
-                                                              matchingElement.id != null
-                                                                  ? matchingElement.title ?? "Pump Day"
-                                                                  : !monthData.isPumpDayAvailable
-                                                                      ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
-                                                                              .dayList![index ?? 0] ??
-                                                                          ""
-                                                                      : !isRestDay
-                                                                          ? monthData.monthDataModel!.weeks![monthData.week! - 1]
-                                                                                  .days![nextWorkOutIndex].title ??
-                                                                              ""
-                                                                          : monthData.pumpDays.isEmpty
-                                                                              ? "Pump Day"
-                                                                              : todayTitleName,
-                                                              textAlign: TextAlign.center,
-                                                              style: TextStyle(
-                                                                color: Colors.white,
-                                                                fontSize: ScreenUtil.horizontalScale(6.5),
-                                                                fontWeight: FontWeight.bold,
-                                                              ),
-                                                            );
-                                                          })
+                                                          Text(
+                                                            title,
+                                                            textAlign: TextAlign.center,
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.horizontalScale(6.5),
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          )
                                                         ],
                                                       ),
                                                     ),
@@ -567,8 +566,11 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               isLoading: false,
                                                             )
                                                           : ButtonWidget(
-                                                              text:
-                                                                  status == Status.started ? 'Continue Your Workout' : 'Start Your Workout',
+                                                              text: title.contains("Rest Day")
+                                                                  ? "Mark Complete"
+                                                                  : status == Status.started
+                                                                      ? 'Continue Your Workout'
+                                                                      : 'Start Your Workout',
                                                               textColor: AppColors.primaryColor,
                                                               color: status == Status.completed || status == Status.skipped
                                                                   ? Colors.white70
@@ -801,6 +803,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                       child: ElevatedButton(
                                         onPressed: () {
                                           monthProvider.updateIsOnMonthPage(true);
+                                          monthProvider.updateScrollToRestDay(false);
+
                                           HapticFeedBack.buttonClick();
                                           mainPageProvider.changeTab(1);
                                         },
@@ -824,6 +828,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                       child: ElevatedButton(
                                         onPressed: () {
                                           monthProvider.updateIsOnMonthPage(true);
+                                          monthProvider.updateScrollToRestDay(false);
+
                                           HapticFeedBack.buttonClick();
                                           monthProvider.updateSelectedSection(1);
                                           mainPageProvider.changeTab(1);
@@ -1384,12 +1390,13 @@ class _DashboardPageState extends State<DashboardPage> {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
       monthProvider.updateIsOnMonthPage(false);
+      monthProvider.updateScrollToRestDay(true);
 
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,
       //   builder: (c1) {
-      //     return skipWorkoutDialog(context, c1);
+      //     return skipWorkoutDialog(context, c1);`
       //   },
       // );
     } else {

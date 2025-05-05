@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -304,7 +303,6 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
-    sqrt(pow(media.width, 2) + pow(media.height, 2));
 
     return isInit
         ? Container(
@@ -344,43 +342,46 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                           titleSpacing: -5,
                                           toolbarHeight: ScreenUtil.verticalScale(5.1),
                                           backgroundColor: Colors.transparent,
+                                          centerTitle: false,
                                           leading: BackArrowWidget(
                                             onPress: () {
                                               Navigator.pop(context);
                                             },
                                           ),
-                                          title: Container(
-                                            margin: EdgeInsets.only(
-                                              left: ScreenUtil.horizontalScale(4),
-                                            ),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: SizedBox(
-                                              width: ScreenUtil.verticalScale(4.65),
-                                              height: ScreenUtil.verticalScale(4.65),
-                                              child: IconButton(
-                                                padding: EdgeInsets.zero,
-                                                icon: AnimatedSwitcher(
-                                                  transitionBuilder: (child, animation) {
-                                                    return ScaleTransition(
-                                                      scale: animation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                  duration: const Duration(milliseconds: 500),
-                                                  child: Icon(
-                                                    isEditMode ? Icons.close : Icons.edit,
-                                                    // color: Color(0XFFd18a9b),
-                                                    color: AppColors.primaryColor,
-                                                    size: ScreenUtil.verticalScale(isEditMode ? 2.5 : 2.3),
+                                          title: isCurrentDayCompleted || isCurrentDaySkipped
+                                              ? SizedBox()
+                                              : Container(
+                                                  margin: EdgeInsets.only(
+                                                    left: ScreenUtil.horizontalScale(4),
+                                                  ),
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.white,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: SizedBox(
+                                                    width: ScreenUtil.verticalScale(4.65),
+                                                    height: ScreenUtil.verticalScale(4.65),
+                                                    child: IconButton(
+                                                      padding: EdgeInsets.zero,
+                                                      icon: AnimatedSwitcher(
+                                                        transitionBuilder: (child, animation) {
+                                                          return ScaleTransition(
+                                                            scale: animation,
+                                                            child: child,
+                                                          );
+                                                        },
+                                                        duration: const Duration(milliseconds: 500),
+                                                        child: Icon(
+                                                          isEditMode ? Icons.close : Icons.edit,
+                                                          // color: Color(0XFFd18a9b),
+                                                          color: AppColors.primaryColor,
+                                                          size: ScreenUtil.verticalScale(isEditMode ? 2.5 : 2.3),
+                                                        ),
+                                                      ),
+                                                      onPressed: toggleEditMode,
+                                                    ),
                                                   ),
                                                 ),
-                                                onPressed: toggleEditMode,
-                                              ),
-                                            ),
-                                          ),
                                           actions: [
                                             Padding(
                                                 padding: EdgeInsets.only(right: isEditMode ? 20 : 10),
@@ -1001,11 +1002,16 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                 String split =
                     monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ??
                         "";
-
-                String warmUpId = monthProvider.monthDataModel?.weeks![monthProvider.overviewCurrentWeek - 1]
-                        .days?[monthProvider.overviewCurrentDay - 1].warmups?.first.warmupId ??
-                    "";
-
+                final dayIndex = int.parse(monthProvider.weekDataModel!.dayList![monthProvider.overviewCurrentDay - 1]
+                        .toString()
+                        .replaceAll("Workout", "")
+                        .replaceAll("Rest", "")
+                        .replaceAll("Day", "")
+                        .replaceAll(" ", "")) -
+                    1;
+                String warmUpId =
+                    monthProvider.monthDataModel?.weeks![monthProvider.overviewCurrentWeek - 1].days?[dayIndex].warmups?.first.warmupId ??
+                        "";
                 String warmUpDataId =
                     "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$warmUpId";
 
@@ -2434,6 +2440,8 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                   IconButton(
                     onPressed: () {
                       monthProvider?.updateIsOnMonthPage(true);
+                      monthProvider?.updateScrollToRestDay(false);
+
                       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                       value.changeTab(1);
                     },

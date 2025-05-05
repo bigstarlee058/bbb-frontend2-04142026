@@ -26,9 +26,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
   String? _imageUrl;
   String? selectedName = "";
   DateTime? selectedDate;
-  String? selectedWeight;
+  TextEditingController selectedWeight = TextEditingController();
   String? selectedGender;
-  String? selectedHeight;
+  TextEditingController selectedHeight = TextEditingController();
   String? selectedLocation;
   String? selectedGoal;
   String? _id;
@@ -60,8 +60,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   File? image;
 
+  bool loader = false;
+
   Future<void> _fetchUserData() async {
     // try {
+
+    setState(() => loader = true);
     final userData1 = await userData!.fetchUserInfo();
     // userData['detail'] = jsonDecode( userData['detail']);
     if (!mounted) return;
@@ -69,8 +73,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       _id = userData1['_id'];
       selectedName = userData1["name"];
       selectedDate = DateTime.parse(userData1["detail"]['dob']);
-      selectedWeight = '${userData1["detail"]["weight"]} lbs'; //'${userData['detail']['weight']} lbs';
-      selectedHeight =
+      selectedWeight.text = '${userData1["detail"]["weight"]} lbs'; //'${userData['detail']['weight']} lbs';
+      selectedHeight.text =
           '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}"'; //'${userData['detail']['height']}\'0"';
       selectedLocation = userData1['detail']['location'];
       _imageUrl = userData1['detail']['avatarUrl'];
@@ -83,6 +87,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         locationProvider.fillDetails(userData1['detail']['country'], userData1['detail']['state'], userData1['detail']['city']);
       }
     });
+    setState(() => loader = false);
   }
 
   bool isLoading = false;
@@ -95,8 +100,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       // 'lastName': 'Vlacic',
       'sex': genderOptions.indexOf(selectedGender!),
       'dob': selectedDate!.toIso8601String(),
-      'weight': int.parse(selectedWeight!.split(' ')[0]),
-      'height': int.parse(selectedHeight!.replaceAll('\'', '').replaceAll("\"", "")),
+      'weight': int.parse(selectedWeight.text.split(' ')[0]),
+      'height': int.parse(selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
       'location': selectedLocation,
       'mygoal': selectedGoal,
       'avatarUrl': _imageUrl ?? '',
@@ -306,153 +311,146 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ],
                 ),
                 Container(
+                  width: media.width,
+                  constraints: BoxConstraints(minHeight: media.height - (media.height / 2.65)),
                   margin: EdgeInsets.only(
                     top: media.height / 2.65,
                     bottom: ScreenUtil.verticalScale(15),
                   ),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildProfileField(
-                          context: context,
-                          label: 'Birthday',
-                          value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime(1998, 9, 21),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now(),
-                            );
-                            if (pickedDate != null && pickedDate != selectedDate) {
-                              setState(() {
-                                selectedDate = pickedDate;
-                              });
-                            }
-                          },
-                        ),
-                        _buildDropdownField(
-                          context: context,
-                          label: 'Gender',
-                          value: selectedGender,
-                          options: genderOptions,
-                          hint: 'Female',
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedGender = newValue!;
-                            });
-                          },
-                        ),
-                        _buildDropdownField(
-                          context: context,
-                          label: 'My Goals',
-                          value: selectedGoal,
-                          options: goalsOptions,
-                          hint: 'Goals',
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedGoal = newValue!;
-                            });
-                          },
-                        ),
-                        Consumer<LocationProvider>(
-                          builder: (context, value, child) => Column(
-                            children: [
-                              _buildDropdownField(
-                                context: context,
-                                label: 'Country',
-                                value: value.selectedCountry,
-                                options: value.country.map((e) => e.countryName).toList(),
-                                hint: 'Country',
-                                onChanged: value.onCountrySelect,
-                              ),
-                              _buildDropdownField(
-                                context: context,
-                                label: 'State',
-                                value: value.selectedState,
-                                options: value.states.map((e) => e.stateName).toList(),
-                                hint: 'State',
-                                onChanged: value.onStateSelect,
-                              ),
-                              _buildDropdownField(
-                                context: context,
-                                label: 'City',
-                                value: value.selectedCity,
-                                options: value.cities.map((e) => e.cityName).toList(),
-                                hint: 'City',
-                                onChanged: value.onCitySelect,
-                              ),
-                            ],
-                          ),
-                        ),
-                        // _buildDropdownField(
-                        //   context: context,
-                        //   label: 'Location',
-                        //   value: selectedLocation,
-                        //   options: locationOptions,
-                        //   hint: 'Location',
-                        //   onChanged: (String? newValue) {
-                        //     setState(() {
-                        //       selectedLocation = newValue!;
-                        //     });
-                        //   },
-                        // ),
-                        _buildDropdownField(
-                          context: context,
-                          label: 'Height',
-                          value: selectedHeight,
-                          options: heightOptions,
-                          hint: '6\'0"',
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedHeight = newValue!;
-                            });
-                          },
-                        ),
-                        _buildDropdownField(
-                          context: context,
-                          label: 'Weight',
-                          value: selectedWeight,
-                          options: weightOptions,
-                          hint: '81 lbs',
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedWeight = newValue!;
-                            });
-                          },
-                        ),
-                        isLoading == true
-                            ? Padding(
-                                padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(4)),
-                                child: const Center(
-                                    child: CircularProgressIndicator(
-                                  color: AppColors.primaryColor,
-                                )),
-                              )
-                            : Container(
-                                margin: EdgeInsets.symmetric(
-                                  vertical: ScreenUtil.verticalScale(4),
-                                  horizontal: ScreenUtil.horizontalScale(9),
-                                ),
-                                child: ButtonWidget(
-                                  text: "Save",
-                                  textColor: Colors.white,
-                                  onPress: _saveUserData,
-                                  color: AppColors.primaryColor,
-                                  isLoading: false,
-                                ),
-                              ),
-                      ],
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
                   ),
+                  child: loader
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryColor,
+                          ),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildProfileField(
+                              context: context,
+                              label: 'Birthday',
+                              value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime(1998, 9, 21),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (pickedDate != null && pickedDate != selectedDate) {
+                                  setState(() {
+                                    selectedDate = pickedDate;
+                                  });
+                                }
+                              },
+                            ),
+                            _buildDropdownField(
+                              context: context,
+                              label: 'Gender',
+                              value: selectedGender,
+                              options: genderOptions,
+                              hint: 'Female',
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedGender = newValue!;
+                                });
+                              },
+                            ),
+                            // _buildDropdownField(
+                            //   context: context,
+                            //   label: 'My Goals',
+                            //   value: selectedGoal,
+                            //   options: goalsOptions,
+                            //   hint: 'Goals',
+                            //   onChanged: (String? newValue) {
+                            //     setState(() {
+                            //       selectedGoal = newValue!;
+                            //     });
+                            //   },
+                            // ),
+                            Consumer<LocationProvider>(
+                              builder: (context, value, child) => Column(
+                                children: [
+                                  _buildDropdownField(
+                                    context: context,
+                                    label: 'Country',
+                                    value: value.selectedCountry,
+                                    options: value.country.map((e) => e.countryName).toList(),
+                                    hint: 'Country',
+                                    onChanged: value.onCountrySelect,
+                                  ),
+                                  _buildDropdownField(
+                                    context: context,
+                                    label: 'State',
+                                    value: value.selectedState,
+                                    options: value.states.map((e) => e.stateName).toList(),
+                                    hint: 'State',
+                                    onChanged: value.onStateSelect,
+                                  ),
+                                  _buildDropdownField(
+                                    context: context,
+                                    label: 'City',
+                                    value: value.selectedCity,
+                                    options: value.cities.map((e) => e.cityName).toList(),
+                                    hint: 'City',
+                                    onChanged: value.onCitySelect,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // _buildDropdownField(
+                            //   context: context,
+                            //   label: 'Location',
+                            //   value: selectedLocation,
+                            //   options: locationOptions,
+                            //   hint: 'Location',
+                            //   onChanged: (String? newValue) {
+                            //     setState(() {
+                            //       selectedLocation = newValue!;
+                            //     });
+                            //   },
+                            // ),
+                            _buildTextField(
+                              context: context,
+                              label: 'Height',
+                              value: selectedHeight,
+                              hint: '6\'0"',
+                            ),
+                            _buildTextField(
+                              context: context,
+                              label: 'Weight',
+                              value: selectedWeight,
+                              hint: '81 lbs',
+                            ),
+                            isLoading == true
+                                ? Padding(
+                                    padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(4)),
+                                    child: const Center(
+                                        child: CircularProgressIndicator(
+                                      color: AppColors.primaryColor,
+                                    )),
+                                  )
+                                : Container(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(4),
+                                      horizontal: ScreenUtil.horizontalScale(9),
+                                    ),
+                                    child: ButtonWidget(
+                                      text: "Save",
+                                      textColor: Colors.white,
+                                      onPress: _saveUserData,
+                                      color: AppColors.primaryColor,
+                                      isLoading: false,
+                                    ),
+                                  ),
+                          ],
+                        ),
                 ),
               ],
             ),
@@ -519,7 +517,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     value,
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
+                      // fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
+                      fontWeight: FontWeight.normal,
                     ),
                     textAlign: TextAlign.center, // Align the text at the center
                   ),
@@ -532,7 +531,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-// Dropdown Field for Gender, Location, etc.
   Widget _buildDropdownField({
     required BuildContext context,
     required String label,
@@ -598,6 +596,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       ),
                     );
                   }).toList(),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                  ),
                   onChanged: onChanged,
                   underline: Container(),
                 ),
@@ -623,6 +626,68 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 //   },
                 //   underline: Container(),
                 // ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required BuildContext context,
+    required String label,
+    required TextEditingController value,
+    required String hint,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 18,
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil.horizontalScale(1),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(
+                  ScreenUtil.verticalScale(5),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x20888888),
+                    spreadRadius: 3,
+                    blurRadius: 10,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: TextField(
+                  controller: value,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
               ),
             ),
           ),

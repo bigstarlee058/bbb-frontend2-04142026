@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:app_links/app_links.dart';
 import 'package:bbb/firebase_options.dart';
@@ -155,6 +154,9 @@ class _MyAppState extends State<MyApp> {
   final scrollProvider = ChangeNotifierProvider<ScrollProvider>(
     create: (context) => ScrollProvider(),
   );
+  // final videoImageProvider = ChangeNotifierProvider<VideoImageProvider>(
+  //   create: (context) => VideoImageProvider(),
+  // );
 
   // ignore: unused_field
   late AppLinks _appLinks;
@@ -208,6 +210,7 @@ class _MyAppState extends State<MyApp> {
           programInfoProvider,
           monthProvider,
           scrollProvider,
+          // videoImageProvider
         ],
         child: MaterialApp(
           navigatorKey: navigatorKey,
@@ -225,6 +228,7 @@ class _MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           initialRoute: AppRoutes.onBoardingScreen,
           routes: {
+            // AppRoutes.splashScreen: (context) => const SplashScreen(),
             AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
             AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
             AppRoutes.loginScreen: (context) => const LoginPage(image: ''),
@@ -262,112 +266,5 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
-  }
-}
-
-class EditModeScreen extends StatefulWidget {
-  @override
-  _EditModeScreenState createState() => _EditModeScreenState();
-}
-
-class _EditModeScreenState extends State<EditModeScreen> with SingleTickerProviderStateMixin {
-  bool isEditMode = false;
-  late AnimationController _controller;
-  late Animation<double> _radiusAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _radiusAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  void toggleEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-      isEditMode ? _controller.forward() : _controller.reverse();
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
-    final maxRadius = sqrt(pow(screenSize.width, 2) + pow(screenSize.height, 2));
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Mode Demo'),
-        actions: [
-          IconButton(
-            icon: Icon(isEditMode ? Icons.close : Icons.edit),
-            onPressed: toggleEditMode,
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Container(color: Colors.white), // Default background
-          AnimatedBuilder(
-            animation: _radiusAnimation,
-            builder: (_, __) {
-              return ClipPath(
-                clipper: CircularRevealClipper(
-                  fraction: _radiusAnimation.value,
-                  maxRadius: maxRadius,
-                ),
-                child: Container(color: Colors.grey[200]),
-              );
-            },
-          ),
-          Column(
-            children: [
-              Container(
-                height: screenSize.height * 0.25,
-                color: Colors.blue[100],
-                width: double.infinity,
-                child: Center(child: Text("Top Image Placeholder")),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (_, index) => ListTile(
-                    title: Text("Exercise ${index + 1}"),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CircularRevealClipper extends CustomClipper<Path> {
-  final double fraction;
-  final double maxRadius;
-
-  CircularRevealClipper({required this.fraction, required this.maxRadius});
-
-  @override
-  Path getClip(Size size) {
-    final radius = maxRadius * fraction;
-    return Path()..addOval(Rect.fromCircle(center: Offset(0, 0), radius: radius));
-  }
-
-  @override
-  bool shouldReclip(covariant CircularRevealClipper oldClipper) {
-    return fraction != oldClipper.fraction;
   }
 }
