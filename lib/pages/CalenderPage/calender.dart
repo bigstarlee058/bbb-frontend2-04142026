@@ -83,49 +83,67 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      child: CCTableCalendar(
-        startingDayOfWeek: StartingDayOfWeek.monday,
-        availableGestures: AvailableGestures.horizontalSwipe,
-        rowHeight: ScreenUtil.verticalScale(5),
-        daysOfWeekHeight: ScreenUtil.verticalScale(3),
-        firstDay: DateTime.utc(2020, 1, 1),
-        lastDay: DateTime.utc(2100, 12, 31),
-        focusedDay: _focusedDay,
-        selectedDayPredicate: (day) {
-          return isSameDay(_selectedDay, day);
-        },
-        headerStyle: HeaderStyle(
-            headerPadding: const EdgeInsets.only(bottom: 10),
-            formatButtonVisible: false,
-            titleCentered: false,
-            leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
-            rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
-            titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
-            titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
-            decoration: BoxDecoration()),
-        calendarStyle: CalendarStyle(
-          defaultTextStyle: TextStyle(fontSize: 14.0),
-          weekendTextStyle: TextStyle(fontSize: 14.0),
-          outsideDecoration: BoxDecoration(color: Colors.transparent),
-          outsideTextStyle: TextStyle(fontSize: 14.0, color: Colors.grey.shade500),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black.withValues(alpha: 0.1), width: 0.3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.4),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: Offset(0, 2),
+          ),
+        ],
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(
+          ScreenUtil.verticalScale(2),
         ),
-        onRangeSelected: (start, end, focusedDay) {},
-        onDaySelected: null,
-        calendarBuilders: CalendarBuilders(
-          disabledBuilder: (context, day, focusedDay) {
-            return _buildDayState(day);
+      ),
+      child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: CCTableCalendar(
+          startingDayOfWeek: StartingDayOfWeek.monday,
+          availableGestures: AvailableGestures.horizontalSwipe,
+          rowHeight: ScreenUtil.verticalScale(5),
+          daysOfWeekHeight: ScreenUtil.verticalScale(3),
+          firstDay: DateTime.utc(2020, 1, 1),
+          lastDay: DateTime.utc(2100, 12, 31),
+          focusedDay: _focusedDay,
+          selectedDayPredicate: (day) {
+            return isSameDay(_selectedDay, day);
           },
-          todayBuilder: (context, day, date) {
-            return _buildDayState(day) ?? _buildCurrentWorkoutDay(day, day: DateTime.now().day);
-          },
-          outsideBuilder: (context, day, date) {
-            return _buildDayState(day, isOutSide: true);
-          },
-          defaultBuilder: (context, date, _) {
-            return _buildDayState(date);
-          },
+          headerStyle: HeaderStyle(
+              headerPadding: const EdgeInsets.only(bottom: 10, top: 5),
+              formatButtonVisible: false,
+              titleCentered: false,
+              leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
+              rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
+              titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
+              titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+              decoration: BoxDecoration()),
+          calendarStyle: CalendarStyle(
+            defaultTextStyle: TextStyle(fontSize: 14.0),
+            weekendTextStyle: TextStyle(fontSize: 14.0),
+            outsideDecoration: BoxDecoration(color: Colors.transparent),
+            outsideTextStyle: TextStyle(fontSize: 14.0, color: Colors.grey.shade500),
+          ),
+          onRangeSelected: (start, end, focusedDay) {},
+          onDaySelected: null,
+          calendarBuilders: CalendarBuilders(
+            disabledBuilder: (context, day, focusedDay) {
+              return _buildDayState(day);
+            },
+            todayBuilder: (context, day, date) {
+              return _buildDayState(day) ?? _buildCurrentWorkoutDay(day, day: DateTime.now().day);
+            },
+            outsideBuilder: (context, day, date) {
+              return _buildDayState(day, isOutSide: true);
+            },
+            defaultBuilder: (context, date, _) {
+              return _buildDayState(date);
+            },
+          ),
         ),
       ),
     );
@@ -260,7 +278,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           final workoutDate = day.endTime!;
           DateTime localTime = Utils.formattedDate("$workoutDate");
           if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
-            final isRange = data11.length == 1 ? false : data11.any((d) => d.any((element) => _isSameDate(localTime, date)));
+            final isRange = data11.any((d) => d.any((element) => _isSameDate(localTime, date)));
+
             final isCircleP = !isRange ? data.any((d) => d.status == Status.completed && _isSameDate(localTime, date)) : false;
             final isCircleB = !isRange ? data.any((d) => d.status == Status.skipped && _isSameDate(localTime, date)) : false;
 

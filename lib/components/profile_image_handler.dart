@@ -41,8 +41,8 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil.horizontalScale(23.5),
-      width: ScreenUtil.horizontalScale(23.5),
+      height: ScreenUtil.horizontalScale(22.5),
+      width: ScreenUtil.horizontalScale(22.5),
       decoration: BoxDecoration(
         color: Colors.grey.withValues(alpha: .9),
         borderRadius: BorderRadius.all(

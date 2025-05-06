@@ -266,6 +266,8 @@ class MonthProvider extends ChangeNotifier {
   MonthDataModel? monthDataModel;
   WarmUpModel? warmUpModel;
 
+  String warmupId = "";
+
   List<WeekDataModel> weeksDataList = [];
 
   bool isFilterLoading = false;
@@ -956,8 +958,9 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateWarmUp(bool val) {
+  updateWarmUp(bool val, String id) {
     isWarmup = val;
+    warmupId = id;
     notifyListeners();
   }
 

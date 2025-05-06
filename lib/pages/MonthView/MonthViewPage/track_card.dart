@@ -110,7 +110,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               child: ExpansionPanelList(
                 sidePadding: true,
                 animationDuration: Duration(milliseconds: 300),
-                expandIconColor: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : AppColors.primaryColor,
+                expandIconColor: Colors.grey.shade400,
                 materialGapSize: 10,
                 expandedHeaderPadding: EdgeInsets.zero,
                 expansionCallback: (panelIndex, isExpanded) {
@@ -119,7 +119,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     curExpandedIdx = isExpanded ? 0 : -1;
                   });
                 },
-                elevation: 1,
+                elevation: 0,
                 children: [
                   expansionPanel1(monthProvider),
                 ],
@@ -879,12 +879,12 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
   }
 
   bool isRestPumpOption(bool isRestDay, MonthProvider monthProvider, String dataId) {
-    return (isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek && monthProvider.isPumpDayAvailable) &&
+    return ((isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek && monthProvider.isPumpDayAvailable) &&
             (monthProvider.allDayHistoryModel.any(
                     (element) => (element.status != Status.skipped && element.status != Status.completed && (dataId == element.dataId))) ||
-                (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId))) ||
-        (isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
-            (monthProvider.allDayHistoryModel.any((element) => ((element.status == Status.started) && dataId == element.dataId)));
+                (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)))) ||
+        ((isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
+            (monthProvider.allDayHistoryModel.any((element) => ((element.status == Status.started) && dataId == element.dataId))));
   }
 
   Future<void> continueWorkoutOnTap(

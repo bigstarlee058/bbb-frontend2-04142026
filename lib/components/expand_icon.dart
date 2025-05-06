@@ -176,7 +176,7 @@ class _ExpandIconState extends State<ExpandIcon> with SingleTickerProviderStateM
           turns: _iconTurns,
           child: Icon(
             Icons.expand_more,
-            color: Colors.grey.withValues(alpha: 600),
+            color: widget.color ?? Colors.grey.withValues(alpha: 600),
             size: ScreenUtil.verticalScale(3.1),
           ),
         ),
