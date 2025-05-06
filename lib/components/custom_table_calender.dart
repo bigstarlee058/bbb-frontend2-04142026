@@ -396,6 +396,7 @@ class _CCTableCalendarState<T> extends State<CCTableCalendar<T>> {
             },
           ),
         ),
+        SizedBox(height: 5)
       ],
     );
   }

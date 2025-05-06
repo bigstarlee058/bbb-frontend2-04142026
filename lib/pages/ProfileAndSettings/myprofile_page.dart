@@ -1,9 +1,11 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/profile_image_handler.dart';
+import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -12,7 +14,9 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
 
 class MyProfilePage extends StatefulWidget {
@@ -34,18 +38,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
   String? _id;
 
   UserDataProvider? userData;
-
-  final List<String> weightOptions = [
-    '100 lbs',
-    '110 lbs',
-    '121 lbs',
-    '130 lbs',
-    '140 lbs',
-  ];
+  double heightInCm = 183;
+  HeightUnit selectedHeightUnit = HeightUnit.cm;
+  bool canConvertUnit = true;
+  bool showSeparationText = true;
 
   final List<String> genderOptions = ['Female', 'Male', 'Other'];
   final List<String> goalsOptions = ['Muscle Growth', 'Weight Gain', 'Strength & Performance'];
-  final List<String> heightOptions = ['5\'0"', '5\'5"', '6\'0"', '6\'5"']; // Example heights
   late LocationProvider locationProvider; // Example locations
   late MainPageProvider mainPageProvider;
 
@@ -73,9 +72,18 @@ class _MyProfilePageState extends State<MyProfilePage> {
       _id = userData1['_id'];
       selectedName = userData1["name"];
       selectedDate = DateTime.parse(userData1["detail"]['dob']);
-      selectedWeight.text = '${userData1["detail"]["weight"]} lbs'; //'${userData['detail']['weight']} lbs';
+      selectedWeight.text = '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
       selectedHeight.text =
-          '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}"'; //'${userData['detail']['height']}\'0"';
+          '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"'; //'${userData['detail']['height']}\'0"';
+      log('   int.parse(userData1["detail"]["height"].toString()[0]), :::::::::::::::::: ${int.parse(userData1["detail"]["height"].toString()[0])}');
+
+      double inches = double.parse(
+          "${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}");
+      log('inches :::::::::::::::::: ${inches}');
+      heightInCm = convertToInches(
+          int.parse(userData1["detail"]["height"].toString()[0]),
+          double.parse(
+              "${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"));
       selectedLocation = userData1['detail']['location'];
       _imageUrl = userData1['detail']['avatarUrl'];
       selectedGender = genderOptions[userData1['detail']['sex'] == true ? 1 : 0];
@@ -88,6 +96,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
       }
     });
     setState(() => loader = false);
+  }
+
+  double convertToInches(int feet, double inches) {
+    if (inches > 11) {
+      throw ArgumentError('Inches must be less than or equal to 11');
+    }
+    double inchesTotal = (feet * 12) + inches;
+    return inchesTotal * 2.54;
   }
 
   bool isLoading = false;
@@ -187,42 +203,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     )
                                   ],
                                 ),
-                                // Container(
-                                //   margin: EdgeInsets.only(
-                                //     right: ScreenUtil.horizontalScale(3),
-                                //   ),
-                                //   child: Row(
-                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                //     children: [
-                                //       BackArrowWidget(
-                                //         onPress: () {
-                                //           // HapticFeedBack.buttonClick();
-                                //           // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                //           // mainPageProvider.changeTab(3);
-                                //           Navigator.pop(context);
-                                //         },
-                                //       ),
-                                //       Padding(
-                                //         padding: EdgeInsets.only(
-                                //           top: ScreenUtil.verticalScale(1),
-                                //         ),
-                                //         child: Row(
-                                //           mainAxisAlignment: MainAxisAlignment.center,
-                                //           children: [
-                                //             Text(
-                                //               'My Profile',
-                                //               style: TextStyle(
-                                //                 color: Colors.white,
-                                //                 fontSize: ScreenUtil.verticalScale(2.5),
-                                //               ),
-                                //             ),
-                                //           ],
-                                //         ),
-                                //       ),
-                                //       const CommonStreakWithNotification(routeString: '/myprofile')
-                                //     ],
-                                //   ),
-                                // ),
                                 Container(
                                   margin: EdgeInsets.symmetric(
                                     horizontal: ScreenUtil.horizontalScale(10),
@@ -231,7 +211,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(5),
+                                        height: ScreenUtil.horizontalScale(2),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -250,7 +230,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                             : const SizedBox(),
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(7),
+                                        height: ScreenUtil.verticalScale(2.5),
                                       ),
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
@@ -259,7 +239,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                 userData.userName,
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(7),
+                                                  fontSize: ScreenUtil.horizontalScale(6),
                                                   fontWeight: FontWeight.bold,
                                                   height: 1,
                                                 ),
@@ -290,7 +270,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 2.647,
+                          height: media.height / 3.199,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -312,10 +292,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 Container(
                   width: media.width,
-                  constraints: BoxConstraints(minHeight: media.height - (media.height / 2.65)),
+                  constraints: BoxConstraints(minHeight: media.height - (media.height / 3.2)),
                   margin: EdgeInsets.only(
-                    top: media.height / 2.65,
-                    bottom: ScreenUtil.verticalScale(15),
+                    top: media.height / 3.2,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -342,6 +321,21 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   initialDate: DateTime(1998, 9, 21),
                                   firstDate: DateTime(1900),
                                   lastDate: DateTime.now(),
+                                  builder: (BuildContext context, Widget? child) {
+                                    return Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: ColorScheme.light(
+                                          primary: AppColors.primaryColor,
+                                          onPrimary: Colors.white,
+                                          onSurface: Colors.black,
+                                        ),
+                                        textButtonTheme: TextButtonThemeData(
+                                          style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
+                                        ),
+                                      ),
+                                      child: child!,
+                                    );
+                                  },
                                 );
                                 if (pickedDate != null && pickedDate != selectedDate) {
                                   setState(() {
@@ -404,19 +398,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 ],
                               ),
                             ),
-                            // _buildDropdownField(
-                            //   context: context,
-                            //   label: 'Location',
-                            //   value: selectedLocation,
-                            //   options: locationOptions,
-                            //   hint: 'Location',
-                            //   onChanged: (String? newValue) {
-                            //     setState(() {
-                            //       selectedLocation = newValue!;
-                            //     });
-                            //   },
-                            // ),
-                            _buildTextField(
+                            _heightPicker(
                               context: context,
                               label: 'Height',
                               value: selectedHeight,
@@ -426,19 +408,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               context: context,
                               label: 'Weight',
                               value: selectedWeight,
-                              hint: '81 lbs',
+                              hint: '81',
                             ),
+                            SizedBox(height: ScreenUtil.verticalScale(3)),
                             isLoading == true
-                                ? Padding(
-                                    padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(4)),
-                                    child: const Center(
-                                        child: CircularProgressIndicator(
-                                      color: AppColors.primaryColor,
-                                    )),
-                                  )
+                                ? const Center(
+                                    child: CircularProgressIndicator(
+                                    color: AppColors.primaryColor,
+                                  ))
                                 : Container(
                                     margin: EdgeInsets.symmetric(
-                                      vertical: ScreenUtil.verticalScale(4),
                                       horizontal: ScreenUtil.horizontalScale(9),
                                     ),
                                     child: ButtonWidget(
@@ -678,7 +657,123 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ],
               ),
               child: Center(
+                child: KeyboardActions(
+                  autoScroll: false,
+                  config: _buildConfig(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IntrinsicWidth(
+                        child: TextField(
+                          controller: value,
+                          keyboardType: TextInputType.number,
+                          onSubmitted: (value) {
+                            FocusScope.of(context).unfocus();
+                          },
+                          textInputAction: TextInputAction.done,
+                          textAlign: TextAlign.center,
+                          focusNode: _nodeText1,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            TextInputFormatter.withFunction(
+                              (oldValue, newValue) {
+                                String newText = newValue.text;
+                                if (newText.isNotEmpty) {
+                                  newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                                }
+                                return TextEditingValue(
+                                  text: newText,
+                                  selection: TextSelection.collapsed(offset: newText.length),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      IntrinsicWidth(
+                        child: Text(
+                          "lbs",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _heightPicker({
+    required BuildContext context,
+    required String label,
+    required TextEditingController value,
+    required String hint,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 18,
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil.horizontalScale(1),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(
+                  ScreenUtil.verticalScale(5),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x20888888),
+                    spreadRadius: 3,
+                    blurRadius: 10,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Center(
                 child: TextField(
+                  readOnly: true,
+                  onTap: () async {
+                    await showCupertinoHeightPicker(
+                      context: context,
+                      initialHeight: heightInCm,
+                      initialSelectedHeightUnit: selectedHeightUnit,
+                      canConvertUnit: canConvertUnit,
+                      showSeparationText: showSeparationText,
+                      onHeightChanged: (val) {
+                        setState(() {
+                          heightInCm = val;
+                          int feet = (heightInCm / 2.54) ~/ 12;
+                          int inches = ((heightInCm / 2.54) % 12).floor();
+                          value.text = '$feet\'$inches"';
+                        });
+                      },
+                    );
+                  },
                   controller: value,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
@@ -693,6 +788,38 @@ class _MyProfilePageState extends State<MyProfilePage> {
           ),
         ],
       ),
+    );
+  }
+
+  final FocusNode _nodeText1 = FocusNode();
+
+  KeyboardActionsConfig _buildConfig(BuildContext context) {
+    return KeyboardActionsConfig(
+      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
+      keyboardBarColor: Colors.white,
+      nextFocus: true,
+      actions: [
+        KeyboardActionsItem(
+          focusNode: _nodeText1,
+          displayArrows: false,
+          toolbarButtons: [
+            (node) {
+              return GestureDetector(
+                onTap: () => node.unfocus(),
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
+                  child: Text(
+                    "Done",
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              );
+            }
+          ],
+        ),
+      ],
     );
   }
 }

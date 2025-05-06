@@ -237,7 +237,7 @@ class ExerciseDataModel {
                 : List<String>.from(json["formats"]!.map((x) => x)),
         extra: json["extra"] == null ? [] : List<ExtraDataModel>.from(json["extra"]!.map((x) => ExtraDataModel.fromJson(x))),
         id: json["_id"],
-        thumbnail: json["thumbnails"],
+        thumbnail: json["thumbnails"] ?? json["thumbnail"],
         isAddedUpdated: json["isAddedUpdated"],
       );
 
@@ -309,9 +309,11 @@ class WarmupDataModel {
   String? guide;
   List<String>? formats;
   String? id;
+  String? thumbnail;
 
   WarmupDataModel({
     this.typeId,
+    this.thumbnail,
     this.warmupId,
     this.title,
     this.guide,
@@ -322,6 +324,7 @@ class WarmupDataModel {
   factory WarmupDataModel.fromJson(Map<String, dynamic> json) => WarmupDataModel(
         typeId: json["typeId"],
         warmupId: json["warmupId"],
+        thumbnail: json["thumbnail"],
         title: json["title"],
         guide: json["guide"],
         formats: json["formats"].runtimeType.toString() == "String"
@@ -334,6 +337,7 @@ class WarmupDataModel {
 
   Map<String, dynamic> toJson() => {
         "typeId": typeId,
+        "thumbnail": thumbnail,
         "warmupId": warmupId,
         "title": title,
         "guide": guide,

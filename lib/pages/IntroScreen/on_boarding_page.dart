@@ -144,7 +144,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       body: Stack(
         children: [
           _isVideoInitialized
-              ? SizedBox.expand(child: VideoPlayer(_videoController))
+              ? SizedBox(height: media.height / 1.37, child: VideoPlayer(_videoController))
               : SizedBox(
                   width: ScreenUtil.horizontalScale(100),
                   child: Image.asset(

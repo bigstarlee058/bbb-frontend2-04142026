@@ -19,7 +19,8 @@ class CircuitsView extends StatefulWidget {
     super.key,
     required this.circuit,
     required this.isDayCompleted,
-    required this.isDaySkipped, required this.isEditable,
+    required this.isDaySkipped,
+    required this.isEditable,
   });
 
   @override
@@ -278,7 +279,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                                                           "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
-                                                      monthProvider.updateWarmUp(false);
+                                                      monthProvider.updateWarmUp(false, "");
                                                       monthProvider.updateIsLastExercise(false);
 
                                                       await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
@@ -299,7 +300,7 @@ class _CircuitsViewState extends State<CircuitsView> {
                                                           "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                       monthProvider.setSelectedExercise(
                                                           widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
-                                                      monthProvider.updateWarmUp(false);
+                                                      monthProvider.updateWarmUp(false, "");
                                                       monthProvider.updateIsLastExercise(false);
 
                                                       await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(

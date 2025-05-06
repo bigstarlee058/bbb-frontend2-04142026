@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -52,8 +51,6 @@ class _ExercisePageState extends State<ExercisePage> {
   int isExercise = 0;
   String tempSetAddress = "";
   bool tempSetAddressLoader = false;
-
-  final GlobalKey _containerKey = GlobalKey();
 
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
@@ -310,14 +307,19 @@ class _ExercisePageState extends State<ExercisePage> {
         exerciseName = monthProvider!.exerciseDetailModel?.title ?? "";
       }
     } else {
+      await monthProvider!.fetchWarmUp(monthProvider!.warmupId).then(
+        (value) {
+          exerciseDesc = monthProvider!.warmUpModel?.description ?? "";
+          exerciseName = monthProvider!.warmUpModel?.title ?? "";
+        },
+      );
+
       // if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
       //   initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
       // } else {
       //   loading = false;
       //   videoNotInitialized = false;
       // }
-      exerciseDesc = monthProvider!.warmUpModel?.description ?? "";
-      exerciseName = monthProvider!.warmUpModel?.title ?? "";
     }
 
     monthProvider?.fetchExerciseHistoryLocalData();
@@ -496,11 +498,8 @@ class _ExercisePageState extends State<ExercisePage> {
         _videoPlayerController.dispose();
       }
       AudioManager.abandonAudioFocus();
-
+      monthProvider?.clearWarmupModel();
       await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO");
-
-      monthProvider?.selectedExercise == null;
-      monthProvider?.exerciseDetailModel == null;
     });
 
     super.dispose();
@@ -527,6 +526,7 @@ class _ExercisePageState extends State<ExercisePage> {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
+
     warmUpIndex = 0;
     backOffIndex = 0;
     workingIndex = 0;
@@ -543,7 +543,7 @@ class _ExercisePageState extends State<ExercisePage> {
                 color: AppColors.primaryColor,
               ),
             )
-          : monthProvider!.exerciseDetailModel == null || (isExercise == 0 && monthProvider?.warmUpModel == null)
+          : (isExercise == 1 && monthProvider!.exerciseDetailModel == null) || (isExercise == 0 && monthProvider?.warmUpModel == null)
               ? Column(
                   children: [
                     backButton(media, context),
@@ -812,15 +812,22 @@ class _ExercisePageState extends State<ExercisePage> {
                           style: TextStyle(color: Colors.white),
                         ),
                       )
-                    : appShimmerImage(
-                        height: videoNotAvailable ? media.height * 0.4 : media.height * 0.8,
-                        width: double.infinity,
-                        isBlur: true,
-                        networkImageUrl: isExercise == 1
-                            ? monthProvider?.exerciseDetailModel?.thumbnail ?? ""
-                            : monthProvider?.warmUpModel?.thumbnail ?? "",
-                        fit: BoxFit.fill,
-                      )),
+                    : Padding(
+                        padding: EdgeInsets.only(bottom: media.height * 0.1),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+
+                // appShimmerImage(
+                //         height: videoNotAvailable ? media.height * 0.4 : media.height * 0.8,
+                //         width: double.infinity,
+                //         isBlur: true,
+                //         networkImageUrl:
+                //             isExercise == 1 ? monthProvider?.exerciseDetailModel?.thumbnail ?? "" : monthProvider?.warmUpModel?.thumbnail ?? "",
+                //         fit: BoxFit.fill,
+                //       ),
+                ),
       );
 
   Widget warmupButton(BuildContext context) {
@@ -1260,7 +1267,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                               String dataId =
                                                   "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${circuitExercises[exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                               monthProvider.setSelectedExercise(circuitExercises[exerciseIndex], exerciseIndex);
-                                              monthProvider.updateWarmUp(false);
+                                              monthProvider.updateWarmUp(false, "");
                                               monthProvider.updateIsLastExercise(false);
                                               Navigator.pop(context);
                                               await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
@@ -1291,7 +1298,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                                       .any((element) => element.dataId == dataId && element.status == Status.completed);
                                                   if (val == false) {
                                                     monthProvider.setSelectedExercise(elementI, i);
-                                                    monthProvider.updateWarmUp(false);
+                                                    monthProvider.updateWarmUp(false, "");
 
                                                     bool isLast = i ==
                                                         exerciseList
