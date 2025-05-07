@@ -220,26 +220,24 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Align(
                         alignment: Alignment.topLeft,
-                        child: SafeArea(
-                          child: BackArrowWidget(onPress: () {
-                            Navigator.pop(context);
-                          }),
-                        ),
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(15)),
-                          height: media.height / 7,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
-                          ),
-                        ),
+                        child: BackArrowWidget(onPress: () {
+                          Navigator.pop(context);
+                        }),
                       ),
                     ],
                   ),
                 ),
               ],
+            ),
+            Positioned(
+              top: ScreenUtil.horizontalScale(42),
+              child: Container(
+                height: 120,
+                width: media.width,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                ),
+              ),
             ),
             Positioned(
                 bottom: -0.7,
@@ -313,7 +311,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: ScreenUtil.verticalScale(2.2)),
                             AppTextFormField(
                               hintText: 'Your Password',
                               keyboardType: TextInputType.visiblePassword,
@@ -348,7 +346,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 12),
+                            SizedBox(height: ScreenUtil.verticalScale(1.5)),
                             Text.rich(TextSpan(
                               style: const TextStyle(
                                 fontSize: 16,
@@ -375,7 +373,7 @@ class _LoginPageState extends State<LoginPage> {
                               ],
                             )),
                             SizedBox(
-                              height: ScreenUtil.horizontalScale(9),
+                              height: ScreenUtil.verticalScale(4.2),
                             ),
                             ButtonWidget(
                               text: 'Sign in',
@@ -391,8 +389,8 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               isLoading: isLoading,
                             ),
-                            const SizedBox(
-                              height: 6,
+                            SizedBox(
+                              height: ScreenUtil.verticalScale(0.8),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -422,7 +420,7 @@ class _LoginPageState extends State<LoginPage> {
                               ],
                             ),
                             SizedBox(
-                              height: ScreenUtil.horizontalScale(7.2),
+                              height: ScreenUtil.verticalScale(3.4),
                             ),
                           ],
                         ),

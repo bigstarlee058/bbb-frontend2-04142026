@@ -72,20 +72,20 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         }),
                       ),
                     ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(0)),
-                        height: media.height / 7,
-                        width: media.width,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
             ],
+          ),
+          Positioned(
+            top: ScreenUtil.horizontalScale(28),
+            child: Container(
+              height: 120,
+              width: media.width,
+              decoration: const BoxDecoration(
+                image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+              ),
+            ),
           ),
           Positioned(
               bottom: -1.3,
