@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/AuthScreen/confirmation_screen.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
@@ -46,6 +50,52 @@ class _SignupPageState extends State<SignupPage> {
     setState(() {});
   }
 
+  void signInUser(String emailAddress, String password, String userName, String lastName) async {
+    if (emailAddress.isEmpty || password.isEmpty || userName.isEmpty || lastName.isEmpty) {
+      showBottomAlert(context, 'Please fill out the inputs');
+      return;
+    }
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final url = Uri.parse('https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signup_user');
+
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: {
+          'username': userName,
+          'lastname': lastName,
+          'email': emailAddress,
+          'password': password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        String message = data['message'];
+
+        if (message == "User registered") {
+          Navigator.pop(context);
+          showBottomAlert(context, 'Signup successfully sign in here.');
+        } else {
+          showBottomAlert(context, 'Failed to signup');
+        }
+      } else {
+        showBottomAlert(context, 'Signup failed');
+      }
+    } catch (e) {
+      showBottomAlert(context, 'An error occurred');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -59,21 +109,9 @@ class _SignupPageState extends State<SignupPage> {
             Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Container(
-                  height: media.height / 1,
-                  width: media.width,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: image.isNotEmpty
-                          ? NetworkImage(
-                              image.startsWith('https://storage.cloud.google.com/')
-                                  ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                  : image,
-                            )
-                          : const AssetImage('assets/img/card.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                Utils.appImage(
+                  media,
+                  image,
                   child: Column(
                     children: [
                       Align(
@@ -86,7 +124,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ],
                   ),
-                ),
+                )
               ],
             ),
             Positioned(
@@ -244,6 +282,16 @@ class _SignupPageState extends State<SignupPage> {
                               textColor: Colors.white,
                               color: AppColors.primaryColor,
                               onPress: () {
+                                if (_formKey.currentState?.validate() == true) {
+                                  signInUser(
+                                    emailController.text,
+                                    passwordController.text,
+                                    fNameController.text,
+                                    lNameController.text,
+                                  );
+                                }
+
+                                return;
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

@@ -66,20 +66,13 @@ class _MonthViewState extends State<MonthView> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";
-        await monthProvider?.fetchMonthLocalData().then(
-          (value) async {
-            await Future.delayed(Duration(seconds: 2)).then(
-              (value) {
-                monthProvider?.monthLocalDataModel.sort((a, b) => DateTime.parse(b.monthStartDate ?? "${DateTime.now()}")
-                    .compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
-                bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
-                if (!alreadySetUp && monthProvider!.isOnMonthPage) {
-                  openSettingDialog();
-                }
-              },
-            );
-          },
-        );
+
+        monthProvider?.monthLocalDataModel.sort((a, b) =>
+            DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));
+        bool alreadySetUp = (monthId == (monthProvider!.monthDataModel?.id ?? ""));
+        if (!alreadySetUp && monthProvider!.isOnMonthPage) {
+          openSettingDialog();
+        }
       },
     );
 

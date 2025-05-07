@@ -13,6 +13,7 @@ import 'package:bbb/pages/ChallengeView/joined_challeng_page.dart';
 import 'package:bbb/pages/CollectionView/collection_detail_page.dart';
 import 'package:bbb/pages/DashBoardScreen/join_the_challenge.dart';
 import 'package:bbb/pages/DashBoardScreen/meet_our_staff.dart';
+import 'package:bbb/pages/DashBoardScreen/program_phase_screen.dart';
 import 'package:bbb/pages/IntroScreen/on_boarding_page.dart';
 import 'package:bbb/pages/MonthView/DayCompletedPage/day_completed_page.dart';
 import 'package:bbb/pages/MonthView/DayOverviewPage/day_overview.dart';
@@ -231,9 +232,10 @@ class _MyAppState extends State<MyApp> {
             // AppRoutes.splashScreen: (context) => const SplashScreen(),
             AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
             AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-            AppRoutes.loginScreen: (context) => const LoginPage(image: ''),
+            AppRoutes.loginScreen: (context) => const LoginPage(),
             AppRoutes.registerScreen: (context) => const SignupPage(image: ''),
             AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
+            AppRoutes.programPhaseScreen: (context) => const ProgramPhaseScreen(),
             AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),
             AppRoutes.exerciseHistory: (context) => const ExerciseHistoryPage(),
             AppRoutes.exerciseLibraryDetailScreen: (context) => const ExerciseLibraryDetailPage(),

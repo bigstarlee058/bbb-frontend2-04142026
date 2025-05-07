@@ -44,4 +44,6 @@ abstract class BaseService<T> {
   static const addAchievementsList = "/api/achievements/add";
   static const fetchAchievementsList = "/api/achievements/fetch";
   static const deleteAchievementsList = "/api/achievements/delete";
+
+  static const signUpUser = "/api/users/signup_user";
 }

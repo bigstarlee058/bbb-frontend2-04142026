@@ -407,7 +407,7 @@ class _ExercisePageState extends State<ExercisePage> {
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: false,
-        looping: false,
+        looping: true,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
