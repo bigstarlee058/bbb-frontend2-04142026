@@ -154,20 +154,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           }),
                         ),
                       ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(20)),
-                          height: media.height / 7,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ],
+            ),
+            Positioned(
+              top: ScreenUtil.horizontalScale(48),
+              child: Container(
+                height: 120,
+                width: media.width,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                ),
+              ),
             ),
             Positioned(
                 bottom: -0.7,

@@ -16,19 +16,17 @@ class ProgramPhasesWidget extends StatelessWidget {
         Container(
           height: media.height / 1.8,
           width: media.width,
-          color: Colors.white, // Set the outside background color to white
+          color: Colors.white,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // Top white section
               Positioned(
                 top: -ScreenUtil.verticalScale(2.8),
                 left: 0,
                 right: 0,
-                height: media.height / 8, // Adjust height of white top section
-                child: Container(
+                height: media.height / 8,
+                child: SizedBox(
                   width: ScreenUtil.horizontalScale(60),
-                  // margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Text(
@@ -44,25 +42,14 @@ class ProgramPhasesWidget extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // // Bottom white section
-              // Positioned(
-              //   bottom: 0,
-              //   left: 0,
-              //   right: 0,
-              //   height: media.height / 8, // Adjust height of white bottom section
-              //   child: Container(
-              //     color: Colors.white,
-              //   ),
-              // ),
-              // // Middle image section with clip path
               Positioned.fill(
                 top: -ScreenUtil.verticalScale(2.6),
                 child: ClipPath(
                   clipper: MiddleClipper(),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      // color: Colors.grey[200],
+                      color: Color(0xFFEEEEEE).withValues(alpha: 0.8),
                       // image: DecorationImage(
                       //   image: const AssetImage('assets/img/pp_4.png'),
                       //   fit: BoxFit.cover,
@@ -71,14 +58,20 @@ class ProgramPhasesWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              // Centered content over the image
               Positioned.fill(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
+                      height: ScreenUtil.verticalScale(36.5),
+                      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.8)),
+                      child: Image.asset(
+                        "assets/img/program-phase.png",
+                      ),
+                    ),
+                    Container(
                       margin: EdgeInsets.only(
-                        bottom: ScreenUtil.verticalScale(10),
+                        bottom: ScreenUtil.verticalScale(8.5),
                         left: ScreenUtil.horizontalScale(18),
                         right: ScreenUtil.horizontalScale(18),
                       ),
@@ -99,9 +92,8 @@ class ProgramPhasesWidget extends StatelessWidget {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Container(
+                child: SizedBox(
                   width: ScreenUtil.horizontalScale(60),
-                  // margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(7), top: ScreenUtil.verticalScale(0)),
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Text(
