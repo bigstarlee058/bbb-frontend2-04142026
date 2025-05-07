@@ -48,16 +48,16 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                height: media.height / 1.6,
+                height: media.height / 1,
                 width: media.width,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: image.isNotEmpty
                         ? NetworkImage(
-                      image.startsWith('https://storage.cloud.google.com/')
-                          ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                          : image,
-                    )
+                            image.startsWith('https://storage.cloud.google.com/')
+                                ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                : image,
+                          )
                         : const AssetImage('assets/img/card.png'),
                     fit: BoxFit.cover,
                   ),

@@ -21,8 +21,7 @@ class AlertDialogState extends State<AppAlertDialog> {
     return AlertDialog(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      content: Text(widget.description,
-          style: GoogleFonts.plusJakartaSans(color: Colors.white)),
+      content: Text(widget.description, textAlign: TextAlign.center, style: GoogleFonts.plusJakartaSans(color: Colors.white)),
       backgroundColor: const Color(0xFF0D0D0D),
     );
   }

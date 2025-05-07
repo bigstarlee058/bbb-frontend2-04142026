@@ -197,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Container(
-                  height: media.height / 1.6,
+                  height: media.height / 1,
                   width: media.width,
                   decoration: BoxDecoration(
                     image: DecorationImage(

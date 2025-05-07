@@ -270,7 +270,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 3.199,
+                          height: media.height / 2.998,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -292,9 +292,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 Container(
                   width: media.width,
-                  constraints: BoxConstraints(minHeight: media.height - (media.height / 3.2)),
+                  constraints: BoxConstraints(minHeight: media.height - (media.height / 3)),
                   margin: EdgeInsets.only(
-                    top: media.height / 3.2,
+                    top: media.height / 3
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
