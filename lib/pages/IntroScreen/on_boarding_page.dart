@@ -5,6 +5,7 @@ import 'package:bbb/pages/AuthScreen/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/app_routes.dart';
@@ -30,6 +31,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   @override
   void initState() {
     super.initState();
+    updateImage();
     loadWelcomeContent();
     _checkLoginStatus();
     _videoController =
@@ -102,6 +104,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     }
   }
 
+  String image = '';
+
+  updateImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    image = prefs.getString("login_image") ?? '';
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _videoController.dispose();
@@ -143,19 +153,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Container(
+          SizedBox(
             height: media.height / 1,
             child: _isVideoInitialized
                 ? Align(
                     alignment: Alignment.topCenter,
                     child: SizedBox(height: media.height / 1.37, child: VideoPlayer(_videoController)),
                   )
-                : SizedBox(
-                    width: media.width,
-                    child: Image.asset(
-                      "assets/img/back.jpg",
-                      fit: BoxFit.cover,
-                    )),
+                : Utils.appImage(media, image),
           ),
           Positioned(
             top: ScreenUtil.horizontalScale(50),

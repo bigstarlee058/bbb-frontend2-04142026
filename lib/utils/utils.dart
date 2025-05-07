@@ -1,3 +1,5 @@
+import 'package:bbb/utils/cache_image_manager.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,6 +14,26 @@ class Utils {
   static BorderRadius buttonRadius = BorderRadius.circular(20);
 
   static RoundedRectangleBorder buttonStyle = RoundedRectangleBorder(borderRadius: buttonRadius);
+
+  static appImage(Size media, String image, {Widget? child}) {
+    return Container(
+      height: media.height / 1,
+      width: media.width,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: image.isNotEmpty
+              ? CachedNetworkImageProvider(
+                  image.startsWith('https://storage.cloud.google.com/')
+                      ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                      : image,
+                  cacheManager: CustomCacheManager())
+              : const AssetImage('assets/img/back.jpg'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: child,
+    );
+  }
 }
 
 extension StringCasingExtension on String {

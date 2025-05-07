@@ -1,6 +1,7 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/material.dart';
 
 class ProgramPhasesWidget extends StatelessWidget {
@@ -80,7 +81,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                         textColor: Colors.white,
                         color: AppColors.primaryColor,
                         onPress: () {
-                          // Navigator.pushNamed(context, '/joinChallenge');
+                          Navigator.pushNamed(context, AppRoutes.programPhaseScreen);
                         },
                         isLoading: false,
                       ),
