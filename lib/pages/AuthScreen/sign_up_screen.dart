@@ -60,7 +60,7 @@ class _SignupPageState extends State<SignupPage> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Container(
-                  height: media.height / 1.6,
+                  height: media.height / 1,
                   width: media.width,
                   decoration: BoxDecoration(
                     image: DecorationImage(

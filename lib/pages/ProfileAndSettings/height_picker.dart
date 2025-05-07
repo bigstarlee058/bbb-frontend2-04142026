@@ -258,21 +258,18 @@ Future<void> showCupertinoHeightPicker({
             topLeft: Radius.circular(ScreenUtil.verticalScale(4)),
             topRight: Radius.circular(ScreenUtil.verticalScale(4)),
           ),
-          child: SafeArea(
-            top: false,
-            child: SizedBox(
-              height: modalHeight,
-              width: maxModalWidth ?? double.infinity,
-              child: ColoredBox(
-                color: modalBackgroundColor ?? CupertinoColors.systemBackground.resolveFrom(context),
-                child: HeightPicker(
-                  key: key,
-                  initialHeight: initialHeight,
-                  initialSelectedHeightUnit: initialSelectedHeightUnit,
-                  showSeparationText: showSeparationText,
-                  canConvertUnit: canConvertUnit,
-                  onHeightChanged: onHeightChanged,
-                ),
+          child: SizedBox(
+            height: modalHeight,
+            width: maxModalWidth ?? double.infinity,
+            child: ColoredBox(
+              color: modalBackgroundColor ?? CupertinoColors.systemBackground.resolveFrom(context),
+              child: HeightPicker(
+                key: key,
+                initialHeight: initialHeight,
+                initialSelectedHeightUnit: initialSelectedHeightUnit,
+                showSeparationText: showSeparationText,
+                canConvertUnit: canConvertUnit,
+                onHeightChanged: onHeightChanged,
               ),
             ),
           ),
