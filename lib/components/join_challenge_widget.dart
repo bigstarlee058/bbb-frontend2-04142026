@@ -14,59 +14,52 @@ class JoinChallengeWidget extends StatelessWidget {
     ScreenUtil.init(context);
 
     return Container(
-      height: media.height / 1.8,
+      height: media.height / 1.6,
       width: media.width,
-      color: Colors.white, // Set the outside background color to white
+      color: Colors.white,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Top white section
-          // Positioned(
-          //   top: 0,
-          //   left: 0,
-          //   right: 0,
-          //   height: media.height / 8, // Adjust height of white top section
-          //   child: Container(
-          //     color: Colors.white,
-          //   ),
-          // ),
-          // // Bottom white section
-          // Positioned(
-          //   bottom: 0,
-          //   left: 0,
-          //   right: 0,
-          //   height: media.height / 8, // Adjust height of white bottom section
-          //   child: Container(
-          //     color: Colors.white,
-          //   ),
-          // ),
-          // // Middle image section with clip path
           Positioned.fill(
             top: 0,
-            child: ClipPath(
-              clipper: MiddleClipper(),
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: featureChallenge.photo.isNotEmpty
-                        ? NetworkImage(featureChallenge.photo.startsWith('https://storage.cloud.google.com/')
-                            ? featureChallenge.photo.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                            : featureChallenge.photo)
-                        : const AssetImage('assets/img/pp_4.png'),
-                    fit: BoxFit.cover,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        height: (media.height / 1.8) / 3,
+                        color: Colors.grey[200],
+                      )
+                    ],
                   ),
                 ),
-              ),
+                ClipPath(
+                  clipper: MiddleClipper(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: featureChallenge.photo.isNotEmpty
+                            ? NetworkImage(featureChallenge.photo.startsWith('https://storage.cloud.google.com/')
+                                ? featureChallenge.photo
+                                    .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                : featureChallenge.photo)
+                            : const AssetImage('assets/img/pp_4.png'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          // Centered content over the image
           Positioned.fill(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
+                SizedBox(
                   width: ScreenUtil.horizontalScale(50),
-                  // margin: EdgeInsets.only(top: ScreenUtil.verticalScale(0.4)),
                   child: Text(
                     featureChallenge.title,
                     maxLines: 2,

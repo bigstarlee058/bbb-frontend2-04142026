@@ -15,14 +15,25 @@ class ProgramPhasesWidget extends StatelessWidget {
     return Column(
       children: [
         Container(
-          height: media.height / 1.8,
+          height: media.height / 1.9,
           width: media.width,
           color: Colors.white,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
+              Positioned.fill(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: (media.height / 1.8) / 3,
+                      color: Colors.grey[200],
+                    )
+                  ],
+                ),
+              ),
               Positioned(
-                top: -ScreenUtil.verticalScale(2.8),
+                top: -ScreenUtil.verticalScale(3.2),
                 left: 0,
                 right: 0,
                 height: media.height / 8,
@@ -31,7 +42,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Text(
-                      "Program Phases",
+                      "Periodization Cycle",
                       maxLines: 2,
                       textAlign: TextAlign.left,
                       style: TextStyle(
@@ -49,8 +60,8 @@ class ProgramPhasesWidget extends StatelessWidget {
                   clipper: MiddleClipper(),
                   child: Container(
                     decoration: BoxDecoration(
-                      // color: Colors.grey[200],
-                      color: Color(0xFFEEEEEE).withValues(alpha: 0.8),
+                      color: Colors.grey[200],
+                      // color: Color(0xFFEEEEEE),
                       // image: DecorationImage(
                       //   image: const AssetImage('assets/img/pp_4.png'),
                       //   fit: BoxFit.cover,

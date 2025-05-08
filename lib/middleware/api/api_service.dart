@@ -17,10 +17,10 @@ class ApiService extends BaseService {
   }
 
   Future<dynamic> getResponse({required APIType apiType, required String url, Map<String, dynamic>? body}) async {
+    String mainUrl = AppConstants.serverUrl + url;
     try {
       String? userIdToken = await getAuthToken();
       Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
-      String mainUrl = AppConstants.serverUrl + url;
 
       Response result;
 
@@ -41,7 +41,7 @@ class ApiService extends BaseService {
 
       return returnResponse(result.statusCode ?? 500, result.data);
     } catch (e) {
-      log('Error=>.ERROR. $e');
+      log('Error=>$mainUrl ERROR. $e');
       return null;
     }
   }

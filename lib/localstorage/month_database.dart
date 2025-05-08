@@ -207,6 +207,7 @@ class DatabaseHelper {
       DatabaseHelper.exerciseNotes,
       DatabaseHelper.extraExerciseHistory,
       DatabaseHelper.swapExerciseHistory,
+      DatabaseHelper.achievementHistory,
     ];
 
     try {
@@ -384,5 +385,25 @@ class DatabaseHelper {
   Future<void> deleteAllData(String tableName) async {
     Database db = await database;
     await db.delete(tableName);
+  }
+
+  Future<void> clearAllTables() async {
+    List<String> tables = [
+      monthHistory,
+      dayStatus,
+      exerciseHistory,
+      exerciseStatus,
+      circuitManager,
+      extraSetHistory,
+      removedExerciseHistory,
+      exerciseNotes,
+      extraExerciseHistory,
+      swapExerciseHistory,
+      achievementHistory,
+    ];
+
+    for (var element in tables) {
+      await deleteAllData(element);
+    }
   }
 }
