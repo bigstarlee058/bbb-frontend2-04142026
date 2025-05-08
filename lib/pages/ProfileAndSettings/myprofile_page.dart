@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -71,28 +70,31 @@ class _MyProfilePageState extends State<MyProfilePage> {
     setState(() {
       _id = userData1['_id'];
       selectedName = userData1["name"];
-      selectedDate = DateTime.parse(userData1["detail"]['dob']);
-      selectedWeight.text = '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
-      selectedHeight.text =
-          '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"'; //'${userData['detail']['height']}\'0"';
-      log('   int.parse(userData1["detail"]["height"].toString()[0]), :::::::::::::::::: ${int.parse(userData1["detail"]["height"].toString()[0])}');
+      selectedDate = userData1["detail"]['dob'] == null ? null : DateTime.parse(userData1["detail"]['dob']);
+      selectedWeight.text =
+          userData1["detail"]["weight"] == null ? "" : '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
+      selectedHeight.text = userData1["detail"]["height"] == null
+          ? ""
+          : '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"'; //'${userData['detail']['height']}\'0"';
 
-      double inches = double.parse(
-          "${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}");
-      log('inches :::::::::::::::::: ${inches}');
-      heightInCm = convertToInches(
-          int.parse(userData1["detail"]["height"].toString()[0]),
-          double.parse(
-              "${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"));
-      selectedLocation = userData1['detail']['location'];
-      _imageUrl = userData1['detail']['avatarUrl'];
-      selectedGender = genderOptions[userData1['detail']['sex'] == true ? 1 : 0];
-      selectedGoal = userData1['detail']['mygoal'];
-
+      heightInCm = userData1["detail"]["height"] == null
+          ? 183
+          : convertToInches(
+              int.parse(userData1["detail"]["height"].toString()[0]),
+              double.parse(
+                  "${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"));
+      selectedLocation = userData1['detail']['location'] ?? "";
+      _imageUrl = userData1['detail']['avatarUrl'] ?? "";
+      selectedGender = genderOptions[userData1['detail']['sex'] == null
+          ? 1
+          : userData1['detail']['sex'] == true
+              ? 1
+              : 0];
+      selectedGoal = userData1['detail']['mygoal'] ?? "";
       if (userData1['detail']['country'] == null || userData1['detail']['country'] == '') {
-        locationProvider.generateToken();
+        locationProvider.setAndCallApi();
       } else {
-        locationProvider.fillDetails(userData1['detail']['country'], userData1['detail']['state'], userData1['detail']['city']);
+        locationProvider.fillDetails(userData1['detail']['country'], userData1['detail']['state'] ?? "", userData1['detail']['city'] ?? "");
       }
     });
     setState(() => loader = false);
@@ -293,9 +295,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 Container(
                   width: media.width,
                   constraints: BoxConstraints(minHeight: media.height - (media.height / 3)),
-                  margin: EdgeInsets.only(
-                    top: media.height / 3
-                  ),
+                  margin: EdgeInsets.only(top: media.height / 3),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -375,7 +375,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     context: context,
                                     label: 'Country',
                                     value: value.selectedCountry,
-                                    options: value.country.map((e) => e.countryName).toList(),
+                                    options: value.country?.countries ?? [],
                                     hint: 'Country',
                                     onChanged: value.onCountrySelect,
                                   ),
@@ -383,7 +383,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     context: context,
                                     label: 'State',
                                     value: value.selectedState,
-                                    options: value.states.map((e) => e.stateName).toList(),
+                                    options: value.states?.states ?? [],
                                     hint: 'State',
                                     onChanged: value.onStateSelect,
                                   ),
@@ -391,7 +391,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     context: context,
                                     label: 'City',
                                     value: value.selectedCity,
-                                    options: value.cities.map((e) => e.cityName).toList(),
+                                    options: value.cities?.cities ?? [],
                                     hint: 'City',
                                     onChanged: value.onCitySelect,
                                   ),
@@ -495,7 +495,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontSize: 16,
+                      color: Colors.black,
+                      fontSize: ScreenUtil.verticalScale(2.3),
                       // fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
                       fontWeight: FontWeight.normal,
                     ),
@@ -577,7 +578,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   }).toList(),
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 16,
+                    fontSize: ScreenUtil.verticalScale(2.3),
                     fontWeight: FontWeight.normal,
                   ),
                   onChanged: onChanged,
@@ -639,14 +640,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
           Expanded(
             flex: 3,
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.horizontalScale(1),
-              ),
+              height: ScreenUtil.verticalScale(6),
+              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  ScreenUtil.verticalScale(5),
-                ),
+                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                 boxShadow: const [
                   BoxShadow(
                     color: Color(0x20888888),
@@ -656,56 +654,70 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                 ],
               ),
-              child: Center(
-                child: KeyboardActions(
-                  autoScroll: false,
-                  config: _buildConfig(context),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      IntrinsicWidth(
-                        child: TextField(
-                          controller: value,
-                          keyboardType: TextInputType.number,
-                          onSubmitted: (value) {
-                            FocusScope.of(context).unfocus();
-                          },
-                          textInputAction: TextInputAction.done,
-                          textAlign: TextAlign.center,
-                          focusNode: _nodeText1,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
+              child: KeyboardActions(
+                autoScroll: false,
+                config: _buildConfig(context),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IntrinsicWidth(
+                      child: TextFormField(
+                        style: TextStyle(
+                          fontSize: ScreenUtil.verticalScale(2.3),
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        controller: value,
+                        keyboardType: TextInputType.number,
+                        onFieldSubmitted: (value) {
+                          FocusScope.of(context).unfocus();
+                        },
+                        textInputAction: TextInputAction.done,
+                        textAlign: TextAlign.center,
+                        focusNode: _nodeText1,
+                        decoration: InputDecoration(
+                          hintText: "Weight",
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: ScreenUtil.verticalScale(2.3),
+                            fontWeight: FontWeight.normal,
                           ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            TextInputFormatter.withFunction(
-                              (oldValue, newValue) {
-                                String newText = newValue.text;
-                                if (newText.isNotEmpty) {
-                                  newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                                }
-                                return TextEditingValue(
-                                  text: newText,
-                                  selection: TextSelection.collapsed(offset: newText.length),
-                                );
-                              },
+                          suffix: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Text(
+                              "lbs",
+                              style: TextStyle(
+                                fontSize: ScreenUtil.verticalScale(2.3),
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
-                          ],
+                          ),
+                          border: InputBorder.none,
+                          isCollapsed: true, // makes it tighter vertically
+                          contentPadding: EdgeInsets.zero,
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            String newText = newValue.text;
+                            if (newText.isNotEmpty) {
+                              newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                            }
+                            return TextEditingValue(
+                              text: newText,
+                              selection: TextSelection.collapsed(offset: newText.length),
+                            );
+                          }),
+                        ],
                       ),
-                      IntrinsicWidth(
-                        child: Text(
-                          "lbs",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );
@@ -755,8 +767,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ],
               ),
               child: Center(
-                child: TextField(
-                  readOnly: true,
+                child: GestureDetector(
                   onTap: () async {
                     await showCupertinoHeightPicker(
                       context: context,
@@ -774,13 +785,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       },
                     );
                   },
-                  controller: value,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
+                  child: Text(
+                    value.text.isEmpty ? 'Height' : value.text,
+                    style: TextStyle(
+                      color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                      fontSize: ScreenUtil.verticalScale(2.3),
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),

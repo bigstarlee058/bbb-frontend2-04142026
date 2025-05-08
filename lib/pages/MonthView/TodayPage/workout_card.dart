@@ -132,55 +132,56 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
     return Slidable(
       enabled: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted ? false : true,
-      endActionPane: null,
-      // widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted
-      //     ? null
-      //     : widget.enabled
-      //         ? ActionPane(
-      //             extentRatio: 0.35,
-      //             motion: const ScrollMotion(),
-      //             children: [
-      //               SizedBox(
-      //                 width: ScreenUtil.horizontalScale(5),
-      //               ),
-      //               SizedBox(
-      //                 height: ScreenUtil.verticalScale(4),
-      //                 width: ScreenUtil.verticalScale(4),
-      //                 child: Row(
-      //                   children: [
-      //                     SlidableAction(
-      //                       onPressed: (context) => widget.openSwapModal!(),
-      //                       icon: Icons.swap_horiz,
-      //                       backgroundColor: Colors.blue,
-      //                       foregroundColor: Colors.white,
-      //                       padding: const EdgeInsets.all(0),
-      //                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-      //                     ),
-      //                   ],
-      //                 ),
-      //               ),
-      //               SizedBox(
-      //                 width: ScreenUtil.horizontalScale(5),
-      //               ),
-      //               SizedBox(
-      //                 height: ScreenUtil.verticalScale(4),
-      //                 width: ScreenUtil.verticalScale(4),
-      //                 child: Row(
-      //                   children: [
-      //                     SlidableAction(
-      //                       onPressed: (context) => widget.onRemove(),
-      //                       icon: Icons.close,
-      //                       backgroundColor: Colors.red,
-      //                       foregroundColor: Colors.white,
-      //                       padding: const EdgeInsets.all(0),
-      //                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-      //                     ),
-      //                   ],
-      //                 ),
-      //               ),
-      //             ],
-      //           )
-      //         : null,
+      endActionPane: widget.isEditMode
+          ? null
+          : widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted
+              ? null
+              : widget.enabled
+                  ? ActionPane(
+                      extentRatio: 0.35,
+                      motion: const ScrollMotion(),
+                      children: [
+                        SizedBox(
+                          width: ScreenUtil.horizontalScale(5),
+                        ),
+                        SizedBox(
+                          height: ScreenUtil.verticalScale(4),
+                          width: ScreenUtil.verticalScale(4),
+                          child: Row(
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) => widget.openSwapModal!(),
+                                icon: Icons.swap_horiz,
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.all(0),
+                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: ScreenUtil.horizontalScale(5),
+                        ),
+                        SizedBox(
+                          height: ScreenUtil.verticalScale(4),
+                          width: ScreenUtil.verticalScale(4),
+                          child: Row(
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) => widget.onRemove(),
+                                icon: Icons.close,
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.all(0),
+                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : null,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(
@@ -317,7 +318,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                               ),
                             ),
                             Text(
-                              "$totalSets working set${totalSets > 1 ? "s" : ""}",
+                              "$totalSets working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),

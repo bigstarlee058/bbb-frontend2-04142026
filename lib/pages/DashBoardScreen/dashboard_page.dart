@@ -708,7 +708,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                                 child: Consumer<MonthProvider>(
                                   builder: (context, value, child) {
-                                    if (value.currentWeek == 0 || (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
+                                    if (monthProvider.monthDataModel == null ||
+                                        value.currentWeek == 0 ||
+                                        (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
 
                                     final startTime = value.startTime ?? DateTime.now();
 
@@ -1001,7 +1003,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: ScreenUtil.horizontalScale(3.5), vertical: ScreenUtil.horizontalScale(5)),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[100],
+                                    color: Colors.grey[200],
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   alignment: Alignment.center,
@@ -1061,24 +1063,24 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                   crossAxisAlignment: CrossAxisAlignment.center,
                                                                   children: [
                                                                     SvgPicture.asset(
-                                                                      height: ScreenUtil.verticalScale(7),
+                                                                      height: ScreenUtil.verticalScale(8),
                                                                       data[index]["image"],
                                                                       colorFilter:
                                                                           ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
                                                                       fit: BoxFit.contain,
                                                                     ),
-                                                                    const SizedBox(height: 10),
-                                                                    Text(
-                                                                      data[index]["title"],
-                                                                      maxLines: 1,
-                                                                      textAlign: TextAlign.center,
-                                                                      overflow: TextOverflow.ellipsis,
-                                                                      style: TextStyle(
-                                                                        fontSize: ScreenUtil.verticalScale(1.45),
-                                                                        color: AppColors.primaryColor,
-                                                                        fontWeight: FontWeight.bold,
-                                                                      ),
-                                                                    ),
+                                                                    // const SizedBox(height: 10),
+                                                                    // Text(
+                                                                    //   data[index]["title"],
+                                                                    //   maxLines: 1,
+                                                                    //   textAlign: TextAlign.center,
+                                                                    //   overflow: TextOverflow.ellipsis,
+                                                                    //   style: TextStyle(
+                                                                    //     fontSize: ScreenUtil.verticalScale(1.45),
+                                                                    //     color: AppColors.primaryColor,
+                                                                    //     fontWeight: FontWeight.bold,
+                                                                    //   ),
+                                                                    // ),
                                                                   ],
                                                                 ),
                                                               ),

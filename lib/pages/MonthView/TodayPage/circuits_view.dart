@@ -253,7 +253,6 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         if (indexW != -1) {
                                           data = monthProvider.circuitModel[indexW];
                                         }
-
                                         return WorkoutCard(
                                           isEditMode: widget.isEditable,
                                           image: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].thumbnail ?? "unknown",
@@ -269,49 +268,53 @@ class _CircuitsViewState extends State<CircuitsView> {
                                                   .any((element) => element.dataId == dataId && element.status == Status.skipped) ||
                                               isExist,
                                           exerciseIndex: exerciseIndex,
-                                          onPress: indexW == -1
-                                              ? roundIndex == 0
-                                                  ? (Function()? function) async {
-                                                      monthProvider.updateIsCircuit(true);
-                                                      monthProvider.updateCircuit(
-                                                          "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
-                                                      String dataId =
-                                                          "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
-                                                      monthProvider.setSelectedExercise(
-                                                          widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
-                                                      monthProvider.updateWarmUp(false, "");
-                                                      monthProvider.updateIsLastExercise(false);
+                                          onPress: widget.isEditable
+                                              ? (Function()? function) {}
+                                              : indexW == -1
+                                                  ? roundIndex == 0
+                                                      ? (Function()? function) async {
+                                                          monthProvider.updateIsCircuit(true);
+                                                          monthProvider.updateCircuit(
+                                                              "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
+                                                          String dataId =
+                                                              "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
+                                                          monthProvider.setSelectedExercise(
+                                                              widget.circuit[circuitsIndex].circuitExercises![exerciseIndex],
+                                                              exerciseIndex);
+                                                          monthProvider.updateWarmUp(false, "");
+                                                          monthProvider.updateIsLastExercise(false);
 
-                                                      await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
-                                                        (value) {
-                                                          function!();
-                                                        },
-                                                      );
+                                                          await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
+                                                            (value) {
+                                                              function!();
+                                                            },
+                                                          );
 
-                                                      monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
-                                                    }
-                                                  : null
-                                              : ((data.lastRound ?? 1) - 1) >= widget.circuit[circuitsIndex].selectedDot!
-                                                  ? (Function()? function) async {
-                                                      monthProvider.updateIsCircuit(true);
-                                                      monthProvider.updateCircuit(
-                                                          "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
-                                                      String dataId =
-                                                          "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
-                                                      monthProvider.setSelectedExercise(
-                                                          widget.circuit[circuitsIndex].circuitExercises![exerciseIndex], exerciseIndex);
-                                                      monthProvider.updateWarmUp(false, "");
-                                                      monthProvider.updateIsLastExercise(false);
+                                                          monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
+                                                        }
+                                                      : null
+                                                  : ((data.lastRound ?? 1) - 1) >= widget.circuit[circuitsIndex].selectedDot!
+                                                      ? (Function()? function) async {
+                                                          monthProvider.updateIsCircuit(true);
+                                                          monthProvider.updateCircuit(
+                                                              "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
+                                                          String dataId =
+                                                              "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
+                                                          monthProvider.setSelectedExercise(
+                                                              widget.circuit[circuitsIndex].circuitExercises![exerciseIndex],
+                                                              exerciseIndex);
+                                                          monthProvider.updateWarmUp(false, "");
+                                                          monthProvider.updateIsLastExercise(false);
 
-                                                      await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
-                                                        (value) {
-                                                          function!();
-                                                        },
-                                                      );
+                                                          await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
+                                                            (value) {
+                                                              function!();
+                                                            },
+                                                          );
 
-                                                      monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
-                                                    }
-                                                  : null,
+                                                          monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
+                                                        }
+                                                      : null,
                                           openSwapModal: () {},
                                           exercise: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex],
                                           exerciseData: exercise.exerciseId ?? "",

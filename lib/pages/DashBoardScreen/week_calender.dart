@@ -75,6 +75,7 @@ class _WeekCalenderState extends State<WeekCalender> {
 
   Widget? _buildDayState(DateTime date) {
     final nowUtc = DateTime.now();
+
     if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
       DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
           .map(

@@ -1425,6 +1425,7 @@ class MonthProvider extends ChangeNotifier {
   }
 
   ExerciseHistoryModel? exerciseHistoryDetails;
+
   Future<void> fetchExerciseSingleExerciseLocalData(dataId) async {
     try {
       final data = await DatabaseHelper().getDataByDataId(tableName: DatabaseHelper.exerciseStatus, id: dataId);
@@ -1640,6 +1641,7 @@ class MonthProvider extends ChangeNotifier {
   }
 
   List<MonthResponseModel> monthLocalDataModel = [];
+
   Future<void> fetchMonthLocalData() async {
     try {
       final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.monthHistory);
@@ -1671,84 +1673,6 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
     exerciseReportGraphData(weekNumber: int.parse(week.toString().replaceAll("Week ", "")));
   }
-
-  // Map<String, Map<String, dynamic>> filterChartData() {
-  //   // try {
-  //   maximumValueOfWeight = 0;
-  //   maximumValueOfTotalEx = 0;
-  //   maximumValueOfTotalTime = 0;
-  //   const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
-  //   DateTime today = DateTime.now().toUtc();
-  //   DateTime sixDaysAgo = today.subtract(const Duration(days: 6));
-  //   List<DayHistoryModel> filteredData = allDayHistoryModel.where((entry) {
-  //     if (entry.status != Status.completed) {
-  //       return false;
-  //     }
-  //     DateTime entryDate = entry.endTime!;
-  //     DateTime localTime = Utils.formattedDate("$entryDate");
-  //     return localTime.isAfter(sixDaysAgo) && localTime.isBefore(today.add(const Duration(days: 1)));
-  //   }).toList();
-  //
-  //   Map<String, Map<String, dynamic>> combinedData = {};
-  //   for (var element in filteredData) {
-  //     if (element.status == Status.completed) {
-  //       DateTime dateDateTime = element.date!;
-  //       DateTime localTime = Utils.formattedDate("$dateDateTime");
-  //       DateTime aDate = element.startTime!;
-  //       DateTime localTimeADate = Utils.formattedDate("$aDate");
-  //       DateTime bDate = element.endTime!;
-  //       DateTime localTimeBDate = Utils.formattedDate("$bDate");
-  //
-  //       String date = localTime.toIso8601String().split('T')[0];
-  //       double totalWeight = double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
-  //       int completedExercise = int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
-  //
-  //       int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
-  //
-  //       String day = weekdays[localTime.weekday] ?? "";
-  //       if (combinedData.containsKey(date)) {
-  //         combinedData[date]!['totalWeight'] += totalWeight;
-  //         combinedData[date]!['completedExercise'] += completedExercise;
-  //         combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
-  //       } else {
-  //         combinedData[date] = {
-  //           'date': date,
-  //           'totalWeight': totalWeight,
-  //           'day': day,
-  //           'completedExercise': completedExercise,
-  //           'workoutTime': workoutTimeInSeconds,
-  //         };
-  //       }
-  //     }
-  //   }
-  //
-  //   combinedData.forEach((key, value) {
-  //     if (double.parse(value["totalWeight"].toString()) > maximumValueOfWeight) {
-  //       maximumValueOfWeight = double.parse(value["totalWeight"].toString());
-  //     }
-  //     if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
-  //       maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
-  //     }
-  //
-  //     final timeInSeconds = double.parse(value["workoutTime"].toString());
-  //     int hours = timeInSeconds ~/ 3600;
-  //
-  //     if (double.parse(value["workoutTime"].toString()) > maximumValueOfTotalTime) {
-  //       maximumValueOfTotalTime = double.parse(hours.toString());
-  //     }
-  //   });
-  //
-  //   maximumValueOfWeight += 3000;
-  //   maximumValueOfTotalEx += 6;
-  //   maximumValueOfTotalTime += 2;
-  //
-  //   notifyListeners();
-  //   return combinedData;
-  //   // } catch (e) {
-  //   //   debugPrint("Error filtering chart data: $e");
-  //   //   return {};
-  //   // }
-  // }
 
   Map<String, Map<String, dynamic>> filterChartData() {
     maximumValueOfWeight = 0;
@@ -2312,7 +2236,7 @@ class MonthProvider extends ChangeNotifier {
 
   /// ::::: ACHIEVEMENT
 
-  final List<Map<String, dynamic>> items = [
+  List<Map<String, dynamic>> items = [
     {
       "image": "assets/img/verified (1).svg",
       "active_image": "assets/img/verified (1).svg",
@@ -2485,6 +2409,7 @@ class MonthProvider extends ChangeNotifier {
   List<AchievementsModel> achievementsModel = [];
 
   updateAchievements() async {
+    achievementsModel = [];
     final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.achievementHistory);
     if (data.isNotEmpty) {
       achievementsModel = List<AchievementsModel>.from(json.decode(jsonEncode(data)).map((x) => AchievementsModel.fromJson(x)));
@@ -2655,7 +2580,7 @@ class MonthProvider extends ChangeNotifier {
         ApiRepo.addAchievementsList(body: data.toJson1());
       }
 
-      if (items[2]["isArchived"] == false) {
+      if (items[1]["isArchived"] == false) {
         final startDate = monthDataModel?.startDate ?? DateTime.now();
         final endDate = monthDataModel?.endDate ?? DateTime.now();
 
@@ -2834,6 +2759,282 @@ class MonthProvider extends ChangeNotifier {
   DateTime getWeekEndDate(DateTime weekStart, DateTime monthEnd) {
     DateTime weekEnd = weekStart.add(Duration(days: 6));
     return weekEnd.isAfter(monthEnd) ? monthEnd : weekEnd;
+  }
+
+  void clearAllValues() {
+    dayDataModel = null;
+    weekDataModel = null;
+    pumpDayModel = null;
+    pumpDays = [];
+    weekStatuses = [];
+    weekStatusesString = [];
+    restDayModel = [];
+    exerciseHistroy = [];
+    isPumpDay = false;
+    isPumpDayAvailable = false;
+    isPastWeek = false;
+    isCircuit = false;
+    isLastExercise = false;
+    settingLoader = false;
+    isOnMonthPage = false;
+    selectedWeekDate = DateTime.now();
+    todayTitleId = "";
+    currentDayTitleId = "";
+    circuitIndex = "";
+    circuitsIndex = 0;
+    streak = 0;
+    selectedSection = 0;
+    scrollToRestDay = false;
+    startTime = null;
+    endTime = null;
+    week = null;
+    actualWeek = null;
+    day = null;
+    currentWeek = 0;
+    overviewCurrentDay = 0;
+    overviewCurrentWeek = 0;
+    splitType = null;
+    equipmentType = "A";
+    monthDataModel = null;
+    warmUpModel = null;
+    warmupId = "";
+    weeksDataList = [];
+    isFilterLoading = false;
+    pastMonthDataModel = null;
+    lastSplit = [];
+    dayStatusList = [];
+    newStreakData = [];
+    newLastSplit = [];
+    loader = false;
+    loader1 = false;
+    isWarmup = false;
+    relatedExercises = [];
+    usedEquipments = [];
+
+    allExercisesMainList = "";
+    allFilterExercises = [];
+    allExercises = [];
+
+    selectedExIndex = 0;
+
+    exerciseDetailModel = null;
+    selectedExercise = null;
+
+    selectedWarmUpSetTotal = 0;
+    selectedBackOffSetTotal = 0;
+    selectedWorkingSetTotal = 0;
+
+    exerciseLoader = false;
+    timerAddress = "";
+    timePassed = "";
+    currentExpandedItem = "0:0";
+
+    expandedDataHistory;
+    historyDataModel = [];
+    exerciseWiseHistoryDataModel = [];
+    exerciseHistoryModel = [];
+    exerciseHistoryDetails;
+    dayHistoryModel = [];
+    allDayHistoryModel = [];
+    allSplitDayHistoryModel = [];
+    dayHistoryDetails;
+    circuitModel = [];
+    allRemovedExercise = [];
+    addedExerciseList = [];
+    swapExerciseList = [];
+    monthLocalDataModel = [];
+
+    items = [
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Breaking the Ice",
+        "subtitle": "Your First Workout Finished",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "I Got This",
+        "subtitle": "First Week Finished",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "I'm Determined",
+        "subtitle": "First Month Finished",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "3 in a Row",
+        "subtitle": "Achieved the streak of 3",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "7 in a Row",
+        "subtitle": "Achieved the streak of 7",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "14 in a Row",
+        "subtitle": "Achieved the Streak of 14",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "30 in a row",
+        "subtitle": "Achieved the streak of 30",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "250k Monster",
+        "subtitle": "Total Weight Lifted > 250k lbs",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "500k Monster",
+        "subtitle": "Total Weight Lifted > 500k lbs",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "5 and Done",
+        "subtitle": "Completed 5 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "10 and Done",
+        "subtitle": "Completed 10 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "20 and Done",
+        "subtitle": "Completed 20 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "50 and Done",
+        "subtitle": "Completed 50 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "100 and Done",
+        "subtitle": "Completed 100 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "250 and Done",
+        "subtitle": "Completed 250 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "500 and Done",
+        "subtitle": "Completed 500 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Trial Survivor",
+        "subtitle": "14+ Days in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "1 Month",
+        "subtitle": "28+ Days in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Quarter Year",
+        "subtitle": "3 + Months in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Half Year",
+        "subtitle": "6+ Months in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Yearling",
+        "subtitle": "12+ Months in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+    ];
+    achievementsModel = [];
+    reportTimeSpent = "Week 1";
+    reportTimeSpentGraphHistory = [];
+    reportMaximumValueOfTotalTime = 0;
+    reportTimeSpentEachDay = [];
+    reportWeightLifted = "Week 1";
+    reportWeightLiftedGraphHistory = [];
+    reportMaximumValueOfWeight = 0;
+    reportWeightLiftedEachDay = [];
+    totalWeightLiftedInAWeek = 0;
+    reportExerciseCompletedWeek = "Week 1";
+    reportExerciseCompletedGraphHistory = [];
+    reportMaximumValueOfTotalEx = 0;
+    reportExerciseCompletedEachDay = [];
+    totalExerciseCompletedInAWeek = 0;
+    graphHistory = [];
+    maximumValueOfWeight = 0;
+    maximumValueOfTotalEx = 0;
+    maximumValueOfTotalTime = 0;
+    liftedWeightEachDay = [];
+    notifyListeners();
   }
 }
 

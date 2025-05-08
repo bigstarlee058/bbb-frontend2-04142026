@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -66,10 +68,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   void _handleLogout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
-    // Add your logout logic here
-    /// clean specific items only
-    //await prefs.clear(); // Clears all data
-    log('All shared preference data cleared');
+    await prefs.clear();
+    await preferences.clearPrefs();
+    await DatabaseHelper().clearAllTables();
+    await preferences.clearPrefs();
+    context.read<MonthProvider>().clearAllValues();
 
     // Navigator.popUntil(context, ModalRoute.withName(AppRoutes.onBoardingScreen));
 

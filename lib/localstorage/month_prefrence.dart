@@ -52,4 +52,8 @@ class SharedPreference {
   clearValue(String key) {
     return _preferences!.remove(key);
   }
+
+  clearPrefs() {
+    return _preferences!.clear();
+  }
 }

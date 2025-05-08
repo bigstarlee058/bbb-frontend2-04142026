@@ -524,7 +524,6 @@ class DataProvider extends ChangeNotifier {
         final value = await DatabaseHelper().areAllTablesEmpty();
         if (value) {
           List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
-
           if (monthEnrollment.isNotEmpty) {
             for (var element in monthEnrollment) {
               final body = {
@@ -710,6 +709,7 @@ class DataProvider extends ChangeNotifier {
           }
         }
       }
+      await monthProvider?.fetchMonthLocalData();
       notifyListeners();
     } catch (e) {
       log("issue in month view loading=> $e");
