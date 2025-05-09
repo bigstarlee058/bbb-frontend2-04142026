@@ -18,38 +18,38 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
   List<Map<String, dynamic>> items = [
     {
       "month": "Month 1 : ",
-      "title": "Glute squad special",
+      "title": "Month 1 : Glute Squad Special",
       "subtitle":
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      "image": "assets/img/pp-112.png",
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      "image": "assets/img/Glute Squad Special.png",
     },
     {
       "month": "Month 2 : ",
-      "title": "Squat + Bench press focus",
+      "title": "Month 2 : Squat + Bench Press Focus",
       "subtitle":
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      "image": "assets/img/pp-112.png",
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      "image": "assets/img/Squat and Bench Press Focus.png",
     },
     {
       "month": "Month 3 : ",
-      "title": "Strong lifting",
+      "title": "Month 3 : Strong Lifting",
       "subtitle":
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      "image": "assets/img/pp-112.png",
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      "image": "assets/img/Stronglifting.png",
     },
     {
       "month": "Month 4 : ",
-      "title": "Deadlift + Chin-up focus",
+      "title": "Month 4 : Deadlift + Chin-up Focus",
       "subtitle":
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      "image": "assets/img/pp-112.png",
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      "image": "assets/img/Deadlift and Chin-Up Focus.png",
     },
     {
       "month": "Month 5 : ",
-      "title": "Hip thrust + Military press focus",
+      "title": "Month 5 : Hip Thrust + Military Press Focus",
       "subtitle":
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      "image": "assets/img/pp-112.png",
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      "image": "assets/img/Hip Thrust and Military Press Focus.png",
     },
   ];
   @override
@@ -229,15 +229,15 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            item["month"],
-            style: GoogleFonts.plusJakartaSans(
-              color: AppColors.primaryColor,
-              fontSize: ScreenUtil.verticalScale(1.9),
-              fontWeight: FontWeight.bold,
-            ),
-            maxLines: 1,
-          ),
+          // Text(
+          //   item["month"],
+          //   style: GoogleFonts.plusJakartaSans(
+          //     color: AppColors.primaryColor,
+          //     fontSize: ScreenUtil.verticalScale(1.9),
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          //   maxLines: 1,
+          // ),
           Expanded(
             child: Text(
               item["title"],
@@ -299,18 +299,37 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
             ),
             child: Column(
               children: [
-                Image.asset(
-                  item["image"],
-                  color: AppColors.primaryColor,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Image.asset(
+                      item["image"],
+                      color: AppColors.primaryColor,
+                      height: ScreenUtil.verticalScale(16.3),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: SizedBox(
+                        height: ScreenUtil.verticalScale(16.9),
+                        child: Text(
+                          item["subtitle"],
+                          maxLines: 7,
+                          style: TextStyle(
+                            fontSize: ScreenUtil.verticalScale(1.7),
+                            color: const Color(0xFF888888),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-                SizedBox(height: 12),
                 Text(
-                  item["subtitle"],
+                  "1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
                   style: TextStyle(
                     fontSize: ScreenUtil.verticalScale(1.7),
                     color: const Color(0xFF888888),
                   ),
-                ),
+                )
               ],
             ),
           ),
