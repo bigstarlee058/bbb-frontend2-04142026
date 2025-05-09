@@ -142,7 +142,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ],
             ),
             Positioned(
-              top: ScreenUtil.horizontalScale(48),
+              top: ScreenUtil.horizontalScale(50),
               child: Container(
                 height: 120,
                 width: media.width,
@@ -237,7 +237,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             ),
                             const SizedBox(height: 20),
                             SizedBox(
-                              height: ScreenUtil.horizontalScale(9),
+                              height: ScreenUtil.horizontalScale(5),
                             ),
                             ButtonWidget(
                               text: 'Send a request',

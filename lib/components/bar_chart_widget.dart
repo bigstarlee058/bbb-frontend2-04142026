@@ -115,7 +115,7 @@ class _BarChartSample7State extends State<BarChartWidget> {
                 int rodIndex,
               ) {
                 return BarTooltipItem(
-                  rod.toY.toString(),
+                  rod.toY.toStringAsFixed(0),
                   TextStyle(
                     fontWeight: FontWeight.bold,
                     color: rod.color,

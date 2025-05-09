@@ -53,7 +53,7 @@ class _ToolsPageState extends State<ToolsPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
                                   backgroundColor: Colors.transparent,
                                   centerTitle: true,
                                   // leading: BackArrowWidget(

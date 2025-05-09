@@ -82,6 +82,7 @@ class _SettingPageState extends State<SettingPage> {
                               children: [
                                 AppBar(
                                   toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   backgroundColor: Colors.transparent,
                                   centerTitle: true,
                                   leading: BackArrowWidget(

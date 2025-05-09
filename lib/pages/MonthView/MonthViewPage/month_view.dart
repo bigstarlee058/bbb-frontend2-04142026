@@ -164,6 +164,7 @@ class _MonthViewState extends State<MonthView> {
                                   builder: (context, scrollProvider, child) {
                                     return AppBar(
                                       toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                      surfaceTintColor: Colors.transparent,
                                       backgroundColor: Colors.transparent,
                                       centerTitle: true,
                                       leading: BackArrowWidget(
@@ -229,6 +230,7 @@ class _MonthViewState extends State<MonthView> {
                                               scrollProvider.scrollOffset1 >= 0.0
                                                   ? AppBar(
                                                       toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                                      surfaceTintColor: Colors.transparent,
                                                       backgroundColor: Colors.transparent,
                                                       leading: BackArrowWidget(
                                                         onPress: () {

@@ -300,32 +300,34 @@ class _WorkoutCardState extends State<WorkoutCard> {
                           widget.name,
                           style: TextStyle(
                               color: (widget.exercise.isAddedUpdated ?? false) ? AppColors.skipDayColor : AppColors.primaryColor,
-                              fontSize: widget.isCircuit ? ScreenUtil.horizontalScale(3) : ScreenUtil.horizontalScale(3.8),
+                              fontSize: ScreenUtil.horizontalScale(3.8),
                               fontWeight: FontWeight.bold,
                               height: 1.2),
                         ),
-                        SizedBox(
-                          height: ScreenUtil.verticalScale(1.5),
-                        ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 8, 2),
-                              child: SvgPicture.asset(
-                                "assets/icons/trend.svg",
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-                                width: 20,
-                              ),
-                            ),
-                            Text(
-                              "$totalSets working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),
-                              ),
-                            ),
-                          ],
-                        )
+                        widget.isCircuit
+                            ? SizedBox()
+                            : Padding(
+                                padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.5)),
+                                child: Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      "assets/icons/trend.svg",
+                                      colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                      width: 20,
+                                    ),
+                                    SizedBox(
+                                      width: 8,
+                                    ),
+                                    Text(
+                                      "$totalSets working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: widget.isCircuit ? ScreenUtil.verticalScale(1.3) : ScreenUtil.verticalScale(1.5),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
                       ],
                     ),
                   ),

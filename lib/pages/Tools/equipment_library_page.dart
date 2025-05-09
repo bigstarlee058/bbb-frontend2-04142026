@@ -124,7 +124,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
                                   centerTitle: true,
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(

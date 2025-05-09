@@ -15,7 +15,7 @@ class ProgramPhasesWidget extends StatelessWidget {
     return Column(
       children: [
         Container(
-          height: media.height / 1.9,
+          height: media.height / 1.7,
           width: media.width,
           color: Colors.white,
           child: Stack(
@@ -33,7 +33,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: -ScreenUtil.verticalScale(3.2),
+                top: -ScreenUtil.verticalScale(3.5),
                 left: 0,
                 right: 0,
                 height: media.height / 8,
@@ -55,7 +55,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                 ),
               ),
               Positioned.fill(
-                top: -ScreenUtil.verticalScale(2.6),
+                top: -ScreenUtil.verticalScale(2.8),
                 child: ClipPath(
                   clipper: MiddleClipper(),
                   child: Container(
@@ -70,23 +70,22 @@ class ProgramPhasesWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned.fill(
+              Positioned(
+                top: -ScreenUtil.verticalScale(1),
+                left: 0,
+                right: 0,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Container(
-                      height: ScreenUtil.verticalScale(36.5),
-                      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.8)),
+                      height: ScreenUtil.verticalScale(43),
+                      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.8), right: ScreenUtil.horizontalScale(4)),
                       child: Image.asset(
                         "assets/img/program-phase.png",
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(
-                        bottom: ScreenUtil.verticalScale(8.5),
-                        left: ScreenUtil.horizontalScale(18),
-                        right: ScreenUtil.horizontalScale(18),
-                      ),
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(18)),
                       child: ButtonWidget(
                         text: 'Learn More',
                         textColor: Colors.white,

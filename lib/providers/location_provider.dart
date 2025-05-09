@@ -8,6 +8,7 @@ class LocationProvider extends ChangeNotifier {
   String? selectedCountry;
   String? selectedState;
   String? selectedCity;
+  TextEditingController selectedCityController = TextEditingController();
   // String token = '';
   // List<Country> country = [];
   // List<model.State> states = [];
@@ -21,7 +22,7 @@ class LocationProvider extends ChangeNotifier {
     selectedCountry = country;
     selectedState = state;
     selectedCity = city;
-
+    selectedCityController.text = city;
     await setAndCallApi(co: country, st: state);
     notifyListeners();
   }

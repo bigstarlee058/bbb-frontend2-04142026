@@ -70,6 +70,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             children: [
                               AppBar(
                                 toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                surfaceTintColor: Colors.transparent,
                                 backgroundColor: Colors.transparent,
                                 centerTitle: true,
                                 leading: BackArrowWidget(

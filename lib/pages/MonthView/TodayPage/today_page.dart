@@ -98,7 +98,6 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
         // fetchWarmupData();
         monthProvider?.fetchExerciseStatusLocalData();
         fetchRemovedExerciseLocalData();
-        log('monthProvider?.dayHistoryDetails :::::::::::::::::: ${monthProvider?.dayHistoryDetails?.dataId}');
         isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
         isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
             monthProvider?.dayHistoryDetails == null ||
@@ -332,6 +331,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                         AppBar(
                                           titleSpacing: -5,
                                           toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                          surfaceTintColor: Colors.transparent,
                                           backgroundColor: Colors.transparent,
                                           centerTitle: false,
                                           leading: BackArrowWidget(
@@ -467,7 +467,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                             top: media.height / 4,
                           ),
                           decoration: BoxDecoration(
-                            color: isEditMode ? Color(0xFFB8D3EB) : Colors.white,
+                            color: isEditMode ? Color(0xFFc3daee) : Colors.white,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
@@ -491,7 +491,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                         duration: Duration(milliseconds: 300),
                                         height: media.height / 11,
                                         width: media.width / 6,
-                                        color: isEditMode ? Color(0xFFB8D3EB) : Colors.white,
+                                        color: isEditMode ? Color(0xFFc3daee) : Colors.white,
                                       ),
                                     ),
                                   ),
@@ -599,6 +599,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                       bool isExist =
                                                           (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
                                                               monthProvider!.isPastWeek;
+                                                      log('monthProvider!.exerciseHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider!.exerciseHistoryModel)}');
                                                       return Column(
                                                         children: [
                                                           Padding(
@@ -613,7 +614,11 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                               isCircuit: false,
                                                               isCompleted: monthProvider!.exerciseHistoryModel.any((element) =>
                                                                   element.dataId == dataId && element.status == Status.completed),
-                                                              isSkipped: (monthProvider!.exerciseHistoryModel.any((element) =>
+                                                              isSkipped: ((isCurrentDaySkipped || isCurrentDayCompleted) &&
+                                                                      monthProvider!.exerciseHistoryModel.any(
+                                                                        (element) => element.dataId != dataId,
+                                                                      )) ||
+                                                                  (monthProvider!.exerciseHistoryModel.any((element) =>
                                                                           element.dataId == dataId && element.status == Status.skipped) ||
                                                                       isExist) ||
                                                                   isCurrentDaySkipped,
@@ -703,12 +708,14 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                     if (isEditMode)
                                       SizedBox()
                                     else ...[
-                                      Container(
-                                        height: 1,
-                                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6), vertical: 36),
-                                        width: media.width * 0.75,
-                                        color: Colors.black12,
-                                      ),
+                                      (monthProvider!.isPumpDay || monthProvider!.isCircuit)
+                                          ? SizedBox()
+                                          : Container(
+                                              height: 1,
+                                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6), vertical: 36),
+                                              width: media.width * 0.75,
+                                              color: Colors.black12,
+                                            ),
                                       SizedBox(height: media.height * 0.025),
                                       Consumer<MonthProvider>(builder: (context, value, child) {
                                         return value.dayHistoryDetails != null && value.dayHistoryDetails?.status == Status.skipped

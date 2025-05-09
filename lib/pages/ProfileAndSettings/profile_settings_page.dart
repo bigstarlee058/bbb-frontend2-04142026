@@ -189,6 +189,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               children: [
                                 AppBar(
                                   toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   backgroundColor: Colors.transparent,
                                   leading: SizedBox(),
                                   centerTitle: true,
