@@ -250,7 +250,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
                                   centerTitle: true,
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(

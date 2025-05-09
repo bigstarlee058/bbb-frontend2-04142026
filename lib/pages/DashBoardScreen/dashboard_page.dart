@@ -189,6 +189,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 return Consumer<UserDataProvider>(builder: (context, userData, child) {
                                   return AppBar(
                                     toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                    surfaceTintColor: Colors.transparent,
                                     backgroundColor: Colors.transparent,
                                     centerTitle: false,
                                     leading: SizedBox(),
@@ -296,6 +297,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                         builder: (context, userData, child) {
                                                           return AppBar(
                                                             toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                                            surfaceTintColor: Colors.transparent,
                                                             backgroundColor: Colors.transparent,
                                                             centerTitle: false,
                                                             leading: SizedBox(),
@@ -497,12 +499,20 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
                                                 orElse: () => DayHistoryModel(),
                                               );
-
                                               String title = matchingElement.id != null
                                                   ? matchingElement.title ?? "Pump Day"
-                                                  : !monthData.isPumpDayAvailable
-                                                      ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0] ??
-                                                          ""
+                                                  : !monthData.isPumpDayAvailable && isRestDay
+                                                      ? (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].restDayList![int.parse(
+                                                                  monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
+                                                                      .dayList![index ?? 0]
+                                                                      .toString()
+                                                                      .split(" ")
+                                                                      .toList()
+                                                                      .last) -
+                                                              1] ??
+                                                          monthData
+                                                              .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0] ??
+                                                          "")
                                                       : !isRestDay
                                                           ? monthData.monthDataModel!.weeks![monthData.week! - 1].days![nextWorkOutIndex]
                                                                   .title ??

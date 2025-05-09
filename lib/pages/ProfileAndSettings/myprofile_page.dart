@@ -125,7 +125,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'avatarUrl': _imageUrl ?? '',
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
-      'city': locationProvider.selectedCity
+      'city': locationProvider.selectedCityController.text
     };
     if (kDebugMode) {
       print('HERE IS USERDETAIL##, $userDetails');
@@ -184,6 +184,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               children: [
                                 AppBar(
                                   toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   backgroundColor: Colors.transparent,
                                   centerTitle: true,
                                   leading: BackArrowWidget(
@@ -387,13 +388,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     hint: 'State',
                                     onChanged: value.onStateSelect,
                                   ),
-                                  _buildDropdownField(
+                                  _buildTextField(
                                     context: context,
                                     label: 'City',
-                                    value: value.selectedCity,
-                                    options: value.cities?.cities ?? [],
+                                    value: value.selectedCityController,
                                     hint: 'City',
-                                    onChanged: value.onCitySelect,
                                   ),
                                 ],
                               ),
@@ -404,7 +403,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               value: selectedHeight,
                               hint: '6\'0"',
                             ),
-                            _buildTextField(
+                            _weightPicker(
                               context: context,
                               label: 'Weight',
                               value: selectedWeight,
@@ -541,7 +540,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             child: Container(
               padding: EdgeInsets.symmetric(
                 horizontal: ScreenUtil.horizontalScale(1),
-              ),
+              ).copyWith(left: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(
@@ -572,7 +571,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       value: value,
                       child: Center(
                         // Center the individual items in dropdown
-                        child: Text(value),
+
+                        child: Text(
+                          value,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     );
                   }).toList(),
@@ -614,12 +619,77 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  Widget _buildTextField({
-    required BuildContext context,
-    required String label,
-    required TextEditingController value,
-    required String hint,
-  }) {
+  Widget _buildTextField(
+      {required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 18,
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              height: ScreenUtil.verticalScale(6),
+              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x20888888),
+                    spreadRadius: 3,
+                    blurRadius: 10,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: TextField(
+                  style: TextStyle(
+                    fontSize: ScreenUtil.verticalScale(2.3),
+                    color: Colors.black,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  controller: value,
+                  keyboardType: TextInputType.text,
+                  onSubmitted: (value) {
+                    FocusScope.of(context).unfocus();
+                  },
+                  textInputAction: TextInputAction.done,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "City",
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontSize: ScreenUtil.verticalScale(2.3),
+                      fontWeight: FontWeight.normal,
+                    ),
+                    border: InputBorder.none,
+                    isCollapsed: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _weightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
@@ -661,8 +731,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IntrinsicWidth(
-                      child: TextFormField(
+                    Flexible(flex: 4, child: SizedBox()),
+                    Flexible(
+                      flex: 6,
+                      child: TextField(
                         style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(2.3),
                           color: Colors.black,
@@ -670,13 +742,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ),
                         controller: value,
                         keyboardType: TextInputType.number,
-                        onFieldSubmitted: (value) {
+                        onSubmitted: (value) {
                           FocusScope.of(context).unfocus();
                         },
                         textInputAction: TextInputAction.done,
                         textAlign: TextAlign.center,
                         focusNode: _nodeText1,
+                        maxLength: 3,
                         decoration: InputDecoration(
+                          counterText: "",
                           hintText: "Weight",
                           hintStyle: TextStyle(
                             color: Colors.grey.shade700,
@@ -713,6 +787,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ],
                       ),
                     ),
+                    Flexible(flex: 4, child: SizedBox()),
                   ],
                 ),
               ),
@@ -723,12 +798,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  Widget _heightPicker({
-    required BuildContext context,
-    required String label,
-    required TextEditingController value,
-    required String hint,
-  }) {
+  Widget _heightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),

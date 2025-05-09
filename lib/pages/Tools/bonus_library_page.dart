@@ -122,7 +122,7 @@ class _BonusLibraryPageState extends State<BonusLibraryPage> {
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(
                                     onPress: () {
