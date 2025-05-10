@@ -8,6 +8,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -18,7 +19,7 @@ class WatchTutorial extends StatefulWidget {
   State<WatchTutorial> createState() => _WatchTutorialState();
 }
 
-class _WatchTutorialState extends State<WatchTutorial> {
+class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateMixin {
   bool loading = false;
   bool videoNotInitialized = false;
   bool isZoom = false;
@@ -27,7 +28,9 @@ class _WatchTutorialState extends State<WatchTutorial> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
   late Size videoSize;
-  Timer? _hideControlsTimer;
+  Timer? hideControlsTimer;
+  late final ProgressBarController _controller;
+  bool isMute = true;
 
   @override
   void initState() {
@@ -80,6 +83,14 @@ class _WatchTutorialState extends State<WatchTutorial> {
         }
         setState(() {});
       });
+
+      _controller = ProgressBarController(
+        vsync: this,
+        barAnimationDuration: const Duration(milliseconds: 300),
+        thumbAnimationDuration: const Duration(milliseconds: 200),
+        waitingDuration: const Duration(milliseconds: 1800),
+      );
+
       setState(() => loading = false);
     } catch (e) {
       setState(() {
@@ -93,8 +104,14 @@ class _WatchTutorialState extends State<WatchTutorial> {
   bool showControls = true;
   bool isFullscreen = false;
 
+  muteUnMute() {
+    isMute = !isMute;
+    _videoPlayerController.setVolume(isMute ? 1 : 0);
+    setState(() {});
+  }
+
   void hideControls() {
-    _hideControlsTimer = Timer(const Duration(seconds: 5), () {
+    hideControlsTimer = Timer(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() => showControls = false);
       }
@@ -103,7 +120,7 @@ class _WatchTutorialState extends State<WatchTutorial> {
 
   void showControlsOnTap() {
     setState(() => showControls = !showControls);
-    _hideControlsTimer?.cancel();
+    hideControls();
   }
 
   void toggleFullscreen() {
@@ -135,14 +152,12 @@ class _WatchTutorialState extends State<WatchTutorial> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    // final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: loading
           ? const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primaryColor,
-              ),
+              child: CircularProgressIndicator(color: AppColors.primaryColor),
             )
           : SingleChildScrollView(
               child: Column(
@@ -155,7 +170,7 @@ class _WatchTutorialState extends State<WatchTutorial> {
                       IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
+                          Navigator.of(context).pop();
                         },
                       ),
                     ],
@@ -172,12 +187,21 @@ class _WatchTutorialState extends State<WatchTutorial> {
                           child: Column(
                             children: [
                               dataProvider!.tutorialData.files.isNotEmpty && !videoNotInitialized
-                                  ? SizedBox(
-                                      height: videoSize.height,
-                                      width: videoSize.width,
-                                      child: Chewie(
-                                        controller: _chewieController!,
-                                      ),
+                                  ? Stack(
+                                      children: [
+                                        SizedBox(
+                                          height: videoSize.height,
+                                          width: videoSize.width,
+                                          child: Chewie(
+                                            controller: _chewieController!,
+                                          ),
+                                        ),
+                                        Container(
+                                          color: showControls ? Colors.black38 : Colors.transparent,
+                                          height: videoSize.height,
+                                          width: videoSize.width,
+                                        ),
+                                      ],
                                     )
                                   : Container(
                                       height: ScreenUtil.verticalScale(40),
@@ -278,33 +302,53 @@ class _WatchTutorialState extends State<WatchTutorial> {
                                   //     ],
                                   //   ),
                                   // ),
+
                                   Container(
-                                    margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
-                                    child: Row(
+                                    margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.3), left: 20, right: 20),
+                                    child: Column(
                                       children: [
-                                        Expanded(
-                                          child: SliderTheme(
-                                            data: SliderTheme.of(context).copyWith(
-                                              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
-                                              trackHeight: isZoom ? 7 : 4,
-                                              trackShape: RectangularSliderTrackShape(),
-                                              overlayShape: SliderComponentShape.noOverlay,
+                                        ProgressBar(
+                                          collapsedBufferedBarColor: Colors.white,
+                                          expandedBufferedBarColor: Colors.white,
+                                          buffered: Duration(
+                                              seconds: _videoPlayerController.value.buffered.isEmpty
+                                                  ? 0
+                                                  : _videoPlayerController.value.buffered.first.end.inSeconds),
+                                          controller: _controller,
+                                          progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
+                                          total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
+                                          onChanged: (value) {
+                                            _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                          },
+                                          onSeek: (Duration value) {},
+                                          onChangeStart: (value) {
+                                            setState(() => isZoom = true);
+                                          },
+                                          onChangeEnd: (value) {
+                                            setState(() => isZoom = false);
+                                          },
+                                        ),
+                                        Column(
+                                          children: [
+                                            SizedBox(height: ScreenUtil.verticalScale(0.8)),
+                                            Row(
+                                              children: [
+                                                Spacer(),
+                                                GestureDetector(
+                                                  onTap: showControls
+                                                      ? () {
+                                                          muteUnMute();
+                                                        }
+                                                      : null,
+                                                  child: Icon(
+                                                    isMute ? Icons.volume_up : Icons.volume_off,
+                                                    color: !showControls ? Colors.transparent : Colors.white70,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            child: Slider(
-                                              activeColor: Colors.red,
-                                              value: _videoPlayerController.value.position.inSeconds.toDouble(),
-                                              max: _videoPlayerController.value.duration.inSeconds.toDouble(),
-                                              onChangeStart: (value) {
-                                                setState(() => isZoom = true);
-                                              },
-                                              onChangeEnd: (value) {
-                                                setState(() => isZoom = false);
-                                              },
-                                              onChanged: (value) {
-                                                _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
-                                              },
-                                            ),
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),

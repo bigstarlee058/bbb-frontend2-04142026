@@ -153,6 +153,10 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          Visibility(
+            child: Utils.appImage(media, image),
+            visible: false,
+          ),
           SizedBox(
             height: media.height / 1,
             child: _isVideoInitialized

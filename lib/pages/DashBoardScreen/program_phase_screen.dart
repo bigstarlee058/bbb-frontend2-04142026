@@ -75,10 +75,12 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                     child: Padding(
                       padding: EdgeInsets.only(
                         right: ScreenUtil.horizontalScale(4.5),
-                        top: ScreenUtil.verticalScale(5.7),
+                        // top: ScreenUtil.verticalScale(5.7),
                       ),
-                      child: Image.asset(
-                        "assets/img/program-phase.png",
+                      child: SafeArea(
+                        child: Image.asset(
+                          "assets/img/program-phase.png",
+                        ),
                       ),
                     ),
                   ),
@@ -199,6 +201,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                             ),
                             ListView.separated(
                               shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
                               separatorBuilder: (context, index) => SizedBox(height: 15),
                               padding: EdgeInsets.symmetric(vertical: 12),
                               itemCount: items.length,
