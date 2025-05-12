@@ -111,7 +111,8 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
   }
 
   void hideControls() {
-    hideControlsTimer = Timer(const Duration(seconds: 3), () {
+    hideControlsTimer?.cancel();
+    hideControlsTimer = Timer(const Duration(seconds: 4), () {
       if (mounted) {
         setState(() => showControls = false);
       }
@@ -147,6 +148,7 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
     }
     _videoPlayerController.dispose();
     AudioManager.abandonAudioFocus();
+    _controller.dispose();
     super.dispose();
   }
 

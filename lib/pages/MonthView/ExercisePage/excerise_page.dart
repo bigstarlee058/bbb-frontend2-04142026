@@ -27,6 +27,7 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -37,13 +38,13 @@ class ExercisePage extends StatefulWidget {
   State<ExercisePage> createState() => _ExercisePageState();
 }
 
-class _ExercisePageState extends State<ExercisePage> {
+class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMixin {
   MonthProvider? monthProvider;
   bool loading = false;
   bool videoLoader = false;
   bool videoNotInitialized = false;
   bool isZoom = false;
-
+  late final ProgressBarController _controller;
   int exerciseIndex = 0;
   String exerciseDesc = "";
   String exerciseName = "";
@@ -426,6 +427,13 @@ class _ExercisePageState extends State<ExercisePage> {
         setState(() {});
       });
 
+      _controller = ProgressBarController(
+        vsync: this,
+        barAnimationDuration: const Duration(milliseconds: 300),
+        thumbAnimationDuration: const Duration(milliseconds: 200),
+        waitingDuration: const Duration(milliseconds: 1800),
+      );
+
       setState(() {
         videoLoader = false;
       });
@@ -447,18 +455,25 @@ class _ExercisePageState extends State<ExercisePage> {
   bool isFullscreen = false;
 
   void hideControls() {
-    _hideControlsTimer = Timer(const Duration(seconds: 5), () {
+    _hideControlsTimer?.cancel();
+
+    _hideControlsTimer = Timer(const Duration(seconds: 4), () {
       setState(() {
         showControls = false;
       });
     });
   }
 
+  // void showControlsOnTap() {
+  //   setState(() {
+  //     showControls = !showControls;
+  //   });
+  //   _hideControlsTimer?.cancel();
+  // }
+
   void showControlsOnTap() {
-    setState(() {
-      showControls = !showControls;
-    });
-    _hideControlsTimer?.cancel();
+    setState(() => showControls = !showControls);
+    hideControls();
   }
 
   void toggleFullscreen() {
@@ -698,29 +713,52 @@ class _ExercisePageState extends State<ExercisePage> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
-                                trackHeight: isZoom ? 7 : 4,
-                                trackShape: RectangularSliderTrackShape(),
-                                overlayShape: SliderComponentShape.noOverlay,
-                              ),
-                              child: Slider(
-                                activeColor: Colors.red,
-                                value: _videoPlayerController.value.position.inSeconds.toDouble(),
-                                max: _videoPlayerController.value.duration.inSeconds.toDouble(),
-                                onChangeStart: (value) {
-                                  setState(() => isZoom = true);
-                                },
-                                onChangeEnd: (value) {
-                                  setState(() => isZoom = false);
-                                },
-                                onChanged: (value) {
-                                  _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
-                                },
-                              ),
+                            child: ProgressBar(
+                              collapsedBufferedBarColor: Colors.white,
+                              expandedBufferedBarColor: Colors.white,
+                              buffered: Duration(
+                                  seconds: _videoPlayerController.value.buffered.isEmpty
+                                      ? 0
+                                      : _videoPlayerController.value.buffered.first.end.inSeconds),
+                              controller: _controller,
+                              progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
+                              total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
+                              onChanged: (value) {
+                                _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                              },
+                              onSeek: (Duration value) {},
+                              onChangeStart: (value) {
+                                setState(() => isZoom = true);
+                              },
+                              onChangeEnd: (value) {
+                                setState(() => isZoom = false);
+                              },
                             ),
                           ),
+                          // Expanded(
+                          //   child: SliderTheme(
+                          //     data: SliderTheme.of(context).copyWith(
+                          //       thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
+                          //       trackHeight: isZoom ? 7 : 4,
+                          //       trackShape: RectangularSliderTrackShape(),
+                          //       overlayShape: SliderComponentShape.noOverlay,
+                          //     ),
+                          //     child: Slider(
+                          //       activeColor: Colors.red,
+                          //       value: _videoPlayerController.value.position.inSeconds.toDouble(),
+                          //       max: _videoPlayerController.value.duration.inSeconds.toDouble(),
+                          //       onChangeStart: (value) {
+                          //         setState(() => isZoom = true);
+                          //       },
+                          //       onChangeEnd: (value) {
+                          //         setState(() => isZoom = false);
+                          //       },
+                          //       onChanged: (value) {
+                          //         _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                          //       },
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -769,6 +807,7 @@ class _ExercisePageState extends State<ExercisePage> {
                         AudioManager.requestAudioFocus();
                       }
                     });
+                    hideControls();
                   },
                 ),
 
@@ -795,12 +834,21 @@ class _ExercisePageState extends State<ExercisePage> {
         child: (isExercise == 1
                 ? (monthProvider?.exerciseDetailModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null
                 : (monthProvider?.warmUpModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null)
-            ? SizedBox(
-                height: videoSize?.height,
-                width: videoSize?.width,
-                child: Chewie(
-                  controller: _chewieController!,
-                ),
+            ? Stack(
+                children: [
+                  SizedBox(
+                    height: videoSize?.height,
+                    width: videoSize?.width,
+                    child: Chewie(
+                      controller: _chewieController!,
+                    ),
+                  ),
+                  Container(
+                    color: showControls ? Colors.black38 : Colors.transparent,
+                    height: videoSize?.height,
+                    width: videoSize?.width,
+                  ),
+                ],
               )
             : Container(
                 height: videoNotAvailable ? media.height * 0.4 : media.height * 0.835,

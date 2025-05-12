@@ -720,7 +720,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                   builder: (context, value, child) {
                                     if (monthProvider.monthDataModel == null ||
                                         value.currentWeek == 0 ||
-                                        (value.monthDataModel?.weeks?.isEmpty ?? false)) return const SizedBox();
+                                        (value.monthDataModel?.weeks?.isEmpty ?? false)) {
+                                      return const SizedBox();
+                                    }
 
                                     final startTime = value.startTime ?? DateTime.now();
 
@@ -1400,7 +1402,12 @@ class _DashboardPageState extends State<DashboardPage> {
       context.read<MainPageProvider>().changeTab(1);
       monthProvider.updateIsOnMonthPage(false);
       monthProvider.updateScrollToRestDay(true);
-
+      _completeRestDay(status: Status.completed, type: 'Rest Day', endDate: true).then(
+        (value) {
+          monthProvider.onInit(context, isEnabled: false);
+        },
+      );
+      await monthProvider.checkForPumpDay();
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,
@@ -1491,6 +1498,75 @@ class _DashboardPageState extends State<DashboardPage> {
       await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
       ApiRepo.addDayStatus(body: data);
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+    }
+
+    await monthProvider.fetchAllDayStatusLocalData();
+    monthProvider.findWeekStatuses();
+    monthProvider.fetchToday();
+    monthProvider.manageStreak();
+    monthProvider.getLiftedWeightGraphData();
+  }
+
+  Future<void> _completeRestDay({required String status, required String type, String? title, bool endDate = false}) async {
+    String split = monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
+
+    if (status == Status.completed) {
+      ApiRepo.addDayStatusList(body: {"date": "${DateTime.now().toUtc()}", "status": Status.completed});
+    }
+
+    final data = {
+      "title": title ?? "",
+      "dataId": dataId,
+      "monthId": monthProvider.monthDataModel?.id,
+      "weekId": monthProvider.weekDataModel?.id,
+      "dayId": monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1],
+      "split": split,
+      "date": "${DateTime.now().toUtc()}",
+      "status": status,
+      "type": type,
+      "startTime": "${DateTime.now().toUtc()}",
+      "endTime": endDate ? "${DateTime.now().toUtc()}" : "",
+    };
+
+    DayHistoryModel? matchingElement =
+        monthProvider.dayHistoryModel.firstWhere((element) => element.dataId == dataId, orElse: () => DayHistoryModel());
+
+    final data1 = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
+    };
+
+    final apiBody = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
+      "dataId": dataId
+    };
+
+    if (matchingElement.id != null) {
+      ApiRepo.updateDayStatus(body: apiBody);
+
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+    } else {
+      ApiRepo.addDayStatus(body: data);
+
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
