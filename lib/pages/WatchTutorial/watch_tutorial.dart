@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -69,13 +70,20 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
-
+      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      _videoPlayerController.setVolume(rawData ? 1 : 0);
+      isMute = rawData;
       if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
       _videoPlayerController.addListener(() async {
+        final bool isFinished =
+            _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
+        if (isFinished) {
+          showControlsOnTapOfPause();
+        }
         if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
           AudioManager.abandonAudioFocus();
         } else {
@@ -104,10 +112,12 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
   bool showControls = true;
   bool isFullscreen = false;
 
-  muteUnMute() {
+  muteUnMute() async {
     isMute = !isMute;
+
     _videoPlayerController.setVolume(isMute ? 1 : 0);
     setState(() {});
+    await preferences.setBool(SharedPreference.isMute, isMute);
   }
 
   void hideControls() {
@@ -121,7 +131,14 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
 
   void showControlsOnTap() {
     setState(() => showControls = !showControls);
-    hideControls();
+    if (_videoPlayerController.value.isPlaying) {
+      hideControls();
+    }
+  }
+
+  void showControlsOnTapOfPause() {
+    hideControlsTimer?.cancel();
+    setState(() => showControls = true);
   }
 
   void toggleFullscreen() {
@@ -145,16 +162,17 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
   void dispose() {
     if (_chewieController != null) {
       _chewieController!.dispose();
+      _videoPlayerController.dispose();
     }
-    _videoPlayerController.dispose();
+
     AudioManager.abandonAudioFocus();
     _controller.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: loading
@@ -253,9 +271,11 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
                                           () {
                                             if (_videoPlayerController.value.isPlaying) {
                                               _videoPlayerController.pause();
+                                              showControlsOnTapOfPause();
                                               AudioManager.abandonAudioFocus();
                                             } else {
                                               _videoPlayerController.play();
+                                              hideControls();
                                               AudioManager.requestAudioFocus();
                                             }
                                           },
@@ -309,27 +329,6 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
                                     margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.3), left: 20, right: 20),
                                     child: Column(
                                       children: [
-                                        ProgressBar(
-                                          collapsedBufferedBarColor: Colors.white,
-                                          expandedBufferedBarColor: Colors.white,
-                                          buffered: Duration(
-                                              seconds: _videoPlayerController.value.buffered.isEmpty
-                                                  ? 0
-                                                  : _videoPlayerController.value.buffered.first.end.inSeconds),
-                                          controller: _controller,
-                                          progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
-                                          total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
-                                          onChanged: (value) {
-                                            _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
-                                          },
-                                          onSeek: (Duration value) {},
-                                          onChangeStart: (value) {
-                                            setState(() => isZoom = true);
-                                          },
-                                          onChangeEnd: (value) {
-                                            setState(() => isZoom = false);
-                                          },
-                                        ),
                                         Column(
                                           children: [
                                             SizedBox(height: ScreenUtil.verticalScale(0.8)),
@@ -352,6 +351,29 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
                                             ),
                                           ],
                                         ),
+                                        SizedBox(height: ScreenUtil.verticalScale(1)),
+                                        ProgressBar(
+                                          collapsedBufferedBarColor: Colors.white,
+                                          expandedBufferedBarColor: Colors.white,
+                                          buffered: Duration(
+                                              seconds: _videoPlayerController.value.buffered.isEmpty
+                                                  ? 0
+                                                  : _videoPlayerController.value.buffered.first.end.inSeconds),
+                                          controller: _controller,
+                                          progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
+                                          total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
+                                          onChanged: (value) {
+                                            _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                          },
+                                          onSeek: (Duration value) {},
+                                          onChangeStart: (value) {
+                                            setState(() => isZoom = true);
+                                          },
+                                          onChangeEnd: (value) {
+                                            setState(() => isZoom = false);
+                                          },
+                                        ),
+                                        SizedBox(height: ScreenUtil.verticalScale(2.2)),
                                       ],
                                     ),
                                   ),
@@ -370,6 +392,7 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
                       onPress: () async {
                         if (_videoPlayerController.value.isPlaying) {
                           _videoPlayerController.pause();
+                          showControlsOnTapOfPause();
                         }
                         await Navigator.pushNamed(context, '/appTutorialScreen');
                       },

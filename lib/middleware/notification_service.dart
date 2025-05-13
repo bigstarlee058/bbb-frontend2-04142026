@@ -6,7 +6,6 @@ import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
   static Future<void> clearNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
   }
@@ -30,7 +29,6 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
         );
-
         await flutterLocalNotificationsPlugin
             .zonedSchedule(10, 'Target rest reached!', 'Your Timer has reached 0, get back to your workout and keep your progress going',
                 tz.TZDateTime.now(tz.local).add(Duration(seconds: second)), const NotificationDetails(android: androidDetails),
@@ -54,26 +52,20 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
     );
-
     DateTime nowUtc = DateTime.now().toUtc();
     tz.TZDateTime nowLocal = tz.TZDateTime.from(nowUtc, tz.local);
     tz.TZDateTime endDate = tz.TZDateTime.from(endDateUtc, tz.local);
-
     tz.TZDateTime nextSunday = tz.TZDateTime(tz.local, nowLocal.year, nowLocal.month, nowLocal.day, 12, 0, 0);
-
     if (nowLocal.weekday != DateTime.sunday) {
       nextSunday = nextSunday.add(Duration(days: (7 - nowLocal.weekday) % 7));
     }
-
     if (nowLocal.weekday == DateTime.sunday && nowLocal.hour >= 12) {
       nextSunday = nextSunday.add(const Duration(days: 7));
     }
-
     if (nextSunday.isBefore(nowLocal)) {
       debugPrint("Skipping scheduling: nextSunday ($nextSunday) is in the past.");
       return;
     }
-
     int notificationId = id;
     while (nextSunday.isBefore(endDate) || nextSunday.isAtSameMomentAs(endDate)) {
       await clearNotification(id);
@@ -86,7 +78,6 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       );
-
       nextSunday = nextSunday.add(const Duration(days: 7));
       notificationId++;
     }
@@ -101,17 +92,13 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
     );
-
     final tz.TZDateTime nowLocal = tz.TZDateTime.from(utcDate, tz.local).subtract(const Duration(hours: 12));
-
     final tz.TZDateTime scheduledTime = tz.TZDateTime(tz.local, nowLocal.year, nowLocal.month, nowLocal.day, 14, 0, 0);
-
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     if (scheduledTime.isBefore(now)) {
       debugPrint("Skipping notification scheduling because the date is in the past: $scheduledTime");
       return;
     }
-
     await flutterLocalNotificationsPlugin
         .zonedSchedule(
       id,

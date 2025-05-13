@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -81,20 +83,25 @@ class ScheduleSection extends StatelessWidget {
 
                                   final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
                                   String status = "";
+                                  String title = "";
                                   if (data.isNotEmpty) {
                                     status = data.first.status ?? "";
+                                    title = data.first.title ?? "";
                                   }
 
+                                  log('monthProvider.todayTitleId :::::::::::::::::: ${monthProvider.todayTitleId}');
                                   return ButtonWidget(
                                     text: monthProvider.todayTitleId.isEmpty
                                         ? "Completed"
-                                        : (!monthProvider.isPumpDayAvailable && monthProvider.todayTitleId.contains("Rest Day"))
+                                        : (!title.contains("Pump Day") &&
+                                                !monthProvider.isPumpDayAvailable &&
+                                                monthProvider.todayTitleId.contains("Rest Day"))
                                             ? "Mark Complete"
                                             : status == Status.started
                                                 ? 'Continue Your Workout'
                                                 : 'Start Your Workout',
                                     textColor: Colors.white,
-                                    onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress,
+                                    onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress!(),
                                     color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
                                     isLoading: false,
                                   );

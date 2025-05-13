@@ -15,7 +15,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vimeo_video_player/vimeo_video_player.dart';
+
+// import 'package:vimeo_video_player/vimeo_video_player.dart';
 
 import '../providers/main_page_provider.dart';
 import '../providers/user_data_provider.dart';
@@ -41,7 +42,7 @@ class _MainPageState extends State<MainPage> {
   late MainPageProvider mainPageProvider;
   late MonthProvider monthProvider;
 
-  VimeoVideoPlayer? vimeoVideoPlayer;
+  // VimeoVideoPlayer? vimeoVideoPlayer;
   late List<Widget> _pages;
   Timer? _timer;
 
@@ -51,11 +52,11 @@ class _MainPageState extends State<MainPage> {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
 
-    vimeoVideoPlayer = VimeoVideoPlayer(
-      // url: 'https://player.vimeo.com/video/953289606',
-      // autoPlay: true,
-      videoId: "953289606",
-    );
+    // vimeoVideoPlayer = VimeoVideoPlayer(
+    // url: 'https://player.vimeo.com/video/953289606',
+    // autoPlay: true,
+    // videoId: "953289606",
+    // );
 
     if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
