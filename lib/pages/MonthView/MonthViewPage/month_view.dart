@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -217,126 +219,138 @@ class _MonthViewState extends State<MonthView> {
                                   );
                                 },
                               ),
-                              SizedBox(
-                                height: media.height / 2,
-                                width: media.width,
-                                child: SafeArea(
-                                  child: Column(
-                                    children: [
-                                      Consumer<ScrollProvider>(
-                                        builder: (context, scrollProvider, child) {
-                                          return Column(
-                                            children: [
-                                              scrollProvider.scrollOffset1 >= 0.0
-                                                  ? AppBar(
-                                                      toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                                      surfaceTintColor: Colors.transparent,
-                                                      backgroundColor: Colors.transparent,
-                                                      leading: BackArrowWidget(
-                                                        onPress: () {
-                                                          monthProvider?.mainPageProvider.changeTab(0);
-                                                        },
-                                                      ),
-                                                      actions: [
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(right: 10),
-                                                          child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
-                                                        )
-                                                      ],
-                                                    )
-                                                  : SizedBox(),
-                                              SizedBox(
-                                                height: scrollProvider.scrollOffset1 >= 0.0 ? 0 : ScreenUtil.verticalScale(5.1),
-                                              )
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                      SizedBox(
-                                        height: ScreenUtil.verticalScale(.3),
-                                      ),
-                                      Consumer<MonthProvider>(builder: (context, monthProvider, child) {
-                                        return Container(
-                                          margin: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(8),
-                                            vertical: ScreenUtil.verticalScale(2),
-                                          ),
-                                          height: media.height * 0.21,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                child: Column(
-                                                  children: [
-                                                    monthProvider.startTime != null && monthProvider.endTime != null
-                                                        ? Row(
-                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                            children: [
-                                                              Text(
-                                                                monthProvider.startTime == null || monthProvider.startTime.toString() == ""
-                                                                    ? ""
-                                                                    : DateFormat('MM/dd').format(monthProvider.startTime!),
-                                                                style: TextStyle(
-                                                                  color: Colors.white,
-                                                                  fontSize: ScreenUtil.verticalScale(2),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                monthProvider.endTime == null || monthProvider.endTime.toString() == ""
-                                                                    ? ""
-                                                                    : DateFormat(' - MM/dd').format(monthProvider.endTime!),
-                                                                style: TextStyle(
-                                                                  color: Colors.white,
-                                                                  fontSize: ScreenUtil.verticalScale(2),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : const SizedBox(),
-                                                    Padding(
-                                                      padding: const EdgeInsets.symmetric(vertical: 5),
-                                                      child: Text(
-                                                        monthProvider.monthDataModel?.title ?? "",
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: ScreenUtil.horizontalScale(6.5),
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      ),
+                              SafeArea(
+                                child: Column(
+                                  children: [
+                                    Consumer<ScrollProvider>(
+                                      builder: (context, scrollProvider, child) {
+                                        return Column(
+                                          children: [
+                                            scrollProvider.scrollOffset1 >= 0.0
+                                                ? AppBar(
+                                                    toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                                    surfaceTintColor: Colors.transparent,
+                                                    backgroundColor: Colors.transparent,
+                                                    leading: BackArrowWidget(
+                                                      onPress: () {
+                                                        monthProvider?.mainPageProvider.changeTab(0);
+                                                      },
                                                     ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.symmetric(
-                                                  horizontal: ScreenUtil.horizontalScale(9),
-                                                ),
-                                                child: ButtonWidget(
-                                                  text: "Watch Video Intro",
-                                                  color: Colors.white,
-                                                  onPress: () {
-                                                    Navigator.of(context).push(
-                                                      FadePageRoute(
-                                                        page: const VideoIntroWidget(
-                                                          vimeoId: '953289606',
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  textColor: AppColors.primaryColor,
-                                                  isLoading: false,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                                    actions: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(right: 10),
+                                                        child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                                      )
+                                                    ],
+                                                  )
+                                                : SizedBox(),
+                                            SizedBox(
+                                              height: scrollProvider.scrollOffset1 >= 0.0 ? 0 : ScreenUtil.verticalScale(5.1),
+                                            )
+                                          ],
                                         );
-                                      }),
-                                    ],
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                child: Center(
+                                  child: SafeArea(
+                                    child: Consumer<MonthProvider>(
+                                      builder: (context, monthProvider, child) {
+                                        return Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              height: ScreenUtil.verticalScale(6),
+                                            ),
+                                            Column(
+                                              children: [
+                                                monthProvider.startTime != null && monthProvider.endTime != null
+                                                    ? Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Text(
+                                                            monthProvider.startTime == null || monthProvider.startTime.toString() == ""
+                                                                ? ""
+                                                                : DateFormat('MM/dd').format(monthProvider.startTime!),
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.verticalScale(2),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            monthProvider.endTime == null || monthProvider.endTime.toString() == ""
+                                                                ? ""
+                                                                : DateFormat(' - MM/dd').format(monthProvider.endTime!),
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.verticalScale(2),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : const SizedBox(),
+                                                // Padding(
+                                                //   padding: const EdgeInsets.symmetric(vertical: 5),
+                                                //   child: Text(
+                                                //     monthProvider.monthDataModel?.title ?? "",
+                                                //     textAlign: TextAlign.center,
+                                                //     style: TextStyle(
+                                                //       color: Colors.white,
+                                                //       fontSize: ScreenUtil.horizontalScale(6.5),
+                                                //       fontWeight: FontWeight.bold,
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: ScreenUtil.horizontalScale(2),
+                                                    right: ScreenUtil.horizontalScale(8),
+                                                  ),
+                                                  child: SizedBox(
+                                                    height: media.height / 6.2,
+                                                    child: Center(
+                                                      child: Image.asset("assets/img/month_hero.png"),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin: EdgeInsets.symmetric(
+                                                    horizontal: ScreenUtil.horizontalScale(16),
+                                                  ),
+                                                  child: ButtonWidget(
+                                                    text: "Watch Video Intro",
+                                                    color: Colors.white,
+                                                    onPress: () {
+                                                      Navigator.of(context).push(
+                                                        FadePageRoute(
+                                                          page: const VideoIntroWidget(
+                                                            vimeoId: '953289606',
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    textColor: AppColors.primaryColor,
+                                                    isLoading: false,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
+
                               // Container(
                               //   alignment: Alignment.center,
                               //   margin: EdgeInsets.symmetric(
@@ -530,7 +544,7 @@ class _MonthViewState extends State<MonthView> {
             (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider?.changeIsPumpDay(isPumpDay);
-
+    log('isPumpDay :::::::::::::::::: ${isPumpDay}');
     if (isPumpDay) {
       final dataList = monthProvider?.dayHistoryModel
           .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
@@ -577,7 +591,6 @@ class _MonthViewState extends State<MonthView> {
 
     final isCompletedOrSkipped = (monthProvider?.allSplitDayHistoryModel
         .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
-
     if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && isCompletedOrSkipped!) {
       return;
     } else if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && !isCompletedOrSkipped!) {
@@ -585,7 +598,12 @@ class _MonthViewState extends State<MonthView> {
       context.read<MainPageProvider>().changeTab(1);
       monthProvider?.updateIsOnMonthPage(false);
       monthProvider?.updateScrollToRestDay(true);
-
+      _completeRestDay(status: Status.completed, type: 'Rest Day', endDate: true).then(
+        (value) {
+          monthProvider?.onInit(context, isEnabled: false);
+        },
+      );
+      await monthProvider?.checkForPumpDay();
       // showDialog(
       //   barrierDismissible: false,
       //   context: context,
@@ -812,4 +830,74 @@ class _MonthViewState extends State<MonthView> {
   //     ),
   //   );
   // }
+
+  Future<void> _completeRestDay({required String status, required String type, String? title, bool endDate = false}) async {
+    String split =
+        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
+
+    if (status == Status.completed) {
+      ApiRepo.addDayStatusList(body: {"date": "${DateTime.now().toUtc()}", "status": Status.completed});
+    }
+
+    final data = {
+      "title": title ?? "",
+      "dataId": dataId,
+      "monthId": monthProvider?.monthDataModel?.id,
+      "weekId": monthProvider?.weekDataModel?.id,
+      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "split": split,
+      "date": "${DateTime.now().toUtc()}",
+      "status": status,
+      "type": type,
+      "startTime": "${DateTime.now().toUtc()}",
+      "endTime": endDate ? "${DateTime.now().toUtc()}" : "",
+    };
+
+    DayHistoryModel? matchingElement =
+        monthProvider?.dayHistoryModel.firstWhere((element) => element.dataId == dataId, orElse: () => DayHistoryModel());
+
+    final data1 = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
+    };
+
+    final apiBody = {
+      "title": title ?? "",
+      "status": status,
+      "type": type,
+      "startTime": status == Status.empty
+          ? ""
+          : matchingElement?.startTime == null
+              ? "${DateTime.now().toUtc()}"
+              : matchingElement?.startTime.toString(),
+      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
+      "dataId": dataId
+    };
+
+    if (matchingElement?.id != null) {
+      ApiRepo.updateDayStatus(body: apiBody);
+
+      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+    } else {
+      ApiRepo.addDayStatus(body: data);
+
+      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+    }
+
+    await monthProvider?.fetchAllDayStatusLocalData();
+    monthProvider?.findWeekStatuses();
+    monthProvider?.fetchToday();
+    monthProvider?.manageStreak();
+    monthProvider?.getLiftedWeightGraphData();
+  }
 }

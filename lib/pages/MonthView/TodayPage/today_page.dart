@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -467,7 +466,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                             top: media.height / 4,
                           ),
                           decoration: BoxDecoration(
-                            color: isEditMode ? Color(0xFFc3daee) : Colors.white,
+                            color: isEditMode ? Color(0xffe5f0f9) : Colors.white,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
@@ -491,7 +490,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                         duration: Duration(milliseconds: 300),
                                         height: media.height / 11,
                                         width: media.width / 6,
-                                        color: isEditMode ? Color(0xFFc3daee) : Colors.white,
+                                        color: isEditMode ? Color(0xffe5f0f9) : Colors.white,
                                       ),
                                     ),
                                   ),
@@ -599,7 +598,6 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                       bool isExist =
                                                           (!monthProvider!.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
                                                               monthProvider!.isPastWeek;
-                                                      log('monthProvider!.exerciseHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider!.exerciseHistoryModel)}');
                                                       return Column(
                                                         children: [
                                                           Padding(

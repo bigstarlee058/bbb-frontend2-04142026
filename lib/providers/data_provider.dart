@@ -818,6 +818,18 @@ class DataProvider extends ChangeNotifier {
   }
 
   void getExerciseFromJson(responseData) {
+    currentExerciseObj = Exercise(
+        id: "",
+        title: "",
+        vimeoId: "",
+        thumbnail: "",
+        description: "",
+        guide: "",
+        relatedExercises: [],
+        categories: [],
+        usedEquipments: [],
+        files: []);
+    notifyListeners();
     if (responseData != null) {
       currentRelatedExercises.clear();
       List<Equipment> equipments = [];

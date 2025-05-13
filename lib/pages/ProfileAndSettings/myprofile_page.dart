@@ -409,7 +409,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               value: selectedWeight,
                               hint: '81',
                             ),
-                            SizedBox(height: ScreenUtil.verticalScale(3)),
+                            SizedBox(height: ScreenUtil.verticalScale(2)),
                             isLoading == true
                                 ? const Center(
                                     child: CircularProgressIndicator(
@@ -456,8 +456,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
               style: const TextStyle(
@@ -467,8 +467,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(50.5),
             child: GestureDetector(
               onTap: onTap,
               child: Container(
@@ -524,8 +524,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
               style: const TextStyle(
@@ -535,83 +535,81 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.horizontalScale(1),
-              ).copyWith(left: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  ScreenUtil.verticalScale(5),
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x20888888),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 1),
-                  ),
-                ],
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(1),
+            ).copyWith(left: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(
+                ScreenUtil.verticalScale(5),
               ),
-              child: Center(
-                // Center the dropdown content
-                child: DropdownButton<String>(
-                  value: value,
-                  dropdownColor: const Color.fromARGB(255, 252, 252, 252),
-                  elevation: 12,
-                  hint: Text(hint),
-                  isDense: true,
-                  isExpanded: true,
-                  alignment: Alignment.center,
-                  // Align the dropdown text to the center
-                  items: options.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Center(
-                        // Center the individual items in dropdown
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x20888888),
+                  spreadRadius: 3,
+                  blurRadius: 10,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Center(
+              // Center the dropdown content
+              child: DropdownButton<String>(
+                value: value,
+                dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                elevation: 12,
+                hint: Text(hint),
+                isDense: true,
+                isExpanded: true,
+                alignment: Alignment.center,
+                // Align the dropdown text to the center
+                items: options.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Center(
+                      // Center the individual items in dropdown
 
-                        child: Text(
-                          value,
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                      child: Text(
+                        value,
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    );
-                  }).toList(),
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: ScreenUtil.verticalScale(2.3),
-                    fontWeight: FontWeight.normal,
-                  ),
-                  onChanged: onChanged,
-                  underline: Container(),
+                    ),
+                  );
+                }).toList(),
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: ScreenUtil.verticalScale(2.3),
+                  fontWeight: FontWeight.normal,
                 ),
-
-                // DropdownButton<String>(
-                //   value: value,
-                //   hint: Text(hint),
-                //   isExpanded: true,
-                //   alignment: Alignment.center, // Align the dropdown text to the center
-                //   items: options.map((String value) {
-                //     return DropdownMenuItem<String>(
-                //       value: value,
-                //       child: Center(
-                //         // Center the individual items in dropdown
-                //         child: Text(value),
-                //       ),
-                //     );
-                //   }).toList(),
-                //   onChanged: (String? newValue) {
-                //     setState(() {
-                //       value = newValue;
-                //     });
-                //   },
-                //   underline: Container(),
-                // ),
+                onChanged: onChanged,
+                underline: Container(),
               ),
+
+              // DropdownButton<String>(
+              //   value: value,
+              //   hint: Text(hint),
+              //   isExpanded: true,
+              //   alignment: Alignment.center, // Align the dropdown text to the center
+              //   items: options.map((String value) {
+              //     return DropdownMenuItem<String>(
+              //       value: value,
+              //       child: Center(
+              //         // Center the individual items in dropdown
+              //         child: Text(value),
+              //       ),
+              //     );
+              //   }).toList(),
+              //   onChanged: (String? newValue) {
+              //     setState(() {
+              //       value = newValue;
+              //     });
+              //   },
+              //   underline: Container(),
+              // ),
             ),
           ),
         ],
@@ -627,8 +625,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
               style: const TextStyle(
@@ -638,48 +636,46 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              height: ScreenUtil.verticalScale(6),
-              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x20888888),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: TextField(
-                  style: TextStyle(
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            height: ScreenUtil.verticalScale(6),
+            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x20888888),
+                  spreadRadius: 3,
+                  blurRadius: 10,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Center(
+              child: TextField(
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(2.3),
+                  color: Colors.black,
+                  fontWeight: FontWeight.normal,
+                ),
+                controller: value,
+                keyboardType: TextInputType.text,
+                onSubmitted: (value) {
+                  FocusScope.of(context).unfocus();
+                },
+                textInputAction: TextInputAction.done,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: "City",
+                  hintStyle: TextStyle(
+                    color: Colors.grey.shade700,
                     fontSize: ScreenUtil.verticalScale(2.3),
-                    color: Colors.black,
                     fontWeight: FontWeight.normal,
                   ),
-                  controller: value,
-                  keyboardType: TextInputType.text,
-                  onSubmitted: (value) {
-                    FocusScope.of(context).unfocus();
-                  },
-                  textInputAction: TextInputAction.done,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    hintText: "City",
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: ScreenUtil.verticalScale(2.3),
-                      fontWeight: FontWeight.normal,
-                    ),
-                    border: InputBorder.none,
-                    isCollapsed: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
+                  border: InputBorder.none,
+                  isCollapsed: true,
+                  contentPadding: EdgeInsets.zero,
                 ),
               ),
             ),
@@ -696,8 +692,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
               style: const TextStyle(
@@ -707,33 +703,37 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              height: ScreenUtil.verticalScale(6),
-              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x20888888),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: KeyboardActions(
-                autoScroll: false,
-                config: _buildConfig(context),
-                child: Row(
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            height: ScreenUtil.verticalScale(6),
+            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x20888888),
+                  spreadRadius: 3,
+                  blurRadius: 10,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child: KeyboardActions(
+              autoScroll: false,
+              config: _buildConfig(context),
+              child: Builder(builder: (context) {
+                return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Flexible(flex: 4, child: SizedBox()),
-                    Flexible(
-                      flex: 6,
+                    Expanded(
+                      child: SizedBox(
+                        width: ScreenUtil.horizontalScale(18.5),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ScreenUtil.horizontalScale(21),
                       child: TextField(
                         style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(2.3),
@@ -787,10 +787,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ],
                       ),
                     ),
-                    Flexible(flex: 4, child: SizedBox()),
+                    Expanded(
+                      child: SizedBox(
+                        width: ScreenUtil.horizontalScale(18.5),
+                      ),
+                    ),
                   ],
-                ),
-              ),
+                );
+              }),
             ),
           )
         ],
@@ -805,8 +809,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
               style: const TextStyle(
@@ -816,52 +820,50 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.horizontalScale(1),
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(1),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(
+                ScreenUtil.verticalScale(5),
               ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  ScreenUtil.verticalScale(5),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x20888888),
+                  spreadRadius: 3,
+                  blurRadius: 10,
+                  offset: Offset(0, 1),
                 ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x20888888),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () async {
-                    await showCupertinoHeightPicker(
-                      context: context,
-                      initialHeight: heightInCm,
-                      initialSelectedHeightUnit: selectedHeightUnit,
-                      canConvertUnit: canConvertUnit,
-                      showSeparationText: showSeparationText,
-                      onHeightChanged: (val) {
-                        setState(() {
-                          heightInCm = val;
-                          int feet = (heightInCm / 2.54) ~/ 12;
-                          int inches = ((heightInCm / 2.54) % 12).floor();
-                          value.text = '$feet\'$inches"';
-                        });
-                      },
-                    );
-                  },
-                  child: Text(
-                    value.text.isEmpty ? 'Height' : value.text,
-                    style: TextStyle(
-                      color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
-                      fontSize: ScreenUtil.verticalScale(2.3),
-                      fontWeight: FontWeight.normal,
-                    ),
+              ],
+            ),
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  await showCupertinoHeightPicker(
+                    context: context,
+                    initialHeight: heightInCm,
+                    initialSelectedHeightUnit: selectedHeightUnit,
+                    canConvertUnit: canConvertUnit,
+                    showSeparationText: showSeparationText,
+                    onHeightChanged: (val) {
+                      setState(() {
+                        heightInCm = val;
+                        int feet = (heightInCm / 2.54) ~/ 12;
+                        int inches = ((heightInCm / 2.54) % 12).floor();
+                        value.text = '$feet\'$inches"';
+                      });
+                    },
+                  );
+                },
+                child: Text(
+                  value.text.isEmpty ? 'Height' : value.text,
+                  style: TextStyle(
+                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                    fontSize: ScreenUtil.verticalScale(2.3),
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ),
