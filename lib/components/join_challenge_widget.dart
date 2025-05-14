@@ -30,7 +30,7 @@ class JoinChallengeWidget extends StatelessWidget {
                     children: [
                       Container(
                         height: (media.height / 1.8) / 3,
-                        color: Colors.grey[200],
+                        color: AppColors.greyColor,
                       )
                     ],
                   ),

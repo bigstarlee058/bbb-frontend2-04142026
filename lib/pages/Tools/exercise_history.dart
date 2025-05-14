@@ -529,7 +529,7 @@ class FilterButton extends StatelessWidget {
       width: buttonWidth,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? AppColors.primaryColor : Colors.grey[200],
+          backgroundColor: isSelected ? AppColors.primaryColor : AppColors.greyColor,
           padding: const EdgeInsets.symmetric(horizontal: 1.0),
         ),
         onPressed: onPressed,

@@ -146,7 +146,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(bottom: 5),
+                                        padding: EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.5)),
                                         child: Text(
                                           'Your Current Streak',
                                           style: TextStyle(
@@ -194,17 +194,24 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: media.height / 3.70,
-                        width: media.width,
-                        child: Align(
-                          alignment: Alignment.bottomRight,
+                  child: Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                      ),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          right: 0,
+                          top: -(media.height / 9.8) + 0.3,
                           child: ClipPath(
                             clipper: DiagonalClipper(),
                             child: Container(
-                              height: media.height / 11,
+                              height: media.height / 9.8,
                               width: media.width / 6,
                               decoration: const BoxDecoration(
                                 color: Colors.white,
@@ -212,16 +219,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             ),
                           ),
                         ),
-                      ),
-                      Container(
-                        width: media.width,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                          ),
-                        ),
-                        child: Column(
+                        Column(
                           children: [
                             SizedBox(
                               height: ScreenUtil.verticalScale(4),
@@ -285,8 +283,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             SizedBox(height: ScreenUtil.verticalScale(10))
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

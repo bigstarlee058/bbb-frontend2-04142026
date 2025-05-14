@@ -317,7 +317,7 @@ class _MonthViewState extends State<MonthView> {
                                                   child: SizedBox(
                                                     height: media.height / 6.2,
                                                     child: Center(
-                                                      child: Image.asset("assets/img/month_hero.png"),
+                                                      child: Image.asset("assets/img/month_hero1.png"),
                                                     ),
                                                   ),
                                                 ),
@@ -438,7 +438,8 @@ class _MonthViewState extends State<MonthView> {
                                                 padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2.2)),
                                                 margin: EdgeInsets.only(left: index == 0 ? 0 : 8),
                                                 decoration: BoxDecoration(
-                                                    color: index == controller.selectedSection ? AppColors.primaryColor : Colors.grey[100],
+                                                    color:
+                                                        index == controller.selectedSection ? AppColors.primaryColor : AppColors.greyColor,
                                                     borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5.5))),
                                                 child: Center(
                                                   child: Text(

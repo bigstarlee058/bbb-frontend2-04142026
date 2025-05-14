@@ -21,7 +21,6 @@ class StepProgressBar extends StatelessWidget {
         return Row(
           children: List.generate(totalSteps, (index) {
             double fillPercent = (progress - index).clamp(0.0, 1.0);
-            final stepOffset = index * (stepWidth + spacing);
             return Padding(
               padding: EdgeInsets.symmetric(horizontal: spacing / 3),
               child: Stack(
@@ -30,7 +29,7 @@ class StepProgressBar extends StatelessWidget {
                     width: stepWidth,
                     height: ScreenUtil.verticalScale(0.8),
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: AppColors.greyColor,
                       borderRadius: index == 0
                           ? BorderRadius.horizontal(left: Radius.circular(20))
                           : index == 3

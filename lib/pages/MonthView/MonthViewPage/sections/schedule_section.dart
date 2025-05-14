@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -89,7 +87,6 @@ class ScheduleSection extends StatelessWidget {
                                     title = data.first.title ?? "";
                                   }
 
-                                  log('monthProvider.todayTitleId :::::::::::::::::: ${monthProvider.todayTitleId}');
                                   return ButtonWidget(
                                     text: monthProvider.todayTitleId.isEmpty
                                         ? "Completed"
