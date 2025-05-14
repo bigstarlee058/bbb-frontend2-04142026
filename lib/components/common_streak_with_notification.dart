@@ -35,21 +35,24 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
             // mainPageProvider.changeTab(4);
           },
           icon: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                height: ScreenUtil.verticalScale(2.2),
+                width: ScreenUtil.verticalScale(2.2),
                 decoration: BoxDecoration(
-                  color: Colors.black12,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white),
                 ),
-                child: Text(
-                  '${streak.streak}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: ScreenUtil.verticalScale(0.8),
+                child: Center(
+                  child: Text(
+                    '${streak.streak}',
+                    style: TextStyle(
+                      fontSize: ScreenUtil.verticalScale(1.4),
+                      height: 0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

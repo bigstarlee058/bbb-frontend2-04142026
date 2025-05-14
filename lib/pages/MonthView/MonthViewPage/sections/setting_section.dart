@@ -116,7 +116,7 @@ class _SettingSectionState extends State<SettingSection> {
                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade200,
+                          color: AppColors.greyColor,
                           blurRadius: 10,
                         ),
                       ],
@@ -176,7 +176,7 @@ class _SettingSectionState extends State<SettingSection> {
                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade200,
+                          color: AppColors.greyColor,
                           blurRadius: 10,
                         ),
                       ],
@@ -236,7 +236,7 @@ class _SettingSectionState extends State<SettingSection> {
                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade200,
+                          color: AppColors.greyColor,
                           blurRadius: 10,
                         ),
                       ],
@@ -360,7 +360,7 @@ class _SettingSectionState extends State<SettingSection> {
                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade200,
+                          color: AppColors.greyColor,
                           blurRadius: 10,
                         ),
                       ],
@@ -420,7 +420,7 @@ class _SettingSectionState extends State<SettingSection> {
                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade200,
+                          color: AppColors.greyColor,
                           blurRadius: 10,
                         ),
                       ],
@@ -480,7 +480,7 @@ class _SettingSectionState extends State<SettingSection> {
                       borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade200,
+                          color: AppColors.greyColor,
                           blurRadius: 10,
                         ),
                       ],

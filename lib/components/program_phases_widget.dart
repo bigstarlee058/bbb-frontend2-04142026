@@ -27,7 +27,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                   children: [
                     Container(
                       height: (media.height / 1.8) / 3,
-                      color: Colors.grey[200],
+                      color: AppColors.greyColor,
                     )
                   ],
                 ),
@@ -60,7 +60,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                   clipper: MiddleClipper(),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: AppColors.greyColor,
                       // color: Color(0xFFEEEEEE),
                       // image: DecorationImage(
                       //   image: const AssetImage('assets/img/pp_4.png'),

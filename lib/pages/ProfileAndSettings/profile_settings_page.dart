@@ -225,8 +225,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           builder: (context, userData, child) =>
                                               userData.userData['detail'] != null && userData.userData['detail']['avatarUrl'] != ""
                                                   ? Container(
-                                                      height: ScreenUtil.horizontalScale(22.5),
-                                                      width: ScreenUtil.horizontalScale(22.5),
+                                                      height: ScreenUtil.verticalScale(10.5),
+                                                      width: ScreenUtil.verticalScale(10.5),
                                                       decoration: BoxDecoration(
                                                         color: Colors.grey.withValues(alpha: .9),
                                                         borderRadius: BorderRadius.all(
@@ -402,37 +402,39 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                   child: Icon(Icons.calendar_month, color: Colors.white, size: 22),
                                                 ),
                                                 SizedBox(height: ScreenUtil.verticalScale(0.9)),
-                                                Builder(builder: (context) {
-                                                  String accountCreatedDate = context.watch<UserDataProvider>().userData != null
-                                                      ? context.watch<UserDataProvider>().userData["createdAt"]
-                                                      : "";
-                                                  DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
-                                                  DateTime today = DateTime.now();
-                                                  int dayDifference = today.difference(targetDate).inDays;
-                                                  return Column(
-                                                    children: [
-                                                      Text(
-                                                        "$dayDifference Day${dayDifference > 1 ? "s" : ""}",
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: ScreenUtil.horizontalScale(3.2),
-                                                          fontWeight: FontWeight.bold,
-                                                          height: 1,
+                                                Builder(
+                                                  builder: (context) {
+                                                    String accountCreatedDate = context.watch<UserDataProvider>().userData != null
+                                                        ? context.watch<UserDataProvider>().userData["createdAt"]
+                                                        : "";
+                                                    DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
+                                                    DateTime today = DateTime.now();
+                                                    int dayDifference = today.difference(targetDate).inDays;
+                                                    return Column(
+                                                      children: [
+                                                        Text(
+                                                          "$dayDifference Day${dayDifference > 1 ? "s" : ""}",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.horizontalScale(3.2),
+                                                            fontWeight: FontWeight.bold,
+                                                            height: 1,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      SizedBox(height: ScreenUtil.verticalScale(0.25)),
-                                                      Text(
-                                                        "Since Joining",
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: ScreenUtil.horizontalScale(3),
-                                                          fontWeight: FontWeight.normal,
-                                                          height: 1,
+                                                        SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                        Text(
+                                                          "Since Joining",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil.horizontalScale(3),
+                                                            fontWeight: FontWeight.normal,
+                                                            height: 1,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                })
+                                                      ],
+                                                    );
+                                                  },
+                                                )
                                               ],
                                             ),
                                           ],
@@ -470,25 +472,21 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                           children: [
                             Container(
                               margin: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.horizontalScale(7),
-                                vertical: ScreenUtil.verticalScale(2.5),
+                                horizontal: ScreenUtil.horizontalScale(6),
+                                vertical: ScreenUtil.verticalScale(3),
                               ),
                               child: Column(
                                 children: [
                                   settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
                                       () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(4.5),
-                                  ),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('My Profile', Icons.person, () => Navigator.pushNamed(context, '/myprofile')),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(4.5),
-                                  ),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
                                   settingsButton('Settings', Icons.settings, () => Navigator.pushNamed(context, '/SettingPage')),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(4.5),
-                                  ),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
                                   settingsButton('Subscription', Icons.refresh, () async {
                                     SharedPreferences prefs = await SharedPreferences.getInstance();
                                     String? token = prefs.getString('authToken');
@@ -506,28 +504,19 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
                                   // SizedBox(height: ScreenUtil.horizontalScale(4.5)),
                                   // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(4.5),
-                                  ),
-                                  settingsButton('Support', Icons.handshake, () {
-                                    toSupportPage();
-                                  }),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
+                                  settingsButton('Support', Icons.handshake, () => toSupportPage()),
                                   // SizedBox(
                                   //   height: ScreenUtil.horizontalScale(4.5),
                                   // ),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(4.5),
-                                  ),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
                                   settingsButton('Legal', Icons.description, () => {}),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(4.5),
-                                  ),
-                                  settingsButton('Log Out', Icons.logout, () {
-                                    _handleLogout(context);
-                                  }),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(5),
-                                  ),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
+                                  settingsButton('Log Out', Icons.logout, () => _handleLogout(context)),
+                                  SizedBox(height: ScreenUtil.verticalScale(1)),
                                 ],
                               ),
                             ),
@@ -569,8 +558,12 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: ScreenUtil.verticalScale(1),
+        decoration: BoxDecoration(
+          color: AppColors.greyColor,
+          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+        ),
+        padding: EdgeInsets.all(
+          ScreenUtil.verticalScale(1.5),
         ),
         // decoration: BoxDecoration(
         //   color: const Color(0xFFFAFAFA),
@@ -596,7 +589,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 Icon(
                   icon,
                   color: AppColors.primaryColor,
-                  size: ScreenUtil.verticalScale(4),
+                  size: ScreenUtil.verticalScale(3.8),
                 ),
                 SizedBox(
                   width: ScreenUtil.verticalScale(3),

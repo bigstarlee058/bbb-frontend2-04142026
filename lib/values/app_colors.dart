@@ -8,7 +8,7 @@ class AppColors {
   static const backOffSetColor = Color.fromRGBO(254, 233, 232, 1.0);
   // static const backOffSetColor1 = Color.fromRGBO(240, 200, 198, 1.0);
   static const backOffSetColor1 = Color.fromRGBO(220, 170, 168, 1.0);
-
+  static const greyColor = Color(0xffF8F8F8);
   static const skipDayColor = Colors.blue;
   static List<Color> get primaryG => [primaryColor, primaryColor];
 }

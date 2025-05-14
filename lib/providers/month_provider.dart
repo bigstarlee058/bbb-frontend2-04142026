@@ -2236,176 +2236,7 @@ class MonthProvider extends ChangeNotifier {
 
   /// ::::: ACHIEVEMENT
 
-  List<Map<String, dynamic>> items = [
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "Breaking the Ice",
-      "subtitle": "Your First Workout Finished",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "I Got This",
-      "subtitle": "First Week Finished",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "I'm Determined",
-      "subtitle": "First Month Finished",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "3 in a Row",
-      "subtitle": "Achieved the streak of 3",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "7 in a Row",
-      "subtitle": "Achieved the streak of 7",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "14 in a Row",
-      "subtitle": "Achieved the Streak of 14",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "30 in a row",
-      "subtitle": "Achieved the streak of 30",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "250k Monster",
-      "subtitle": "Total Weight Lifted > 250k lbs",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "500k Monster",
-      "subtitle": "Total Weight Lifted > 500k lbs",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "5 and Done",
-      "subtitle": "Completed 5 Days",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "10 and Done",
-      "subtitle": "Completed 10 Days",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "20 and Done",
-      "subtitle": "Completed 20 Days",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "50 and Done",
-      "subtitle": "Completed 50 Days",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "100 and Done",
-      "subtitle": "Completed 100 Days",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "250 and Done",
-      "subtitle": "Completed 250 Days",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "500 and Done",
-      "subtitle": "Completed 500 Days",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "Trial Survivor",
-      "subtitle": "14+ Days in the App",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "1 Month",
-      "subtitle": "28+ Days in the App",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "Quarter Year",
-      "subtitle": "3 + Months in the App",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "Half Year",
-      "subtitle": "6+ Months in the App",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-    {
-      "image": "assets/img/verified (1).svg",
-      "active_image": "assets/img/verified (1).svg",
-      "title": "Yearling",
-      "subtitle": "12+ Months in the App",
-      "isArchived": false,
-      "time": "${DateTime.now().toUtc()}"
-    },
-  ];
+  List<Map<String, dynamic>> items = [];
   List<AchievementsModel> achievementsModel = [];
 
   updateAchievements() async {
@@ -2416,6 +2247,177 @@ class MonthProvider extends ChangeNotifier {
     } else {
       achievementsModel = [];
     }
+
+    items = [
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Breaking the Ice",
+        "subtitle": "Your First Workout Finished",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "I Got This",
+        "subtitle": "First Week Finished",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "I'm Determined",
+        "subtitle": "First Month Finished",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "3 in a Row",
+        "subtitle": "Achieved the streak of 3",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "7 in a Row",
+        "subtitle": "Achieved the streak of 7",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "14 in a Row",
+        "subtitle": "Achieved the Streak of 14",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "30 in a row",
+        "subtitle": "Achieved the streak of 30",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "250k Monster",
+        "subtitle": "Total Weight Lifted > 250k lbs",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "500k Monster",
+        "subtitle": "Total Weight Lifted > 500k lbs",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "5 and Done",
+        "subtitle": "Completed 5 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "10 and Done",
+        "subtitle": "Completed 10 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "20 and Done",
+        "subtitle": "Completed 20 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "50 and Done",
+        "subtitle": "Completed 50 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "100 and Done",
+        "subtitle": "Completed 100 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "250 and Done",
+        "subtitle": "Completed 250 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "500 and Done",
+        "subtitle": "Completed 500 Days",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Trial Survivor",
+        "subtitle": "14+ Days in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "1 Month",
+        "subtitle": "28+ Days in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Quarter Year",
+        "subtitle": "3 + Months in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Half Year",
+        "subtitle": "6+ Months in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+      {
+        "image": "assets/img/verified (1).svg",
+        "active_image": "assets/img/verified (1).svg",
+        "title": "Yearling",
+        "subtitle": "12+ Months in the App",
+        "isArchived": false,
+        "time": "${DateTime.now().toUtc()}"
+      },
+    ];
 
     String accountCreatedDate = userDataProvider.userData != null ? userDataProvider.userData["createdAt"] : "";
     DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();

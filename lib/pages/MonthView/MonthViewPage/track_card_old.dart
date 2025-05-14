@@ -176,11 +176,11 @@
 //       //     child: Icon(
 //       //       Icons.done,
 //       //       size: ScreenUtil.verticalScale(2.5),
-//       //       color: 1 == 2 ? Colors.white : Colors.grey[100],
+//       //       color: 1 == 2 ? Colors.white : AppColors.greyColor,
 //       //     ),
 //       //   ),
 //       // ),
-//       backgroundColor: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : Colors.grey[100],
+//       backgroundColor: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor : AppColors.greyColor,
 //       body: Container(
 //         padding: EdgeInsets.symmetric(
 //           horizontal: ScreenUtil.horizontalScale(3.8),

@@ -86,16 +86,16 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black.withValues(alpha: 0.1), width: 0.3),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 0.3),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.4),
+            color: Colors.grey.withValues(alpha: 0.27),
             blurRadius: 10,
             spreadRadius: 2,
             offset: Offset(0, 2),
           ),
         ],
-        color: Colors.grey[100],
+        color: AppColors.greyColor,
         borderRadius: BorderRadius.circular(
           ScreenUtil.verticalScale(2),
         ),

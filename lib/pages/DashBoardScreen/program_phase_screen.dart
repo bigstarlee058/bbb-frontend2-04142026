@@ -264,7 +264,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
       collapsedBackgroundColor: const Color(0xFF0D0D0D),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-        color: Colors.grey[100],
+        color: AppColors.greyColor,
       ),
       iconColor: AppColors.primaryColor,
       collapsedIconColor: Colors.white,
