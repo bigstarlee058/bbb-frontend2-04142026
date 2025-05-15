@@ -9,6 +9,7 @@ import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/foundation.dart';
@@ -460,8 +461,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
             width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
               ),
@@ -476,18 +477,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   horizontal: ScreenUtil.horizontalScale(1),
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                    ScreenUtil.verticalScale(5),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x20888888),
-                      spreadRadius: 3,
-                      blurRadius: 10,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+                  color: Colors.grey.withValues(alpha: 0.052),
+                  borderRadius: Utils.buttonRadius,
                 ),
                 child: Center(
                   // Center the text
@@ -495,7 +486,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     value,
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: ScreenUtil.verticalScale(2.3),
+                      fontSize: ScreenUtil.verticalScale(1.95),
                       // fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
                       fontWeight: FontWeight.normal,
                     ),
@@ -528,8 +519,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
             width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
               ),
@@ -541,18 +532,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
               horizontal: ScreenUtil.horizontalScale(1),
             ).copyWith(left: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(
-                ScreenUtil.verticalScale(5),
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x20888888),
-                  spreadRadius: 3,
-                  blurRadius: 10,
-                  offset: Offset(0, 1),
-                ),
-              ],
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
             ),
             child: Center(
               // Center the dropdown content
@@ -575,6 +556,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         value,
                         maxLines: 1,
                         textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: ScreenUtil.verticalScale(1.95),
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -582,7 +566,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 }).toList(),
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: ScreenUtil.verticalScale(2.3),
+                  fontSize: ScreenUtil.verticalScale(1.95),
                   fontWeight: FontWeight.normal,
                 ),
                 onChanged: onChanged,
@@ -629,8 +613,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
             width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
               ),
@@ -641,21 +625,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
             height: ScreenUtil.verticalScale(6),
             padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x20888888),
-                  spreadRadius: 3,
-                  blurRadius: 10,
-                  offset: Offset(0, 1),
-                ),
-              ],
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
             ),
             child: Center(
               child: TextField(
                 style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(2.3),
+                  fontSize: ScreenUtil.verticalScale(1.95),
                   color: Colors.black,
                   fontWeight: FontWeight.normal,
                 ),
@@ -670,7 +646,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   hintText: "City",
                   hintStyle: TextStyle(
                     color: Colors.grey.shade700,
-                    fontSize: ScreenUtil.verticalScale(2.3),
+                    fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
                   ),
                   border: InputBorder.none,
@@ -696,8 +672,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
             width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
               ),
@@ -708,16 +684,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
             height: ScreenUtil.verticalScale(6),
             padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x20888888),
-                  spreadRadius: 3,
-                  blurRadius: 10,
-                  offset: Offset(0, 1),
-                ),
-              ],
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
             ),
             child: KeyboardActions(
               autoScroll: false,
@@ -729,14 +697,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   children: [
                     Expanded(
                       child: SizedBox(
-                        width: ScreenUtil.horizontalScale(18.5),
+                        width: ScreenUtil.horizontalScale(20.5),
                       ),
                     ),
                     SizedBox(
-                      width: ScreenUtil.horizontalScale(21),
+                      width: ScreenUtil.horizontalScale(17),
                       child: TextField(
                         style: TextStyle(
-                          fontSize: ScreenUtil.verticalScale(2.3),
+                          fontSize: ScreenUtil.verticalScale(1.95),
                           color: Colors.black,
                           fontWeight: FontWeight.normal,
                         ),
@@ -754,7 +722,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           hintText: "Weight",
                           hintStyle: TextStyle(
                             color: Colors.grey.shade700,
-                            fontSize: ScreenUtil.verticalScale(2.3),
+                            fontSize: ScreenUtil.verticalScale(1.95),
                             fontWeight: FontWeight.normal,
                           ),
                           suffix: Padding(
@@ -762,7 +730,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             child: Text(
                               "lbs",
                               style: TextStyle(
-                                fontSize: ScreenUtil.verticalScale(2.3),
+                                fontSize: ScreenUtil.verticalScale(1.95),
                                 color: Colors.black,
                                 fontWeight: FontWeight.normal,
                               ),
@@ -789,7 +757,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     ),
                     Expanded(
                       child: SizedBox(
-                        width: ScreenUtil.horizontalScale(18.5),
+                        width: ScreenUtil.horizontalScale(20.5),
                       ),
                     ),
                   ],
@@ -813,8 +781,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
             width: ScreenUtil.horizontalScale(34.5),
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
               ),
@@ -826,18 +794,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
               horizontal: ScreenUtil.horizontalScale(1),
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(
-                ScreenUtil.verticalScale(5),
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x20888888),
-                  spreadRadius: 3,
-                  blurRadius: 10,
-                  offset: Offset(0, 1),
-                ),
-              ],
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
             ),
             child: Center(
               child: GestureDetector(
@@ -862,7 +820,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   value.text.isEmpty ? 'Height' : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
-                    fontSize: ScreenUtil.verticalScale(2.3),
+                    fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
                   ),
                 ),

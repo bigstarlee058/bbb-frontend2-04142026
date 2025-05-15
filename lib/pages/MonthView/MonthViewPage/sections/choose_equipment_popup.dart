@@ -242,11 +242,20 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog> with Tick
                                               ),
                                             ),
                                           ),
-                                          Container(
+
+                                          AnimatedContainer(
+                                            duration: Duration(milliseconds: 1500),
+                                            curve: Curves.fastOutSlowIn,
                                             color: showControls ? Colors.black38 : Colors.transparent,
                                             height: videoSize.height - 18,
                                             width: videoSize.width - 6,
                                           ),
+
+                                          // Container(
+                                          //   color: showControls ? Colors.black38 : Colors.transparent,
+                                          //   height: videoSize.height - 18,
+                                          //   width: videoSize.width - 6,
+                                          // ),
                                         ],
                                       )
                                     : Container(

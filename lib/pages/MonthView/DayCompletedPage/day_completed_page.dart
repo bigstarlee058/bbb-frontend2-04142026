@@ -46,8 +46,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    WidgetsBinding.instance
-        .addPostFrameCallback((timeStamp) async => await monthProvider?.fetchAllDayStatusLocalData().then((value) => onInit()));
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => onInit());
     super.initState();
   }
 
@@ -88,8 +87,6 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       exerciseCompleted = int.parse(data1.completedExercise ?? "0");
       averageRIR = double.parse(data1.averageRIR == "NaN" ? "0" : data1.averageRIR ?? "0");
     }
-
-    await Future.delayed(const Duration(milliseconds: 1000));
 
     setState(() {});
   }
@@ -182,7 +179,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(height: ScreenUtil.horizontalScale(10)),
+                            SizedBox(height: ScreenUtil.verticalScale(8.5)),
                             Text(
                               'Congratulations!',
                               style: TextStyle(
@@ -215,7 +212,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                 ),
               ),
               SizedBox(
-                height: media.height / 2.79,
+                height: media.height / 2.449,
                 width: media.width,
                 child: Align(
                   alignment: Alignment.bottomRight,
@@ -234,7 +231,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
             ],
           ),
           Container(
-            margin: EdgeInsets.only(top: media.height / 2.8),
+            margin: EdgeInsets.only(top: media.height / 2.45),
             child: Container(
               width: media.width,
               decoration: BoxDecoration(
@@ -244,11 +241,11 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                 ),
               ),
               child: Container(
-                margin: EdgeInsets.only(top: media.height / 20),
+                margin: EdgeInsets.only(top: media.height / 25),
                 child: Column(
                   children: [
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
                       child: Column(
                         children: [
                           IconRow(
@@ -260,6 +257,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                           formattedDates[index] &&
                                       element.status == Status.completed)
                                   ? IconDataWithDot(
+                                      index: index,
                                       day: last7Days[6 - index],
                                       icon: Icons.check,
                                       iconColor: Colors.white,
@@ -267,6 +265,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       showDot: true,
                                       dotColor: Colors.transparent)
                                   : IconDataWithDot(
+                                      index: index,
                                       day: last7Days[6 - index],
                                       icon: Icons.close,
                                       iconColor: Colors.white,
@@ -278,7 +277,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: ScreenUtil.verticalScale(3)),
+                    SizedBox(height: ScreenUtil.verticalScale(2)),
                     Text(
                       "Here's an overview of your today's workout.",
                       style: TextStyle(
@@ -295,314 +294,144 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: ScreenUtil.verticalScale(3)),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(ScreenUtil.verticalScale(3)),
-                        ),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            spreadRadius: 2,
-                            blurRadius: 10,
-                            offset: Offset(0, 1),
+                    SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                    GestureDetector(
+                      onTap: () {
+                        monthProvider?.updateGraphType("Exercise");
+                        Navigator.pushNamed(context, '/graphAndReports');
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(ScreenUtil.verticalScale(3)),
                           ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Exercises Completed',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black54, fontSize: 16.5),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              "$exerciseCompleted",
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Color(0xFFDD1166),
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              spreadRadius: 2,
+                              blurRadius: 10,
+                              offset: Offset(0, 1),
                             ),
                           ],
                         ),
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Exercises Completed',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                "$exerciseCompleted",
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Color(0xFFDD1166),
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                    SizedBox(height: ScreenUtil.horizontalScale(4.5)),
+                    SizedBox(height: ScreenUtil.verticalScale(2.5)),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
                       child: Row(
                         children: [
                           Expanded(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(ScreenUtil.verticalScale(3)),
+                            child: GestureDetector(
+                              onTap: () {
+                                monthProvider?.updateGraphType("Weight");
+                                Navigator.pushNamed(context, '/graphAndReports');
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(ScreenUtil.verticalScale(3)),
+                                  ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      spreadRadius: 2,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
                                 ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    spreadRadius: 2,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    'Weight Lifted',
-                                    style: TextStyle(color: Colors.black54, fontSize: 16.5),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    '${totalWeight.toStringAsFixed(0)} Lbs',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
-                                  )
-                                ],
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Weight Lifted',
+                                      style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      '${totalWeight.toStringAsFixed(0)} Lbs',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                           SizedBox(width: ScreenUtil.horizontalScale(4.5)),
                           Expanded(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(ScreenUtil.verticalScale(3)),
+                            child: GestureDetector(
+                              onTap: () {
+                                monthProvider?.updateGraphType("RIR");
+                                Navigator.pushNamed(context, '/graphAndReports');
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(ScreenUtil.verticalScale(3)),
+                                  ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      spreadRadius: 2,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
                                 ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    spreadRadius: 2,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    'Average RIR',
-                                    style: TextStyle(color: Colors.black54, fontSize: 16.5),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    averageRIR == 0 ? "0" : averageRIR.toStringAsFixed(2),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
-                                  )
-                                ],
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Average RIR',
+                                      style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      averageRIR == 0 ? "0" : averageRIR.toStringAsFixed(2),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(
-                    //     horizontal: ScreenUtil.horizontalScale(8),
-                    //   ),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       Expanded(
-                    //         child: Column(
-                    //           mainAxisAlignment: MainAxisAlignment.start,
-                    //           children: [
-                    //             Container(
-                    //               padding: EdgeInsets.symmetric(
-                    //                 horizontal: ScreenUtil.verticalScale(4.1),
-                    //                 vertical: ScreenUtil.verticalScale(2),
-                    //               ),
-                    //               decoration: BoxDecoration(
-                    //                 color: Colors.white,
-                    //                 borderRadius: BorderRadius.all(
-                    //                   Radius.circular(ScreenUtil.verticalScale(3)),
-                    //                 ),
-                    //                 boxShadow: const [
-                    //                   BoxShadow(
-                    //                     color: Colors.black12,
-                    //                     spreadRadius: 2,
-                    //                     blurRadius: 10,
-                    //                     offset: Offset(0, 1),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //               child: Column(
-                    //                 crossAxisAlignment: CrossAxisAlignment.center,
-                    //                 children: [
-                    //                   const Text(
-                    //                     'Exercises\nCompleted',
-                    //                     textAlign: TextAlign.center,
-                    //                     style: TextStyle(color: Colors.black54),
-                    //                   ),
-                    //                   const SizedBox(height: 10),
-                    //                   Text(
-                    //                     "$exerciseCompleted",
-                    //                     textAlign: TextAlign.center,
-                    //                     style: const TextStyle(
-                    //                       color: Color(0xFFDD1166),
-                    //                       fontSize: 16,
-                    //                       fontWeight: FontWeight.w500,
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //             const SizedBox(
-                    //               height: 20,
-                    //             ),
-                    //             Container(
-                    //               padding: EdgeInsets.symmetric(
-                    //                 horizontal: ScreenUtil.verticalScale(3.5),
-                    //                 vertical: ScreenUtil.verticalScale(2),
-                    //               ),
-                    //               decoration: BoxDecoration(
-                    //                 color: Colors.white,
-                    //                 borderRadius: BorderRadius.all(
-                    //                   Radius.circular(
-                    //                     ScreenUtil.verticalScale(3),
-                    //                   ),
-                    //                 ),
-                    //                 boxShadow: const [
-                    //                   BoxShadow(
-                    //                     color: Colors.black12,
-                    //                     spreadRadius: 2,
-                    //                     blurRadius: 10,
-                    //                     offset: Offset(0, 1),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //               child: Column(
-                    //                 crossAxisAlignment: CrossAxisAlignment.center,
-                    //                 children: [
-                    //                   const Text(
-                    //                     'Average RIR',
-                    //                     style: TextStyle(color: Colors.black54),
-                    //                   ),
-                    //                   const SizedBox(
-                    //                     height: 10,
-                    //                   ),
-                    //                   Text(
-                    //                     averageRIR.toStringAsFixed(2),
-                    //                     textAlign: TextAlign.center,
-                    //                     style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
-                    //                   )
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       ),
-                    //       const SizedBox(width: 5),
-                    //       Expanded(
-                    //         child: Column(
-                    //           mainAxisAlignment: MainAxisAlignment.start,
-                    //           children: [
-                    //             Container(
-                    //               padding: EdgeInsets.symmetric(
-                    //                 horizontal: ScreenUtil.verticalScale(4.1),
-                    //                 vertical: ScreenUtil.verticalScale(2),
-                    //               ),
-                    //               decoration: BoxDecoration(
-                    //                 color: Colors.white,
-                    //                 borderRadius: BorderRadius.all(
-                    //                   Radius.circular(ScreenUtil.verticalScale(3)),
-                    //                 ),
-                    //                 boxShadow: const [
-                    //                   BoxShadow(
-                    //                     color: Colors.black12,
-                    //                     spreadRadius: 2,
-                    //                     blurRadius: 10,
-                    //                     offset: Offset(0, 1),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //               child: Column(
-                    //                 crossAxisAlignment: CrossAxisAlignment.start,
-                    //                 children: [
-                    //                   const Text(
-                    //                     'Time Spent',
-                    //                     style: TextStyle(color: Colors.black54),
-                    //                   ),
-                    //                   const SizedBox(height: 10),
-                    //                   Text(
-                    //                     time.isEmpty ? " \n " : time,
-                    //                     textAlign: TextAlign.center,
-                    //                     style: const TextStyle(
-                    //                       color: Color(0xFFDD1166),
-                    //                       fontSize: 15,
-                    //                       fontWeight: FontWeight.w500,
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //             const SizedBox(
-                    //               height: 20,
-                    //             ),
-                    //             Container(
-                    //               padding: EdgeInsets.symmetric(
-                    //                 horizontal: ScreenUtil.verticalScale(3.5),
-                    //                 vertical: ScreenUtil.verticalScale(2),
-                    //               ),
-                    //               decoration: BoxDecoration(
-                    //                 color: Colors.white,
-                    //                 borderRadius: BorderRadius.all(
-                    //                   Radius.circular(
-                    //                     ScreenUtil.verticalScale(3),
-                    //                   ),
-                    //                 ),
-                    //                 boxShadow: const [
-                    //                   BoxShadow(
-                    //                     color: Colors.black12,
-                    //                     spreadRadius: 2,
-                    //                     blurRadius: 10,
-                    //                     offset: Offset(0, 1),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //               child: Column(
-                    //                 crossAxisAlignment: CrossAxisAlignment.center,
-                    //                 children: [
-                    //                   const Text(
-                    //                     'Weight Lifted',
-                    //                     style: TextStyle(color: Colors.black54),
-                    //                   ),
-                    //                   const SizedBox(
-                    //                     height: 10,
-                    //                   ),
-                    //                   Text(
-                    //                     '${totalWeight.toStringAsFixed(0)} Lbs',
-                    //                     textAlign: TextAlign.center,
-                    //                     style: const TextStyle(color: Color(0xFFDD1166), fontSize: 15, fontWeight: FontWeight.w500),
-                    //                   )
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
-                    Spacer(),
+                    SizedBox(height: ScreenUtil.verticalScale(2.5)),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                       child: ButtonWidget(
@@ -620,29 +449,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         isLoading: false,
                       ),
                     ),
-                    // const SizedBox(height: 16),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                    //   child: Consumer<MonthProvider>(builder: (context, monthData, child) {
-                    //     return ButtonWidget(
-                    //       text: monthData.todayTitleId.isEmpty ? "Completed" : "Next Workout",
-                    //       textColor: Colors.white,
-                    //       onPress: () {
-                    //         monthProvider?.checkForPumpDay();
-                    //         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                    //         mainPageProvider?.changeTab(1);
-                    //
-                    //         if (monthData.todayTitleId.isNotEmpty) {
-                    //           continueWorkoutOnTap(monthData, context);
-                    //         }
-                    //       },
-                    //       color: monthData.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                    //       isLoading: false,
-                    //     );
-                    //   }),
-                    // ),
-                    // const SizedBox(height: 30),
-                    SizedBox(height: ScreenUtil.horizontalScale(7.5)),
+                    SizedBox(height: ScreenUtil.horizontalScale(7)),
                   ],
                 ),
               ),
@@ -1037,6 +844,7 @@ class IconDataWithDot {
   final bool showDot;
   final Color? dotColor;
   final String? day;
+  final int? index;
 
   IconDataWithDot({
     required this.icon,
@@ -1044,6 +852,7 @@ class IconDataWithDot {
     required this.iconColor,
     required this.backgroundColor,
     required this.dotColor,
+    required this.index,
     this.borderColor,
     this.showDot = false,
   });
@@ -1057,43 +866,52 @@ class IconWithDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
-          decoration: BoxDecoration(
-            color: iconData.backgroundColor,
-            shape: BoxShape.circle,
-            border: iconData.borderColor != null ? Border.all(color: iconData.borderColor!) : null,
-          ),
-          child: iconData.icon != null
-              ? Icon(
-                  iconData.icon,
-                  color: iconData.iconColor,
-                  size: ScreenUtil.verticalScale(
-                    3,
-                  ),
-                )
-              : Icon(
-                  null,
-                  size: ScreenUtil.verticalScale(
-                    3,
-                  ),
-                ),
-        ),
-        if (iconData.showDot)
-          Padding(
-            padding: const EdgeInsets.only(top: 4.0),
-            child: Icon(
-              Icons.circle,
-              size: ScreenUtil.verticalScale(
-                0.7,
-              ),
-              color: iconData.dotColor ?? Colors.red[700],
+    return Container(
+      // color: iconData.index == 6 ? Colors.red : Colors.transparent,
+      padding: iconData.index == 6
+          ? EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1))
+          : EdgeInsets.zero,
+      decoration:
+          iconData.index == 6 ? BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)) : BoxDecoration(),
+      child: Column(
+        children: [
+          Text(iconData.day ?? ""),
+          Container(
+            padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
+            margin: EdgeInsets.only(top: ScreenUtil.verticalScale(1)),
+            decoration: BoxDecoration(
+              color: iconData.backgroundColor,
+              shape: BoxShape.circle,
+              border: iconData.borderColor != null ? Border.all(color: iconData.borderColor!) : null,
             ),
+            child: iconData.icon != null
+                ? Icon(
+                    iconData.icon,
+                    color: iconData.iconColor,
+                    size: ScreenUtil.verticalScale(
+                      2.75,
+                    ),
+                  )
+                : Icon(
+                    null,
+                    size: ScreenUtil.verticalScale(
+                      2.75,
+                    ),
+                  ),
           ),
-        Text(iconData.day ?? ""),
-      ],
+          // if (iconData.showDot)
+          //   Padding(
+          //     padding: const EdgeInsets.only(top: 4.0),
+          //     child: Icon(
+          //       Icons.circle,
+          //       size: ScreenUtil.verticalScale(
+          //         0.7,
+          //       ),
+          //       color: iconData.dotColor ?? Colors.red[700],
+          //     ),
+          //   ),
+        ],
+      ),
     );
   }
 }

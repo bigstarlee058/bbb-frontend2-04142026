@@ -154,9 +154,9 @@ class DayDataModel {
         typeId: json["typeId"],
         title: json["title"],
         description: json["description"],
-        vimeoId: json["vimeoId"],
-        vimeoId2: json["vimeoIdTwo"],
-        vimeoId3: json["vimeoIdThree"],
+        vimeoId: json["vimeoId"] ?? "",
+        vimeoId2: json["vimeoIdTwo"] ?? "",
+        vimeoId3: json["vimeoIdThree"] ?? "",
         thumbnail: json["thumbnail"],
         formats: json["formats"].runtimeType.toString() == "String"
             ? json["formats"].toString().split(',').toList()

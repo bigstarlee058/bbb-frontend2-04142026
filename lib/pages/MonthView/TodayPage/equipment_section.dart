@@ -108,7 +108,15 @@ class _EquipmentSectionState extends State<EquipmentSection> {
 
         // Padding around the background
         decoration: BoxDecoration(
-          color: AppColors.primaryColor,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
+          ],
+          color: Colors.white,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(7)),
           ),
@@ -148,23 +156,23 @@ class _EquipmentSectionState extends State<EquipmentSection> {
                   Text(
                     title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.primaryColor,
                       fontSize: ScreenUtil.verticalScale(2),
                       fontWeight: FontWeight.bold,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    // maxLines: 1,
+                    // overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: ScreenUtil.verticalScale(1)),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(1.7),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  // SizedBox(height: ScreenUtil.verticalScale(1)),
+                  // Text(
+                  //   description,
+                  //   style: TextStyle(
+                  //     color: Colors.white,
+                  //     fontSize: ScreenUtil.verticalScale(1.7),
+                  //   ),
+                  //   maxLines: 2,
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
                 ],
               ),
             ),
@@ -172,15 +180,16 @@ class _EquipmentSectionState extends State<EquipmentSection> {
             GestureDetector(
               onTap: null,
               child: Container(
+                margin: EdgeInsets.only(left: 10),
                 padding: EdgeInsets.all(ScreenUtil.verticalScale(0.85)),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.primaryColor,
                   shape: BoxShape.circle,
                 ),
                 child: SvgPicture.asset(
                   "assets/icons/shopping-bag.svg",
                   height: ScreenUtil.verticalScale(2.3),
-                  colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
             ),

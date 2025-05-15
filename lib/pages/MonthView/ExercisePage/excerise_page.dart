@@ -857,59 +857,63 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
           bottom: videoSize!.height / 2,
           left: 10,
           right: 10,
-          child: Visibility(
-            visible: showControls,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // Skip backward button
-                IconButton(
-                  iconSize: 40,
-                  icon: const Icon(
-                    Icons.replay_10,
-                    color: Colors.white70,
-                  ),
-                  onPressed: () {
-                    _videoPlayerController.seekTo(
-                      _videoPlayerController.value.position - const Duration(seconds: 10),
-                    );
-                  },
-                ),
-                IconButton(
-                  iconSize: 60,
-                  icon: Icon(
-                    _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                    color: Colors.white70,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      if (_videoPlayerController.value.isPlaying) {
-                        _videoPlayerController.pause();
-                        showControlsOnTapOfPause();
-                        AudioManager.abandonAudioFocus();
-                      } else {
-                        _videoPlayerController.play();
-                        hideControls();
-                        AudioManager.requestAudioFocus();
-                      }
-                    });
-                  },
-                ),
+          child: AnimatedOpacity(
+            opacity: showControls ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+            child: showControls
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      // Skip backward button
+                      IconButton(
+                        iconSize: 40,
+                        icon: const Icon(
+                          Icons.replay_10,
+                          color: Colors.white70,
+                        ),
+                        onPressed: () {
+                          _videoPlayerController.seekTo(
+                            _videoPlayerController.value.position - const Duration(seconds: 10),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        iconSize: 60,
+                        icon: Icon(
+                          _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                          color: Colors.white70,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            if (_videoPlayerController.value.isPlaying) {
+                              _videoPlayerController.pause();
+                              showControlsOnTapOfPause();
+                              AudioManager.abandonAudioFocus();
+                            } else {
+                              _videoPlayerController.play();
+                              hideControls();
+                              AudioManager.requestAudioFocus();
+                            }
+                          });
+                        },
+                      ),
 
-                IconButton(
-                  iconSize: 40,
-                  icon: const Icon(
-                    Icons.forward_10,
-                    color: Colors.white70,
-                  ),
-                  onPressed: () {
-                    _videoPlayerController.seekTo(
-                      _videoPlayerController.value.position + const Duration(seconds: 10),
-                    );
-                  },
-                ),
-              ],
-            ),
+                      IconButton(
+                        iconSize: 40,
+                        icon: const Icon(
+                          Icons.forward_10,
+                          color: Colors.white70,
+                        ),
+                        onPressed: () {
+                          _videoPlayerController.seekTo(
+                            _videoPlayerController.value.position + const Duration(seconds: 10),
+                          );
+                        },
+                      ),
+                    ],
+                  )
+                : const SizedBox(),
           ),
         )
       : const SizedBox();
@@ -928,11 +932,18 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                       controller: _chewieController!,
                     ),
                   ),
-                  Container(
-                    color: showControls ? Colors.black38 : Colors.transparent,
+                  AnimatedContainer(
+                    duration: Duration(milliseconds: 1500),
+                    curve: Curves.fastOutSlowIn,
                     height: videoSize?.height,
                     width: videoSize?.width,
+                    color: showControls ? Colors.black38 : Colors.transparent,
                   ),
+                  // Container(
+                  //   color: showControls ? Colors.black38 : Colors.transparent,
+                  //   height: videoSize?.height,
+                  //   width: videoSize?.width,
+                  // ),
                 ],
               )
             : Container(

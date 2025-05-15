@@ -264,11 +264,20 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                                     controller: _chewieController!,
                                                   ),
                                                 ),
-                                                Container(
+
+                                                AnimatedContainer(
+                                                  duration: Duration(milliseconds: 1500),
+                                                  curve: Curves.fastOutSlowIn,
                                                   color: showControls ? Colors.black38 : Colors.transparent,
                                                   height: videoSize?.height,
                                                   width: videoSize?.width,
                                                 ),
+
+                                                // Container(
+                                                //   color: showControls ? Colors.black38 : Colors.transparent,
+                                                //   height: videoSize?.height,
+                                                //   width: videoSize?.width,
+                                                // ),
                                               ],
                                             )
                                           : Container(

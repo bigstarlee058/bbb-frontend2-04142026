@@ -398,25 +398,26 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                       fontSize: ScreenUtil.verticalScale(2),
                       fontWeight: FontWeight.bold,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    // maxLines: 1,
+                    // overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: ScreenUtil.verticalScale(0.5)),
-                  Text(
-                    equipment.description,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: ScreenUtil.verticalScale(1.7),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  // SizedBox(height: ScreenUtil.verticalScale(0.5)),
+                  // Text(
+                  //   equipment.description,
+                  //   style: TextStyle(
+                  //     color: Colors.grey[600],
+                  //     fontSize: ScreenUtil.verticalScale(1.7),
+                  //   ),
+                  //   maxLines: 2,
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
                 ],
               ),
             ),
             GestureDetector(
               onTap: null,
               child: Container(
+                margin: EdgeInsets.only(left: 10),
                 padding: EdgeInsets.all(ScreenUtil.verticalScale(0.85)),
                 decoration: BoxDecoration(
                   color: AppColors.primaryColor,
