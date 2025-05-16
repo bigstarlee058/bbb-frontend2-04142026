@@ -1663,6 +1663,7 @@ class MonthProvider extends ChangeNotifier {
   List<Map<String, dynamic>> graphHistory = [];
   double maximumValueOfWeight = 0;
   double maximumValueOfTotalEx = 0;
+  double maximumValueAvgRIR = 0;
   double maximumValueOfTotalTime = 0;
   List<Map<String, dynamic>> liftedWeightEachDay = [];
 
@@ -1671,18 +1672,10 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  changeWeekGraphs() {
-    String newValue =
-        "Week ${int.parse(week.toString().replaceAll("Week ", "")) > 4 ? 4 : int.parse(week.toString().replaceAll("Week ", ""))}";
-
-    reportExerciseCompletedWeek = newValue;
-    notifyListeners();
-    exerciseReportGraphData(weekNumber: int.parse(week.toString().replaceAll("Week ", "")));
-  }
-
   Map<String, Map<String, dynamic>> filterChartData() {
     maximumValueOfWeight = 0;
     maximumValueOfTotalEx = 0;
+    maximumValueAvgRIR = 0;
     maximumValueOfTotalTime = 0;
     List<Map<String, dynamic>> weeks =
         getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()), Utils.formattedDate(monthDataModel!.endDate!.toString()));
@@ -1713,7 +1706,10 @@ class MonthProvider extends ChangeNotifier {
           DateTime localTimeBDate = Utils.formattedDate("$bDate");
 
           String date = localTime.toIso8601String().split('T')[0];
+
           double totalWeight = double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
+          double totalAverageRIR =
+              element.averageRIR != "NaN" ? double.parse((element.averageRIR?.isNotEmpty ?? false ? element.averageRIR : "0") ?? "0") : 0;
           int completedExercise = int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
 
           int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
@@ -1721,6 +1717,7 @@ class MonthProvider extends ChangeNotifier {
           String day = weekdays[localTime.weekday] ?? "";
           if (combinedData.containsKey(date)) {
             combinedData[date]!['totalWeight'] += totalWeight;
+            combinedData[date]!['totalAverage'] += totalAverageRIR;
             combinedData[date]!['completedExercise'] += completedExercise;
             combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
           } else {
@@ -1729,6 +1726,7 @@ class MonthProvider extends ChangeNotifier {
               'totalWeight': totalWeight,
               'day': day,
               'completedExercise': completedExercise,
+              'totalAverage': totalAverageRIR,
               'workoutTime': workoutTimeInSeconds,
             };
           }
@@ -1742,6 +1740,9 @@ class MonthProvider extends ChangeNotifier {
         if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
           maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
         }
+        if (double.parse(value["totalAverage"].toString()) > maximumValueAvgRIR) {
+          maximumValueAvgRIR = double.parse(value["totalAverage"].toString());
+        }
 
         final timeInSeconds = double.parse(value["workoutTime"].toString());
         int hours = timeInSeconds ~/ 3600;
@@ -1753,6 +1754,7 @@ class MonthProvider extends ChangeNotifier {
 
       maximumValueOfWeight += 3000;
       maximumValueOfTotalEx += 6;
+      maximumValueAvgRIR += 2;
       maximumValueOfTotalTime += 2;
 
       notifyListeners();
@@ -1764,39 +1766,40 @@ class MonthProvider extends ChangeNotifier {
   }
 
   Future<void> getLiftedWeightGraphData() async {
-    // try {
-    liftedWeightEachDay = [];
-    graphHistory = [];
+    try {
+      liftedWeightEachDay = [];
+      graphHistory = [];
 
-    Map<String, Map<String, dynamic>> combinedData = filterChartData();
+      Map<String, Map<String, dynamic>> combinedData = filterChartData();
 
-    if (combinedData.isNotEmpty) {
-      combinedData.forEach(
-        (key, value) {
-          liftedWeightEachDay.add({
-            "day": value['day'],
-            "totalCompletedExercise": value['completedExercise'],
-            "totalTime": value['workoutTime'],
-            "totalWeight": value['totalWeight'],
-            "date": key,
-          });
-        },
-      );
+      if (combinedData.isNotEmpty) {
+        combinedData.forEach(
+          (key, value) {
+            liftedWeightEachDay.add({
+              "day": value['day'],
+              "totalCompletedExercise": value['completedExercise'],
+              "totalTime": value['workoutTime'],
+              "totalAverageRIR": value['totalAverage'],
+              "totalWeight": value['totalWeight'],
+              "date": key,
+            });
+          },
+        );
+      }
+
+      graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error getting lifted weight graph data: $e");
     }
-
-    graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
-
-    notifyListeners();
-    // } catch (e) {
-    //   debugPrint("Error getting lifted weight graph data: $e");
-    // }
   }
 
   List<Map<String, dynamic>> processLiftedWeightGraphData(List<Map<String, dynamic>> data) {
     try {
       List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
       DateTime today = DateTime.now();
-      String todayDayName = DateFormat('EEE').format(today);
+      DateFormat('EEE').format(today);
 
       for (String day in allDays) {
         if (!data.any((entry) => entry['day'] == day)) {
@@ -1805,6 +1808,7 @@ class MonthProvider extends ChangeNotifier {
             "totalCompletedExercise": 0,
             "totalTime": 0,
             "totalWeight": 0,
+            "totalAverageRIR": 0,
           });
         }
       }
@@ -1815,6 +1819,7 @@ class MonthProvider extends ChangeNotifier {
             double.parse(entry["totalCompletedExercise"].toString()),
             double.parse(entry["totalTime"].toString()),
             double.parse(entry["totalWeight"].toString()),
+            double.parse(entry["totalAverageRIR"].toString()),
           ],
       };
 
@@ -1829,6 +1834,7 @@ class MonthProvider extends ChangeNotifier {
           "totalCompletedExercise": _BarData(AppColors.primaryColor, dataList[0], 0.0),
           "totalTime": _BarData(AppColors.primaryColor, dataList[1], 0.0),
           "totalWeight": _BarData(AppColors.primaryColor, dataList[2], 0.0),
+          "totalAverageRIR": _BarData(AppColors.primaryColor, dataList[3], 0.0),
         };
       }).toList();
 
@@ -1970,6 +1976,124 @@ class MonthProvider extends ChangeNotifier {
       return list;
     } catch (e) {
       debugPrint("Error processing exercise completed graph data: $e");
+      return [];
+    }
+  }
+
+  /// ::::: AVERAGE RIR ================================================================================
+
+  String reportAverageRIRWeek = "Week 1";
+  List<Map<String, dynamic>> reportAverageRIRGraphHistory = [];
+  double reportMaximumValueOfAverageRIR = 0;
+  List<Map<String, dynamic>> reportAverageRIREachDay = [];
+  double averageRIRInAWeek = 0;
+
+  changeAverageRIR(value) {
+    String newValue =
+        "Week ${int.parse(value.toString().replaceAll("Week ", "")) > 4 ? 4 : int.parse(value.toString().replaceAll("Week ", ""))}";
+
+    reportAverageRIRWeek = newValue;
+    notifyListeners();
+    averageRIRGraphData(weekNumber: int.parse(value.toString().replaceAll("Week ", "")));
+  }
+
+  Map<String, Map<String, dynamic>> reportFilterAverageRIRChartData(int weekNumber) {
+    reportMaximumValueOfAverageRIR = 0;
+
+    List<Map<String, dynamic>> weeks =
+        getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()), Utils.formattedDate(monthDataModel!.endDate!.toString()));
+    var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
+
+    const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
+    DateTime startDate = DateTime.parse(week['startDate']);
+    DateTime endDate = DateTime.parse(week['endDate']);
+
+    List<DayHistoryModel> filteredData = allDayHistoryModel.where((data) {
+      if (data.status != Status.completed) {
+        return false;
+      }
+      DateTime entryDate = data.endTime!;
+      return entryDate.isAfter(startDate) && entryDate.isBefore(endDate);
+    }).toList();
+
+    Map<String, Map<String, dynamic>> combinedData = {};
+
+    try {
+      for (var element in filteredData) {
+        if (element.status == Status.completed) {
+          DateTime dateTime = element.date!;
+          DateTime localTime = Utils.formattedDate("$dateTime");
+          String date = localTime.toIso8601String().split('T')[0];
+
+          double averageRIR =
+              element.averageRIR != "NaN" ? double.parse((element.averageRIR?.isNotEmpty ?? false ? element.averageRIR : "0") ?? "0") : 0;
+          String day = weekdays[localTime.weekday] ?? "";
+          if (combinedData.containsKey(date)) {
+            combinedData[date]!['averageRIR'] += averageRIR;
+          } else {
+            combinedData[date] = {'date': date, 'day': day, 'averageRIR': averageRIR};
+          }
+        }
+      }
+
+      combinedData.forEach((key, value) {
+        if (double.parse(value["averageRIR"].toString()) > reportMaximumValueOfAverageRIR) {
+          reportMaximumValueOfAverageRIR = double.parse(value["averageRIR"].toString());
+        }
+      });
+
+      reportMaximumValueOfAverageRIR += 6;
+    } catch (e) {
+      debugPrint("Error filtering Average RIR chart data: $e");
+    }
+
+    notifyListeners();
+    return combinedData;
+  }
+
+  Future<void> averageRIRGraphData({int? weekNumber}) async {
+    reportAverageRIREachDay = [];
+    int week = weekNumber ?? currentWeek;
+    try {
+      Map<String, Map<String, dynamic>> combinedData = reportFilterAverageRIRChartData(week);
+      if (combinedData.isNotEmpty) {
+        combinedData.forEach(
+          (key, value) {
+            reportAverageRIREachDay.add({"day": value['day'], "totalAverageRIR": value['averageRIR'], "date": key});
+          },
+        );
+      }
+      reportAverageRIRGraphHistory = reportProcessAverageRIRGraphData(reportAverageRIREachDay);
+    } catch (e) {
+      debugPrint("Error fetching average RIR graph data: $e");
+    }
+
+    notifyListeners();
+  }
+
+  List<Map<String, dynamic>> reportProcessAverageRIRGraphData(List<Map<String, dynamic>> data) {
+    averageRIRInAWeek = 0;
+    List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    try {
+      for (String day in allDays) {
+        if (!data.any((entry) => entry['day'] == day)) {
+          data.add({"day": day, "totalAverageRIR": 0});
+        }
+      }
+      Map<String, List<double>> exerciseData = {
+        for (var entry in data) entry["day"]: [double.parse(entry["totalAverageRIR"].toString())],
+      };
+
+      final list = allDays.map((day) {
+        List<double> dataList = exerciseData[day]!;
+        averageRIRInAWeek += dataList[0];
+        return {"day": day, "totalAverageRIR": _BarData(AppColors.primaryColor, dataList[0], 0.0)};
+      }).toList();
+
+      return list;
+    } catch (e) {
+      debugPrint("Error processing average RIR graph data: $e");
       return [];
     }
   }
@@ -3033,10 +3157,15 @@ class MonthProvider extends ChangeNotifier {
     reportWeightLiftedEachDay = [];
     totalWeightLiftedInAWeek = 0;
     reportExerciseCompletedWeek = "Week 1";
+    reportAverageRIRWeek = "Week 1";
     reportExerciseCompletedGraphHistory = [];
+    reportAverageRIRGraphHistory = [];
     reportMaximumValueOfTotalEx = 0;
+    reportMaximumValueOfAverageRIR = 0;
     reportExerciseCompletedEachDay = [];
+    reportAverageRIREachDay = [];
     totalExerciseCompletedInAWeek = 0;
+    averageRIRInAWeek = 0;
     graphHistory = [];
     maximumValueOfWeight = 0;
     maximumValueOfTotalEx = 0;

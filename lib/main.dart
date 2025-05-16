@@ -45,6 +45,7 @@ import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -134,18 +135,15 @@ class _MyAppState extends State<MyApp> {
   final dataProvider = ChangeNotifierProvider<DataProvider>(
     create: (context) => DataProvider(),
   );
-
   final userDataProvider = ChangeNotifierProvider<UserDataProvider>(
     create: (context) => UserDataProvider(),
   );
   final programInfoProvider = ChangeNotifierProvider<ProgramInfoProvider>(
     create: (context) => ProgramInfoProvider(),
   );
-
   final locationProvider = ChangeNotifierProvider<LocationProvider>(
     create: (context) => LocationProvider(),
   );
-
   final mainPageProvider = ChangeNotifierProvider<MainPageProvider>(
     create: (context) => MainPageProvider(),
   );
@@ -155,11 +153,7 @@ class _MyAppState extends State<MyApp> {
   final scrollProvider = ChangeNotifierProvider<ScrollProvider>(
     create: (context) => ScrollProvider(),
   );
-  // final videoImageProvider = ChangeNotifierProvider<VideoImageProvider>(
-  //   create: (context) => VideoImageProvider(),
-  // );
 
-  // ignore: unused_field
   late AppLinks _appLinks;
 
   @override
@@ -196,7 +190,9 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  // This widget is the root of your application.
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
+
   @override
   Widget build(BuildContext context) {
     c = context;
@@ -214,6 +210,7 @@ class _MyAppState extends State<MyApp> {
           // videoImageProvider
         ],
         child: MaterialApp(
+          navigatorObservers: <NavigatorObserver>[observer],
           navigatorKey: navigatorKey,
           locale: !kReleaseMode ? DevicePreview.locale(context) : null,
           builder: !kReleaseMode ? DevicePreview.appBuilder : null,

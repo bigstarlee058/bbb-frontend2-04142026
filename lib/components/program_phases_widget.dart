@@ -79,9 +79,9 @@ class ProgramPhasesWidget extends StatelessWidget {
                   children: [
                     Container(
                       height: ScreenUtil.verticalScale(43),
-                      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.8), right: ScreenUtil.horizontalScale(4)),
+                      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.8)),
                       child: Image.asset(
-                        "assets/img/program-phase.png",
+                        "assets/img/program-phase-1.png",
                       ),
                     ),
                     Container(

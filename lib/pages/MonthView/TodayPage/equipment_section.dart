@@ -18,73 +18,73 @@ class _EquipmentSectionState extends State<EquipmentSection> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
-    return Column(
-      children: [
-        const SizedBox(height: 40),
-        Container(
-          height: 0.5,
-          margin: const EdgeInsets.symmetric(horizontal: 40),
-          width: media.width,
-          color: Colors.black12,
-        ),
-        const SizedBox(height: 40),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          child: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Equipment used',
-                style: TextStyle(
-                  color: AppColors.primaryColor,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+    return Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+      return monthProvider.usedEquipments.isEmpty
+          ? SizedBox()
+          : Column(
+              children: [
+                const SizedBox(height: 40),
+                Container(
+                  height: 0.5,
+                  margin: const EdgeInsets.symmetric(horizontal: 40),
+                  width: media.width,
+                  color: Colors.black12,
                 ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                style: TextStyle(
-                  color: Colors.black54,
-                ),
-              )
-            ],
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Consumer<MonthProvider>(
-          builder: (context, monthProvider, child) {
-            if (monthProvider.usedEquipments.isNotEmpty) {
-              return Column(
-                children: List.generate(
-                  monthProvider.usedEquipments.length,
-                  (index) => Column(
+                const SizedBox(height: 40),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      equipmentCard(
-                        monthProvider.usedEquipments[index].title!,
-                        monthProvider.usedEquipments[index].description!,
-                        monthProvider.usedEquipments[index].link!,
-                        monthProvider.usedEquipments[0].thumbnail!,
+                      Text(
+                        'Equipment used',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      if (index < monthProvider.usedEquipments.length - 1) const SizedBox(height: 20),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                        style: TextStyle(
+                          color: Colors.black54,
+                        ),
+                      )
                     ],
                   ),
                 ),
-              );
-            } else {
-              return const SizedBox();
-            }
-          },
-        ),
-      ],
-    );
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  children: List.generate(
+                    monthProvider.usedEquipments.length,
+                        (index) => Column(
+                      children: [
+                        equipmentCard(
+                          monthProvider.usedEquipments[index].title!,
+                          monthProvider
+                              .usedEquipments[index].description!,
+                          monthProvider.usedEquipments[index].link!,
+                          monthProvider.usedEquipments[0].thumbnail!,
+                        ),
+                        if (index <
+                            monthProvider.usedEquipments.length - 1)
+                          const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+    });
   }
 
-  Widget equipmentCard(String title, String description, String link, String image) {
+  Widget equipmentCard(
+      String title, String description, String link, String image) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           disabledBackgroundColor: const Color(0xFFF3F3F3),
@@ -136,9 +136,12 @@ class _EquipmentSectionState extends State<EquipmentSection> {
                 ),
                 image: DecorationImage(
                   image: image.isNotEmpty
-                      ? NetworkImage(image.startsWith('https://storage.cloud.google.com/')
-                          ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                          : image)
+                      ? NetworkImage(
+                          image.startsWith('https://storage.cloud.google.com/')
+                              ? image.replaceFirst(
+                                  'https://storage.cloud.google.com/',
+                                  'https://storage.googleapis.com/')
+                              : image)
                       : const AssetImage('assets/img/back.jpg'),
                   fit: BoxFit.cover,
                   opacity: 1,

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class JoinChallengeWidget extends StatelessWidget {
   final Challenges featureChallenge;
-  const JoinChallengeWidget({super.key, required this.featureChallenge});
+  const   JoinChallengeWidget({super.key, required this.featureChallenge});
 
   @override
   Widget build(BuildContext context) {

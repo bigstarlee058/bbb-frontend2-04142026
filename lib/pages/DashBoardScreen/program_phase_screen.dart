@@ -72,15 +72,9 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                   ),
                   child: Align(
                     alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        right: ScreenUtil.horizontalScale(4.5),
-                        // top: ScreenUtil.verticalScale(5.7),
-                      ),
-                      child: SafeArea(
-                        child: Image.asset(
-                          "assets/img/program-phase.png",
-                        ),
+                    child: SafeArea(
+                      child: Image.asset(
+                        "assets/img/program-phase-1.png",
                       ),
                     ),
                   ),

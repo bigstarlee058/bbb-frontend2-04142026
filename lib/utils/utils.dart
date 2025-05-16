@@ -42,3 +42,23 @@ extension StringCasingExtension on String {
     return this[0].toUpperCase() + substring(1);
   }
 }
+
+
+
+class NoBottomBounceScrollPhysics extends BouncingScrollPhysics {
+  const NoBottomBounceScrollPhysics({super.parent});
+
+  @override
+  NoBottomBounceScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return NoBottomBounceScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  double applyBoundaryConditions(ScrollMetrics position, double value) {
+    if (value > position.pixels && value > position.maxScrollExtent) {
+      return value - position.maxScrollExtent;
+    }
+
+    return super.applyBoundaryConditions(position, value);
+  }
+}
