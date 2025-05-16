@@ -321,149 +321,133 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: media.height / 3.5,
-                                  width: media.width,
-                                  child: SafeArea(
-                                    child: Column(
-                                      children: [
-                                        AppBar(
-                                          titleSpacing: -5,
-                                          toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                          surfaceTintColor: Colors.transparent,
-                                          backgroundColor: Colors.transparent,
-                                          centerTitle: false,
-                                          leading: BackArrowWidget(
-                                            onPress: () {
-                                              Navigator.pop(context);
-                                            },
-                                          ),
-                                          title: isCurrentDayCompleted ||
-                                                  isCurrentDaySkipped ||
-                                                  monthProvider!.isCircuit ||
-                                                  monthProvider!.isPumpDay
-                                              ? SizedBox()
-                                              : Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    SafeArea(
-                                                      child: Container(
-                                                        margin: EdgeInsets.only(
-                                                          left: ScreenUtil.horizontalScale(4),
-                                                        ),
-                                                        decoration: const BoxDecoration(
-                                                          color: Color(0XFFd18a9b),
-                                                          shape: BoxShape.circle,
-                                                        ),
-                                                        child: SizedBox(
-                                                          width: ScreenUtil.verticalScale(4.55),
-                                                          height: ScreenUtil.verticalScale(4.55),
-                                                          child: Center(
-                                                            child: IconButton(
-                                                              padding: EdgeInsets.zero,
-                                                              icon: Icon(
-                                                                isEditMode ? Icons.close : Icons.edit,
-                                                                color: Colors.white,
-                                                                size: ScreenUtil.verticalScale(isEditMode ? 2.9 : 2.4),
-                                                              ),
-                                                              onPressed: toggleEditMode,
+                                SafeArea(
+                                  child: AppBar(
+                                    titleSpacing: -5,
+                                    toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                    surfaceTintColor: Colors.transparent,
+                                    backgroundColor: Colors.transparent,
+                                    centerTitle: false,
+                                    leading: BackArrowWidget(
+                                      onPress: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    title:
+                                        isCurrentDayCompleted || isCurrentDaySkipped || monthProvider!.isCircuit || monthProvider!.isPumpDay
+                                            ? SizedBox()
+                                            : Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  SafeArea(
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                        left: ScreenUtil.horizontalScale(4),
+                                                      ),
+                                                      decoration: const BoxDecoration(
+                                                        color: Color(0XFFd18a9b),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: SizedBox(
+                                                        width: ScreenUtil.verticalScale(4.55),
+                                                        height: ScreenUtil.verticalScale(4.55),
+                                                        child: Center(
+                                                          child: IconButton(
+                                                            padding: EdgeInsets.zero,
+                                                            icon: Icon(
+                                                              isEditMode ? Icons.close : Icons.edit,
+                                                              color: Colors.white,
+                                                              size: ScreenUtil.verticalScale(isEditMode ? 2.9 : 2.4),
                                                             ),
+                                                            onPressed: toggleEditMode,
                                                           ),
                                                         ),
                                                       ),
                                                     ),
-                                                    isEditMode
-                                                        ? Padding(
-                                                            padding: const EdgeInsets.only(left: 10),
-                                                            child: Text(
-                                                              "Edit Mode",
-                                                              style: TextStyle(
-                                                                  color: Colors.white,
-                                                                  fontSize: ScreenUtil.verticalScale(2),
-                                                                  fontWeight: FontWeight.w600),
-                                                            ),
-                                                          )
-                                                        : SizedBox()
-                                                  ],
-                                                ),
-                                          actions: [
-                                            Padding(
-                                                padding: EdgeInsets.only(right: 10),
-                                                child: const CommonStreakWithNotification(routeString: "today"))
-                                          ],
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(5),
-                                          ),
-                                          height: media.height * 0.17,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    monthProvider!.isPumpDay || monthProvider!.isCircuit
-                                                        ? SizedBox()
-                                                        : Text(
-                                                            "Option ${monthProvider!.equipmentType}: ${monthProvider!.equipmentType == "A" ? "Fully equipped gym" : monthProvider?.equipmentType == "B" ? "Home gym" : "Dumbbells and bands"}",
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2),
-                                                            ),
-                                                          ),
-                                                    Consumer<MonthProvider>(
-                                                      builder: (context, monthProvider, child) {
-                                                        return Padding(
-                                                          padding: EdgeInsets.only(
-                                                              top: 5,
-                                                              bottom: getTextLineCount(
-                                                                          text: (monthProvider.isPumpDay
-                                                                              ? monthProvider.pumpDayModel?.title ?? "Pump Day"
-                                                                              : currentDayTitle),
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: ScreenUtil.horizontalScale(6),
-                                                                              fontWeight: FontWeight.bold),
-                                                                          maxWidth: (media.width - ScreenUtil.horizontalScale(16))) >
-                                                                      1
-                                                                  ? media.height * 0.030
-                                                                  : media.height * 0.048),
+                                                  ),
+                                                  isEditMode
+                                                      ? Padding(
+                                                          padding: const EdgeInsets.only(left: 10),
                                                           child: Text(
-                                                            (monthProvider.isPumpDay
-                                                                ? monthProvider.pumpDayModel?.title ?? "Pump Day"
-                                                                : currentDayTitle),
-                                                            textAlign: TextAlign.center,
-                                                            maxLines: 2,
+                                                            "Edit Mode",
                                                             style: TextStyle(
                                                                 color: Colors.white,
-                                                                fontSize: ScreenUtil.horizontalScale(6.5),
-                                                                fontWeight: FontWeight.bold),
+                                                                fontSize: ScreenUtil.verticalScale(2),
+                                                                fontWeight: FontWeight.w600),
                                                           ),
-                                                        );
-                                                      },
-                                                    )
-                                                  ],
-                                                ),
+                                                        )
+                                                      : SizedBox()
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    actions: [
+                                      Padding(
+                                          padding: EdgeInsets.only(right: 10),
+                                          child: const CommonStreakWithNotification(routeString: "today"))
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ],
                         ),
+                        Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                top: ScreenUtil.verticalScale(monthProvider!.isCircuit || monthProvider!.isPumpDay ? 10 : 12)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    monthProvider!.isPumpDay || monthProvider!.isCircuit
+                                        ? SizedBox()
+                                        : Text(
+                                            "Option ${monthProvider!.equipmentType}: ${monthProvider!.equipmentType == "A" ? "Fully equipped gym" : monthProvider?.equipmentType == "B" ? "Home gym" : "Dumbbells and bands"}",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(1.9),
+                                            ),
+                                          ),
+                                    Consumer<MonthProvider>(
+                                      builder: (context, monthProvider, child) {
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 5,
+                                              bottom: getTextLineCount(
+                                                          text: (monthProvider.isPumpDay
+                                                              ? monthProvider.pumpDayModel?.title ?? "Pump Day"
+                                                              : currentDayTitle),
+                                                          style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: ScreenUtil.horizontalScale(6),
+                                                              fontWeight: FontWeight.bold),
+                                                          maxWidth: (media.width - ScreenUtil.horizontalScale(16))) >
+                                                      1
+                                                  ? media.height * 0.030
+                                                  : media.height * 0.048),
+                                          child: Text(
+                                            (monthProvider.isPumpDay ? monthProvider.pumpDayModel?.title ?? "Pump Day" : currentDayTitle),
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                                color: Colors.white, fontSize: ScreenUtil.verticalScale(3), fontWeight: FontWeight.bold),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         AnimatedContainer(
                           duration: Duration(milliseconds: 300),
                           width: media.width,
                           margin: EdgeInsets.only(
-                            top: media.height / 4,
+                            top: media.height / ((monthProvider!.isCircuit || monthProvider!.isPumpDay) ? 5 : 4.2),
                           ),
                           decoration: BoxDecoration(
                             color: isEditMode ? Color(0xffe5f0f9) : Colors.white,
@@ -478,9 +462,9 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                             clipBehavior: Clip.none,
                             children: [
                               Positioned(
-                                top: -(media.height / 4) + 0.3,
+                                top: -(media.height / ((monthProvider!.isCircuit || monthProvider!.isPumpDay) ? 5 : 4.2)) + 0.3,
                                 child: SizedBox(
-                                  height: media.height / 4,
+                                  height: (media.height / ((monthProvider!.isCircuit || monthProvider!.isPumpDay) ? 5 : 4.2)),
                                   width: media.width,
                                   child: Align(
                                     alignment: Alignment.bottomRight,
@@ -500,7 +484,9 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                 margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(6.5)),
                                 child: Column(
                                   children: [
-                                    VideoSlider(),
+                                    VideoSlider(
+                                      dayDataModel: monthProvider!.dayDataModel!,
+                                    ),
                                     isEditMode
                                         ? Container(
                                             margin: EdgeInsets.symmetric(

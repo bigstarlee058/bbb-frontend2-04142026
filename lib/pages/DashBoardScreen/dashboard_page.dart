@@ -155,7 +155,14 @@ class _DashboardPageState extends State<DashboardPage> {
           return true;
         },
         child: Stack(
-          children: [
+          children: [      Container(
+            height: media.height / 1,
+            width: media.width,
+            decoration: const BoxDecoration(
+              image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+            ),
+          ),
+
             Container(
               height: media.height / 1,
               width: media.width,
@@ -167,6 +174,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
             ),
+
+
             Column(
               children: [
                 Consumer<UserDataProvider>(builder: (context, userData, child) {
@@ -202,965 +211,946 @@ class _DashboardPageState extends State<DashboardPage> {
                     }),
                     child: SingleChildScrollView(
                       physics: NoBottomBounceScrollPhysics(),
-                      child: Column(
+                      child: Stack(
                         children: [
                           Stack(
                             children: [
-                              Column(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      SizedBox(
-                                        height: (media.height / 2) - ScreenUtil.verticalScale(5.1),
-                                        width: media.width,
-                                        child: SafeArea(
-                                          child: Column(
+                              Consumer<MonthProvider>(
+                                builder: (context, monthData, child) {
+                                  if ((monthData.monthDataModel?.weeks == null || monthData.loader)) {
+                                    return const SizedBox();
+                                  }
+
+                                  if ((monthData.week ?? 0) > 4) {
+                                    return const SizedBox();
+                                  }
+                                  if (monthData.todayTitleId.isNotEmpty) {
+                                    int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList
+                                        ?.indexWhere((element) => element == monthData.todayTitleId);
+
+                                    if ((index ?? 0) < 0) {
+                                      return SizedBox();
+                                    }
+
+                                    String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
+                                            .toString()
+                                            .split(" ")[1] ??
+                                        "";
+                                    String dataId =
+                                        "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
+
+                                    final data = monthData.allDayHistoryModel.where((element) => element.dataId == dataId);
+                                    String status = "";
+                                    if (data.isNotEmpty) {
+                                      status = data.first.status ?? "";
+                                    }
+                                    final dayIndex = int.parse((monthData
+                                                .monthDataModel?.weeks![(monthData.week ?? 1) - 1].dayList?[index ?? 0]
+                                                .toString()
+                                                .replaceAll("Workout", "")
+                                                .replaceAll("Rest", "")
+                                                .replaceAll("Day", "")
+                                                .replaceAll(" ", "") ??
+                                            "0")) -
+                                        1;
+
+                                    DayDataModel dayData =
+                                        "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                                .toString()
+                                                .contains("Workout")
+                                            ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].days![dayIndex]
+                                            : DayDataModel();
+
+                                    bool isRestDay =
+                                        "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                                            .toString()
+                                            .contains("Rest Day");
+
+                                    int nextWorkOutIndex = monthData
+                                            .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
+                                            .toString()
+                                            .contains("Workout")
+                                        ? int.parse(monthData
+                                                .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
+                                                .toString()
+                                                .replaceAll("Day ", "")
+                                                .replaceAll(" Workout", "")) -
+                                            1
+                                        : 0;
+
+                                    String todayTitleName = "Pump Day";
+
+                                    final dataList = monthProvider.dayHistoryModel
+                                        .where((element) =>
+                                            element.type?.contains("Pump Day") == true && element.status != Status.empty)
+                                        .toList();
+
+                                    if (monthProvider.pumpDays.isNotEmpty) {
+                                      if (dataList.isNotEmpty) {
+                                        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
+                                            (e1.dayId == monthProvider.todayTitleId &&
+                                                e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+                                        if (index1 != -1) {
+                                          todayTitleName = monthProvider.pumpDays[index1].title ?? "Pump Day";
+                                        } else {
+                                          if (monthProvider.pumpDays.length == 1) {
+                                            todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
+                                          } else {
+                                            int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList
+                                                .any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+                                            todayTitleName = monthProvider
+                                                    .pumpDays[index == -1
+                                                        ? 0
+                                                        : index1 == 0
+                                                            ? 1
+                                                            : 0]
+                                                    .title ??
+                                                "Pump Day";
+                                          }
+                                        }
+                                      } else {
+                                        todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
+                                      }
+                                    }
+                                    DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
+                                      (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                      orElse: () => DayHistoryModel(),
+                                    );
+                                    String title = matchingElement.id != null
+                                        ? matchingElement.title ?? "Pump Day"
+                                        : !monthData.isPumpDayAvailable && isRestDay
+                                            ? (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].restDayList![
+                                                    int.parse(monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
+                                                            .dayList![index ?? 0]
+                                                            .toString()
+                                                            .split(" ")
+                                                            .toList()
+                                                            .last) -
+                                                        1] ??
+                                                monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
+                                                    .dayList![index ?? 0] ??
+                                                "")
+                                            : !isRestDay
+                                                ? monthData.monthDataModel!.weeks![monthData.week! - 1]
+                                                        .days![nextWorkOutIndex].title ??
+                                                    ""
+                                                : monthData.pumpDays.isEmpty
+                                                    ? "Pump Day"
+                                                    : todayTitleName;
+
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(8),
+                                        vertical: ScreenUtil.verticalScale(2),
+                                      ),
+                                      height: media.height * 0.22,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Your current workout:',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(2),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          SizedBox(
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  title,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: ScreenUtil.horizontalScale(6.5),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                                            decoration: status == Status.completed
+                                                ? BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)))
+                                                : const BoxDecoration(),
+                                            child: status == Status.completed
+                                                ? ButtonWidget(
+                                                    text: "Completed",
+                                                    textColor: Colors.white,
+                                                    onPress: () {},
+                                                    color: Colors.green,
+                                                    isLoading: false,
+                                                  )
+                                                : ButtonWidget(
+                                                    text: title.contains("Rest Day")
+                                                        ? "Mark Complete"
+                                                        : status == Status.started
+                                                            ? 'Continue Your Workout'
+                                                            : 'Start Your Workout',
+                                                    textColor: AppColors.primaryColor,
+                                                    color: status == Status.completed || status == Status.skipped
+                                                        ? Colors.white70
+                                                        : Colors.white,
+                                                    onPress: status == Status.completed || status == Status.skipped
+                                                        ? null
+                                                        : () => continueWorkoutOnTap(
+                                                            isRestDay, monthData, dataId, index, dayData, context),
+                                                    isLoading: false,
+                                                  ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
+                                            .toString()
+                                            .split(" ")[1] ??
+                                        "";
+
+                                    String dataId =
+                                        "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
+
+                                    DayHistoryModel data = monthData.allDayHistoryModel.firstWhere(
+                                      (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
+                                      orElse: () => DayHistoryModel(title: "Pump Day"),
+                                    );
+
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(8),
+                                        vertical: ScreenUtil.verticalScale(2),
+                                      ),
+                                      height: media.height * 0.22,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Your current workout:',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(2),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          SizedBox(
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  data.id != null
+                                                      ? data.title
+                                                      : (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList
+                                                              ?.last) ??
+                                                          "",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: ScreenUtil.verticalScale(3),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4))),
+                                            child: ButtonWidget(
+                                              text: "Completed",
+                                              textColor: Colors.white,
+                                              onPress: () {},
+                                              color: Colors.green,
+                                              isLoading: false,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                              SizedBox(
+                                height: media.height / 2.549 - ScreenUtil.verticalScale(10),
+                                width: media.width,
+                                child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: ClipPath(
+                                    clipper: DiagonalClipper(),
+                                    child: Container(
+                                      height: media.height / 11,
+                                      width: media.width / 6,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: media.height / 2.55 - ScreenUtil.verticalScale(10)),
+                            child: Container(
+                              width: media.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                                ),
+                              ),
+                              child: Column(children: [
+                                Container(
+                                  width: media.width,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(55),
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7),
+                                    vertical: ScreenUtil.verticalScale(1.5),
+                                  ),
+                                  child: Consumer<MonthProvider>(
+                                    builder: (context, value, child) {
+                                      if (monthProvider.monthDataModel == null ||
+                                          value.currentWeek == 0 ||
+                                          (value.monthDataModel?.weeks?.isEmpty ?? false)) {
+                                        return const SizedBox();
+                                      }
+
+                                      final startTime = value.startTime ?? DateTime.now();
+
+                                      int dayDelta = DateTime(today.year, today.month, today.day)
+                                          .difference(DateTime(startTime.year, startTime.month, startTime.day))
+                                          .inDays;
+
+                                      int week = (dayDelta ~/ 7) + 1;
+
+                                      final val1 = (week - 1) * 7;
+
+                                      final val2 = value.allDayHistoryModel.where((element) =>
+                                          element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
+                                          element.split == value.splitType &&
+                                          element.monthId == value.monthDataModel?.id &&
+                                          (element.status == "Completed" || element.status == "Skipped"));
+                                      int count = week > 4 ? val1 : val1 + val2.length;
+
+                                      if (count > 28) {
+                                        count = 28;
+                                      }
+                                      return Column(
+                                        children: [
+                                          const SizedBox(height: 15),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Consumer<MonthProvider>(
-                                                builder: (context, monthData, child) {
-                                                  if ((monthData.monthDataModel?.weeks == null || monthData.loader)) {
-                                                    return const SizedBox();
-                                                  }
-
-                                                  if ((monthData.week ?? 0) > 4) {
-                                                    return const SizedBox();
-                                                  }
-                                                  if (monthData.todayTitleId.isNotEmpty) {
-                                                    int? index = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList
-                                                        ?.indexWhere((element) => element == monthData.todayTitleId);
-
-                                                    if ((index ?? 0) < 0) {
-                                                      return SizedBox();
-                                                    }
-
-                                                    String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
-                                                            .toString()
-                                                            .split(" ")[1] ??
-                                                        "";
-                                                    String dataId =
-                                                        "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.todayTitleId}";
-
-                                                    final data = monthData.allDayHistoryModel.where((element) => element.dataId == dataId);
-                                                    String status = "";
-                                                    if (data.isNotEmpty) {
-                                                      status = data.first.status ?? "";
-                                                    }
-                                                    final dayIndex = int.parse((monthData
-                                                                .monthDataModel?.weeks![(monthData.week ?? 1) - 1].dayList?[index ?? 0]
-                                                                .toString()
-                                                                .replaceAll("Workout", "")
-                                                                .replaceAll("Rest", "")
-                                                                .replaceAll("Day", "")
-                                                                .replaceAll(" ", "") ??
-                                                            "0")) -
-                                                        1;
-
-                                                    DayDataModel dayData =
-                                                        "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                                .toString()
-                                                                .contains("Workout")
-                                                            ? monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].days![dayIndex]
-                                                            : DayDataModel();
-
-                                                    bool isRestDay =
-                                                        "${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                                                            .toString()
-                                                            .contains("Rest Day");
-
-                                                    int nextWorkOutIndex = monthData
-                                                            .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
-                                                            .toString()
-                                                            .contains("Workout")
-                                                        ? int.parse(monthData
-                                                                .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
-                                                                .toString()
-                                                                .replaceAll("Day ", "")
-                                                                .replaceAll(" Workout", "")) -
-                                                            1
-                                                        : 0;
-
-                                                    String todayTitleName = "Pump Day";
-
-                                                    final dataList = monthProvider.dayHistoryModel
-                                                        .where((element) =>
-                                                            element.type?.contains("Pump Day") == true && element.status != Status.empty)
-                                                        .toList();
-
-                                                    if (monthProvider.pumpDays.isNotEmpty) {
-                                                      if (dataList.isNotEmpty) {
-                                                        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
-                                                            (e1.dayId == monthProvider.todayTitleId &&
-                                                                e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
-                                                        if (index1 != -1) {
-                                                          todayTitleName = monthProvider.pumpDays[index1].title ?? "Pump Day";
-                                                        } else {
-                                                          if (monthProvider.pumpDays.length == 1) {
-                                                            todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
-                                                          } else {
-                                                            int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList
-                                                                .any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
-                                                            todayTitleName = monthProvider
-                                                                    .pumpDays[index == -1
-                                                                        ? 0
-                                                                        : index1 == 0
-                                                                            ? 1
-                                                                            : 0]
-                                                                    .title ??
-                                                                "Pump Day";
-                                                          }
-                                                        }
-                                                      } else {
-                                                        todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
-                                                      }
-                                                    }
-                                                    DayHistoryModel? matchingElement = monthData.allDayHistoryModel.firstWhere(
-                                                      (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                      orElse: () => DayHistoryModel(),
-                                                    );
-                                                    String title = matchingElement.id != null
-                                                        ? matchingElement.title ?? "Pump Day"
-                                                        : !monthData.isPumpDayAvailable && isRestDay
-                                                            ? (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].restDayList![
-                                                                    int.parse(monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
-                                                                            .dayList![index ?? 0]
-                                                                            .toString()
-                                                                            .split(" ")
-                                                                            .toList()
-                                                                            .last) -
-                                                                        1] ??
-                                                                monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
-                                                                    .dayList![index ?? 0] ??
-                                                                "")
-                                                            : !isRestDay
-                                                                ? monthData.monthDataModel!.weeks![monthData.week! - 1]
-                                                                        .days![nextWorkOutIndex].title ??
-                                                                    ""
-                                                                : monthData.pumpDays.isEmpty
-                                                                    ? "Pump Day"
-                                                                    : todayTitleName;
-
-                                                    return Container(
-                                                      margin: EdgeInsets.symmetric(
-                                                        horizontal: ScreenUtil.horizontalScale(8),
-                                                        vertical: ScreenUtil.verticalScale(2),
-                                                      ),
-                                                      height: media.height * 0.22,
-                                                      child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        children: [
-                                                          Text(
-                                                            'Your current workout:',
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          SizedBox(
-                                                            child: Column(
-                                                              children: [
-                                                                Text(
-                                                                  title,
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: ScreenUtil.horizontalScale(6.5),
-                                                                    fontWeight: FontWeight.bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          const SizedBox(height: 10),
-                                                          Container(
-                                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                                                            decoration: status == Status.completed
-                                                                ? BoxDecoration(
-                                                                    color: Colors.white,
-                                                                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)))
-                                                                : const BoxDecoration(),
-                                                            child: status == Status.completed
-                                                                ? ButtonWidget(
-                                                                    text: "Completed",
-                                                                    textColor: Colors.white,
-                                                                    onPress: () {},
-                                                                    color: Colors.green,
-                                                                    isLoading: false,
-                                                                  )
-                                                                : ButtonWidget(
-                                                                    text: title.contains("Rest Day")
-                                                                        ? "Mark Complete"
-                                                                        : status == Status.started
-                                                                            ? 'Continue Your Workout'
-                                                                            : 'Start Your Workout',
-                                                                    textColor: AppColors.primaryColor,
-                                                                    color: status == Status.completed || status == Status.skipped
-                                                                        ? Colors.white70
-                                                                        : Colors.white,
-                                                                    onPress: status == Status.completed || status == Status.skipped
-                                                                        ? null
-                                                                        : () => continueWorkoutOnTap(
-                                                                            isRestDay, monthData, dataId, index, dayData, context),
-                                                                    isLoading: false,
-                                                                  ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    String split = monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].idList?.first
-                                                            .toString()
-                                                            .split(" ")[1] ??
-                                                        "";
-
-                                                    String dataId =
-                                                        "$split-${monthData.monthDataModel?.id}-${monthData.monthDataModel?.weeks?[(monthData.week ?? 1) - 1].id}-${monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].idList?.last}";
-
-                                                    DayHistoryModel data = monthData.allDayHistoryModel.firstWhere(
-                                                      (element) => element.dataId == dataId && element.type!.contains("Pump Day"),
-                                                      orElse: () => DayHistoryModel(title: "Pump Day"),
-                                                    );
-
-                                                    return Container(
-                                                      margin: EdgeInsets.symmetric(
-                                                        horizontal: ScreenUtil.horizontalScale(8),
-                                                        vertical: ScreenUtil.verticalScale(2),
-                                                      ),
-                                                      height: media.height * 0.22,
-                                                      child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        children: [
-                                                          Text(
-                                                            'Your current workout:',
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          SizedBox(
-                                                            child: Column(
-                                                              children: [
-                                                                Text(
-                                                                  data.id != null
-                                                                      ? data.title
-                                                                      : (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList
-                                                                              ?.last) ??
-                                                                          "",
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: ScreenUtil.verticalScale(3),
-                                                                    fontWeight: FontWeight.bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          const SizedBox(height: 10),
-                                                          Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Colors.white,
-                                                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4))),
-                                                            child: ButtonWidget(
-                                                              text: "Completed",
-                                                              textColor: Colors.white,
-                                                              onPress: () {},
-                                                              color: Colors.green,
-                                                              isLoading: false,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }
-                                                },
-                                              )
+                                              Text(
+                                                '${28 - count} days remaining',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: ScreenUtil.verticalScale(1.5),
+                                                ),
+                                              ),
+                                              Text(
+                                                '${count * 100 ~/ 28}% Complete',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: ScreenUtil.verticalScale(1.5),
+                                                ),
+                                              ),
                                             ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          StepProgressBar(
+                                            totalSteps: 4,
+                                            progress: ((count * 100 ~/ 28) / 100) * 4,
+                                          ),
+                                          // const SizedBox(height: 10),
+                                          // Stack(
+                                          //   children: [
+                                          //     Row(
+                                          //       children: List.generate(
+                                          //         4,
+                                          //         (index) => Expanded(
+                                          //           child: Container(
+                                          //             margin: EdgeInsets.symmetric(horizontal: 3),
+                                          //             color: Colors.grey[300],
+                                          //             height: ScreenUtil.verticalScale(0.6),
+                                          //           ),
+                                          //         ),
+                                          //       ),
+                                          //     ),
+                                          //     Container(
+                                          //       width: (ScreenUtil.horizontalScale(80)) / (28 / count),
+                                          //       height: ScreenUtil.verticalScale(0.6),
+                                          //       decoration: BoxDecoration(
+                                          //         gradient: LinearGradient(
+                                          //           colors: [AppColors.backOffSetColor, AppColors.primaryColor],
+                                          //         ),
+                                          //       ),
+                                          //     ),
+                                          //   ],
+                                          // ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 13),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            monthProvider.updateIsOnMonthPage(true);
+                                            monthProvider.updateScrollToRestDay(false);
+
+                                            HapticFeedBack.buttonClick();
+                                            mainPageProvider.changeTab(1);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            shape: Utils.buttonStyle,
+                                            backgroundColor: AppColors.primaryColor,
+                                            padding: const EdgeInsets.symmetric(vertical: 18),
+                                          ),
+                                          child: Text(
+                                            'Month View',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.verticalScale(2),
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      SizedBox(
-                                        height: media.height / 2.549 - ScreenUtil.verticalScale(5.1),
-                                        width: media.width,
-                                        child: Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: ClipPath(
-                                            clipper: DiagonalClipper(),
-                                            child: Container(
-                                              height: media.height / 11,
-                                              width: media.width / 6,
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                              ),
+                                      SizedBox(width: ScreenUtil.horizontalScale(3)),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            monthProvider.updateIsOnMonthPage(true);
+                                            monthProvider.updateScrollToRestDay(false);
+
+                                            HapticFeedBack.buttonClick();
+                                            monthProvider.updateSelectedSection(1);
+                                            mainPageProvider.changeTab(1);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            shape: Utils.buttonStyle,
+                                            side: BorderSide(width: 2.0, color: AppColors.primaryColor),
+                                            backgroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(vertical: 18),
+                                          ),
+                                          child: Text(
+                                            'Edit Schedule',
+                                            style: TextStyle(
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.verticalScale(2),
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  // Extra content below the Stack if needed
-                                ],
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(top: media.height / 2.55 - ScreenUtil.verticalScale(5.1)),
-                                child: Container(
-                                  width: media.width,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                                    ),
-                                  ),
-                                  child: Column(children: [
-                                    Container(
-                                      width: media.width,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(55),
-                                        ),
-                                      ),
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(7),
-                                        vertical: ScreenUtil.verticalScale(1.5),
-                                      ),
-                                      child: Consumer<MonthProvider>(
-                                        builder: (context, value, child) {
-                                          if (monthProvider.monthDataModel == null ||
-                                              value.currentWeek == 0 ||
-                                              (value.monthDataModel?.weeks?.isEmpty ?? false)) {
-                                            return const SizedBox();
-                                          }
-
-                                          final startTime = value.startTime ?? DateTime.now();
-
-                                          int dayDelta = DateTime(today.year, today.month, today.day)
-                                              .difference(DateTime(startTime.year, startTime.month, startTime.day))
-                                              .inDays;
-
-                                          int week = (dayDelta ~/ 7) + 1;
-
-                                          final val1 = (week - 1) * 7;
-
-                                          final val2 = value.allDayHistoryModel.where((element) =>
-                                              element.weekId == value.monthDataModel!.weeks![value.currentWeek - 1].id &&
-                                              element.split == value.splitType &&
-                                              element.monthId == value.monthDataModel?.id &&
-                                              (element.status == "Completed" || element.status == "Skipped"));
-                                          int count = week > 4 ? val1 : val1 + val2.length;
-
-                                          if (count > 28) {
-                                            count = 28;
-                                          }
-                                          return Column(
+                                ),
+                                Consumer<MonthProvider>(
+                                  builder: (context, monthProvider, child) {
+                                    return Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              const SizedBox(height: 15),
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    '${28 - count} days remaining',
-                                                    style: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize: ScreenUtil.verticalScale(1.5),
-                                                    ),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    bottom: ScreenUtil.verticalScale(1.4), top: ScreenUtil.verticalScale(2.3)),
+                                                child: Text(
+                                                  "Current Week Activity",
+                                                  style: TextStyle(
+                                                    color: AppColors.primaryColor,
+                                                    fontSize: ScreenUtil.horizontalScale(5),
+                                                    fontWeight: FontWeight.w700,
                                                   ),
-                                                  Text(
-                                                    '${count * 100 ~/ 28}% Complete',
-                                                    style: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize: ScreenUtil.verticalScale(1.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 10),
-                                              StepProgressBar(
-                                                totalSteps: 4,
-                                                progress: ((count * 100 ~/ 28) / 100) * 4,
-                                              ),
-                                              // const SizedBox(height: 10),
-                                              // Stack(
-                                              //   children: [
-                                              //     Row(
-                                              //       children: List.generate(
-                                              //         4,
-                                              //         (index) => Expanded(
-                                              //           child: Container(
-                                              //             margin: EdgeInsets.symmetric(horizontal: 3),
-                                              //             color: Colors.grey[300],
-                                              //             height: ScreenUtil.verticalScale(0.6),
-                                              //           ),
-                                              //         ),
-                                              //       ),
-                                              //     ),
-                                              //     Container(
-                                              //       width: (ScreenUtil.horizontalScale(80)) / (28 / count),
-                                              //       height: ScreenUtil.verticalScale(0.6),
-                                              //       decoration: BoxDecoration(
-                                              //         gradient: LinearGradient(
-                                              //           colors: [AppColors.backOffSetColor, AppColors.primaryColor],
-                                              //         ),
-                                              //       ),
-                                              //     ),
-                                              //   ],
-                                              // ),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(height: 13),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(7),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                monthProvider.updateIsOnMonthPage(true);
-                                                monthProvider.updateScrollToRestDay(false);
-
-                                                HapticFeedBack.buttonClick();
-                                                mainPageProvider.changeTab(1);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                shape: Utils.buttonStyle,
-                                                backgroundColor: AppColors.primaryColor,
-                                                padding: const EdgeInsets.symmetric(vertical: 18),
-                                              ),
-                                              child: Text(
-                                                'Month View',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.verticalScale(2),
-                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
+                                            ],
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.pushNamed(context, '/streak-calendar');
+                                          },
+                                          child: Container(
+                                            color: Colors.transparent,
+                                            child: WeekCalender(monthProvider: monthProvider),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                Consumer<MonthProvider>(
+                                  builder: (context, value, child) {
+                                    final listA = monthProvider.graphHistory.map((e) => e["totalCompletedExercise"].value > 0).toList();
+                                    final listB = monthProvider.graphHistory.map((e) => e["totalWeight"].value > 0).toList();
+                                    final isAvailable =
+                                        listA.any((element) => element == true) || listB.any((element) => element == true);
+                                    if (isAvailable) {
+                                      return Column(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    "Recent Activity",
+                                                    style: TextStyle(
+                                                      color: AppColors.primaryColor,
+                                                      fontSize: ScreenUtil.horizontalScale(5.2),
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ),
+                                                PopupMenuButton<String>(
+                                                  color: const Color.fromARGB(255, 252, 252, 252),
+                                                  elevation: 10,
+                                                  shadowColor: Colors.black.withValues(alpha: 0.2),
+                                                  itemBuilder: (context) {
+                                                    return [
+                                                      "Exercises Completed",
+                                                      // "Time Spent",
+                                                      "Weight Lifted",
+                                                    ].map((str) {
+                                                      return PopupMenuItem(
+                                                          value: str,
+                                                          child: Material(
+                                                            elevation: 0,
+                                                            color: const Color.fromARGB(255, 252, 252, 252),
+                                                            child: Text(
+                                                              str,
+                                                              style: TextStyle(
+                                                                color: Colors.grey,
+                                                                fontSize: ScreenUtil.verticalScale(1.5),
+                                                              ),
+                                                            ),
+                                                          ));
+                                                    }).toList();
+                                                  },
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                                    children: <Widget>[
+                                                      Text(
+                                                        selectedChart,
+                                                        style: TextStyle(
+                                                          color: Colors.grey,
+                                                          fontSize: ScreenUtil.verticalScale(1.5),
+                                                        ),
+                                                      ),
+                                                      const Icon(
+                                                        Icons.keyboard_arrow_down_rounded,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  onSelected: (v) {
+                                                    setState(() {
+                                                      selectedChart = v;
+                                                    });
+                                                  },
+                                                )
+                                              ],
                                             ),
                                           ),
-                                          SizedBox(width: ScreenUtil.horizontalScale(3)),
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                monthProvider.updateIsOnMonthPage(true);
-                                                monthProvider.updateScrollToRestDay(false);
-
-                                                HapticFeedBack.buttonClick();
-                                                monthProvider.updateSelectedSection(1);
-                                                mainPageProvider.changeTab(1);
+                                          Container(
+                                            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8.5)).copyWith(top: 6),
+                                            child: selectedChart == "Exercises Completed"
+                                                ? const ExerciseCompletedGraph()
+                                                : selectedChart == "Weight Lifted"
+                                                    ? const WeightLiftedGraph()
+                                                    // : const TimeSpentGraph(),
+                                                    : const SizedBox(),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                              horizontal: ScreenUtil.horizontalScale(9),
+                                              vertical: ScreenUtil.verticalScale(1),
+                                            ),
+                                            child: ButtonWidget(
+                                              text: 'See all progress reports',
+                                              textColor: Colors.white,
+                                              color: AppColors.primaryColor,
+                                              onPress: () {
+                                                Navigator.pushNamed(context, "/graphAndReports");
                                               },
-                                              style: ElevatedButton.styleFrom(
-                                                shape: Utils.buttonStyle,
-                                                side: BorderSide(width: 2.0, color: AppColors.primaryColor),
-                                                backgroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(vertical: 18),
-                                              ),
-                                              child: Text(
-                                                'Edit Schedule',
-                                                style: TextStyle(
-                                                  color: AppColors.primaryColor,
-                                                  fontSize: ScreenUtil.verticalScale(2),
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
+                                              isLoading: false,
                                             ),
                                           ),
                                         ],
-                                      ),
+                                      );
+                                    } else {
+                                      return SizedBox();
+                                    }
+                                  },
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil.horizontalScale(3.5), vertical: ScreenUtil.horizontalScale(5)),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.greyColor,
+                                      borderRadius: BorderRadius.circular(15),
                                     ),
-                                    Consumer<MonthProvider>(
-                                      builder: (context, monthProvider, child) {
-                                        return Column(
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: ScreenUtil.verticalScale(1.4), top: ScreenUtil.verticalScale(2.3)),
-                                                    child: Text(
-                                                      "Current Week Activity",
-                                                      style: TextStyle(
-                                                        color: AppColors.primaryColor,
-                                                        fontSize: ScreenUtil.horizontalScale(5),
-                                                        fontWeight: FontWeight.w700,
-                                                      ),
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Center(
+                                          child: Text(
+                                            'Achievements',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.horizontalScale(5),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: ScreenUtil.verticalScale(2.2),
+                                        ),
+                                        Consumer<MonthProvider>(builder: (context, value, child) {
+                                          final data = value.items.where((element) => element["isArchived"] == true).toList();
+                                          return value.items.isEmpty
+                                              ? Center(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(top: 2, bottom: 5),
+                                                    child: Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          "Fetching earned achievements",
+                                                          style: TextStyle(fontSize: 15.5, color: Colors.grey.shade600),
+                                                        ),
+                                                        SizedBox(width: 2),
+                                                        RotatedBox(
+                                                            quarterTurns: 2,
+                                                            child: LoadingAnimationWidget.progressiveDots(
+                                                                size: 14.5, color: Colors.grey.shade600))
+                                                      ],
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.pushNamed(context, '/streak-calendar');
-                                              },
-                                              child: Container(
-                                                color: Colors.transparent,
-                                                child: WeekCalender(monthProvider: monthProvider),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                    Consumer<MonthProvider>(
-                                      builder: (context, value, child) {
-                                        final listA = monthProvider.graphHistory.map((e) => e["totalCompletedExercise"].value > 0).toList();
-                                        final listB = monthProvider.graphHistory.map((e) => e["totalWeight"].value > 0).toList();
-                                        final isAvailable =
-                                            listA.any((element) => element == true) || listB.any((element) => element == true);
-                                        if (isAvailable) {
-                                          return Column(
-                                            children: [
-                                              Container(
-                                                margin: EdgeInsets.symmetric(
-                                                    horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        "Recent Activity",
-                                                        style: TextStyle(
-                                                          color: AppColors.primaryColor,
-                                                          fontSize: ScreenUtil.horizontalScale(5.2),
-                                                          fontWeight: FontWeight.w700,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    PopupMenuButton<String>(
-                                                      color: const Color.fromARGB(255, 252, 252, 252),
-                                                      elevation: 10,
-                                                      shadowColor: Colors.black.withValues(alpha: 0.2),
-                                                      itemBuilder: (context) {
-                                                        return [
-                                                          "Exercises Completed",
-                                                          // "Time Spent",
-                                                          "Weight Lifted",
-                                                        ].map((str) {
-                                                          return PopupMenuItem(
-                                                              value: str,
-                                                              child: Material(
-                                                                elevation: 0,
-                                                                color: const Color.fromARGB(255, 252, 252, 252),
-                                                                child: Text(
-                                                                  str,
-                                                                  style: TextStyle(
-                                                                    color: Colors.grey,
-                                                                    fontSize: ScreenUtil.verticalScale(1.5),
-                                                                  ),
-                                                                ),
-                                                              ));
-                                                        }).toList();
-                                                      },
-                                                      child: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                                        children: <Widget>[
-                                                          Text(
-                                                            selectedChart,
-                                                            style: TextStyle(
-                                                              color: Colors.grey,
-                                                              fontSize: ScreenUtil.verticalScale(1.5),
-                                                            ),
-                                                          ),
-                                                          const Icon(
-                                                            Icons.keyboard_arrow_down_rounded,
-                                                            color: Colors.grey,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      onSelected: (v) {
-                                                        setState(() {
-                                                          selectedChart = v;
-                                                        });
-                                                      },
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8.5)).copyWith(top: 6),
-                                                child: selectedChart == "Exercises Completed"
-                                                    ? const ExerciseCompletedGraph()
-                                                    : selectedChart == "Weight Lifted"
-                                                        ? const WeightLiftedGraph()
-                                                        // : const TimeSpentGraph(),
-                                                        : const SizedBox(),
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.symmetric(
-                                                  horizontal: ScreenUtil.horizontalScale(9),
-                                                  vertical: ScreenUtil.verticalScale(1),
-                                                ),
-                                                child: ButtonWidget(
-                                                  text: 'See all progress reports',
-                                                  textColor: Colors.white,
-                                                  color: AppColors.primaryColor,
-                                                  onPress: () {
-                                                    Navigator.pushNamed(context, "/graphAndReports");
-                                                  },
-                                                  isLoading: false,
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        } else {
-                                          return SizedBox();
-                                        }
-                                      },
-                                    ),
-
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(7), vertical: ScreenUtil.verticalScale(2.3)),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: ScreenUtil.horizontalScale(3.5), vertical: ScreenUtil.horizontalScale(5)),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.greyColor,
-                                          borderRadius: BorderRadius.circular(15),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Center(
-                                              child: Text(
-                                                'Achievements',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: AppColors.primaryColor,
-                                                  fontSize: ScreenUtil.horizontalScale(5),
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: ScreenUtil.verticalScale(2.2),
-                                            ),
-                                            Consumer<MonthProvider>(builder: (context, value, child) {
-                                              final data = value.items.where((element) => element["isArchived"] == true).toList();
-                                              return value.items.isEmpty
+                                                )
+                                              : !value.items.any((element) => element["isArchived"] == true)
                                                   ? Center(
                                                       child: Padding(
                                                         padding: const EdgeInsets.only(top: 2, bottom: 5),
-                                                        child: Row(
-                                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            Text(
-                                                              "Fetching earned achievements",
-                                                              style: TextStyle(fontSize: 15.5, color: Colors.grey.shade600),
-                                                            ),
-                                                            SizedBox(width: 2),
-                                                            RotatedBox(
-                                                                quarterTurns: 2,
-                                                                child: LoadingAnimationWidget.progressiveDots(
-                                                                    size: 14.5, color: Colors.grey.shade600))
-                                                          ],
+                                                        child: Text(
+                                                          "No achievements available!",
+                                                          style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                                                         ),
                                                       ),
                                                     )
-                                                  : !value.items.any((element) => element["isArchived"] == true)
-                                                      ? Center(
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.only(top: 2, bottom: 5),
-                                                            child: Text(
-                                                              "No achievements available!",
-                                                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-                                                            ),
-                                                          ),
-                                                        )
-                                                      : Builder(
-                                                          builder: (context) {
-                                                            data.sort((a, b) => DateTime.parse(a["time"].toString())
-                                                                .compareTo(DateTime.parse(b["time"].toString())));
-                                                            return Row(
-                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                              children: List.generate(
-                                                                3,
-                                                                (index) => (data.length - 1) < index
-                                                                    ? Expanded(child: SizedBox())
-                                                                    : Expanded(
-                                                                        child: GestureDetector(
-                                                                          onTap: () {
-                                                                            AnimatedDialog.showAnimatedDialog(
-                                                                              context: context,
-                                                                              pageBuilder: (context, anim1, anim2) =>
-                                                                                  ShareAchievementDialog(
-                                                                                title: data[index]["title"],
-                                                                                imagePath: data[index]["image"],
-                                                                                subtitle: data[index]["subtitle"],
-                                                                                time: data[index]["time"],
-                                                                              ),
-                                                                            );
-                                                                          },
-                                                                          child: Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                                                            children: [
-                                                                              SvgPicture.asset(
-                                                                                height: ScreenUtil.verticalScale(8),
-                                                                                data[index]["image"],
-                                                                                colorFilter: ColorFilter.mode(
-                                                                                    AppColors.primaryColor, BlendMode.srcIn),
-                                                                                fit: BoxFit.contain,
-                                                                              ),
-                                                                              // const SizedBox(height: 10),
-                                                                              // Text(
-                                                                              //   data[index]["title"],
-                                                                              //   maxLines: 1,
-                                                                              //   textAlign: TextAlign.center,
-                                                                              //   overflow: TextOverflow.ellipsis,
-                                                                              //   style: TextStyle(
-                                                                              //     fontSize: ScreenUtil.verticalScale(1.45),
-                                                                              //     color: AppColors.primaryColor,
-                                                                              //     fontWeight: FontWeight.bold,
-                                                                              //   ),
-                                                                              // ),
-                                                                            ],
+                                                  : Builder(
+                                                      builder: (context) {
+                                                        data.sort((a, b) => DateTime.parse(a["time"].toString())
+                                                            .compareTo(DateTime.parse(b["time"].toString())));
+                                                        return Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: List.generate(
+                                                            3,
+                                                            (index) => (data.length - 1) < index
+                                                                ? Expanded(child: SizedBox())
+                                                                : Expanded(
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        AnimatedDialog.showAnimatedDialog(
+                                                                          context: context,
+                                                                          pageBuilder: (context, anim1, anim2) =>
+                                                                              ShareAchievementDialog(
+                                                                            title: data[index]["title"],
+                                                                            imagePath: data[index]["image"],
+                                                                            subtitle: data[index]["subtitle"],
+                                                                            time: data[index]["time"],
                                                                           ),
-                                                                        ),
+                                                                        );
+                                                                      },
+                                                                      child: Column(
+                                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                                        children: [
+                                                                          SvgPicture.asset(
+                                                                            height: ScreenUtil.verticalScale(8),
+                                                                            data[index]["image"],
+                                                                            colorFilter: ColorFilter.mode(
+                                                                                AppColors.primaryColor, BlendMode.srcIn),
+                                                                            fit: BoxFit.contain,
+                                                                          ),
+                                                                          // const SizedBox(height: 10),
+                                                                          // Text(
+                                                                          //   data[index]["title"],
+                                                                          //   maxLines: 1,
+                                                                          //   textAlign: TextAlign.center,
+                                                                          //   overflow: TextOverflow.ellipsis,
+                                                                          //   style: TextStyle(
+                                                                          //     fontSize: ScreenUtil.verticalScale(1.45),
+                                                                          //     color: AppColors.primaryColor,
+                                                                          //     fontWeight: FontWeight.bold,
+                                                                          //   ),
+                                                                          // ),
+                                                                        ],
                                                                       ),
-                                                              ),
-                                                            );
-                                                          },
+                                                                    ),
+                                                                  ),
+                                                          ),
                                                         );
-                                            }),
-                                          ],
+                                                      },
+                                                    );
+                                        }),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(9),
+                                  ).copyWith(top: ScreenUtil.verticalScale(1.2)),
+                                  child: ButtonWidget(
+                                    text: 'See all Achievements',
+                                    textColor: Colors.white,
+                                    color: AppColors.primaryColor,
+                                    onPress: () {
+                                      Navigator.pushNamed(context, "/seeAllAchievementPage");
+                                    },
+                                    isLoading: false,
+                                  ),
+                                ),
+                                featureChallengeData.id != ""
+
+                                    ///Please recheck this multiple
+                                    ? JoinChallengeWidget(featureChallenge: featureChallengeData)
+                                    : SizedBox(height: ScreenUtil.verticalScale(5)),
+
+                                ProgramPhasesWidget(),
+
+                                /// New Method
+
+                                SizedBox(
+                                  width: media.width,
+                                  child: Column(
+                                    children: [
+                                      // Container(
+                                      //   width: media.width,
+                                      //   margin: EdgeInsets.only(
+                                      //       left: ScreenUtil.horizontalScale(7), right: ScreenUtil.horizontalScale(7), bottom: 20),
+                                      //   child: Text(
+                                      //     "Member Spotlight",
+                                      //     style: TextStyle(
+                                      //       color: AppColors.primaryColor,
+                                      //       fontSize: ScreenUtil.verticalScale(2.3),
+                                      //       fontWeight: FontWeight.w800,
+                                      //     ),
+                                      //     textAlign: TextAlign.start,
+                                      //   ),
+                                      // ),
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(2.5),
+                                      ),
+                                      Consumer<DataProvider>(builder: (context, dataProvider, child) {
+                                        return dataProvider.athletesData.isNotEmpty
+                                            ? CarouselSlider.builder(
+                                                itemCount: dataProvider.athletesData.length,
+                                                options: CarouselOptions(
+                                                  height: ScreenUtil.verticalScale(38),
+                                                  viewportFraction: 0.65,
+                                                  enlargeCenterPage: true,
+                                                  enlargeFactor: 0.4,
+                                                  enableInfiniteScroll: true,
+                                                  autoPlay: false,
+                                                  onPageChanged: (index, reason) {},
+                                                  scrollDirection: Axis.horizontal,
+                                                ),
+                                                itemBuilder: (context, index, realIndex) {
+                                                  return Center(
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        // Navigator.pushNamed(context, '/meetOurStaff');
+                                                      },
+                                                      child: AnimatedContainer(
+                                                        width: media.width,
+                                                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                                                        duration: const Duration(milliseconds: 300),
+                                                        child: AthletesListWidget(
+                                                          height: ScreenUtil.verticalScale(38),
+                                                          width: ScreenUtil.horizontalScale(60),
+                                                          oneAthlete: dataProvider.athletesData[index],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              )
+                                            : const SizedBox();
+                                      }),
+                                    ],
+                                  ),
+                                ),
+
+                                Consumer<DataProvider>(
+                                  builder: (context, dataProvider, child) {
+                                    return (dataProvider.collectionsData.isNotEmpty)
+                                        ? Container(
+                                            width: media.width,
+                                            margin: EdgeInsets.symmetric(
+                                              vertical: ScreenUtil.verticalScale(2.5),
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                      left: ScreenUtil.horizontalScale(7),
+                                                      right: ScreenUtil.horizontalScale(7),
+                                                      bottom: ScreenUtil.verticalScale(2.4)),
+                                                  width: media.width,
+                                                  child: Center(
+                                                    child: Text(
+                                                      "Featured Collections",
+                                                      style: TextStyle(
+                                                        color: AppColors.primaryColor,
+                                                        fontSize: ScreenUtil.horizontalScale(5),
+                                                        fontWeight: FontWeight.w800,
+                                                      ),
+                                                      textAlign: TextAlign.start,
+                                                    ),
+                                                  ),
+                                                ),
+                                                CarouselSlider.builder(
+                                                  itemCount: dataProvider.staffsData.length,
+                                                  options: CarouselOptions(
+                                                    height: ScreenUtil.verticalScale(38),
+                                                    viewportFraction: 0.65,
+                                                    enlargeCenterPage: true,
+                                                    enlargeFactor: 0.4,
+                                                    enableInfiniteScroll: true,
+                                                    autoPlay: false,
+                                                    onPageChanged: (index, reason) {},
+                                                    scrollDirection: Axis.horizontal,
+                                                  ),
+                                                  itemBuilder: (context, index, realIndex) {
+                                                    return CollectionGrid(collection: dataProvider.collectionsData[index]);
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : SizedBox(height: ScreenUtil.verticalScale(5));
+                                  },
+                                ),
+
+                                SizedBox(
+                                  width: media.width,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: media.width,
+                                        margin: EdgeInsets.only(
+                                          left: ScreenUtil.horizontalScale(7),
+                                          right: ScreenUtil.horizontalScale(7),
+                                          bottom: ScreenUtil.verticalScale(2.4),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "Meet our team",
+                                            style: TextStyle(
+                                              color: AppColors.primaryColor,
+                                              fontSize: ScreenUtil.horizontalScale(5),
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                            textAlign: TextAlign.start,
+                                          ),
                                         ),
                                       ),
-                                    ),
-
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(9),
-                                      ).copyWith(top: ScreenUtil.verticalScale(1.2)),
-                                      child: ButtonWidget(
-                                        text: 'See all Achievements',
-                                        textColor: Colors.white,
-                                        color: AppColors.primaryColor,
-                                        onPress: () {
-                                          Navigator.pushNamed(context, "/seeAllAchievementPage");
+                                      Consumer<DataProvider>(
+                                        builder: (context, dataProvider, child) {
+                                          return (dataProvider.staffsData.isNotEmpty)
+                                              ? CarouselSlider.builder(
+                                                  itemCount: dataProvider.staffsData.length,
+                                                  options: CarouselOptions(
+                                                    height: ScreenUtil.verticalScale(38),
+                                                    viewportFraction: 0.65,
+                                                    enlargeCenterPage: true,
+                                                    enlargeFactor: 0.4,
+                                                    enableInfiniteScroll: true,
+                                                    autoPlay: false,
+                                                    onPageChanged: (index, reason) {},
+                                                    scrollDirection: Axis.horizontal,
+                                                  ),
+                                                  itemBuilder: (context, index, realIndex) {
+                                                    return Center(
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          // Navigator.pushNamed(context, '/meetOurStaff');
+                                                        },
+                                                        child: AnimatedContainer(
+                                                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                                                          duration: const Duration(milliseconds: 300),
+                                                          child: StaffListWidget(
+                                                            height: ScreenUtil.verticalScale(38),
+                                                            width: ScreenUtil.horizontalScale(60),
+                                                            oneStaff: dataProvider.staffsData[index],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                )
+                                              : const SizedBox();
                                         },
-                                        isLoading: false,
                                       ),
-                                    ),
-                                    featureChallengeData.id != ""
 
-                                        ///Please recheck this multiple
-                                        ? JoinChallengeWidget(featureChallenge: featureChallengeData)
-                                        : SizedBox(height: ScreenUtil.verticalScale(5)),
+                                      SizedBox(
+                                        height: 100,
+                                      )
 
-                                    ProgramPhasesWidget(),
+                                      /// Old
 
-                                    /// New Method
-
-                                    SizedBox(
-                                      width: media.width,
-                                      child: Column(
-                                        children: [
-                                          // Container(
-                                          //   width: media.width,
-                                          //   margin: EdgeInsets.only(
-                                          //       left: ScreenUtil.horizontalScale(7), right: ScreenUtil.horizontalScale(7), bottom: 20),
-                                          //   child: Text(
-                                          //     "Member Spotlight",
-                                          //     style: TextStyle(
-                                          //       color: AppColors.primaryColor,
-                                          //       fontSize: ScreenUtil.verticalScale(2.3),
-                                          //       fontWeight: FontWeight.w800,
-                                          //     ),
-                                          //     textAlign: TextAlign.start,
-                                          //   ),
-                                          // ),
-                                          SizedBox(
-                                            height: ScreenUtil.verticalScale(2.5),
-                                          ),
-                                          Consumer<DataProvider>(builder: (context, dataProvider, child) {
-                                            return dataProvider.athletesData.isNotEmpty
-                                                ? CarouselSlider.builder(
-                                                    itemCount: dataProvider.athletesData.length,
-                                                    options: CarouselOptions(
-                                                      height: ScreenUtil.verticalScale(38),
-                                                      viewportFraction: 0.65,
-                                                      enlargeCenterPage: true,
-                                                      enlargeFactor: 0.4,
-                                                      enableInfiniteScroll: true,
-                                                      autoPlay: false,
-                                                      onPageChanged: (index, reason) {},
-                                                      scrollDirection: Axis.horizontal,
-                                                    ),
-                                                    itemBuilder: (context, index, realIndex) {
-                                                      return Center(
-                                                        child: GestureDetector(
-                                                          onTap: () {
-                                                            // Navigator.pushNamed(context, '/meetOurStaff');
-                                                          },
-                                                          child: AnimatedContainer(
-                                                            width: media.width,
-                                                            margin: const EdgeInsets.symmetric(horizontal: 5),
-                                                            duration: const Duration(milliseconds: 300),
-                                                            child: AthletesListWidget(
-                                                              height: ScreenUtil.verticalScale(38),
-                                                              width: ScreenUtil.horizontalScale(60),
-                                                              oneAthlete: dataProvider.athletesData[index],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  )
-                                                : const SizedBox();
-                                          }),
-                                        ],
-                                      ),
-                                    ),
-
-                                    Consumer<DataProvider>(
-                                      builder: (context, dataProvider, child) {
-                                        return (dataProvider.collectionsData.isNotEmpty)
-                                            ? Container(
-                                                width: media.width,
-                                                margin: EdgeInsets.symmetric(
-                                                  vertical: ScreenUtil.verticalScale(2.5),
-                                                ),
-                                                child: Column(
-                                                  children: [
-                                                    Container(
-                                                      margin: EdgeInsets.only(
-                                                          left: ScreenUtil.horizontalScale(7),
-                                                          right: ScreenUtil.horizontalScale(7),
-                                                          bottom: ScreenUtil.verticalScale(2.4)),
-                                                      width: media.width,
-                                                      child: Center(
-                                                        child: Text(
-                                                          "Featured Collections",
-                                                          style: TextStyle(
-                                                            color: AppColors.primaryColor,
-                                                            fontSize: ScreenUtil.horizontalScale(5),
-                                                            fontWeight: FontWeight.w800,
-                                                          ),
-                                                          textAlign: TextAlign.start,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    CarouselSlider.builder(
-                                                      itemCount: dataProvider.staffsData.length,
-                                                      options: CarouselOptions(
-                                                        height: ScreenUtil.verticalScale(38),
-                                                        viewportFraction: 0.65,
-                                                        enlargeCenterPage: true,
-                                                        enlargeFactor: 0.4,
-                                                        enableInfiniteScroll: true,
-                                                        autoPlay: false,
-                                                        onPageChanged: (index, reason) {},
-                                                        scrollDirection: Axis.horizontal,
-                                                      ),
-                                                      itemBuilder: (context, index, realIndex) {
-                                                        return CollectionGrid(collection: dataProvider.collectionsData[index]);
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            : SizedBox(height: ScreenUtil.verticalScale(5));
-                                      },
-                                    ),
-
-                                    SizedBox(
-                                      width: media.width,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            width: media.width,
-                                            margin: EdgeInsets.only(
-                                              left: ScreenUtil.horizontalScale(7),
-                                              right: ScreenUtil.horizontalScale(7),
-                                              bottom: ScreenUtil.verticalScale(2.4),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                "Meet our team",
-                                                style: TextStyle(
-                                                  color: AppColors.primaryColor,
-                                                  fontSize: ScreenUtil.horizontalScale(5),
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                                textAlign: TextAlign.start,
-                                              ),
-                                            ),
-                                          ),
-                                          Consumer<DataProvider>(
-                                            builder: (context, dataProvider, child) {
-                                              return (dataProvider.staffsData.isNotEmpty)
-                                                  ? CarouselSlider.builder(
-                                                      itemCount: dataProvider.staffsData.length,
-                                                      options: CarouselOptions(
-                                                        height: ScreenUtil.verticalScale(38),
-                                                        viewportFraction: 0.65,
-                                                        enlargeCenterPage: true,
-                                                        enlargeFactor: 0.4,
-                                                        enableInfiniteScroll: true,
-                                                        autoPlay: false,
-                                                        onPageChanged: (index, reason) {},
-                                                        scrollDirection: Axis.horizontal,
-                                                      ),
-                                                      itemBuilder: (context, index, realIndex) {
-                                                        return Center(
-                                                          child: GestureDetector(
-                                                            onTap: () {
-                                                              // Navigator.pushNamed(context, '/meetOurStaff');
-                                                            },
-                                                            child: AnimatedContainer(
-                                                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                                                              duration: const Duration(milliseconds: 300),
-                                                              child: StaffListWidget(
-                                                                height: ScreenUtil.verticalScale(38),
-                                                                width: ScreenUtil.horizontalScale(60),
-                                                                oneStaff: dataProvider.staffsData[index],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    )
-                                                  : const SizedBox();
-                                            },
-                                          ),
-
-                                          SizedBox(
-                                            height: 100,
-                                          )
-
-                                          /// Old
-
-                                          // staffs.isNotEmpty
-                                          //     ? StaffCarousel(
-                                          //         athletes: staffs, // List of athlete widgets (or data),
-                                          //         height: ScreenUtil.verticalScale(48),
-                                          //       )
-                                          //     : const SizedBox(),
-                                        ],
-                                      ),
-                                    ),
-                                  ]),
+                                      // staffs.isNotEmpty
+                                      //     ? StaffCarousel(
+                                      //         athletes: staffs, // List of athlete widgets (or data),
+                                      //         height: ScreenUtil.verticalScale(48),
+                                      //       )
+                                      //     : const SizedBox(),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ]),
+                            ),
                           ),
                         ],
                       ),

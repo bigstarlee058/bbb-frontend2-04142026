@@ -29,6 +29,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   DataProvider? dataProvider;
   List<ExerciseLibrary> _filteredExercises = [];
   late MainPageProvider mainPageProvider;
+  ScrollController scrollController = ScrollController();
 
   final TextEditingController _controller = TextEditingController();
   List<String> items = [];
@@ -40,9 +41,13 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   @override
   void initState() {
     super.initState();
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToMiddle();
+    });
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    monthProvider = Provider.of<MonthProvider>(context, listen: false);
+
     dataProvider?.fetchAdminData().then((_) {
       setState(() {
         _filteredExercises = dataProvider!.adminExercises;
@@ -67,6 +72,31 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     });
   }
 
+  void scrollToMiddle() {
+    if (monthProvider?.graphType == "Weight") {
+      final middleOffset = scrollController.position.maxScrollExtent /
+          (monthProvider?.graphType == "Exercise"
+              ? 12
+              : monthProvider?.graphType == "Weight"
+                  ? 2
+                  : monthProvider?.graphType == "RIR"
+                      ? 1.51
+                      : 1);
+
+      scrollController.animateTo(
+        middleOffset,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider?.updateGraphType(""));
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -74,6 +104,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        controller: scrollController,
         physics: const ClampingScrollPhysics(),
         child: Stack(
           clipBehavior: Clip.none,

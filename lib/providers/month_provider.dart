@@ -1659,11 +1659,17 @@ class MonthProvider extends ChangeNotifier {
 
   /// CHART =============================++++++++++++++++++++++++++++++++++
 
+  String graphType = "";
   List<Map<String, dynamic>> graphHistory = [];
   double maximumValueOfWeight = 0;
   double maximumValueOfTotalEx = 0;
   double maximumValueOfTotalTime = 0;
   List<Map<String, dynamic>> liftedWeightEachDay = [];
+
+  updateGraphType(String value) {
+    graphType = value;
+    notifyListeners();
+  }
 
   changeWeekGraphs() {
     String newValue =

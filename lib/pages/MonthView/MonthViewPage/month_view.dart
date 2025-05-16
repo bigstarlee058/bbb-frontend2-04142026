@@ -42,7 +42,7 @@ class _MonthViewState extends State<MonthView> {
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
   late ProgramInfoProvider provider;
-  ScrollController _scrollController = ScrollController();
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -83,7 +83,7 @@ class _MonthViewState extends State<MonthView> {
 
   void scrollToMiddle() {
     if (monthProvider!.scrollToRestDay) {
-      final middleOffset = _scrollController.position.maxScrollExtent /
+      final middleOffset = scrollController.position.maxScrollExtent /
           ((monthProvider?.week) == 1
               ? 1.66
               : (monthProvider?.week) == 2
@@ -91,7 +91,7 @@ class _MonthViewState extends State<MonthView> {
                   : (monthProvider?.week) == 3
                       ? 1.37
                       : 1.255);
-      _scrollController.animateTo(
+      scrollController.animateTo(
         middleOffset,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
@@ -140,6 +140,7 @@ class _MonthViewState extends State<MonthView> {
                   height: media.height / 1,
                   width: media.width,
                   decoration: const BoxDecoration(
+                    color: Colors.black,
                     image: DecorationImage(
                       image: AssetImage('assets/img/back.jpg'),
                       fit: BoxFit.cover,
@@ -196,7 +197,7 @@ class _MonthViewState extends State<MonthView> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                controller: _scrollController,
+                controller: scrollController,
                 physics: BouncingScrollPhysics(),
                 children: [
                   Stack(
@@ -213,6 +214,7 @@ class _MonthViewState extends State<MonthView> {
                                       height: media.height / 1,
                                       width: media.width,
                                       decoration: const BoxDecoration(
+                                        color: Colors.black,
                                         image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                                       ),
                                     ),
@@ -315,7 +317,7 @@ class _MonthViewState extends State<MonthView> {
                                                     right: ScreenUtil.horizontalScale(8),
                                                   ),
                                                   child: SizedBox(
-                                                    height: media.height / 6.2,
+                                                    height: media.height / 7.5,
                                                     child: Center(
                                                       child: Image.asset("assets/img/month_hero1.png"),
                                                     ),

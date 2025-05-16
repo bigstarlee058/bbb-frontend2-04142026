@@ -232,11 +232,20 @@ class _AppTutorialState extends State<AppTutorial> with TickerProviderStateMixin
                                             controller: _chewieController!,
                                           ),
                                         ),
-                                        Container(
-                                          color: showControls ? Colors.black38 : Colors.transparent,
+
+                                        AnimatedContainer(
+                                          duration: Duration(milliseconds: 1500),
+                                          curve: Curves.fastOutSlowIn,
                                           height: videoSize.height,
                                           width: videoSize.width,
+                                          color: showControls ? Colors.black38 : Colors.transparent,
                                         ),
+
+                                        // Container(
+                                        //   color: showControls ? Colors.black38 : Colors.transparent,
+                                        //   height: videoSize.height,
+                                        //   width: videoSize.width,
+                                        // ),
                                       ],
                                     )
                                   : Container(
