@@ -8,14 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class WeightLiftedGraph extends StatefulWidget {
-  const WeightLiftedGraph({super.key});
-
+class ReportAverageRIRGraph extends StatefulWidget {
+  const ReportAverageRIRGraph({super.key});
   @override
-  State<WeightLiftedGraph> createState() => _BarChartSample7State();
+  State<ReportAverageRIRGraph> createState() => _ReportAverageRIRGraphState();
 }
 
-class _BarChartSample7State extends State<WeightLiftedGraph> {
+class _ReportAverageRIRGraphState extends State<ReportAverageRIRGraph> {
   BarChartGroupData generateBarGroup(
     int x,
     Color color,
@@ -41,6 +40,12 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
   }
 
   int touchedGroupIndex = -1;
+  @override
+  void initState() {
+    MonthProvider monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider.changeAverageRIR("Week ${monthProvider.currentWeek}"));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +72,8 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: monthProvider.maximumValueOfWeight > 8000 ? (monthProvider.maximumValueOfWeight / 8) : 1000,
-                    reservedSize: 32,
+                    interval: monthProvider.reportMaximumValueOfAverageRIR > 14 ? monthProvider.reportMaximumValueOfAverageRIR / 5 : 2,
+                    reservedSize: 30, // Space for titles
                     getTitlesWidget: getLeftTitles, // Use this method to generate Y-axis titles
                   ),
                 ),
@@ -84,7 +89,8 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
               ),
               gridData: FlGridData(
                 verticalInterval: 0.125,
-                horizontalInterval: monthProvider.maximumValueOfWeight > 8000 ? (monthProvider.maximumValueOfWeight / 8) : 1000,
+                horizontalInterval:
+                    monthProvider.reportMaximumValueOfAverageRIR > 14 ? monthProvider.reportMaximumValueOfAverageRIR / 5 : 2,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -95,25 +101,25 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                   strokeWidth: 1,
                 ),
               ),
-              barGroups: monthProvider.graphHistory.asMap().entries.map((e) {
+              barGroups: monthProvider.reportAverageRIRGraphHistory.asMap().entries.map((e) {
                 final index = e.key;
-                final data = e.value['totalWeight'];
-
+                final data = e.value['totalAverageRIR'];
                 return generateBarGroup(
                   index,
-                  data.color,
+                  AppColors.primaryColor,
                   data.value,
                   data.shadowValue,
                 );
               }).toList(),
-              maxY: monthProvider.maximumValueOfWeight > 8000 ? monthProvider.maximumValueOfWeight : 8000,
-              minY: 0,
+
+              maxY: monthProvider.reportMaximumValueOfAverageRIR > 14 ? monthProvider.reportMaximumValueOfAverageRIR : 14,
+              minY: 0, // Set min Y value
               barTouchData: BarTouchData(
                 enabled: true,
                 handleBuiltInTouches: false,
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (group1) => Colors.transparent,
-                  // tooltipMargin: 0,
+                  getTooltipColor: (group) => Colors.transparent,
+                  tooltipMargin: 0,
                   getTooltipItem: (
                     BarChartGroupData group,
                     int groupIndex,
@@ -121,11 +127,11 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
                     int rodIndex,
                   ) {
                     return BarTooltipItem(
-                      rod.toY.toStringAsFixed(0),
+                      rod.toY.toStringAsFixed(2),
                       TextStyle(
                         fontWeight: FontWeight.bold,
                         color: rod.color,
-                        fontSize: 14,
+                        fontSize: 18,
                         shadows: const [
                           Shadow(
                             color: Colors.black26,
@@ -156,14 +162,17 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
   }
 
   Widget getTitles(double value, TitleMeta meta, MonthProvider monthProvider) {
-    List titles = monthProvider.graphHistory.asMap().entries.map((e) {
+    List titles = monthProvider.reportAverageRIRGraphHistory.asMap().entries.map((e) {
       return e.value['day'];
     }).toList();
+    final isd = int.parse(monthProvider.reportAverageRIRWeek.toString().replaceAll("Week ", ""));
     DateTime today = DateTime.now();
     String todayDayName = DateFormat('EEE').format(today);
     int index = -1;
+    if (isd == monthProvider.currentWeek) {
+      index = titles.indexWhere((element) => element == todayDayName);
+    }
 
-    index = titles.indexWhere((element) => element == todayDayName);
     var todayStyle = const TextStyle(
       color: AppColors.primaryColor,
       fontWeight: FontWeight.bold,
@@ -211,73 +220,13 @@ class _BarChartSample7State extends State<WeightLiftedGraph> {
     );
   }
 
-  // Widget getTitles(double value, TitleMeta meta, MonthProvider monthProvider) {
-  //   List titles = monthProvider.graphHistory.asMap().entries.map((e) {
-  //     return e.value['day'];
-  //   }).toList();
-  //
-  //   var style = const TextStyle(
-  //     color: Colors.grey,
-  //     fontWeight: FontWeight.w500,
-  //     fontSize: 12,
-  //   );
-  //   Widget text;
-  //   switch (value.toInt()) {
-  //     case 0:
-  //       text = Text(titles[0], style: style);
-  //       break;
-  //     case 1:
-  //       text = Text(titles[1], style: style);
-  //       break;
-  //     case 2:
-  //       text = Text(titles[2], style: style);
-  //       break;
-  //     case 3:
-  //       text = Text(titles[3], style: style);
-  //       break;
-  //     case 4:
-  //       text = Text(titles[4], style: style);
-  //       break;
-  //     case 5:
-  //       text = Text(titles[5], style: style);
-  //       break;
-  //     case 6:
-  //       text = Text(
-  //         titles[6],
-  //         style: const TextStyle(
-  //           color: AppColors.primaryColor,
-  //           fontWeight: FontWeight.bold,
-  //           fontSize: 12,
-  //         ),
-  //       );
-  //       break;
-  //     default:
-  //       text = Text('', style: style);
-  //       break;
-  //   }
-  //   return SideTitleWidget(
-  //     // axisSide: meta.axisSide,
-  //     meta: meta,
-  //     space: 9,
-  //     child: text,
-  //   );
-  // }
-
   Widget getLeftTitles(double value, TitleMeta meta) {
     const style = TextStyle(
       color: Colors.grey,
       fontWeight: FontWeight.w500,
       fontSize: 12,
     );
-    String roundedValue = "";
-
-    if (value < 1000) {
-      roundedValue = value.toStringAsFixed(0);
-    } else {
-      int val = (value / 1000).round();
-      roundedValue = '${val.toString()}k';
-    }
-    return Text(roundedValue == "0k" ? "0" : roundedValue, style: style);
+    return Text(value.toString().split(".").first, style: style);
   }
 }
 

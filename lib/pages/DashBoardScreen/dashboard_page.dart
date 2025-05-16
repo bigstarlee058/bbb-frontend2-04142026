@@ -15,6 +15,7 @@ import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/challenges.dart';
+import 'package:bbb/pages/Charts/avarage_rir.dart';
 import 'package:bbb/pages/Charts/exercise_completed.dart';
 import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/pages/DashBoardScreen/step_progress_bar.dart';
@@ -155,14 +156,14 @@ class _DashboardPageState extends State<DashboardPage> {
           return true;
         },
         child: Stack(
-          children: [      Container(
-            height: media.height / 1,
-            width: media.width,
-            decoration: const BoxDecoration(
-              image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+          children: [
+            Container(
+              height: media.height / 1,
+              width: media.width,
+              decoration: const BoxDecoration(
+                image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+              ),
             ),
-          ),
-
             Container(
               height: media.height / 1,
               width: media.width,
@@ -174,8 +175,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
             ),
-
-
             Column(
               children: [
                 Consumer<UserDataProvider>(builder: (context, userData, child) {
@@ -266,12 +265,10 @@ class _DashboardPageState extends State<DashboardPage> {
                                             .toString()
                                             .contains("Rest Day");
 
-                                    int nextWorkOutIndex = monthData
-                                            .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
+                                    int nextWorkOutIndex = monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
                                             .toString()
                                             .contains("Workout")
-                                        ? int.parse(monthData
-                                                .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
+                                        ? int.parse(monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
                                                 .toString()
                                                 .replaceAll("Day ", "")
                                                 .replaceAll(" Workout", "")) -
@@ -281,8 +278,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     String todayTitleName = "Pump Day";
 
                                     final dataList = monthProvider.dayHistoryModel
-                                        .where((element) =>
-                                            element.type?.contains("Pump Day") == true && element.status != Status.empty)
+                                        .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
                                         .toList();
 
                                     if (monthProvider.pumpDays.isNotEmpty) {
@@ -296,8 +292,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                           if (monthProvider.pumpDays.length == 1) {
                                             todayTitleName = monthProvider.pumpDays[0].title ?? "Pump Day";
                                           } else {
-                                            int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList
-                                                .any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+                                            int index1 = monthProvider.pumpDays.indexWhere(
+                                                (el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
                                             todayTitleName = monthProvider
                                                     .pumpDays[index == -1
                                                         ? 0
@@ -319,21 +315,17 @@ class _DashboardPageState extends State<DashboardPage> {
                                     String title = matchingElement.id != null
                                         ? matchingElement.title ?? "Pump Day"
                                         : !monthData.isPumpDayAvailable && isRestDay
-                                            ? (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].restDayList![
-                                                    int.parse(monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
-                                                            .dayList![index ?? 0]
-                                                            .toString()
-                                                            .split(" ")
-                                                            .toList()
-                                                            .last) -
-                                                        1] ??
-                                                monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1]
-                                                    .dayList![index ?? 0] ??
+                                            ? (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].restDayList![int.parse(monthData
+                                                        .monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0]
+                                                        .toString()
+                                                        .split(" ")
+                                                        .toList()
+                                                        .last) -
+                                                    1] ??
+                                                monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList![index ?? 0] ??
                                                 "")
                                             : !isRestDay
-                                                ? monthData.monthDataModel!.weeks![monthData.week! - 1]
-                                                        .days![nextWorkOutIndex].title ??
-                                                    ""
+                                                ? monthData.monthDataModel!.weeks![monthData.week! - 1].days![nextWorkOutIndex].title ?? ""
                                                 : monthData.pumpDays.isEmpty
                                                     ? "Pump Day"
                                                     : todayTitleName;
@@ -378,8 +370,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
                                             decoration: status == Status.completed
                                                 ? BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)))
+                                                    color: Colors.white, borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)))
                                                 : const BoxDecoration(),
                                             child: status == Status.completed
                                                 ? ButtonWidget(
@@ -401,8 +392,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                         : Colors.white,
                                                     onPress: status == Status.completed || status == Status.skipped
                                                         ? null
-                                                        : () => continueWorkoutOnTap(
-                                                            isRestDay, monthData, dataId, index, dayData, context),
+                                                        : () => continueWorkoutOnTap(isRestDay, monthData, dataId, index, dayData, context),
                                                     isLoading: false,
                                                   ),
                                           )
@@ -449,9 +439,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 Text(
                                                   data.id != null
                                                       ? data.title
-                                                      : (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList
-                                                              ?.last) ??
-                                                          "",
+                                                      : (monthData.monthDataModel!.weeks![(monthData.week ?? 1) - 1].dayList?.last) ?? "",
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     color: Colors.white,
@@ -465,8 +453,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           const SizedBox(height: 10),
                                           Container(
                                             decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4))),
+                                                color: Colors.white, borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4))),
                                             child: ButtonWidget(
                                               text: "Completed",
                                               textColor: Colors.white,
@@ -482,7 +469,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 },
                               ),
                               SizedBox(
-                                height: media.height / 2.549 - ScreenUtil.verticalScale(10),
+                                height: media.height / 3.429,
                                 width: media.width,
                                 child: Align(
                                   alignment: Alignment.bottomRight,
@@ -501,7 +488,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: media.height / 2.55 - ScreenUtil.verticalScale(10)),
+                            margin: EdgeInsets.only(top: media.height / 3.43),
                             child: Container(
                               width: media.width,
                               decoration: BoxDecoration(
@@ -712,8 +699,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   builder: (context, value, child) {
                                     final listA = monthProvider.graphHistory.map((e) => e["totalCompletedExercise"].value > 0).toList();
                                     final listB = monthProvider.graphHistory.map((e) => e["totalWeight"].value > 0).toList();
-                                    final isAvailable =
-                                        listA.any((element) => element == true) || listB.any((element) => element == true);
+                                    final isAvailable = listA.any((element) => element == true) || listB.any((element) => element == true);
                                     if (isAvailable) {
                                       return Column(
                                         children: [
@@ -742,6 +728,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       "Exercises Completed",
                                                       // "Time Spent",
                                                       "Weight Lifted",
+                                                      "Average RIR",
                                                     ].map((str) {
                                                       return PopupMenuItem(
                                                           value: str,
@@ -760,7 +747,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                   },
                                                   child: Row(
                                                     mainAxisSize: MainAxisSize.min,
-                                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: <Widget>[
                                                       Text(
                                                         selectedChart,
@@ -791,7 +778,10 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 : selectedChart == "Weight Lifted"
                                                     ? const WeightLiftedGraph()
                                                     // : const TimeSpentGraph(),
-                                                    : const SizedBox(),
+                                                    : selectedChart == "Average RIR"
+                                                        ? const AverageRIRGraph()
+                                                        // : const TimeSpentGraph(),
+                                                        : const SizedBox(),
                                           ),
                                           Container(
                                             margin: EdgeInsets.symmetric(
@@ -892,8 +882,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                       onTap: () {
                                                                         AnimatedDialog.showAnimatedDialog(
                                                                           context: context,
-                                                                          pageBuilder: (context, anim1, anim2) =>
-                                                                              ShareAchievementDialog(
+                                                                          pageBuilder: (context, anim1, anim2) => ShareAchievementDialog(
                                                                             title: data[index]["title"],
                                                                             imagePath: data[index]["image"],
                                                                             subtitle: data[index]["subtitle"],
@@ -907,8 +896,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                           SvgPicture.asset(
                                                                             height: ScreenUtil.verticalScale(8),
                                                                             data[index]["image"],
-                                                                            colorFilter: ColorFilter.mode(
-                                                                                AppColors.primaryColor, BlendMode.srcIn),
+                                                                            colorFilter:
+                                                                                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
                                                                             fit: BoxFit.contain,
                                                                           ),
                                                                           // const SizedBox(height: 10),
@@ -1411,23 +1400,5 @@ class _DashboardPageState extends State<DashboardPage> {
     monthProvider.fetchToday();
     monthProvider.manageStreak();
     monthProvider.getLiftedWeightGraphData();
-  }
-}
-
-class NoBottomBounceScrollPhysics extends BouncingScrollPhysics {
-  const NoBottomBounceScrollPhysics({super.parent});
-
-  @override
-  NoBottomBounceScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return NoBottomBounceScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  double applyBoundaryConditions(ScrollMetrics position, double value) {
-    if (value > position.pixels && value > position.maxScrollExtent) {
-      return value - position.maxScrollExtent;
-    }
-
-    return super.applyBoundaryConditions(position, value);
   }
 }

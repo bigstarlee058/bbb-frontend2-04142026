@@ -7,6 +7,7 @@ import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/radar_chart.dart';
+import 'package:bbb/pages/Tools/GraphsReports/Charts/report_average_rir.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -73,15 +74,13 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   }
 
   void scrollToMiddle() {
-    if (monthProvider?.graphType == "Weight") {
+    if (monthProvider?.graphType == "Weight" || monthProvider?.graphType == "RIR") {
       final middleOffset = scrollController.position.maxScrollExtent /
-          (monthProvider?.graphType == "Exercise"
-              ? 12
-              : monthProvider?.graphType == "Weight"
-                  ? 2
-                  : monthProvider?.graphType == "RIR"
-                      ? 1.51
-                      : 1);
+          (monthProvider?.graphType == "Weight"
+              ? 3
+              : monthProvider?.graphType == "RIR"
+                  ? 1.5
+                  : 1);
 
       scrollController.animateTo(
         middleOffset,
@@ -261,6 +260,65 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                     SizedBox(height: ScreenUtil.horizontalScale(2)),
                     Container(
                         margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)), child: const ReportWeightLiftedGraph()),
+
+                    /// AVERAGE RIR
+
+                    SizedBox(height: ScreenUtil.horizontalScale(4)),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Average RIR",
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontSize: ScreenUtil.verticalScale(2.3),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Container(
+                            height: ScreenUtil.verticalScale(4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
+                            ),
+                            child: Consumer<MonthProvider>(
+                              builder: (context, monthProvider, child) {
+                                return DropdownButtonHideUnderline(
+                                  child: DropdownButton(
+                                    value: monthProvider.reportAverageRIRWeek,
+                                    items: ["Week 1", "Week 2", "Week 3", "Week 4"]
+                                        .map(
+                                          (name) => DropdownMenuItem(
+                                            value: name,
+                                            child: Text(
+                                              name,
+                                              style: TextStyle(
+                                                color: const Color(0xA09F9F9F),
+                                                fontSize: ScreenUtil.verticalScale(1.5),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: monthProvider.changeWeekWeightLifted,
+                                    icon: const Icon(
+                                      Icons.expand_more,
+                                      color: Color(0xA09F9F9F),
+                                      size: 25,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: ScreenUtil.horizontalScale(2)),
+                    Container(
+                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)), child: const ReportAverageRIRGraph()),
 
                     /// TIME SPENT
 
