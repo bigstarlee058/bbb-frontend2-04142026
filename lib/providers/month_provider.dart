@@ -22,7 +22,6 @@ import 'package:bbb/models/MonthResponseModel/rest_day_model.dart';
 import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/warm_up_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
-import 'package:bbb/models/SyncDataResponseModel/day_status_list_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -417,7 +416,7 @@ class MonthProvider extends ChangeNotifier {
 
   MonthDataModel? pastMonthDataModel;
   List<String> lastSplit = [];
-  List<DayStatusListDataModel> dayStatusList = [];
+  // List<DayStatusListDataModel> dayStatusList = [];
   List<DayHistoryModel> newStreakData = [];
   List<String> newLastSplit = [];
 
@@ -521,15 +520,18 @@ class MonthProvider extends ChangeNotifier {
               week = actualWeek! > 4 ? 4 : actualWeek;
               day = dayDelta % 7 + 1;
               currentWeek = week!;
-              updateDayStatusList();
+
+              // updateDayStatusList();
               await fetchMonthLocalData();
               await fetchAllDayStatusLocalData();
               await fetchDayStatusLocalData();
               await checkForPumpDay();
               await getLiftedWeightGraphData();
               await manageStreak();
+              updateAchievements();
               findWeekStatuses();
               fetchToday();
+
               // filter();
             }
           } catch (innerError, innerStackTrace) {
@@ -548,10 +550,10 @@ class MonthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateDayStatusList() async {
-    dayStatusList = await ApiRepo.fetchDayStatusList() ?? [];
-    notifyListeners();
-  }
+  // Future<void> updateDayStatusList() async {
+  //   dayStatusList = await ApiRepo.fetchDayStatusList() ?? [];
+  //   notifyListeners();
+  // }
 
   Future<void> fetchWarmUp(String warmUpId) async {
     try {
@@ -1251,7 +1253,8 @@ class MonthProvider extends ChangeNotifier {
     }
 
     await preferences.putInt(SharedPreference.lastStreakCount, streak);
-    await updateDayStatusList().then((value) => updateAchievements());
+    // await updateDayStatusList().then((value) => updateAchievements());
+    await updateAchievements();
     notifyListeners();
   }
 
@@ -1680,7 +1683,6 @@ class MonthProvider extends ChangeNotifier {
     List<Map<String, dynamic>> weeks =
         getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()), Utils.formattedDate(monthDataModel!.endDate!.toString()));
     var week = weeks.firstWhere((week) => week['weekNumber'] == this.week, orElse: () => {});
-
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
     DateTime startDate = DateTime.parse(week['startDate']);
     DateTime endDate = DateTime.parse(week['endDate']);
@@ -1692,20 +1694,24 @@ class MonthProvider extends ChangeNotifier {
       DateTime entryDate = data.endTime!;
       return entryDate.isAfter(startDate) && entryDate.isBefore(endDate);
     }).toList();
-
     Map<String, Map<String, dynamic>> combinedData = {};
+    filteredData.sort(
+      (a, b) {
+        return a.endTime!.compareTo(b.endTime!);
+      },
+    );
 
     try {
       for (var element in filteredData) {
         if (element.status == Status.completed) {
-          DateTime dateDateTime = element.date!;
-          DateTime localTime = Utils.formattedDate("$dateDateTime");
+          // DateTime dateDateTime = element.date!;
+          // DateTime localTime = Utils.formattedDate("$dateDateTime");
           DateTime aDate = element.startTime!;
           DateTime localTimeADate = Utils.formattedDate("$aDate");
           DateTime bDate = element.endTime!;
           DateTime localTimeBDate = Utils.formattedDate("$bDate");
 
-          String date = localTime.toIso8601String().split('T')[0];
+          String date = bDate.toIso8601String().split('T')[0];
 
           double totalWeight = double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
           double totalAverageRIR =
@@ -1714,7 +1720,8 @@ class MonthProvider extends ChangeNotifier {
 
           int workoutTimeInSeconds = localTimeBDate.difference(localTimeADate).inSeconds;
 
-          String day = weekdays[localTime.weekday] ?? "";
+          String day = weekdays[bDate.weekday] ?? "";
+
           if (combinedData.containsKey(date)) {
             combinedData[date]!['totalWeight'] += totalWeight;
             combinedData[date]!['totalAverage'] += totalAverageRIR;
@@ -1905,7 +1912,8 @@ class MonthProvider extends ChangeNotifier {
     try {
       for (var element in filteredData) {
         if (element.status == Status.completed) {
-          DateTime dateTime = element.date!;
+          // DateTime dateTime = element.date!;
+          DateTime dateTime = element.endTime!;
           DateTime localTime = Utils.formattedDate("$dateTime");
           String date = localTime.toIso8601String().split('T')[0];
           int completedExercise = int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
@@ -2021,17 +2029,18 @@ class MonthProvider extends ChangeNotifier {
     try {
       for (var element in filteredData) {
         if (element.status == Status.completed) {
-          DateTime dateTime = element.date!;
+          // DateTime dateTime = element.date!;
+          DateTime dateTime = element.endTime!;
           DateTime localTime = Utils.formattedDate("$dateTime");
-          String date = localTime.toIso8601String().split('T')[0];
+          String dateSort = localTime.toIso8601String().split('T')[0];
 
           double averageRIR =
               element.averageRIR != "NaN" ? double.parse((element.averageRIR?.isNotEmpty ?? false ? element.averageRIR : "0") ?? "0") : 0;
           String day = weekdays[localTime.weekday] ?? "";
-          if (combinedData.containsKey(date)) {
-            combinedData[date]!['averageRIR'] += averageRIR;
+          if (combinedData.containsKey(dateSort)) {
+            combinedData[dateSort]!['averageRIR'] += averageRIR;
           } else {
-            combinedData[date] = {'date': date, 'day': day, 'averageRIR': averageRIR};
+            combinedData[dateSort] = {'date': dateSort, 'day': day, 'averageRIR': averageRIR};
           }
         }
       }
@@ -2141,17 +2150,17 @@ class MonthProvider extends ChangeNotifier {
 
     for (var element in filteredData) {
       if (element.status == Status.completed) {
-        DateTime dateTime = element.date!;
-
+        // DateTime dateTime = element.date!;
+        DateTime dateTime = element.endTime!;
         DateTime localTime = Utils.formattedDate("$dateTime");
 
-        String date = localTime.toIso8601String().split('T')[0];
+        String dateSort = localTime.toIso8601String().split('T')[0];
         double totalWeight = double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
         String day = weekdays[localTime.weekday] ?? "";
-        if (combinedData.containsKey(date)) {
-          combinedData[date]!['totalWeight'] += totalWeight;
+        if (combinedData.containsKey(dateSort)) {
+          combinedData[dateSort]!['totalWeight'] += totalWeight;
         } else {
-          combinedData[date] = {'date': date, 'totalWeight': totalWeight, 'day': day};
+          combinedData[dateSort] = {'date': dateSort, 'totalWeight': totalWeight, 'day': day};
         }
       }
     }
@@ -2369,7 +2378,7 @@ class MonthProvider extends ChangeNotifier {
   List<Map<String, dynamic>> items = [];
   List<AchievementsModel> achievementsModel = [];
 
-  updateAchievements() async {
+  updateAchievementsData() async {
     achievementsModel = [];
     final data = await DatabaseHelper().fetchData(tableName: DatabaseHelper.achievementHistory);
     if (data.isNotEmpty) {
@@ -2549,10 +2558,6 @@ class MonthProvider extends ChangeNotifier {
       },
     ];
 
-    String accountCreatedDate = userDataProvider.userData != null ? userDataProvider.userData["createdAt"] : "";
-    DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
-    DateTime today = DateTime.now();
-    int dayDifference = today.difference(targetDate).inDays;
     for (var element in achievementsModel) {
       if (element.achievementsTitle == "Breaking the Ice") {
         items[0]["isArchived"] = true;
@@ -2639,6 +2644,16 @@ class MonthProvider extends ChangeNotifier {
         items[20]["time"] = element.achievementsDate.toString();
       }
     }
+    notifyListeners();
+  }
+
+  updateAchievements() async {
+    updateAchievementsData();
+
+    String accountCreatedDate = userDataProvider.userData != null ? userDataProvider.userData["createdAt"] : "";
+    DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
+    DateTime today = DateTime.now();
+    int dayDifference = today.difference(targetDate).inDays;
 
     if (items[0]["isArchived"] == false) {
       if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
@@ -2764,15 +2779,15 @@ class MonthProvider extends ChangeNotifier {
 
     Map<String, dynamic> filteredData = {};
 
-    List<DayStatusListDataModel> completedData = dayStatusList.where((item) => item.status == Status.completed).toList();
+    // List<DayStatusListDataModel> completedData = dayStatusList.where((item) => item.status == Status.completed).toList();
 
-    for (var entry in completedData) {
-      DateTime date = Utils.formattedDate("${entry.date}");
-      String dateOnly = "${date.year}-${date.month}-${date.day}";
-      if (!filteredData.containsKey(dateOnly)) {
-        filteredData[dateOnly] = entry;
-      }
-    }
+    // for (var entry in completedData) {
+    //   DateTime date = Utils.formattedDate("${entry.date}");
+    //   String dateOnly = "${date.year}-${date.month}-${date.day}";
+    //   if (!filteredData.containsKey(dateOnly)) {
+    //     filteredData[dateOnly] = entry;
+    //   }
+    // }
 
     List<dynamic> uniqueEntries = filteredData.values.toList();
 
@@ -2934,7 +2949,7 @@ class MonthProvider extends ChangeNotifier {
     isFilterLoading = false;
     pastMonthDataModel = null;
     lastSplit = [];
-    dayStatusList = [];
+    // dayStatusList = [];
     newStreakData = [];
     newLastSplit = [];
     loader = false;
