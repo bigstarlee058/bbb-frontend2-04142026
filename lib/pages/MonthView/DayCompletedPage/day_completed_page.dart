@@ -432,24 +432,26 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       ),
                     ),
                     SizedBox(height: ScreenUtil.verticalScale(2.5)),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                      child: ButtonWidget(
-                        text: "Back to Dashboard",
-                        // textColor: const Color(0x40000000),
-                        textColor: Colors.white,
-                        onPress: () {
-                          monthProvider?.checkForPumpDay();
-                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                          mainPageProvider?.changeTab(0);
-                          // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                        },
-                        // color: const Color(0xC0FFFFFF),
-                        color: AppColors.primaryColor,
-                        isLoading: false,
+                    SafeArea(
+                      top: false,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                        child: ButtonWidget(
+                          text: "Back to Dashboard",
+                          // textColor: const Color(0x40000000),
+                          textColor: Colors.white,
+                          onPress: () {
+                            monthProvider?.checkForPumpDay();
+                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                            mainPageProvider?.changeTab(0);
+                            // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                          },
+                          // color: const Color(0xC0FFFFFF),
+                          color: AppColors.primaryColor,
+                          isLoading: false,
+                        ),
                       ),
                     ),
-                    SizedBox(height: ScreenUtil.horizontalScale(7)),
                   ],
                 ),
               ),

@@ -146,6 +146,9 @@ class _DashboardPageState extends State<DashboardPage> {
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => monthProvider.getLiftedWeightGraphData(),
+      // ),
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
           WidgetsBinding.instance.scheduleFrameCallback(
