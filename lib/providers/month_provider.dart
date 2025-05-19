@@ -528,9 +528,10 @@ class MonthProvider extends ChangeNotifier {
               await checkForPumpDay();
               await getLiftedWeightGraphData();
               await manageStreak();
-              updateAchievements();
+              await updateAchievementsData();
+              await updateAchievements();
               findWeekStatuses();
-              fetchToday();
+              await fetchToday();
 
               // filter();
             }
@@ -1254,6 +1255,7 @@ class MonthProvider extends ChangeNotifier {
 
     await preferences.putInt(SharedPreference.lastStreakCount, streak);
     // await updateDayStatusList().then((value) => updateAchievements());
+    await updateAchievementsData();
     await updateAchievements();
     notifyListeners();
   }
@@ -2386,7 +2388,7 @@ class MonthProvider extends ChangeNotifier {
     } else {
       achievementsModel = [];
     }
-
+    log('achievementsModel :::::::::::::::::: ${achievementsModel.length}');
     items = [
       {
         "image": "assets/img/verified (1).svg",
@@ -2557,7 +2559,7 @@ class MonthProvider extends ChangeNotifier {
         "time": "${DateTime.now().toUtc()}"
       },
     ];
-
+    log('items :::::::::::::::::: ${items}');
     for (var element in achievementsModel) {
       if (element.achievementsTitle == "Breaking the Ice") {
         items[0]["isArchived"] = true;
@@ -2654,7 +2656,7 @@ class MonthProvider extends ChangeNotifier {
     DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
     DateTime today = DateTime.now();
     int dayDifference = today.difference(targetDate).inDays;
-
+    log('items :::::::::::::::::: ${items}');
     if (items[0]["isArchived"] == false) {
       if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
         items[0]["isArchived"] = true;
