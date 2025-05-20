@@ -517,11 +517,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Spacer(),
                     Container(
                       height: ScreenUtil.verticalScale(7.8),
-                      width: ScreenUtil.verticalScale(7.8),
-                      margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
+                      // width: ScreenUtil.verticalScale(7.8),
+                      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1)),
                       decoration: BoxDecoration(
                         color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.backOffSetColor :*/
                             AppColors.greyColor,
@@ -529,26 +531,24 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                           ScreenUtil.verticalScale(1),
                         ),
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
-                        child: Center(
-                          child: Image.asset(
-                            "assets/img/pumpday.png",
-                          ),
-                        ),
+                      child: Image.asset(
+                        height: ScreenUtil.verticalScale(4),
+                        width: ScreenUtil.verticalScale(4),
+                        "assets/img/pumpday.png",
                       ),
                     ),
-                    const SizedBox(width: 2),
-                    Expanded(
-                      child: Text(
-                        "Pump Day",
-                        style: TextStyle(
-                            color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
-                            fontSize: ScreenUtil.verticalScale(1.5),
-                            fontWeight: FontWeight.bold,
-                            height: 1),
-                      ),
+                    SizedBox(
+                      width: 6,
                     ),
+                    Text(
+                      "Pump Day",
+                      style: TextStyle(
+                          color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
+                          fontSize: ScreenUtil.verticalScale(1.5),
+                          fontWeight: FontWeight.bold,
+                          height: 1),
+                    ),
+                    Spacer(),
                   ],
                 ),
               ),
@@ -596,11 +596,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Spacer(),
                     Container(
                       height: ScreenUtil.verticalScale(7.8),
-                      width: ScreenUtil.verticalScale(7.8),
-                      margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
+                      // width: ScreenUtil.verticalScale(7.8),
+                      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1)),
                       decoration: BoxDecoration(
                         color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.backOffSetColor :*/
                             AppColors.greyColor,
@@ -608,26 +610,30 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                           ScreenUtil.verticalScale(1),
                         ),
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
-                        child: Center(
-                          child: Image.asset(
-                            "assets/img/restday.png",
-                          ),
+                      child: Container(
+                        // color: Colors.red,
+                        child: Image.asset(
+                          height: ScreenUtil.verticalScale(4),
+                          width: ScreenUtil.verticalScale(4),
+                          "assets/img/restday.png",
                         ),
                       ),
                     ),
-                    const SizedBox(width: 2),
-                    Expanded(
-                      child: Text(
-                        "Rest Day",
-                        style: TextStyle(
-                            color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
-                            fontSize: ScreenUtil.verticalScale(1.5),
-                            fontWeight: FontWeight.bold,
-                            height: 1),
-                      ),
+                    SizedBox(
+                      width: 6,
                     ),
+                    Text(
+                      "Rest Day",
+                      style: TextStyle(
+                          color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
+                          fontSize: ScreenUtil.verticalScale(1.5),
+                          fontWeight: FontWeight.bold,
+                          height: 1),
+                    ),
+                    // SizedBox(
+                    //   width: 6,
+                    // ),
+                    Spacer(),
                   ],
                 ),
               ),
@@ -684,27 +690,27 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 ],
               ),
             ),
-            SizedBox(
-              width: ScreenUtil.horizontalScale(5),
-            ),
-            SizedBox(
-              height: ScreenUtil.verticalScale(4),
-              width: ScreenUtil.verticalScale(4),
-              child: Row(
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      // widget.onRemove();
-                    },
-                    icon: Icons.close,
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.all(0),
-                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-                  ),
-                ],
-              ),
-            ),
+            // SizedBox(
+            //   width: ScreenUtil.horizontalScale(5),
+            // ),
+            // SizedBox(
+            //   height: ScreenUtil.verticalScale(4),
+            //   width: ScreenUtil.verticalScale(4),
+            //   child: Row(
+            //     children: [
+            //       SlidableAction(
+            //         onPressed: (context) {
+            //           // widget.onRemove();
+            //         },
+            //         icon: Icons.close,
+            //         backgroundColor: Colors.red,
+            //         foregroundColor: Colors.white,
+            //         padding: const EdgeInsets.all(0),
+            //         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
         child: Padding(
@@ -1035,38 +1041,38 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
                       child: Row(
                         children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await _saveDayData(status: Status.skipped, type: 'Rest Day', endDate: true).then(
-                                  (value) {
-                                    monthProvider?.onInit(context, isEnabled: false);
-                                  },
-                                );
-                                if (!c1.mounted) return;
-                                Navigator.of(c1).pop();
-                                await monthProvider?.checkForPumpDay();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                backgroundColor: AppColors.skipDayColor,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: ScreenUtil.verticalScale(1.7),
-                                ),
-                              ),
-                              child: Text(
-                                "Skip day",
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.verticalScale(2),
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: ScreenUtil.horizontalScale(3)),
+                          // Expanded(
+                          //   child: ElevatedButton(
+                          //     onPressed: () async {
+                          //       await _saveDayData(status: Status.skipped, type: 'Rest Day', endDate: true).then(
+                          //         (value) {
+                          //           monthProvider?.onInit(context, isEnabled: false);
+                          //         },
+                          //       );
+                          //       if (!c1.mounted) return;
+                          //       Navigator.of(c1).pop();
+                          //       await monthProvider?.checkForPumpDay();
+                          //     },
+                          //     style: ElevatedButton.styleFrom(
+                          //       shape: RoundedRectangleBorder(
+                          //         borderRadius: BorderRadius.circular(15),
+                          //       ),
+                          //       backgroundColor: AppColors.skipDayColor,
+                          //       padding: EdgeInsets.symmetric(
+                          //         vertical: ScreenUtil.verticalScale(1.7),
+                          //       ),
+                          //     ),
+                          //     child: Text(
+                          //       "Skip day",
+                          //       style: TextStyle(
+                          //         fontSize: ScreenUtil.verticalScale(2),
+                          //         fontWeight: FontWeight.bold,
+                          //         color: Colors.white,
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                          // SizedBox(width: ScreenUtil.horizontalScale(3)),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () async {

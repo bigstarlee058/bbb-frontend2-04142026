@@ -253,6 +253,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                 Container(
                   margin: EdgeInsets.only(top: media.height / 3.2),
                   child: Container(
+                    constraints: BoxConstraints(
+                      minHeight: (media.height - (media.height / 4) - (media.height * 0.12)),
+                    ),
                     width: media.width,
                     decoration: BoxDecoration(
                       color: Colors.white,

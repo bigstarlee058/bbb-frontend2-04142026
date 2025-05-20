@@ -42,6 +42,7 @@ class Status {
   static const String started = "Started";
   static const String skipped = "Skipped";
   static const String completed = "Completed";
+  static const String reset = "Reset";
 }
 
 class MonthProvider extends ChangeNotifier {
@@ -637,7 +638,7 @@ class MonthProvider extends ChangeNotifier {
     monthDataModel = null;
     String monthId = preferences.getString(SharedPreference.monthId) ?? "";
     String split = preferences.getString(SharedPreference.split) ?? "";
-
+    log('split :::::::::::::::::: ${split}');
     try {
       final rawTempData = preferences.getString("$split-$monthId");
       if (rawTempData != null && rawTempData.isNotEmpty) {
@@ -693,6 +694,7 @@ class MonthProvider extends ChangeNotifier {
 
   void changeEquipmentType(String value) async {
     equipmentType = value;
+    await preferences.putString(SharedPreference.equipmentType, value.isEmpty ? "A" : equipmentType);
     notifyListeners();
   }
 

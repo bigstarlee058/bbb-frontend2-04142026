@@ -197,7 +197,8 @@ class _LoginPageState extends State<LoginPage> {
             Positioned(
               top: ScreenUtil.horizontalScale(42),
               child: Container(
-                height: 120,
+                // height: 120,
+                height: 150,
                 width: media.width,
                 decoration: const BoxDecoration(
                   image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),

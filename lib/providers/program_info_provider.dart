@@ -1,3 +1,4 @@
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,9 +22,15 @@ class ProgramInfoProvider extends ChangeNotifier {
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('authToken');
-
+      String split = preferences.getString(SharedPreference.split) ?? "";
+      String equipmentType = preferences.getString(SharedPreference.equipmentType) ?? "";
       final response = await http.get(
-        Uri.parse('${AppConstants.serverUrl}/api/program-info'), // replace with actual endpoint
+        Uri.parse('${AppConstants.serverUrl}/api/program-info').replace(
+          queryParameters: {
+            'split': split,
+            'equipmentType': equipmentType,
+          },
+        ), // replace with actual endpoint
         headers: {"auth_token": "$token"},
       );
 
