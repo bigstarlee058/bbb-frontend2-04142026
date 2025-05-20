@@ -422,6 +422,7 @@ class DataProvider extends ChangeNotifier {
 
       log('DateTime.now().toUtc :::::::::::::::::: ${DateTime.now().toUtc()}');
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
+      log('queryParams :::::::::::::::::: ${queryParams}');
       String? userIdToken = await getAuthToken();
       final response = await http.post(
         url,
