@@ -64,14 +64,14 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     onInit();
-    _dateNotifier.stream.listen((newDate) {
-      if (_currentDate.day != newDate.day) {
-        setState(() {
-          _currentDate = newDate;
-          monthProvider.onInit(context, isEnabled: false);
-        });
-      }
-    });
+    // _dateNotifier.stream.listen((newDate) {
+    //   if (_currentDate.day != newDate.day) {
+    //     setState(() {
+    //       _currentDate = newDate;
+    //       monthProvider.onInit(context, isEnabled: false);
+    //     });
+    //   }
+    // });
     super.initState();
   }
 
@@ -890,6 +890,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                                                             imagePath: data[index]["image"],
                                                                             subtitle: data[index]["subtitle"],
                                                                             time: data[index]["time"],
+                                                                            count: 4,
+                                                                            length: 4,
                                                                           ),
                                                                         );
                                                                       },

@@ -149,6 +149,9 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                 Container(
                   margin: EdgeInsets.only(top: media.height / 4.6),
                   child: Container(
+                    constraints: BoxConstraints(
+                      minHeight: (media.height - (media.height / 8) - (media.height * 0.12)),
+                    ),
                     width: media.width,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -191,11 +194,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
           AnimatedDialog.showAnimatedDialog(
             context: context,
             pageBuilder: (c1, anim1, anim2) => ShareAchievementDialog(
-              title: item["title"]!,
-              imagePath: item["image"]!,
-              subtitle: item["subtitle"]!,
-              time: item["time"],
-            ),
+                title: item["title"]!, imagePath: item["image"]!, subtitle: item["subtitle"]!, time: item["time"], count: 4, length: 4),
           );
         }
       },

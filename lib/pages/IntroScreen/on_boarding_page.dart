@@ -3,6 +3,9 @@ import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/welcome_content_model.dart';
 import 'package:bbb/pages/AuthScreen/login_page.dart';
 import 'package:bbb/pages/main_page.dart';
+import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/date_notifier.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -12,6 +15,7 @@ import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
 import 'package:video_player/video_player.dart';
 
@@ -27,12 +31,16 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   late VideoPlayerController _videoController;
   bool _isVideoInitialized = false;
   bool isLoading = false;
-
+  MonthProvider? monthProvider;
+  DateTime _currentDate = DateTime.now();
+  late DataProvider? dataProvider;
+  final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   @override
   void initState() {
     super.initState();
     updateImage();
     loadWelcomeContent();
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
     _checkLoginStatus();
     _videoController =
         VideoPlayerController.asset('assets/videos/welcome_new.mp4', videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
@@ -67,7 +75,27 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           ),
         ),
       );
+
+      // await _initializeFetchData().then(
+      //   (value) async {
+      //     if (monthProvider?.monthDataModel == null) {
+      //       await monthProvider?.onInit(context);
+      //
+      //     }
+      //   },
+      // );
       await isFromNotification();
+    }
+  }
+
+  Future<void> _initializeFetchData() async {
+    debugPrint("this  is initial state func");
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    if (dataProvider != null) {
+      await dataProvider?.fetchMonthWorkouts(3);
+    } else {
+      debugPrint("dataProvider is null");
     }
   }
 
@@ -169,7 +197,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           Positioned(
             top: ScreenUtil.horizontalScale(50),
             child: Container(
-              height: 120,
+              // height: 120,
+              height: 150,
               width: media.width,
               decoration: const BoxDecoration(
                 image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),

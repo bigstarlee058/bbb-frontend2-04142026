@@ -29,6 +29,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -112,8 +113,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
 
       _chewieController1 = ChewieController(
         videoPlayerController: _videoPlayerController1,
-        autoPlay: false,
-        looping: false,
+        autoPlay: true,
+        looping: true,
         showControls: false,
         aspectRatio: _videoPlayerController1.value.aspectRatio,
       );
@@ -373,7 +374,7 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       }
     }
     setState(() => loading = false);
-    videoInitialize();
+    await videoInitialize();
   }
 
   bool videoNotAvailable = false;
@@ -449,7 +450,9 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
         } else {
           AudioManager.requestAudioFocus();
         }
-        setState(() {});
+        // setState(() {
+        //
+        // });
       });
 
       _controller = ProgressBarController(
@@ -1088,7 +1091,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                               },
                             );
                           },
-                          child: const Icon(Icons.edit, color: AppColors.primaryColor, size: 30),
+                          child: SvgPicture.asset("assets/img/sticky-note.svg", color: AppColors.primaryColor),
+                          // child: const Icon(Icons.edit, color: AppColors.primaryColor, size: 30),
                         ),
                       ],
                     ),

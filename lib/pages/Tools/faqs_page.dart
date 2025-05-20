@@ -22,6 +22,7 @@ class FAQsPage extends StatefulWidget {
 class _FAQsPageState extends State<FAQsPage> {
   DataProvider? dataProvider;
   final Map<int, bool> _expandedStates = {0: false};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _FAQsPageState extends State<FAQsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        controller: _scrollController,
         physics: const ClampingScrollPhysics(),
         child: Column(
           children: [
@@ -108,7 +110,7 @@ class _FAQsPageState extends State<FAQsPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "Frequently asked question",
+                                        "Frequently asked questions",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: ScreenUtil.verticalScale(2),
@@ -230,11 +232,28 @@ class _FAQsPageState extends State<FAQsPage> {
           ],
         ),
         initiallyExpanded: _expandedStates[index] ?? false,
+        // onExpansionChanged: (bool value) {
+        //   setState(() {
+        //     _expandedStates[index] = value;
+        //   });
+        // },
         onExpansionChanged: (bool value) {
           setState(() {
             _expandedStates[index] = value;
           });
+
+          if (value && index == dataProvider!.faQsModel.length - 1) {
+            // Delay to ensure expansion animation finishes before scroll
+            Future.delayed(const Duration(milliseconds: 300), () {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOut,
+              );
+            });
+          }
         },
+
         backgroundColor: AppColors.greyColor,
         collapsedBackgroundColor: AppColors.greyColor, childrenPadding: EdgeInsets.zero,
         // decoration: BoxDecoration(

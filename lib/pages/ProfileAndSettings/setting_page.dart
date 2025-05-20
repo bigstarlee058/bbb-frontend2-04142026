@@ -1,6 +1,7 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/middleware/notification_service.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -22,10 +23,12 @@ class _SettingPageState extends State<SettingPage> {
   bool? isSwitchOn = true;
   bool? isHapticFeedbackOn = true;
   late MainPageProvider mainPageProvider;
+  late MonthProvider monthProvider;
   @override
   void initState() {
     getSwitch();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
     super.initState();
   }
 
@@ -52,8 +55,8 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        // physics: const ClampingScrollPhysics(),
-        physics: NeverScrollableScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
+        // physics: NeverScrollableScrollPhysics(),
         child: Column(
           children: [
             Stack(
@@ -160,9 +163,12 @@ class _SettingPageState extends State<SettingPage> {
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: media.height / 2.65, bottom: ScreenUtil.verticalScale(15)),
+                  margin: EdgeInsets.only(top: media.height / 2.65),
                   width: media.width,
-                  height: ScreenUtil.verticalScale((media.height - media.height / 2)),
+                  constraints: BoxConstraints(
+                    minHeight: (media.height - (media.height / 4) - (media.height * 0.12)),
+                  ),
+                  // height: ScreenUtil.verticalScale((media.height - media.height / 2)),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -275,6 +281,17 @@ class _SettingPageState extends State<SettingPage> {
                             ),
                           ],
                         ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(7), 0, ScreenUtil.horizontalScale(7), 0),
+                        child: Divider(
+                          thickness: 0.3,
+                          height: 0,
+                        ),
+                      ),
+                      SettingSection(
+                        monthProvider: monthProvider,
+                        isSetting: true,
                       ),
                     ],
                   ),

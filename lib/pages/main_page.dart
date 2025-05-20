@@ -6,6 +6,7 @@ import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -46,12 +47,21 @@ class _MainPageState extends State<MainPage> {
   late List<Widget> _pages;
   Timer? _timer;
 
+  DateTime _currentDate = DateTime.now();
+  final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   @override
   void initState() {
     super.initState();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-
+    _dateNotifier.stream.listen((newDate) {
+      if (_currentDate.day != newDate.day) {
+        setState(() {
+          _currentDate = newDate;
+          monthProvider?.onInit(context, isEnabled: false);
+        });
+      }
+    });
     // vimeoVideoPlayer = VimeoVideoPlayer(
     // url: 'https://player.vimeo.com/video/953289606',
     // autoPlay: true,

@@ -130,7 +130,8 @@ class _SignupPageState extends State<SignupPage> {
             Positioned(
               top: ScreenUtil.horizontalScale(29),
               child: Container(
-                height: 120,
+                height: 150,
+                // height: 120,
                 width: media.width,
                 decoration: const BoxDecoration(
                   image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
