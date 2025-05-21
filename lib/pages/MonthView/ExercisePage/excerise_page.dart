@@ -450,9 +450,9 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
         } else {
           AudioManager.requestAudioFocus();
         }
-        // setState(() {
-        //
-        // });
+        setState(() {
+
+        });
       });
 
       _controller = ProgressBarController(
