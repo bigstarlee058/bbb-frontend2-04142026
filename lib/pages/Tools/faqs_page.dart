@@ -2,6 +2,7 @@ import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/faqs_model.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
@@ -50,17 +51,22 @@ class _FAQsPageState extends State<FAQsPage> {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          height: media.height / 1,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
+                        Utils.appImage(
+                          media,
+                          dataProvider?.screenBackgroundResponse?.imageFaQs ?? "",
+                          imageKey: "imageFaQs",
                         ),
+                        // Container(
+                        //   height: media.height / 1,
+                        //   width: media.width,
+                        //   decoration: const BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/img/back.jpg'),
+                        //       fit: BoxFit.cover,
+                        //       opacity: 1,
+                        //     ),
+                        //   ),
+                        // ),
                         SizedBox(
                           height: media.height / 2.5,
                           width: media.width,
@@ -182,11 +188,16 @@ class _FAQsPageState extends State<FAQsPage> {
                                       physics: NeverScrollableScrollPhysics(),
                                       itemCount: dataProvider!.faQsModel.length,
                                       itemBuilder: (context, index) {
-                                        return ClipRRect(
-                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
-                                          child: buildExpansionTileItem(
-                                            index,
-                                            dataProvider!.faQsModel[index],
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: ScreenUtil.verticalScale(dataProvider!.faQsModel.length - 1 == index ? 2 : 0.5),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                                            child: buildExpansionTileItem(
+                                              index,
+                                              dataProvider!.faQsModel[index],
+                                            ),
                                           ),
                                         );
                                       },
@@ -243,7 +254,6 @@ class _FAQsPageState extends State<FAQsPage> {
           });
 
           if (value && index == dataProvider!.faQsModel.length - 1) {
-            // Delay to ensure expansion animation finishes before scroll
             Future.delayed(const Duration(milliseconds: 300), () {
               _scrollController.animateTo(
                 _scrollController.position.maxScrollExtent,

@@ -8,9 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class InformationSection extends StatefulWidget {
-  const InformationSection({super.key, required this.programInfoProvider});
+  const InformationSection({super.key, required this.programInfoProvider, required this.scrollController});
 
   final ProgramInfoProvider programInfoProvider;
+  final ScrollController scrollController;
 
   @override
   State<InformationSection> createState() => _InformationSectionState();
@@ -68,9 +69,7 @@ class _InformationSectionState extends State<InformationSection> {
                               return ClipRRect(
                                 borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
                                 child: buildExpansionTileItem(
-                                  index,
-                                  value.programInfoModel!.sections[index],
-                                ),
+                                    index, value.programInfoModel!.sections[index], value.programInfoModel!.sections.length),
                               );
                             },
                           ),
@@ -82,7 +81,7 @@ class _InformationSectionState extends State<InformationSection> {
     );
   }
 
-  Widget buildExpansionTileItem(int index, Section item) {
+  Widget buildExpansionTileItem(int index, Section item, int length) {
     return Theme(
       data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent,
@@ -114,6 +113,19 @@ class _InformationSectionState extends State<InformationSection> {
           setState(() {
             _expandedStates[index] = value;
           });
+          if (value == true && index == length - 1) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Future.delayed(const Duration(milliseconds: 300), () {
+                if (widget.scrollController.hasClients) {
+                  widget.scrollController.animateTo(
+                    widget.scrollController.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOut,
+                  );
+                }
+              });
+            });
+          }
         },
         backgroundColor: AppColors.greyColor,
         collapsedBackgroundColor: AppColors.greyColor, childrenPadding: EdgeInsets.zero,

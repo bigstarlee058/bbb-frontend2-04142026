@@ -14,6 +14,7 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/IntroScreen/video_intro_page.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -39,6 +40,8 @@ class MonthView extends StatefulWidget {
 
 class _MonthViewState extends State<MonthView> {
   MonthProvider? monthProvider;
+  DataProvider? dataProvider;
+
   ScrollProvider? scrollProvider;
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
@@ -47,6 +50,8 @@ class _MonthViewState extends State<MonthView> {
   final GlobalKey optionKey = GlobalKey();
   @override
   void initState() {
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     provider = context.read<ProgramInfoProvider>();
@@ -134,24 +139,25 @@ class _MonthViewState extends State<MonthView> {
         },
         child: Stack(
           children: [
-            Container(
-              height: media.height / 1,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
-              ),
-            ),
-            Container(
-              height: media.height / 1,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/img/back_dark.jpg'),
-                  fit: BoxFit.cover,
-                  opacity: 1,
-                ),
-              ),
-            ),
+            // Container(
+            //   height: media.height / 1,
+            //   width: media.width,
+            //   decoration: const BoxDecoration(
+            //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+            //   ),
+            // ),
+            Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageMonthView ?? "", imageKey: "imageMonthView", isDark: true),
+            // Container(
+            //   height: media.height / 1,
+            //   width: media.width,
+            //   decoration: const BoxDecoration(
+            //     image: DecorationImage(
+            //       image: AssetImage('assets/img/back_dark.jpg'),
+            //       fit: BoxFit.cover,
+            //       opacity: 1,
+            //     ),
+            //   ),
+            // ),
             Column(
               children: [
                 AppBar(
@@ -369,7 +375,7 @@ class _MonthViewState extends State<MonthView> {
                                                       if (index == 1) {
                                                         Future.delayed(const Duration(milliseconds: 300), () {
                                                           scrollController.animateTo(
-                                                            scrollController.position.maxScrollExtent,
+                                                            scrollController.position.maxScrollExtent / 1.07,
                                                             duration: const Duration(milliseconds: 500),
                                                             curve: Curves.easeOut,
                                                           );
@@ -439,7 +445,10 @@ class _MonthViewState extends State<MonthView> {
                                                   )),
                                               Visibility(
                                                   visible: monthProvider.selectedSection == 2,
-                                                  child: InformationSection(programInfoProvider: provider)),
+                                                  child: InformationSection(
+                                                    programInfoProvider: provider,
+                                                    scrollController: scrollController,
+                                                  )),
                                             ]
                                           ],
                                         ),

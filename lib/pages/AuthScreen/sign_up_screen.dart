@@ -4,12 +4,14 @@ import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/AuthScreen/confirmation_screen.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
@@ -27,6 +29,7 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController lNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  DataProvider? dataProvider;
 
   bool isObscure = true;
   bool isLoading = false;
@@ -35,6 +38,8 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   void initState() {
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => updateImage());
 
     super.initState();
@@ -111,7 +116,8 @@ class _SignupPageState extends State<SignupPage> {
               children: [
                 Utils.appImage(
                   media,
-                  image,
+                  dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
+                  imageKey: "imageSignup",
                   child: Column(
                     children: [
                       Align(

@@ -52,6 +52,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
       "image": "assets/img/Hip Thrust and Military Press Focus.png",
     },
   ];
+  final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -59,6 +60,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        controller: _scrollController,
         physics: const ClampingScrollPhysics(),
         child: Stack(
           children: [
@@ -200,7 +202,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                               padding: EdgeInsets.symmetric(vertical: 12),
                               itemCount: items.length,
                               itemBuilder: (context, index) {
-                                return buildExpansionTileItem(index, items[index]);
+                                return buildExpansionTileItem(index, items[index], items.length);
                               },
                             ),
                           ],
@@ -217,7 +219,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
     );
   }
 
-  ExpansionTileItem buildExpansionTileItem(int index, Map<String, dynamic> item) {
+  ExpansionTileItem buildExpansionTileItem(int index, Map<String, dynamic> item, int length) {
     return ExpansionTileItem(
       tilePadding: EdgeInsets.symmetric(
         horizontal: ScreenUtil.horizontalScale(5),
@@ -253,6 +255,37 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
         setState(() {
           _expandedStates[index] = value;
         });
+
+        if (value == true && index == length - 1) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Future.delayed(const Duration(milliseconds: 300), () {
+              if (_scrollController.hasClients) {
+                _scrollController.animateTo(
+                  _scrollController.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+          });
+        }
+        // if (value == true) {
+        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     Future.delayed(const Duration(milliseconds: 300), () {
+        //       if (_scrollController.hasClients) {
+        //         // Scroll to the expanded item's approximate offset
+        //         final itemHeight = 700.0; // Estimate or calculate per item height
+        //         final expandedOffset = index * itemHeight;
+        //
+        //         _scrollController.animateTo(
+        //           expandedOffset,
+        //           duration: const Duration(milliseconds: 500),
+        //           curve: Curves.easeOut,
+        //         );
+        //       }
+        //     });
+        //   });
+        // }
       },
       backgroundColor: const Color(0xFF0D0D0D),
       collapsedBackgroundColor: const Color(0xFF0D0D0D),

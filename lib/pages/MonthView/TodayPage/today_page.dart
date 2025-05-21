@@ -20,6 +20,7 @@ import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
 import 'package:bbb/pages/MonthView/TodayPage/circuits_view.dart';
 import 'package:bbb/pages/MonthView/TodayPage/video_slider.dart';
 import 'package:bbb/pages/MonthView/TodayPage/workout_card.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -44,6 +45,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
   final today = DateTime.now();
   MonthProvider? monthProvider;
   String searchQuery = "";
+  DataProvider? dataProvider;
 
   List<ExerciseDataModel> exercises = [];
   List<RemovedExerciseModel> removedExercise = [];
@@ -60,6 +62,8 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
 
   @override
   void initState() {
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
 
@@ -305,24 +309,25 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
             backgroundColor: Colors.white,
             body: Stack(
               children: [
-                Container(
-                  height: media.height,
-                  width: media.width,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
-                  ),
-                ),
-                Container(
-                  height: media.height / 1,
-                  width: media.width,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/img/back_dark.jpg'),
-                      fit: BoxFit.cover,
-                      opacity: 1,
-                    ),
-                  ),
-                ),
+                // Container(
+                //   height: media.height,
+                //   width: media.width,
+                //   decoration: const BoxDecoration(
+                //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                //   ),
+                // ),
+                Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageToday ?? "", imageKey: "imageToday", isDark: true),
+                // Container(
+                //   height: media.height / 1,
+                //   width: media.width,
+                //   decoration: const BoxDecoration(
+                //     image: DecorationImage(
+                //       image: AssetImage('assets/img/back_dark.jpg'),
+                //       fit: BoxFit.cover,
+                //       opacity: 1,
+                //     ),
+                //   ),
+                // ),
                 Column(
                   children: [
                     AppBar(

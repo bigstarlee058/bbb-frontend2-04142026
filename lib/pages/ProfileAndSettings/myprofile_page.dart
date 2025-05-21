@@ -5,6 +5,7 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/profile_image_handler.dart';
 import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -36,6 +37,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   String? selectedLocation;
   String? selectedGoal;
   String? _id;
+  DataProvider? dataProvider;
 
   UserDataProvider? userData;
   double heightInCm = 183;
@@ -52,6 +54,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   void initState() {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     locationProvider = Provider.of<LocationProvider>(context, listen: false);
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     _fetchUserData();
     super.initState();
@@ -166,16 +169,21 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          height: media.height / 1,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
+                        // Container(
+                        //   height: media.height / 1,
+                        //   width: media.width,
+                        //   decoration: const BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/img/back.jpg'),
+                        //       fit: BoxFit.cover,
+                        //       opacity: 1,
+                        //     ),
+                        //   ),
+                        // ),
+                        Utils.appImage(
+                          media,
+                          dataProvider?.screenBackgroundResponse?.imageMyProfle ?? "",
+                          imageKey: "imageMyProfle",
                         ),
                         SizedBox(
                           height: media.height / 1.5,

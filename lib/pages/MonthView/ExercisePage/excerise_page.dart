@@ -103,6 +103,22 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     );
   }
 
+  final ValueNotifier<Duration> videoProgressValue = ValueNotifier(Duration.zero);
+  Duration getBufferedPosition() {
+    final position = _videoPlayerController.value.position;
+    final buffered = _videoPlayerController.value.buffered;
+
+    for (final range in buffered) {
+      if (range.start <= position && position <= range.end) {
+        return range.end;
+      }
+    }
+
+    // fallback to last buffered range or zero
+    return buffered.isNotEmpty ? buffered.last.end : Duration.zero;
+  }
+
+  final ValueNotifier<Duration> videoProgressValue1 = ValueNotifier(Duration.zero);
   Future<void> initializeVideo1(String url) async {
     try {
       _videoPlayerController1 = VideoPlayerController.networkUrl(
@@ -113,7 +129,7 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
 
       _chewieController1 = ChewieController(
         videoPlayerController: _videoPlayerController1,
-        autoPlay: true,
+        autoPlay: false,
         looping: true,
         showControls: false,
         aspectRatio: _videoPlayerController1.value.aspectRatio,
@@ -127,20 +143,19 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       }
 
       _videoPlayerController1.addListener(() async {
-        final bool isFinished =
-            _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
+        final position = _videoPlayerController.value.position;
+        final duration = _videoPlayerController.value.duration;
+        final bool isFinished = position >= duration && !_videoPlayerController.value.isPlaying;
         if (isFinished) {
           showControlsOnTapOfPause();
         }
-        if (_videoPlayerController1.value.position >= _videoPlayerController1.value.duration) {
+        if (duration != null && position >= duration) {
           AudioManager.abandonAudioFocus();
         } else {
           AudioManager.requestAudioFocus();
         }
 
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() {});
-        });
+        videoProgressValue1.value = position;
       });
 
       _controller1 = ProgressBarController(
@@ -443,17 +458,26 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
+      _videoPlayerController.addListener(() {
+        final position = _videoPlayerController.value.position;
+        final duration = _videoPlayerController.value.duration;
 
-      _videoPlayerController.addListener(() async {
-        if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+        if (duration != null && position >= duration) {
           AudioManager.abandonAudioFocus();
         } else {
           AudioManager.requestAudioFocus();
         }
-        setState(() {
 
-        });
+        videoProgressValue.value = position; // 🔁 Update progress
       });
+
+      // _videoPlayerController.addListener(() async {
+      //   if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+      //     AudioManager.abandonAudioFocus();
+      //   } else {
+      //     AudioManager.requestAudioFocus();
+      //   }
+      // });
 
       _controller = ProgressBarController(
         vsync: this,
@@ -771,27 +795,54 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                             ],
                           ),
                           SizedBox(height: ScreenUtil.verticalScale(1)),
-                          ProgressBar(
-                            collapsedBufferedBarColor: Colors.white,
-                            expandedBufferedBarColor: Colors.white,
-                            buffered: Duration(
-                                seconds: _videoPlayerController.value.buffered.isEmpty
-                                    ? 0
-                                    : _videoPlayerController.value.buffered.first.end.inSeconds),
-                            controller: _controller,
-                            progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
-                            total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
-                            onChanged: (value) {
-                              _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                          ValueListenableBuilder<Duration>(
+                            valueListenable: videoProgressValue,
+                            builder: (context, progress, _) {
+                              return ProgressBar(
+                                collapsedBufferedBarColor: Colors.white,
+                                expandedBufferedBarColor: Colors.white,
+                                buffered: getBufferedPosition(),
+                                controller: _controller,
+                                progress: progress,
+                                total: Duration(
+                                  seconds: _videoPlayerController.value.duration.inSeconds,
+                                ),
+                                onChanged: (value) {
+                                  _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                },
+                                onSeek: (value) {},
+                                onChangeStart: (value) {
+                                  _videoPlayerController.pause();
+                                  isZoom = true;
+                                },
+                                onChangeEnd: (value) {
+                                  _videoPlayerController.play();
+                                  isZoom = false;
+                                },
+                              );
                             },
-                            onSeek: (Duration value) {},
-                            onChangeStart: (value) {
-                              setState(() => isZoom = true);
-                            },
-                            onChangeEnd: (value) {
-                              setState(() => isZoom = false);
-                            },
-                          ),
+                          )
+                          // ProgressBar(
+                          //   collapsedBufferedBarColor: Colors.white,
+                          //   expandedBufferedBarColor: Colors.white,
+                          //   buffered: Duration(
+                          //       seconds: _videoPlayerController.value.buffered.isEmpty
+                          //           ? 0
+                          //           : _videoPlayerController.value.buffered.first.end.inSeconds),
+                          //   controller: _controller,
+                          //   progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
+                          //   total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
+                          //   onChanged: (value) {
+                          //     _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                          //   },
+                          //   onSeek: (Duration value) {},
+                          //   onChangeStart: (value) {
+                          //     setState(() => isZoom = true);
+                          //   },
+                          //   onChangeEnd: (value) {
+                          //     setState(() => isZoom = false);
+                          //   },
+                          // ),
                         ],
                       ),
                     ),
@@ -1034,7 +1085,7 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Padding(
@@ -1042,68 +1093,89 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                         child: Text(
                           exerciseName,
                           maxLines: 2,
-                          style: const TextStyle(
+                          style: TextStyle(
                             height: 1.3,
                             color: AppColors.primaryColor,
-                            fontSize: 25,
+                            fontSize: ScreenUtil.verticalScale(2.8),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        !monthProvider!.isWarmup
-                            ? GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    "/exerciseHistory",
-                                    arguments: {
-                                      'exerciseName': exerciseName,
-                                      'exerciseIndex': exerciseIndex,
-                                    },
-                                  );
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const SizedBox(width: 10),
+                          !monthProvider!.isWarmup
+                              ? GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      "/exerciseHistory",
+                                      arguments: {
+                                        'exerciseName': exerciseName,
+                                        'exerciseIndex': exerciseIndex,
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    height: ScreenUtil.verticalScale(4),
+                                    width: ScreenUtil.verticalScale(4),
+                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
+                                    decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                        "assets/icons/bar-chart.svg",
+                                        color: Colors.white,
+                                        height: ScreenUtil.verticalScale(2.5),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                backgroundColor: Colors.white,
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (BuildContext context) {
+                                  return const AddNoteBottomSheet();
                                 },
-                                child: const Icon(
-                                  Icons.insert_chart_outlined_sharp,
-                                  color: AppColors.primaryColor,
-                                  size: 30,
+                              );
+                            },
+                            child: Container(
+                              height: ScreenUtil.verticalScale(4),
+                              width: ScreenUtil.verticalScale(4),
+                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.55)),
+                              decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  "assets/icons/note.svg",
+                                  color: Colors.white,
+                                  height: ScreenUtil.verticalScale(10),
                                 ),
-                              )
-                            : SizedBox(),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                              backgroundColor: Colors.white,
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (BuildContext context) {
-                                return const AddNoteBottomSheet();
-                              },
-                            );
-                          },
-                          child: SvgPicture.asset("assets/img/sticky-note.svg", color: AppColors.primaryColor),
-                          // child: const Icon(Icons.edit, color: AppColors.primaryColor, size: 30),
-                        ),
-                      ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 )
               ],
             ),
-            guideLineText(),
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: guideLineText(),
+            ),
             if (isExercise == 1)
               Padding(
-                padding: const EdgeInsets.only(top: 15, bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20),
                 child: Column(
                   children: [
                     Align(
@@ -1541,6 +1613,7 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
               videoNotInitialized: videoNotInitialized1,
               videoPlayerController: _videoPlayerController1,
               videoSize: videoSize1,
+              videoProgressValue: videoProgressValue1,
             ),
           );
         },

@@ -1,12 +1,13 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class ConfirmationScreen extends StatefulWidget {
   final String image;
@@ -18,23 +19,11 @@ class ConfirmationScreen extends StatefulWidget {
 }
 
 class _ConfirmationScreenState extends State<ConfirmationScreen> {
-  String image = '';
-
+  DataProvider? dataProvider;
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => updateImage());
-
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
     super.initState();
-  }
-
-  updateImage() async {
-    if (widget.image == "") {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      image = prefs.getString("login_image") ?? '';
-    } else {
-      image = widget.image;
-    }
-    setState(() {});
   }
 
   @override
@@ -50,7 +39,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             children: [
               Utils.appImage(
                 media,
-                image,
+                dataProvider?.screenBackgroundResponse?.imageEmailConfirm ?? "",
+                imageKey: "imageEmailConfirm",
                 child: Column(
                   children: [
                     Align(

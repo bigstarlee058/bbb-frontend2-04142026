@@ -4,6 +4,7 @@ import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -11,7 +12,7 @@ import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String image;
@@ -25,12 +26,14 @@ class ResetPasswordScreen extends StatefulWidget {
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   TextEditingController emailInputController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  DataProvider? dataProvider;
 
   bool isLoading = false;
 
   @override
   void initState() {
-    _checkLoginStatus();
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
     super.initState();
   }
 
@@ -99,18 +102,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     }
   }
 
-  String image = '';
-  Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (widget.image == "") {
-      image = prefs.getString("login_image") ?? '';
-    } else {
-      image = widget.image;
-    }
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -125,7 +116,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               children: [
                 Utils.appImage(
                   media,
-                  image,
+                  dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
+                  imageKey: "imageForgot",
                   child: Column(
                     children: [
                       Align(

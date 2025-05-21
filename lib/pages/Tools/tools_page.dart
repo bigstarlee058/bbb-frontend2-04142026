@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/tools_page_button.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ToolsPage extends StatefulWidget {
   const ToolsPage({super.key});
@@ -14,6 +17,15 @@ class ToolsPage extends StatefulWidget {
 }
 
 class _ToolsPageState extends State<ToolsPage> {
+  DataProvider? dataProvider;
+
+  @override
+  void initState() {
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+    super.initState();
+  }
+
   final List<Map<String, String>> items = [
     {
       "image": "assets/img/verified (1).svg",
@@ -35,17 +47,23 @@ class _ToolsPageState extends State<ToolsPage> {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          height: media.height / 1,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
+                        Utils.appImage(
+                          media,
+                          dataProvider?.screenBackgroundResponse?.imageTools ?? "",
+                          imageKey: "imageTools",
                         ),
+
+                        // Container(
+                        //   height: media.height / 1,
+                        //   width: media.width,
+                        //   decoration: const BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/img/back.jpg'),
+                        //       fit: BoxFit.cover,
+                        //       opacity: 1,
+                        //     ),
+                        //   ),
+                        // ),
                         SizedBox(
                           height: media.height / 4,
                           width: media.width,

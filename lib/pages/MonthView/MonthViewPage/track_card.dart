@@ -199,6 +199,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       .replaceAll("Day", "")
                       .replaceAll(" ", "")) -
                   1;
+
               DayDataModel dayData = weekDataModel!.dayList![index].toString().contains("Workout") ? dayDataList[dayIndex] : DayDataModel();
               bool isRestDay = weekDataModel?.dayList?[index].contains("Rest Day");
 
@@ -656,11 +657,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     .any((e) => (e.status == Status.completed || e.status == Status.skipped) && e.dataId == dataId) ==
                 false)),
         endActionPane: ActionPane(
-          extentRatio: 0.35,
+          extentRatio: 0.22,
           motion: const ScrollMotion(),
           children: [
             SizedBox(
-              width: ScreenUtil.horizontalScale(5),
+              width: ScreenUtil.horizontalScale(2),
             ),
             SizedBox(
               height: ScreenUtil.verticalScale(4),
@@ -1028,7 +1029,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
                       child: Text(
-                        "Would you like to mark the rest day complete or skip?",
+                        "Would you like to mark the rest day as complete?",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,

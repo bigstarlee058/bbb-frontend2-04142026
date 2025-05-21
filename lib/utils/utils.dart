@@ -15,23 +15,39 @@ class Utils {
 
   static RoundedRectangleBorder buttonStyle = RoundedRectangleBorder(borderRadius: buttonRadius);
 
-  static appImage(Size media, String image, {Widget? child}) {
+  static appImage(Size media, String image, {Widget? child, required String imageKey, bool? isDark}) {
     return Container(
       height: media.height / 1,
       width: media.width,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: image.isNotEmpty
-              ? CachedNetworkImageProvider(
-                  image.startsWith('https://storage.cloud.google.com/')
-                      ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                      : image,
-                  cacheManager: CustomCacheManager())
-              : const AssetImage('assets/img/back.jpg'),
           fit: BoxFit.cover,
+          image: AssetImage(
+            isDark == true ? 'assets/img/back_dark.jpg' : 'assets/img/back.jpg',
+          ),
         ),
       ),
-      child: child,
+      child: Center(
+        child: Container(
+          height: media.height / 1,
+          width: media.width,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: image.isNotEmpty
+                  ? CachedNetworkImageProvider(
+                      cacheKey: imageKey,
+                      image.startsWith('https://storage.cloud.google.com/')
+                          ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                          : image,
+                      cacheManager: CustomCacheManager(),
+                    )
+                  : const AssetImage('assets/img/back.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: child,
+        ),
+      ),
     );
   }
 }
@@ -42,8 +58,6 @@ extension StringCasingExtension on String {
     return this[0].toUpperCase() + substring(1);
   }
 }
-
-
 
 class NoBottomBounceScrollPhysics extends BouncingScrollPhysics {
   const NoBottomBounceScrollPhysics({super.parent});

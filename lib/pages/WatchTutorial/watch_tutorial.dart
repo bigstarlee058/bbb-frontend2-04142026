@@ -53,6 +53,21 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
     tutorialDesc = dataProvider?.tutorialData.description ?? "";
   }
 
+  final ValueNotifier<Duration> videoProgressValue = ValueNotifier(Duration.zero);
+  Duration getBufferedPosition() {
+    final position = _videoPlayerController.value.position;
+    final buffered = _videoPlayerController.value.buffered;
+
+    for (final range in buffered) {
+      if (range.start <= position && position <= range.end) {
+        return range.end;
+      }
+    }
+
+    // fallback to last buffered range or zero
+    return buffered.isNotEmpty ? buffered.last.end : Duration.zero;
+  }
+
   Future<void> initializeVideo(String url) async {
     try {
       _videoPlayerController =
@@ -66,7 +81,7 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
-        looping: false,
+        looping: true,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
@@ -78,20 +93,34 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
         videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
+      // _videoPlayerController.addListener(() async {
+      //   final bool isFinished =
+      //       _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
+      //   if (isFinished) {
+      //     showControlsOnTapOfPause();
+      //   }
+      //   if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+      //     AudioManager.abandonAudioFocus();
+      //   } else {
+      //     AudioManager.requestAudioFocus();
+      //   }
+      //   setState(() {});
+      // });
       _videoPlayerController.addListener(() async {
-        final bool isFinished =
-            _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
+        final position = _videoPlayerController.value.position;
+        final duration = _videoPlayerController.value.duration;
+        final bool isFinished = position >= duration && !_videoPlayerController.value.isPlaying;
         if (isFinished) {
           showControlsOnTapOfPause();
         }
-        if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+        if (duration != null && position >= duration) {
           AudioManager.abandonAudioFocus();
         } else {
           AudioManager.requestAudioFocus();
         }
-        setState(() {});
-      });
 
+        videoProgressValue.value = position;
+      });
       _controller = ProgressBarController(
         vsync: this,
         barAnimationDuration: const Duration(milliseconds: 300),
@@ -361,27 +390,54 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
                                           ],
                                         ),
                                         SizedBox(height: ScreenUtil.verticalScale(1)),
-                                        ProgressBar(
-                                          collapsedBufferedBarColor: Colors.white,
-                                          expandedBufferedBarColor: Colors.white,
-                                          buffered: Duration(
-                                              seconds: _videoPlayerController.value.buffered.isEmpty
-                                                  ? 0
-                                                  : _videoPlayerController.value.buffered.first.end.inSeconds),
-                                          controller: _controller,
-                                          progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
-                                          total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
-                                          onChanged: (value) {
-                                            _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
-                                          },
-                                          onSeek: (Duration value) {},
-                                          onChangeStart: (value) {
-                                            setState(() => isZoom = true);
-                                          },
-                                          onChangeEnd: (value) {
-                                            setState(() => isZoom = false);
+                                        ValueListenableBuilder<Duration>(
+                                          valueListenable: videoProgressValue,
+                                          builder: (context, progress, _) {
+                                            return ProgressBar(
+                                              collapsedBufferedBarColor: Colors.white,
+                                              expandedBufferedBarColor: Colors.white,
+                                              buffered: getBufferedPosition(),
+                                              controller: _controller,
+                                              progress: progress,
+                                              total: Duration(
+                                                seconds: _videoPlayerController.value.duration.inSeconds,
+                                              ),
+                                              onChanged: (value) {
+                                                _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                              },
+                                              onSeek: (value) {},
+                                              onChangeStart: (value) {
+                                                _videoPlayerController.pause();
+                                                isZoom = true;
+                                              },
+                                              onChangeEnd: (value) {
+                                                _videoPlayerController.play();
+                                                isZoom = false;
+                                              },
+                                            );
                                           },
                                         ),
+                                        // ProgressBar(
+                                        //   collapsedBufferedBarColor: Colors.white,
+                                        //   expandedBufferedBarColor: Colors.white,
+                                        //   buffered: Duration(
+                                        //       seconds: _videoPlayerController.value.buffered.isEmpty
+                                        //           ? 0
+                                        //           : _videoPlayerController.value.buffered.first.end.inSeconds),
+                                        //   controller: _controller,
+                                        //   progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
+                                        //   total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
+                                        //   onChanged: (value) {
+                                        //     _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                        //   },
+                                        //   onSeek: (Duration value) {},
+                                        //   onChangeStart: (value) {
+                                        //     setState(() => isZoom = true);
+                                        //   },
+                                        //   onChangeEnd: (value) {
+                                        //     setState(() => isZoom = false);
+                                        //   },
+                                        // ),
                                         SizedBox(height: ScreenUtil.verticalScale(2.2)),
                                       ],
                                     ),

@@ -22,6 +22,7 @@ class ExerciseTutorialScreen extends StatefulWidget {
     required this.chewieController,
     required this.videoSize,
     required this.controller,
+    required this.videoProgressValue,
   });
 
   final bool loading;
@@ -31,6 +32,8 @@ class ExerciseTutorialScreen extends StatefulWidget {
   final ChewieController chewieController;
   final Size videoSize;
   final ProgressBarController controller;
+  final ValueNotifier<Duration> videoProgressValue;
+
   @override
   State<ExerciseTutorialScreen> createState() => _ExerciseTutorialScreenState();
 }
@@ -47,6 +50,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
     );
     widget.videoPlayerController.play();
     widget.videoPlayerController.addListener(() {
+      widget.videoProgressValue.value = widget.videoPlayerController.value.position;
       setState(() {});
     });
     hideControls1();
@@ -278,25 +282,53 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                               ],
                                             ),
                                             SizedBox(height: ScreenUtil.verticalScale(1)),
-                                            ProgressBar(
-                                              collapsedBufferedBarColor: Colors.white,
-                                              expandedBufferedBarColor: Colors.white,
-                                              buffered: Duration(
-                                                  seconds: widget.videoPlayerController.value.buffered.isEmpty
-                                                      ? 0
-                                                      : widget.videoPlayerController.value.buffered.first.end.inSeconds),
-                                              controller: widget.controller,
-                                              progress: Duration(seconds: widget.videoPlayerController.value.position.inSeconds),
-                                              total: Duration(seconds: widget.videoPlayerController.value.duration.inSeconds),
-                                              onChanged: (value) {
-                                                widget.videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
-                                              },
-                                              onSeek: (Duration value) {},
-                                              onChangeStart: (value) {
-                                                setState(() => isZoom1 = true);
-                                              },
-                                              onChangeEnd: (value) {
-                                                setState(() => isZoom1 = false);
+                                            // ProgressBar(
+                                            //   collapsedBufferedBarColor: Colors.white,
+                                            //   expandedBufferedBarColor: Colors.white,
+                                            //   buffered: Duration(
+                                            //       seconds: widget.videoPlayerController.value.buffered.isEmpty
+                                            //           ? 0
+                                            //           : widget.videoPlayerController.value.buffered.first.end.inSeconds),
+                                            //   controller: widget.controller,
+                                            //   progress: Duration(seconds: widget.videoPlayerController.value.position.inSeconds),
+                                            //   total: Duration(seconds: widget.videoPlayerController.value.duration.inSeconds),
+                                            //   onChanged: (value) {
+                                            //     widget.videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                            //   },
+                                            //   onSeek: (Duration value) {},
+                                            //   onChangeStart: (value) {
+                                            //     setState(() => isZoom1 = true);
+                                            //   },
+                                            //   onChangeEnd: (value) {
+                                            //     setState(() => isZoom1 = false);
+                                            //   },
+                                            // ),
+                                            ValueListenableBuilder<Duration>(
+                                              valueListenable: widget.videoProgressValue,
+                                              builder: (context, progress, _) {
+                                                return ProgressBar(
+                                                  collapsedBufferedBarColor: Colors.white,
+                                                  expandedBufferedBarColor: Colors.white,
+                                                  buffered: Duration(
+                                                      seconds: widget.videoPlayerController.value.buffered.isEmpty
+                                                          ? 0
+                                                          : widget.videoPlayerController.value.buffered.first.end.inSeconds),
+                                                  controller: widget.controller,
+                                                  progress: progress,
+                                                  total: Duration(
+                                                    seconds: widget.videoPlayerController.value.duration.inSeconds,
+                                                  ),
+                                                  onChanged: (value) {
+                                                    widget.videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                                  },
+                                                  onSeek: (value) {},
+                                                  onChangeStart: (value) {
+                                                    isZoom1 = true;
+                                                  },
+                                                  onChangeEnd: (value) {
+                                                    isZoom1 = false;
+                                                  },
+                                                );
                                               },
                                             ),
                                             SizedBox(height: ScreenUtil.verticalScale(2.2)),
