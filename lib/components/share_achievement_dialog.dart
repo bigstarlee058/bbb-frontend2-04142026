@@ -434,21 +434,22 @@ class _ShareAchievementDialogState extends State<ShareAchievementDialog> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: GestureDetector(
-                            child: Container(
-                              decoration: const BoxDecoration(color: Colors.transparent),
-                              child: const Padding(
-                                padding: EdgeInsets.all(2.0),
-                                child: Icon(size: 25, Icons.close, color: AppColors.primaryColor),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
+                        // Align(
+                        //   alignment: Alignment.topRight,
+                        //   child: GestureDetector(
+                        //     child: Container(
+                        //
+                        //       decoration: const BoxDecoration(color: AppColors.primaryColor,borderRadius: BorderRadius.all(Radius.circular(100))),
+                        //       child: const Padding(
+                        //         padding: EdgeInsets.all(2.0),
+                        //         child: Icon(size: 24, Icons.close, color:Colors.white),
+                        //       ),
+                        //     ),
+                        //     onTap: () {
+                        //       Navigator.of(context).pop();
+                        //     },
+                        //   ),
+                        // ),
                         SizedBox(height: ScreenUtil.verticalScale(1)),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -477,6 +478,20 @@ class _ShareAchievementDialogState extends State<ShareAchievementDialog> {
                                 totalSteps: widget.length,
                                 progress: widget.count.clamp(0, widget.length).toDouble(),
                               ),
+                            ),
+                            SizedBox(width: ScreenUtil.horizontalScale(2)),
+                            GestureDetector(
+                              child: Container(
+
+                                decoration: const BoxDecoration(color: AppColors.primaryColor,borderRadius: BorderRadius.all(Radius.circular(100))),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(2.0),
+                                  child: Icon(size: 24, Icons.close, color:Colors.white),
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
                             ),
                           ],
                         ),

@@ -76,7 +76,7 @@ class _SettingSectionState extends State<SettingSection> {
                       child: com.ExpansionPanelList(
                         sidePadding: false,
                         animationDuration: Duration(milliseconds: 300),
-                        expandIconColor: Colors.grey.shade400,
+                        expandIconColor: AppColors.primaryColor,
                         materialGapSize: 10,
                         expandedHeaderPadding: EdgeInsets.zero,
                         expansionCallback: (panelIndex, isExpanded) {
@@ -374,7 +374,8 @@ class _SettingSectionState extends State<SettingSection> {
                       child: com.ExpansionPanelList(
                         sidePadding: false,
                         animationDuration: Duration(milliseconds: 300),
-                        expandIconColor: Colors.grey.shade400,
+
+                        expandIconColor: AppColors.primaryColor,
                         materialGapSize: 10,
                         expandedHeaderPadding: EdgeInsets.zero,
                         expansionCallback: (panelIndex, isExpanded) {
