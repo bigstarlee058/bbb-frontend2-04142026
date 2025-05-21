@@ -27,6 +27,7 @@ import 'package:bbb/models/equipment.dart';
 import 'package:bbb/models/equipmenttitle.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/models/faqs_model.dart';
+import 'package:bbb/models/screen_bg_model.dart';
 import 'package:bbb/models/staffs.dart';
 import 'package:bbb/models/tutorials.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -58,6 +59,7 @@ class DataProvider extends ChangeNotifier {
   bool workoutCheckpointState = false;
 
   GetChooseWorkoutModel? getChooseWorkoutModel;
+  ScreenBackgroundResponse? screenBackgroundResponse;
   GetChooseEquipmentModel? getChooseEquipmentModel;
   List<FaQsModel> faQsModel = [];
   bool faqLoader = false;
@@ -83,6 +85,52 @@ class DataProvider extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('authToken');
     return authToken;
+  }
+
+  List<Map<String, dynamic>> imageList = [];
+  Future<void> getAppBGs() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
+    String? userIdToken = await getAuthToken();
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        if (data != null) {
+          screenBackgroundResponse = ScreenBackgroundResponse.fromJson(data);
+          imageList = [
+            {"image": screenBackgroundResponse?.imageLogin ?? "", "key": "imageLogin"},
+            {"image": screenBackgroundResponse?.imageSignup ?? "", "key": "imageSignup"},
+            {"image": screenBackgroundResponse?.imageAchievement ?? "", "key": "imageAchievement"},
+            {"image": screenBackgroundResponse?.imageApparel ?? "", "key": "imageApparel"},
+            {"image": screenBackgroundResponse?.imageDashboard ?? "", "key": "imageDashboard"},
+            {"image": screenBackgroundResponse?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
+            {"image": screenBackgroundResponse?.imageExerciseLibrary ?? "", "key": "imageExerciseLibrary"},
+            {"image": screenBackgroundResponse?.imageFaQs ?? "", "key": "imageFaQs"},
+            {"image": screenBackgroundResponse?.imageForgot ?? "", "key": "imageForgot"},
+            {"image": screenBackgroundResponse?.imageGraphs ?? "", "key": "imageGraphs"},
+            {"image": screenBackgroundResponse?.imageMonthView ?? "", "key": "imageMonthView"},
+            {"image": screenBackgroundResponse?.imageMyProfle ?? "", "key": "imageMyProfle"},
+            {"image": screenBackgroundResponse?.imageProfile ?? "", "key": "imageProfile"},
+            {"image": screenBackgroundResponse?.imageSetting ?? "", "key": "imageSetting"},
+            {"image": screenBackgroundResponse?.imageStreakCalendar ?? "", "key": "imageStreakCalendar"},
+            {"image": screenBackgroundResponse?.imageToday ?? "", "key": "imageToday"},
+            {"image": screenBackgroundResponse?.imageTools ?? "", "key": "imageTools"},
+          ];
+        }
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get screen bg data');
+      }
+    } catch (e) {
+      throw Exception('Failed to get screen bg data');
+    }
   }
 
   Future<bool> joinChallenge(String? userid, String? challengeid) async {

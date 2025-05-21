@@ -52,13 +52,14 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     _dateNotifier.stream.listen((newDate) {
       if (_currentDate.day != newDate.day) {
         setState(() {
           _currentDate = newDate;
-          monthProvider?.onInit(context, isEnabled: false);
+          monthProvider.onInit(context, isEnabled: false);
         });
       }
     });

@@ -5,6 +5,7 @@ import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
 import 'package:bbb/pages/main_page.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -13,7 +14,6 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -31,11 +31,10 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
+  DataProvider? dataProvider;
   bool isObscure = true;
   bool isLoading = false;
   ImageProvider? imageProvider;
-  String image = '';
 
   late MainPageProvider mainPageProvider;
 
@@ -43,14 +42,13 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
 
     _checkLoginStatus();
   }
 
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    image = prefs.getString("login_image") ?? '';
 
     setState(() {});
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -161,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  // static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +176,8 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Utils.appImage(
                   media,
-                  image,
+                  dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                  imageKey: "imageLogin",
                   child: Column(
                     children: [
                       Align(

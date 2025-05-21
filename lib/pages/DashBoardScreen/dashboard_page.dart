@@ -21,7 +21,6 @@ import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/pages/DashBoardScreen/step_progress_bar.dart';
 import 'package:bbb/pages/DashBoardScreen/week_calender.dart';
 import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
@@ -58,8 +57,6 @@ class _DashboardPageState extends State<DashboardPage> {
   late ScrollProvider scrollProvider;
   String selectedChart = "Exercises Completed";
   Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
-  final DateStreamNotifier _dateNotifier = DateStreamNotifier();
-  DateTime _currentDate = DateTime.now();
   @override
   void initState() {
     super.initState();
@@ -160,24 +157,25 @@ class _DashboardPageState extends State<DashboardPage> {
         },
         child: Stack(
           children: [
-            Container(
-              height: media.height / 1,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
-              ),
-            ),
-            Container(
-              height: media.height / 1,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/img/back_dark.jpg'),
-                  fit: BoxFit.cover,
-                  opacity: 1,
-                ),
-              ),
-            ),
+            // Container(
+            //   height: media.height / 1,
+            //   width: media.width,
+            //   decoration: const BoxDecoration(
+            //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+            //   ),
+            // ),
+            Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageDashboard ?? "", imageKey: "imageDashboard", isDark: true),
+            // Container(
+            //   height: media.height / 1,
+            //   width: media.width,
+            //   decoration: const BoxDecoration(
+            //     image: DecorationImage(
+            //       image: AssetImage('assets/img/back_dark.jpg'),
+            //       fit: BoxFit.cover,
+            //       opacity: 1,
+            //     ),
+            //   ),
+            // ),
             Column(
               children: [
                 Consumer<UserDataProvider>(builder: (context, userData, child) {

@@ -46,14 +46,36 @@ class _SettingSectionState extends State<SettingSection> {
     super.initState();
   }
 
-  updateSplitIndex(int index) {
+  updateSplitIndex(int index) async {
     splitIndex = index;
     setState(() {});
+    if (widget.isSetting) {
+      String newValue1 = splitIndex == 0
+          ? "3"
+          : splitIndex == 1
+              ? "4"
+              : "5";
+
+      await widget.monthProvider.changeDaySplit(newValue1);
+      await widget.monthProvider.filterWorkouts();
+      await widget.monthProvider.updateLocalData();
+      await widget.monthProvider.checkForPumpDay();
+      await widget.monthProvider.manageStreak();
+      await widget.monthProvider.getLiftedWeightGraphData();
+    }
   }
 
-  updateEquipments(int index) {
+  updateEquipments(int index) async {
     equipments = index;
     setState(() {});
+    if (widget.isSetting) {
+      String newValue2 = equipments == 0
+          ? "A"
+          : equipments == 1
+              ? "B"
+              : "C";
+      widget.monthProvider.changeEquipmentType(newValue2);
+    }
   }
 
   @override
@@ -110,8 +132,7 @@ class _SettingSectionState extends State<SettingSection> {
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 10),
-                                      SizedBox(width: 4),
+                                      SizedBox(width: 14),
                                     ],
                                   ),
                                 );
@@ -224,7 +245,7 @@ class _SettingSectionState extends State<SettingSection> {
                                           ],
                                         ),
                                       ),
-                                      const SizedBox(height: 15),
+                                      const SizedBox(height: 5),
                                       Container(
                                         margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
                                         padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
@@ -374,7 +395,6 @@ class _SettingSectionState extends State<SettingSection> {
                       child: com.ExpansionPanelList(
                         sidePadding: false,
                         animationDuration: Duration(milliseconds: 300),
-
                         expandIconColor: AppColors.primaryColor,
                         materialGapSize: 10,
                         expandedHeaderPadding: EdgeInsets.zero,
@@ -523,7 +543,7 @@ class _SettingSectionState extends State<SettingSection> {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(height: 15),
+                                    const SizedBox(height: 5),
                                     Container(
                                       margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
                                       padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
@@ -653,70 +673,6 @@ class _SettingSectionState extends State<SettingSection> {
                     ),
                   ),
                 ),
-                if (isSplit == true || isEquipment == true)
-                  Consumer<MonthProvider>(
-                    builder: (context, value, child) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-                        child: ButtonWidget(
-                          text: "Save",
-                          textColor: Colors.white,
-                          color: AppColors.primaryColor,
-                          onPress: () async {
-                            value.updateSettingLoader(true);
-
-                            String newValue1 = splitIndex == 0
-                                ? "3"
-                                : splitIndex == 1
-                                    ? "4"
-                                    : "5";
-
-                            String newValue2 = equipments == 0
-                                ? "A"
-                                : equipments == 1
-                                    ? "B"
-                                    : "C";
-
-                            await value.changeDaySplit(newValue1);
-                            value.changeEquipmentType(newValue2);
-                            await value.filterWorkouts();
-
-                            await value.updateLocalData();
-
-                            await Future.delayed(Duration(seconds: 1)).then(
-                              (v) {
-                                value.updateSettingLoader(false);
-                              },
-                            );
-
-                            Fluttertoast.showToast(
-                              msg: "Saved successfully!",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.TOP_RIGHT,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: AppColors.primaryColor,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                            await value.checkForPumpDay();
-                            await value.manageStreak();
-                            await value.getLiftedWeightGraphData();
-                          },
-                          isLoading: value.settingLoader,
-                        ),
-                      );
-                    },
-                  ),
-
-                // Consumer<MonthProvider>(
-                //   builder: (context, value, child) => SelectDropdown(
-                //     onChange: (String newValue) async {
-                //       value.changeEquipmentType(newValue);
-                //       await value.filterWorkouts();
-                //       await value.updateLocalData();
-                //     },
-                //   ),
-                // ),
               ],
             ),
           )
@@ -1205,7 +1161,7 @@ class _SettingSectionState extends State<SettingSection> {
                 Consumer<MonthProvider>(
                   builder: (context, value, child) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                       child: ButtonWidget(
                         text: "Save",
                         textColor: Colors.white,

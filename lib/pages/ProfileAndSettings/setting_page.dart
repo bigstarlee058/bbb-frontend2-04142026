@@ -2,9 +2,11 @@ import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +26,15 @@ class _SettingPageState extends State<SettingPage> {
   bool? isHapticFeedbackOn = true;
   late MainPageProvider mainPageProvider;
   late MonthProvider monthProvider;
+  DataProvider? dataProvider;
+
   @override
   void initState() {
     getSwitch();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
     super.initState();
   }
 
@@ -65,16 +71,21 @@ class _SettingPageState extends State<SettingPage> {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          height: media.height / 1,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
+                        // Container(
+                        //   height: media.height / 1,
+                        //   width: media.width,
+                        //   decoration: const BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/img/back.jpg'),
+                        //       fit: BoxFit.cover,
+                        //       opacity: 1,
+                        //     ),
+                        //   ),
+                        // ),
+                        Utils.appImage(
+                          media,
+                          dataProvider?.screenBackgroundResponse?.imageSetting ?? "",
+                          imageKey: "imageSetting",
                         ),
                         SizedBox(
                           height: media.height / 1.5,

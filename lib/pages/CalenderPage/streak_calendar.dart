@@ -7,9 +7,11 @@ import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 // import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/CalenderPage/calender.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
@@ -26,10 +28,13 @@ class StreakCalendarPage extends StatefulWidget {
 class _StreakCalendarPageState extends State<StreakCalendarPage> {
   MonthProvider? monthProvider;
   late MainPageProvider mainPageProvider;
+  DataProvider? dataProvider;
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     super.initState();
   }
@@ -52,16 +57,10 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                 Positioned(
                   top: 0,
                   child: FittedBox(
-                    child: Container(
-                      height: media.height / 1,
-                      width: media.width,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/img/back.jpg'),
-                          fit: BoxFit.cover,
-                          opacity: 1,
-                        ),
-                      ),
+                    child: Utils.appImage(
+                      media,
+                      dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
+                      imageKey: "imageStreakCalendar",
                       child: SafeArea(
                         child: SizedBox(
                           height: media.height / 1.8,

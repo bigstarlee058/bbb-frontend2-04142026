@@ -7,6 +7,7 @@ import 'package:bbb/pages/AuthScreen/email_verification_page.dart';
 import 'package:bbb/pages/AuthScreen/login_page.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
 import 'package:bbb/pages/AuthScreen/sign_up_screen.dart';
+import 'package:bbb/pages/AuthScreen/splash_screen.dart';
 import 'package:bbb/pages/CalenderPage/calendar_page.dart';
 import 'package:bbb/pages/CalenderPage/streak_calendar.dart';
 import 'package:bbb/pages/ChallengeView/joined_challeng_page.dart';
@@ -224,9 +225,9 @@ class _MyAppState extends State<MyApp> {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.transparent),
           ),
           debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.onBoardingScreen,
+          initialRoute: AppRoutes.splashScreen,
           routes: {
-            // AppRoutes.splashScreen: (context) => const SplashScreen(),
+            AppRoutes.splashScreen: (context) => const SplashScreen(),
             AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
             AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
             AppRoutes.loginScreen: (context) => const LoginPage(),

@@ -1264,15 +1264,12 @@ class MonthProvider extends ChangeNotifier {
 
   List<DayHistoryModel> decodedDataAll() {
     String encodedTempData = jsonEncode(allSplitDayHistoryModel);
-
     List<DayHistoryModel> decodedData;
     try {
       decodedData = List<DayHistoryModel>.from(
         json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)),
       );
-
-      decodedData.removeWhere((element) => element.status == Status.empty || element.status == Status.started);
-
+      decodedData.removeWhere((element) => element.status == Status.empty || element.status == Status.started || element.endTime == null);
       decodedData.sort((a, b) {
         DateTime aDate = a.endTime!;
         DateTime localTimeADate = Utils.formattedDate("$aDate");
@@ -2561,7 +2558,6 @@ class MonthProvider extends ChangeNotifier {
         "time": "${DateTime.now().toUtc()}"
       },
     ];
-    log('items :::::::::::::::::: ${items}');
     for (var element in achievementsModel) {
       if (element.achievementsTitle == "Breaking the Ice") {
         items[0]["isArchived"] = true;
@@ -2658,7 +2654,6 @@ class MonthProvider extends ChangeNotifier {
     DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
     DateTime today = DateTime.now();
     int dayDifference = today.difference(targetDate).inDays;
-    log('items :::::::::::::::::: ${items}');
     if (items[0]["isArchived"] == false) {
       if (allDayHistoryModel.any((element) => element.status == Status.completed)) {
         items[0]["isArchived"] = true;

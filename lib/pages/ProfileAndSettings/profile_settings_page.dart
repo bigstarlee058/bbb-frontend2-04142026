@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -29,6 +31,13 @@ class ProfileSettingsPage extends StatefulWidget {
 
 class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   UserDataProvider? userData;
+  DataProvider? dataProvider;
+
+  @override
+  void initState() {
+    dataProvider = Provider.of<DataProvider>(this.context, listen: false);
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
@@ -37,11 +46,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       listen: false,
     );
     super.didChangeDependencies();
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   Future<void> _pickAndUploadImage() async {
@@ -170,16 +174,21 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          height: media.height / 1,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
+                        // Container(
+                        //   height: media.height / 1,
+                        //   width: media.width,
+                        //   decoration: const BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/img/back.jpg'),
+                        //       fit: BoxFit.cover,
+                        //       opacity: 1,
+                        //     ),
+                        //   ),
+                        // ),
+                        Utils.appImage(
+                          media,
+                          dataProvider?.screenBackgroundResponse?.imageProfile ?? "",
+                          imageKey: "imageProfile",
                         ),
                         SizedBox(
                           height: media.height / 1.5,

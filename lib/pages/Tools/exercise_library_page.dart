@@ -1,6 +1,7 @@
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
@@ -111,16 +112,21 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                   children: [
                     Stack(
                       children: <Widget>[
-                        Container(
-                          height: media.height / 1,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
+                        // Container(
+                        //   height: media.height / 1,
+                        //   width: media.width,
+                        //   decoration: const BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/img/back.jpg'),
+                        //       fit: BoxFit.cover,
+                        //       opacity: 1,
+                        //     ),
+                        //   ),
+                        // ),
+                        Utils.appImage(
+                          media,
+                          dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
+                          imageKey: "imageExerciseLibrary",
                         ),
                         SizedBox(
                           height: media.height / 2.5,

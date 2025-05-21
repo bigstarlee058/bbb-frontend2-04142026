@@ -1,20 +1,15 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/models/welcome_content_model.dart';
-import 'package:bbb/pages/AuthScreen/login_page.dart';
+import 'package:bbb/models/screen_bg_model.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/month_provider.dart';
-import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
 import 'package:video_player/video_player.dart';
@@ -32,14 +27,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   bool _isVideoInitialized = false;
   bool isLoading = false;
   MonthProvider? monthProvider;
-  DateTime _currentDate = DateTime.now();
   late DataProvider? dataProvider;
-  final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   @override
   void initState() {
     super.initState();
-    updateImage();
-    loadWelcomeContent();
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+    // loadWelcomeContent();
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     _checkLoginStatus();
     _videoController =
@@ -60,7 +54,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     }
   }
 
-  late WelcomeContentModel welcomeContentModel;
+  // late WelcomeContentModel welcomeContentModel;
 
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -88,57 +82,49 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     }
   }
 
-  Future<void> _initializeFetchData() async {
-    debugPrint("this  is initial state func");
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    if (dataProvider != null) {
-      await dataProvider?.fetchMonthWorkouts(3);
-    } else {
-      debugPrint("dataProvider is null");
-    }
-  }
+  // Future<void> _initializeFetchData() async {
+  //   debugPrint("this  is initial state func");
+  //   dataProvider = Provider.of<DataProvider>(context, listen: false);
+  //   dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
+  //   if (dataProvider != null) {
+  //     await dataProvider?.fetchMonthWorkouts(3);
+  //   } else {
+  //     debugPrint("dataProvider is null");
+  //   }
+  // }
 
-  void loadWelcomeContent() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      final descriptionResponse = await http.get(
-        Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'), // replace with actual endpoint
-      );
-
-      if (descriptionResponse.statusCode == 200) {
-        welcomeContentModel = welcomeContentModelFromJson(descriptionResponse.body);
-        final image = CustomCacheManager().cacheImage(welcomeContentModel.imgUrl);
-        prefs.setString("login_image", welcomeContentModel.imgUrl);
-        // bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-      } else {
-        showBottomAlert(context, 'Failed to load description');
-        debugPrint('this is login page ${descriptionResponse.statusCode}');
-      }
-    } catch (e) {
-      showBottomAlert(context, 'An error occurred');
-      debugPrint('this is login page $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
-
-  String image = '';
-
-  updateImage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    image = prefs.getString("login_image") ?? '';
-    setState(() {});
-  }
+  // void loadWelcomeContent() async {
+  //   try {
+  //     setState(() {
+  //       isLoading = true;
+  //     });
+  //
+  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+  //
+  //     final descriptionResponse = await http.get(
+  //       Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'), // replace with actual endpoint
+  //     );
+  //
+  //     if (descriptionResponse.statusCode == 200) {
+  //       welcomeContentModel = welcomeContentModelFromJson(descriptionResponse.body);
+  //       final image = CustomCacheManager().cacheImage(welcomeContentModel.imgUrl);
+  //       prefs.setString("login_image", welcomeContentModel.imgUrl);
+  //       // bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+  //     } else {
+  //       showBottomAlert(context, 'Failed to load description');
+  //       debugPrint('this is login page ${descriptionResponse.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     showBottomAlert(context, 'An error occurred');
+  //     debugPrint('this is login page $e');
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -181,9 +167,17 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Visibility(
-            child: Utils.appImage(media, image),
-            visible: false,
+          Column(
+            children: dataProvider!.imageList.map((item) {
+              return Visibility(
+                visible: false,
+                child: Utils.appImage(
+                  media / 20,
+                  item["image"] ?? "",
+                  imageKey: item["key"] ?? "",
+                ),
+              );
+            }).toList(),
           ),
           SizedBox(
             height: media.height / 1,
@@ -192,7 +186,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     alignment: Alignment.topCenter,
                     child: SizedBox(height: media.height / 1.37, child: VideoPlayer(_videoController)),
                   )
-                : Utils.appImage(media, image),
+                : Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageLogin ?? "", imageKey: "imageLogin"),
           ),
           Positioned(
             top: ScreenUtil.horizontalScale(50),
@@ -250,7 +244,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                                     height: media.height * .28,
                                   )
                                 : TextSlider(
-                                    slide: welcomeContentModel.slides,
+                                    slide: dataProvider!.screenBackgroundResponse?.slides ?? [],
                                   ),
                             ButtonWidget(
                               text: 'Sign in',
@@ -300,7 +294,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -381,7 +375,7 @@ class _TextSliderState extends State<TextSlider> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      widget.slide[index].title,
+                      widget.slide[index].title ?? "",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: ScreenUtil.verticalScale(2.6),
@@ -393,7 +387,7 @@ class _TextSliderState extends State<TextSlider> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6.0),
                       child: Text(
-                        widget.slide[index].description,
+                        widget.slide[index].description ?? "",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(1.65),
