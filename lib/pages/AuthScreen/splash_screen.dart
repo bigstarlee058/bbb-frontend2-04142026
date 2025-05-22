@@ -1,6 +1,9 @@
+import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,22 +14,38 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   DataProvider? dataProvider;
-  bool isLoading = false;
-
   @override
   void initState() {
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
-
-    onInit();
     super.initState();
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    _checkLoginStatus();
   }
 
-  onInit() async {
+  Future<void> _checkLoginStatus() async {
     await dataProvider?.getAppBGs().then(
-      (value) {
-        Navigator.pushReplacementNamed(context, '/onboarding');
+      (value) async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+        if (isLoggedIn) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+            ),
+          );
+          await isFromNotification();
+        } else {
+          Navigator.pushReplacementNamed(context, '/onboarding');
+        }
       },
     );
+  }
+
+  isFromNotification() async {
+    int? status = preferences.getInt(SharedPreference.fromNotification);
+    if (status == 1) {
+      await Navigator.pushNamed(context, '/exercise');
+    }
   }
 
   @override

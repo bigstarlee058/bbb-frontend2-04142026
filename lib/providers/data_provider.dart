@@ -31,8 +31,8 @@ import 'package:bbb/models/screen_bg_model.dart';
 import 'package:bbb/models/staffs.dart';
 import 'package:bbb/models/tutorials.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/values/app_constants.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,7 +59,7 @@ class DataProvider extends ChangeNotifier {
   bool workoutCheckpointState = false;
 
   GetChooseWorkoutModel? getChooseWorkoutModel;
-  ScreenBackgroundResponse? screenBackgroundResponse;
+  ScreenBackgroundResponse? screenBackgroundModel;
   GetChooseEquipmentModel? getChooseEquipmentModel;
   List<FaQsModel> faQsModel = [];
   bool faqLoader = false;
@@ -87,7 +87,8 @@ class DataProvider extends ChangeNotifier {
     return authToken;
   }
 
-  List<Map<String, dynamic>> imageList = [];
+  List<Map<String, dynamic>> allImageList = [];
+  List<Map<String, dynamic>> allSplashImageList = [];
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
     String? userIdToken = await getAuthToken();
@@ -103,34 +104,79 @@ class DataProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data != null) {
-          screenBackgroundResponse = ScreenBackgroundResponse.fromJson(data);
-          imageList = [
-            {"image": screenBackgroundResponse?.imageLogin ?? "", "key": "imageLogin"},
-            {"image": screenBackgroundResponse?.imageSignup ?? "", "key": "imageSignup"},
-            {"image": screenBackgroundResponse?.imageAchievement ?? "", "key": "imageAchievement"},
-            {"image": screenBackgroundResponse?.imageApparel ?? "", "key": "imageApparel"},
-            {"image": screenBackgroundResponse?.imageDashboard ?? "", "key": "imageDashboard"},
-            {"image": screenBackgroundResponse?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
-            {"image": screenBackgroundResponse?.imageExerciseLibrary ?? "", "key": "imageExerciseLibrary"},
-            {"image": screenBackgroundResponse?.imageFaQs ?? "", "key": "imageFaQs"},
-            {"image": screenBackgroundResponse?.imageForgot ?? "", "key": "imageForgot"},
-            {"image": screenBackgroundResponse?.imageGraphs ?? "", "key": "imageGraphs"},
-            {"image": screenBackgroundResponse?.imageMonthView ?? "", "key": "imageMonthView"},
-            {"image": screenBackgroundResponse?.imageMyProfle ?? "", "key": "imageMyProfle"},
-            {"image": screenBackgroundResponse?.imageProfile ?? "", "key": "imageProfile"},
-            {"image": screenBackgroundResponse?.imageSetting ?? "", "key": "imageSetting"},
-            {"image": screenBackgroundResponse?.imageStreakCalendar ?? "", "key": "imageStreakCalendar"},
-            {"image": screenBackgroundResponse?.imageToday ?? "", "key": "imageToday"},
-            {"image": screenBackgroundResponse?.imageTools ?? "", "key": "imageTools"},
+          screenBackgroundModel = ScreenBackgroundResponse.fromJson(data);
+
+          allSplashImageList = [
+            {"image": screenBackgroundModel?.imageLogin ?? "", "key": "imageLogin"},
+            {"image": screenBackgroundModel?.imageSignup ?? "", "key": "imageSignup"},
+            {"image": screenBackgroundModel?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
+          ];
+
+          allImageList = [
+            {"image": screenBackgroundModel?.imageDashboard ?? "", "key": "imageDashboard"},
+            {"image": screenBackgroundModel?.imageLogin ?? "", "key": "imageLogin"},
+            {"image": screenBackgroundModel?.imageSignup ?? "", "key": "imageSignup"},
+            {"image": screenBackgroundModel?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
+            {"image": screenBackgroundModel?.imageAchievement ?? "", "key": "imageAchievement"},
+            {"image": screenBackgroundModel?.imageApparel ?? "", "key": "imageApparel"},
+            {"image": screenBackgroundModel?.imageExerciseLibrary ?? "", "key": "imageExerciseLibrary"},
+            {"image": screenBackgroundModel?.imageFaQs ?? "", "key": "imageFaQs"},
+            {"image": screenBackgroundModel?.imageForgot ?? "", "key": "imageForgot"},
+            {"image": screenBackgroundModel?.imageGraphs ?? "", "key": "imageGraphs"},
+            {"image": screenBackgroundModel?.imageMonthView ?? "", "key": "imageMonthView"},
+            {"image": screenBackgroundModel?.imageMyProfle ?? "", "key": "imageMyProfle"},
+            {"image": screenBackgroundModel?.imageProfile ?? "", "key": "imageProfile"},
+            {"image": screenBackgroundModel?.imageSetting ?? "", "key": "imageSetting"},
+            {"image": screenBackgroundModel?.imageStreakCalendar ?? "", "key": "imageStreakCalendar"},
+            {"image": screenBackgroundModel?.imageToday ?? "", "key": "imageToday"},
+            {"image": screenBackgroundModel?.imageTools ?? "", "key": "imageTools"},
           ];
         }
         notifyListeners();
+        await preloadAndCacheImages();
       } else {
         throw Exception('Failed to get screen bg data');
       }
     } catch (e) {
       throw Exception('Failed to get screen bg data');
     }
+  }
+
+  Map<String, FileImage> cachedImageMap = {};
+  Map<String, FileImage> cachedSplashImageMap = {};
+
+  Future<void> preloadAndCacheImages() async {
+    for (var element in allSplashImageList) {
+      String url = element["image"];
+      String key = element["key"];
+
+      final processedUrl = url.startsWith('https://storage.cloud.google.com/')
+          ? url.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          : url;
+
+      try {
+        final file = await CustomCacheManager().getSingleFile(processedUrl);
+        cachedSplashImageMap[key] = FileImage(file);
+      } catch (e) {
+        debugPrint("Image cache failed for $key: $e");
+      }
+    }
+    for (var element in allImageList) {
+      String url = element["image"];
+      String key = element["key"];
+
+      final processedUrl = url.startsWith('https://storage.cloud.google.com/')
+          ? url.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          : url;
+
+      try {
+        final file = await CustomCacheManager().getSingleFile(processedUrl);
+        cachedImageMap[key] = FileImage(file);
+      } catch (e) {
+        debugPrint("Image cache failed for $key: $e");
+      }
+    }
+    notifyListeners();
   }
 
   Future<bool> joinChallenge(String? userid, String? challengeid) async {
@@ -470,7 +516,7 @@ class DataProvider extends ChangeNotifier {
 
       log('DateTime.now().toUtc :::::::::::::::::: ${DateTime.now().toUtc()}');
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
-      log('queryParams :::::::::::::::::: ${queryParams}');
+      log('queryParams :::::::::::::::::: $queryParams');
       String? userIdToken = await getAuthToken();
       final response = await http.post(
         url,

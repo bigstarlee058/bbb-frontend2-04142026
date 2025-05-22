@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:bbb/pages/DashBoardScreen/step_progress_bar.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -454,7 +453,7 @@ class _ShareAchievementDialogState extends State<ShareAchievementDialog> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            SizedBox(width: ScreenUtil.horizontalScale(2)),
+                            /*SizedBox(width: ScreenUtil.horizontalScale(2)),
                             Expanded(
                               child: StepProgressBar(
                                 stepHeight: ScreenUtil.verticalScale(1.2),
@@ -479,14 +478,14 @@ class _ShareAchievementDialogState extends State<ShareAchievementDialog> {
                                 progress: widget.count.clamp(0, widget.length).toDouble(),
                               ),
                             ),
-                            SizedBox(width: ScreenUtil.horizontalScale(2)),
+                            SizedBox(width: ScreenUtil.horizontalScale(2)),*/
                             GestureDetector(
                               child: Container(
-
-                                decoration: const BoxDecoration(color: AppColors.primaryColor,borderRadius: BorderRadius.all(Radius.circular(100))),
+                                decoration: const BoxDecoration(
+                                    color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
                                 child: const Padding(
                                   padding: EdgeInsets.all(2.0),
-                                  child: Icon(size: 24, Icons.close, color:Colors.white),
+                                  child: Icon(size: 24, Icons.close, color: Colors.white),
                                 ),
                               ),
                               onTap: () {

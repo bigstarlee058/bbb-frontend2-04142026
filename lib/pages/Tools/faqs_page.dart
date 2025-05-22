@@ -53,7 +53,9 @@ class _FAQsPageState extends State<FAQsPage> {
                       children: [
                         Utils.appImage(
                           media,
-                          dataProvider?.screenBackgroundResponse?.imageFaQs ?? "",
+                          // dataProvider?.screenBackgroundResponse?.imageFaQs ?? "",
+                          dataProvider!.cachedImageMap["imageFaQs"],
+
                           imageKey: "imageFaQs",
                         ),
                         // Container(
@@ -167,7 +169,7 @@ class _FAQsPageState extends State<FAQsPage> {
                       builder: (context, value, child) {
                         return Container(
                           width: media.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)).copyWith(bottom: 5),
                           child: value.faqLoader && value.faQsModel.isEmpty
                               ? Center(
                                   child: CircularProgressIndicator(
@@ -254,12 +256,16 @@ class _FAQsPageState extends State<FAQsPage> {
           });
 
           if (value && index == dataProvider!.faQsModel.length - 1) {
-            Future.delayed(const Duration(milliseconds: 300), () {
-              _scrollController.animateTo(
-                _scrollController.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOut,
-              );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Future.delayed(const Duration(milliseconds: 100), () {
+                if (_scrollController.hasClients) {
+                  _scrollController.animateTo(
+                    _scrollController.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 100),
+                    curve: Curves.easeOut,
+                  );
+                }
+              });
             });
           }
         },
@@ -314,7 +320,7 @@ class _FAQsPageState extends State<FAQsPage> {
               ),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(2))
+          SizedBox(height: ScreenUtil.verticalScale(1))
         ],
       ),
     );

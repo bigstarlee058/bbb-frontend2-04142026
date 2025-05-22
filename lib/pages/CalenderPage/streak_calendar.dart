@@ -59,7 +59,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                   child: FittedBox(
                     child: Utils.appImage(
                       media,
-                      dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
+                      // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
+                      dataProvider!.cachedImageMap["imageStreakCalendar"],
                       imageKey: "imageStreakCalendar",
                       child: SafeArea(
                         child: SizedBox(

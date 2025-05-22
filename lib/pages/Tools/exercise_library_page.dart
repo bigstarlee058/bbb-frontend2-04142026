@@ -125,7 +125,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                         // ),
                         Utils.appImage(
                           media,
-                          dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
+                          // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
+                          dataProvider!.cachedImageMap["imageExerciseLibrary"],
+
                           imageKey: "imageExerciseLibrary",
                         ),
                         SizedBox(

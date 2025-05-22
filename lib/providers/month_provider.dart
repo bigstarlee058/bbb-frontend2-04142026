@@ -25,6 +25,7 @@ import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,7 @@ class Status {
 class MonthProvider extends ChangeNotifier {
   late MainPageProvider mainPageProvider;
   late UserDataProvider userDataProvider;
+  FileImage? monthTitleImage;
 
   DayDataModel? dayDataModel;
   WeekDataModel? weekDataModel;
@@ -509,6 +511,16 @@ class MonthProvider extends ChangeNotifier {
         (value) async {
           try {
             if (monthDataModel != null) {
+              final processedUrl = (monthDataModel?.thumbnail ?? "").startsWith('https://storage.cloud.google.com/')
+                  ? (monthDataModel?.thumbnail ?? "").replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                  : (monthDataModel?.thumbnail ?? "");
+              try {
+                final file = await CustomCacheManager().getSingleFile(processedUrl);
+                monthTitleImage = FileImage(file);
+              } catch (e) {
+                debugPrint("Image cache failed : $e");
+              }
+              notifyListeners();
               DateTime today = DateTime.now();
               startTime = Utils.formattedDate("${monthDataModel?.startDate ?? DateTime.now().toUtc()}");
               endTime = Utils.formattedDate("${monthDataModel?.endDate ?? DateTime.now().toUtc()}");

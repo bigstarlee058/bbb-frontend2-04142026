@@ -156,7 +156,23 @@ class _DashboardPageState extends State<DashboardPage> {
           return true;
         },
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
+            SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                children: dataProvider!.cachedImageMap.entries.map((entry) {
+                  return Visibility(
+                    visible: true,
+                    child: Utils.appImage(
+                      media,
+                      entry.value,
+                      imageKey: entry.key,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
             // Container(
             //   height: media.height / 1,
             //   width: media.width,
@@ -164,7 +180,12 @@ class _DashboardPageState extends State<DashboardPage> {
             //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
             //   ),
             // ),
-            Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageDashboard ?? "", imageKey: "imageDashboard", isDark: true),
+            // Utils.appImage(
+            //   media,
+            //   // dataProvider?.screenBackgroundResponse?.imageDashboard ?? "",
+            //   dataProvider!.cachedImageMap["imageDashboard"],
+            //   imageKey: "imageDashboard",
+            // ),
             // Container(
             //   height: media.height / 1,
             //   width: media.width,

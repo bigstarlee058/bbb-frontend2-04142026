@@ -115,11 +115,11 @@ class _InformationSectionState extends State<InformationSection> {
           });
           if (value == true && index == length - 1) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Future.delayed(const Duration(milliseconds: 300), () {
+              Future.delayed(const Duration(milliseconds: 100), () {
                 if (widget.scrollController.hasClients) {
                   widget.scrollController.animateTo(
                     widget.scrollController.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 100),
                     curve: Curves.easeOut,
                   );
                 }

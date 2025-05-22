@@ -182,7 +182,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         // ),
                         Utils.appImage(
                           media,
-                          dataProvider?.screenBackgroundResponse?.imageMyProfle ?? "",
+                          // dataProvider?.screenBackgroundResponse?.imageMyProfle ?? "",
+                          dataProvider!.cachedImageMap["imageMyProfle"],
+
                           imageKey: "imageMyProfle",
                         ),
                         SizedBox(

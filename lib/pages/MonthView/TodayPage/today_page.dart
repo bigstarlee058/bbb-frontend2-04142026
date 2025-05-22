@@ -316,7 +316,13 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                 //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
                 //   ),
                 // ),
-                Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageToday ?? "", imageKey: "imageToday", isDark: true),
+                Utils.appImage(
+                  media,
+                  // dataProvider?.screenBackgroundResponse?.imageToday ?? "",
+                  dataProvider!.cachedImageMap["imageToday"],
+
+                  imageKey: "imageToday",
+                ),
                 // Container(
                 //   height: media.height / 1,
                 //   width: media.width,
@@ -2606,9 +2612,6 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
 
     double totalWeight = 0;
     int exCount = 0;
-    double totalSet = 0;
-    double totalRIR = 0;
-
     double average = 0;
 
     if (monthProvider!.isPumpDay) {

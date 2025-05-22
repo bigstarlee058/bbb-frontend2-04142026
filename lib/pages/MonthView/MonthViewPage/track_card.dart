@@ -1029,7 +1029,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
                       child: Text(
-                        "Would you like to mark the rest day as complete?",
+                        "Would you like to choose today as a\nrest day?",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -1095,7 +1095,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                 ),
                               ),
                               child: Text(
-                                "Mark complete",
+                                "Confirm",
                                 style: TextStyle(
                                   fontSize: ScreenUtil.verticalScale(2),
                                   fontWeight: FontWeight.bold,

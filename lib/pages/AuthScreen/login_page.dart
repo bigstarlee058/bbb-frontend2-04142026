@@ -176,7 +176,8 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Utils.appImage(
                   media,
-                  dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                  // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                  dataProvider!.cachedImageMap["imageLogin"],
                   imageKey: "imageLogin",
                   child: Column(
                     children: [

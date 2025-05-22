@@ -247,8 +247,8 @@ class _WatchTutorialState extends State<WatchTutorial> with TickerProviderStateM
                                         ),
 
                                         AnimatedContainer(
-                                          duration: Duration(milliseconds: 1500),
-                                          curve: Curves.fastOutSlowIn,
+                                          duration: Duration(milliseconds: 1700),
+                                          curve: Curves.easeInOut,
                                           height: videoSize.height,
                                           width: videoSize.width,
                                           color: showControls ? Colors.black38 : Colors.transparent,
