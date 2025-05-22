@@ -1,7 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/screen_bg_model.dart';
-import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -11,7 +9,6 @@ import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Add this for shared preferences
 import 'package:video_player/video_player.dart';
 
 class OnBoardingPage extends StatefulWidget {
@@ -32,10 +29,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   void initState() {
     super.initState();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-
     // loadWelcomeContent();
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    _checkLoginStatus();
+    // _checkLoginStatus();
     _videoController =
         VideoPlayerController.asset('assets/videos/welcome_new.mp4', videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
           ..initialize().then((_) {
@@ -47,40 +43,40 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           });
   }
 
-  isFromNotification() async {
-    int? status = preferences.getInt(SharedPreference.fromNotification);
-    if (status == 1) {
-      await Navigator.pushNamed(context, '/exercise');
-    }
-  }
+  // isFromNotification() async {
+  //   int? status = preferences.getInt(SharedPreference.fromNotification);
+  //   if (status == 1) {
+  //     await Navigator.pushNamed(context, '/exercise');
+  //   }
+  // }
 
   // late WelcomeContentModel welcomeContentModel;
-
-  Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainPage(
-            welcomeDescription: '',
-            welcomeImageUrl: '',
-          ),
-        ),
-      );
-
-      // await _initializeFetchData().then(
-      //   (value) async {
-      //     if (monthProvider?.monthDataModel == null) {
-      //       await monthProvider?.onInit(context);
-      //
-      //     }
-      //   },
-      // );
-      await isFromNotification();
-    }
-  }
+  //
+  // Future<void> _checkLoginStatus() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  //   if (isLoggedIn) {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => const MainPage(
+  //           welcomeDescription: '',
+  //           welcomeImageUrl: '',
+  //         ),
+  //       ),
+  //     );
+  //
+  //     // await _initializeFetchData().then(
+  //     //   (value) async {
+  //     //     if (monthProvider?.monthDataModel == null) {
+  //     //       await monthProvider?.onInit(context);
+  //     //
+  //     //     }
+  //     //   },
+  //     // );
+  //     await isFromNotification();
+  //   }
+  // }
 
   // Future<void> _initializeFetchData() async {
   //   debugPrint("this  is initial state func");
@@ -166,18 +162,22 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Column(
-            children: dataProvider!.imageList.map((item) {
-              return Visibility(
-                visible: false,
-                child: Utils.appImage(
-                  media / 20,
-                  item["image"] ?? "",
-                  imageKey: item["key"] ?? "",
-                ),
-              );
-            }).toList(),
+          SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: Column(
+              children: dataProvider!.cachedSplashImageMap.entries.map((entry) {
+                return Visibility(
+                  visible: true,
+                  child: Utils.appImage(
+                    media / 25,
+                    entry.value,
+                    imageKey: entry.key,
+                  ),
+                );
+              }).toList(),
+            ),
           ),
           SizedBox(
             height: media.height / 1,
@@ -186,7 +186,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     alignment: Alignment.topCenter,
                     child: SizedBox(height: media.height / 1.37, child: VideoPlayer(_videoController)),
                   )
-                : Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageLogin ?? "", imageKey: "imageLogin"),
+                : Utils.appImage(
+                    media,
+                    // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                    dataProvider!.cachedImageMap["imageLogin"],
+
+                    imageKey: "imageLogin",
+                  ),
           ),
           Positioned(
             top: ScreenUtil.horizontalScale(50),
@@ -244,7 +250,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                                     height: media.height * .28,
                                   )
                                 : TextSlider(
-                                    slide: dataProvider!.screenBackgroundResponse?.slides ?? [],
+                                    slide: dataProvider!.screenBackgroundModel?.slides ?? [],
                                   ),
                             ButtonWidget(
                               text: 'Sign in',

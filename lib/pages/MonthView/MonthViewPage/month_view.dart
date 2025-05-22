@@ -48,10 +48,21 @@ class _MonthViewState extends State<MonthView> {
   late ProgramInfoProvider provider;
   ScrollController scrollController = ScrollController();
   final GlobalKey optionKey = GlobalKey();
+
+  bool _isPrecached = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isPrecached) {
+      precacheImage(dataProvider!.cachedImageMap["imageMonthView"]!, context);
+      _isPrecached = true;
+    }
+  }
+
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     provider = context.read<ProgramInfoProvider>();
@@ -146,7 +157,13 @@ class _MonthViewState extends State<MonthView> {
             //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
             //   ),
             // ),
-            Utils.appImage(media, dataProvider?.screenBackgroundResponse?.imageMonthView ?? "", imageKey: "imageMonthView", isDark: true),
+            Utils.appImage(
+              media,
+              // dataProvider?.screenBackgroundResponse?.imageMonthView ?? "",
+              dataProvider!.cachedImageMap["imageMonthView"],
+
+              imageKey: "imageMonthView",
+            ),
             // Container(
             //   height: media.height / 1,
             //   width: media.width,
@@ -260,6 +277,16 @@ class _MonthViewState extends State<MonthView> {
                                                           child: Image.asset("assets/img/month_hero1.png"),
                                                         ),
                                                       ),
+                                                      // child: SizedBox(
+                                                      //   height: media.height / 7.5,
+                                                      //   child: Center(
+                                                      //     child: Utils.appImage(
+                                                      //       Size(media.width, media.height / 7.5),
+                                                      //       monthProvider.monthTitleImage,
+                                                      //       imageKey: '',
+                                                      //     ),
+                                                      //   ),
+                                                      // ),
                                                     ),
                                                     Container(
                                                       margin: EdgeInsets.symmetric(

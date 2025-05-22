@@ -258,17 +258,18 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
 
         if (value == true && index == length - 1) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Future.delayed(const Duration(milliseconds: 300), () {
+            Future.delayed(const Duration(milliseconds: 100), () {
               if (_scrollController.hasClients) {
                 _scrollController.animateTo(
                   _scrollController.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 100),
                   curve: Curves.easeOut,
                 );
               }
             });
           });
         }
+
         // if (value == true) {
         //   WidgetsBinding.instance.addPostFrameCallback((_) {
         //     Future.delayed(const Duration(milliseconds: 300), () {

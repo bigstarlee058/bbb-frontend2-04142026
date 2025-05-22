@@ -120,7 +120,9 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                         // ),
                         Utils.appImage(
                           media,
-                          dataProvider?.screenBackgroundResponse?.imageApparel ?? "",
+                          // dataProvider?.screenBackgroundResponse?.imageApparel ?? "",
+                          dataProvider!.cachedImageMap["imageApparel"],
+
                           imageKey: "imageDashboard",
                         ),
                         SizedBox(

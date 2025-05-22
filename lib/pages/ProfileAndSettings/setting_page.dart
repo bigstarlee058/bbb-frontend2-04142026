@@ -84,7 +84,9 @@ class _SettingPageState extends State<SettingPage> {
                         // ),
                         Utils.appImage(
                           media,
-                          dataProvider?.screenBackgroundResponse?.imageSetting ?? "",
+                          // dataProvider?.screenBackgroundResponse?.imageSetting ?? "",
+                          dataProvider!.cachedImageMap["imageSetting"],
+
                           imageKey: "imageSetting",
                         ),
                         SizedBox(

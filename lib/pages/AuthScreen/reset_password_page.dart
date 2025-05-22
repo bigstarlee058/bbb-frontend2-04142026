@@ -116,7 +116,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               children: [
                 Utils.appImage(
                   media,
-                  dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
+                  // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
+                  dataProvider!.cachedImageMap["imageForgot"],
                   imageKey: "imageForgot",
                   child: Column(
                     children: [

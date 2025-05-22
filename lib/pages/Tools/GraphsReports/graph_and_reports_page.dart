@@ -6,7 +6,7 @@ import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/exerciselibrary.dart';
-import 'package:bbb/pages/Tools/GraphsReports/Charts/radar_chart.dart';
+import 'package:bbb/pages/Tools/GraphsReports/Charts/custom_radar.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_average_rir.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
@@ -122,7 +122,9 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
             // ),
             Utils.appImage(
               media,
-              dataProvider?.screenBackgroundResponse?.imageGraphs ?? "",
+              // dataProvider?.screenBackgroundResponse?.imageGraphs ?? "",
+              dataProvider!.cachedImageMap["imageGraphs"],
+
               imageKey: "imageGraphs",
             ),
             Container(

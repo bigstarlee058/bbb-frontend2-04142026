@@ -275,8 +275,8 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                           ),
 
                                           AnimatedContainer(
-                                            duration: Duration(milliseconds: 1500),
-                                            curve: Curves.fastOutSlowIn,
+                                            duration: Duration(milliseconds: 1700),
+                                            curve: Curves.easeInOut,
                                             color: showControls ? Colors.black38 : Colors.transparent,
                                             height: videoSize.height - 18,
                                             width: videoSize.width - 6,

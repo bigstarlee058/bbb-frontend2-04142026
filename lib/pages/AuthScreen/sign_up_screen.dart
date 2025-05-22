@@ -116,7 +116,8 @@ class _SignupPageState extends State<SignupPage> {
               children: [
                 Utils.appImage(
                   media,
-                  dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
+                  // dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
+                  dataProvider!.cachedImageMap["imageSignup"],
                   imageKey: "imageSignup",
                   child: Column(
                     children: [

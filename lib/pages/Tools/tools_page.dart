@@ -49,7 +49,8 @@ class _ToolsPageState extends State<ToolsPage> {
                       children: [
                         Utils.appImage(
                           media,
-                          dataProvider?.screenBackgroundResponse?.imageTools ?? "",
+                          // dataProvider?.screenBackgroundResponse?.imageTools ?? "",
+                          dataProvider!.cachedImageMap["imageTools"],
                           imageKey: "imageTools",
                         ),
 

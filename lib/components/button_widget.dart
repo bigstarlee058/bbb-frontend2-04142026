@@ -10,6 +10,7 @@ class ButtonWidget extends StatefulWidget {
     required this.color,
     required this.onPress,
     required this.isLoading,
+    this.icon,
   });
 
   final String text;
@@ -17,6 +18,7 @@ class ButtonWidget extends StatefulWidget {
   final Color textColor;
   final Function()? onPress;
   final bool isLoading;
+  final Widget? icon;
 
   @override
   State<ButtonWidget> createState() => _ButtonWidgetState();
@@ -48,13 +50,19 @@ class _ButtonWidgetState extends State<ButtonWidget> {
                   strokeWidth: 2.0,
                 ),
               )
-            : Text(
-                widget.text,
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(2.2),
-                  fontWeight: FontWeight.bold,
-                  color: widget.textColor,
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.text,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.verticalScale(2.2),
+                      fontWeight: FontWeight.bold,
+                      color: widget.textColor,
+                    ),
+                  ),
+                  widget.icon ?? SizedBox()
+                ],
               ),
       ),
     );

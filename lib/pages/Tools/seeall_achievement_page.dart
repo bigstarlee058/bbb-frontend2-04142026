@@ -55,7 +55,9 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                       children: [
                         Utils.appImage(
                           media,
-                          dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
+                          // dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
+                          dataProvider!.cachedImageMap["imageAchievement"],
+
                           imageKey: "imageAchievement",
                         ),
                         // Container(
@@ -171,16 +173,17 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     ),
                     child: Container(
                       width: media.width,
-                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                       child: GridView.builder(
-                        padding: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
+                        padding: EdgeInsets.only(
+                          top: ScreenUtil.verticalScale(3),
+                        ),
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: ScreenUtil.horizontalScale(1),
-                            mainAxisSpacing: ScreenUtil.horizontalScale(1),
-                            childAspectRatio: 0.8),
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.95,
+                        ),
                         itemCount: monthProvider?.items.length,
                         itemBuilder: (context, index) {
                           return _buildGridItem(monthProvider!.items[index], index);
@@ -216,8 +219,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              height: ScreenUtil.verticalScale(9),
-              width: ScreenUtil.verticalScale(9),
+              height: ScreenUtil.verticalScale(12),
+              width: ScreenUtil.verticalScale(12),
               child: SvgPicture.asset(
                 item["image"]!,
                 colorFilter: ColorFilter.mode(item["isArchived"]! == true ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
@@ -231,7 +234,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.45),
+                fontSize: ScreenUtil.verticalScale(1.8),
                 color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.bold,
               ),
@@ -244,7 +247,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.visible,
                 style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.1),
+                  fontSize: ScreenUtil.verticalScale(1.5),
                   color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                   fontWeight: FontWeight.w500,
                 ),

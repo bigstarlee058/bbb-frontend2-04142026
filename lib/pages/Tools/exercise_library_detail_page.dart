@@ -292,8 +292,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                                 ),
 
                                                 AnimatedContainer(
-                                                  duration: Duration(milliseconds: 1500),
-                                                  curve: Curves.fastOutSlowIn,
+                                                  duration: Duration(milliseconds: 1700),
+                                                  curve: Curves.easeInOut,
                                                   color: showControls ? Colors.black38 : Colors.transparent,
                                                   height: videoSize?.height,
                                                   width: videoSize?.width,
