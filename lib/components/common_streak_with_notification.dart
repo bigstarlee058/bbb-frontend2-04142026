@@ -34,34 +34,40 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
             // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
             // mainPageProvider.changeTab(4);
           },
-          icon: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: ScreenUtil.verticalScale(2.2),
-                width: ScreenUtil.verticalScale(2.2),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white),
-                ),
-                child: Center(
-                  child: Text(
-                    '${streak.streak}',
-                    style: TextStyle(
-                      fontSize: ScreenUtil.verticalScale(1.4),
-                      height: 0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+          icon: Container(
+            height: ScreenUtil.verticalScale(2.2),
+            width: ScreenUtil.verticalScale(4.8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: ScreenUtil.verticalScale(2.2),
+                  width: ScreenUtil.verticalScale(2.2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${streak.streak}',
+                      style: TextStyle(
+                        fontSize: ScreenUtil.verticalScale(1.4),
+                        height: 0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Icon(
-                Icons.local_fire_department_outlined,
-                color: Colors.white,
-                size: ScreenUtil.verticalScale(3),
-              )
-            ],
+                Center(
+                  child: Icon(
+                    Icons.local_fire_department_outlined,
+                    color: Colors.white,
+                    size: ScreenUtil.verticalScale(2.5),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
 

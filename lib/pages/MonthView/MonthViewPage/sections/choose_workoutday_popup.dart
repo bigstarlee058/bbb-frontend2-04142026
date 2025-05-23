@@ -307,8 +307,10 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                   bottom: videoSize.height / 2.25,
                                   left: 15,
                                   right: 15,
-                                  child: Visibility(
-                                    visible: showControls,
+                                  child: AnimatedOpacity(
+                                    opacity: showControls ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 800),
+                                    curve: Curves.easeInOut,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [

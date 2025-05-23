@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -277,4 +279,496 @@ Future<void> showCupertinoHeightPicker({
       );
     },
   );
+}
+
+Future<void> showCupertinoWaistPicker({
+  Key? key,
+  required BuildContext context,
+  required Function(double) onWaistChanged,
+  double initialWaist = 80.0,
+  WaistUnit initialSelectedWaistUnit = WaistUnit.cm,
+  bool canConvertUnit = true,
+  double modalHeight = 300,
+  double? maxModalWidth,
+  Color? modalBackgroundColor,
+  Color barrierColor = kCupertinoModalBarrierColor,
+}) async {
+  return await showCupertinoModalPopup<void>(
+    context: context,
+    barrierColor: barrierColor,
+    builder: (context) {
+      return Theme(
+        data: Theme.of(context).copyWith(primaryColor: Colors.white),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: SizedBox(
+            height: modalHeight,
+            width: maxModalWidth ?? double.infinity,
+            child: ColoredBox(
+              color: modalBackgroundColor ?? CupertinoColors.systemBackground.resolveFrom(context),
+              child: WaistPicker(
+                key: key,
+                initialWaist: initialWaist.toInt(),
+                initialSelectedWaistUnit: initialSelectedWaistUnit,
+                canConvertUnit: canConvertUnit,
+                onWaistChanged: onWaistChanged,
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+Future<void> showCupertinoHipPicker({
+  Key? key,
+  required BuildContext context,
+  required Function(int) onHipChanged,
+  double initialHip = 90.0,
+  HipUnit initialSelectedHipUnit = HipUnit.cm,
+  bool canConvertUnit = true,
+  double modalHeight = 300,
+  double? maxModalWidth,
+  Color? modalBackgroundColor,
+  Color barrierColor = kCupertinoModalBarrierColor,
+}) async {
+  return await showCupertinoModalPopup<void>(
+    context: context,
+    barrierColor: barrierColor,
+    builder: (context) {
+      return Theme(
+        data: Theme.of(context).copyWith(primaryColor: Colors.white),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: SizedBox(
+            height: modalHeight,
+            width: maxModalWidth ?? double.infinity,
+            child: ColoredBox(
+              color: modalBackgroundColor ?? CupertinoColors.systemBackground.resolveFrom(context),
+              child: HipPicker(
+                key: key,
+                initialHip: initialHip.toInt(),
+                initialSelectedHipUnit: initialSelectedHipUnit,
+                canConvertUnit: canConvertUnit,
+                onHipChanged: onHipChanged,
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+Future<void> showCupertinoMidThighPicker({
+  Key? key,
+  required BuildContext context,
+  required Function(int) onMidThighChanged,
+  double initialMidThigh = 50,
+  MidThighUnit initialSelectedMidThighUnit = MidThighUnit.cm,
+  bool canConvertUnit = true,
+  double modalHeight = 300,
+  double? maxModalWidth,
+  Color? modalBackgroundColor,
+  Color barrierColor = kCupertinoModalBarrierColor,
+}) async {
+  return await showCupertinoModalPopup<void>(
+    context: context,
+    barrierColor: barrierColor,
+    builder: (context) {
+      return Theme(
+        data: Theme.of(context).copyWith(primaryColor: Colors.white),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: SizedBox(
+            height: modalHeight,
+            width: maxModalWidth ?? double.infinity,
+            child: ColoredBox(
+              color: modalBackgroundColor ?? CupertinoColors.systemBackground.resolveFrom(context),
+              child: MidThighPicker(
+                key: key,
+                initialMidThigh: initialMidThigh.toInt(),
+                initialSelectedMidThighUnit: initialSelectedMidThighUnit,
+                canConvertUnit: canConvertUnit,
+                onMidThighChanged: onMidThighChanged,
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+enum WaistUnit { inches, cm }
+
+class WaistPicker extends StatefulWidget {
+  final int initialWaist;
+  final WaistUnit initialSelectedWaistUnit;
+  final bool canConvertUnit;
+  final Function(double) onWaistChanged;
+  const WaistPicker({
+    super.key,
+    required this.initialWaist,
+    required this.initialSelectedWaistUnit,
+    required this.canConvertUnit,
+    required this.onWaistChanged,
+  });
+
+  @override
+  State<WaistPicker> createState() => _WaistPickerState();
+}
+
+class _WaistPickerState extends State<WaistPicker> {
+  late WaistUnit _currentUnit;
+  late FixedExtentScrollController _mainController;
+  late FixedExtentScrollController _unitController;
+
+  int _selectedHip = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUnit = widget.initialSelectedWaistUnit;
+    _selectedHip = widget.initialWaist;
+
+    int initialItem = _currentUnit == WaistUnit.cm ? widget.initialWaist - 76 : widget.initialWaist - 30;
+
+    _mainController = FixedExtentScrollController(initialItem: widget.initialWaist);
+    _unitController = FixedExtentScrollController(
+      initialItem: _currentUnit == WaistUnit.cm ? 1 : 0,
+    );
+  }
+
+  void _onMainChanged(int index) {
+    setState(() {
+      _selectedHip = _currentUnit == WaistUnit.cm ? index + 76 : index + 30;
+    });
+  }
+
+  void _onUnitChanged(int index) {
+    setState(() {
+      _currentUnit = index == 0 ? WaistUnit.inches : WaistUnit.cm;
+      int newIndex = _currentUnit == HipUnit.cm ? (_selectedHip - 76).clamp(0, 76) : (_selectedHip - 30).clamp(0, 30);
+      _mainController.jumpToItem(newIndex);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> cmItems = List.generate(
+      77,
+      (i) => Center(child: Text("${i + 76}", style: const TextStyle(fontSize: 18))),
+    );
+    final List<Widget> inchItems = List.generate(
+      31,
+      (i) => Center(child: Text("${i + 30}", style: const TextStyle(fontSize: 18))),
+    );
+
+    return Scaffold(
+      body: Column(
+        children: [
+          SizedBox(
+            height: 200,
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoPicker(
+                    itemExtent: 32,
+                    scrollController: _mainController,
+                    onSelectedItemChanged: _onMainChanged,
+                    children: _currentUnit == WaistUnit.cm ? cmItems : inchItems,
+                  ),
+                ),
+                if (widget.canConvertUnit)
+                  Expanded(
+                    child: CupertinoPicker(
+                      itemExtent: 32,
+                      scrollController: _unitController,
+                      onSelectedItemChanged: _onUnitChanged,
+                      children: const [
+                        Center(child: Text("Inches", style: TextStyle(fontSize: 18))),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ButtonWidget(
+              text: "Set",
+              textColor: Colors.white,
+              color: AppColors.primaryColor,
+              onPress: () {
+                Navigator.pop(context);
+                widget.onWaistChanged(_selectedHip.toDouble()); // return only the number
+              },
+              isLoading: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum HipUnit { inches, cm }
+
+class HipPicker extends StatefulWidget {
+  final int initialHip; // change to int for clarity
+  final HipUnit initialSelectedHipUnit;
+  final bool canConvertUnit;
+  final Function(int) onHipChanged;
+
+  const HipPicker({
+    super.key,
+    required this.initialHip,
+    required this.initialSelectedHipUnit,
+    required this.canConvertUnit,
+    required this.onHipChanged,
+  });
+
+  @override
+  State<HipPicker> createState() => _HipPickerState();
+}
+
+class _HipPickerState extends State<HipPicker> {
+  late HipUnit _currentUnit;
+  late FixedExtentScrollController _mainController;
+  late FixedExtentScrollController _unitController;
+
+  int _selectedHip = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUnit = widget.initialSelectedHipUnit;
+    _selectedHip = widget.initialHip;
+
+    int initialItem = _currentUnit == HipUnit.cm ? widget.initialHip - 76 : widget.initialHip - 30;
+
+    _mainController = FixedExtentScrollController(initialItem: widget.initialHip);
+    _unitController = FixedExtentScrollController(
+      initialItem: _currentUnit == HipUnit.cm ? 1 : 0,
+    );
+  }
+
+  void _onMainChanged(int index) {
+    setState(() {
+      _selectedHip = _currentUnit == HipUnit.cm ? index + 76 : index + 30;
+    });
+  }
+
+  void _onUnitChanged(int index) {
+    setState(() {
+      _currentUnit = index == 0 ? HipUnit.inches : HipUnit.cm;
+      int newIndex = _currentUnit == HipUnit.cm ? (_selectedHip - 76).clamp(0, 76) : (_selectedHip - 30).clamp(0, 30);
+      _mainController.jumpToItem(newIndex);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> cmItems = List.generate(
+      77,
+      (i) => Center(child: Text("${i + 76}", style: const TextStyle(fontSize: 18))),
+    );
+    final List<Widget> inchItems = List.generate(
+      31,
+      (i) => Center(child: Text("${i + 30}", style: const TextStyle(fontSize: 18))),
+    );
+
+    return Scaffold(
+      body: Column(
+        children: [
+          SizedBox(
+            height: 200,
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoPicker(
+                    itemExtent: 32,
+                    scrollController: _mainController,
+                    onSelectedItemChanged: _onMainChanged,
+                    children: _currentUnit == HipUnit.cm ? cmItems : inchItems,
+                  ),
+                ),
+                if (widget.canConvertUnit)
+                  Expanded(
+                    child: CupertinoPicker(
+                      itemExtent: 32,
+                      scrollController: _unitController,
+                      onSelectedItemChanged: _onUnitChanged,
+                      children: const [
+                        Center(child: Text("Inches", style: TextStyle(fontSize: 18))),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ButtonWidget(
+              text: "Set",
+              textColor: Colors.white,
+              color: AppColors.primaryColor,
+              onPress: () {
+                Navigator.pop(context);
+                widget.onHipChanged(_selectedHip); // return only the number
+              },
+              isLoading: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum MidThighUnit { inches, cm }
+
+class MidThighPicker extends StatefulWidget {
+  final int initialMidThigh;
+  final MidThighUnit initialSelectedMidThighUnit;
+  final bool canConvertUnit;
+  final Function(int) onMidThighChanged;
+
+  const MidThighPicker({
+    super.key,
+    required this.initialMidThigh,
+    required this.initialSelectedMidThighUnit,
+    required this.canConvertUnit,
+    required this.onMidThighChanged,
+  });
+
+  @override
+  State<MidThighPicker> createState() => _MidThighPickerState();
+}
+
+class _MidThighPickerState extends State<MidThighPicker> {
+  late int _midThighValue;
+  late MidThighUnit _currentUnit;
+  late FixedExtentScrollController _mainController;
+  late FixedExtentScrollController _unitController;
+  bool _isConverting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _midThighValue = widget.initialMidThigh;
+    _currentUnit = widget.initialSelectedMidThighUnit;
+
+    if (_currentUnit == MidThighUnit.inches) {
+      _mainController = FixedExtentScrollController(initialItem: _midThighValue - 10);
+      _unitController = FixedExtentScrollController(initialItem: 0);
+    } else {
+      _mainController = FixedExtentScrollController(initialItem: _midThighValue - 20);
+      _unitController = FixedExtentScrollController(initialItem: 1);
+    }
+  }
+
+  @override
+  void dispose() {
+    _mainController.dispose();
+    _unitController.dispose();
+    super.dispose();
+  }
+
+  void _onMainChanged(int index) {
+    if (_isConverting) return;
+    setState(() {
+      _midThighValue = _currentUnit == MidThighUnit.inches ? index + 10 : index + 20;
+      log('_midThighValue ==> $_midThighValue ($_currentUnit)');
+    });
+  }
+
+  Future<void> _onUnitChanged(int index) async {
+    if (_isConverting) return;
+    setState(() {
+      _isConverting = true;
+    });
+
+    if (index == 0 && _currentUnit != MidThighUnit.inches) {
+      _currentUnit = MidThighUnit.inches;
+      await _mainController.animateToItem(
+        _midThighValue - 10,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    } else if (index == 1 && _currentUnit != MidThighUnit.cm) {
+      _currentUnit = MidThighUnit.cm;
+      await _mainController.animateToItem(
+        _midThighValue - 20,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+
+    setState(() {
+      _isConverting = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> cmItems = List.generate(
+      80,
+      (i) => Center(child: Text("${i + 20}", style: const TextStyle(fontSize: 18))),
+    );
+    final List<Widget> inchItems = List.generate(
+      40,
+      (i) => Center(child: Text("${i + 10}", style: const TextStyle(fontSize: 18))),
+    );
+
+    return Scaffold(
+      body: Column(
+        children: [
+          SizedBox(
+            height: 200,
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoPicker(
+                    itemExtent: 32,
+                    scrollController: _mainController,
+                    onSelectedItemChanged: _onMainChanged,
+                    children: _currentUnit == MidThighUnit.inches ? inchItems : cmItems,
+                  ),
+                ),
+                if (widget.canConvertUnit)
+                  Expanded(
+                    child: CupertinoPicker(
+                      itemExtent: 32,
+                      scrollController: _unitController,
+                      onSelectedItemChanged: _onUnitChanged,
+                      children: const [
+                        Center(child: Text("Inches", style: TextStyle(fontSize: 18))),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ButtonWidget(
+              text: "Set",
+              textColor: Colors.white,
+              color: AppColors.primaryColor,
+              onPress: () {
+                Navigator.pop(context);
+                log('_midThighValue========d==>>>>>${_midThighValue}');
+
+                widget.onMidThighChanged(_midThighValue);
+              },
+              isLoading: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

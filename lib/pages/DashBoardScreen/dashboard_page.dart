@@ -201,7 +201,7 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 Consumer<UserDataProvider>(builder: (context, userData, child) {
                   return AppBar(
-                    toolbarHeight: ScreenUtil.verticalScale(5.1),
+                    toolbarHeight: ScreenUtil.verticalScale(4),
                     surfaceTintColor: Colors.transparent,
                     backgroundColor: Colors.transparent,
                     centerTitle: false,

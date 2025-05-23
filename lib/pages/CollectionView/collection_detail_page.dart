@@ -86,21 +86,21 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
     var media = MediaQuery.of(context).size;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            disabledBackgroundColor: const Color(0xFFF3F3F3),
-            backgroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(ScreenUtil.verticalScale(12)),
-              ),
-              side: const BorderSide(color: Color(0x12000000), width: 0.5),
-            ),
-            surfaceTintColor: Colors.transparent,
-            overlayColor: Colors.grey.shade400,
-            padding: EdgeInsets.zero),
-        onPressed: () {
+      child: GestureDetector(
+        // style: ElevatedButton.styleFrom(
+        //     disabledBackgroundColor: const Color(0xFFF3F3F3),
+        //     backgroundColor: Colors.white,
+        //     elevation: 0,
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.all(
+        //         Radius.circular(ScreenUtil.verticalScale(12)),
+        //       ),
+        //       side: const BorderSide(color: Color(0x12000000), width: 0.5),
+        //     ),
+        //     surfaceTintColor: Colors.transparent,
+        //     overlayColor: Colors.grey.shade400,
+        //     padding: EdgeInsets.zero),
+        onTap: () {
           _launchURL(link);
         },
         child: Container(
@@ -108,12 +108,12 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
           height: ScreenUtil.verticalScale(11),
           decoration: BoxDecoration(
             color: Colors.white,
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Colors.black12,
                 spreadRadius: 1,
-                blurRadius: 5,
                 offset: Offset(0, 1),
+                color: Colors.black12,
+                blurRadius: 5,
               ),
             ],
             // border: Border.all(color: AppColors.primaryColor),

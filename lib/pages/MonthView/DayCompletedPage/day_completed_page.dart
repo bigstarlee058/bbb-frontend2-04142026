@@ -36,7 +36,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   double averageRIR = 0;
   String time = "";
   bool loader = true;
-
+  bool isOnTap = false;
   List<String> getLast7DayNames() {
     List<String> dayNames = [];
     for (int i = 0; i < 7; i++) {
@@ -47,11 +47,17 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     return dayNames;
   }
 
+  updateOnTap(bool value) {
+    isOnTap = value;
+    setState(() {});
+  }
+
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => onInit());
+
     super.initState();
   }
 
@@ -445,34 +451,56 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       ),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7))
-                            .copyWith(bottom: ScreenUtil.verticalScale(2.5), top: ScreenUtil.verticalScale(1.5)),
-                        child: ButtonWidget(
-                          icon: Padding(
-                            padding: const EdgeInsets.only(left: 5),
-                            child: Icon(
-                              Icons.share_outlined,
-                              color: Colors.grey.shade500,
+                            .copyWith(bottom: ScreenUtil.verticalScale(3.2), top: ScreenUtil.verticalScale(1.5)),
+                        child: GestureDetector(
+                          onTap: isOnTap
+                              ? null
+                              : () async {
+                                  updateOnTap(true);
+                                  try {
+                                    await screenshotController.capture(delay: Duration(milliseconds: 200)).then(
+                                      (image) async {
+                                        if (image == null) return;
+                                        final directory = await getTemporaryDirectory();
+                                        final imagePath = File('${directory.path}/screenshot.png');
+                                        await imagePath.writeAsBytes(image);
+                                        await Share.shareXFiles([XFile(imagePath.path)], text: 'Congratulations!').then(
+                                          (value) {
+                                            updateOnTap(false);
+                                          },
+                                        );
+                                      },
+                                    );
+                                  } catch (e) {
+                                    debugPrint('Error capturing and sharing screenshot: $e');
+                                  }
+                                },
+                          // style: ElevatedButton.styleFrom(
+                          //   backgroundColor: Color(0xC8FFFFFF),
+                          //   shape: Utils.buttonStyle,
+                          //   padding: EdgeInsets.symmetric(
+                          //     vertical: ScreenUtil.verticalScale(1.7),
+                          //   ),
+                          // ),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: ScreenUtil.verticalScale(1.7),
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: Utils.buttonRadius,
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Share",
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.verticalScale(2.2),
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
                             ),
                           ),
-                          text: "Share",
-                          textColor: Colors.grey.shade500,
-                          onPress: () async {
-                            try {
-                              await screenshotController.capture(delay: Duration(milliseconds: 200)).then(
-                                (image) async {
-                                  if (image == null) return;
-                                  final directory = await getTemporaryDirectory();
-                                  final imagePath = File('${directory.path}/screenshot.png');
-                                  await imagePath.writeAsBytes(image);
-                                  await Share.shareXFiles([XFile(imagePath.path)], text: 'Congratulations!');
-                                },
-                              );
-                            } catch (e) {
-                              debugPrint('Error capturing and sharing screenshot: $e');
-                            }
-                          },
-                          color: const Color(0xC8FFFFFF),
-                          isLoading: false,
                         ),
                       ),
                     ],

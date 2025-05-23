@@ -5,46 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fda79f2a-562b-4806-9ddf-4d3b91527bdd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/Charts/report_time_spent.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/../.flutter-plugins-dependencies" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/components/athletes_list_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/athletes_list_widget.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/components/staff_list_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/staff_list_widget.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/components/streak_calendar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/streak_calendar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/components/timer_with_progress.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/timer_with_progress.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/components/warmup_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/warmup_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/components/weekly_track_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/weekly_track_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/Charts/time_spent.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Charts/time_spent.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/Charts/weight_lifted.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Charts/weight_lifted.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/exercise_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/exercise_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/add_notes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/add_notes.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/back_off_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/back_off_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/custom_video_controls.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/custom_video_controls.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/equipment_section.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/equipment_section.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/normal_set_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ExerciseView/widgets/normal_set_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/circuits_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/circuits_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_completed_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_completed_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_overview_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/day_overview_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/monthly_view_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/monthly_view_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthlyView/today_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthlyView/today_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/appInsightsSettings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/appInsightsSettings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/kotlinc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/components/common_streak_with_notification.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/common_streak_with_notification.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/CollectionView/collection_detail_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/CollectionView/collection_detail_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/dashboard_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/dashboard_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthView/MonthViewPage/track_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthView/MonthViewPage/track_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/height_picker.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/height_picker.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/myprofile_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/myprofile_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/Tools/graph_and_reports_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Tools/GraphsReports/graph_and_reports_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/calendar_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/calendar_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/dashboard_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/dashboard_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/1_new.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/1_new.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/3_new_today_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/3_new_today_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/4_new_excerise_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/4_new_excerise_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/Widgets/4_1_new_exercise_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/Widgets/4_1_new_exercise_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Month/new_day_completed_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Month/new_day_completed_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/new/Providers/month_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/new/Providers/month_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/providers/data_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/data_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/providers/exercise_history_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/exercise_history_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/providers/pump_day_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/pump_day_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/providers/user_data_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/user_data_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/providers/weekly_graph_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/weekly_graph_provider.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,11 +27,18 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=RZ8M926RWHV)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=Default, isTemplate=false, identifier=serial=192.168.29.184:5555;connection=149bd36e)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view />
+      </state>
+    </system>
   </component>
   <component name="GenerateSignedApkSettings">
     <option name="KEY_STORE_PATH" value="$PROJECT_DIR$/../../../JKS/keystore.jks" />
@@ -68,9 +48,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2sLLt5vgCDQWEpCoFr6MZYEYiXI" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -85,9 +65,11 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
+    "com.google.services.firebase.aqiPopupShown": "true",
     "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "nevil",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/user/Desktop/bbb/bbb-frontend/android",
+    "last_opened_file_path": "/Users/user/Desktop/bbb/bbb-frontend2/android",
     "show.migrate.to.gradle.popup": "false"
   },
   "keyToStringList": {
