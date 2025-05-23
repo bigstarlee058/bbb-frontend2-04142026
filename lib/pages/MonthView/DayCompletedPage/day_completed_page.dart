@@ -451,7 +451,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       ),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7))
-                            .copyWith(bottom: ScreenUtil.verticalScale(2.5), top: ScreenUtil.verticalScale(1.5)),
+                            .copyWith(bottom: ScreenUtil.verticalScale(3.2), top: ScreenUtil.verticalScale(1.5)),
                         child: GestureDetector(
                           onTap: isOnTap
                               ? null

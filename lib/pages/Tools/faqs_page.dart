@@ -186,7 +186,7 @@ class _FAQsPageState extends State<FAQsPage> {
                                   : ListView.separated(
                                       separatorBuilder: (context, index) => SizedBox(height: 15),
                                       shrinkWrap: true,
-                                      padding: EdgeInsets.zero,
+                                      padding: EdgeInsets.only(top: 0, bottom: ScreenUtil.verticalScale(3.2)),
                                       physics: NeverScrollableScrollPhysics(),
                                       itemCount: dataProvider!.faQsModel.length,
                                       itemBuilder: (context, index) {
@@ -257,7 +257,7 @@ class _FAQsPageState extends State<FAQsPage> {
 
           if (value && index == dataProvider!.faQsModel.length - 1) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Future.delayed(const Duration(milliseconds: 100), () {
+              Future.delayed(const Duration(milliseconds: 200), () {
                 if (_scrollController.hasClients) {
                   _scrollController.animateTo(
                     _scrollController.position.maxScrollExtent,

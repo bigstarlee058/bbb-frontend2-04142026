@@ -199,7 +199,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               separatorBuilder: (context, index) => SizedBox(height: 15),
-                              padding: EdgeInsets.symmetric(vertical: 12),
+                              padding: EdgeInsets.symmetric(vertical: 12).copyWith(bottom: ScreenUtil.verticalScale(3.2)),
                               itemCount: items.length,
                               itemBuilder: (context, index) {
                                 return buildExpansionTileItem(index, items[index], items.length);
@@ -258,7 +258,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
 
         if (value == true && index == length - 1) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Future.delayed(const Duration(milliseconds: 100), () {
+            Future.delayed(const Duration(milliseconds: 200), () {
               if (_scrollController.hasClients) {
                 _scrollController.animateTo(
                   _scrollController.position.maxScrollExtent,
