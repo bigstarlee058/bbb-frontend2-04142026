@@ -915,59 +915,57 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
             opacity: showControls ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOut,
-            child: showControls
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      // Skip backward button
-                      IconButton(
-                        iconSize: 40,
-                        icon: const Icon(
-                          Icons.replay_10,
-                          color: Colors.white70,
-                        ),
-                        onPressed: () {
-                          _videoPlayerController.seekTo(
-                            _videoPlayerController.value.position - const Duration(seconds: 10),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        iconSize: 60,
-                        icon: Icon(
-                          _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                          color: Colors.white70,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            if (_videoPlayerController.value.isPlaying) {
-                              _videoPlayerController.pause();
-                              showControlsOnTapOfPause();
-                              AudioManager.abandonAudioFocus();
-                            } else {
-                              _videoPlayerController.play();
-                              hideControls();
-                              AudioManager.requestAudioFocus();
-                            }
-                          });
-                        },
-                      ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // Skip backward button
+                IconButton(
+                  iconSize: 40,
+                  icon: const Icon(
+                    Icons.replay_10,
+                    color: Colors.white70,
+                  ),
+                  onPressed: () {
+                    _videoPlayerController.seekTo(
+                      _videoPlayerController.value.position - const Duration(seconds: 10),
+                    );
+                  },
+                ),
+                IconButton(
+                  iconSize: 60,
+                  icon: Icon(
+                    _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                    color: Colors.white70,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (_videoPlayerController.value.isPlaying) {
+                        _videoPlayerController.pause();
+                        showControlsOnTapOfPause();
+                        AudioManager.abandonAudioFocus();
+                      } else {
+                        _videoPlayerController.play();
+                        hideControls();
+                        AudioManager.requestAudioFocus();
+                      }
+                    });
+                  },
+                ),
 
-                      IconButton(
-                        iconSize: 40,
-                        icon: const Icon(
-                          Icons.forward_10,
-                          color: Colors.white70,
-                        ),
-                        onPressed: () {
-                          _videoPlayerController.seekTo(
-                            _videoPlayerController.value.position + const Duration(seconds: 10),
-                          );
-                        },
-                      ),
-                    ],
-                  )
-                : const SizedBox(),
+                IconButton(
+                  iconSize: 40,
+                  icon: const Icon(
+                    Icons.forward_10,
+                    color: Colors.white70,
+                  ),
+                  onPressed: () {
+                    _videoPlayerController.seekTo(
+                      _videoPlayerController.value.position + const Duration(seconds: 10),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         )
       : const SizedBox();

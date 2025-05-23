@@ -660,33 +660,40 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           extentRatio: 0.22,
           motion: const ScrollMotion(),
           children: [
-            SizedBox(
-              width: ScreenUtil.horizontalScale(2),
-            ),
-            SizedBox(
-              height: ScreenUtil.verticalScale(4),
-              width: ScreenUtil.verticalScale(4),
+            Container(
+              color: Colors.white,
               child: Row(
                 children: [
-                  SlidableAction(
-                    onPressed: (context) async {
-                      if (monthProvider.weekStatuses[mainIndex!] != WeekType.currentWeek) return;
-                      await Future.delayed(Duration(milliseconds: 300)).then(
-                        (v) async {
-                          monthProvider.changeIsPumpDay(false);
-                          monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
-                          monthProvider.overviewCurrentDay = index + 1;
-                          monthProvider.dayDataModel = dayData;
-                          monthProvider.weekDataModel = weekDataModel;
-                          await deletePumpDayData();
-                        },
-                      );
-                    },
-                    icon: Icons.swap_horiz,
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.all(0),
-                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                  SizedBox(
+                    width: ScreenUtil.horizontalScale(2),
+                  ),
+                  SizedBox(
+                    height: ScreenUtil.verticalScale(4),
+                    width: ScreenUtil.verticalScale(4),
+                    child: Row(
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) async {
+                            if (monthProvider.weekStatuses[mainIndex!] != WeekType.currentWeek) return;
+                            await Future.delayed(Duration(milliseconds: 300)).then(
+                              (v) async {
+                                monthProvider.changeIsPumpDay(false);
+                                monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
+                                monthProvider.overviewCurrentDay = index + 1;
+                                monthProvider.dayDataModel = dayData;
+                                monthProvider.weekDataModel = weekDataModel;
+                                await deletePumpDayData();
+                              },
+                            );
+                          },
+                          icon: Icons.swap_horiz,
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.all(0),
+                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

@@ -367,8 +367,10 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                               bottom: videoSize!.height / 2,
                               left: 10,
                               right: 10,
-                              child: Visibility(
-                                visible: showControls,
+                              child: AnimatedOpacity(
+                                opacity: showControls ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 800),
+                                curve: Curves.easeInOut,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [

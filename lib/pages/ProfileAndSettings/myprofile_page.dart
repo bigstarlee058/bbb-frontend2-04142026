@@ -1,3 +1,5 @@
+///my...
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -32,8 +34,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
   String? selectedName = "";
   DateTime? selectedDate;
   TextEditingController selectedWeight = TextEditingController();
+  TextEditingController selectedBodyFat = TextEditingController();
   String? selectedGender;
   TextEditingController selectedHeight = TextEditingController();
+  TextEditingController selectedMidThigh = TextEditingController();
+  TextEditingController selectedWaist = TextEditingController();
+  TextEditingController selectedHip = TextEditingController();
   String? selectedLocation;
   String? selectedGoal;
   String? _id;
@@ -41,7 +47,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   UserDataProvider? userData;
   double heightInCm = 183;
+  double waistInCm = 31;
+  double hipInCm = 30;
+  double midThigh = 30;
   HeightUnit selectedHeightUnit = HeightUnit.cm;
+  WaistUnit selectedWaistUnit = WaistUnit.inches;
+  HipUnit selectedHipUnit = HipUnit.inches;
   bool canConvertUnit = true;
   bool showSeparationText = true;
 
@@ -76,10 +87,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
       selectedName = userData1["name"];
       selectedDate = userData1["detail"]['dob'] == null ? null : DateTime.parse(userData1["detail"]['dob']);
       selectedWeight.text =
-          userData1["detail"]["weight"] == null ? "" : '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
+          userData1["detail"]["weight"] == null ? "0" : '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
+      selectedBodyFat.text =
+          userData1["detail"]["bodyfat"] == null ? "0" : '${userData1["detail"]["bodyfat"]}'; //'${userData['detail']['weight']}';
+
       selectedHeight.text = userData1["detail"]["height"] == null
-          ? ""
+          ? "0"
           : '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"'; //'${userData['detail']['height']}\'0"';
+      selectedMidThigh.text = userData1["detail"]["midthigh"] == null ? "0" : "${userData1["detail"]["midthigh"].toString()}\"";
+      selectedHip.text = userData1["detail"]["hip"] == null ? "${0}\"" : "${userData1["detail"]["hip"].toString()}\"";
+      selectedWaist.text = userData1["detail"]["waist"] == null ? "0" : "${userData1["detail"]["waist"].toString()}\"";
 
       heightInCm = userData1["detail"]["height"] == null
           ? 183
@@ -87,6 +104,25 @@ class _MyProfilePageState extends State<MyProfilePage> {
               int.parse(userData1["detail"]["height"].toString()[0]),
               double.parse(
                   "${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"));
+      waistInCm = userData1["detail"]["waist"] == null
+          ? 31
+          : convertToInches(
+              int.parse(userData1["detail"]["waist"].toString()[0]),
+              double.parse(
+                  "${userData1["detail"]["waist"].toString()[1]}${userData1["detail"]["waist"].toString().length > 2 ? userData1["detail"]["waist"].toString()[2] : ""}"));
+      // hipInCm = userData1["detail"]["hip"] == null
+      //     ? 31
+      //     : convertToInches(
+      //         int.parse(userData1["detail"]["hip"].toString()[0]),
+      //         double.parse(
+      //             "${userData1["detail"]["hip"].toString()[1]}${userData1["detail"]["hip"].toString().length > 2 ? userData1["detail"]["hip"].toString()[2] : ""}"));
+      // midThigh = userData1["detail"]["midthigh"] == null
+      //     ? 31
+      //     : convertToInches(
+      //         int.parse(userData1["detail"]["midthigh"].toString()[0]),
+      //         double.parse(
+      //             "${userData1["detail"]["midthigh"].toString()[1]}${userData1["detail"]["midthigh"].toString().length > 2 ? userData1["detail"]["midthigh"].toString()[2] : ""}"));
+
       selectedLocation = userData1['detail']['location'] ?? "";
       _imageUrl = userData1['detail']['avatarUrl'] ?? "";
       selectedGender = genderOptions[userData1['detail']['sex'] == null
@@ -129,7 +165,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'avatarUrl': _imageUrl ?? '',
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
-      'city': locationProvider.selectedCityController.text
+      'city': locationProvider.selectedCityController.text,
+      'waist': int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'hip': int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'midthigh': int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'bodyfat': int.parse(selectedBodyFat.text.split(' ')[0]),
     };
     if (kDebugMode) {
       print('HERE IS USERDETAIL##, $userDetails');
@@ -179,6 +219,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         //       opacity: 1,
                         //     ),
                         //   ),
+                        // ),
                         // ),
                         Utils.appImage(
                           media,
@@ -420,6 +461,30 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               value: selectedWeight,
                               hint: '81',
                             ),
+                            _waistPicker(
+                              context: context,
+                              label: 'Waist',
+                              value: selectedWaist,
+                              hint: '3\'1"',
+                            ),
+                            _hipPicker(
+                              context: context,
+                              label: 'Hip',
+                              value: selectedHip,
+                              hint: '3\'1"',
+                            ),
+                            _midThighPicker(
+                              context: context,
+                              label: 'Mid-Thigh',
+                              value: selectedMidThigh,
+                              hint: '3\'1"',
+                            ),
+                            _bodyFatPicker(
+                              context: context,
+                              label: 'Body-Fat',
+                              value: selectedBodyFat,
+                              hint: '40',
+                            ),
                             SizedBox(height: ScreenUtil.verticalScale(2)),
                             isLoading == true
                                 ? const Center(
@@ -438,6 +503,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       isLoading: false,
                                     ),
                                   ),
+                            SizedBox(height: ScreenUtil.verticalScale(3.2)),
                           ],
                         ),
                 ),
@@ -780,6 +846,238 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
+  Widget _bodyFatPicker(
+      {required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            height: ScreenUtil.verticalScale(6),
+            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
+            ),
+            child: KeyboardActions(
+              autoScroll: false,
+              config: _buildConfig1(context),
+              child: Builder(builder: (context) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        width: ScreenUtil.horizontalScale(21),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ScreenUtil.horizontalScale(12),
+                      child: TextField(
+                        style: TextStyle(
+                          fontSize: ScreenUtil.verticalScale(1.95),
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        controller: value,
+                        keyboardType: TextInputType.number,
+                        onSubmitted: (value) {
+                          FocusScope.of(context).unfocus();
+                        },
+                        textInputAction: TextInputAction.done,
+                        textAlign: TextAlign.center,
+                        focusNode: _nodeText2,
+                        maxLength: 3,
+                        decoration: InputDecoration(
+                          counterText: "",
+                          hintText: "50",
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: ScreenUtil.verticalScale(1.95),
+                            fontWeight: FontWeight.normal,
+                          ),
+                          suffix: Text(
+                            "%",
+                            style: TextStyle(
+                              fontSize: ScreenUtil.verticalScale(1.95),
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          isCollapsed: true, // makes it tighter vertically
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            String newText = newValue.text;
+                            if (newText.isNotEmpty) {
+                              newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                            }
+                            return TextEditingValue(
+                              text: newText,
+                              selection: TextSelection.collapsed(offset: newText.length),
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: SizedBox(
+                        width: ScreenUtil.horizontalScale(21),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _waistPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(1),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
+            ),
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  log('value.text==========>>>>>${value.text}');
+                  final rawText = value.text; // e.g., '39"'
+                  final cleanText = rawText.replaceAll(RegExp(r'[^0-9.]'), ''); // removes non-numeric characters
+                  final parsedValue = double.tryParse(cleanText) ?? 0;
+                  log('double.tryParse(value.text) ?? 0==========>>>>>${double.tryParse(value.text) ?? 0}');
+
+                  await showCupertinoWaistPicker(
+                    initialWaist: parsedValue,
+                    context: context,
+                    canConvertUnit: canConvertUnit,
+                    onWaistChanged: (val) {
+                      setState(() {
+                        log('val==========>>>>>${val}');
+
+                        value.text = '${val.toInt()}"';
+                      });
+                    },
+                  );
+                },
+                child: Text(
+                  value.text.isEmpty ? 'Waist' : value.text,
+                  style: TextStyle(
+                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                    fontSize: ScreenUtil.verticalScale(1.95),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _hipPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(1),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
+            ),
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  final rawText = value.text; // e.g., '39"'
+                  final cleanText = rawText.replaceAll(RegExp(r'[^0-9.]'), ''); // removes non-numeric characters
+                  final parsedValue = double.tryParse(cleanText) ?? 0;
+                  await showCupertinoHipPicker(
+                    initialHip: parsedValue,
+                    context: context,
+                    canConvertUnit: canConvertUnit,
+                    onHipChanged: (val) {
+                      setState(() {
+                        value.text = '${val.toInt()}"';
+                      });
+                    },
+                  );
+                },
+                child: Text(
+                  value.text.isEmpty ? 'Hip' : value.text,
+                  style: TextStyle(
+                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                    fontSize: ScreenUtil.verticalScale(1.95),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _heightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
@@ -842,7 +1140,76 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
+  Widget _midThighPicker({
+    required BuildContext context,
+    required String label,
+    required TextEditingController value,
+    required String hint,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: ScreenUtil.horizontalScale(7.5),
+        vertical: ScreenUtil.verticalScale(0.8),
+      ),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: ScreenUtil.horizontalScale(34.5),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            width: ScreenUtil.horizontalScale(50.5),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(1),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.052),
+              borderRadius: Utils.buttonRadius,
+            ),
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  final rawText = value.text; // e.g., '39"'
+                  final cleanText = rawText.replaceAll(RegExp(r'[^0-9.]'), ''); // removes non-numeric characters
+                  final parsedValue = double.tryParse(cleanText) ?? 0;
+                  await showCupertinoMidThighPicker(
+                    initialMidThigh: parsedValue,
+                    context: context,
+                    canConvertUnit: canConvertUnit,
+                    onMidThighChanged: (val) {
+                      setState(() {
+                        value.text = '$val"';
+                      });
+                    },
+                  );
+                },
+                child: Text(
+                  value.text.isEmpty ? hint : value.text,
+                  style: TextStyle(
+                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                    fontSize: ScreenUtil.verticalScale(1.95),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   final FocusNode _nodeText1 = FocusNode();
+  final FocusNode _nodeText2 = FocusNode();
 
   KeyboardActionsConfig _buildConfig(BuildContext context) {
     return KeyboardActionsConfig(
@@ -852,6 +1219,36 @@ class _MyProfilePageState extends State<MyProfilePage> {
       actions: [
         KeyboardActionsItem(
           focusNode: _nodeText1,
+          displayArrows: false,
+          toolbarButtons: [
+            (node) {
+              return GestureDetector(
+                onTap: () => node.unfocus(),
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
+                  child: Text(
+                    "Done",
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              );
+            }
+          ],
+        ),
+      ],
+    );
+  }
+
+  KeyboardActionsConfig _buildConfig1(BuildContext context) {
+    return KeyboardActionsConfig(
+      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
+      keyboardBarColor: Colors.white,
+      nextFocus: true,
+      actions: [
+        KeyboardActionsItem(
+          focusNode: _nodeText2,
           displayArrows: false,
           toolbarButtons: [
             (node) {
