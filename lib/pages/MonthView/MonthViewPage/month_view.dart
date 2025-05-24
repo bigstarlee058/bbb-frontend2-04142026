@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -177,26 +177,71 @@ class _MonthViewState extends State<MonthView> {
             // ),
             Column(
               children: [
-                AppBar(
-                  backgroundColor: Colors.transparent,
-                  toolbarHeight: ScreenUtil.verticalScale(5.1) + 5,
-                  surfaceTintColor: Colors.transparent,
-                  automaticallyImplyLeading: false,
-                  leading: Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: BackArrowWidget(
-                      onPress: () {
-                        monthProvider?.mainPageProvider.changeTab(0);
-                      },
-                    ),
+                SafeArea(
+                  bottom: false,
+                  child: Consumer<ScrollProvider>(
+                    builder: (context, scrollValue, child) {
+                      double targetHeight = scrollValue.scrollOffset1 > 40 ? ScreenUtil.verticalScale(3.2) : ScreenUtil.verticalScale(5);
+
+                      return Column(
+                        children: [
+                          SizedBox(height: Platform.isAndroid ? ScreenUtil.verticalScale(0.09) : 0),
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            height: targetHeight,
+                            width: media.width,
+                            decoration: BoxDecoration(color: Colors.transparent),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: BackArrowWidget(
+                                      position: scrollValue.scrollOffset1,
+                                      onPress: () {
+                                        monthProvider?.mainPageProvider.changeTab(0);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: CommonStreakWithNotification(
+                                    routeString: '/month-view',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 5)
+                        ],
+                      );
+                    },
                   ),
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
-                    )
-                  ],
                 ),
+                // AppBar(
+                //   backgroundColor: Colors.transparent,
+                //   toolbarHeight: ScreenUtil.verticalScale(5.1) + 5,
+                //   surfaceTintColor: Colors.transparent,
+                //   automaticallyImplyLeading: false,
+                //   leading: Padding(
+                //     padding: const EdgeInsets.only(bottom: 5),
+                //     child: BackArrowWidget(
+                //       onPress: () {
+                //         monthProvider?.mainPageProvider.changeTab(0);
+                //       },
+                //     ),
+                //   ),
+                //   actions: [
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 10),
+                //       child: const CommonStreakWithNotification(routeString: '/month-view'),
+                //     )
+                //   ],
+                // ),
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,
@@ -540,7 +585,6 @@ class _MonthViewState extends State<MonthView> {
             (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider?.changeIsPumpDay(isPumpDay);
-    log('isPumpDay :::::::::::::::::: ${isPumpDay}');
     if (isPumpDay) {
       final dataList = monthProvider?.dayHistoryModel
           .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)

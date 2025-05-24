@@ -38,7 +38,6 @@ class StepProgressBar extends StatelessWidget {
                       if (onStepTap != null) {
                         onStepTap!(index);
                       }
-                      log('index :::::::::::::::::: ${index}');
                     },
                     child: Container(
                       width: stepWidth,
@@ -73,7 +72,6 @@ class StepProgressBar extends StatelessWidget {
                           if (onStepTap != null) {
                             onStepTap!(index);
                           }
-                          log('index :::::::::::::::::: ${index}');
                         },
                         child: Container(
                           width: stepWidth * fillPercent,

@@ -8,10 +8,12 @@ class CommonStreakWithNotification extends StatefulWidget {
   const CommonStreakWithNotification({super.key, required this.routeString});
   final String routeString;
   @override
-  State<CommonStreakWithNotification> createState() => _CommonStreakWithNotificationState();
+  State<CommonStreakWithNotification> createState() =>
+      _CommonStreakWithNotificationState();
 }
 
-class _CommonStreakWithNotificationState extends State<CommonStreakWithNotification> {
+class _CommonStreakWithNotificationState
+    extends State<CommonStreakWithNotification> {
   MonthProvider? monthProvider;
   late MainPageProvider mainPageProvider;
 
@@ -27,22 +29,22 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
     final streak = context.watch<MonthProvider>();
     return Row(
       children: [
-        IconButton(
-          onPressed: () async {
+        GestureDetector(
+          onTap: () async {
             Navigator.pushNamed(context, '/streak-calendar');
             // monthProvider?.routeString = widget.routeString;
             // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
             // mainPageProvider.changeTab(4);
           },
-          icon: Container(
-            height: ScreenUtil.verticalScale(2.2),
-            width: ScreenUtil.verticalScale(4.8),
+          child: SizedBox(
+            height: ScreenUtil.verticalScale(2.8),
+            width: ScreenUtil.verticalScale(5),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  height: ScreenUtil.verticalScale(2.2),
-                  width: ScreenUtil.verticalScale(2.2),
+                  height: ScreenUtil.verticalScale(2),
+                  width: ScreenUtil.verticalScale(2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white),
@@ -59,11 +61,13 @@ class _CommonStreakWithNotificationState extends State<CommonStreakWithNotificat
                     ),
                   ),
                 ),
-                Center(
+                SizedBox(
+                  height: ScreenUtil.verticalScale(2),
+                  width: ScreenUtil.verticalScale(2),
                   child: Icon(
                     Icons.local_fire_department_outlined,
                     color: Colors.white,
-                    size: ScreenUtil.verticalScale(2.5),
+                    size: ScreenUtil.verticalScale(2.3),
                   ),
                 )
               ],
