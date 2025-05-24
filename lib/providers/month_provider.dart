@@ -650,7 +650,6 @@ class MonthProvider extends ChangeNotifier {
     monthDataModel = null;
     String monthId = preferences.getString(SharedPreference.monthId) ?? "";
     String split = preferences.getString(SharedPreference.split) ?? "";
-    log('split :::::::::::::::::: ${split}');
     try {
       final rawTempData = preferences.getString("$split-$monthId");
       if (rawTempData != null && rawTempData.isNotEmpty) {
@@ -2399,7 +2398,6 @@ class MonthProvider extends ChangeNotifier {
     } else {
       achievementsModel = [];
     }
-    log('achievementsModel :::::::::::::::::: ${achievementsModel.length}');
     items = [
       {
         "image": "assets/img/verified (1).svg",

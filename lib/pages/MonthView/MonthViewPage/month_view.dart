@@ -473,6 +473,7 @@ class _MonthViewState extends State<MonthView> {
                                               Visibility(
                                                   visible: monthProvider.selectedSection == 2,
                                                   child: InformationSection(
+                                                    monthProvider: monthProvider,
                                                     programInfoProvider: provider,
                                                     scrollController: scrollController,
                                                   )),
