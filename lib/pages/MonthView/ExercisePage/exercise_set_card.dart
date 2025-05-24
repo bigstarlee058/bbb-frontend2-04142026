@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/choice_clip.dart';
 import 'package:bbb/components/expansion_panel.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
@@ -131,7 +130,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
     dataId =
-        "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
     await monthProvider?.fetchSingleSetLocalData(dataId).then(
       (value) {
         if (value?.status == Status.completed) {
@@ -152,7 +151,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     String split =
         monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
     dataId =
-        "$split-${monthProvider?.selectedExercise?.id}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
     HistoryDataModel? expandedDataHistory = monthProvider?.historyDataModel.firstWhere(
       (element) => element.dataId == dataId,
       orElse: () => HistoryDataModel(),
@@ -251,7 +250,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   }
 
   Future<void> _saveData() async {
-    HapticFeedBack.buttonClick();
+    // HapticFeedBack.buttonClick();
     _handleCloseTimer();
     monthProvider?.timerAddress = "";
     monthProvider?.timePassed = "";

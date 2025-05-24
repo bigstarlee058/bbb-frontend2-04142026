@@ -1,4 +1,5 @@
 import 'package:bbb/models/program_info_model.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -8,10 +9,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class InformationSection extends StatefulWidget {
-  const InformationSection({super.key, required this.programInfoProvider, required this.scrollController});
+  const InformationSection({
+    super.key,
+    required this.programInfoProvider,
+    required this.scrollController,
+    required this.monthProvider,
+  });
 
   final ProgramInfoProvider programInfoProvider;
   final ScrollController scrollController;
+  final MonthProvider monthProvider;
 
   @override
   State<InformationSection> createState() => _InformationSectionState();
@@ -40,8 +47,8 @@ class _InformationSectionState extends State<InformationSection> {
               ),
               color: Colors.white,
               child: value.loading
-                  ? SizedBox(
-                      height: media.height / 3,
+                  ? Padding(
+                      padding: EdgeInsets.only(bottom: media.height * 0.1),
                       child: const Center(
                         child: CircularProgressIndicator(color: AppColors.primaryColor),
                       ),
@@ -66,11 +73,17 @@ class _InformationSectionState extends State<InformationSection> {
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: value.programInfoModel!.sections.length,
                             itemBuilder: (context, index) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
-                                child: buildExpansionTileItem(
-                                    index, value.programInfoModel!.sections[index], value.programInfoModel!.sections.length),
-                              );
+                              return value.programInfoModel!.sections[index].formats != null &&
+                                      value.programInfoModel!.sections[index].variations != null &&
+                                      value.programInfoModel!.sections[index].formats!.contains(widget.monthProvider.equipmentType) &&
+                                      value.programInfoModel!.sections[index].variations!
+                                          .contains(widget.monthProvider.splitType?.replaceAll("split", ""))
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                                      child: buildExpansionTileItem(
+                                          index, value.programInfoModel!.sections[index], value.programInfoModel!.sections.length),
+                                    )
+                                  : SizedBox();
                             },
                           ),
                         ),
