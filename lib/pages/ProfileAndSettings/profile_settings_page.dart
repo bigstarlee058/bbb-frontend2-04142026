@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -107,34 +108,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      /// TEST PROFILE ONBOARDING SCREEN
-      // floatingActionButton: Padding(
-      //   padding: EdgeInsets.only(bottom: 75),
-      //   child: ElevatedButton(
-      //     style: ElevatedButton.styleFrom(
-      //       backgroundColor: AppColors.primaryColor,
-      //       shape: Utils.buttonStyle,
-      //       padding: EdgeInsets.symmetric(
-      //         vertical: ScreenUtil.verticalScale(1.7),
-      //       ),
-      //     ),
-      //     child: Container(
-      //       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-      //       child: Text(
-      //         "Profile Onboarding",
-      //         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      //       ),
-      //     ),
-      //     onPressed: () async {
-      //       await Navigator.push(
-      //         context,
-      //         MaterialPageRoute(
-      //           builder: (context) => ProfileBoardingScreen(),
-      //         ),
-      //       );
-      //     },
-      //   ),
-      // ),
       /// TEST VERSION AVAILABLE SCREEN
       // floatingActionButton: Padding(
       //   padding: EdgeInsets.only(bottom: 75),
@@ -204,11 +177,21 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   backgroundColor: Colors.transparent,
                                   leading: SizedBox(),
                                   centerTitle: true,
-                                  title: Text(
-                                    'Profile',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.verticalScale(2.5),
+                                  title: GestureDetector(
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProfileBoardingScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Profile',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: ScreenUtil.verticalScale(2.5),
+                                      ),
                                     ),
                                   ),
                                   actions: [
@@ -488,9 +471,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               ),
                               child: Column(
                                 children: [
-                                  settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
-                                      () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
-                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+                                  // settingsButton('Re-watch the tutorial', Icons.play_circle_outline,
+                                  //     () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
+                                  // SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('My Profile', Icons.person, () => Navigator.pushNamed(context, '/myprofile')),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),

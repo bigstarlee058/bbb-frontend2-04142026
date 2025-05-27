@@ -3,12 +3,16 @@ import 'dart:io';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:path/path.dart' as path;
 
 class ProfileBoardingScreen extends StatefulWidget {
@@ -21,15 +25,30 @@ class ProfileBoardingScreen extends StatefulWidget {
 class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   int currentPage = 1;
   TextEditingController nameController = TextEditingController();
+  TextEditingController lNameController = TextEditingController();
   PageController pageController = PageController();
   File? image;
   DateTime? selectedDate;
-  String? selectedWeight;
   String? selectedGender;
-  String? selectedHeight;
+  TextEditingController selectedWeight = TextEditingController();
+  TextEditingController selectedBodyFat = TextEditingController();
+  TextEditingController selectedHeight = TextEditingController();
+  TextEditingController selectedMidThigh = TextEditingController();
+  TextEditingController selectedWaist = TextEditingController();
+  TextEditingController selectedHip = TextEditingController();
   final List<String> heightOptions = ['5\'0"', '5\'5"', '6\'0"', '6\'5"']; // Example heights
   final List<String> weightOptions = ['100 lbs', '110 lbs', '121 lbs', '130 lbs', '140 lbs'];
   final List<String> genderOptions = ['Female', 'Male', 'Other'];
+  double heightInCm = 183;
+  HeightUnit selectedHeightUnit = HeightUnit.cm;
+  bool canConvertUnit = true;
+  bool showSeparationText = true;
+
+  final FocusNode _nodeText1 = FocusNode();
+  final FocusNode _nodeText2 = FocusNode();
+  final FocusNode _nodeText3 = FocusNode();
+  final FocusNode _nodeText4 = FocusNode();
+  final FocusNode _nodeText5 = FocusNode();
 
   Future<void> _pickAndUploadImage() async {
     try {
@@ -70,7 +89,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                     Stack(
                       children: [
                         Container(
-                          height: media.height / 2,
+                          height: media.height,
                           width: media.width,
                           decoration: const BoxDecoration(
                             image: DecorationImage(
@@ -117,7 +136,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: media.height / 7.9,
+                          height: media.height / 7.99,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -149,17 +168,17 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          constraints: BoxConstraints(minHeight: media.height * 0.72),
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(55),
-                            ),
-                          ),
-                          child: Container(
+                    child: Container(
+                      constraints: BoxConstraints(minHeight: media.height - media.height / 8),
+                      width: media.width,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(55),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Container(
                             margin: EdgeInsets.symmetric(
                               horizontal: ScreenUtil.horizontalScale(5),
                               vertical: ScreenUtil.verticalScale(2),
@@ -168,7 +187,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                             child: Column(
                               children: [
                                 SizedBox(
-                                  height: media.height * 0.68,
+                                  height: media.height * 0.8,
                                   child: PageView.builder(
                                     onPageChanged: (value) {
                                       currentPage = value + 1;
@@ -188,58 +207,60 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                               ],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)).copyWith(bottom: ScreenUtil.horizontalScale(7)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                right: ScreenUtil.horizontalScale(2),
-                left: ScreenUtil.horizontalScale(2),
-                bottom: ScreenUtil.verticalScale(1.5),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(
-                  3,
-                  (index) => Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(right: index == 2 ? 0 : 5),
-                      height: 5,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: currentPage > (index) ? AppColors.primaryColor : Colors.grey.withValues(alpha: 0.4),
+                          Positioned(
+                            bottom: ScreenUtil.verticalScale(3.2),
+                            right: ScreenUtil.horizontalScale(7),
+                            left: ScreenUtil.horizontalScale(7),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    right: ScreenUtil.horizontalScale(2),
+                                    left: ScreenUtil.horizontalScale(2),
+                                    bottom: ScreenUtil.verticalScale(1),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: List.generate(
+                                      3,
+                                      (index) => Expanded(
+                                        child: Container(
+                                          margin: EdgeInsets.only(right: index == 2 ? 0 : 5),
+                                          height: 5,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(20),
+                                            color: currentPage > (index) ? AppColors.primaryColor : Colors.grey.withValues(alpha: 0.4),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: ScreenUtil.verticalScale(1)),
+                                ButtonWidget(
+                                  text: "Next",
+                                  textColor: Colors.white,
+                                  color: AppColors.primaryColor,
+                                  onPress: () {
+                                    pageController.nextPage(
+                                      duration: const Duration(milliseconds: 400),
+                                      curve: Curves.fastOutSlowIn,
+                                    );
+                                    // currentPage = pageController.page!.toInt();
+                                    setState(() {});
+                                  },
+                                  isLoading: false,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(height: ScreenUtil.verticalScale(1)),
-            ButtonWidget(
-              text: "Next",
-              textColor: Colors.white,
-              color: AppColors.primaryColor,
-              onPress: () {
-                pageController.nextPage(
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.fastOutSlowIn,
-                );
-                // currentPage = pageController.page!.toInt();
-                setState(() {});
-              },
-              isLoading: false,
+              ],
             ),
           ],
         ),
@@ -250,23 +271,23 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   Widget page1() => Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: ScreenUtil.verticalScale(3.5)),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
           Text(
             "Name",
             style: TextStyle(
-              fontSize: ScreenUtil.verticalScale(4),
+              fontSize: ScreenUtil.verticalScale(3),
               height: 1,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(4)),
+          SizedBox(height: ScreenUtil.verticalScale(3)),
           Align(
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text(
-                "Enter your name",
+                "Enter your first name",
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.8),
                   height: 1,
@@ -280,11 +301,53 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: AppTextFormField(
-              hintText: 'Your Name',
+              hintText: 'First Name',
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               onChanged: (value) {},
               controller: nameController,
+              suffixIcon: Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: IconButton(
+                  onPressed: () {},
+                  style: ButtonStyle(
+                    minimumSize: WidgetStateProperty.all(
+                      const Size(48, 48),
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.person,
+                    color: Color(0XFFd9d9d9),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(3)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                "Enter your last name",
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.8),
+                  height: 1,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(1.2)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: AppTextFormField(
+              hintText: 'Last Name',
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              onChanged: (value) {},
+              controller: lNameController,
               suffixIcon: Padding(
                 padding: const EdgeInsets.only(right: 15),
                 child: IconButton(
@@ -307,33 +370,30 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
 
   Widget page2(BuildContext context) => Column(
         children: [
-          SizedBox(height: ScreenUtil.verticalScale(3.5)),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
           Text(
             "Details",
             style: TextStyle(
-              fontSize: ScreenUtil.verticalScale(4),
+              fontSize: ScreenUtil.verticalScale(3),
               height: 1,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(4)),
+          SizedBox(height: ScreenUtil.verticalScale(3)),
           Align(
             alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                "Add your details",
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.8),
-                  height: 1,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
+            child: Text(
+              "Add your details",
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.8),
+                height: 1,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey,
               ),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(1.2)),
+          SizedBox(height: ScreenUtil.verticalScale(0.6)),
           _buildDropdownField(
             context: context,
             label: 'Gender',
@@ -346,7 +406,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               });
             },
           ),
-          SizedBox(height: ScreenUtil.verticalScale(1)),
           _buildProfileField(
             context: context,
             label: 'Birthday',
@@ -357,6 +416,21 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                 initialDate: DateTime(1998, 9, 21),
                 firstDate: DateTime(1900),
                 lastDate: DateTime.now(),
+                builder: (BuildContext context, Widget? child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.light(
+                        primary: AppColors.primaryColor,
+                        onPrimary: Colors.white,
+                        onSurface: Colors.black,
+                      ),
+                      textButtonTheme: TextButtonThemeData(
+                        style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
+                      ),
+                    ),
+                    child: child!,
+                  );
+                },
               );
               if (pickedDate != null && pickedDate != selectedDate) {
                 setState(() {
@@ -365,46 +439,84 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               }
             },
           ),
-          SizedBox(height: ScreenUtil.verticalScale(1)),
-          _buildDropdownField(
+          _heightPicker(
             context: context,
             label: 'Height',
             value: selectedHeight,
-            options: heightOptions,
-            hint: '5\'5"',
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedHeight = newValue!;
-              });
-            },
+            hint: '6\'0"',
           ),
-          SizedBox(height: ScreenUtil.verticalScale(1)),
-          _buildDropdownField(
+          _numberPicker(
             context: context,
             label: 'Weight',
-            value: selectedWeight,
-            options: weightOptions,
-            hint: '100 lbs',
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedWeight = newValue!;
-              });
-            },
+            controller: selectedWeight,
+            focusNode: _nodeText1,
+            suffix: "lbs",
+          ),
+          _numberPicker(
+            context: context,
+            label: 'Waist',
+            controller: selectedWaist,
+            focusNode: _nodeText2,
+            suffix: '"',
+          ),
+          _numberPicker(
+            context: context,
+            label: 'Hip',
+            controller: selectedHip,
+            focusNode: _nodeText3,
+            suffix: '"',
+          ),
+          _numberPicker(
+            context: context,
+            label: 'Mid-Thigh',
+            controller: selectedMidThigh,
+            focusNode: _nodeText4,
+            suffix: '"',
+          ),
+          _numberPicker(
+            context: context,
+            label: 'Body-Fat',
+            controller: selectedBodyFat,
+            focusNode: _nodeText5,
+            suffix: "%", // hint: '81',
           ),
         ],
       );
 
   Widget page3() => Column(
         children: [
-          SizedBox(height: ScreenUtil.verticalScale(3.5)),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
+          Text(
+            "Profile",
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(3),
+              height: 1,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(4)),
+          Align(
+            alignment: Alignment.center,
+            child: Text(
+              "Add your profile image",
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.8),
+                height: 1,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(4)),
           Center(
             child: Container(
-              height: ScreenUtil.horizontalScale(23.5),
-              width: ScreenUtil.horizontalScale(23.5),
+              height: ScreenUtil.horizontalScale(32),
+              width: ScreenUtil.horizontalScale(32),
               decoration: BoxDecoration(
                 color: Colors.grey.withValues(alpha: .9),
                 borderRadius: BorderRadius.all(
-                  Radius.circular(ScreenUtil.horizontalScale(12.5)),
+                  Radius.circular(ScreenUtil.horizontalScale(32)),
                 ),
               ),
               child: Stack(
@@ -412,16 +524,16 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                 alignment: Alignment.center,
                 children: [
                   Container(
-                    height: ScreenUtil.horizontalScale(25),
-                    width: ScreenUtil.horizontalScale(25),
+                    height: ScreenUtil.horizontalScale(32),
+                    width: ScreenUtil.horizontalScale(32),
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor,
                       borderRadius: BorderRadius.all(
-                        Radius.circular(ScreenUtil.horizontalScale(12.5)),
+                        Radius.circular(ScreenUtil.horizontalScale(32)),
                       ),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
+                      borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(32)),
                       child: image != null
                           ? Image.file(
                               image!,
@@ -449,7 +561,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                         // Handle camera icon action here
                       },
                       child: CircleAvatar(
-                        radius: ScreenUtil.horizontalScale(3.5), // Adjust size as needed
+                        radius: ScreenUtil.horizontalScale(4), // Adjust size as needed
                         backgroundColor: Colors.black.withValues(alpha: .7),
                         child: Center(
                           child: Icon(
@@ -465,7 +577,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(5)),
+          /*SizedBox(height: ScreenUtil.verticalScale(5)),
           Text(
             "What’s Your Goal?",
             style: TextStyle(
@@ -493,7 +605,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ),
           SizedBox(height: ScreenUtil.verticalScale(1.2)),
           Container(
-            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
             padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -553,7 +665,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ),
           const SizedBox(height: 5),
           Container(
-            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
             padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -613,7 +725,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ),
           const SizedBox(height: 5),
           Container(
-            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
             padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -670,99 +782,80 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                 )
               ],
             ),
-          ),
+          ),*/
         ],
       );
 
-  Widget _buildDropdownField(
-      {required BuildContext context,
-      required String label,
-      required String? value,
-      required List<String> options,
-      required String hint,
-      required ValueChanged<String?> onChanged}) {
+  Widget _buildDropdownField({
+    required BuildContext context,
+    required String label,
+    required String? value,
+    required List<String> options,
+    required String hint,
+    required ValueChanged<String?> onChanged,
+  }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.6)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(32),
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.horizontalScale(1),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  ScreenUtil.verticalScale(5),
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x20888888),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Center(
-                // Center the dropdown content
-                child: DropdownButton<String>(
-                  value: value,
-                  dropdownColor: const Color.fromARGB(255, 252, 252, 252),
-                  elevation: 12,
-                  hint: Text(hint),
-                  isDense: true,
-                  isExpanded: true,
-                  alignment: Alignment.center,
-                  // Align the dropdown text to the center
-                  items: options.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Center(
-                        // Center the individual items in dropdown
-                        child: Text(value),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: onChanged,
-                  underline: Container(),
-                ),
+          Container(
+            width: ScreenUtil.horizontalScale(50),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(1),
+            ).copyWith(left: 20),
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
+            ),
+            child: Center(
+              // Center the dropdown content
+              child: DropdownButton<String>(
+                value: value,
+                dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                elevation: 12,
+                hint: Text(hint),
+                isDense: true,
+                isExpanded: true,
+                alignment: Alignment.center,
+                // Align the dropdown text to the center
+                items: options.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Center(
+                      // Center the individual items in dropdown
 
-                // DropdownButton<String>(
-                //   value: value,
-                //   hint: Text(hint),
-                //   isExpanded: true,
-                //   alignment: Alignment.center, // Align the dropdown text to the center
-                //   items: options.map((String value) {
-                //     return DropdownMenuItem<String>(
-                //       value: value,
-                //       child: Center(
-                //         // Center the individual items in dropdown
-                //         child: Text(value),
-                //       ),
-                //     );
-                //   }).toList(),
-                //   onChanged: (String? newValue) {
-                //     setState(() {
-                //       value = newValue;
-                //     });
-                //   },
-                //   underline: Container(),
-                // ),
+                      child: Text(
+                        value,
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: ScreenUtil.verticalScale(1.95),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: ScreenUtil.verticalScale(1.95),
+                  fontWeight: FontWeight.normal,
+                ),
+                onChanged: onChanged,
+                underline: Container(),
               ),
             ),
           ),
@@ -771,26 +864,31 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
     );
   }
 
-  Widget _buildProfileField({required BuildContext context, required String label, required String value, required VoidCallback onTap}) {
+  Widget _buildProfileField({
+    required BuildContext context,
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.6)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(32),
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
+          SizedBox(
+            width: ScreenUtil.horizontalScale(50),
             child: GestureDetector(
               onTap: onTap,
               child: Container(
@@ -798,28 +896,212 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                   horizontal: ScreenUtil.horizontalScale(1),
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                    ScreenUtil.verticalScale(5),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x20888888),
-                      spreadRadius: 3,
-                      blurRadius: 10,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+                  color: Colors.grey.withValues(alpha: 0.052),
+                  borderRadius: Utils.buttonRadius,
                 ),
                 child: Center(
                   // Center the text
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
+                      color: value == 'Select Birthday' ? Colors.grey.shade700 : Colors.black,
+                      fontSize: ScreenUtil.verticalScale(1.95),
+                      // fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
+                      fontWeight: FontWeight.normal,
                     ),
                     textAlign: TextAlign.center, // Align the text at the center
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _numberPicker({
+    required BuildContext context,
+    required String label,
+    required TextEditingController controller,
+    required String suffix,
+    required FocusNode focusNode,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: ScreenUtil.verticalScale(0.6),
+      ),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: ScreenUtil.horizontalScale(32),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            width: ScreenUtil.horizontalScale(50),
+            height: ScreenUtil.verticalScale(6),
+            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.052),
+              borderRadius: Utils.buttonRadius,
+            ),
+            child: KeyboardActions(
+              autoScroll: false,
+              config: _buildConfig(context, focusNode),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IntrinsicWidth(
+                    child: TextField(
+                      style: TextStyle(
+                        fontSize: ScreenUtil.verticalScale(1.95),
+                        color: Colors.black,
+                      ),
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                      textAlign: TextAlign.center,
+                      focusNode: focusNode,
+                      maxLength: 3,
+                      decoration: InputDecoration(
+                        counterText: "",
+                        hintText: !focusNode.hasFocus && label == "Weight"
+                            ? "     0 lbs"
+                            : !focusNode.hasFocus && label == "Body-Fat"
+                                ? "    0 %"
+                                : '  0"',
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: ScreenUtil.verticalScale(1.95),
+                        ),
+                        suffix: Text(
+                          suffix,
+                          style: TextStyle(
+                            fontSize: ScreenUtil.verticalScale(1.95),
+                            color: Colors.black,
+                          ),
+                        ),
+                        border: InputBorder.none,
+                        isCollapsed: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        TextInputFormatter.withFunction((oldValue, newValue) {
+                          String newText = newValue.text;
+                          if (newText.isNotEmpty) {
+                            newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                          }
+                          return TextEditingValue(
+                            text: newText,
+                            selection: TextSelection.collapsed(offset: newText.length),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  KeyboardActionsConfig _buildConfig(BuildContext context, FocusNode nodeText) {
+    return KeyboardActionsConfig(
+      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
+      keyboardBarColor: Colors.white,
+      nextFocus: true,
+      actions: [
+        KeyboardActionsItem(
+          focusNode: nodeText,
+          displayArrows: false,
+          toolbarButtons: [
+            (node) {
+              return GestureDetector(
+                onTap: () => node.unfocus(),
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
+                  child: Text(
+                    "Done",
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              );
+            }
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _heightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.6)),
+      height: ScreenUtil.verticalScale(6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: ScreenUtil.horizontalScale(32),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.95),
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            width: ScreenUtil.horizontalScale(50),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(1),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.052),
+              borderRadius: Utils.buttonRadius,
+            ),
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  await showCupertinoHeightPicker(
+                    context: context,
+                    initialHeight: heightInCm,
+                    initialSelectedHeightUnit: selectedHeightUnit,
+                    canConvertUnit: canConvertUnit,
+                    showSeparationText: showSeparationText,
+                    onHeightChanged: (val) {
+                      setState(() {
+                        heightInCm = val;
+                        int feet = (heightInCm / 2.54) ~/ 12;
+                        int inches = ((heightInCm / 2.54) % 12).floor();
+                        value.text = '$feet\'$inches"';
+                      });
+                    },
+                  );
+                },
+                child: Text(
+                  value.text.isEmpty ? 'Height' : value.text,
+                  style: TextStyle(
+                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                    fontSize: ScreenUtil.verticalScale(1.95),
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ),

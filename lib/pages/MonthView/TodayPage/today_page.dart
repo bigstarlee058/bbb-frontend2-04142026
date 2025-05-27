@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -15,6 +16,7 @@ import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
+import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/removed_exercise_model.dart';
 import 'package:bbb/models/MonthResponseModel/swap_exercise_model.dart';
@@ -304,11 +306,13 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
 
     return NotificationListener(
       onNotification: (ScrollNotification notification) {
-        WidgetsBinding.instance.scheduleFrameCallback(
-          (timeStamp) {
-            scrollProvider?.updateOffSet2(notification.metrics.pixels);
-          },
-        );
+        if (notification.metrics.axis == Axis.vertical) {
+          WidgetsBinding.instance.scheduleFrameCallback(
+            (timeStamp) {
+              scrollProvider?.updateOffSet2(notification.metrics.pixels);
+            },
+          );
+        }
         return true;
       },
       child: isInit
@@ -354,7 +358,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                         child: Consumer<ScrollProvider>(
                           builder: (context, scrollValue, child) {
                             double targetHeight =
-                                scrollValue.scrollOffset2 > 40 ? ScreenUtil.verticalScale(3.2) : ScreenUtil.verticalScale(5);
+                                scrollValue.scrollOffset2 > 40 ? ScreenUtil.verticalScale(3.2) : ScreenUtil.verticalScale(4.8);
 
                             return Column(
                               children: [
@@ -372,6 +376,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: BackArrowWidget(
+                                            bigSize: 4.8,
                                             position: scrollValue.scrollOffset2,
                                             onPress: () {
                                               Navigator.pop(context);
@@ -393,8 +398,8 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: SizedBox(
-                                                      width: ScreenUtil.verticalScale(4),
-                                                      height: ScreenUtil.verticalScale(4),
+                                                      width: ScreenUtil.verticalScale(4.8),
+                                                      height: ScreenUtil.verticalScale(4.8),
                                                       child: Center(
                                                         child: GestureDetector(
                                                           onTap: toggleEditMode,
@@ -867,7 +872,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                                             child: ButtonWidget(
                                                               text: value.dayHistoryDetails?.status == Status.completed
-                                                                  ? "Reset?"
+                                                                  ? "Reset Day?"
                                                                   : "Skipped",
                                                               textColor: Colors.white,
                                                               onPress: value.dayHistoryDetails?.status == Status.completed
@@ -2056,6 +2061,189 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
       ApiRepo.addExerciseStatus(body: data);
       await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
+
+    if (status == Status.reset) {
+      if (type.contains("Circuit")) {
+        if (monthProvider!.pumpDayModel!.circuits != null && monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
+          for (int i = 0; i < monthProvider!.pumpDayModel!.circuits!.length; i++) {
+            var element = monthProvider!.pumpDayModel!.circuits![i];
+
+            String exId = element.id ?? "";
+
+            String cManagerId =
+                "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
+
+            await DatabaseHelper().deleteSingleData(tableName: DatabaseHelper.circuitManager, id: cManagerId);
+
+            if (element.circuitExercises != null && element.circuitExercises!.isNotEmpty) {
+              for (int j = 0; j < element.circuitExercises!.length; j++) {
+                var cir = element.circuitExercises![j];
+                if (cir.extra != null && cir.extra!.isNotEmpty) {
+                  for (int z = 0; z < cir.extra!.length; z++) {
+                    var sets = cir.extra![z];
+                    String dataId =
+                        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${cir.exerciseId}";
+                    final db = await DatabaseHelper().database;
+                    List<Map<String, dynamic>> result = await db.rawQuery('''
+                                                            SELECT * FROM ${DatabaseHelper.exerciseHistory}
+                                                            WHERE dataId LIKE ?
+                                                            ''', ['%$dataId%']);
+                    List<HistoryDataModel> data =
+                        List<HistoryDataModel>.from(json.decode(jsonEncode(result)).map((x) => HistoryDataModel.fromJson(x)));
+                    if (data.isNotEmpty) {
+                      for (var element in data) {
+                        var dataId = element.dataId;
+
+                        Map<String, dynamic> updateData = {
+                          "sets": sets.sets.toString(),
+                          "reps": sets.reps.toString(),
+                          "weight": sets.weight.toString(),
+                          "rest": sets.rest.toString(),
+                          "load": sets.load.toString(),
+                          "type": sets.type.toString(),
+                          "effort": "100",
+                          "date": "${DateTime.now().toUtc()}",
+                          "status": Status.empty,
+                          "totalSet": "0",
+                        };
+
+                        Map<String, dynamic> updateData1 = {
+                          "sets": sets.sets.toString(),
+                          "reps": sets.reps.toString(),
+                          "weight": sets.weight.toString(),
+                          "rest": sets.rest.toString(),
+                          "load": sets.load.toString(),
+                          "type": sets.type.toString(),
+                          "effort": "100",
+                          "date": "${DateTime.now().toUtc()}",
+                          "status": Status.empty,
+                          "totalSet": "0",
+                          "dataId": dataId,
+                        };
+
+                        ApiRepo.updateExerciseHistory(body: updateData1);
+                        await DatabaseHelper().updateData(data: updateData, tableName: DatabaseHelper.exerciseHistory, id: dataId!);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (exercises.isNotEmpty) {
+          for (int j = 0; j < exercises.length; j++) {
+            var exercise = exercises[j];
+            if (exercise.extra != null && exercise.extra!.isNotEmpty) {
+              for (int z = 0; z < exercise.extra!.length; z++) {
+                var sets = exercise.extra![z];
+
+                String dataId =
+                    "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercise.exerciseId}";
+                final db = await DatabaseHelper().database;
+                List<Map<String, dynamic>> result = await db.rawQuery('''
+                                                            SELECT * FROM ${DatabaseHelper.exerciseHistory}
+                                                            WHERE dataId LIKE ?
+                                                            ''', ['%$dataId%']);
+                List<HistoryDataModel> data =
+                    List<HistoryDataModel>.from(json.decode(jsonEncode(result)).map((x) => HistoryDataModel.fromJson(x)));
+                if (data.isNotEmpty) {
+                  for (var element in data) {
+                    var dataId = element.dataId;
+
+                    Map<String, dynamic> updateData = {
+                      "sets": sets.sets.toString(),
+                      "reps": sets.reps.toString(),
+                      "weight": sets.weight.toString(),
+                      "rest": sets.rest.toString(),
+                      "load": sets.load.toString(),
+                      "type": sets.type.toString(),
+                      "effort": "100",
+                      "date": "${DateTime.now().toUtc()}",
+                      "status": Status.empty,
+                      "totalSet": "0",
+                    };
+
+                    Map<String, dynamic> updateData1 = {
+                      "sets": sets.sets.toString(),
+                      "reps": sets.reps.toString(),
+                      "weight": sets.weight.toString(),
+                      "rest": sets.rest.toString(),
+                      "load": sets.load.toString(),
+                      "type": sets.type.toString(),
+                      "effort": "100",
+                      "date": "${DateTime.now().toUtc()}",
+                      "status": Status.empty,
+                      "totalSet": "0",
+                      "dataId": dataId,
+                    };
+
+                    ApiRepo.updateExerciseHistory(body: updateData1);
+                    await DatabaseHelper().updateData(data: updateData, tableName: DatabaseHelper.exerciseHistory, id: dataId!);
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        if (exercises.isNotEmpty) {
+          for (int j = 0; j < exercises.length; j++) {
+            var exercise = exercises[j];
+            if (exercise.extra != null && exercise.extra!.isNotEmpty) {
+              for (int z = 0; z < exercise.extra!.length; z++) {
+                var sets = exercise.extra![z];
+
+                String dataId =
+                    "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exercise.exerciseId}";
+                final db = await DatabaseHelper().database;
+                List<Map<String, dynamic>> result = await db.rawQuery('''
+                                                            SELECT * FROM ${DatabaseHelper.exerciseHistory}
+                                                            WHERE dataId LIKE ?
+                                                            ''', ['%$dataId%']);
+                List<HistoryDataModel> data =
+                    List<HistoryDataModel>.from(json.decode(jsonEncode(result)).map((x) => HistoryDataModel.fromJson(x)));
+                if (data.isNotEmpty) {
+                  for (var element in data) {
+                    var dataId = element.dataId;
+
+                    Map<String, dynamic> updateData = {
+                      "sets": sets.sets.toString(),
+                      "reps": sets.reps.toString(),
+                      "weight": sets.weight.toString(),
+                      "rest": sets.rest.toString(),
+                      "load": sets.load.toString(),
+                      "type": sets.type.toString(),
+                      "effort": "100",
+                      "date": "${DateTime.now().toUtc()}",
+                      "status": Status.empty,
+                      "totalSet": "0",
+                    };
+
+                    Map<String, dynamic> updateData1 = {
+                      "sets": sets.sets.toString(),
+                      "reps": sets.reps.toString(),
+                      "weight": sets.weight.toString(),
+                      "rest": sets.rest.toString(),
+                      "load": sets.load.toString(),
+                      "type": sets.type.toString(),
+                      "effort": "100",
+                      "date": "${DateTime.now().toUtc()}",
+                      "status": Status.empty,
+                      "totalSet": "0",
+                      "dataId": dataId,
+                    };
+
+                    ApiRepo.updateExerciseHistory(body: updateData1);
+                    await DatabaseHelper().updateData(data: updateData, tableName: DatabaseHelper.exerciseHistory, id: dataId!);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   Future<void> _saveDayData({required String status, required String type, required String status1}) async {
@@ -2093,10 +2281,15 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
               var elementZ = elementI.circuitExercises?[z];
 
               String dataId =
-                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
+                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j:$z";
+              log('dataId :::::::::::::::::: ${dataId}');
+
+              log('monthProvider?.exerciseHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider?.exerciseHistoryModel)}');
 
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
+
+              log('val :::::::::::::::::: $val');
               if (val == false) {
                 await _saveExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
               }
@@ -2105,7 +2298,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
         }
       }
     }
-
+    // return;
     if (exercises.isNotEmpty) {
       final data = exercises;
 
@@ -2752,6 +2945,8 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
         }
       }
     }
+
+    // return;
 
     if (exercises.isNotEmpty) {
       final data = exercises;

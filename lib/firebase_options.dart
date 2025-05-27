@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAg2zOiwcJhPzJiUEx2TkqpS9r38bv3FjI',
-    appId: '1:648656113534:android:074e334a3b7f82a38a6d2f',
+    appId: '1:648656113534:android:4028cd6afef677c08a6d2f',
     messagingSenderId: '648656113534',
     projectId: 'bootybybret',
     storageBucket: 'bootybybret.firebasestorage.app',
@@ -59,10 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBgBzSmF0SBcViUamTIY8yRHUIV-CVQn2o',
-    appId: '1:648656113534:ios:af2a6257be9ea61f8a6d2f',
+    appId: '1:648656113534:ios:a54c0702673ea2988a6d2f',
     messagingSenderId: '648656113534',
     projectId: 'bootybybret',
     storageBucket: 'bootybybret.firebasestorage.app',
-    iosBundleId: 'com.example1.bbb',
+    iosBundleId: 'com.bootybybret.app',
   );
+
 }

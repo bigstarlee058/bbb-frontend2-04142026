@@ -127,6 +127,10 @@ class DayDataModel {
   String? vimeoId;
   String? vimeoId2;
   String? vimeoId3;
+
+  String? thumbnailOne;
+  String? thumbnailTwo;
+  String? thumbnailThree;
   dynamic thumbnail;
   List<String>? formats;
   List<WarmupDataModel>? warmups;
@@ -144,6 +148,9 @@ class DayDataModel {
     this.vimeoId3,
     this.thumbnail,
     this.formats,
+    this.thumbnailOne,
+    this.thumbnailTwo,
+    this.thumbnailThree,
     this.warmups,
     this.exercises,
     this.id,
@@ -157,6 +164,9 @@ class DayDataModel {
         vimeoId: json["vimeoId"] ?? "",
         vimeoId2: json["vimeoIdTwo"] ?? "",
         vimeoId3: json["vimeoIdThree"] ?? "",
+        thumbnailOne: json["thumbnailOne"] ?? "",
+        thumbnailTwo: json["thumbnailTwo"] ?? "",
+        thumbnailThree: json["thumbnailThree"] ?? "",
         thumbnail: json["thumbnail"],
         formats: json["formats"].runtimeType.toString() == "String"
             ? json["formats"].toString().split(',').toList()
@@ -177,6 +187,9 @@ class DayDataModel {
         "vimeoId": vimeoId,
         "vimeoIdTwo": vimeoId2,
         "vimeoIdThree": vimeoId3,
+        "thumbnailThree": thumbnailThree,
+        "thumbnailTwo": thumbnailTwo,
+        "thumbnailOne": thumbnailOne,
         "thumbnail": thumbnail,
         "formats": formats.runtimeType.toString() == "String"
             ? formats.toString().split(',').toList()

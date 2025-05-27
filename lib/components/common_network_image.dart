@@ -41,6 +41,7 @@ Widget appShimmerImage(
     BoxFit? fit,
     BorderRadiusGeometry? borderRadius,
     Widget? child,
+    Color? color,
     bool? isBlur}) {
   return CachedNetworkImage(
     imageUrl: networkImageUrl.startsWith('https://storage.cloud.google.com/')
@@ -51,13 +52,13 @@ Widget appShimmerImage(
     fit: fit,
     placeholder: (context, url) {
       return Shimmer.fromColors(
-        baseColor: AppColors.primaryColor.withValues(alpha: 0.9),
-        highlightColor: AppColors.primaryColor.withValues(alpha: 0.7),
+        baseColor: color ?? AppColors.primaryColor.withValues(alpha: 0.9),
+        highlightColor: color ?? AppColors.primaryColor.withValues(alpha: 0.7),
         child: Container(
           height: height,
           width: width,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor,
+            color: color ?? AppColors.primaryColor,
             borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
           ),
         ),

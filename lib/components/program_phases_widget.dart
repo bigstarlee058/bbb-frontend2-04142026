@@ -1,8 +1,10 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProgramPhasesWidget extends StatelessWidget {
   const ProgramPhasesWidget({super.key});
@@ -41,16 +43,18 @@ class ProgramPhasesWidget extends StatelessWidget {
                   width: ScreenUtil.horizontalScale(60),
                   child: Align(
                     alignment: Alignment.topCenter,
-                    child: Text(
-                      "Periodization Cycle",
-                      maxLines: 2,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          color: AppColors.primaryColor,
-                          fontSize: ScreenUtil.horizontalScale(5),
-                          fontWeight: FontWeight.bold,
-                          height: 1.35),
-                    ),
+                    child: Consumer<DataProvider>(builder: (context, value, c) {
+                      return Text(
+                        value.programPhaseModel?.phasesmaininfo?.title ?? "Periodization Cycle",
+                        maxLines: 2,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: AppColors.primaryColor,
+                            fontSize: ScreenUtil.horizontalScale(5),
+                            fontWeight: FontWeight.bold,
+                            height: 1.35),
+                      );
+                    }),
                   ),
                 ),
               ),
@@ -77,13 +81,22 @@ class ProgramPhasesWidget extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Container(
-                      height: ScreenUtil.verticalScale(43),
-                      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.8)),
-                      child: Image.asset(
-                        "assets/img/program-phase-1.png",
-                      ),
-                    ),
+                    Consumer<DataProvider>(builder: (context, value, c) {
+                      return Container(
+                        height: ScreenUtil.verticalScale(43),
+                        margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.8)),
+                        child: value.programPhaseModel != null
+                            ? value.programPhaseModel!.phasesmaininfo!.thumbnail!.isEmpty
+                                ? Image.asset("assets/img/program-phase-1.png")
+                                : Image.network(
+                                    value.programPhaseModel!.phasesmaininfo!.thumbnail!.startsWith('https://storage.cloud.google.com/')
+                                        ? value.programPhaseModel!.phasesmaininfo!.thumbnail!
+                                            .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                        : value.programPhaseModel!.phasesmaininfo!.thumbnail!,
+                                  )
+                            : Image.asset("assets/img/program-phase-1.png"),
+                      );
+                    }),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(18)),
                       child: ButtonWidget(

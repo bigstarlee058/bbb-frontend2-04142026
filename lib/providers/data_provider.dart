@@ -27,12 +27,18 @@ import 'package:bbb/models/equipment.dart';
 import 'package:bbb/models/equipmenttitle.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/models/faqs_model.dart';
+import 'package:bbb/models/get_all_achivements.dart';
+import 'package:bbb/models/program_phase_model.dart';
 import 'package:bbb/models/screen_bg_model.dart';
 import 'package:bbb/models/staffs.dart';
+import 'package:bbb/models/tutorial_details_model.dart';
+import 'package:bbb/models/tutorial_model.dart';
 import 'package:bbb/models/tutorials.dart';
+import 'package:bbb/models/vimeo_to_video_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/cache_image_manager.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -92,6 +98,7 @@ class DataProvider extends ChangeNotifier {
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
     String? userIdToken = await getAuthToken();
+    log('userIdToken :::::::::::::::::: ${userIdToken}');
     try {
       final response = await http.get(
         url,
@@ -139,6 +146,141 @@ class DataProvider extends ChangeNotifier {
       }
     } catch (e) {
       throw Exception('Failed to get screen bg data');
+    }
+  }
+
+  List<AchievementModel> achievementList = [];
+
+  Future getAllAchievement() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/achievements-group/get');
+    String? userIdToken = await getAuthToken();
+
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        achievementList = List<AchievementModel>.from(data.map((x) => AchievementModel.fromJson(x)));
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get achievementList');
+      }
+    } catch (e) {
+      throw Exception('Failed to get achievementList');
+    }
+  }
+
+  List<TutorialModel> tutorialList = [];
+  bool tutorialLoader = false;
+  Future getAllTutorials() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/tutorials/get');
+    String? userIdToken = await getAuthToken();
+    if (tutorialList.isEmpty) {
+      tutorialLoader = true;
+      notifyListeners();
+    }
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        tutorialList = List<TutorialModel>.from(data.map((x) => TutorialModel.fromJson(x)));
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get tutorialList');
+      }
+    } catch (e) {
+      throw Exception('Failed to get tutorialList');
+    } finally {
+      if (tutorialList.isEmpty) {
+        tutorialLoader = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  TutorialDataModel? tutorialDataModel;
+  Future getTutorialDetails({required String id}) async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/tutorials/get/$id');
+    String? userIdToken = await getAuthToken();
+
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        tutorialDataModel = TutorialDataModel.fromJson(data);
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get tutorialDataModel');
+      }
+    } catch (e) {
+      throw Exception('Failed to get tutorialDataModel');
+    }
+  }
+
+  ProgramPhaseModel? programPhaseModel;
+  Future getProgramPhaseDetails() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/phases/get');
+    String? userIdToken = await getAuthToken();
+
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        programPhaseModel = ProgramPhaseModel.fromJson(data);
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get programPhaseModel');
+      }
+    } catch (e) {
+      throw Exception('Failed to get programPhaseModel');
+    }
+  }
+
+  VimeoToVideoModel? videoModel;
+  Future getVideoUsingVimeo(String vimeoId) async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/getVideoUrl/$vimeoId');
+    String? userIdToken = await getAuthToken();
+    videoModel = null;
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        videoModel = VimeoToVideoModel.fromJson(data);
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get videoModel');
+      }
+    } catch (e) {
+      throw Exception('Failed to get videoModel');
     }
   }
 
@@ -199,9 +341,6 @@ class DataProvider extends ChangeNotifier {
       throw Exception('Failed to update user data: ${response.body}');
     }
   }
-
-  List<Staffs> get staffs => staffsData;
-  List<Staffs> get athletes => athletesData;
 
   Future<void> fetchStaffs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/staffs/admin/get');
@@ -813,17 +952,30 @@ class DataProvider extends ChangeNotifier {
   Future<void> fetchCheckoutPoint() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/settings/');
     String? userIdToken = await getAuthToken();
-    try {
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
-        },
-      );
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
+    Dio dio = Dio();
 
+    try {
+      // final response = await http.get(
+      //   url,
+      //   headers: <String, String>{
+      //     'Content-Type': 'application/json; charset=UTF-8',
+      //     'AUTH_TOKEN': userIdToken ?? "",
+      //   },
+      // );
+      // log('response :::::::::::::::::: ${jsonEncode(response)}');
+
+      final response = await dio.get(
+        url.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'AUTH_TOKEN': userIdToken ?? "",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        var data = response.data;
         var responseData = data[0];
 
         if (equipmentCheckpoint == '' || bonusCheckpoint == '' || workoutCheckpoint == '') {

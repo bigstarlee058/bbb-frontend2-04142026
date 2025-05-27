@@ -18,6 +18,7 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +52,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   double hipInCm = 30;
   double midThigh = 30;
   HeightUnit selectedHeightUnit = HeightUnit.cm;
+
   WaistUnit selectedWaistUnit = WaistUnit.inches;
   HipUnit selectedHipUnit = HipUnit.inches;
   bool canConvertUnit = true;
@@ -94,9 +96,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
       selectedHeight.text = userData1["detail"]["height"] == null
           ? "0"
           : '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"'; //'${userData['detail']['height']}\'0"';
-      selectedMidThigh.text = userData1["detail"]["midthigh"] == null ? "0" : "${userData1["detail"]["midthigh"].toString()}\"";
-      selectedHip.text = userData1["detail"]["hip"] == null ? "${0}\"" : "${userData1["detail"]["hip"].toString()}\"";
-      selectedWaist.text = userData1["detail"]["waist"] == null ? "0" : "${userData1["detail"]["waist"].toString()}\"";
+      selectedMidThigh.text = userData1["detail"]["midthigh"] == null ? "0" : userData1["detail"]["midthigh"].toString();
+      selectedHip.text = userData1["detail"]["hip"] == null ? "0" : userData1["detail"]["hip"].toString();
+      selectedWaist.text = userData1["detail"]["waist"] == null ? "0" : userData1["detail"]["waist"].toString();
 
       heightInCm = userData1["detail"]["height"] == null
           ? 183
@@ -177,6 +179,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
     if (_id != null) {
       await userData!.updateUserInfo(_id!, userDetails, image);
+
+      ///
+
+      Fluttertoast.showToast(
+        msg: "Profile updated!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP_RIGHT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: AppColors.primaryColor,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+
       setState(() {
         isLoading = false;
       });
@@ -455,36 +470,45 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               value: selectedHeight,
                               hint: '6\'0"',
                             ),
-                            _weightPicker(
+                            _numberPicker(
                               context: context,
                               label: 'Weight',
-                              value: selectedWeight,
-                              hint: '81',
+                              controller: selectedWeight,
+                              focusNode: _nodeText1,
+                              suffix: "lbs",
                             ),
-                            _waistPicker(
+
+                            _numberPicker(
                               context: context,
                               label: 'Waist',
-                              value: selectedWaist,
-                              hint: '3\'1"',
+                              controller: selectedWaist,
+                              focusNode: _nodeText2,
+                              suffix: '"',
                             ),
-                            _hipPicker(
+                            _numberPicker(
                               context: context,
                               label: 'Hip',
-                              value: selectedHip,
-                              hint: '3\'1"',
+                              controller: selectedHip,
+                              focusNode: _nodeText3,
+                              suffix: '"',
                             ),
-                            _midThighPicker(
+
+                            _numberPicker(
                               context: context,
                               label: 'Mid-Thigh',
-                              value: selectedMidThigh,
-                              hint: '3\'1"',
+                              controller: selectedMidThigh,
+                              focusNode: _nodeText4,
+                              suffix: '"',
                             ),
-                            _bodyFatPicker(
+
+                            _numberPicker(
                               context: context,
                               label: 'Body-Fat',
-                              value: selectedBodyFat,
-                              hint: '40',
+                              controller: selectedBodyFat,
+                              focusNode: _nodeText5,
+                              suffix: "%", // hint: '81',
                             ),
+
                             SizedBox(height: ScreenUtil.verticalScale(2)),
                             isLoading == true
                                 ? const Center(
@@ -737,119 +761,18 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  Widget _weightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+  Widget _numberPicker({
+    required BuildContext context,
+    required String label,
+    required TextEditingController controller,
+    required String suffix,
+    required FocusNode focusNode,
+  }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: ScreenUtil.horizontalScale(34.5),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.95),
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            width: ScreenUtil.horizontalScale(50.5),
-            height: ScreenUtil.verticalScale(6),
-            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
-            decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: KeyboardActions(
-              autoScroll: false,
-              config: _buildConfig(context),
-              child: Builder(builder: (context) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: ScreenUtil.horizontalScale(20.5),
-                      ),
-                    ),
-                    SizedBox(
-                      width: ScreenUtil.horizontalScale(17),
-                      child: TextField(
-                        style: TextStyle(
-                          fontSize: ScreenUtil.verticalScale(1.95),
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                        ),
-                        controller: value,
-                        keyboardType: TextInputType.number,
-                        onSubmitted: (value) {
-                          FocusScope.of(context).unfocus();
-                        },
-                        textInputAction: TextInputAction.done,
-                        textAlign: TextAlign.center,
-                        focusNode: _nodeText1,
-                        maxLength: 3,
-                        decoration: InputDecoration(
-                          counterText: "",
-                          hintText: "Weight",
-                          hintStyle: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: ScreenUtil.verticalScale(1.95),
-                            fontWeight: FontWeight.normal,
-                          ),
-                          suffix: Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Text(
-                              "lbs",
-                              style: TextStyle(
-                                fontSize: ScreenUtil.verticalScale(1.95),
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                          border: InputBorder.none,
-                          isCollapsed: true, // makes it tighter vertically
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          TextInputFormatter.withFunction((oldValue, newValue) {
-                            String newText = newValue.text;
-                            if (newText.isNotEmpty) {
-                              newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                            }
-                            return TextEditingValue(
-                              text: newText,
-                              selection: TextSelection.collapsed(offset: newText.length),
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: SizedBox(
-                        width: ScreenUtil.horizontalScale(20.5),
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          )
-        ],
+      margin: EdgeInsets.symmetric(
+        horizontal: ScreenUtil.horizontalScale(7.5),
+        vertical: ScreenUtil.verticalScale(0.8),
       ),
-    );
-  }
-
-  Widget _bodyFatPicker(
-      {required BuildContext context, required String label, required TextEditingController value, required String hint}) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -870,84 +793,66 @@ class _MyProfilePageState extends State<MyProfilePage> {
             height: ScreenUtil.verticalScale(6),
             padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
+              color: Colors.grey.withOpacity(0.052),
               borderRadius: Utils.buttonRadius,
             ),
             child: KeyboardActions(
               autoScroll: false,
-              config: _buildConfig1(context),
-              child: Builder(builder: (context) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: ScreenUtil.horizontalScale(21),
+              config: _buildConfig(context, focusNode),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IntrinsicWidth(
+                    child: TextField(
+                      style: TextStyle(
+                        fontSize: ScreenUtil.verticalScale(1.95),
+                        color: Colors.black,
                       ),
-                    ),
-                    SizedBox(
-                      width: ScreenUtil.horizontalScale(12),
-                      child: TextField(
-                        style: TextStyle(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                      textAlign: TextAlign.center,
+                      focusNode: focusNode,
+                      maxLength: 3,
+                      decoration: InputDecoration(
+                        counterText: "",
+                        hintText: "0",
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade700,
                           fontSize: ScreenUtil.verticalScale(1.95),
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
                         ),
-                        controller: value,
-                        keyboardType: TextInputType.number,
-                        onSubmitted: (value) {
-                          FocusScope.of(context).unfocus();
-                        },
-                        textInputAction: TextInputAction.done,
-                        textAlign: TextAlign.center,
-                        focusNode: _nodeText2,
-                        maxLength: 3,
-                        decoration: InputDecoration(
-                          counterText: "",
-                          hintText: "50",
-                          hintStyle: TextStyle(
-                            color: Colors.grey.shade700,
+                        suffix: Text(
+                          suffix,
+                          style: TextStyle(
                             fontSize: ScreenUtil.verticalScale(1.95),
-                            fontWeight: FontWeight.normal,
+                            color: Colors.black,
                           ),
-                          suffix: Text(
-                            "%",
-                            style: TextStyle(
-                              fontSize: ScreenUtil.verticalScale(1.95),
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          border: InputBorder.none,
-                          isCollapsed: true, // makes it tighter vertically
-                          contentPadding: EdgeInsets.zero,
                         ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          TextInputFormatter.withFunction((oldValue, newValue) {
-                            String newText = newValue.text;
-                            if (newText.isNotEmpty) {
-                              newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                            }
-                            return TextEditingValue(
-                              text: newText,
-                              selection: TextSelection.collapsed(offset: newText.length),
-                            );
-                          }),
-                        ],
+                        border: InputBorder.none,
+                        isCollapsed: true,
+                        contentPadding: EdgeInsets.zero,
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        TextInputFormatter.withFunction((oldValue, newValue) {
+                          String newText = newValue.text;
+                          if (newText.isNotEmpty) {
+                            newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                          }
+                          return TextEditingValue(
+                            text: newText,
+                            selection: TextSelection.collapsed(offset: newText.length),
+                          );
+                        }),
+                      ],
                     ),
-                    Expanded(
-                      child: SizedBox(
-                        width: ScreenUtil.horizontalScale(21),
-                      ),
-                    ),
-                  ],
-                );
-              }),
+                  ),
+                ],
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -1004,66 +909,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 },
                 child: Text(
                   value.text.isEmpty ? 'Waist' : value.text,
-                  style: TextStyle(
-                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
-                    fontSize: ScreenUtil.verticalScale(1.95),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _hipPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: ScreenUtil.horizontalScale(34.5),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.95),
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            width: ScreenUtil.horizontalScale(50.5),
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(1),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  final rawText = value.text; // e.g., '39"'
-                  final cleanText = rawText.replaceAll(RegExp(r'[^0-9.]'), ''); // removes non-numeric characters
-                  final parsedValue = double.tryParse(cleanText) ?? 0;
-                  await showCupertinoHipPicker(
-                    initialHip: parsedValue,
-                    context: context,
-                    canConvertUnit: canConvertUnit,
-                    onHipChanged: (val) {
-                      setState(() {
-                        value.text = '${val.toInt()}"';
-                      });
-                    },
-                  );
-                },
-                child: Text(
-                  value.text.isEmpty ? 'Hip' : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
                     fontSize: ScreenUtil.verticalScale(1.95),
@@ -1140,115 +985,20 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  Widget _midThighPicker({
-    required BuildContext context,
-    required String label,
-    required TextEditingController value,
-    required String hint,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: ScreenUtil.horizontalScale(7.5),
-        vertical: ScreenUtil.verticalScale(0.8),
-      ),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: ScreenUtil.horizontalScale(34.5),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.95),
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            width: ScreenUtil.horizontalScale(50.5),
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(1),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  final rawText = value.text; // e.g., '39"'
-                  final cleanText = rawText.replaceAll(RegExp(r'[^0-9.]'), ''); // removes non-numeric characters
-                  final parsedValue = double.tryParse(cleanText) ?? 0;
-                  await showCupertinoMidThighPicker(
-                    initialMidThigh: parsedValue,
-                    context: context,
-                    canConvertUnit: canConvertUnit,
-                    onMidThighChanged: (val) {
-                      setState(() {
-                        value.text = '$val"';
-                      });
-                    },
-                  );
-                },
-                child: Text(
-                  value.text.isEmpty ? hint : value.text,
-                  style: TextStyle(
-                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
-                    fontSize: ScreenUtil.verticalScale(1.95),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   final FocusNode _nodeText1 = FocusNode();
   final FocusNode _nodeText2 = FocusNode();
+  final FocusNode _nodeText3 = FocusNode();
+  final FocusNode _nodeText4 = FocusNode();
+  final FocusNode _nodeText5 = FocusNode();
 
-  KeyboardActionsConfig _buildConfig(BuildContext context) {
+  KeyboardActionsConfig _buildConfig(BuildContext context, FocusNode nodeText) {
     return KeyboardActionsConfig(
       keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
       keyboardBarColor: Colors.white,
       nextFocus: true,
       actions: [
         KeyboardActionsItem(
-          focusNode: _nodeText1,
-          displayArrows: false,
-          toolbarButtons: [
-            (node) {
-              return GestureDetector(
-                onTap: () => node.unfocus(),
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
-                  child: Text(
-                    "Done",
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
-              );
-            }
-          ],
-        ),
-      ],
-    );
-  }
-
-  KeyboardActionsConfig _buildConfig1(BuildContext context) {
-    return KeyboardActionsConfig(
-      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
-      keyboardBarColor: Colors.white,
-      nextFocus: true,
-      actions: [
-        KeyboardActionsItem(
-          focusNode: _nodeText2,
+          focusNode: nodeText,
           displayArrows: false,
           toolbarButtons: [
             (node) {

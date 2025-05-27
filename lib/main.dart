@@ -34,6 +34,7 @@ import 'package:bbb/pages/Tools/faqs_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
 import 'package:bbb/pages/Tools/seeall_achievement_page.dart';
+import 'package:bbb/pages/Tools/tutorial_page.dart';
 import 'package:bbb/pages/WatchTutorial/app_tutorial.dart';
 import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
 import 'package:bbb/pages/main_page.dart';
@@ -240,6 +241,7 @@ class _MyAppState extends State<MyApp> {
             AppRoutes.exerciseLibraryScreen: (context) => const ExerciseLibraryPage(),
             AppRoutes.equipmentLibraryScreen: (context) => const EquipmentLibraryPage(),
             AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
+            AppRoutes.tutorialScreen: (context) => const TutorialPage(),
             AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(image: ''),
             AppRoutes.emailVerificationScreen: (context) => const EmailVerificationScreen(),
             AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),

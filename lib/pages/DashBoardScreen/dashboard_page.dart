@@ -83,6 +83,8 @@ class _DashboardPageState extends State<DashboardPage> {
     loadStaffsData();
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
+    loadAchievementsData();
+    loadProgramPhaseData();
     requestNotificationPermission();
 
     // _scrollController = ScrollController();
@@ -107,6 +109,10 @@ class _DashboardPageState extends State<DashboardPage> {
     await dataProvider?.fetchStaffs();
   }
 
+  void loadAchievementsData() async {
+    await dataProvider?.getAllAchievement();
+  }
+
   void loadFeaturedChallengeData() async {
     await dataProvider?.fetchFeaturedChalleng();
     if (dataProvider!.featureChallengeData.id != "") {
@@ -124,6 +130,10 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void loadFeaturedCollectionData() async {
     await dataProvider?.fetchFeaturedColllections();
+  }
+
+  void loadProgramPhaseData() async {
+    await dataProvider?.getProgramPhaseDetails();
   }
 
   Future<void> _initializeFetchData() async {
@@ -149,12 +159,13 @@ class _DashboardPageState extends State<DashboardPage> {
       // ),
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
-          WidgetsBinding.instance.scheduleFrameCallback(
-            (timeStamp) {
-              scrollProvider.updateOffSet(notification.metrics.pixels);
-              print("==========${scrollProvider.scrollOffset}");
-            },
-          );
+          if (notification.metrics.axis == Axis.vertical) {
+            WidgetsBinding.instance.scheduleFrameCallback(
+              (timeStamp) {
+                scrollProvider.updateOffSet(notification.metrics.pixels);
+              },
+            );
+          }
           return true;
         },
         child: Stack(
@@ -297,6 +308,12 @@ class _DashboardPageState extends State<DashboardPage> {
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,
                     onRefresh: () async => await _initializeFetchData().then((value) async {
+                      loadUserInfo();
+                      loadStaffsData();
+                      loadFeaturedChallengeData();
+                      loadAchievementsData();
+                      loadProgramPhaseData();
+                      loadFeaturedCollectionData();
                       if (!context.mounted) return;
                       await monthProvider.onInit(context, isEnabled: false);
                     }),

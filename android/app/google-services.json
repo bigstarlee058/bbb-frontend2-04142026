@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:648656113534:android:4028cd6afef677c08a6d2f",
+        "android_client_info": {
+          "package_name": "com.bootybybret.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg2zOiwcJhPzJiUEx2TkqpS9r38bv3FjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:648656113534:android:074e334a3b7f82a38a6d2f",
         "android_client_info": {
           "package_name": "com.example.bbb"
