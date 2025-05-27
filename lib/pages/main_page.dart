@@ -68,7 +68,6 @@ class _MainPageState extends State<MainPage> {
     // autoPlay: true,
     // videoId: "953289606",
     // );
-
     if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         _showWelcomeModal();
@@ -177,7 +176,7 @@ class _MainPageState extends State<MainPage> {
 
   void _startPeriodicUpdate() {
     _timer = Timer.periodic(
-      const Duration(minutes: 1),
+      const Duration(seconds: 10),
       (Timer timer) {
         _initializeData();
       },

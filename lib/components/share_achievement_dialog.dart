@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/utils/screen_util.dart';
@@ -319,7 +318,6 @@ class _ShareAchievementDialogState extends State<ShareAchievementDialog> {
                           setState(() {
                             currentPage = index;
                           });
-                          log('currentPage :::::::::1::::::::: ${currentPage}');
                         },
                         itemBuilder: (context, index) {
                           return Padding(

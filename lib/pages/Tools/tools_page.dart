@@ -226,6 +226,15 @@ class _ToolsPageState extends State<ToolsPage> {
                                   height: ScreenUtil.verticalScale(1.3),
                                 ),
                                 const ToolsPageButton(
+                                  title: 'Tutorials',
+                                  icon: 'assets/icons/tutorials.svg',
+                                  url: '/tutorialScreen',
+                                ),
+
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(1.3),
+                                ),
+                                const ToolsPageButton(
                                   title: 'FAQs',
                                   icon: 'assets/icons/faqs.svg',
                                   url: '/faqs',

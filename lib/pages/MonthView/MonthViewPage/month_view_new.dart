@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -31,14 +32,14 @@ import 'package:provider/provider.dart';
 
 import 'sections/schedule_section.dart';
 
-class MonthView extends StatefulWidget {
-  const MonthView({super.key});
+class MonthViewNew extends StatefulWidget {
+  const MonthViewNew({super.key});
 
   @override
-  State<MonthView> createState() => _MonthViewState();
+  State<MonthViewNew> createState() => _MonthViewNewState();
 }
 
-class _MonthViewState extends State<MonthView> {
+class _MonthViewNewState extends State<MonthViewNew> {
   MonthProvider? monthProvider;
   DataProvider? dataProvider;
 
@@ -278,31 +279,87 @@ class _MonthViewState extends State<MonthView> {
                                                 ),
                                                 Column(
                                                   children: [
-                                                    monthProvider.startTime != null && monthProvider.endTime != null
-                                                        ? Row(
-                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                            children: [
-                                                              Text(
-                                                                monthProvider.startTime == null || monthProvider.startTime.toString() == ""
-                                                                    ? ""
-                                                                    : DateFormat('MM/dd').format(monthProvider.startTime!),
-                                                                style: TextStyle(
-                                                                  color: Colors.white,
-                                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              int index = monthProvider.monthLocalDataModel.indexWhere(
+                                                                (element) => element.monthId == monthProvider.monthDataModel?.id,
+                                                              );
+                                                              log('Previous Month :::::::::::::::::: ${monthProvider.monthLocalDataModel[index + 1]}');
+                                                            },
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
+                                                              width: ScreenUtil.horizontalScale(20),
+                                                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  "Previous",
+                                                                  style: TextStyle(
+                                                                    color: Colors.white,
+                                                                    fontSize: ScreenUtil.verticalScale(1.8),
+                                                                  ),
                                                                 ),
                                                               ),
-                                                              Text(
-                                                                monthProvider.endTime == null || monthProvider.endTime.toString() == ""
-                                                                    ? ""
-                                                                    : DateFormat(' - MM/dd').format(monthProvider.endTime!),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: Container(
+                                                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.5)),
+                                                              margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2)),
+                                                              decoration: BoxDecoration(
+                                                                  color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
+                                                              child: monthProvider.startTime != null && monthProvider.endTime != null
+                                                                  ? Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                      children: [
+                                                                        Text(
+                                                                          monthProvider.startTime == null ||
+                                                                                  monthProvider.startTime.toString() == ""
+                                                                              ? ""
+                                                                              : DateFormat('MM/dd').format(monthProvider.startTime!),
+                                                                          style: TextStyle(
+                                                                            color: Colors.white,
+                                                                            fontSize: ScreenUtil.verticalScale(1.8),
+                                                                          ),
+                                                                        ),
+                                                                        Text(
+                                                                          monthProvider.endTime == null ||
+                                                                                  monthProvider.endTime.toString() == ""
+                                                                              ? ""
+                                                                              : DateFormat(' - MM/dd').format(monthProvider.endTime!),
+                                                                          style: TextStyle(
+                                                                            color: Colors.white,
+                                                                            fontSize: ScreenUtil.verticalScale(1.8),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : const SizedBox(),
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                            decoration: BoxDecoration(
+                                                                color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
+                                                            width: ScreenUtil.horizontalScale(20),
+                                                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Next",
                                                                 style: TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: ScreenUtil.verticalScale(2),
+                                                                  fontSize: ScreenUtil.verticalScale(1.8),
                                                                 ),
                                                               ),
-                                                            ],
-                                                          )
-                                                        : const SizedBox(),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                     // Padding(
                                                     //   padding: const EdgeInsets.symmetric(vertical: 5),
                                                     //   child: Text(
@@ -320,24 +377,22 @@ class _MonthViewState extends State<MonthView> {
                                                         left: ScreenUtil.horizontalScale(2),
                                                         right: ScreenUtil.horizontalScale(8),
                                                       ),
+                                                      child: SizedBox(
+                                                        height: media.height / 7.5,
+                                                        child: Center(
+                                                          child: Image.asset("assets/img/month_hero1.png"),
+                                                        ),
+                                                      ),
                                                       // child: SizedBox(
                                                       //   height: media.height / 7.5,
                                                       //   child: Center(
-                                                      //     child: Image.asset("assets/img/month_hero1.png"),
+                                                      //     child: Utils.appImage(
+                                                      //       Size(media.width, media.height / 7.5),
+                                                      //       monthProvider.monthTitleImage,
+                                                      //       imageKey: '',
+                                                      //     ),
                                                       //   ),
                                                       // ),
-                                                      child: monthProvider.monthTitleImage == null
-                                                          ? SizedBox(height: media.height / 7.5)
-                                                          : SizedBox(
-                                                              height: media.height / 7.5,
-                                                              child: Center(
-                                                                child: Utils.appImage(
-                                                                  Size(media.width, media.height / 7.5),
-                                                                  monthProvider.monthTitleImage,
-                                                                  imageKey: '',
-                                                                ),
-                                                              ),
-                                                            ),
                                                     ),
                                                     Container(
                                                       margin: EdgeInsets.symmetric(

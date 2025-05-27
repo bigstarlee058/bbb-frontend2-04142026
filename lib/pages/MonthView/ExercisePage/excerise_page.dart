@@ -331,6 +331,7 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
   Timer? _hideControlsTimer;
 
   Future<void> fetchExercise({String? exerciseId, int? exerciseIndex, bool? isPumpDay, bool? isCircuit, String? circuitIndex}) async {
+    log('exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString() :::::::::::::::::: ${exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString()}');
     if (monthProvider?.isWarmup == false) {
       await monthProvider?.fetchCurrentExercise(exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
       isExercise = 1;
@@ -1178,16 +1179,18 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                   children: [
                     Align(
                       alignment: Alignment.topLeft,
-                      child: Html(
-                        data: exerciseDesc,
-                        style: {
-                          "p.fancy": Style(
-                            padding: HtmlPaddings.zero,
-                            color: Colors.black,
-                            textAlign: TextAlign.left,
-                          ),
-                        },
-                      ),
+                      child: (exerciseDesc.trim() != '<p><br></p>' && exerciseDesc.trim().isNotEmpty)
+                          ? Html(
+                              data: exerciseDesc,
+                              style: {
+                                "p.fancy": Style(
+                                  padding: HtmlPaddings.zero,
+                                  color: Colors.black,
+                                  textAlign: TextAlign.left,
+                                ),
+                              },
+                            )
+                          : const SizedBox.shrink(),
                     ),
                     // Align(
                     //   alignment: Alignment.topLeft,
@@ -1473,7 +1476,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                               List<ExerciseHistoryModel> completedExerciseCurrentRound =
                                                   monthProvider.exerciseHistoryModel.where(
                                                 (element) {
-                                                  return element.type!.contains("Circuit - $circuitIndex:$circuitRound");
+                                                  return element.type!.contains("Circuit - $circuitIndex:$circuitRound") &&
+                                                      (element.status == Status.skipped || element.status == Status.completed);
                                                 },
                                               ).toList();
 

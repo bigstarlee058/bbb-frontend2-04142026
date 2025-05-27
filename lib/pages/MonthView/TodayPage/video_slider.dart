@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/TodayPage/slider_video_page.dart';
 import 'package:bbb/routes/fade_page_route.dart';
@@ -7,7 +10,10 @@ import 'package:flutter/material.dart';
 
 class VideoSlider extends StatefulWidget {
   final DayDataModel dayDataModel;
-  const VideoSlider({super.key, required this.dayDataModel});
+  const VideoSlider({
+    super.key,
+    required this.dayDataModel,
+  });
 
   @override
   State<VideoSlider> createState() => _VideoSliderState();
@@ -17,27 +23,43 @@ class _VideoSliderState extends State<VideoSlider> {
   int currentVideoIndex = 0;
   PageController pageController = PageController();
 
-  int totalCount = 0;
-
   @override
   void initState() {
     getCount();
     super.initState();
   }
 
+  List<Map<String, dynamic>> videoData = [];
+
   getCount() {
-    List videoList = [
-      widget.dayDataModel.vimeoId?.isNotEmpty,
-      widget.dayDataModel.vimeoId2?.isNotEmpty,
-      widget.dayDataModel.vimeoId3?.isNotEmpty,
-    ];
-    totalCount = videoList.where((element) => element == true).toList().length;
+    if (widget.dayDataModel.vimeoId!.isNotEmpty) {
+      videoData.add({
+        "image": widget.dayDataModel.thumbnailOne,
+        "vimeo": widget.dayDataModel.vimeoId,
+      });
+    }
+
+    if (widget.dayDataModel.vimeoId2!.isNotEmpty) {
+      videoData.add({
+        "image": widget.dayDataModel.thumbnailTwo,
+        "vimeo": widget.dayDataModel.vimeoId2,
+      });
+    }
+
+    if (widget.dayDataModel.vimeoId3!.isNotEmpty) {
+      videoData.add({
+        "image": widget.dayDataModel.thumbnailThree,
+        "vimeo": widget.dayDataModel.vimeoId3,
+      });
+    }
+
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return totalCount == 0
+    log('videoData[index]["image"] :::::::::::::::::: ${videoData[0]["image"]}');
+    return videoData.isEmpty
         ? SizedBox()
         : Column(
             children: [
@@ -50,38 +72,59 @@ class _VideoSliderState extends State<VideoSlider> {
                   child: PageView.builder(
                     physics: BouncingScrollPhysics(),
                     controller: pageController,
-                    itemCount: totalCount,
+                    itemCount: videoData.length,
                     onPageChanged: (v) {
                       currentVideoIndex = v;
                       setState(() {});
                     },
-                    itemBuilder: (context, index) => Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: AssetImage("assets/img/pp_4.png"),
-                        ),
-                      ),
-                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
-                      child: Center(
-                        child: IconButton(
-                          iconSize: 60,
-                          icon: Icon(
-                            Icons.play_circle_filled,
-                            color: Colors.white70,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              FadePageRoute(
-                                page: const SliderVideoPage(
-                                    videoUrl:
-                                        'https://player.vimeo.com/progressive_redirect/playback/1046944756/rendition/1440p/file.mp4?loc=external&oauth2_token_id=1782285824&signature=0a8c7ae81c9e71258d2ec9446e16be900d8e8ef4792a4006041d5b27c9604ec0'),
+                    itemBuilder: (context, index) => Padding(
+                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
+                      child: videoData[index]["image"].toString().isEmpty
+                          ? Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: AssetImage("assets/img/pp_4.png"),
+                                ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                              child: IconButton(
+                                iconSize: 60,
+                                icon: Icon(
+                                  Icons.play_circle_filled,
+                                  color: Colors.white70,
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    FadePageRoute(
+                                      page: SliderVideoPage(videoUrl: videoData[index]["vimeo"]),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          : appShimmerImage(
+                              networkImageUrl: videoData[index]["image"].startsWith('https://storage.cloud.google.com/')
+                                  ? videoData[index]["image"]
+                                      .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                  : videoData[index]["image"],
+                              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                              fit: BoxFit.cover,
+                              child: IconButton(
+                                iconSize: 60,
+                                icon: Icon(
+                                  Icons.play_circle_filled,
+                                  color: Colors.white70,
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    FadePageRoute(
+                                      page: SliderVideoPage(videoUrl: videoData[index]["vimeo"]),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -89,12 +132,12 @@ class _VideoSliderState extends State<VideoSlider> {
               SizedBox(
                 height: ScreenUtil.horizontalScale(2),
               ),
-              totalCount == 1
+              videoData.isEmpty
                   ? SizedBox()
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        totalCount,
+                        videoData.length,
                         (index) => Padding(
                           padding: const EdgeInsets.all(5),
                           child: Container(

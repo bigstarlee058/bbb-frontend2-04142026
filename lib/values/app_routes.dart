@@ -10,6 +10,7 @@ class AppRoutes {
   static const String exerciseLibraryScreen = '/exerciseLibrary';
   static const String equipmentLibraryScreen = '/equipmentLibrary';
   static const String bonusLibraryScreen = '/bonusLibrary';
+  static const String tutorialScreen = '/tutorialScreen';
   static const String graphAndReportsScreen = '/graphAndReports';
   static const String exerciseHistory = '/exerciseHistory';
   static const String nutritionCalculatorScreen = '/nutritionCalculator';

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/athletes_list_widget.dart';
@@ -82,6 +83,8 @@ class _DashboardPageState extends State<DashboardPage> {
     loadStaffsData();
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
+    loadAchievementsData();
+    loadProgramPhaseData();
     requestNotificationPermission();
 
     // _scrollController = ScrollController();
@@ -106,6 +109,10 @@ class _DashboardPageState extends State<DashboardPage> {
     await dataProvider?.fetchStaffs();
   }
 
+  void loadAchievementsData() async {
+    await dataProvider?.getAllAchievement();
+  }
+
   void loadFeaturedChallengeData() async {
     await dataProvider?.fetchFeaturedChalleng();
     if (dataProvider!.featureChallengeData.id != "") {
@@ -123,6 +130,10 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void loadFeaturedCollectionData() async {
     await dataProvider?.fetchFeaturedColllections();
+  }
+
+  void loadProgramPhaseData() async {
+    await dataProvider?.getProgramPhaseDetails();
   }
 
   Future<void> _initializeFetchData() async {
@@ -148,11 +159,13 @@ class _DashboardPageState extends State<DashboardPage> {
       // ),
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
-          WidgetsBinding.instance.scheduleFrameCallback(
-            (timeStamp) {
-              scrollProvider.updateOffSet(notification.metrics.pixels);
-            },
-          );
+          if (notification.metrics.axis == Axis.vertical) {
+            WidgetsBinding.instance.scheduleFrameCallback(
+              (timeStamp) {
+                scrollProvider.updateOffSet(notification.metrics.pixels);
+              },
+            );
+          }
           return true;
         },
         child: Stack(
@@ -199,34 +212,108 @@ class _DashboardPageState extends State<DashboardPage> {
             // ),
             Column(
               children: [
-                Consumer<UserDataProvider>(builder: (context, userData, child) {
-                  return AppBar(
-                    toolbarHeight: ScreenUtil.verticalScale(4),
-                    surfaceTintColor: Colors.transparent,
-                    backgroundColor: Colors.transparent,
-                    centerTitle: false,
-                    leading: SizedBox(),
-                    titleSpacing: ScreenUtil.horizontalScale(6),
-                    leadingWidth: 0,
-                    title: Text(
-                      'Hi ${userData.userName}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: ScreenUtil.horizontalScale(5.5),
-                      ),
-                    ),
-                    actions: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
-                      )
-                    ],
-                  );
-                }),
+                // Consumer<ScrollProvider>(builder: (context, value, child) {
+                //   double targetHeight = value.scrollOffset > 0
+                //       ? ScreenUtil.verticalScale(3.5)
+                //       : ScreenUtil.verticalScale(4);
+                //
+                //   return AppBar(
+                //     toolbarHeight: ScreenUtil.verticalScale(4),
+                //     surfaceTintColor: Colors.transparent,
+                //     backgroundColor: Colors.transparent,
+                //     centerTitle: false,
+                //     leading: SizedBox(),
+                //     titleSpacing: ScreenUtil.horizontalScale(6),
+                //     leadingWidth: 0,
+                //     title: Consumer<UserDataProvider>(
+                //         builder: (context, userData, child) {
+                //       return AnimatedOpacity(
+                //         opacity: value.scrollOffset > 0 ? 0 : 1,
+                //         duration: Duration(milliseconds: 300),
+                //         child: Text(
+                //           'Hi ${userData.userName}',
+                //           style: TextStyle(
+                //             color: Colors.white,
+                //             fontSize: ScreenUtil.horizontalScale(5.5),
+                //           ),
+                //         ),
+                //       );
+                //     }),
+                //     actions: [
+                //       Padding(
+                //         padding: const EdgeInsets.only(right: 10),
+                //         child: const CommonStreakWithNotification(
+                //             routeString: '/exerciseLibrary'),
+                //       )
+                //     ],
+                //   );
+                // }),
+                SafeArea(
+                  bottom: false,
+                  child: Consumer<ScrollProvider>(
+                    builder: (context, scrollValue, child) {
+                      double targetHeight = scrollValue.scrollOffset > 0 ? ScreenUtil.verticalScale(3.2) : ScreenUtil.verticalScale(5);
+                      return Column(
+                        children: [
+                          SizedBox(height: Platform.isAndroid ? ScreenUtil.verticalScale(0.09) : 0),
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            height: targetHeight,
+                            width: media.width,
+                            padding: EdgeInsets.only(
+                              left: ScreenUtil.horizontalScale(6),
+                            ),
+                            decoration: BoxDecoration(color: Colors.transparent),
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.1)),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Consumer<UserDataProvider>(
+                                      builder: (context, userData, child) {
+                                        return AnimatedOpacity(
+                                          opacity: scrollValue.scrollOffset > 0 ? 0 : 1,
+                                          duration: Duration(milliseconds: 300),
+                                          child: Text(
+                                            'Hi ${userData.userName}',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: ScreenUtil.horizontalScale(5.5),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: CommonStreakWithNotification(
+                                        routeString: '/exerciseLibrary',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 3)
+                        ],
+                      );
+                    },
+                  ),
+                ),
+
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,
                     onRefresh: () async => await _initializeFetchData().then((value) async {
+                      loadUserInfo();
+                      loadStaffsData();
+                      loadFeaturedChallengeData();
+                      loadAchievementsData();
+                      loadProgramPhaseData();
+                      loadFeaturedCollectionData();
                       if (!context.mounted) return;
                       await monthProvider.onInit(context, isEnabled: false);
                     }),

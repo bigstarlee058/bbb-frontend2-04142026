@@ -1353,10 +1353,7 @@ class MonthProvider extends ChangeNotifier {
     HistoryDataModel? expandedDataHistory;
 
     try {
-      final data = await DatabaseHelper().getDataByDataId(
-        tableName: DatabaseHelper.exerciseHistory,
-        id: dataId,
-      );
+      final data = await DatabaseHelper().getDataByDataId(tableName: DatabaseHelper.exerciseHistory, id: dataId);
 
       if (data != null) {
         expandedDataHistory = HistoryDataModel.fromJson(data);
