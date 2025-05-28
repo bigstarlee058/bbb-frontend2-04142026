@@ -1,4 +1,4 @@
-package com.example1.bbb
+package com.bootybybret.app
 
 import android.content.ContentResolver
 import android.content.Context
