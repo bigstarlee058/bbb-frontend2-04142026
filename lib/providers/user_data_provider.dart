@@ -22,10 +22,12 @@ class UserDataProvider extends ChangeNotifier {
     return authToken;
   }
 
+  var user;
+
   Future<Map<String, dynamic>> fetchUserInfo() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/get_user');
     String? token = await getAuthToken();
-    log('token :::::::::::::::::: ${token}');
+    log('token :::::::::::::::::: $token');
     final response = await http.get(
       url,
       headers: {'Content-Type': 'application/json; charset=UTF-8', 'AUTH_TOKEN': token ?? ""},
@@ -34,10 +36,52 @@ class UserDataProvider extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       getUserDataFromJson(jsonResponse);
+      user = jsonResponse;
       notifyListeners();
       return jsonResponse;
     } else {
       throw Exception('Failed to load user data');
+    }
+  }
+
+  Future<void> addUserInfo(String? id, Map<String, dynamic> userDetails, File? imageFile) async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
+
+    String? userIdToken = await getAuthToken();
+
+    try {
+      http.MultipartRequest request = http.MultipartRequest("PUT", url);
+      request.fields['detail'] = jsonEncode(userDetails);
+
+      if (imageFile != null) {
+        final stream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
+        final length = await imageFile.length();
+        final multipartFile = http.MultipartFile(
+          'image',
+          stream,
+          length,
+          filename: basename(imageFile.path),
+        );
+        request.files.add(multipartFile);
+      } else {
+        request.fields['image'] = '';
+      }
+      request.headers.addAll({
+        'AUTH_TOKEN': userIdToken!,
+        'Accept': 'application/json',
+      });
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        log('jsonDecode(responseBody) :::::::::::::::::: ${jsonDecode(responseBody)}');
+        updateUserData();
+      } else {
+        debugPrint('Failed to update user data. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error updating user info: $e');
     }
   }
 
@@ -72,8 +116,8 @@ class UserDataProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        var data = jsonDecode(responseBody);
-        updateUserData(data['result']['detail']);
+        jsonDecode(responseBody);
+        updateUserData();
       } else {
         debugPrint('Failed to update user data. Status: ${response.statusCode}');
       }
@@ -90,7 +134,7 @@ class UserDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateUserData(var value) async {
+  updateUserData() async {
     await fetchUserInfo();
     notifyListeners();
   }

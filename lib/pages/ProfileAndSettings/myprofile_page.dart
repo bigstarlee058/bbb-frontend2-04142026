@@ -83,6 +83,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
     setState(() => loader = true);
     final userData1 = await userData!.fetchUserInfo();
     // userData['detail'] = jsonDecode( userData['detail']);
+
+    log('userData1 :::::::::::::::::: $userData1');
     if (!mounted) return;
     setState(() {
       _id = userData1['_id'];
@@ -848,13 +850,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           color: Colors.grey.shade700,
                           fontSize: ScreenUtil.verticalScale(1.95),
                         ),
-                        suffix: Text(
-                          suffix,
-                          style: TextStyle(
-                            fontSize: ScreenUtil.verticalScale(1.95),
-                            color: Colors.black,
-                          ),
-                        ),
+                        suffix: !focusNode.hasFocus
+                            ? SizedBox()
+                            : Text(
+                                suffix,
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.verticalScale(1.95),
+                                  color: Colors.black,
+                                ),
+                              ),
                         border: InputBorder.none,
                         isCollapsed: true,
                         contentPadding: EdgeInsets.zero,

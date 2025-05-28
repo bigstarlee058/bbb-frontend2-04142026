@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/TodayPage/slider_video_page.dart';
@@ -58,7 +56,6 @@ class _VideoSliderState extends State<VideoSlider> {
 
   @override
   Widget build(BuildContext context) {
-    log('videoData[index]["image"] :::::::::::::::::: ${videoData[0]["image"]}');
     return videoData.isEmpty
         ? SizedBox()
         : Column(

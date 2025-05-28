@@ -1,6 +1,7 @@
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,10 +15,14 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   DataProvider? dataProvider;
+  late UserDataProvider userData;
+
   @override
   void initState() {
     super.initState();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
+    userData = Provider.of<UserDataProvider>(context, listen: false);
+
     _checkLoginStatus();
   }
 
@@ -27,6 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
         if (isLoggedIn) {
+          await userData.fetchUserInfo();
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

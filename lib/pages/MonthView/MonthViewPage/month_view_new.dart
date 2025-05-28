@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -42,7 +41,7 @@ class MonthViewNew extends StatefulWidget {
 class _MonthViewNewState extends State<MonthViewNew> {
   MonthProvider? monthProvider;
   DataProvider? dataProvider;
-
+  // PageController pageController = PageController();
   ScrollProvider? scrollProvider;
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
@@ -286,10 +285,10 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                         children: [
                                                           GestureDetector(
                                                             onTap: () {
-                                                              int index = monthProvider.monthLocalDataModel.indexWhere(
-                                                                (element) => element.monthId == monthProvider.monthDataModel?.id,
-                                                              );
-                                                              log('Previous Month :::::::::::::::::: ${monthProvider.monthLocalDataModel[index + 1]}');
+                                                              // int index = monthProvider.monthLocalDataModel.indexWhere(
+                                                              //   (element) => element.monthId == monthProvider.monthDataModel?.id,
+                                                              // );
+                                                              // log('Previous Month :::::::::::::::::: ${monthProvider.monthLocalDataModel[index + 1]}');
                                                             },
                                                             child: Container(
                                                               decoration: BoxDecoration(
@@ -569,7 +568,9 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                               Visibility(
                                                   visible: monthProvider.selectedSection == 0,
                                                   child: ScheduleSection(
-                                                      monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
+                                                      // pageController: pageController,
+                                                      monthProvider: monthProvider,
+                                                      onPress: () => continueWorkoutOnTap(context))),
                                               Visibility(
                                                   visible: monthProvider.selectedSection == 1,
                                                   child: SettingSection(

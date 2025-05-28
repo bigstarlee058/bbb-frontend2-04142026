@@ -621,9 +621,11 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                         margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(6.5)),
                                         child: Column(
                                           children: [
-                                            VideoSlider(
-                                              dayDataModel: monthProvider!.dayDataModel!,
-                                            ),
+                                            monthProvider!.isPumpDay || monthProvider!.isCircuit
+                                                ? SizedBox()
+                                                : VideoSlider(
+                                                    dayDataModel: monthProvider!.dayDataModel!,
+                                                  ),
                                             isEditMode
                                                 ? Container(
                                                     margin: EdgeInsets.symmetric(

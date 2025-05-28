@@ -177,21 +177,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   backgroundColor: Colors.transparent,
                                   leading: SizedBox(),
                                   centerTitle: true,
-                                  title: GestureDetector(
-                                    onTap: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProfileBoardingScreen(),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      'Profile',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: ScreenUtil.verticalScale(2.5),
-                                      ),
+                                  title: Text(
+                                    'Profile',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.verticalScale(2.5),
                                     ),
                                   ),
                                   actions: [
