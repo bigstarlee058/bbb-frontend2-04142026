@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.bootybybret.app</string>
+	<string>com.example1.bbb</string>
 	<key>PROJECT_ID</key>
 	<string>bootybybret</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:648656113534:ios:a54c0702673ea2988a6d2f</string>
+	<string>1:648656113534:ios:af2a6257be9ea61f8a6d2f</string>
 </dict>
 </plist>

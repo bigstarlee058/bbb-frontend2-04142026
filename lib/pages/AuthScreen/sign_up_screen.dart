@@ -4,10 +4,12 @@ import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/AuthScreen/confirmation_screen.dart';
+import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -84,8 +86,8 @@ class _SignupPageState extends State<SignupPage> {
         String message = data['message'];
 
         if (message == "User registered") {
-          Navigator.pop(context);
-          showBottomAlert(context, 'Signup successfully sign in here.');
+          await loginUser(emailAddress, password);
+          showBottomAlert(context, 'Signup successfully with $emailAddress.');
         } else {
           showBottomAlert(context, 'Failed to signup');
         }
@@ -94,6 +96,79 @@ class _SignupPageState extends State<SignupPage> {
       }
     } catch (e) {
       showBottomAlert(context, 'An error occurred');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _saveLoginState(bool isLoggedIn) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+  }
+
+  Future<void> loginUser(String emailAddress, String password) async {
+    if (emailAddress.isEmpty || password.isEmpty) {
+      showBottomAlert(context, 'Please fill out the inputs');
+      return;
+    }
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: {
+          'username': emailAddress,
+          'password': password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        await _saveLoginState(true);
+        String token = data['token'];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('authToken', token);
+
+        // Fetch additional data for the welcome modal
+        final descriptionResponse = await http.get(
+          Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'),
+          headers: {"Authorization": "Bearer $token"},
+        );
+
+        if (descriptionResponse.statusCode == 200) {
+          final descriptionData = json.decode(descriptionResponse.body);
+
+          bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainPage(
+                showWelcomeModal: !hasSeenWelcome,
+                welcomeDescription: descriptionData['description'] ?? "",
+                welcomeImageUrl: descriptionData['vimeoId'],
+              ),
+            ),
+            (route) => false,
+          );
+        } else {
+          showBottomAlert(context, 'Failed to load description');
+          debugPrint('this is login page ${descriptionResponse.statusCode}');
+        }
+      } else {
+        showBottomAlert(context, 'Login failed');
+      }
+    } catch (e) {
+      showBottomAlert(context, 'An error occurred');
+      debugPrint('this is login page $e');
     } finally {
       setState(() {
         isLoading = false;
