@@ -92,21 +92,20 @@ class _MyProfilePageState extends State<MyProfilePage> {
           userData1["detail"]["weight"] == null ? "0" : '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
       selectedBodyFat.text =
           userData1["detail"]["bodyfat"] == null ? "0" : '${userData1["detail"]["bodyfat"]}'; //'${userData['detail']['weight']}';
-
-      selectedHeight.text = userData1["detail"]["height"] == null
+      selectedHeight.text = userData1["detail"]["height"] == null || userData1["detail"]["height"].toString() == "0"
           ? "0"
           : '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"'; //'${userData['detail']['height']}\'0"';
       selectedMidThigh.text = userData1["detail"]["midthigh"] == null ? "0" : userData1["detail"]["midthigh"].toString();
       selectedHip.text = userData1["detail"]["hip"] == null ? "0" : userData1["detail"]["hip"].toString();
       selectedWaist.text = userData1["detail"]["waist"] == null ? "0" : userData1["detail"]["waist"].toString();
 
-      heightInCm = userData1["detail"]["height"] == null
+      heightInCm = userData1["detail"]["height"] == null || userData1["detail"]["height"].toString() == "0"
           ? 183
           : convertToInches(
               int.parse(userData1["detail"]["height"].toString()[0]),
               double.parse(
                   "${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"));
-      waistInCm = userData1["detail"]["waist"] == null
+      waistInCm = userData1["detail"]["waist"] == null || userData1["detail"]["waist"].toString() == "0"
           ? 31
           : convertToInches(
               int.parse(userData1["detail"]["waist"].toString()[0]),
@@ -159,7 +158,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       // 'firstName': 'Nick',
       // 'lastName': 'Vlacic',
       'sex': genderOptions.indexOf(selectedGender!),
-      'dob': selectedDate!.toIso8601String(),
+      'dob': selectedDate?.toIso8601String(),
       'weight': int.parse(selectedWeight.text.split(' ')[0]),
       'height': int.parse(selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
       'location': selectedLocation,
@@ -206,6 +205,32 @@ class _MyProfilePageState extends State<MyProfilePage> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  @override
+  void dispose() {
+    _imageUrl = null;
+    selectedName = "";
+    selectedDate = null;
+    selectedWeight.clear();
+    selectedBodyFat.clear();
+    selectedGender = null;
+    selectedHeight.clear();
+    selectedMidThigh.clear();
+    selectedWaist.clear();
+    selectedHip.clear();
+    selectedLocation = null;
+    selectedGoal = null;
+    heightInCm = 183;
+    waistInCm = 31;
+    hipInCm = 30;
+    midThigh = 30;
+    selectedHeightUnit = HeightUnit.cm;
+    selectedWaistUnit = WaistUnit.inches;
+    selectedHipUnit = HipUnit.inches;
+    canConvertUnit = true;
+    showSeparationText = true;
+    super.dispose();
   }
 
   @override
