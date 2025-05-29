@@ -81,22 +81,26 @@ class _MainPageState extends State<MainPage> {
             await Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfileBoardingScreen(),
+                  builder: (context) => ProfileBoardingScreen(
+                    welcomeDescription: widget.welcomeDescription,
+                    welcomeImageUrl: widget.welcomeImageUrl,
+                  ),
                 ),
                 (route) => false);
+          }
+          return;
+        } else {
+          if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              ///
+              _showWelcomeModal();
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('hasSeenWelcome', true);
+            });
           }
         }
       },
     );
-
-    if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        ///
-        _showWelcomeModal();
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('hasSeenWelcome', true);
-      });
-    }
 
     // _initializeData();
     _startPeriodicUpdate();

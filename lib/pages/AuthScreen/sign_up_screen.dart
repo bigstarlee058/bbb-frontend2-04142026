@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -79,6 +80,8 @@ class _SignupPageState extends State<SignupPage> {
           'password': password,
         },
       );
+
+      log('response :::::::::::::::::: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

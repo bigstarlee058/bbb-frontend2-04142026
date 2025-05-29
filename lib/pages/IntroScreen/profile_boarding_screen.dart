@@ -19,10 +19,12 @@ import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileBoardingScreen extends StatefulWidget {
-  const ProfileBoardingScreen({super.key});
-
+  const ProfileBoardingScreen({super.key, required this.welcomeDescription, required this.welcomeImageUrl});
+  final String welcomeDescription;
+  final String welcomeImageUrl;
   @override
   State<ProfileBoardingScreen> createState() => _ProfileBoardingScreenState();
 }
@@ -359,13 +361,20 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                                         }
 
                                         /// UPDATE DATA
+                                        ///
                                         await _saveUserData().then(
-                                          (value) {
-                                            Navigator.pushReplacement(
+                                          (value) async {
+                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                            bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+                                            await Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const MainPage(welcomeDescription: '', welcomeImageUrl: '', isComeFromOnBoarding: true),
+                                                builder: (context) => MainPage(
+                                                  showWelcomeModal: !hasSeenWelcome,
+                                                  welcomeDescription: widget.welcomeDescription,
+                                                  welcomeImageUrl: widget.welcomeImageUrl,
+                                                  isComeFromOnBoarding: true,
+                                                ),
                                               ),
                                             );
                                           },
@@ -1057,17 +1066,12 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                       maxLength: 3,
                       decoration: InputDecoration(
                         counterText: "",
-                        // hintText: !focusNode.hasFocus && label == "Weight"
-                        //     ? "     0 lbs"
-                        //     : !focusNode.hasFocus && label == "Body-Fat"
-                        //         ? "    0 %"
-                        //         : '  0"',
                         hintText: "0",
                         hintStyle: TextStyle(
                           color: Colors.grey.shade700,
                           fontSize: ScreenUtil.verticalScale(1.95),
                         ),
-                        suffix: !focusNode.hasFocus
+                        suffix: !focusNode.hasFocus && controller.text.isEmpty
                             ? SizedBox()
                             : Text(
                                 suffix,

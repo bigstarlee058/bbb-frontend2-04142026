@@ -850,7 +850,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           color: Colors.grey.shade700,
                           fontSize: ScreenUtil.verticalScale(1.95),
                         ),
-                        suffix: !focusNode.hasFocus
+                        suffix: !focusNode.hasFocus && controller.text.isEmpty
                             ? SizedBox()
                             : Text(
                                 suffix,
