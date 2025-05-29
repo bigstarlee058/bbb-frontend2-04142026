@@ -1184,9 +1184,7 @@ class _SettingSectionState extends State<SettingSection> {
                           await value.changeDaySplit(newValue1);
                           value.changeEquipmentType(newValue2);
                           await value.filterWorkouts();
-
                           await value.updateLocalData();
-
                           await Future.delayed(Duration(seconds: 1)).then(
                             (v) {
                               value.updateSettingLoader(false);

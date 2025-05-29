@@ -73,7 +73,7 @@ class _MonthViewState extends State<MonthView> {
       if (_currentDate.day != newDate.day) {
         setState(() {
           _currentDate = newDate;
-          monthProvider?.onInit(context, isEnabled: false);
+          monthProvider?.onInit(context: context, isEnabled: false);
         });
       }
     });
@@ -249,7 +249,7 @@ class _MonthViewState extends State<MonthView> {
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,
-                    onRefresh: () async => await monthProvider?.onInit(context, isEnabled: false),
+                    onRefresh: () async => await monthProvider?.onInit(context: context, isEnabled: false),
                     child: ListView(
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
@@ -646,7 +646,7 @@ class _MonthViewState extends State<MonthView> {
       monthProvider?.updateScrollToRestDay(true);
       _completeRestDay(status: Status.completed, type: 'Rest Day', endDate: true).then(
         (value) {
-          monthProvider?.onInit(context, isEnabled: false);
+          monthProvider?.onInit(context: context, isEnabled: false);
         },
       );
       await monthProvider?.checkForPumpDay();

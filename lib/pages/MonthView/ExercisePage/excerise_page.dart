@@ -252,7 +252,7 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     setState(() {
       loading = true;
     });
-    await monthProvider?.onInit(context);
+    await monthProvider?.onInit(context: context);
     String rawTempData = preferences.getString(SharedPreference.payload) ?? "";
     if (rawTempData.isEmpty) {
       log('Error: rawTempData is empty.');

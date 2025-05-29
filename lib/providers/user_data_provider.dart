@@ -27,7 +27,6 @@ class UserDataProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> fetchUserInfo() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/get_user');
     String? token = await getAuthToken();
-    log('token :::::::::::::::::: $token');
     final response = await http.get(
       url,
       headers: {'Content-Type': 'application/json; charset=UTF-8', 'AUTH_TOKEN': token ?? ""},

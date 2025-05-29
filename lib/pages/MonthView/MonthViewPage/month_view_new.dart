@@ -13,6 +13,7 @@ import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/IntroScreen/video_intro_page.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/schedule_section_new.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/date_notifier.dart';
@@ -29,8 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import 'sections/schedule_section.dart';
-
 class MonthViewNew extends StatefulWidget {
   const MonthViewNew({super.key});
 
@@ -41,7 +40,7 @@ class MonthViewNew extends StatefulWidget {
 class _MonthViewNewState extends State<MonthViewNew> {
   MonthProvider? monthProvider;
   DataProvider? dataProvider;
-  // PageController pageController = PageController();
+  PageController pageController = PageController();
   ScrollProvider? scrollProvider;
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
@@ -73,7 +72,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
       if (_currentDate.day != newDate.day) {
         setState(() {
           _currentDate = newDate;
-          monthProvider?.onInit(context, isEnabled: false);
+          monthProvider?.onInit(context: context, isEnabled: false);
         });
       }
     });
@@ -125,8 +124,10 @@ class _MonthViewNewState extends State<MonthViewNew> {
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider?.onInit(isEnabled: false));
         monthProvider?.updateSelectedSection(0);
         monthProvider?.updateIsOnMonthPage(false);
+        monthProvider?.updateIsCurrentMonth(true);
         monthProvider?.updateScrollToRestDay(false);
       },
     );
@@ -163,7 +164,6 @@ class _MonthViewNewState extends State<MonthViewNew> {
               media,
               // dataProvider?.screenBackgroundResponse?.imageMonthView ?? "",
               dataProvider!.cachedImageMap["imageMonthView"],
-
               imageKey: "imageMonthView",
             ),
             // Container(
@@ -249,7 +249,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,
-                    onRefresh: () async => await monthProvider?.onInit(context, isEnabled: false),
+                    onRefresh: () async => await monthProvider?.onInit(context: context, isEnabled: false),
                     child: ListView(
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
@@ -285,10 +285,15 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                         children: [
                                                           GestureDetector(
                                                             onTap: () {
-                                                              // int index = monthProvider.monthLocalDataModel.indexWhere(
-                                                              //   (element) => element.monthId == monthProvider.monthDataModel?.id,
-                                                              // );
-                                                              // log('Previous Month :::::::::::::::::: ${monthProvider.monthLocalDataModel[index + 1]}');
+                                                              pageController.animateToPage(
+                                                                monthProvider.currentMonthIndex,
+                                                                duration: Duration(milliseconds: 300),
+                                                                curve: Curves.easeInOut,
+                                                              );
+
+                                                              monthProvider.fetchPastMonth(
+                                                                  monthProvider.monthLocalDataModel[monthProvider.currentMonthIndex],
+                                                                  context);
                                                             },
                                                             child: Container(
                                                               decoration: BoxDecoration(
@@ -564,27 +569,27 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                         ),
                                         child: Column(
                                           children: [
-                                            if (!monthProvider.loader) ...[
-                                              Visibility(
-                                                  visible: monthProvider.selectedSection == 0,
-                                                  child: ScheduleSection(
-                                                      // pageController: pageController,
-                                                      monthProvider: monthProvider,
-                                                      onPress: () => continueWorkoutOnTap(context))),
-                                              Visibility(
-                                                  visible: monthProvider.selectedSection == 1,
-                                                  child: SettingSection(
+                                            // if (!monthProvider.loader) ...[
+                                            Visibility(
+                                                visible: monthProvider.selectedSection == 0,
+                                                child: ScheduleSectionNew(
+                                                    pageController: pageController,
                                                     monthProvider: monthProvider,
-                                                    isSetting: false,
-                                                  )),
-                                              Visibility(
-                                                  visible: monthProvider.selectedSection == 2,
-                                                  child: InformationSection(
-                                                    monthProvider: monthProvider,
-                                                    programInfoProvider: provider,
-                                                    scrollController: scrollController,
-                                                  )),
-                                            ]
+                                                    onPress: () => continueWorkoutOnTap(context))),
+                                            Visibility(
+                                                visible: monthProvider.selectedSection == 1,
+                                                child: SettingSection(
+                                                  monthProvider: monthProvider,
+                                                  isSetting: false,
+                                                )),
+                                            Visibility(
+                                                visible: monthProvider.selectedSection == 2,
+                                                child: InformationSection(
+                                                  monthProvider: monthProvider,
+                                                  programInfoProvider: provider,
+                                                  scrollController: scrollController,
+                                                )),
+                                            // ]
                                           ],
                                         ),
                                       );
@@ -702,7 +707,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
       monthProvider?.updateScrollToRestDay(true);
       _completeRestDay(status: Status.completed, type: 'Rest Day', endDate: true).then(
         (value) {
-          monthProvider?.onInit(context, isEnabled: false);
+          monthProvider?.onInit(context: context, isEnabled: false);
         },
       );
       await monthProvider?.checkForPumpDay();

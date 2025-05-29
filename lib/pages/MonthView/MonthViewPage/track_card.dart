@@ -73,7 +73,17 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     weekDataModel = widget.monthProvider?.weeksDataList[mainIndex!];
     thisWeek = ((mainIndex! + 1) == monthProvider?.week);
     // _isExpanded = false;
-    _isExpanded = (mainIndex! + 1) == monthProvider?.week ? true : false;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (monthProvider!.isCurrentMonth) {
+        if ((mainIndex! + 1) == monthProvider?.week ? true : false) {
+          monthProvider!.updateWeekExpandedHeight((monthProvider!.isCurrentMonth) ? 84 : 0);
+        }
+        await Future.delayed(Duration.zero).then(
+          (value) => _isExpanded = (mainIndex! + 1) == monthProvider?.week ? true : false,
+        );
+      }
+    });
+
     dayDataList = weekDataModel!.days!;
   }
 
@@ -82,15 +92,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     return Consumer<MonthProvider>(
       builder: (context, monthProvider, child) {
         return Container(
-          child: monthProvider.weekStatuses.isEmpty
-              ? SizedBox()
-              : Column(
-                  children: [
-                    filterViewList1(monthProvider),
-                    // SizedBox(height: 25),
-                    // filterViewList(monthProvider),
-                  ],
-                ),
+          child: monthProvider.weekStatuses.isEmpty ? SizedBox() : filterViewList1(monthProvider),
         );
       },
     );
@@ -111,13 +113,26 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 sidePadding: true,
                 animationDuration: Duration(milliseconds: 300),
                 expandIconColor: Colors.grey.shade400,
-                materialGapSize: 10,
+                // materialGapSize: 10,
                 expandedHeaderPadding: EdgeInsets.zero,
-                expansionCallback: (panelIndex, isExpanded) {
-                  setState(() {
+                expansionCallback: (panelIndex, isExpanded) async {
+                  if (isExpanded) {
+                    monthProvider.updateWeekExpandedHeight(monthProvider.weekExpandedHeight + 84);
+                    await Future.delayed(Duration(milliseconds: 100)).then(
+                      (value) {
+                        _isExpanded = isExpanded;
+                        curExpandedIdx = isExpanded ? 0 : -1;
+                        setState(() {});
+                      },
+                    );
+                  } else {
                     _isExpanded = isExpanded;
                     curExpandedIdx = isExpanded ? 0 : -1;
-                  });
+                    setState(() {});
+                    await Future.delayed(Duration(milliseconds: 310)).then(
+                      (value) => monthProvider.updateWeekExpandedHeight(monthProvider.weekExpandedHeight - 84),
+                    );
+                  }
                 },
                 elevation: 0,
                 children: [
@@ -136,57 +151,57 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       isExpanded: _isExpanded,
       canTapOnHeader: true,
       headerBuilder: (context, isExpanded) {
-        return Padding(
-          padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(6)),
-          child: Row(
-            children: [
-              Text(
-                widget.title != "" ? (widget.title.toString().toLowerCase().capitalizeFirst()) : "Week",
-                // style: GoogleFonts.plusJakartaSans(
-                //   color: Colors.black,
-                //   fontSize: ScreenUtil.verticalScale(1.8),
-                //   fontWeight: FontWeight.bold,
-                // ),
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: ScreenUtil.horizontalScale(5.5),
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
-                ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: DashedBorder(
-                      spaceLength: 8,
-                      strokeCap: StrokeCap.square,
-                      dashLength: 1,
-                      top: BorderSide(color: Colors.grey.shade400, width: 1.5),
+        return SizedBox(
+          height: ScreenUtil.verticalScale(4),
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(6)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.title != "" ? (widget.title.toString().toLowerCase().capitalizeFirst()) : "Week",
+                    // style: GoogleFonts.plusJakartaSans(
+                    //   color: Colors.black,
+                    //   fontSize: ScreenUtil.verticalScale(1.8),
+                    //   fontWeight: FontWeight.bold,
+                    // ),
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.horizontalScale(5.5),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
                     ),
                   ),
-                ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: ScreenUtil.verticalScale(2)),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: DashedBorder(
+                            spaceLength: 8,
+                            strokeCap: StrokeCap.square,
+                            dashLength: 1,
+                            top: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                ],
               ),
-              SizedBox(width: 4),
-            ],
+            ),
           ),
         );
       },
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Text(
-          //   weekDataModel?.description?.trim() ?? "",
-          //   style: TextStyle(
-          //       fontSize: ScreenUtil.verticalScale(1.7),
-          //       color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : const Color(0xFF888888)),
-          // ),
-          // SizedBox(
-          //   height: ScreenUtil.verticalScale(weekDataModel!.description!.isEmpty ? 0 : 3),
-          // ),
-          SizedBox(height: ScreenUtil.verticalScale(1.3)),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
           ListView.separated(
-            separatorBuilder: (context, index) => SizedBox(height: 7),
+            separatorBuilder: (context, index) => SizedBox(height: ScreenUtil.verticalScale(1)),
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -240,7 +255,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       : pumpDayRestday(monthProvider, dataId, index, isRestDay, dayData);
             },
           ),
-          SizedBox(height: 10)
+          SizedBox(height: ScreenUtil.verticalScale(1)),
         ],
       ),
     );
@@ -1086,7 +1101,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                               onPressed: () async {
                                 await _saveDayData(status: Status.completed, type: 'Rest Day', endDate: true).then(
                                   (value) {
-                                    monthProvider?.onInit(context, isEnabled: false);
+                                    monthProvider?.onInit(context: context, isEnabled: false);
                                   },
                                 );
                                 if (!c1.mounted) return;

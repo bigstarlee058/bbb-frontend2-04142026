@@ -1,6 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
-import 'package:bbb/pages/MonthView/TodayPage/circuits_view.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -17,21 +16,33 @@ class ScheduleSectionNew extends StatelessWidget {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
-    return Consumer<MonthProvider>(builder: (context, value, child) {
-      return ExpandablePageView(
-        onPageChanged: (int value) {},
-        pageController: pageController,
-        children: List.generate(
-          3,
-          (index) {
-            if (value.week == null || value.week! > 4) return const SizedBox();
-            String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
-            return Container(
-              constraints: BoxConstraints(
-                minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12)),
-              ),
-              child: value.isFilterLoading
-                  ? const SizedBox()
+    return Consumer<MonthProvider>(
+      builder: (context, value, child) {
+        return SizedBox(
+          height: ScreenUtil.verticalScale(49.5 + (value.weekExpandedHeight).toDouble()),
+          child: PageView.builder(
+            reverse: true,
+            // physics: NeverScrollableScrollPhysics(),
+            onPageChanged: (int v) {
+              value.updateCurrentMonthIndex(v);
+              value.fetchPastMonth(value.monthLocalDataModel[v], context);
+            },
+            controller: pageController,
+            itemCount: value.monthLocalDataModel.length,
+            itemBuilder: (context, index) {
+              if (value.pastMonthDataLoader || value.loader) {
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: ScreenUtil.verticalScale(15)),
+                    child: Align(alignment: Alignment.topCenter, child: CircularProgressIndicator()),
+                  ),
+                );
+              }
+
+              if (value.week == null || value.week! > 4) return const SizedBox();
+              String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+              return value.isFilterLoading
+                  ? Container(constraints: BoxConstraints(minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12))))
                   : value.weeksDataList.isNotEmpty
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,13 +72,14 @@ class ScheduleSectionNew extends StatelessWidget {
                                       expandedVal: (index + 1) == value.week ? true : false,
                                       completedWeek: index + 1,
                                     ),
-                                    const SizedBox(height: 15),
+                                    SizedBox(height: ScreenUtil.verticalScale(1.5)),
                                   ],
                                 );
                               },
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ScreenUtil.verticalScale(2.4)),
                             Container(
+                              height: ScreenUtil.verticalScale(6.6),
                               margin: EdgeInsets.symmetric(
                                 horizontal: ScreenUtil.horizontalScale(9),
                               ),
@@ -109,13 +121,16 @@ class ScheduleSectionNew extends StatelessWidget {
                             SizedBox(height: ScreenUtil.verticalScale(15))
                           ],
                         )
-                      : const Center(
-                          child: Text("No workout data available"),
-                        ),
-            );
-          },
-        ),
-      );
-    });
+                      : Container(
+                          constraints: BoxConstraints(minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12))),
+                          child: const Center(
+                            child: Text("No workout data available"),
+                          ),
+                        );
+            },
+          ),
+        );
+      },
+    );
   }
 }
