@@ -1200,6 +1200,7 @@ class _SettingSectionState extends State<SettingSection> {
                             textColor: Colors.white,
                             fontSize: 16.0,
                           );
+
                           await value.checkForPumpDay();
                           await value.manageStreak();
                           await value.getLiftedWeightGraphData();

@@ -74,9 +74,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     thisWeek = ((mainIndex! + 1) == monthProvider?.week);
     // _isExpanded = false;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      if (monthProvider!.isCurrentMonth) {
+      if (monthProvider!.isCurrentMonth == "Current") {
         if ((mainIndex! + 1) == monthProvider?.week ? true : false) {
-          monthProvider!.updateWeekExpandedHeight((monthProvider!.isCurrentMonth) ? 84 : 0);
+          monthProvider!.updateWeekExpandedHeight((monthProvider!.isCurrentMonth == "Current") ? 84 : 0);
         }
         await Future.delayed(Duration.zero).then(
           (value) => _isExpanded = (mainIndex! + 1) == monthProvider?.week ? true : false,
@@ -813,17 +813,19 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            (matchingElement.type ?? "").contains("Pump Day")
-                                ? "${matchingElement.title}"
-                                : weekDataModel!
-                                    .restDayList?[int.parse(weekDataModel!.dayList![index].toString().split(" ").toList().last) - 1],
-                            style: TextStyle(
-                                color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
-                                fontSize: ScreenUtil.verticalScale(1.8),
-                                fontWeight: FontWeight.bold,
-                                height: 1),
-                          ),
+                          Builder(builder: (context) {
+                            return Text(
+                              (matchingElement.type ?? "").contains("Pump Day")
+                                  ? "${matchingElement.title}"
+                                  : weekDataModel!
+                                      .restDayList?[int.parse(weekDataModel!.dayList![index].toString().split(" ").toList().last) - 1],
+                              style: TextStyle(
+                                  color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
+                                  fontSize: ScreenUtil.verticalScale(1.8),
+                                  fontWeight: FontWeight.bold,
+                                  height: 1),
+                            );
+                          }),
                           Spacer(),
                           monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek &&
                                   (matchingElement.type ?? "").contains("Pump Day")

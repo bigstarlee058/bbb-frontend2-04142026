@@ -19,13 +19,13 @@ class ScheduleSectionNew extends StatelessWidget {
     return Consumer<MonthProvider>(
       builder: (context, value, child) {
         return SizedBox(
-          height: ScreenUtil.verticalScale(49.5 + (value.weekExpandedHeight).toDouble()),
+          height: ScreenUtil.verticalScale((value.isCurrentMonth == "Future" ? 41 : 49.5) + (value.weekExpandedHeight).toDouble()),
           child: PageView.builder(
             reverse: true,
-            // physics: NeverScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             onPageChanged: (int v) {
-              value.updateCurrentMonthIndex(v);
-              value.fetchPastMonth(value.monthLocalDataModel[v], context);
+              // value.updateCurrentMonthIndex(v);
+              // value.fetchPastMonth(value.monthLocalDataModel[v], context);
             },
             controller: pageController,
             itemCount: value.monthLocalDataModel.length,
@@ -40,7 +40,9 @@ class ScheduleSectionNew extends StatelessWidget {
               }
 
               if (value.week == null || value.week! > 4) return const SizedBox();
-              String split = value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
+              String split = value.week == 0
+                  ? "${value.splitType}"
+                  : value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
               return value.isFilterLoading
                   ? Container(constraints: BoxConstraints(minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12))))
                   : value.weeksDataList.isNotEmpty
@@ -78,46 +80,48 @@ class ScheduleSectionNew extends StatelessWidget {
                               },
                             ),
                             SizedBox(height: ScreenUtil.verticalScale(2.4)),
-                            Container(
-                              height: ScreenUtil.verticalScale(6.6),
-                              margin: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.horizontalScale(9),
-                              ),
-                              child: Consumer<MonthProvider>(
-                                builder: (context, monthProvider, child) {
-                                  String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
-                                          .toString()
-                                          .split(" ")[1] ??
-                                      "";
-                                  String dataId =
-                                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
+                            value.week == 0
+                                ? SizedBox()
+                                : Container(
+                                    height: ScreenUtil.verticalScale(6.6),
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(9),
+                                    ),
+                                    child: Consumer<MonthProvider>(
+                                      builder: (context, monthProvider, child) {
+                                        String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
+                                                .toString()
+                                                .split(" ")[1] ??
+                                            "";
+                                        String dataId =
+                                            "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
 
-                                  final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
-                                  String status = "";
-                                  String title = "";
-                                  if (data.isNotEmpty) {
-                                    status = data.first.status ?? "";
-                                    title = data.first.title ?? "";
-                                  }
+                                        final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
+                                        String status = "";
+                                        String title = "";
+                                        if (data.isNotEmpty) {
+                                          status = data.first.status ?? "";
+                                          title = data.first.title ?? "";
+                                        }
 
-                                  return ButtonWidget(
-                                    text: monthProvider.todayTitleId.isEmpty
-                                        ? "Completed"
-                                        : (!title.contains("Pump Day") &&
-                                                !monthProvider.isPumpDayAvailable &&
-                                                monthProvider.todayTitleId.contains("Rest Day"))
-                                            ? "Mark Complete"
-                                            : status == Status.started
-                                                ? 'Continue Your Workout'
-                                                : 'Start Your Workout',
-                                    textColor: Colors.white,
-                                    onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress!(),
-                                    color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
-                                    isLoading: false,
-                                  );
-                                },
-                              ),
-                            ),
+                                        return ButtonWidget(
+                                          text: monthProvider.todayTitleId.isEmpty
+                                              ? "Completed"
+                                              : (!title.contains("Pump Day") &&
+                                                      !monthProvider.isPumpDayAvailable &&
+                                                      monthProvider.todayTitleId.contains("Rest Day"))
+                                                  ? "Mark Complete"
+                                                  : status == Status.started
+                                                      ? 'Continue Your Workout'
+                                                      : 'Start Your Workout',
+                                          textColor: Colors.white,
+                                          onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress!(),
+                                          color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
+                                          isLoading: false,
+                                        );
+                                      },
+                                    ),
+                                  ),
                             SizedBox(height: ScreenUtil.verticalScale(15))
                           ],
                         )

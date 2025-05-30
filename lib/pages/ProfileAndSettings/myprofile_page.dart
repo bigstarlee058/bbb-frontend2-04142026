@@ -84,7 +84,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
     final userData1 = await userData!.fetchUserInfo();
     // userData['detail'] = jsonDecode( userData['detail']);
 
-    log('userData1 :::::::::::::::::: $userData1');
     if (!mounted) return;
     setState(() {
       _id = userData1['_id'];

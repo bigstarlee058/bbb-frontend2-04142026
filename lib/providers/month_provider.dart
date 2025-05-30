@@ -342,7 +342,7 @@ class MonthProvider extends ChangeNotifier {
     try {
       weekStatuses = [];
       weekStatusesString = [];
-      if (isCurrentMonth) {
+      if (isCurrentMonth == "Current") {
         final fixedStartDate = DateTime(startTime!.year, startTime!.month, startTime!.day);
         final fixedEndDate = DateTime(endTime!.year, endTime!.month, endTime!.day);
         const totalWeeks = 4;
@@ -384,8 +384,13 @@ class MonthProvider extends ChangeNotifier {
         findSplitTypeList();
         notifyListeners();
       } else {
-        weekStatuses = [WeekType.pastWeek, WeekType.pastWeek, WeekType.pastWeek, WeekType.pastWeek];
-        weekStatusesString = ["P", "P", "P", "P"];
+        if (isCurrentMonth == "Past") {
+          weekStatuses = [WeekType.pastWeek, WeekType.pastWeek, WeekType.pastWeek, WeekType.pastWeek];
+          weekStatusesString = ["P", "P", "P", "P"];
+        } else {
+          weekStatuses = [WeekType.futureWeek, WeekType.futureWeek, WeekType.futureWeek, WeekType.futureWeek];
+          weekStatusesString = ["F", "F", "F", "F"];
+        }
         findSplitTypeList();
         notifyListeners();
       }
@@ -400,13 +405,15 @@ class MonthProvider extends ChangeNotifier {
   List<DayHistoryModel> newStreakData = [];
   List<String> newLastSplit = [];
 
-  void findSplitTypeList() {
+  Future<void> findSplitTypeList() async {
     try {
       lastSplit = [];
       newLastSplit = [];
       newStreakData = [];
 
-      final data1 = allSplitDayHistoryModel.where((element) => element.status != Status.empty || element.status != Status.started).toList();
+      final data1 = allSplitDayHistoryModel
+          .where((element) => (element.status != Status.empty || element.status != Status.started) && element.monthId == monthDataModel?.id)
+          .toList();
 
       data1.sort((a, b) {
         DateTime aDate = a.endTime ?? a.startTime ?? a.date!;
@@ -415,16 +422,14 @@ class MonthProvider extends ChangeNotifier {
         DateTime localTimeBDate = Utils.formattedDate("$bDate");
         return (localTimeBDate).compareTo(localTimeADate);
       });
-
       weekStatusesString.removeWhere((element) => element != "P");
-
       if (weekStatusesString.isNotEmpty) {
         for (var i = 0; i < ((weekStatusesString.length == 4) ? weekStatusesString.length : weekStatusesString.length + 1); i++) {
           try {
             final data = data1.where((element) {
               return element.weekId == monthDataModel!.weeks![i].id;
             }).toList();
-            log('weekStatusesString :::::::::::::::::: $weekStatusesString');
+            log('data :::::::::::::::::: $data');
             if (data.isNotEmpty) {
               if (weekStatusesString.length > i) {
                 data.sort((a, b) {
@@ -435,23 +440,28 @@ class MonthProvider extends ChangeNotifier {
                   return (localTimeBDate).compareTo(localTimeADate);
                 });
                 lastSplit.add(data.first.split ?? "");
-
+                log('lastSplit :::::::::::::::::: $lastSplit');
                 String split = data.first.split ?? "";
+                if (isCurrentMonth == "Current") {
+                  final monthId = preferences.getString(SharedPreference.monthId) ?? "";
 
-                if (isCurrentMonth) {
-                  final rawTempData = preferences.getString("$split-${monthDataModel?.id}");
+                  log('i :::::::::::::::::: ${i}');
 
+                  if (i == ((weekStatusesString.length == 4) ? weekStatusesString.length : weekStatusesString.length + 1)) {
+                    split = splitType ?? "";
+                  }
+
+                  final rawTempData = preferences.getString("$split-$monthId");
+                  log('rawTempData :::::::::::::::::: $rawTempData');
                   if (rawTempData!.isNotEmpty) {
                     pastMonthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
                     WeekDataModel weekDataModel = pastMonthDataModel!.weeks![i];
                     monthDataModel!.weeks![i] = weekDataModel;
                   }
                 } else {
-                  final data = pastMonthDataList.where((element) => element["monthId"] == pastMonthDataModel?.id);
-
+                  final data = pastMonthDataList.where((element) => element["monthId"] == monthDataModel?.id);
                   if (data.isNotEmpty) {
-                    log('split :::::::::::::::::: ${split}');
-                    final newData = data.first["monthData"][split == SplitType.split3
+                    var newData = data.first["monthData"][split == SplitType.split3
                         ? 0
                         : split == SplitType.split4
                             ? 1
@@ -461,7 +471,19 @@ class MonthProvider extends ChangeNotifier {
                     monthDataModel!.weeks![i] = weekDataModel;
                   }
                 }
+              } else {
+                if (isCurrentMonth == "Current") {
+                  final monthId = preferences.getString(SharedPreference.monthId) ?? "";
+                  final rawTempData = preferences.getString("$splitType-$monthId");
+                  log('rawTempData :::::::::::::::::: $rawTempData');
+                  if (rawTempData!.isNotEmpty) {
+                    pastMonthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData.toString()));
+                    WeekDataModel weekDataModel = pastMonthDataModel!.weeks![i];
+                    monthDataModel!.weeks![i] = weekDataModel;
+                  }
+                }
               }
+
               newStreakData.addAll(allSplitDayHistoryModel
                   .where((element) =>
                       monthDataModel!.weeks![i].id == element.weekId &&
@@ -615,7 +637,7 @@ class MonthProvider extends ChangeNotifier {
         weeksDataList = monthDataModel!.weeks!;
       }
 
-      findSplitTypeList();
+      await findSplitTypeList();
       await getRestDayData();
 
       notifyListeners();
@@ -674,7 +696,7 @@ class MonthProvider extends ChangeNotifier {
     try {
       await Future.delayed(const Duration(milliseconds: 50));
 
-      if (isCurrentMonth) {
+      if (isCurrentMonth == "Current") {
         await getSplitData();
       } else {
         await getSplitDataPastMonth(monthLocalDataModel[currentMonthIndex]);
@@ -1374,6 +1396,8 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchAllDayStatusLocalData() async {
     try {
+      await getAllDayStatusData();
+
       String split = monthDataModel?.weeks?[week! - 1].idList?.first.toString().split(" ")[1] ?? "";
 
       final data =
@@ -1385,20 +1409,58 @@ class MonthProvider extends ChangeNotifier {
         allDayHistoryModel = [];
       }
 
-      for (var element in monthDataModel!.weeks!) {
-        if (allDayHistoryModel.any((data) => data.weekId == element.id)) {
-          if (splitType == SplitType.split3) {
-            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
-          } else if (splitType == SplitType.split4) {
-            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
+      // for (var element in monthDataModel!.weeks!) {
+      //   if (allDayHistoryModel.any((data) => data.weekId == element.id)) {
+      //     if (splitType == SplitType.split3) {
+      //       element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
+      //     } else if (splitType == SplitType.split4) {
+      //       element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
+      //     } else {
+      //       element.restDayList = ["Rest Day 1", "Rest Day 2"];
+      //     }
+      //     final list = allDayHistoryModel.where((e1) => e1.type!.contains("Pump Day") && e1.weekId == element.id).toList();
+      //     if (list.isNotEmpty) {
+      //       for (var pump in list) {
+      //         int pumpDayIndex = int.parse(pump.dayId?.split(" ").last ?? "1");
+      //         int restDayIndex = element.restDayList!.indexOf("Rest Day $pumpDayIndex");
+      //         if (restDayIndex != -1) {
+      //           element.restDayList?[restDayIndex] = "Pump Day";
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+      log('lastSplit :::::::::::::::::: $lastSplit');
+      log('isCurrentMonth :::::::::::::::::: $isCurrentMonth');
+      for (int i = 0; i < monthDataModel!.weeks!.length; i++) {
+        var element = monthDataModel!.weeks![i];
+        if (allSplitDayHistoryModel.any((data) => data.weekId == element.id)) {
+          if (isCurrentMonth == "Current" || isCurrentMonth == "Future") {
+            if (splitType == SplitType.split3) {
+              element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
+            } else if (splitType == SplitType.split4) {
+              element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
+            } else {
+              element.restDayList = ["Rest Day 1", "Rest Day 2"];
+            }
           } else {
-            element.restDayList = ["Rest Day 1", "Rest Day 2"];
+            if (lastSplit[i] == SplitType.split3) {
+              element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
+            } else if (lastSplit[i] == SplitType.split4) {
+              element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
+            } else {
+              element.restDayList = ["Rest Day 1", "Rest Day 2"];
+            }
           }
-          final list = allDayHistoryModel.where((e1) => e1.type!.contains("Pump Day") && e1.weekId == element.id).toList();
+
+          final list = allSplitDayHistoryModel.where((e1) => e1.type!.contains("Pump Day") && e1.weekId == element.id).toList();
+
           if (list.isNotEmpty) {
-            for (var pump in list) {
+            for (int j = 0; j < list.length; j++) {
+              var pump = list[j];
               int pumpDayIndex = int.parse(pump.dayId?.split(" ").last ?? "1");
               int restDayIndex = element.restDayList!.indexOf("Rest Day $pumpDayIndex");
+
               if (restDayIndex != -1) {
                 element.restDayList?[restDayIndex] = "Pump Day";
               }
@@ -1420,7 +1482,6 @@ class MonthProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint("Error fetching all day status local data: $e");
     }
-    await getAllDayStatusData();
   }
 
   Future<void> getAllDayStatusData() async {
@@ -3041,6 +3102,7 @@ class MonthProvider extends ChangeNotifier {
         "time": "${DateTime.now().toUtc()}"
       },
     ];
+
     achievementsModel = [];
     reportTimeSpent = "Week 1";
     reportTimeSpentGraphHistory = [];
@@ -3071,10 +3133,10 @@ class MonthProvider extends ChangeNotifier {
 
   /// PAST MONTH DATA ===============================================================================================
   int currentMonthIndex = 0;
-  bool isCurrentMonth = true;
+  String isCurrentMonth = "Current";
   int weekExpandedHeight = 0;
 
-  updateIsCurrentMonth(bool value) {
+  updateIsCurrentMonth(String value) {
     isCurrentMonth = value;
     notifyListeners();
   }
@@ -3102,12 +3164,18 @@ class MonthProvider extends ChangeNotifier {
   List<Map<String, dynamic>> pastMonthDataList = [];
 
   fetchPastMonth(MonthResponseModel monthData, BuildContext context) async {
+    String id = preferences.getString(SharedPreference.monthId) ?? "";
+    int index = monthLocalDataModel.indexWhere((element) => element.monthId == id);
+    updateIsCurrentMonth(index == currentMonthIndex
+        ? "Current"
+        : index > currentMonthIndex
+            ? "Future"
+            : "Past");
     if (monthData.monthId == monthDataModel?.id) {
       weekExpandedHeight = 0;
-      updateIsCurrentMonth(true);
-      onInit(context: context, isEnabled: true);
+
+      await onInit(context: context, isEnabled: true);
     } else {
-      updateIsCurrentMonth(false);
       await fetchMonthWorkout(
         DateTime.parse(monthData.monthStartDate ?? "").add(Duration(days: 14)).toUtc().toString(),
         context,
@@ -3467,6 +3535,7 @@ class MonthProvider extends ChangeNotifier {
                 : 2];
         weeksDataList = monthDataModel!.weeks!;
       }
+      findSplitTypeList();
 
       notifyListeners();
     } catch (e, stackTrace) {
