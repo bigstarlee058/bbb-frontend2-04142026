@@ -19,7 +19,7 @@ class ScheduleSectionNew extends StatelessWidget {
     return Consumer<MonthProvider>(
       builder: (context, value, child) {
         return SizedBox(
-          height: ScreenUtil.verticalScale((value.isCurrentMonth == "Future" ? 41 : 49.5) + (value.weekExpandedHeight).toDouble()),
+          height: ScreenUtil.verticalScale((/*value.isCurrentMonth == "Current" ? 50 :*/ 50) + (value.weekExpandedHeight).toDouble()),
           child: PageView.builder(
             reverse: true,
             physics: NeverScrollableScrollPhysics(),
@@ -30,7 +30,7 @@ class ScheduleSectionNew extends StatelessWidget {
             controller: pageController,
             itemCount: value.monthLocalDataModel.length,
             itemBuilder: (context, index) {
-              if (value.pastMonthDataLoader || value.loader) {
+              if (value.switchMonthLoader) {
                 return Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: ScreenUtil.verticalScale(15)),
@@ -80,7 +80,7 @@ class ScheduleSectionNew extends StatelessWidget {
                               },
                             ),
                             SizedBox(height: ScreenUtil.verticalScale(2.4)),
-                            value.week == 0
+                            value.week == 0 || value.isCurrentMonth != "Current"
                                 ? SizedBox()
                                 : Container(
                                     height: ScreenUtil.verticalScale(6.6),

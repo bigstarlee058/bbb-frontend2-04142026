@@ -150,9 +150,9 @@ class _MonthViewNewState extends State<MonthViewNew> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => monthProvider?.findSplitTypeList(),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => monthProvider?.fetchAllDayStatusLocalData(),
+      ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -278,49 +278,44 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                       child: Row(
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
-                                                          /*monthProvider.currentMonthIndex > 0
-                                                              // (monthProvider.currentMonthIndex + 1) >= monthProvider.monthLocalDataModel.length
-                                                              ? SizedBox(width: ScreenUtil.horizontalScale(20))
-                                                              :*/
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              if (monthProvider.currentMonthIndex <
-                                                                  monthProvider.monthLocalDataModel.length - 1) {
-                                                                monthProvider.updateCurrentMonthIndex(monthProvider.currentMonthIndex + 1);
+                                                          monthProvider.currentMonthIndex < monthProvider.monthLocalDataModel.length - 1
+                                                              ? GestureDetector(
+                                                                  onTap: () {
+                                                                    if (monthProvider.currentMonthIndex <
+                                                                        monthProvider.monthLocalDataModel.length - 1) {
+                                                                      monthProvider
+                                                                          .updateCurrentMonthIndex(monthProvider.currentMonthIndex + 1);
 
-                                                                monthProvider.fetchPastMonth(
-                                                                    monthProvider.monthLocalDataModel[monthProvider.currentMonthIndex],
-                                                                    context);
+                                                                      monthProvider.fetchPastMonth(
+                                                                          monthProvider
+                                                                              .monthLocalDataModel[monthProvider.currentMonthIndex],
+                                                                          context);
 
-                                                                pageController.animateToPage(
-                                                                  monthProvider.currentMonthIndex,
-                                                                  duration: Duration(milliseconds: 300),
-                                                                  curve: Curves.ease,
-                                                                );
-                                                              }
-
-                                                              // pageController.animateToPage(
-                                                              //   monthProvider.currentMonthIndex,
-                                                              //   duration: Duration(milliseconds: 300),
-                                                              //   curve: Curves.easeInOut,
-                                                              // );
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
-                                                              width: ScreenUtil.horizontalScale(20),
-                                                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  "Previous",
-                                                                  style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: ScreenUtil.verticalScale(1.8),
+                                                                      pageController.animateToPage(
+                                                                        monthProvider.currentMonthIndex,
+                                                                        duration: Duration(milliseconds: 300),
+                                                                        curve: Curves.ease,
+                                                                      );
+                                                                    }
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: AppColors.primaryColor,
+                                                                        borderRadius: BorderRadius.circular(10)),
+                                                                    width: ScreenUtil.horizontalScale(20),
+                                                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                                                                    child: Center(
+                                                                      child: Text(
+                                                                        "Previous",
+                                                                        style: TextStyle(
+                                                                          color: Colors.white,
+                                                                          fontSize: ScreenUtil.verticalScale(1.8),
+                                                                        ),
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
+                                                                )
+                                                              : SizedBox(width: ScreenUtil.horizontalScale(20)),
                                                           Expanded(
                                                             child: Container(
                                                               padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.5)),
@@ -356,49 +351,43 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                                   : const SizedBox(),
                                                             ),
                                                           ),
-                                                          /*monthProvider.currentMonthIndex < (monthProvider.monthLocalDataModel.length - 1)
-                                                              // currentIndex(monthProvider.currentMonthIndex - 1) >=
-                                                              //         monthProvider.monthLocalDataModel.length
-                                                              ? SizedBox(width: ScreenUtil.horizontalScale(20))
-                                                              :*/
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              if (monthProvider.currentMonthIndex > 0) {
-                                                                monthProvider.updateCurrentMonthIndex(monthProvider.currentMonthIndex - 1);
+                                                          monthProvider.currentMonthIndex > 0
+                                                              ? GestureDetector(
+                                                                  onTap: () {
+                                                                    if (monthProvider.currentMonthIndex > 0) {
+                                                                      monthProvider
+                                                                          .updateCurrentMonthIndex(monthProvider.currentMonthIndex - 1);
 
-                                                                monthProvider.fetchPastMonth(
-                                                                    monthProvider.monthLocalDataModel[monthProvider.currentMonthIndex],
-                                                                    context);
+                                                                      monthProvider.fetchPastMonth(
+                                                                          monthProvider
+                                                                              .monthLocalDataModel[monthProvider.currentMonthIndex],
+                                                                          context);
 
-                                                                pageController.animateToPage(
-                                                                  monthProvider.currentMonthIndex,
-                                                                  duration: Duration(milliseconds: 300),
-                                                                  curve: Curves.ease,
-                                                                );
-                                                              }
-
-                                                              // pageController.animateToPage(
-                                                              //   monthProvider.currentMonthIndex,
-                                                              //   duration: Duration(milliseconds: 300),
-                                                              //   curve: Curves.easeInOut,
-                                                              // );
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
-                                                              width: ScreenUtil.horizontalScale(20),
-                                                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  "Next",
-                                                                  style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: ScreenUtil.verticalScale(1.8),
+                                                                      pageController.animateToPage(
+                                                                        monthProvider.currentMonthIndex,
+                                                                        duration: Duration(milliseconds: 300),
+                                                                        curve: Curves.ease,
+                                                                      );
+                                                                    }
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: AppColors.primaryColor,
+                                                                        borderRadius: BorderRadius.circular(10)),
+                                                                    width: ScreenUtil.horizontalScale(20),
+                                                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                                                                    child: Center(
+                                                                      child: Text(
+                                                                        "Next",
+                                                                        style: TextStyle(
+                                                                          color: Colors.white,
+                                                                          fontSize: ScreenUtil.verticalScale(1.8),
+                                                                        ),
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
+                                                                )
+                                                              : SizedBox(width: ScreenUtil.horizontalScale(20)),
                                                         ],
                                                       ),
                                                     ),

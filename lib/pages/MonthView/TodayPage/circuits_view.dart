@@ -227,8 +227,11 @@ class _CircuitsViewState extends State<CircuitsView> {
                                     String dataId =
                                         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${exercise.exerciseId}-$tempIndex";
 
-                                    bool isExist = (!monthProvider.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
-                                        monthProvider.isPastWeek;
+                                    bool isExist = ((!monthProvider.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
+                                            monthProvider.isPastWeek) ||
+                                        ((!monthProvider.exerciseHistoryModel
+                                                .any((item) => item.dataId == dataId && item.status == Status.started)) &&
+                                            monthProvider.isPastWeek);
                                     return Padding(
                                       padding: EdgeInsets.only(
                                           left: 20,

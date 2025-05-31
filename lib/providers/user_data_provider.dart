@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/values/app_constants.dart';
@@ -74,7 +73,6 @@ class UserDataProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        log('jsonDecode(responseBody) :::::::::::::::::: ${jsonDecode(responseBody)}');
         updateUserData();
       } else {
         debugPrint('Failed to update user data. Status: ${response.statusCode}');

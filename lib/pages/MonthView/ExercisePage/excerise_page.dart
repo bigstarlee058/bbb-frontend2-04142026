@@ -331,7 +331,6 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
   Timer? _hideControlsTimer;
 
   Future<void> fetchExercise({String? exerciseId, int? exerciseIndex, bool? isPumpDay, bool? isCircuit, String? circuitIndex}) async {
-    log('exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString() :::::::::::::::::: ${exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString()}');
     if (monthProvider?.isWarmup == false) {
       await monthProvider?.fetchCurrentExercise(exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
       isExercise = 1;
@@ -416,7 +415,7 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
         }
       }
     } catch (e) {
-      log('EXERCISE PAGE :::::::::::::::::: $e');
+      log('EXERCISE PAGE $e');
     }
   }
 
@@ -1377,217 +1376,224 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                       },
                     ),
                     SizedBox(height: 20),
-                    count != 0 && !isCurrentDaySkipped && !isCurrentDayCompleted
-                        ? Padding(
-                            padding: const EdgeInsets.only(bottom: 40),
-                            child: TextButton(
-                              onPressed: () async {
-                                setState(() => tempSetAddressLoader = true);
-                                final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
-                                if (data!.isNotEmpty) {
-                                  tempSetAddress = monthProvider!.currentExpandedItem;
-                                  monthProvider?.addSetCountInWorkingSet();
-                                  _addExtraSet(data.first);
-                                  await Future.delayed(Duration(milliseconds: 200));
-                                }
-                                setState(() => tempSetAddressLoader = false);
-                              },
-                              child: IntrinsicWidth(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.add,
-                                      color: Colors.grey.shade600,
-                                      size: ScreenUtil.verticalScale(3),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      "Add Set",
-                                      style: TextStyle(
-                                        fontSize: ScreenUtil.verticalScale(2),
-                                        fontWeight: FontWeight.bold,
+
+                    if (monthProvider!.isCurrentMonth == "Future") ...[
+                      SizedBox()
+                    ] else ...[
+                      count != 0 && !isCurrentDaySkipped && !isCurrentDayCompleted
+                          ? Padding(
+                              padding: const EdgeInsets.only(bottom: 40),
+                              child: TextButton(
+                                onPressed: () async {
+                                  setState(() => tempSetAddressLoader = true);
+                                  final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
+                                  if (data!.isNotEmpty) {
+                                    tempSetAddress = monthProvider!.currentExpandedItem;
+                                    monthProvider?.addSetCountInWorkingSet();
+                                    _addExtraSet(data.first);
+                                    await Future.delayed(Duration(milliseconds: 200));
+                                  }
+                                  setState(() => tempSetAddressLoader = false);
+                                },
+                                child: IntrinsicWidth(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.add,
                                         color: Colors.grey.shade600,
+                                        size: ScreenUtil.verticalScale(3),
                                       ),
-                                    )
-                                  ],
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "Add Set",
+                                        style: TextStyle(
+                                          fontSize: ScreenUtil.verticalScale(2),
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        : SizedBox(),
-                    Container(height: 0.5, margin: const EdgeInsets.symmetric(horizontal: 40), width: media.width, color: Colors.black12),
-                    if (isCurrentDayCompleted || isCurrentDaySkipped) ...[
-                      const SizedBox(height: 40),
-                      ButtonWidget(
-                        text: isCurrentExerciseCompleted ? "Completed" : "Skipped",
-                        textColor: Colors.white,
-                        onPress: null,
-                        color: AppColors.primaryColor,
-                        isLoading: false,
-                      )
-                    ] else ...[
-                      const SizedBox(height: 30),
-                      Consumer<MonthProvider>(
-                        builder: (context, monthProvider, child) {
-                          return monthProvider.exerciseHistoryDetails?.status == Status.skipped
-                              ? const SizedBox()
-                              : Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: ButtonWidget(
-                                      text: monthProvider.exerciseHistoryDetails?.status == Status.completed
-                                          ? "Save"
-                                          : monthProvider.isLastExercise
-                                              ? "Finish"
-                                              : /*monthProvider.isPumpDay && monthProvider.isCircuit
+                            )
+                          : SizedBox(),
+                      Container(height: 0.5, margin: const EdgeInsets.symmetric(horizontal: 40), width: media.width, color: Colors.black12),
+                      if (isCurrentDayCompleted || isCurrentDaySkipped) ...[
+                        const SizedBox(height: 40),
+                        ButtonWidget(
+                          text: isCurrentExerciseCompleted ? "Completed" : "Skipped",
+                          textColor: Colors.white,
+                          onPress: null,
+                          color: AppColors.primaryColor,
+                          isLoading: false,
+                        )
+                      ] else ...[
+                        const SizedBox(height: 30),
+                        Consumer<MonthProvider>(
+                          builder: (context, monthProvider, child) {
+                            return monthProvider.exerciseHistoryDetails?.status == Status.skipped
+                                ? const SizedBox()
+                                : Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: ButtonWidget(
+                                        text: monthProvider.exerciseHistoryDetails?.status == Status.completed
+                                            ? "Save"
+                                            : monthProvider.isLastExercise
+                                                ? "Finish"
+                                                : /*monthProvider.isPumpDay && monthProvider.isCircuit
                                                             ? "Finish"
                                                             :*/
-                                              "Finish & Next",
-                                      textColor: Colors.white,
-                                      onPress: () async {
-                                        HapticFeedBack.buttonClick();
-                                        int count = 0;
-                                        await _saveExerciseData(
-                                            status: Status.completed,
-                                            id: monthProvider.isPumpDay && monthProvider.isCircuit
-                                                ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                                : monthProvider.exerciseDetailModel!.sId.toString(),
-                                            type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise");
+                                                "Finish & Next",
+                                        textColor: Colors.white,
+                                        onPress: () async {
+                                          HapticFeedBack.buttonClick();
+                                          int count = 0;
+                                          await _saveExerciseData(
+                                              status: Status.completed,
+                                              id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                                  ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
+                                                  : monthProvider.exerciseDetailModel!.sId.toString(),
+                                              type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise");
 
-                                        WidgetsBinding.instance.addPostFrameCallback(
-                                          (timeStamp) async {
-                                            String split = monthProvider
-                                                    .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
-                                                    .toString()
-                                                    .split(" ")[1] ??
-                                                "";
-                                            /*if (isCurrentExerciseCompleted) {
+                                          WidgetsBinding.instance.addPostFrameCallback(
+                                            (timeStamp) async {
+                                              String split = monthProvider
+                                                      .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                      .toString()
+                                                      .split(" ")[1] ??
+                                                  "";
+                                              /*if (isCurrentExerciseCompleted) {
                                                         Navigator.pop(context);
                                                         return;
                                                       } else*/
-                                            if (monthProvider.isPumpDay && monthProvider.isCircuit) {
-                                              List<String> indexList = monthProvider.circuitIndex.split(":");
+                                              if (monthProvider.isPumpDay && monthProvider.isCircuit) {
+                                                List<String> indexList = monthProvider.circuitIndex.split(":");
 
-                                              int circuitIndex = int.parse(indexList[0]);
-                                              int circuitRound = int.parse(indexList[1]);
-                                              int exerciseIndex = int.parse(indexList[2]);
+                                                int circuitIndex = int.parse(indexList[0]);
+                                                int circuitRound = int.parse(indexList[1]);
+                                                int exerciseIndex = int.parse(indexList[2]);
 
-                                              var circuitExercises = monthProvider.pumpDayModel!.circuits![circuitIndex].circuitExercises!;
-                                              List<ExerciseHistoryModel> completedExerciseCurrentRound =
-                                                  monthProvider.exerciseHistoryModel.where(
-                                                (element) {
-                                                  return element.type!.contains("Circuit - $circuitIndex:$circuitRound") &&
-                                                      (element.status == Status.skipped || element.status == Status.completed);
-                                                },
-                                              ).toList();
+                                                var circuitExercises =
+                                                    monthProvider.pumpDayModel!.circuits![circuitIndex].circuitExercises!;
+                                                List<ExerciseHistoryModel> completedExerciseCurrentRound =
+                                                    monthProvider.exerciseHistoryModel.where(
+                                                  (element) {
+                                                    return element.type!.contains("Circuit - $circuitIndex:$circuitRound") &&
+                                                        (element.status == Status.skipped || element.status == Status.completed);
+                                                  },
+                                                ).toList();
 
-                                              if (completedExerciseCurrentRound.length == circuitExercises.length) {
-                                                circuitRound = circuitRound + 1;
-                                                exerciseIndex = 0;
-                                              } else {
-                                                exerciseIndex = exerciseIndex + 1;
-                                                if (exerciseIndex == circuitExercises.length) {
+                                                if (completedExerciseCurrentRound.length == circuitExercises.length) {
+                                                  circuitRound = circuitRound + 1;
+                                                  exerciseIndex = 0;
+                                                } else {
+                                                  exerciseIndex = exerciseIndex + 1;
+                                                  if (exerciseIndex == circuitExercises.length) {
+                                                    Navigator.pop(context);
+                                                    return;
+                                                  }
+                                                }
+
+                                                if (circuitRound > monthProvider.pumpDayModel!.circuits![circuitIndex].round!) {
                                                   Navigator.pop(context);
                                                   return;
                                                 }
-                                              }
 
-                                              if (circuitRound > monthProvider.pumpDayModel!.circuits![circuitIndex].round!) {
+                                                monthProvider.updateIsCircuit(true);
+                                                monthProvider.updateCircuit("$circuitIndex:$circuitRound:$exerciseIndex", circuitIndex);
+                                                String dataId =
+                                                    "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${circuitExercises[exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
+                                                monthProvider.setSelectedExercise(circuitExercises[exerciseIndex], exerciseIndex);
+                                                monthProvider.updateWarmUp(false, "");
+                                                monthProvider.updateIsLastExercise(false);
                                                 Navigator.pop(context);
-                                                return;
-                                              }
-
-                                              monthProvider.updateIsCircuit(true);
-                                              monthProvider.updateCircuit("$circuitIndex:$circuitRound:$exerciseIndex", circuitIndex);
-                                              String dataId =
-                                                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${circuitExercises[exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
-                                              monthProvider.setSelectedExercise(circuitExercises[exerciseIndex], exerciseIndex);
-                                              monthProvider.updateWarmUp(false, "");
-                                              monthProvider.updateIsLastExercise(false);
-                                              Navigator.pop(context);
-                                              await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
-                                              monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
-                                            } else {
-                                              for (var element in monthProvider.exerciseHistoryModel) {
-                                                if (element.status.toString() == Status.completed) {
-                                                  count++;
-                                                }
-                                              }
-                                              List<ExerciseDataModel> exerciseList = [];
-
-                                              exerciseList.addAll(monthProvider.dayDataModel!.exercises!
-                                                  .where((element) => element.formats!.contains(monthProvider.equipmentType)));
-
-                                              if (exerciseList.length != count &&
-                                                  exerciseList.length != monthProvider.selectedExIndex + 1) {
-                                                Navigator.pop(context);
-
-                                                await Future.delayed(const Duration(milliseconds: 100));
-
-                                                int skipIndex = monthProvider.selectedExIndex + 1;
-                                                for (int i = skipIndex; i < exerciseList.length; i++) {
-                                                  var elementI = exerciseList[i];
-                                                  String dataId =
-                                                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-                                                  bool val = monthProvider.exerciseHistoryModel
-                                                      .any((element) => element.dataId == dataId && element.status == Status.completed);
-                                                  if (val == false) {
-                                                    monthProvider.setSelectedExercise(elementI, i);
-                                                    monthProvider.updateWarmUp(false, "");
-
-                                                    bool isLast = i ==
-                                                        exerciseList
-                                                            .indexWhere((element) => element.exerciseId == exerciseList.last.exerciseId);
-                                                    monthProvider.updateIsLastExercise(isLast);
-
-                                                    await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
-                                                    break;
+                                                await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                                                monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
+                                              } else {
+                                                for (var element in monthProvider.exerciseHistoryModel) {
+                                                  if (element.status.toString() == Status.completed) {
+                                                    count++;
                                                   }
                                                 }
-                                              } else {
-                                                Navigator.pop(context);
+                                                List<ExerciseDataModel> exerciseList = [];
+
+                                                exerciseList.addAll(monthProvider.dayDataModel!.exercises!
+                                                    .where((element) => element.formats!.contains(monthProvider.equipmentType)));
+
+                                                if (exerciseList.length != count &&
+                                                    exerciseList.length != monthProvider.selectedExIndex + 1) {
+                                                  Navigator.pop(context);
+
+                                                  await Future.delayed(const Duration(milliseconds: 100));
+
+                                                  int skipIndex = monthProvider.selectedExIndex + 1;
+                                                  for (int i = skipIndex; i < exerciseList.length; i++) {
+                                                    var elementI = exerciseList[i];
+                                                    String dataId =
+                                                        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+                                                    bool val = monthProvider.exerciseHistoryModel
+                                                        .any((element) => element.dataId == dataId && element.status == Status.completed);
+                                                    if (val == false) {
+                                                      monthProvider.setSelectedExercise(elementI, i);
+                                                      monthProvider.updateWarmUp(false, "");
+
+                                                      bool isLast = i ==
+                                                          exerciseList
+                                                              .indexWhere((element) => element.exerciseId == exerciseList.last.exerciseId);
+                                                      monthProvider.updateIsLastExercise(isLast);
+
+                                                      await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                                                      break;
+                                                    }
+                                                  }
+                                                } else {
+                                                  Navigator.pop(context);
+                                                }
                                               }
-                                            }
-                                          },
-                                        );
-                                      },
-                                      color: AppColors.primaryColor,
-                                      isLoading: false),
-                                );
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      Consumer<MonthProvider>(
-                        builder: (context, monthProvider, child) {
-                          return ButtonWidget(
-                            text: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip the exercise",
-                            textColor: const Color(0xFFFFFFFF),
-                            color: AppColors.skipDayColor,
-                            onPress: () async {
-                              WidgetsBinding.instance.addPostFrameCallback(
-                                (timeStamp) async {
-                                  HapticFeedBack.buttonClick();
-                                  final status = monthProvider.exerciseHistoryDetails?.status;
-                                  await _saveExerciseData(
-                                    status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
-                                    id: monthProvider.isPumpDay && monthProvider.isCircuit
-                                        ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                        : monthProvider.exerciseDetailModel!.sId.toString(),
-                                    type: monthProvider.isPumpDay && monthProvider.isCircuit
-                                        ? "Circuit - ${monthProvider.circuitIndex}"
-                                        : "Exercise",
+                                            },
+                                          );
+                                        },
+                                        color: AppColors.primaryColor,
+                                        isLoading: false),
                                   );
-                                  if (status != Status.skipped) {
-                                    Navigator.pop(context);
-                                  }
-                                },
-                              );
-                            },
-                            isLoading: false,
-                          );
-                        },
-                      ),
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Consumer<MonthProvider>(
+                          builder: (context, monthProvider, child) {
+                            return ButtonWidget(
+                              text: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip the exercise",
+                              textColor: const Color(0xFFFFFFFF),
+                              color: AppColors.skipDayColor,
+                              onPress: () async {
+                                WidgetsBinding.instance.addPostFrameCallback(
+                                  (timeStamp) async {
+                                    HapticFeedBack.buttonClick();
+                                    final status = monthProvider.exerciseHistoryDetails?.status;
+                                    await _saveExerciseData(
+                                      status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
+                                      id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                          ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
+                                          : monthProvider.exerciseDetailModel!.sId.toString(),
+                                      type: monthProvider.isPumpDay && monthProvider.isCircuit
+                                          ? "Circuit - ${monthProvider.circuitIndex}"
+                                          : "Exercise",
+                                    );
+                                    if (status != Status.skipped) {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                );
+                              },
+                              isLoading: false,
+                            );
+                          },
+                        ),
+                      ],
                     ],
+
                     const EquipmentSection(),
                   ],
                 ),

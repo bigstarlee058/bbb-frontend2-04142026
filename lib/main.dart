@@ -209,7 +209,6 @@ class _MyAppState extends State<MyApp> {
           programInfoProvider,
           monthProvider,
           scrollProvider,
-          // videoImageProvider
         ],
         child: MaterialApp(
           navigatorObservers: <NavigatorObserver>[observer],

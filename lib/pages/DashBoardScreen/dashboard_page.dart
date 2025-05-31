@@ -325,7 +325,9 @@ class _DashboardPageState extends State<DashboardPage> {
                             children: [
                               Consumer<MonthProvider>(
                                 builder: (context, monthData, child) {
-                                  if ((monthData.monthDataModel?.weeks == null || monthData.loader)) {
+                                  if ((monthData.monthDataModel?.weeks == null || monthData.loader) ||
+                                      monthData.switchMonthLoader ||
+                                      monthData.week == 0) {
                                     return const SizedBox();
                                   }
 

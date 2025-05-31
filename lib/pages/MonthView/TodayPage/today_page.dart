@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -292,8 +291,10 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
   @override
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      monthProvider?.fetchAllDayStatusLocalData();
-      monthProvider?.checkForPumpDay();
+      if (monthProvider?.isCurrentMonth != "Future") {
+        monthProvider?.fetchAllDayStatusLocalData();
+        monthProvider?.checkForPumpDay();
+      }
     });
     super.dispose();
   }
@@ -383,7 +384,11 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                             },
                                           ),
                                         ),
-                                        isCurrentDayCompleted || isCurrentDaySkipped || monthProvider!.isCircuit || monthProvider!.isPumpDay
+                                        monthProvider!.isCurrentMonth == "Future" ||
+                                                isCurrentDayCompleted ||
+                                                isCurrentDaySkipped ||
+                                                monthProvider!.isCircuit ||
+                                                monthProvider!.isPumpDay
                                             ? SizedBox()
                                             : Row(
                                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -802,7 +807,8 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                     isCurrentDaySkipped ||
                                                     monthProvider!.isPastWeek ||
                                                     monthProvider!.isPumpDay ||
-                                                    monthProvider!.isCircuit
+                                                    monthProvider!.isCircuit ||
+                                                    monthProvider!.isCurrentMonth == "Future"
                                                 ? const SizedBox()
                                                 : Padding(
                                                     padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.6)),
@@ -833,7 +839,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                       ),
                                                     ),
                                                   ),
-                                            if (isEditMode)
+                                            if (isEditMode || monthProvider!.isCurrentMonth == "Future")
                                               SizedBox()
                                             else ...[
                                               (monthProvider!.isPumpDay || monthProvider!.isCircuit)
@@ -867,9 +873,10 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                           isLoading: false,
                                                         ),
                                                       )
-                                                    : value.dayHistoryDetails == null ||
-                                                            (isCurrentDaySkipped || isCurrentDayCompleted) ||
-                                                            value.isPastWeek
+                                                    : (value.dayHistoryDetails == null ||
+                                                                (isCurrentDaySkipped || isCurrentDayCompleted) ||
+                                                                value.isPastWeek) &&
+                                                            value.isCurrentMonth == "Current"
                                                         ? Container(
                                                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                                             child: ButtonWidget(
@@ -2284,14 +2291,9 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
 
               String dataId =
                   "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j:$z";
-              log('dataId :::::::::::::::::: ${dataId}');
-
-              log('monthProvider?.exerciseHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider?.exerciseHistoryModel)}');
 
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
-
-              log('val :::::::::::::::::: $val');
               if (val == false) {
                 await _saveExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
               }

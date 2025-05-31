@@ -851,7 +851,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                           const SizedBox(height: 30),
                                         ],
                                       ),
-                                if (widget.isEditable)
+                                if (widget.isEditable && monthProvider!.isCurrentMonth != "Future")
                                   ButtonWidget(
                                     text: _restDuration != 0 ? "Save & start rest timer" : "Save",
                                     // text: "Save",
