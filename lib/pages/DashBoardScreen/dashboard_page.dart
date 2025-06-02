@@ -315,7 +315,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       loadProgramPhaseData();
                       loadFeaturedCollectionData();
                       if (!context.mounted) return;
-                      await monthProvider.onInit(context, isEnabled: false);
+                      await monthProvider.onInit(context: context, isEnabled: false);
                     }),
                     child: SingleChildScrollView(
                       physics: NoBottomBounceScrollPhysics(),
@@ -325,7 +325,9 @@ class _DashboardPageState extends State<DashboardPage> {
                             children: [
                               Consumer<MonthProvider>(
                                 builder: (context, monthData, child) {
-                                  if ((monthData.monthDataModel?.weeks == null || monthData.loader)) {
+                                  if ((monthData.monthDataModel?.weeks == null || monthData.loader) ||
+                                      monthData.switchMonthLoader ||
+                                      monthData.week == 0) {
                                     return const SizedBox();
                                   }
 
@@ -1340,7 +1342,7 @@ class _DashboardPageState extends State<DashboardPage> {
       monthProvider.updateScrollToRestDay(true);
       _completeRestDay(status: Status.completed, type: 'Rest Day', endDate: true).then(
         (value) {
-          monthProvider.onInit(context, isEnabled: false);
+          monthProvider.onInit(context: context, isEnabled: false);
         },
       );
       await monthProvider.checkForPumpDay();

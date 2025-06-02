@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/pages/DashBoardScreen/dashboard_page.dart';
-import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
+import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/month_view_new.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -26,11 +27,13 @@ class MainPage extends StatefulWidget {
   final bool showWelcomeModal;
   final String welcomeDescription;
   final String welcomeImageUrl;
+  final bool isComeFromOnBoarding;
   const MainPage({
     super.key,
     this.showWelcomeModal = false,
     required this.welcomeDescription,
     required this.welcomeImageUrl,
+    this.isComeFromOnBoarding = false,
   });
 
   @override
@@ -59,7 +62,7 @@ class _MainPageState extends State<MainPage> {
       if (_currentDate.day != newDate.day) {
         setState(() {
           _currentDate = newDate;
-          monthProvider.onInit(context, isEnabled: false);
+          monthProvider.onInit(context: context, isEnabled: false);
         });
       }
     });
@@ -68,15 +71,36 @@ class _MainPageState extends State<MainPage> {
     // autoPlay: true,
     // videoId: "953289606",
     // );
-    if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        _showWelcomeModal();
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('hasSeenWelcome', true);
-      });
-    }
-
     userData = Provider.of<UserDataProvider>(context, listen: false);
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        await userData.fetchUserInfo();
+        if (userData.user != null && !widget.isComeFromOnBoarding) {
+          if (userData.user["detail"]['dob'] == null || userData.user["detail"]["weight"] == null) {
+            await Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileBoardingScreen(
+                    welcomeDescription: widget.welcomeDescription,
+                    welcomeImageUrl: widget.welcomeImageUrl,
+                  ),
+                ),
+                (route) => false);
+          }
+          return;
+        } else {
+          if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              ///
+              _showWelcomeModal();
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('hasSeenWelcome', true);
+            });
+          }
+        }
+      },
+    );
 
     // _initializeData();
     _startPeriodicUpdate();
@@ -104,7 +128,7 @@ class _MainPageState extends State<MainPage> {
       (timeStamp) async => await _initializeFetchData().then(
         (value) async {
           if (monthProvider.monthDataModel == null) {
-            await monthProvider.onInit(context);
+            await monthProvider.onInit(context: context);
           }
         },
       ),
@@ -112,7 +136,7 @@ class _MainPageState extends State<MainPage> {
 
     _pages = [
       const DashboardPage(),
-      const MonthView(),
+      const MonthViewNew(),
       const ToolsPage(),
       const ProfileSettingsPage(),
       // const StreakCalendarPage(),

@@ -98,7 +98,6 @@ class DataProvider extends ChangeNotifier {
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
     String? userIdToken = await getAuthToken();
-    log('userIdToken :::::::::::::::::: ${userIdToken}');
     try {
       final response = await http.get(
         url,
@@ -653,7 +652,6 @@ class DataProvider extends ChangeNotifier {
         'date': "${DateTime.now().toUtc()}"
       };
 
-      log('DateTime.now().toUtc :::::::::::::::::: ${DateTime.now().toUtc()}');
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
       String? userIdToken = await getAuthToken();
       final response = await http.post(

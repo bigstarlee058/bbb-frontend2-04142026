@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -292,8 +291,10 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
   @override
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      monthProvider?.fetchAllDayStatusLocalData();
-      monthProvider?.checkForPumpDay();
+      if (monthProvider?.isCurrentMonth != "Future") {
+        monthProvider?.fetchAllDayStatusLocalData();
+        monthProvider?.checkForPumpDay();
+      }
     });
     super.dispose();
   }
@@ -383,7 +384,11 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                             },
                                           ),
                                         ),
-                                        isCurrentDayCompleted || isCurrentDaySkipped || monthProvider!.isCircuit || monthProvider!.isPumpDay
+                                        monthProvider!.isCurrentMonth == "Future" ||
+                                                isCurrentDayCompleted ||
+                                                isCurrentDaySkipped ||
+                                                monthProvider!.isCircuit ||
+                                                monthProvider!.isPumpDay
                                             ? SizedBox()
                                             : Row(
                                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -621,9 +626,11 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                         margin: EdgeInsets.only(top: ScreenUtil.horizontalScale(6.5)),
                                         child: Column(
                                           children: [
-                                            VideoSlider(
-                                              dayDataModel: monthProvider!.dayDataModel!,
-                                            ),
+                                            monthProvider!.isPumpDay || monthProvider!.isCircuit
+                                                ? SizedBox()
+                                                : VideoSlider(
+                                                    dayDataModel: monthProvider!.dayDataModel!,
+                                                  ),
                                             isEditMode
                                                 ? Container(
                                                     margin: EdgeInsets.symmetric(
@@ -800,7 +807,8 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                     isCurrentDaySkipped ||
                                                     monthProvider!.isPastWeek ||
                                                     monthProvider!.isPumpDay ||
-                                                    monthProvider!.isCircuit
+                                                    monthProvider!.isCircuit ||
+                                                    monthProvider!.isCurrentMonth == "Future"
                                                 ? const SizedBox()
                                                 : Padding(
                                                     padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.6)),
@@ -831,8 +839,32 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                       ),
                                                     ),
                                                   ),
-                                            if (isEditMode)
+                                            if (isEditMode || monthProvider!.isCurrentMonth == "Future")
                                               SizedBox()
+                                            else if (monthProvider!.isCurrentMonth == "Past" || monthProvider!.isPastWeek)
+                                              Column(
+                                                children: [
+                                                  Container(
+                                                    height: 1,
+                                                    margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6), vertical: 36),
+                                                    width: media.width * 0.75,
+                                                    color: Colors.black12,
+                                                  ),
+                                                  SizedBox(height: media.height * 0.025),
+                                                  Container(
+                                                    margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                                    child: ButtonWidget(
+                                                      text: monthProvider?.dayHistoryDetails?.status == Status.completed
+                                                          ? "Completed"
+                                                          : "Skipped",
+                                                      textColor: Colors.white,
+                                                      onPress: null,
+                                                      color: AppColors.primaryColor,
+                                                      isLoading: false,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
                                             else ...[
                                               (monthProvider!.isPumpDay || monthProvider!.isCircuit)
                                                   ? SizedBox()
@@ -865,9 +897,9 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                           isLoading: false,
                                                         ),
                                                       )
-                                                    : value.dayHistoryDetails == null ||
-                                                            (isCurrentDaySkipped || isCurrentDayCompleted) ||
-                                                            value.isPastWeek
+                                                    : (value.dayHistoryDetails == null || (isCurrentDaySkipped || isCurrentDayCompleted)) &&
+                                                            value.isCurrentMonth == "Current" &&
+                                                            !value.isPastWeek
                                                         ? Container(
                                                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                                             child: ButtonWidget(
@@ -2282,14 +2314,9 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
 
               String dataId =
                   "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j:$z";
-              log('dataId :::::::::::::::::: ${dataId}');
-
-              log('monthProvider?.exerciseHistoryModel :::::::::::::::::: ${jsonEncode(monthProvider?.exerciseHistoryModel)}');
 
               bool? val = monthProvider?.exerciseHistoryModel
                   .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
-
-              log('val :::::::::::::::::: $val');
               if (val == false) {
                 await _saveExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
               }

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -14,6 +13,7 @@ import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/IntroScreen/video_intro_page.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/schedule_section_new.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/date_notifier.dart';
@@ -30,8 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import 'sections/schedule_section.dart';
-
 class MonthViewNew extends StatefulWidget {
   const MonthViewNew({super.key});
 
@@ -42,7 +40,7 @@ class MonthViewNew extends StatefulWidget {
 class _MonthViewNewState extends State<MonthViewNew> {
   MonthProvider? monthProvider;
   DataProvider? dataProvider;
-
+  PageController pageController = PageController();
   ScrollProvider? scrollProvider;
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
@@ -69,12 +67,23 @@ class _MonthViewNewState extends State<MonthViewNew> {
     provider = context.read<ProgramInfoProvider>();
     provider.getProgramInfo(context);
 
+    int index = monthProvider?.monthLocalDataModel.indexWhere(
+          (element) => element.monthId == monthProvider?.monthDataModel?.id,
+        ) ??
+        0;
+
+    pageController = PageController(initialPage: index);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      monthProvider?.updateCurrentMonthIndex(index);
+    });
+
     monthProvider?.mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     _dateNotifier.stream.listen((newDate) {
       if (_currentDate.day != newDate.day) {
         setState(() {
           _currentDate = newDate;
-          monthProvider?.onInit(context, isEnabled: false);
+          monthProvider?.onInit(context: context, isEnabled: false);
         });
       }
     });
@@ -126,8 +135,10 @@ class _MonthViewNewState extends State<MonthViewNew> {
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider?.onInit(isEnabled: false));
         monthProvider?.updateSelectedSection(0);
         monthProvider?.updateIsOnMonthPage(false);
+        monthProvider?.updateIsCurrentMonth("Current");
         monthProvider?.updateScrollToRestDay(false);
       },
     );
@@ -139,6 +150,9 @@ class _MonthViewNewState extends State<MonthViewNew> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => monthProvider?.fetchAllDayStatusLocalData(),
+      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -153,31 +167,11 @@ class _MonthViewNewState extends State<MonthViewNew> {
         },
         child: Stack(
           children: [
-            // Container(
-            //   height: media.height / 1,
-            //   width: media.width,
-            //   decoration: const BoxDecoration(
-            //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
-            //   ),
-            // ),
             Utils.appImage(
               media,
-              // dataProvider?.screenBackgroundResponse?.imageMonthView ?? "",
               dataProvider!.cachedImageMap["imageMonthView"],
-
               imageKey: "imageMonthView",
             ),
-            // Container(
-            //   height: media.height / 1,
-            //   width: media.width,
-            //   decoration: const BoxDecoration(
-            //     image: DecorationImage(
-            //       image: AssetImage('assets/img/back_dark.jpg'),
-            //       fit: BoxFit.cover,
-            //       opacity: 1,
-            //     ),
-            //   ),
-            // ),
             Column(
               children: [
                 SafeArea(
@@ -227,30 +221,10 @@ class _MonthViewNewState extends State<MonthViewNew> {
                     },
                   ),
                 ),
-                // AppBar(
-                //   backgroundColor: Colors.transparent,
-                //   toolbarHeight: ScreenUtil.verticalScale(5.1) + 5,
-                //   surfaceTintColor: Colors.transparent,
-                //   automaticallyImplyLeading: false,
-                //   leading: Padding(
-                //     padding: const EdgeInsets.only(bottom: 5),
-                //     child: BackArrowWidget(
-                //       onPress: () {
-                //         monthProvider?.mainPageProvider.changeTab(0);
-                //       },
-                //     ),
-                //   ),
-                //   actions: [
-                //     Padding(
-                //       padding: const EdgeInsets.only(right: 10),
-                //       child: const CommonStreakWithNotification(routeString: '/month-view'),
-                //     )
-                //   ],
-                // ),
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,
-                    onRefresh: () async => await monthProvider?.onInit(context, isEnabled: false),
+                    onRefresh: () async => await monthProvider?.onInit(context: context, isEnabled: false),
                     child: ListView(
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
@@ -275,7 +249,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                               crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
                                                 SizedBox(
-                                                  height: ScreenUtil.verticalScale(2),
+                                                  height: ScreenUtil.verticalScale(1.5),
                                                 ),
                                                 Column(
                                                   children: [
@@ -284,29 +258,44 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                       child: Row(
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              int index = monthProvider.monthLocalDataModel.indexWhere(
-                                                                (element) => element.monthId == monthProvider.monthDataModel?.id,
-                                                              );
-                                                              log('Previous Month :::::::::::::::::: ${monthProvider.monthLocalDataModel[index + 1]}');
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
-                                                              width: ScreenUtil.horizontalScale(20),
-                                                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  "Previous",
-                                                                  style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: ScreenUtil.verticalScale(1.8),
+                                                          monthProvider.currentMonthIndex < monthProvider.monthLocalDataModel.length - 1
+                                                              ? GestureDetector(
+                                                                  onTap: () {
+                                                                    if (monthProvider.currentMonthIndex <
+                                                                        monthProvider.monthLocalDataModel.length - 1) {
+                                                                      monthProvider
+                                                                          .updateCurrentMonthIndex(monthProvider.currentMonthIndex + 1);
+
+                                                                      monthProvider.fetchPastMonth(
+                                                                          monthProvider
+                                                                              .monthLocalDataModel[monthProvider.currentMonthIndex],
+                                                                          context);
+
+                                                                      pageController.animateToPage(
+                                                                        monthProvider.currentMonthIndex,
+                                                                        duration: Duration(milliseconds: 300),
+                                                                        curve: Curves.ease,
+                                                                      );
+                                                                    }
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: AppColors.primaryColor,
+                                                                        borderRadius: BorderRadius.circular(10)),
+                                                                    width: ScreenUtil.horizontalScale(20),
+                                                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                                                                    child: Center(
+                                                                      child: Text(
+                                                                        "Previous",
+                                                                        style: TextStyle(
+                                                                          color: Colors.white,
+                                                                          fontSize: ScreenUtil.verticalScale(1.8),
+                                                                        ),
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
+                                                                )
+                                                              : SizedBox(width: ScreenUtil.horizontalScale(20)),
                                                           Expanded(
                                                             child: Container(
                                                               padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.5)),
@@ -342,57 +331,71 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                                   : const SizedBox(),
                                                             ),
                                                           ),
-                                                          Container(
-                                                            decoration: BoxDecoration(
-                                                                color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
-                                                            width: ScreenUtil.horizontalScale(20),
-                                                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Next",
-                                                                style: TextStyle(
-                                                                  color: Colors.white,
-                                                                  fontSize: ScreenUtil.verticalScale(1.8),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
+                                                          monthProvider.currentMonthIndex > 0
+                                                              ? GestureDetector(
+                                                                  onTap: () {
+                                                                    if (monthProvider.currentMonthIndex > 0) {
+                                                                      monthProvider
+                                                                          .updateCurrentMonthIndex(monthProvider.currentMonthIndex - 1);
+
+                                                                      monthProvider.fetchPastMonth(
+                                                                          monthProvider
+                                                                              .monthLocalDataModel[monthProvider.currentMonthIndex],
+                                                                          context);
+
+                                                                      pageController.animateToPage(
+                                                                        monthProvider.currentMonthIndex,
+                                                                        duration: Duration(milliseconds: 300),
+                                                                        curve: Curves.ease,
+                                                                      );
+                                                                    }
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: AppColors.primaryColor,
+                                                                        borderRadius: BorderRadius.circular(10)),
+                                                                    width: ScreenUtil.horizontalScale(20),
+                                                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
+                                                                    child: Center(
+                                                                      child: Text(
+                                                                        "Next",
+                                                                        style: TextStyle(
+                                                                          color: Colors.white,
+                                                                          fontSize: ScreenUtil.verticalScale(1.8),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              : SizedBox(width: ScreenUtil.horizontalScale(20)),
                                                         ],
                                                       ),
                                                     ),
-                                                    // Padding(
-                                                    //   padding: const EdgeInsets.symmetric(vertical: 5),
-                                                    //   child: Text(
-                                                    //     monthProvider.monthDataModel?.title ?? "",
-                                                    //     textAlign: TextAlign.center,
-                                                    //     style: TextStyle(
-                                                    //       color: Colors.white,
-                                                    //       fontSize: ScreenUtil.horizontalScale(6.5),
-                                                    //       fontWeight: FontWeight.bold,
-                                                    //     ),
-                                                    //   ),
-                                                    // ),
                                                     Padding(
                                                       padding: EdgeInsets.only(
                                                         left: ScreenUtil.horizontalScale(2),
                                                         right: ScreenUtil.horizontalScale(8),
-                                                      ),
-                                                      child: SizedBox(
-                                                        height: media.height / 7.5,
-                                                        child: Center(
-                                                          child: Image.asset("assets/img/month_hero1.png"),
-                                                        ),
+                                                        top: ScreenUtil.verticalScale(1.8),
+                                                        bottom: ScreenUtil.verticalScale(1.2),
                                                       ),
                                                       // child: SizedBox(
                                                       //   height: media.height / 7.5,
                                                       //   child: Center(
-                                                      //     child: Utils.appImage(
-                                                      //       Size(media.width, media.height / 7.5),
-                                                      //       monthProvider.monthTitleImage,
-                                                      //       imageKey: '',
-                                                      //     ),
+                                                      //     child: Image.asset("assets/img/month_hero1.png"),
                                                       //   ),
                                                       // ),
+                                                      child: monthProvider.monthTitleImage == null
+                                                          ? SizedBox(height: media.height / 7.5)
+                                                          : SizedBox(
+                                                              height: media.height / 7.5,
+                                                              child: Center(
+                                                                child: Utils.appImage(
+                                                                  Size(media.width, media.height / 7.5),
+                                                                  monthProvider.monthTitleImage,
+                                                                  imageKey: '',
+                                                                ),
+                                                              ),
+                                                            ),
                                                     ),
                                                     Container(
                                                       margin: EdgeInsets.symmetric(
@@ -455,7 +458,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                     //   ),
                                     // ),
                                     SizedBox(
-                                      height: media.height / 3.429,
+                                      height: media.height / 3.229,
                                       width: media.width,
                                       child: Align(
                                         alignment: Alignment.bottomRight,
@@ -483,7 +486,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                   topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                                 ),
                               ),
-                              margin: EdgeInsets.only(top: media.height / 3.43),
+                              margin: EdgeInsets.only(top: media.height / 3.23),
                               child: Column(
                                 children: [
                                   SizedBox(
@@ -565,25 +568,27 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                         ),
                                         child: Column(
                                           children: [
-                                            if (!monthProvider.loader) ...[
-                                              Visibility(
-                                                  visible: monthProvider.selectedSection == 0,
-                                                  child: ScheduleSection(
-                                                      monthProvider: monthProvider, onPress: () => continueWorkoutOnTap(context))),
-                                              Visibility(
-                                                  visible: monthProvider.selectedSection == 1,
-                                                  child: SettingSection(
+                                            // if (!monthProvider.loader) ...[
+                                            Visibility(
+                                                visible: monthProvider.selectedSection == 0,
+                                                child: ScheduleSectionNew(
+                                                    pageController: pageController,
                                                     monthProvider: monthProvider,
-                                                    isSetting: false,
-                                                  )),
-                                              Visibility(
-                                                  visible: monthProvider.selectedSection == 2,
-                                                  child: InformationSection(
-                                                    monthProvider: monthProvider,
-                                                    programInfoProvider: provider,
-                                                    scrollController: scrollController,
-                                                  )),
-                                            ]
+                                                    onPress: () => continueWorkoutOnTap(context))),
+                                            Visibility(
+                                                visible: monthProvider.selectedSection == 1,
+                                                child: SettingSection(
+                                                  monthProvider: monthProvider,
+                                                  isSetting: false,
+                                                )),
+                                            Visibility(
+                                                visible: monthProvider.selectedSection == 2,
+                                                child: InformationSection(
+                                                  monthProvider: monthProvider,
+                                                  programInfoProvider: provider,
+                                                  scrollController: scrollController,
+                                                )),
+                                            // ]
                                           ],
                                         ),
                                       );
@@ -701,7 +706,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
       monthProvider?.updateScrollToRestDay(true);
       _completeRestDay(status: Status.completed, type: 'Rest Day', endDate: true).then(
         (value) {
-          monthProvider?.onInit(context, isEnabled: false);
+          monthProvider?.onInit(context: context, isEnabled: false);
         },
       );
       await monthProvider?.checkForPumpDay();

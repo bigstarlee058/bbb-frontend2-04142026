@@ -6,6 +6,7 @@ class SharedPreference {
   static SharedPreferences? _preferences;
 
   static const String monthId = "MONTH-ID";
+  static const String role = "ROLE";
   static const String split = "SPLIT-TYPE";
   static const String equipmentType = "EQUIPMENT-TYPE";
   static const String lastMonthDataUpdate = "LAST-MONTH-UPDATE";

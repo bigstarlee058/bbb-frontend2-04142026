@@ -73,7 +73,17 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     weekDataModel = widget.monthProvider?.weeksDataList[mainIndex!];
     thisWeek = ((mainIndex! + 1) == monthProvider?.week);
     // _isExpanded = false;
-    _isExpanded = (mainIndex! + 1) == monthProvider?.week ? true : false;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (monthProvider!.isCurrentMonth == "Current") {
+        if ((mainIndex! + 1) == monthProvider?.week ? true : false) {
+          monthProvider!.updateWeekExpandedHeight((monthProvider!.isCurrentMonth == "Current") ? 84 : 0);
+        }
+        await Future.delayed(Duration.zero).then(
+          (value) => _isExpanded = (mainIndex! + 1) == monthProvider?.week ? true : false,
+        );
+      }
+    });
+
     dayDataList = weekDataModel!.days!;
   }
 
@@ -82,15 +92,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     return Consumer<MonthProvider>(
       builder: (context, monthProvider, child) {
         return Container(
-          child: monthProvider.weekStatuses.isEmpty
-              ? SizedBox()
-              : Column(
-                  children: [
-                    filterViewList1(monthProvider),
-                    // SizedBox(height: 25),
-                    // filterViewList(monthProvider),
-                  ],
-                ),
+          child: monthProvider.weekStatuses.isEmpty ? SizedBox() : filterViewList1(monthProvider),
         );
       },
     );
@@ -111,13 +113,26 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 sidePadding: true,
                 animationDuration: Duration(milliseconds: 300),
                 expandIconColor: Colors.grey.shade400,
-                materialGapSize: 10,
+                // materialGapSize: 10,
                 expandedHeaderPadding: EdgeInsets.zero,
-                expansionCallback: (panelIndex, isExpanded) {
-                  setState(() {
+                expansionCallback: (panelIndex, isExpanded) async {
+                  if (isExpanded) {
+                    monthProvider.updateWeekExpandedHeight(monthProvider.weekExpandedHeight + 84);
+                    await Future.delayed(Duration(milliseconds: 100)).then(
+                      (value) {
+                        _isExpanded = isExpanded;
+                        curExpandedIdx = isExpanded ? 0 : -1;
+                        setState(() {});
+                      },
+                    );
+                  } else {
                     _isExpanded = isExpanded;
                     curExpandedIdx = isExpanded ? 0 : -1;
-                  });
+                    setState(() {});
+                    await Future.delayed(Duration(milliseconds: 310)).then(
+                      (value) => monthProvider.updateWeekExpandedHeight(monthProvider.weekExpandedHeight - 84),
+                    );
+                  }
                 },
                 elevation: 0,
                 children: [
@@ -136,57 +151,57 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       isExpanded: _isExpanded,
       canTapOnHeader: true,
       headerBuilder: (context, isExpanded) {
-        return Padding(
-          padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(6)),
-          child: Row(
-            children: [
-              Text(
-                widget.title != "" ? (widget.title.toString().toLowerCase().capitalizeFirst()) : "Week",
-                // style: GoogleFonts.plusJakartaSans(
-                //   color: Colors.black,
-                //   fontSize: ScreenUtil.verticalScale(1.8),
-                //   fontWeight: FontWeight.bold,
-                // ),
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: ScreenUtil.horizontalScale(5.5),
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
-                ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: DashedBorder(
-                      spaceLength: 8,
-                      strokeCap: StrokeCap.square,
-                      dashLength: 1,
-                      top: BorderSide(color: Colors.grey.shade400, width: 1.5),
+        return SizedBox(
+          height: ScreenUtil.verticalScale(4),
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(6)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.title != "" ? (widget.title.toString().toLowerCase().capitalizeFirst()) : "Week",
+                    // style: GoogleFonts.plusJakartaSans(
+                    //   color: Colors.black,
+                    //   fontSize: ScreenUtil.verticalScale(1.8),
+                    //   fontWeight: FontWeight.bold,
+                    // ),
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.horizontalScale(5.5),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
                     ),
                   ),
-                ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: ScreenUtil.verticalScale(2)),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: DashedBorder(
+                            spaceLength: 8,
+                            strokeCap: StrokeCap.square,
+                            dashLength: 1,
+                            top: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                ],
               ),
-              SizedBox(width: 4),
-            ],
+            ),
           ),
         );
       },
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Text(
-          //   weekDataModel?.description?.trim() ?? "",
-          //   style: TextStyle(
-          //       fontSize: ScreenUtil.verticalScale(1.7),
-          //       color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : const Color(0xFF888888)),
-          // ),
-          // SizedBox(
-          //   height: ScreenUtil.verticalScale(weekDataModel!.description!.isEmpty ? 0 : 3),
-          // ),
-          SizedBox(height: ScreenUtil.verticalScale(1.3)),
+          SizedBox(height: ScreenUtil.verticalScale(1)),
           ListView.separated(
-            separatorBuilder: (context, index) => SizedBox(height: 7),
+            separatorBuilder: (context, index) => SizedBox(height: ScreenUtil.verticalScale(1)),
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -240,7 +255,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       : pumpDayRestday(monthProvider, dataId, index, isRestDay, dayData);
             },
           ),
-          SizedBox(height: 10)
+          SizedBox(height: ScreenUtil.verticalScale(1)),
         ],
       ),
     );
@@ -317,7 +332,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               child: SizedBox(
                 height: 60,
                 child: InkWell(
-                  onTap: monthProvider.weekStatuses[mainIndex!] == WeekType.futureWeek
+                  onTap: monthProvider.weekStatuses[mainIndex!] == WeekType.futureWeek && monthProvider.isCurrentMonth != "Future"
                       ? null
                       : () => continueWorkoutOnTap(isRestDay, dataId, index, dayData, context, mainIndex!, weekDataModel!.idList![index]),
                   child: Row(
@@ -647,7 +662,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   Widget pumpDayRestday(MonthProvider monthProvider, String dataId, int index, bool isRestDay, DayDataModel dayData) {
     return Builder(builder: (context) {
-      DayHistoryModel? matchingElement = monthProvider.allDayHistoryModel
+      DayHistoryModel? matchingElement = monthProvider.allSplitDayHistoryModel
           .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
 
       return Slidable(
@@ -896,32 +911,33 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   bool isRestPumpOption(bool isRestDay, MonthProvider monthProvider, String dataId) {
     return ((isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek && monthProvider.isPumpDayAvailable) &&
-            (monthProvider.allDayHistoryModel.any(
+            (monthProvider.allSplitDayHistoryModel.any(
                     (element) => (element.status != Status.skipped && element.status != Status.completed && (dataId == element.dataId))) ||
-                (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)))) ||
+                (!monthProvider.allSplitDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)))) ||
         ((isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
-            (monthProvider.allDayHistoryModel.any((element) => ((element.status == Status.started) && dataId == element.dataId))));
+            (monthProvider.allSplitDayHistoryModel.any((element) => ((element.status == Status.started) && dataId == element.dataId))));
   }
 
   Future<void> continueWorkoutOnTap(
       bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex, String dayId) async {
-    DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel
+    DayHistoryModel? matchingElement = monthProvider!.allSplitDayHistoryModel
         .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
 
     bool isRestDayForPastWeek =
         monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek && (!(matchingElement.title ?? "").contains("Pump Day"));
     bool isPumpDay = (isRestDay &&
-            monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+            monthProvider!.allSplitDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
+            (monthProvider!.allSplitDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (monthProvider!.allDayHistoryModel
+            (monthProvider!.allSplitDayHistoryModel
                 .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
+            (!monthProvider!.allSplitDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider?.changeIsPumpDay(isRestDayForPastWeek ? !isRestDayForPastWeek : isPumpDay);
 
@@ -980,8 +996,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         if ((monthProvider!.allSplitDayHistoryModel
                 .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
             false) {
-          _saveDayData(
-              type: "Pump Day - ${monthProvider!.pumpDayModel?.id}", status: Status.started, title: monthProvider!.pumpDayModel?.title);
+          if (monthProvider?.isCurrentMonth == "Future") {
+            _saveDayData(
+                type: "Pump Day - ${monthProvider!.pumpDayModel?.id}", status: Status.started, title: monthProvider!.pumpDayModel?.title);
+          }
           if (!context.mounted) return;
           await Navigator.pushNamed(context, '/today').then(
             (value) {
@@ -994,7 +1012,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         }
       } else {
         if ((monthProvider?.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
-          _saveDayData(status: Status.started, type: 'Workout Day');
+          if (monthProvider?.isCurrentMonth == "Future") {
+            _saveDayData(status: Status.started, type: 'Workout Day');
+          }
         }
         if (!context.mounted) return;
         await Navigator.pushNamed(context, '/today');
@@ -1086,7 +1106,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                               onPressed: () async {
                                 await _saveDayData(status: Status.completed, type: 'Rest Day', endDate: true).then(
                                   (value) {
-                                    monthProvider?.onInit(context, isEnabled: false);
+                                    monthProvider?.onInit(context: context, isEnabled: false);
                                   },
                                 );
                                 if (!c1.mounted) return;
@@ -1232,5 +1252,109 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     monthProvider?.fetchToday();
     monthProvider?.manageStreak();
     monthProvider?.getLiftedWeightGraphData();
+  }
+
+  ///
+
+  Future<void> showWorkout(
+      bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex, String dayId) async {
+    DayHistoryModel? matchingElement = monthProvider!.allSplitDayHistoryModel
+        .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
+
+    bool isRestDayForPastWeek =
+        monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek && (!(matchingElement.title ?? "").contains("Pump Day"));
+    bool isPumpDay = (isRestDay &&
+            monthProvider!.allSplitDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+        (isRestDay &&
+            monthProvider!.isPumpDayAvailable &&
+            (monthProvider!.allSplitDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
+        (isRestDay &&
+            monthProvider!.isPumpDayAvailable &&
+            (monthProvider!.allSplitDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
+        (isRestDay &&
+            monthProvider!.isPumpDayAvailable &&
+            (!monthProvider!.allSplitDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
+
+    monthProvider?.changeIsPumpDay(isRestDayForPastWeek ? !isRestDayForPastWeek : isPumpDay);
+
+    if (isPumpDay) {
+      final dataList = monthProvider?.dayHistoryModel
+          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .toList();
+
+      if (dataList!.isNotEmpty) {
+        int index1 = monthProvider!.pumpDays
+            .indexWhere((el1) => dataList.any((e1) => (e1.dayId == dayId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        if (index1 != -1) {
+          monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index1]);
+        } else {
+          int index1 =
+              monthProvider!.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          monthProvider?.updatePumpDayData(monthProvider!.pumpDays[index == -1
+              ? 0
+              : index1 == 0
+                  ? 1
+                  : 0]);
+        }
+      } else {
+        monthProvider?.updatePumpDayData(monthProvider!.pumpDays[0]);
+      }
+    }
+
+    monthProvider?.overviewCurrentWeek = widget.weekIndex + 1;
+    monthProvider?.overviewCurrentDay = index + 1;
+    monthProvider?.dayDataModel = dayData;
+    // monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
+    monthProvider?.weekDataModel = weekDataModel;
+    monthProvider?.updateIsPastWeek(monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
+
+    final dayIndex = monthProvider!.overviewCurrentDay;
+    int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+        ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+        : 0;
+    String currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+        ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
+        : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
+
+    final isCompletedOrSkipped = (monthProvider!.allSplitDayHistoryModel
+        .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
+
+    if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && isCompletedOrSkipped) {
+      return;
+    } else if (currentDayTitle.contains("Rest Day") && (!monthProvider!.isPumpDay) && !isCompletedOrSkipped) {
+      if (monthProvider?.weekStatuses[mainIndex!] != WeekType.currentWeek) return;
+      AnimatedDialog.showAnimatedDialog(
+        context: context,
+        pageBuilder: (c1, anim1, anim2) => skipWorkoutDialog(context, c1),
+      );
+    } else {
+      if (monthProvider!.isPumpDay) {
+        if ((monthProvider!.allSplitDayHistoryModel
+                .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+            false) {
+          _saveDayData(
+              type: "Pump Day - ${monthProvider!.pumpDayModel?.id}", status: Status.started, title: monthProvider!.pumpDayModel?.title);
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today').then(
+            (value) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await monthProvider?.checkForPumpDay());
+            },
+          );
+        } else {
+          if (!context.mounted) return;
+          await Navigator.pushNamed(context, '/today');
+        }
+      } else {
+        if ((monthProvider?.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
+          _saveDayData(status: Status.started, type: 'Workout Day');
+        }
+        if (!context.mounted) return;
+        await Navigator.pushNamed(context, '/today');
+      }
+    }
+
+    // Navigator.pushNamed(context, '/dayOverview');
   }
 }

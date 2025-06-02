@@ -480,7 +480,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       monthProvider.updateScrollToRestDay(true);
       _completeRestDay(status: Status.completed, type: 'Rest Day', endDate: true).then(
         (value) {
-          monthProvider.onInit(context, isEnabled: false);
+          monthProvider.onInit(context: context, isEnabled: false);
         },
       );
       await monthProvider.checkForPumpDay();

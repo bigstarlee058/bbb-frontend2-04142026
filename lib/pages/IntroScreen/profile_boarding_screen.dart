@@ -4,28 +4,36 @@ import 'dart:io';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
+import 'package:bbb/pages/main_page.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:path/path.dart' as path;
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileBoardingScreen extends StatefulWidget {
-  const ProfileBoardingScreen({super.key});
-
+  const ProfileBoardingScreen({super.key, required this.welcomeDescription, required this.welcomeImageUrl});
+  final String welcomeDescription;
+  final String welcomeImageUrl;
   @override
   State<ProfileBoardingScreen> createState() => _ProfileBoardingScreenState();
 }
 
 class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
+  late UserDataProvider userData;
+
   int currentPage = 1;
   TextEditingController nameController = TextEditingController();
-  TextEditingController lNameController = TextEditingController();
   PageController pageController = PageController();
   File? image;
   DateTime? selectedDate;
@@ -70,6 +78,63 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
 
   updateSplitIndex(int index) {
     goalIndex = index;
+    setState(() {});
+  }
+
+  bool isLoading = false;
+  Future<void> _saveUserData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final userDetails = {
+      'lastName': '',
+      'firstName': nameController.text.toString(),
+      'sex': genderOptions.indexOf(selectedGender!),
+      'dob': selectedDate?.toIso8601String(),
+      'weight': selectedWeight.text.isEmpty ? "" : int.parse(selectedWeight.text.split(' ')[0]),
+      'height': selectedHeight.text.isEmpty ? "" : int.parse(selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'waist': selectedWaist.text.isEmpty ? "0" : int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'hip': selectedHip.text.isEmpty ? "0" : int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'midthigh': selectedMidThigh.text.isEmpty ? "0" : int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'bodyfat': selectedBodyFat.text.isEmpty ? "0" : int.parse(selectedBodyFat.text.split(' ')[0]),
+    };
+    if (kDebugMode) {
+      print('HERE IS USERDETAIL##, $userDetails');
+    }
+
+    await userData.addUserInfo(userData.userId, userDetails, image);
+    Fluttertoast.showToast(
+      msg: "Profile saved!",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.TOP_RIGHT,
+      timeInSecForIosWeb: 1,
+      backgroundColor: AppColors.primaryColor,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    setState(() {
+      isLoading = false;
+    });
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    userData = Provider.of<UserDataProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) => onInit(),
+    );
+    super.initState();
+  }
+
+  onInit() {
+    if (userData.user != null) {
+      nameController.text = userData.user["name"] ?? "";
+    }
     setState(() {});
   }
 
@@ -239,18 +304,85 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                                 ),
                                 SizedBox(height: ScreenUtil.verticalScale(1)),
                                 ButtonWidget(
-                                  text: "Next",
+                                  text: currentPage == 3 ? "Save" : "Next",
                                   textColor: Colors.white,
                                   color: AppColors.primaryColor,
-                                  onPress: () {
-                                    pageController.nextPage(
-                                      duration: const Duration(milliseconds: 400),
-                                      curve: Curves.fastOutSlowIn,
-                                    );
-                                    // currentPage = pageController.page!.toInt();
-                                    setState(() {});
+                                  onPress: () async {
+                                    /// 1
+
+                                    if (currentPage == 1) {
+                                      if (nameController.text.isEmpty) {
+                                        showBottomAlert(context, 'Please enter name');
+                                        return;
+                                      } else {
+                                        pageController.nextPage(
+                                          duration: const Duration(milliseconds: 400),
+                                          curve: Curves.fastOutSlowIn,
+                                        );
+                                        setState(() {});
+                                      }
+                                    }
+
+                                    /// 2
+
+                                    if (currentPage == 2) {
+                                      if (selectedGender == null ||
+                                          selectedDate == null ||
+                                          selectedHeight.text.isEmpty ||
+                                          selectedWeight.text.isEmpty) {
+                                        showBottomAlert(context, 'Please enter details');
+                                        return;
+                                      } else {
+                                        pageController.nextPage(
+                                          duration: const Duration(milliseconds: 400),
+                                          curve: Curves.fastOutSlowIn,
+                                        );
+                                        setState(() {});
+                                      }
+                                    }
+
+                                    /// 3
+
+                                    if (currentPage == 3) {
+                                      if (image == null) {
+                                        showBottomAlert(context, 'Please upload profile image');
+                                        return;
+                                      } else {
+                                        if (nameController.text.isEmpty) {
+                                          showBottomAlert(context, 'Please enter name');
+                                          return;
+                                        }
+                                        if (selectedGender == null ||
+                                            selectedDate == null ||
+                                            selectedHeight.text.isEmpty ||
+                                            selectedWeight.text.isEmpty) {
+                                          showBottomAlert(context, 'Please enter details');
+                                          return;
+                                        }
+
+                                        /// UPDATE DATA
+                                        ///
+                                        await _saveUserData().then(
+                                          (value) async {
+                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                            bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+                                            await Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => MainPage(
+                                                  showWelcomeModal: !hasSeenWelcome,
+                                                  welcomeDescription: widget.welcomeDescription,
+                                                  welcomeImageUrl: widget.welcomeImageUrl,
+                                                  isComeFromOnBoarding: true,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      }
+                                    }
                                   },
-                                  isLoading: false,
+                                  isLoading: isLoading,
                                 ),
                               ],
                             ),
@@ -281,13 +413,13 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(3)),
+          SizedBox(height: ScreenUtil.verticalScale(4)),
           Align(
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text(
-                "Enter your first name",
+                "Enter your name",
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.8),
                   height: 1,
@@ -297,7 +429,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(1.2)),
+          SizedBox(height: ScreenUtil.verticalScale(1.5)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: AppTextFormField(
@@ -306,48 +438,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               textInputAction: TextInputAction.next,
               onChanged: (value) {},
               controller: nameController,
-              suffixIcon: Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: IconButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    minimumSize: WidgetStateProperty.all(
-                      const Size(48, 48),
-                    ),
-                  ),
-                  icon: const Icon(
-                    Icons.person,
-                    color: Color(0XFFd9d9d9),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(3)),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                "Enter your last name",
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.8),
-                  height: 1,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(1.2)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: AppTextFormField(
-              hintText: 'Last Name',
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              onChanged: (value) {},
-              controller: lNameController,
               suffixIcon: Padding(
                 padding: const EdgeInsets.only(right: 15),
                 child: IconButton(
@@ -976,22 +1066,20 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                       maxLength: 3,
                       decoration: InputDecoration(
                         counterText: "",
-                        hintText: !focusNode.hasFocus && label == "Weight"
-                            ? "     0 lbs"
-                            : !focusNode.hasFocus && label == "Body-Fat"
-                                ? "    0 %"
-                                : '  0"',
+                        hintText: "0",
                         hintStyle: TextStyle(
                           color: Colors.grey.shade700,
                           fontSize: ScreenUtil.verticalScale(1.95),
                         ),
-                        suffix: Text(
-                          suffix,
-                          style: TextStyle(
-                            fontSize: ScreenUtil.verticalScale(1.95),
-                            color: Colors.black,
-                          ),
-                        ),
+                        suffix: !focusNode.hasFocus && controller.text.isEmpty
+                            ? SizedBox()
+                            : Text(
+                                suffix,
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.verticalScale(1.95),
+                                  color: Colors.black,
+                                ),
+                              ),
                         border: InputBorder.none,
                         isCollapsed: true,
                         contentPadding: EdgeInsets.zero,
@@ -1111,4 +1199,38 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       ),
     );
   }
+}
+
+void showBottomAlert(BuildContext context, String msg) {
+  OverlayState? overlayState = Overlay.of(context);
+  OverlayEntry overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      bottom: 20.0,
+      left: MediaQuery.of(context).size.width * 0.1,
+      right: MediaQuery.of(context).size.width * 0.1,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Center(
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlayState.insert(overlayEntry); //In here I changed the code ?.
+
+  // Remove the alert after 3 seconds
+  Future.delayed(const Duration(seconds: 3), () {
+    overlayEntry.remove();
+  });
 }

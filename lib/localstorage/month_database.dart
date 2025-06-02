@@ -342,6 +342,18 @@ class DatabaseHelper {
     return null;
   }
 
+  Future<List<Map<String, dynamic>>> getDataByM({required String tableName, required String monthId}) async {
+    Database db = await database;
+    List<Map<String, dynamic>> results = await db.query(
+      tableName,
+      where: 'monthId = ?',
+      whereArgs: [monthId],
+    );
+    return results;
+    // List<Map<String, dynamic>> results = await db.query(tableName, where: 'monthId = ?', whereArgs: [monthId]);
+    // return results;
+  }
+
   Future<List<Map<String, dynamic>>> getDataByAnyWithSplitField(
       {required String tableName, required String fieldName, required String split, required String id}) async {
     Database db = await database;

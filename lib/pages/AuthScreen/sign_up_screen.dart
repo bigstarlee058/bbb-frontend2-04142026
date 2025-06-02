@@ -148,7 +148,7 @@ class _SignupPageState extends State<SignupPage> {
 
           bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
 
-          Navigator.pushAndRemoveUntil(
+          await Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => MainPage(
