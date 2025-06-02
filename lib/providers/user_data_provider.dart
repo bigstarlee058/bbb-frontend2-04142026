@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -128,6 +129,7 @@ class UserDataProvider extends ChangeNotifier {
     userName = responseData["name"];
     userEmail = responseData["email"];
     userData = responseData;
+    await preferences.putString(SharedPreference.role, (responseData["role"] ?? 0).toString());
     notifyListeners();
   }
 

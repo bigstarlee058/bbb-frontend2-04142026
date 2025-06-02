@@ -662,7 +662,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   Widget pumpDayRestday(MonthProvider monthProvider, String dataId, int index, bool isRestDay, DayDataModel dayData) {
     return Builder(builder: (context) {
-      DayHistoryModel? matchingElement = monthProvider.allDayHistoryModel
+      DayHistoryModel? matchingElement = monthProvider.allSplitDayHistoryModel
           .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
 
       return Slidable(
@@ -813,19 +813,17 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Builder(builder: (context) {
-                            return Text(
-                              (matchingElement.type ?? "").contains("Pump Day")
-                                  ? "${matchingElement.title}"
-                                  : weekDataModel!
-                                      .restDayList?[int.parse(weekDataModel!.dayList![index].toString().split(" ").toList().last) - 1],
-                              style: TextStyle(
-                                  color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
-                                  fontSize: ScreenUtil.verticalScale(1.8),
-                                  fontWeight: FontWeight.bold,
-                                  height: 1),
-                            );
-                          }),
+                          Text(
+                            (matchingElement.type ?? "").contains("Pump Day")
+                                ? "${matchingElement.title}"
+                                : weekDataModel!
+                                    .restDayList?[int.parse(weekDataModel!.dayList![index].toString().split(" ").toList().last) - 1],
+                            style: TextStyle(
+                                color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/ Colors.black,
+                                fontSize: ScreenUtil.verticalScale(1.8),
+                                fontWeight: FontWeight.bold,
+                                height: 1),
+                          ),
                           Spacer(),
                           monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek &&
                                   (matchingElement.type ?? "").contains("Pump Day")
@@ -913,36 +911,33 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   bool isRestPumpOption(bool isRestDay, MonthProvider monthProvider, String dataId) {
     return ((isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek && monthProvider.isPumpDayAvailable) &&
-            (monthProvider.allDayHistoryModel.any(
+            (monthProvider.allSplitDayHistoryModel.any(
                     (element) => (element.status != Status.skipped && element.status != Status.completed && (dataId == element.dataId))) ||
-                (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)))) ||
+                (!monthProvider.allSplitDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)))) ||
         ((isRestDay && monthProvider.weekStatuses[mainIndex!] == WeekType.currentWeek) &&
-            (monthProvider.allDayHistoryModel.any((element) => ((element.status == Status.started) && dataId == element.dataId))));
+            (monthProvider.allSplitDayHistoryModel.any((element) => ((element.status == Status.started) && dataId == element.dataId))));
   }
 
   Future<void> continueWorkoutOnTap(
       bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex, String dayId) async {
-    if (monthProvider?.isCurrentMonth == "Future") {
-      await Navigator.pushNamed(context, '/today');
-      return;
-    }
-    DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel
+    DayHistoryModel? matchingElement = monthProvider!.allSplitDayHistoryModel
         .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
 
     bool isRestDayForPastWeek =
         monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek && (!(matchingElement.title ?? "").contains("Pump Day"));
     bool isPumpDay = (isRestDay &&
-            monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+            monthProvider!.allSplitDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
+            (monthProvider!.allSplitDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (monthProvider!.allDayHistoryModel
+            (monthProvider!.allSplitDayHistoryModel
                 .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
+            (!monthProvider!.allSplitDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider?.changeIsPumpDay(isRestDayForPastWeek ? !isRestDayForPastWeek : isPumpDay);
 
@@ -1001,8 +996,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         if ((monthProvider!.allSplitDayHistoryModel
                 .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
             false) {
-          _saveDayData(
-              type: "Pump Day - ${monthProvider!.pumpDayModel?.id}", status: Status.started, title: monthProvider!.pumpDayModel?.title);
+          if (monthProvider?.isCurrentMonth == "Future") {
+            _saveDayData(
+                type: "Pump Day - ${monthProvider!.pumpDayModel?.id}", status: Status.started, title: monthProvider!.pumpDayModel?.title);
+          }
           if (!context.mounted) return;
           await Navigator.pushNamed(context, '/today').then(
             (value) {
@@ -1015,7 +1012,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         }
       } else {
         if ((monthProvider?.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
-          _saveDayData(status: Status.started, type: 'Workout Day');
+          if (monthProvider?.isCurrentMonth == "Future") {
+            _saveDayData(status: Status.started, type: 'Workout Day');
+          }
         }
         if (!context.mounted) return;
         await Navigator.pushNamed(context, '/today');
@@ -1259,23 +1258,24 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   Future<void> showWorkout(
       bool isRestDay, String dataId, int index, DayDataModel dayData, BuildContext context, int weekIndex, String dayId) async {
-    DayHistoryModel? matchingElement = monthProvider!.allDayHistoryModel
+    DayHistoryModel? matchingElement = monthProvider!.allSplitDayHistoryModel
         .firstWhere((element) => element.dataId == dataId && element.type!.contains("Pump Day"), orElse: () => DayHistoryModel());
 
     bool isRestDayForPastWeek =
         monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek && (!(matchingElement.title ?? "").contains("Pump Day"));
     bool isPumpDay = (isRestDay &&
-            monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+            monthProvider!.allSplitDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
+            (monthProvider!.allSplitDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day"))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (monthProvider!.allDayHistoryModel
+            (monthProvider!.allSplitDayHistoryModel
                 .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
         (isRestDay &&
             monthProvider!.isPumpDayAvailable &&
-            (!monthProvider!.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
+            (!monthProvider!.allSplitDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
 
     monthProvider?.changeIsPumpDay(isRestDayForPastWeek ? !isRestDayForPastWeek : isPumpDay);
 

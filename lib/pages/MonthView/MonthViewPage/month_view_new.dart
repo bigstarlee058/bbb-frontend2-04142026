@@ -150,9 +150,9 @@ class _MonthViewNewState extends State<MonthViewNew> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => monthProvider?.fetchAllDayStatusLocalData(),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => monthProvider?.fetchAllDayStatusLocalData(),
+      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -221,26 +221,6 @@ class _MonthViewNewState extends State<MonthViewNew> {
                     },
                   ),
                 ),
-                // AppBar(
-                //   backgroundColor: Colors.transparent,
-                //   toolbarHeight: ScreenUtil.verticalScale(5.1) + 5,
-                //   surfaceTintColor: Colors.transparent,
-                //   automaticallyImplyLeading: false,
-                //   leading: Padding(
-                //     padding: const EdgeInsets.only(bottom: 5),
-                //     child: BackArrowWidget(
-                //       onPress: () {
-                //         monthProvider?.mainPageProvider.changeTab(0);
-                //       },
-                //     ),
-                //   ),
-                //   actions: [
-                //     Padding(
-                //       padding: const EdgeInsets.only(right: 10),
-                //       child: const CommonStreakWithNotification(routeString: '/month-view'),
-                //     )
-                //   ],
-                // ),
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,
@@ -269,7 +249,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                               crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
                                                 SizedBox(
-                                                  height: ScreenUtil.verticalScale(2),
+                                                  height: ScreenUtil.verticalScale(1.5),
                                                 ),
                                                 Column(
                                                   children: [
@@ -391,22 +371,12 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                         ],
                                                       ),
                                                     ),
-                                                    // Padding(
-                                                    //   padding: const EdgeInsets.symmetric(vertical: 5),
-                                                    //   child: Text(
-                                                    //     monthProvider.monthDataModel?.title ?? "",
-                                                    //     textAlign: TextAlign.center,
-                                                    //     style: TextStyle(
-                                                    //       color: Colors.white,
-                                                    //       fontSize: ScreenUtil.horizontalScale(6.5),
-                                                    //       fontWeight: FontWeight.bold,
-                                                    //     ),
-                                                    //   ),
-                                                    // ),
                                                     Padding(
                                                       padding: EdgeInsets.only(
                                                         left: ScreenUtil.horizontalScale(2),
                                                         right: ScreenUtil.horizontalScale(8),
+                                                        top: ScreenUtil.verticalScale(1.8),
+                                                        bottom: ScreenUtil.verticalScale(1.2),
                                                       ),
                                                       // child: SizedBox(
                                                       //   height: media.height / 7.5,
@@ -488,7 +458,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                     //   ),
                                     // ),
                                     SizedBox(
-                                      height: media.height / 3.429,
+                                      height: media.height / 3.229,
                                       width: media.width,
                                       child: Align(
                                         alignment: Alignment.bottomRight,
@@ -516,7 +486,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                   topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                                 ),
                               ),
-                              margin: EdgeInsets.only(top: media.height / 3.43),
+                              margin: EdgeInsets.only(top: media.height / 3.23),
                               child: Column(
                                 children: [
                                   SizedBox(

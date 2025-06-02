@@ -841,6 +841,30 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                   ),
                                             if (isEditMode || monthProvider!.isCurrentMonth == "Future")
                                               SizedBox()
+                                            else if (monthProvider!.isCurrentMonth == "Past" || monthProvider!.isPastWeek)
+                                              Column(
+                                                children: [
+                                                  Container(
+                                                    height: 1,
+                                                    margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6), vertical: 36),
+                                                    width: media.width * 0.75,
+                                                    color: Colors.black12,
+                                                  ),
+                                                  SizedBox(height: media.height * 0.025),
+                                                  Container(
+                                                    margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
+                                                    child: ButtonWidget(
+                                                      text: monthProvider?.dayHistoryDetails?.status == Status.completed
+                                                          ? "Completed"
+                                                          : "Skipped",
+                                                      textColor: Colors.white,
+                                                      onPress: null,
+                                                      color: AppColors.primaryColor,
+                                                      isLoading: false,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
                                             else ...[
                                               (monthProvider!.isPumpDay || monthProvider!.isCircuit)
                                                   ? SizedBox()
@@ -873,10 +897,9 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                           isLoading: false,
                                                         ),
                                                       )
-                                                    : (value.dayHistoryDetails == null ||
-                                                                (isCurrentDaySkipped || isCurrentDayCompleted) ||
-                                                                value.isPastWeek) &&
-                                                            value.isCurrentMonth == "Current"
+                                                    : (value.dayHistoryDetails == null || (isCurrentDaySkipped || isCurrentDayCompleted)) &&
+                                                            value.isCurrentMonth == "Current" &&
+                                                            !value.isPastWeek
                                                         ? Container(
                                                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(5)),
                                                             child: ButtonWidget(

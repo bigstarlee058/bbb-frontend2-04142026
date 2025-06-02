@@ -55,7 +55,10 @@ class ScheduleSectionNew extends StatelessWidget {
                               padding: EdgeInsets.zero,
                               physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
-                                return Column(
+                                return /*index != 1
+                                    ? SizedBox()
+                                    :*/
+                                    Column(
                                   children: [
                                     WeeklyTrackCard(
                                       index: index,
