@@ -86,8 +86,9 @@ class _SignupPageState extends State<SignupPage> {
         String message = data['message'];
 
         if (message == "User registered") {
-          await loginUser(emailAddress, password);
-          showBottomAlert(context, 'Signup successfully with $emailAddress.');
+          Navigator.pop(context);
+          // await loginUser(emailAddress, password);
+          showBottomAlert(context, 'Signup successfully with $emailAddress please login here.');
         } else {
           showBottomAlert(context, 'Failed to signup');
         }
