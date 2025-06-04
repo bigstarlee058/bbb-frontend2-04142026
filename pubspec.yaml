@@ -69,6 +69,8 @@ dependencies:
   flutter_radar_chart: ^0.2.1
   firebase_analytics: ^11.4.5
 
+  ntp: ^2.0.0
+
   purchases_flutter: ^8.9.0
   purchases_ui_flutter: ^8.9.0
 

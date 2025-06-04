@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +26,6 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
-
     _checkLoginStatus();
   }
 
@@ -31,15 +34,35 @@ class _SplashScreenState extends State<SplashScreen> {
       (value) async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+        DateTime now = await NTP.now();
         if (isLoggedIn) {
           await userData.fetchUserInfo();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-            ),
-          );
-          await isFromNotification();
+          Map<String, dynamic> subscriptionData = userData.user["subscription"];
+          log('subscriptionData :::::::::::::::::: $subscriptionData');
+
+          DateTime? startTime = (subscriptionData["purchase_date"] == "" || subscriptionData["purchase_date"] == null)
+              ? null
+              : DateTime.parse(subscriptionData["purchase_date"]);
+          DateTime? endTime = (subscriptionData["end_date"] == "" || subscriptionData["end_date"] == null)
+              ? null
+              : DateTime.parse(subscriptionData["end_date"]);
+
+          if (subscriptionData["user_subscription_status"] == "free_user" ||
+              (startTime != null && endTime != null && (now.isAfter(startTime) && now.isBefore(endTime)))) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SubscriptionPayWall(),
+                ));
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+              ),
+            );
+            await isFromNotification();
+          }
         } else {
           Navigator.pushReplacementNamed(context, '/onboarding');
         }

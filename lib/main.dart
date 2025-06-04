@@ -55,6 +55,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -63,7 +64,7 @@ import 'providers/month_provider.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+Offerings? offering;
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {}
 
@@ -74,6 +75,9 @@ void main() async {
   await DatabaseHelper().initDatabase();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await Purchases.configure(
+    PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'),
   );
   WidgetsFlutterBinding.ensureInitialized();
   await _configureLocalTimeZone();
