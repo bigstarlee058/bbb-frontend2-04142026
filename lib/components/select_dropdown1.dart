@@ -14,7 +14,7 @@ class SelectDropdown1 extends StatefulWidget {
 }
 
 class _SelectDropdown1State extends State<SelectDropdown1> {
-  String _selectedEquipment = '3 Days per Week';
+  String _selectedEquipment = '3 days per week';
   MonthProvider? monthProvider;
 
   @override
@@ -25,10 +25,10 @@ class _SelectDropdown1State extends State<SelectDropdown1> {
     );
 
     _selectedEquipment = monthProvider!.splitType.toString().replaceAll("split", "") == "3"
-        ? '3 Days per Week'
+        ? '3 days per week'
         : monthProvider!.splitType.toString().replaceAll("split", "") == "4"
-            ? '4 Days per Week'
-            : '5 Days per Week';
+            ? '4 days per week'
+            : '5 days per week';
     super.initState();
   }
 
@@ -75,14 +75,14 @@ class _SelectDropdown1State extends State<SelectDropdown1> {
           onChanged: (String? newValue) {
             setState(() {
               _selectedEquipment = newValue!;
-              widget.onChange(newValue == '3 Days per Week'
+              widget.onChange(newValue == '3 days per week'
                   ? '3'
-                  : newValue == '4 Days per Week'
+                  : newValue == '4 days per week'
                       ? '4'
                       : '5'); // Trigger the onChange callback
             });
           },
-          items: <String>['3 Days per Week', '4 Days per Week', '5 Days per Week'].map<DropdownMenuItem<String>>((String value) {
+          items: <String>['3 days per week', '4 days per week', '5 days per week'].map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Row(
@@ -91,9 +91,9 @@ class _SelectDropdown1State extends State<SelectDropdown1> {
                     backgroundColor: AppColors.primaryColor,
                     radius: ScreenUtil.verticalScale(2),
                     child: Text(
-                      value == '3 Days per Week'
+                      value == '3 days per week'
                           ? '3'
-                          : value == '4 Days per Week'
+                          : value == '4 days per week'
                               ? '4'
                               : '5',
                       style: TextStyle(

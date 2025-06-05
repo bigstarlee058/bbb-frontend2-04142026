@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:bbb/firebase_options.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/pages/AuthScreen/email_verification_page.dart';
 import 'package:bbb/pages/AuthScreen/login_page.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
 import 'package:bbb/pages/AuthScreen/sign_up_screen.dart';
@@ -64,10 +64,10 @@ import 'providers/month_provider.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-Offerings? offering;
+
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {}
-
+Offerings? offering;
 BuildContext? c;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +79,10 @@ void main() async {
   await Purchases.configure(
     PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'),
   );
+  offering = await Purchases.getOfferings();
+
+  await preferences.putString(SharedPreference.offerings, jsonEncode(offering));
+
   WidgetsFlutterBinding.ensureInitialized();
   await _configureLocalTimeZone();
   const androidInitializationSetting = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -246,7 +250,8 @@ class _MyAppState extends State<MyApp> {
             AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
             AppRoutes.tutorialScreen: (context) => const TutorialPage(),
             AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(image: ''),
-            AppRoutes.emailVerificationScreen: (context) => const EmailVerificationScreen(),
+            // AppRoutes.emailVerificationScreen: (context) =>
+            //     const EmailVerificationScreen(),
             AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
             AppRoutes.todayScreen: (context) => const TodayPage(),
             AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),

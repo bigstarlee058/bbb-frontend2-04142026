@@ -149,7 +149,7 @@ class _SettingSectionState extends State<SettingSection> {
                                         child: Row(
                                           children: [
                                             Text(
-                                              'Choose workout day split',
+                                              'Choose workout frequency',
                                               textAlign: TextAlign.left,
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
@@ -215,7 +215,7 @@ class _SettingSectionState extends State<SettingSection> {
                                             ),
                                             const SizedBox(width: 10),
                                             Text(
-                                              "3 Days per Week",
+                                              "3 days per week",
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
                                                 fontSize: ScreenUtil.verticalScale(1.8),
@@ -275,7 +275,7 @@ class _SettingSectionState extends State<SettingSection> {
                                             ),
                                             const SizedBox(width: 10),
                                             Text(
-                                              "4 Days per Week",
+                                              "4 days per week",
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
                                                 fontSize: ScreenUtil.verticalScale(1.8),
@@ -335,7 +335,7 @@ class _SettingSectionState extends State<SettingSection> {
                                             ),
                                             const SizedBox(width: 10),
                                             Text(
-                                              "5 Days per Week",
+                                              "5 days per week",
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
                                                 fontSize: ScreenUtil.verticalScale(1.8),
@@ -689,7 +689,7 @@ class _SettingSectionState extends State<SettingSection> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Choose workout day split',
+                        'Choose workout frequency',
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           color: const Color(0xBB888888),
@@ -759,7 +759,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                "3 Days per Week",
+                                "3 days per week",
                                 style: TextStyle(
                                   color: const Color(0xBB888888),
                                   fontSize: ScreenUtil.verticalScale(1.8),
@@ -819,7 +819,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                "4 Days per Week",
+                                "4 days per week",
                                 style: TextStyle(
                                   color: const Color(0xBB888888),
                                   fontSize: ScreenUtil.verticalScale(1.8),
@@ -879,7 +879,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                "5 Days per Week",
+                                "5 days per week",
                                 style: TextStyle(
                                   color: const Color(0xBB888888),
                                   fontSize: ScreenUtil.verticalScale(1.8),

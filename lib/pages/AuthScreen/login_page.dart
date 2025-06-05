@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
+import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -17,6 +19,7 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ntp/ntp.dart' show NTP;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isObscure = true;
   bool isLoading = false;
   ImageProvider? imageProvider;
+  late UserDataProvider userData;
 
   late MainPageProvider mainPageProvider;
 
@@ -43,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-
+    userData = Provider.of<UserDataProvider>(context, listen: false);
     _checkLoginStatus();
   }
 
@@ -72,7 +76,8 @@ class _LoginPageState extends State<LoginPage> {
         );
         mainPageProvider.changeTab(0);
       } catch (e) {
-        debugPrint("----TESTING BOTTOM INDEX IS 0 ----Error in indexing login_page");
+        debugPrint(
+            "----TESTING BOTTOM INDEX IS 0 ----Error in indexing login_page");
       }
     }
   }
@@ -92,7 +97,8 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+      final url = Uri.parse(
+          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -122,19 +128,44 @@ class _LoginPageState extends State<LoginPage> {
 
           // Check if the welcome modal has been shown
           bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-
-          // Navigate to MainPage, passing the welcome data if modal should be shown
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MainPage(
-                showWelcomeModal: !hasSeenWelcome,
-                welcomeDescription: descriptionData['description'] ?? "",
-                welcomeImageUrl: descriptionData['vimeoId'], // pass fetched description
+          // DateTime now = await NTP.now();
+          //
+          // await userData.fetchUserInfo();
+          //
+          // Map<String, dynamic> subscriptionData = userData.user["subscription"];
+          // log('subscriptionData :::::::::::::::::: $subscriptionData');
+          //
+          // DateTime? startTime = (subscriptionData["purchase_date"] == "" ||
+          //         subscriptionData["purchase_date"] == null)
+          //     ? null
+          //     : DateTime.parse(subscriptionData["purchase_date"]);
+          // DateTime? endTime = (subscriptionData["end_date"] == "" ||
+          //         subscriptionData["end_date"] == null)
+          //     ? null
+          //     : DateTime.parse(subscriptionData["end_date"]);
+          // if (subscriptionData["user_subscription_status"] == "free_user" ||
+          //     (startTime != null &&
+          //         endTime != null &&
+          //         (now.isAfter(startTime) && now.isBefore(endTime)))) {
+          //   await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => SubscriptionPayWall(),
+          //       ));
+          // } else {
+            await Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MainPage(
+                  showWelcomeModal: !hasSeenWelcome,
+                  welcomeDescription: descriptionData['description'] ?? "",
+                  welcomeImageUrl:
+                      descriptionData['vimeoId'], // pass fetched description
+                ),
               ),
-            ),
-            (route) => false,
-          );
+              (route) => false,
+            );
+          // }
         } else {
           // Handle error if fetching description fails
           showBottomAlert(context, 'Failed to load description');
@@ -201,7 +232,10 @@ class _LoginPageState extends State<LoginPage> {
                 height: 150,
                 width: media.width,
                 decoration: const BoxDecoration(
-                  image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                  image: DecorationImage(
+                      image: AssetImage('assets/img/bbb-logo.png'),
+                      fit: BoxFit.fitHeight,
+                      opacity: 1),
                 ),
               ),
             ),
@@ -230,7 +264,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.verticalScale(4.4)),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -306,7 +341,9 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   icon: Icon(
-                                    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    isObscure
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
                                     color: Colors.grey.shade400,
                                   ),
                                 ),
@@ -329,7 +366,8 @@ class _LoginPageState extends State<LoginPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (ctx) => const ResetPasswordScreen(
+                                          builder: (ctx) =>
+                                              const ResetPasswordScreen(
                                             image: '',
                                           ),
                                         ),
@@ -373,7 +411,8 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(65, 30),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
                                       alignment: Alignment.center),
                                   child: const Text(
                                     'Sign up',

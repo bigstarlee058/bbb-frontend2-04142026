@@ -8,6 +8,7 @@ import 'package:bbb/providers/user_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -34,35 +35,40 @@ class _SplashScreenState extends State<SplashScreen> {
       (value) async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-        DateTime now = await NTP.now();
+
         if (isLoggedIn) {
           await userData.fetchUserInfo();
-          Map<String, dynamic> subscriptionData = userData.user["subscription"];
-          log('subscriptionData :::::::::::::::::: $subscriptionData');
 
-          DateTime? startTime = (subscriptionData["purchase_date"] == "" || subscriptionData["purchase_date"] == null)
-              ? null
-              : DateTime.parse(subscriptionData["purchase_date"]);
-          DateTime? endTime = (subscriptionData["end_date"] == "" || subscriptionData["end_date"] == null)
-              ? null
-              : DateTime.parse(subscriptionData["end_date"]);
-
-          if (subscriptionData["user_subscription_status"] == "free_user" ||
-              (startTime != null && endTime != null && (now.isAfter(startTime) && now.isBefore(endTime)))) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SubscriptionPayWall(),
-                ));
-          } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-              ),
-            );
-            await isFromNotification();
-          }
+          // Map<String, dynamic> subscriptionData = userData.user["subscription"];
+          // DateTime? startTime = (subscriptionData["purchase_date"] == "" ||
+          //         subscriptionData["purchase_date"] == null)
+          //     ? null
+          //     : DateTime.parse(subscriptionData["purchase_date"]);
+          // DateTime? endTime = (subscriptionData["end_date"] == "" ||
+          //         subscriptionData["end_date"] == null)
+          //     ? null
+          //     : DateTime.parse(subscriptionData["end_date"]);
+          // DateTime now = await NTP.now();
+          // if (subscriptionData["user_subscription_status"] != "free_user" &&
+          //     startTime != null &&
+          //     endTime != null &&
+          //     now.isAfter(startTime) &&
+          //     now.isBefore(endTime)) {
+          await Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+            ),
+          );
+          await isFromNotification();
+          // } else {
+          //   await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => SubscriptionPayWall(),
+          //       ));
+          // }
         } else {
           Navigator.pushReplacementNamed(context, '/onboarding');
         }

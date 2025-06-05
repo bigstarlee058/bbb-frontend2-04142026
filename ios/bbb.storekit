@@ -1,0 +1,145 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "F2D31F31",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6746472250",
+    "_developerTeamID" : "NGS5G69R62",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 770748143.41909206,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21696560",
+      "localizations" : [
+
+      ],
+      "name" : "Subscriptions",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.95",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6746628393",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Monthly Membership",
+              "displayName" : "Monthly Membership",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "monthly_membership",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly Membership",
+          "subscriptionGroupID" : "21696560",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "289.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6746630294",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Yearly Membership",
+              "displayName" : "Yearly Membership",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "yearly_membership",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yearly Membership",
+          "subscriptionGroupID" : "21696560",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

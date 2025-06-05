@@ -479,7 +479,7 @@ class _MonthViewState extends State<MonthView> {
                                                       child: Center(
                                                         child: Text(
                                                           index == 0
-                                                              ? "Schedule"
+                                                              ? "Program"
                                                               : index == 1
                                                                   ? "Options"
                                                                   // : "Information",
