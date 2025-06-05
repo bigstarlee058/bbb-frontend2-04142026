@@ -109,7 +109,7 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
         fetchRemovedExerciseLocalData();
         isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
         isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped ||
-            monthProvider?.dayHistoryDetails == null ||
+            (monthProvider?.dayHistoryDetails == null && monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] == WeekType.pastWeek) ||
             (monthProvider!.actualWeek! > 4 && monthProvider?.dayHistoryDetails?.status == Status.started);
 
         monthProvider?.fetchAllExercise();
@@ -729,6 +729,23 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                               bool isExist = (!monthProvider!.exerciseHistoryModel
                                                                       .any((item) => item.dataId != dataId)) &&
                                                                   monthProvider!.isPastWeek;
+
+
+                                                              print("object1===>>${(monthProvider!.exerciseHistoryModel.any((element) =>
+                                                              element.dataId == dataId &&
+                                                                  element.status == Status.skipped) ||
+                                                                  isExist)}");
+
+                                                              print("==========++>>>>>>>>>>>>>>  ${((isCurrentDaySkipped || isCurrentDayCompleted) &&
+                                                                  monthProvider!.exerciseHistoryModel.any(
+                                                                        (element) => element.dataId != dataId,
+                                                                  )) ||
+                                                                  (monthProvider!.exerciseHistoryModel.any((element) =>
+                                                                  element.dataId == dataId &&
+                                                                      element.status == Status.skipped) ||
+                                                                      isExist) ||
+                                                                  isCurrentDaySkipped}");
+
                                                               return Column(
                                                                 children: [
                                                                   Padding(

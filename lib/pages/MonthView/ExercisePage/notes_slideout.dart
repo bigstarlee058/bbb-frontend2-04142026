@@ -47,7 +47,8 @@ class NotesSlideout extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.center,
                     child: Text(
-                      "RIR is a method for measuring the intensity of a lift by counting how many more repetitions you could perform before technical failure.",
+                      // "RIR is a method for measuring the intensity of a lift by counting how many more repetitions you could perform before technical failure.",
+                      "Reps in reserve is a subjective measurement which has you estimating how many additional reps you’d be able to perform at the end of your set. We use RIR to quantify effort (proximity to failure).",
                       style: TextStyle(
                         fontSize: 16,
                       ),
@@ -63,9 +64,9 @@ class NotesSlideout extends StatelessWidget {
                       vertical: 10,
                       horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Colors.red, // Background color
+                    color: Color(0xFF2196F3), // Background color
                     border: Border.all(
-                      color: Colors.red, // Border color
+                      color: Color(0xFF2196F3), // Border color
                       width: 1, // Border width
                     ),
                     borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -116,9 +117,9 @@ class NotesSlideout extends StatelessWidget {
                       vertical: 10,
                       horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Colors.orange, // Background color
+                    color: Color(0xFF5D79C3), // Background color
                     border: Border.all(
-                      color: Colors.orange, // Border color
+                      color:Color(0xFF5D79C3), // Border color
                       width: 1, // Border width
                     ),
                     borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -168,9 +169,9 @@ class NotesSlideout extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   decoration: BoxDecoration(
-                    color: Colors.yellow, // Background color
+                    color: Color(0xFF9A5C93), // Background color
                     border: Border.all(
-                      color: Colors.yellow, // Border color
+                      color:Color(0xFF9A5C93),// Border color
                       width: 1, // Border width
                     ),
                     borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -221,9 +222,9 @@ class NotesSlideout extends StatelessWidget {
                       vertical: 10,
                       horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Colors.green, // Background color
+                    color: Color(0xFFB7436B), // Background color
                     border: Border.all(
-                      color: Colors.green, // Border color
+                      color: Color(0xFFB7436B), // Border color
                       width: 1, // Border width
                     ),
                     borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -274,9 +275,9 @@ class NotesSlideout extends StatelessWidget {
                       vertical: 10,
                       horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Colors.blue, // Background color
+                    color: Color(0xFF9A354E), // Background color
                     border: Border.all(
-                      color: Colors.blue, // Border color
+                      color: Color(0xFF9A354E),  // Border color
                       width: 1, // Border width
                     ),
                     borderRadius: BorderRadius.circular(8), // Rounded corners
