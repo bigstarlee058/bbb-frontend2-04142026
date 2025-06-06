@@ -222,12 +222,12 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(20),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(20),
             color: const Color(0xFFFFFFFF),
           ),
           child: loading
@@ -245,8 +245,10 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                         children: [
                           IconButton(
                             icon: const Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.of(context).pop();
+                            onPressed: () async {
+                              if(context.mounted) {
+                                Navigator.of(context).pop();
+                              }
                             },
                           ),
                           SizedBox(width: ScreenUtil.horizontalScale(3)),

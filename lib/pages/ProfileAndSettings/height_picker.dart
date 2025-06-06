@@ -128,6 +128,7 @@ class _HeightPickerState extends State<HeightPicker> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           SizedBox(
@@ -264,7 +265,7 @@ Future<void> showCupertinoHeightPicker({
             height: modalHeight,
             width: maxModalWidth ?? double.infinity,
             child: ColoredBox(
-              color: modalBackgroundColor ?? CupertinoColors.systemBackground.resolveFrom(context),
+              color: Colors.white,
               child: HeightPicker(
                 key: key,
                 initialHeight: initialHeight,

@@ -104,7 +104,6 @@ class _MonthViewNewState extends State<MonthViewNew> {
         }
       },
     );
-
     super.initState();
   }
 

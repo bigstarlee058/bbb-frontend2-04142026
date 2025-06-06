@@ -60,6 +60,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'localstorage/month_database.dart';
+import 'pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'providers/month_provider.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -67,7 +68,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {}
-Offerings? offering;
+
 BuildContext? c;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,12 +77,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await Purchases.configure(
-    PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'),
-  );
-  offering = await Purchases.getOfferings();
 
-  await preferences.putString(SharedPreference.offerings, jsonEncode(offering));
+  if (Platform.isIOS) {
+    await Purchases.configure(PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
+    Offerings offering = await Purchases.getOfferings();
+    await preferences.putString(SharedPreference.offerings, jsonEncode(offering));
+  }
 
   WidgetsFlutterBinding.ensureInitialized();
   await _configureLocalTimeZone();
@@ -272,6 +273,7 @@ class _MyAppState extends State<MyApp> {
             AppRoutes.settingPage: (context) => const SettingPage(),
             AppRoutes.seeAllAchievementPage: (context) => const SeeAllAchievementPage(),
             AppRoutes.faqsPage: (context) => const FAQsPage(),
+            AppRoutes.paywall: (context) => const SubscriptionPayWall(),
           },
         ),
       ),

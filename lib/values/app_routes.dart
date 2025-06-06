@@ -37,4 +37,5 @@ class AppRoutes {
   static const String settingPage = '/SettingPage';
   static const String seeAllAchievementPage = '/seeAllAchievementPage';
   static const String faqsPage = '/faqs';
+  static const String paywall = '/paywall';
 }

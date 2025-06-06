@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -19,8 +20,8 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ntp/ntp.dart' show NTP;
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -48,38 +49,13 @@ class _LoginPageState extends State<LoginPage> {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
-    _checkLoginStatus();
-  }
-
-  Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {});
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const MainPage(
-                  welcomeDescription: '',
-                  welcomeImageUrl: '',
-                )),
-      );
-    } else {
-      debugPrint("----TESTING BOTTOM INDEX IS 0");
-      try {
-        UserDataProvider userData;
-        userData = Provider.of<UserDataProvider>(
-          context,
-          listen: false,
-        );
-        mainPageProvider.changeTab(0);
-      } catch (e) {
-        debugPrint(
-            "----TESTING BOTTOM INDEX IS 0 ----Error in indexing login_page");
-      }
-    }
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        if (Platform.isIOS) {
+          getOffering();
+        }
+      },
+    );
   }
 
   Future<void> _saveLoginState(bool isLoggedIn) async {
@@ -97,8 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse(
-          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -128,54 +103,86 @@ class _LoginPageState extends State<LoginPage> {
 
           // Check if the welcome modal has been shown
           bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-          // DateTime now = await NTP.now();
-          //
-          // await userData.fetchUserInfo();
-          //
-          // Map<String, dynamic> subscriptionData = userData.user["subscription"];
-          // log('subscriptionData :::::::::::::::::: $subscriptionData');
-          //
-          // DateTime? startTime = (subscriptionData["purchase_date"] == "" ||
-          //         subscriptionData["purchase_date"] == null)
-          //     ? null
-          //     : DateTime.parse(subscriptionData["purchase_date"]);
-          // DateTime? endTime = (subscriptionData["end_date"] == "" ||
-          //         subscriptionData["end_date"] == null)
-          //     ? null
-          //     : DateTime.parse(subscriptionData["end_date"]);
-          // if (subscriptionData["user_subscription_status"] == "free_user" ||
-          //     (startTime != null &&
-          //         endTime != null &&
-          //         (now.isAfter(startTime) && now.isBefore(endTime)))) {
-          //   await Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => SubscriptionPayWall(),
-          //       ));
-          // } else {
-            await Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MainPage(
-                  showWelcomeModal: !hasSeenWelcome,
-                  welcomeDescription: descriptionData['description'] ?? "",
-                  welcomeImageUrl:
-                      descriptionData['vimeoId'], // pass fetched description
-                ),
-              ),
-              (route) => false,
-            );
-          // }
+
+          if (Platform.isIOS) {
+            try {
+              CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+              if (customerInfo.entitlements.active.isNotEmpty) {
+                customerInfo.entitlements.active.forEach((key, entitlement) async {
+                  final latestPurchaseDate = customerInfo.allPurchaseDates;
+                  final identifier = entitlement.productIdentifier;
+
+                  await _updateSubscriptionData(
+                    type: identifier,
+                    endDate: entitlement.expirationDate ?? "",
+                    startDate: latestPurchaseDate[identifier] ?? "",
+                    status: "subscribed_user",
+                  );
+                });
+              } else {
+                await _updateSubscriptionData(
+                  type: "",
+                  endDate: "",
+                  startDate: "",
+                  status: "free_user",
+                );
+              }
+            } catch (e) {
+              debugPrint("Error fetching subscription: $e");
+            }
+          }
+
+          await userData.fetchUserInfo();
+
+          if (Platform.isIOS) {
+            Map<String, dynamic> subscriptionData = userData.user["subscription"];
+
+            if (subscriptionData["user_subscription_status"] == "free_user") {
+              if (mounted) {
+                await Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => SubscriptionPayWall()),
+                );
+              }
+            } else {
+              if (mounted) {
+                await Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MainPage(
+                            showWelcomeModal: !hasSeenWelcome,
+                            welcomeDescription: descriptionData['description'] ?? "",
+                            welcomeImageUrl: descriptionData['vimeoId'])),
+                    (route) => false);
+              }
+            }
+          } else {
+            if (mounted) {
+              await Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MainPage(
+                          showWelcomeModal: !hasSeenWelcome,
+                          welcomeDescription: descriptionData['description'] ?? "",
+                          welcomeImageUrl: descriptionData['vimeoId'])),
+                  (route) => false);
+            }
+          }
         } else {
-          // Handle error if fetching description fails
-          showBottomAlert(context, 'Failed to load description');
+          if (mounted) {
+            showBottomAlert(context, 'Failed to load description');
+          }
           debugPrint('this is login page ${descriptionResponse.statusCode}');
         }
       } else {
-        showBottomAlert(context, 'Login failed');
+        if (mounted) {
+          showBottomAlert(context, 'Login failed');
+        }
       }
     } catch (e) {
-      showBottomAlert(context, 'An error occurred');
+      if (mounted) {
+        showBottomAlert(context, 'An error occurred');
+      }
       debugPrint('this is login page $e');
     } finally {
       setState(() {
@@ -190,7 +197,70 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  String monthPrice = "";
+  String yearPrice = "";
+
+  Future<void> getOffering() async {
+    try {
+      Offerings fetched = await Purchases.getOfferings();
+      setState(() {
+        for (var offeringItem in fetched.all.values) {
+          for (var package in offeringItem.availablePackages) {
+            if (package.storeProduct.identifier == "monthly_membership") {
+              monthPrice = package.storeProduct.priceString;
+            } else if (package.storeProduct.identifier == "yearly_membership") {
+              yearPrice = package.storeProduct.priceString;
+            }
+          }
+        }
+      });
+    } catch (e) {
+      log("Failed to fetch offerings: $e");
+    }
+  }
+
+  Future<void> _updateSubscriptionData({
+    required String status,
+    required String type,
+    required String startDate,
+    required String endDate,
+  }) async {
+    try {
+      final Map<String, String> queryParams = {
+        "user_subscription_status": status,
+        "subscription_type": type,
+        "price": type == ""
+            ? ""
+            : type == "monthly_membership"
+                ? monthPrice
+                : yearPrice,
+        "purchase_date": startDate,
+        "end_date": endDate,
+      };
+
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      String? userIdToken = await getAuthToken();
+
+      final response = await http.put(
+        url,
+        body: queryParams,
+        headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        userData.user = jsonResponse;
+        await userData.fetchUserInfo();
+      }
+    } catch (e) {
+      log("issue in month view loading => $e");
+    }
+  }
+
+  Future<String?> getAuthToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('authToken');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,10 +302,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 150,
                 width: media.width,
                 decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/img/bbb-logo.png'),
-                      fit: BoxFit.fitHeight,
-                      opacity: 1),
+                  image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
                 ),
               ),
             ),
@@ -264,8 +331,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.verticalScale(4.4)),
+                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -341,9 +407,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   icon: Icon(
-                                    isObscure
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
+                                    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                     color: Colors.grey.shade400,
                                   ),
                                 ),
@@ -366,8 +430,7 @@ class _LoginPageState extends State<LoginPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (ctx) =>
-                                              const ResetPasswordScreen(
+                                          builder: (ctx) => const ResetPasswordScreen(
                                             image: '',
                                           ),
                                         ),
@@ -411,8 +474,7 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(65, 30),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       alignment: Alignment.center),
                                   child: const Text(
                                     'Sign up',

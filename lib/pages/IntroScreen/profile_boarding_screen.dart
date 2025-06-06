@@ -10,6 +10,8 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
+import 'package:bottom_picker/bottom_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -501,32 +503,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             label: 'Birthday',
             value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
             onTap: () async {
-              DateTime? pickedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime(1998, 9, 21),
-                firstDate: DateTime(1900),
-                lastDate: DateTime.now(),
-                builder: (BuildContext context, Widget? child) {
-                  return Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: ColorScheme.light(
-                        primary: AppColors.primaryColor,
-                        onPrimary: Colors.white,
-                        onSurface: Colors.black,
-                      ),
-                      textButtonTheme: TextButtonThemeData(
-                        style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
-                      ),
-                    ),
-                    child: child!,
-                  );
-                },
-              );
-              if (pickedDate != null && pickedDate != selectedDate) {
-                setState(() {
-                  selectedDate = pickedDate;
-                });
-              }
+              _showDatePicker(context);
             },
           ),
           _heightPicker(
@@ -1198,6 +1175,57 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
         ],
       ),
     );
+  }
+
+  void _showDatePicker(BuildContext context) {
+    return BottomPicker.date(
+      pickerTextStyle: TextStyle(
+        fontSize: ScreenUtil.verticalScale(1.8),
+        fontWeight: FontWeight.w400,
+        color: AppColors.blackColor,
+      ),
+      dateOrder: DatePickerDateOrder.mdy,
+      initialDateTime: DateTime(2000, 1, 1),
+      maxDateTime: DateTime.now(),
+      minDateTime: DateTime(1950, 1, 1),
+      onSubmit: (dob) {
+        selectedDate = dob;
+        setState(() {});
+      },
+      backgroundColor: Colors.white,
+      height: 320,
+      displayCloseIcon: true,
+      closeIconColor: Colors.black,
+      buttonWidth: ScreenUtil.horizontalScale(80),
+      buttonContent: Center(
+        child: Text(
+          "Select",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: ScreenUtil.verticalScale(1.8),
+          ),
+        ),
+      ),
+      buttonPadding: ScreenUtil.verticalScale(1.3),
+      buttonStyle: BoxDecoration(
+        color: AppColors.primaryColor,
+        borderRadius: BorderRadius.circular(
+          ScreenUtil.verticalScale(1.5),
+        ),
+      ),
+      pickerTitle: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Text(
+          "Select Date of Birth",
+          style: TextStyle(
+            color: AppColors.blackColor,
+            fontWeight: FontWeight.w600,
+            fontSize: ScreenUtil.verticalScale(2),
+          ),
+        ),
+      ),
+    ).show(context);
   }
 }
 
