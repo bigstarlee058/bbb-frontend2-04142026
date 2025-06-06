@@ -20,7 +20,8 @@ class ShareAchievementNewDialog extends StatefulWidget {
   final List<Achievement> achievements;
 
   @override
-  State<ShareAchievementNewDialog> createState() => _ShareAchievementNewDialogState();
+  State<ShareAchievementNewDialog> createState() =>
+      _ShareAchievementNewDialogState();
 }
 
 class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
@@ -28,6 +29,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
 
   final TextEditingController textEditingController = TextEditingController();
   final PageController pageController = PageController();
+  final PageController pageController1 = PageController();
   int currentPage = 0;
 
   @override
@@ -36,7 +38,8 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+      insetPadding:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Stack(
@@ -49,18 +52,15 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                   width: ScreenUtil.verticalScale(38),
                   height: ScreenUtil.verticalScale(38),
                   child: PageView.builder(
+                    controller: pageController1,
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: widget.achievements.length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        currentPage = index;
-                      });
-                    },
+                    onPageChanged: (index) {},
                     itemBuilder: (context, index) {
-                      var data = widget.achievements[index];
-
+                      var data = widget.achievements[currentPage];
                       return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.horizontalScale(1)),
                         child: SizedBox(
                           height: ScreenUtil.verticalScale(38),
                           width: ScreenUtil.horizontalScale(38),
@@ -72,13 +72,19 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                               appShimmerImage(
                                 height: ScreenUtil.verticalScale(18),
                                 width: ScreenUtil.verticalScale(18),
-                                networkImageUrl: data.achievementAchievementId!.image!.startsWith('https://storage.cloud.google.com/')
+                                networkImageUrl: data
+                                        .achievementAchievementId!.image!
+                                        .startsWith(
+                                            'https://storage.cloud.google.com/')
                                     ? data.achievementAchievementId!.image!
-                                        .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                        .replaceFirst(
+                                            'https://storage.cloud.google.com/',
+                                            'https://storage.googleapis.com/')
                                     : data.achievementAchievementId!.image!,
                                 fit: BoxFit.cover,
                                 borderRadius: BorderRadius.all(
-                                  Radius.circular(ScreenUtil.verticalScale(500)),
+                                  Radius.circular(
+                                      ScreenUtil.verticalScale(500)),
                                 ),
                               ),
                               SizedBox(height: ScreenUtil.verticalScale(3)),
@@ -94,9 +100,11 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 5),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5),
                                 child: Text(
-                                  data.achievementAchievementId!.description ?? "",
+                                  data.achievementAchievementId!.description ??
+                                      "",
                                   maxLines: 1,
                                   textAlign: TextAlign.center,
                                   overflow: TextOverflow.ellipsis,
@@ -108,8 +116,12 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                 ),
                               ),
                               Text(
-                                DateFormat('MM/dd/yyyy hh:mm a')
-                                    .format(Utils.formattedDate(data.achievementAchievementId!.createdAt.toString())),
+                                data.achievedDate!.isEmpty &&
+                                        data.achieved == false
+                                    ? "Not archived yet"
+                                    : DateFormat('MM/dd/yyyy hh:mm a').format(
+                                        Utils.formattedDate(
+                                            data.achievedDate.toString())),
                                 maxLines: 1,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
@@ -136,23 +148,20 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
               child: Stack(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)).copyWith(top: ScreenUtil.verticalScale(5)),
+                    padding: EdgeInsets.all(ScreenUtil.horizontalScale(2))
+                        .copyWith(top: ScreenUtil.verticalScale(5)),
                     child: SizedBox(
                       height: ScreenUtil.verticalScale(45),
                       child: PageView.builder(
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: widget.achievements.length,
                         controller: pageController,
-                        onPageChanged: (index) {
-                          setState(() {
-                            currentPage = index;
-                          });
-                        },
                         itemBuilder: (context, index) {
                           var data = widget.achievements[index];
 
                           return Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(1)),
                             child: SizedBox(
                               height: ScreenUtil.verticalScale(45),
                               width: ScreenUtil.horizontalScale(45),
@@ -161,17 +170,51 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   SizedBox(height: ScreenUtil.verticalScale(3)),
-                                  appShimmerImage(
-                                    height: ScreenUtil.verticalScale(18),
-                                    width: ScreenUtil.verticalScale(18),
-                                    networkImageUrl: data.achievementAchievementId!.image!.startsWith('https://storage.cloud.google.com/')
-                                        ? data.achievementAchievementId!.image!
-                                            .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                        : data.achievementAchievementId!.image!,
-                                    fit: BoxFit.cover,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(ScreenUtil.verticalScale(500)),
-                                    ),
+                                  Stack(
+                                    children: [
+                                      appShimmerImage(
+                                        height: ScreenUtil.verticalScale(18),
+                                        width: ScreenUtil.verticalScale(18),
+                                        networkImageUrl: data
+                                                .achievementAchievementId!
+                                                .image!
+                                                .startsWith(
+                                                    'https://storage.cloud.google.com/')
+                                            ? data.achievementAchievementId!
+                                                .image!
+                                                .replaceFirst(
+                                                    'https://storage.cloud.google.com/',
+                                                    'https://storage.googleapis.com/')
+                                            : data.achievementAchievementId!
+                                                .image!,
+                                        fit: BoxFit.cover,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(
+                                              ScreenUtil.verticalScale(500)),
+                                        ),
+                                      ),
+                                      Container(
+                                        height: ScreenUtil.verticalScale(18),
+                                        width: ScreenUtil.verticalScale(18),
+                                        decoration: BoxDecoration(
+                                          color: data.achieved == true
+                                              ? Color(0xFFAADDAA)
+                                                  .withValues(alpha: 0.8)
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                                ScreenUtil.verticalScale(500)),
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.check,
+                                          color: data.achieved == true
+                                              ? Colors.white
+                                              : Colors.transparent,
+                                          size: 30,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                   SizedBox(height: ScreenUtil.verticalScale(3)),
                                   Text(
@@ -186,9 +229,12 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 5),
                                     child: Text(
-                                      data.achievementAchievementId!.description ?? "",
+                                      data.achievementAchievementId!
+                                              .description ??
+                                          "",
                                       maxLines: 1,
                                       textAlign: TextAlign.center,
                                       overflow: TextOverflow.ellipsis,
@@ -200,8 +246,12 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                     ),
                                   ),
                                   Text(
-                                    DateFormat('MM/dd/yyyy hh:mm a')
-                                        .format(Utils.formattedDate(data.achievementAchievementId!.createdAt.toString())),
+                                    data.achievedDate!.isEmpty &&
+                                            data.achieved == false
+                                        ? "Not archived yet"
+                                        : DateFormat('MM/dd/yyyy hh:mm a')
+                                            .format(Utils.formattedDate(
+                                                data.achievedDate.toString())),
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
@@ -213,37 +263,54 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   ),
                                   SizedBox(height: ScreenUtil.verticalScale(3)),
                                   Padding(
-                                    padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                                    padding: EdgeInsets.all(
+                                        ScreenUtil.horizontalScale(2)),
                                     child: Row(
                                       children: [
                                         Expanded(
                                           child: ElevatedButton(
                                             onPressed: () async {
                                               try {
-                                                await screenshotController.capture(delay: Duration(milliseconds: 200)).then(
+                                                await screenshotController
+                                                    .capture(
+                                                        delay: Duration(
+                                                            milliseconds: 200))
+                                                    .then(
                                                   (image) async {
                                                     if (image == null) return;
-                                                    final directory = await getTemporaryDirectory();
-                                                    final imagePath = File('${directory.path}/screenshot.png');
-                                                    await imagePath.writeAsBytes(image);
-                                                    await Share.shareXFiles([XFile(imagePath.path)], text: 'Check this out!');
+                                                    final directory =
+                                                        await getTemporaryDirectory();
+                                                    final imagePath = File(
+                                                        '${directory.path}/screenshot.png');
+                                                    await imagePath
+                                                        .writeAsBytes(image);
+                                                    await Share.shareXFiles([
+                                                      XFile(imagePath.path)
+                                                    ], text: 'Check this out!');
                                                   },
                                                 );
                                               } catch (e) {
-                                                debugPrint('Error capturing and sharing screenshot: $e');
+                                                debugPrint(
+                                                    'Error capturing and sharing screenshot: $e');
                                               }
                                             },
                                             style: ElevatedButton.styleFrom(
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(15),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
                                               ),
-                                              backgroundColor: AppColors.primaryColor,
-                                              padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.7)),
+                                              backgroundColor:
+                                                  AppColors.primaryColor,
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical:
+                                                      ScreenUtil.verticalScale(
+                                                          1.7)),
                                             ),
                                             child: Text(
                                               "Share",
                                               style: TextStyle(
-                                                fontSize: ScreenUtil.verticalScale(2),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(2),
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white,
                                               ),
@@ -273,39 +340,50 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            SizedBox(width: ScreenUtil.verticalScale(2)),
                             Expanded(
-                              child: StepProgressBar(
-                                stepHeight: ScreenUtil.verticalScale(1.5),
-                                onStepTap: (int index) {
-                                  setState(() {
-                                    currentPage = index;
-                                  });
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.verticalScale(2)),
+                                child: StepProgressBar(
+                                  stepHeight: ScreenUtil.verticalScale(1.5),
+                                  onStepTap: (int index) {
+                                    setState(() {
+                                      currentPage = index;
+                                    });
 
-                                  Future.delayed(Duration(milliseconds: 50), () {
                                     if (pageController.hasClients) {
                                       pageController.animateToPage(
                                         index,
-                                        duration: Duration(milliseconds: 300),
+                                        duration: Duration(milliseconds: 200),
+                                        curve: Curves.easeInOut,
+                                      );
+                                      pageController1.animateToPage(
+                                        index,
+                                        duration: Duration(milliseconds: 200),
                                         curve: Curves.easeInOut,
                                       );
                                     } else {
-                                      debugPrint('PageController has no clients yet.');
+                                      debugPrint(
+                                          'PageController has no clients yet.');
                                     }
-                                  });
-                                },
-                                totalSteps: widget.achievements.length,
-                                progress: (currentPage + 1).toDouble(),
+                                  },
+                                  totalSteps: widget.achievements.length,
+                                  progress: (currentPage + 1).toDouble(),
+                                ),
                               ),
                             ),
-                            SizedBox(width: ScreenUtil.horizontalScale(2)),
                             GestureDetector(
                               child: Container(
                                 decoration: const BoxDecoration(
-                                    color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
+                                    color: AppColors.primaryColor,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(100))),
                                 child: const Padding(
                                   padding: EdgeInsets.all(2.0),
-                                  child: Icon(size: 24, Icons.close, color: Colors.white),
+                                  child: Icon(
+                                      size: 24,
+                                      Icons.close,
+                                      color: Colors.white),
                                 ),
                               ),
                               onTap: () {

@@ -51,7 +51,8 @@ class _SplashScreenState extends State<SplashScreen> {
             try {
               CustomerInfo customerInfo = await Purchases.getCustomerInfo();
               if (customerInfo.entitlements.active.isNotEmpty) {
-                customerInfo.entitlements.active.forEach((key, entitlement) async {
+                customerInfo.entitlements.active
+                    .forEach((key, entitlement) async {
                   final latestPurchaseDate = customerInfo.allPurchaseDates;
                   final identifier = entitlement.productIdentifier;
 
@@ -79,14 +80,16 @@ class _SplashScreenState extends State<SplashScreen> {
           await userData.fetchUserInfo();
 
           if (Platform.isIOS) {
-            Map<String, dynamic> subscriptionData = userData.user["subscription"];
+            Map<String, dynamic> subscriptionData =
+                userData.user["subscription"];
 
             if (subscriptionData["user_subscription_status"] != "free_user") {
               if (mounted) {
                 await Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+                    builder: (context) => const MainPage(
+                        welcomeDescription: '', welcomeImageUrl: ''),
                   ),
                 );
               }
@@ -106,7 +109,8 @@ class _SplashScreenState extends State<SplashScreen> {
               await Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+                  builder: (context) => const MainPage(
+                      welcomeDescription: '', welcomeImageUrl: ''),
                 ),
               );
             }
@@ -169,7 +173,8 @@ class _SplashScreenState extends State<SplashScreen> {
         "end_date": endDate,
       };
 
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      Uri url =
+          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(

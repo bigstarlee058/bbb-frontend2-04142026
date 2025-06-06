@@ -70,7 +70,8 @@ class DataProvider extends ChangeNotifier {
   List<FaQsModel> faQsModel = [];
   bool faqLoader = false;
 
-  Collections collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+  Collections collectionData = Collections(
+      id: "", title: "", description: "", photo: "", equipments: []);
   Exercise currentExerciseObj = Exercise(
       id: "",
       title: "",
@@ -84,8 +85,10 @@ class DataProvider extends ChangeNotifier {
       files: []);
   late List<Exercise> currentRelatedExercises = [];
 
-  Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
-  Tutorials tutorialData = Tutorials(id: "", title: "", description: "", photo: "", files: []);
+  Challenges featureChallengeData =
+      Challenges(id: '', title: '', description: '', photo: '');
+  Tutorials tutorialData =
+      Tutorials(id: "", title: "", description: "", photo: "", files: []);
 
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -98,6 +101,7 @@ class DataProvider extends ChangeNotifier {
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
     String? userIdToken = await getAuthToken();
+
     try {
       final response = await http.get(
         url,
@@ -113,29 +117,89 @@ class DataProvider extends ChangeNotifier {
           screenBackgroundModel = ScreenBackgroundResponse.fromJson(data);
 
           allSplashImageList = [
-            {"image": screenBackgroundModel?.imageLogin ?? "", "key": "imageLogin"},
-            {"image": screenBackgroundModel?.imageSignup ?? "", "key": "imageSignup"},
-            {"image": screenBackgroundModel?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
+            {
+              "image": screenBackgroundModel?.imageLogin ?? "",
+              "key": "imageLogin"
+            },
+            {
+              "image": screenBackgroundModel?.imageSignup ?? "",
+              "key": "imageSignup"
+            },
+            {
+              "image": screenBackgroundModel?.imageEmailConfirm ?? "",
+              "key": "imageEmailConfirm"
+            },
           ];
 
           allImageList = [
-            {"image": screenBackgroundModel?.imageDashboard ?? "", "key": "imageDashboard"},
-            {"image": screenBackgroundModel?.imageLogin ?? "", "key": "imageLogin"},
-            {"image": screenBackgroundModel?.imageSignup ?? "", "key": "imageSignup"},
-            {"image": screenBackgroundModel?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
-            {"image": screenBackgroundModel?.imageAchievement ?? "", "key": "imageAchievement"},
-            {"image": screenBackgroundModel?.imageApparel ?? "", "key": "imageApparel"},
-            {"image": screenBackgroundModel?.imageExerciseLibrary ?? "", "key": "imageExerciseLibrary"},
-            {"image": screenBackgroundModel?.imageFaQs ?? "", "key": "imageFaQs"},
-            {"image": screenBackgroundModel?.imageForgot ?? "", "key": "imageForgot"},
-            {"image": screenBackgroundModel?.imageGraphs ?? "", "key": "imageGraphs"},
-            {"image": screenBackgroundModel?.imageMonthView ?? "", "key": "imageMonthView"},
-            {"image": screenBackgroundModel?.imageMyProfle ?? "", "key": "imageMyProfle"},
-            {"image": screenBackgroundModel?.imageProfile ?? "", "key": "imageProfile"},
-            {"image": screenBackgroundModel?.imageSetting ?? "", "key": "imageSetting"},
-            {"image": screenBackgroundModel?.imageStreakCalendar ?? "", "key": "imageStreakCalendar"},
-            {"image": screenBackgroundModel?.imageToday ?? "", "key": "imageToday"},
-            {"image": screenBackgroundModel?.imageTools ?? "", "key": "imageTools"},
+            {
+              "image": screenBackgroundModel?.imageDashboard ?? "",
+              "key": "imageDashboard"
+            },
+            {
+              "image": screenBackgroundModel?.imageLogin ?? "",
+              "key": "imageLogin"
+            },
+            {
+              "image": screenBackgroundModel?.imageSignup ?? "",
+              "key": "imageSignup"
+            },
+            {
+              "image": screenBackgroundModel?.imageEmailConfirm ?? "",
+              "key": "imageEmailConfirm"
+            },
+            {
+              "image": screenBackgroundModel?.imageAchievement ?? "",
+              "key": "imageAchievement"
+            },
+            {
+              "image": screenBackgroundModel?.imageApparel ?? "",
+              "key": "imageApparel"
+            },
+            {
+              "image": screenBackgroundModel?.imageExerciseLibrary ?? "",
+              "key": "imageExerciseLibrary"
+            },
+            {
+              "image": screenBackgroundModel?.imageFaQs ?? "",
+              "key": "imageFaQs"
+            },
+            {
+              "image": screenBackgroundModel?.imageForgot ?? "",
+              "key": "imageForgot"
+            },
+            {
+              "image": screenBackgroundModel?.imageGraphs ?? "",
+              "key": "imageGraphs"
+            },
+            {
+              "image": screenBackgroundModel?.imageMonthView ?? "",
+              "key": "imageMonthView"
+            },
+            {
+              "image": screenBackgroundModel?.imageMyProfle ?? "",
+              "key": "imageMyProfle"
+            },
+            {
+              "image": screenBackgroundModel?.imageProfile ?? "",
+              "key": "imageProfile"
+            },
+            {
+              "image": screenBackgroundModel?.imageSetting ?? "",
+              "key": "imageSetting"
+            },
+            {
+              "image": screenBackgroundModel?.imageStreakCalendar ?? "",
+              "key": "imageStreakCalendar"
+            },
+            {
+              "image": screenBackgroundModel?.imageToday ?? "",
+              "key": "imageToday"
+            },
+            {
+              "image": screenBackgroundModel?.imageTools ?? "",
+              "key": "imageTools"
+            },
           ];
         }
         notifyListeners();
@@ -148,9 +212,16 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  bool loader = false;
+
   List<AchievementModel> achievementList = [];
 
   Future getAllAchievement() async {
+    loader = true;
+    notifyListeners();
+
+    List<AchievementsDataModel> achievementsData =
+        await ApiRepo.fetchAchievementsList();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/achievements-group/get');
     String? userIdToken = await getAuthToken();
 
@@ -164,13 +235,45 @@ class DataProvider extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        achievementList = List<AchievementModel>.from(data.map((x) => AchievementModel.fromJson(x)));
+        achievementList = List<AchievementModel>.from(
+            data.map((x) => AchievementModel.fromJson(x)));
+
+        for (var element in achievementList) {
+          if (element.achievements!.isNotEmpty) {
+            for (var ele in element.achievements!) {
+              if (achievementsData.any(
+                (demo) => demo.achievementsTitle != ele.achievementId,
+              )) {
+                if ((ele.achievementAchievementId?.value ?? 0) <
+                    (element.currentValue ?? 0)) {
+                  final data = UpdateAchievementsRequest(
+                      achievementsDate: DateTime.now().toUtc().toString(),
+                      achievementsTitle: ele.achievementId ?? "",
+                      achievementsSubtitle: "SYNC");
+                  await ApiRepo.addAchievementsList(body: data.toJson1());
+
+                  ele.achieved = true;
+                  ele.achievedDate = DateTime.now().toUtc().toString();
+                }
+              } else {
+                AchievementsDataModel? data = achievementsData.firstWhere(
+                    (demo) => demo.achievementsTitle == ele.achievementId);
+                ele.achieved = true;
+                ele.achievedDate = data.achievementsDate.toString();
+              }
+            }
+          }
+        }
+
         notifyListeners();
       } else {
         throw Exception('Failed to get achievementList');
       }
     } catch (e) {
       throw Exception('Failed to get achievementList');
+    } finally {
+      loader = false;
+      notifyListeners();
     }
   }
 
@@ -193,7 +296,8 @@ class DataProvider extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        tutorialList = List<TutorialModel>.from(data.map((x) => TutorialModel.fromJson(x)));
+        tutorialList = List<TutorialModel>.from(
+            data.map((x) => TutorialModel.fromJson(x)));
         notifyListeners();
       } else {
         throw Exception('Failed to get tutorialList');
@@ -260,7 +364,8 @@ class DataProvider extends ChangeNotifier {
 
   VimeoToVideoModel? videoModel;
   Future getVideoUsingVimeo(String vimeoId) async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/getVideoUrl/$vimeoId');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/workouts/getVideoUrl/$vimeoId');
     String? userIdToken = await getAuthToken();
     videoModel = null;
     try {
@@ -292,7 +397,8 @@ class DataProvider extends ChangeNotifier {
       String key = element["key"];
 
       final processedUrl = url.startsWith('https://storage.cloud.google.com/')
-          ? url.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          ? url.replaceFirst('https://storage.cloud.google.com/',
+              'https://storage.googleapis.com/')
           : url;
 
       try {
@@ -307,7 +413,8 @@ class DataProvider extends ChangeNotifier {
       String key = element["key"];
 
       final processedUrl = url.startsWith('https://storage.cloud.google.com/')
-          ? url.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          ? url.replaceFirst('https://storage.cloud.google.com/',
+              'https://storage.googleapis.com/')
           : url;
 
       try {
@@ -356,8 +463,14 @@ class DataProvider extends ChangeNotifier {
         final Map<String, dynamic> data = json.decode(response.body);
         if (data['staffs'] is List) {
           // Map the 'staffs' list to Staff objects
-          staffsData = (data['staffs'] as List).where((item) => item['type'] == 1).map((item) => Staffs.fromJson(item)).toList();
-          athletesData = (data['staffs'] as List).where((item) => item['type'] == 2).map((item) => Staffs.fromJson(item)).toList();
+          staffsData = (data['staffs'] as List)
+              .where((item) => item['type'] == 1)
+              .map((item) => Staffs.fromJson(item))
+              .toList();
+          athletesData = (data['staffs'] as List)
+              .where((item) => item['type'] == 2)
+              .map((item) => Staffs.fromJson(item))
+              .toList();
           notifyListeners(); // Notify listeners to update the UI
         }
       } else {
@@ -371,7 +484,8 @@ class DataProvider extends ChangeNotifier {
   Challenges get featureChallenge => featureChallengeData;
 
   Future<void> fetchFeaturedChalleng() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
+    Uri url =
+        Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -397,7 +511,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> getChooseWorkoutData() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/popupworkout/get_popupworkout');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/popupworkout/get_popupworkout');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -423,7 +538,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> getChooseEquipmentData() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/popupequipment/get_popupequipment');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/popupequipment/get_popupequipment');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -465,7 +581,8 @@ class DataProvider extends ChangeNotifier {
         var data = json.decode(response.body);
         if (data != null) {
           // faQsModel = FaQsModel.fromJson(data);
-          faQsModel = List<FaQsModel>.from(data.map((x) => FaQsModel.fromJson(x)));
+          faQsModel =
+              List<FaQsModel>.from(data.map((x) => FaQsModel.fromJson(x)));
         }
         faqLoader = false;
         notifyListeners();
@@ -484,7 +601,8 @@ class DataProvider extends ChangeNotifier {
   List<Collections> get collections => collectionsData;
 
   Future<void> fetchFeaturedColllections() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/collections/get-featured');
+    Uri url =
+        Uri.parse('${AppConstants.serverUrl}/api/collections/get-featured');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -498,7 +616,9 @@ class DataProvider extends ChangeNotifier {
         final Map<String, dynamic> data = json.decode(response.body);
         if (data['collections'] is List) {
           // Map the 'staffs' list to Staff objects
-          collectionsData = (data['collections'] as List).map((item) => Collections.fromJson(item)).toList();
+          collectionsData = (data['collections'] as List)
+              .map((item) => Collections.fromJson(item))
+              .toList();
           notifyListeners(); // Notify listeners to update the UI
         }
       } else {
@@ -512,9 +632,11 @@ class DataProvider extends ChangeNotifier {
   Collections get oneCollection => collectionData;
 
   Future<void> fetchOneCollection(String collectionId) async {
-    collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+    collectionData = Collections(
+        id: "", title: "", description: "", photo: "", equipments: []);
     notifyListeners();
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/collections/get/$collectionId');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/collections/get/$collectionId');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -529,7 +651,8 @@ class DataProvider extends ChangeNotifier {
         collectionData = Collections.fromJson(data);
         notifyListeners(); // Notify listeners to update the UI
       } else {
-        collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+        collectionData = Collections(
+            id: "", title: "", description: "", photo: "", equipments: []);
         throw Exception('Failed to load staff data');
       }
     } catch (e) {
@@ -552,7 +675,9 @@ class DataProvider extends ChangeNotifier {
     if (response.statusCode == 200) {
       Map<String, dynamic> responseData = jsonDecode(response.body);
 
-      if (responseData.containsKey('exercises') && responseData.containsKey('categories') && responseData.containsKey('equipments')) {
+      if (responseData.containsKey('exercises') &&
+          responseData.containsKey('categories') &&
+          responseData.containsKey('equipments')) {
         List<dynamic> exercisesData = responseData['exercises'];
         List<ExerciseLibrary> exerciseList = exercisesData.map((exerciseJson) {
           return ExerciseLibrary.fromJson(exerciseJson);
@@ -563,7 +688,8 @@ class DataProvider extends ChangeNotifier {
         }).toList();
 
         List<dynamic> equipmentsData = responseData['equipments'];
-        List<EquipmentTitle> equipmentList = equipmentsData.map((equipmentJson) {
+        List<EquipmentTitle> equipmentList =
+            equipmentsData.map((equipmentJson) {
           return EquipmentTitle.fromJson(equipmentJson);
         }).toList();
 
@@ -573,7 +699,8 @@ class DataProvider extends ChangeNotifier {
 
         notifyListeners();
       } else {
-        throw Exception('Missing data in response (exercises, categories, or equipments)');
+        throw Exception(
+            'Missing data in response (exercises, categories, or equipments)');
       }
     } else {
       throw Exception('Failed to load admin data');
@@ -581,7 +708,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> fetchAdminEquipmentsData() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/equipments/admin/get?perPage=100000');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/equipments/admin/get?perPage=100000');
     String? userIdToken = await getAuthToken();
     final response = await http.get(
       url,
@@ -657,7 +785,10 @@ class DataProvider extends ChangeNotifier {
       final response = await http.post(
         url,
         body: queryParams,
-        headers: <String, String>{'Content-Type': 'application/x-www-form-urlencoded', 'AUTH_TOKEN': userIdToken ?? ""},
+        headers: <String, String>{
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'AUTH_TOKEN': userIdToken ?? ""
+        },
       );
       if (response.statusCode == 200) {
         await getMonthInfoFromJson(responseData: jsonDecode(response.body));
@@ -670,21 +801,50 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getMonthInfoFromJson({Map<String, dynamic>? responseData}) async {
+  Future<void> getMonthInfoFromJson(
+      {Map<String, dynamic>? responseData}) async {
     try {
       if (responseData != null) {
-        MonthDataModel monthDataModelSplit3 = MonthDataModel.fromJson(responseData);
-        MonthDataModel monthDataModelSplit4 = MonthDataModel.fromJson(responseData);
-        MonthDataModel monthDataModelSplit5 = MonthDataModel.fromJson(responseData);
+        MonthDataModel monthDataModelSplit3 =
+            MonthDataModel.fromJson(responseData);
+        MonthDataModel monthDataModelSplit4 =
+            MonthDataModel.fromJson(responseData);
+        MonthDataModel monthDataModelSplit5 =
+            MonthDataModel.fromJson(responseData);
         await monthProvider?.fetchMonthLocalData();
 
-        List split3 = ["Day 1 Workout", "Rest Day 1", "Day 2 Workout", "Rest Day 2", "Day 3 Workout", "Rest Day 3", "Rest Day 4"];
+        List split3 = [
+          "Day 1 Workout",
+          "Rest Day 1",
+          "Day 2 Workout",
+          "Rest Day 2",
+          "Day 3 Workout",
+          "Rest Day 3",
+          "Rest Day 4"
+        ];
 
-        List split4 = ["Day 1 Workout", "Day 2 Workout", "Rest Day 1", "Day 3 Workout", "Day 4 Workout", "Rest Day 2", "Rest Day 3"];
+        List split4 = [
+          "Day 1 Workout",
+          "Day 2 Workout",
+          "Rest Day 1",
+          "Day 3 Workout",
+          "Day 4 Workout",
+          "Rest Day 2",
+          "Rest Day 3"
+        ];
 
-        List split5 = ["Day 1 Workout", "Day 2 Workout", "Day 3 Workout", "Day 4 Workout", "Day 5 Workout", "Rest Day 1", "Rest Day 2"];
+        List split5 = [
+          "Day 1 Workout",
+          "Day 2 Workout",
+          "Day 3 Workout",
+          "Day 4 Workout",
+          "Day 5 Workout",
+          "Rest Day 1",
+          "Rest Day 2"
+        ];
 
-        await preferences.putString(SharedPreference.monthId, "${monthDataModelSplit3.id}");
+        await preferences.putString(
+            SharedPreference.monthId, "${monthDataModelSplit3.id}");
         monthDataModelSplit3.weeks?.forEach(
           (element) {
             element.dayList = split3;
@@ -697,15 +857,23 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split3 Rest Day 3",
               "${element.id} split3 Rest Day 4",
             ];
-            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
-            element.days?.removeWhere((element) => !element.formats!.contains("3"));
+            element.restDayList = [
+              "Rest Day 1",
+              "Rest Day 2",
+              "Rest Day 3",
+              "Rest Day 4"
+            ];
+            element.days
+                ?.removeWhere((element) => !element.formats!.contains("3"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split3[i];
             }
           },
         );
 
-        await preferences.putString("${SplitType.split3}-${monthDataModelSplit3.id}", jsonEncode(monthDataModelSplit3));
+        await preferences.putString(
+            "${SplitType.split3}-${monthDataModelSplit3.id}",
+            jsonEncode(monthDataModelSplit3));
         monthDataModelSplit4.weeks?.forEach(
           (element) {
             element.dayList = split4;
@@ -719,13 +887,16 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split4 Rest Day 3",
             ];
             element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
-            element.days?.removeWhere((element) => !element.formats!.contains("4"));
+            element.days
+                ?.removeWhere((element) => !element.formats!.contains("4"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split4[i];
             }
           },
         );
-        await preferences.putString("${SplitType.split4}-${monthDataModelSplit4.id}", jsonEncode(monthDataModelSplit4));
+        await preferences.putString(
+            "${SplitType.split4}-${monthDataModelSplit4.id}",
+            jsonEncode(monthDataModelSplit4));
         monthDataModelSplit5.weeks?.forEach(
           (element) {
             element.dayList = split5;
@@ -739,22 +910,28 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split5 Rest Day 2",
             ];
             element.restDayList = ["Rest Day 1", "Rest Day 2"];
-            element.days?.removeWhere((element) => !element.formats!.contains("5"));
+            element.days
+                ?.removeWhere((element) => !element.formats!.contains("5"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split5[i];
             }
           },
         );
-        await preferences.putString("${SplitType.split5}-${monthDataModelSplit5.id}", jsonEncode(monthDataModelSplit5));
+        await preferences.putString(
+            "${SplitType.split5}-${monthDataModelSplit5.id}",
+            jsonEncode(monthDataModelSplit5));
         final dataList = [];
         for (var element in monthDataModelSplit3.weeks ?? []) {
-          final data = await monthProvider?.fetchRestDay(element.restdayId ?? "");
+          final data =
+              await monthProvider?.fetchRestDay(element.restdayId ?? "");
           dataList.add(data);
-          await preferences.putString("REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
+          await preferences.putString(
+              "REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
         }
         final value = await DatabaseHelper().areAllTablesEmpty();
         if (value) {
-          List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+          List<MonthEnrollmentDataModel> monthEnrollment =
+              await ApiRepo.fetchMonthEnrollment();
           if (monthEnrollment.isNotEmpty) {
             for (var element in monthEnrollment) {
               final body = {
@@ -762,11 +939,14 @@ class DataProvider extends ChangeNotifier {
                 "monthStartDate": element.startDate.toString(),
                 "monthEndDate": element.endDate.toString(),
               };
-              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.monthHistory);
+              await DatabaseHelper().insertData(
+                  data: body, tableName: DatabaseHelper.monthHistory);
             }
           } else {
-            MonthResponseModel? matchingElement = monthProvider?.monthLocalDataModel
-                .firstWhere((element) => element.monthId == monthDataModelSplit3.id, orElse: () => MonthResponseModel());
+            MonthResponseModel? matchingElement =
+                monthProvider?.monthLocalDataModel.firstWhere(
+                    (element) => element.monthId == monthDataModelSplit3.id,
+                    orElse: () => MonthResponseModel());
 
             final data = {
               "monthId": monthDataModelSplit3.id,
@@ -775,10 +955,12 @@ class DataProvider extends ChangeNotifier {
             };
 
             if (matchingElement?.id == null) {
-              await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.monthHistory);
+              await DatabaseHelper().insertData(
+                  data: data, tableName: DatabaseHelper.monthHistory);
             }
           }
-          List<AchievementsDataModel> achievementsData = await ApiRepo.fetchAchievementsList();
+          List<AchievementsDataModel> achievementsData =
+              await ApiRepo.fetchAchievementsList();
           if (achievementsData.isNotEmpty) {
             for (var element in achievementsData) {
               final body = {
@@ -786,13 +968,16 @@ class DataProvider extends ChangeNotifier {
                 "achievementsSubtitle": element.achievementsSubtitle ?? "",
                 "achievementsDate": element.achievementsDate.toString(),
               };
-              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.achievementHistory);
+              await DatabaseHelper().insertData(
+                  data: body, tableName: DatabaseHelper.achievementHistory);
             }
           }
           StreakDataModel? streakDataModel = await ApiRepo.fetchStreakCount();
-          await preferences.putInt(SharedPreference.lastStreakCount, int.parse((streakDataModel?.count ?? "0")));
+          await preferences.putInt(SharedPreference.lastStreakCount,
+              int.parse((streakDataModel?.count ?? "0")));
 
-          List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
+          List<DayStatusDataModel> dayStatus =
+              await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
 
           if (dayStatus.isNotEmpty) {
             for (var element in dayStatus) {
@@ -812,10 +997,13 @@ class DataProvider extends ChangeNotifier {
                 "totalWeight": element.totalWeight ?? "",
                 "averageRIR": element.averageRIR ?? "",
               };
-              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.dayStatus);
+              await DatabaseHelper()
+                  .insertData(data: body, tableName: DatabaseHelper.dayStatus);
             }
 
-            List<ExerciseHistoryDataModel> exerciseHistroy = await ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? "");
+            List<ExerciseHistoryDataModel> exerciseHistroy =
+                await ApiRepo.fetchExerciseHistory(
+                    monthDataModelSplit3.id ?? "");
             if (exerciseHistroy.isNotEmpty) {
               for (var element in exerciseHistroy) {
                 final body = {
@@ -839,10 +1027,13 @@ class DataProvider extends ChangeNotifier {
                   "status": element.status ?? "",
                   "totalSet": element.totalSet?.toString() ?? "",
                 };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+                await DatabaseHelper().insertData(
+                    data: body, tableName: DatabaseHelper.exerciseHistory);
               }
             }
-            List<ExerciseStatusDataModel> exerciseStatus = await ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? "");
+            List<ExerciseStatusDataModel> exerciseStatus =
+                await ApiRepo.fetchExerciseStatus(
+                    monthDataModelSplit3.id ?? "");
             if (exerciseStatus.isNotEmpty) {
               for (var element in exerciseStatus) {
                 final body = {
@@ -859,10 +1050,12 @@ class DataProvider extends ChangeNotifier {
                   "totalSet": element.totalSet ?? "",
                   "totalRIR": element.totalRIR ?? "",
                 };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
+                await DatabaseHelper().insertData(
+                    data: body, tableName: DatabaseHelper.exerciseStatus);
               }
             }
-            List<ExerciseNotesDataModel> exerciseNotes = await ApiRepo.fetchExerciseNotes();
+            List<ExerciseNotesDataModel> exerciseNotes =
+                await ApiRepo.fetchExerciseNotes();
             if (exerciseNotes.isNotEmpty) {
               for (var element in exerciseNotes) {
                 final body = {
@@ -870,10 +1063,12 @@ class DataProvider extends ChangeNotifier {
                   "date": element.date ?? "",
                   "note": element.note ?? "",
                 };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseNotes);
+                await DatabaseHelper().insertData(
+                    data: body, tableName: DatabaseHelper.exerciseNotes);
               }
             }
-            List<ExtraSetDataModel> extraSet = await ApiRepo.fetchExtraSet(monthDataModelSplit3.id ?? "");
+            List<ExtraSetDataModel> extraSet =
+                await ApiRepo.fetchExtraSet(monthDataModelSplit3.id ?? "");
             if (extraSet.isNotEmpty) {
               for (var element in extraSet) {
                 final body = {
@@ -887,10 +1082,13 @@ class DataProvider extends ChangeNotifier {
                   "date": element.date,
                   "dataId": element.dataId,
                 };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.extraSetHistory);
+                await DatabaseHelper().insertData(
+                    data: body, tableName: DatabaseHelper.extraSetHistory);
               }
             }
-            List<RemovedExerciseDataModel> removedExercise = await ApiRepo.fetchRemovedExercise(monthDataModelSplit3.id ?? "");
+            List<RemovedExerciseDataModel> removedExercise =
+                await ApiRepo.fetchRemovedExercise(
+                    monthDataModelSplit3.id ?? "");
             if (removedExercise.isNotEmpty) {
               for (var element in removedExercise) {
                 final body = {
@@ -901,10 +1099,13 @@ class DataProvider extends ChangeNotifier {
                   "weekId": element.weekId ?? "",
                   "dayId": element.dataId ?? "",
                 };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
+                await DatabaseHelper().insertData(
+                    data: body,
+                    tableName: DatabaseHelper.removedExerciseHistory);
               }
             }
-            List<ExtraExerciseDataModel> extraExercise = await ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? "");
+            List<ExtraExerciseDataModel> extraExercise =
+                await ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? "");
             if (extraExercise.isNotEmpty) {
               for (var element in extraExercise) {
                 final body = {
@@ -917,10 +1118,12 @@ class DataProvider extends ChangeNotifier {
                   "exerciseId": element.exerciseId ?? "",
                   "exerciseJson": element.exerciseJson ?? ""
                 };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.extraExerciseHistory);
+                await DatabaseHelper().insertData(
+                    data: body, tableName: DatabaseHelper.extraExerciseHistory);
               }
             }
-            List<SwapExerciseDataModel> swapExercise = await ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? "");
+            List<SwapExerciseDataModel> swapExercise =
+                await ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? "");
             if (swapExercise.isNotEmpty) {
               for (var element in swapExercise) {
                 final body = {
@@ -934,7 +1137,8 @@ class DataProvider extends ChangeNotifier {
                   "exerciseJson": element.exerciseJson ?? "",
                   "insertIndex": element.insertIndex ?? ""
                 };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
+                await DatabaseHelper().insertData(
+                    data: body, tableName: DatabaseHelper.swapExerciseHistory);
               }
             }
           }
@@ -976,17 +1180,23 @@ class DataProvider extends ChangeNotifier {
         var data = response.data;
         var responseData = data[0];
 
-        if (equipmentCheckpoint == '' || bonusCheckpoint == '' || workoutCheckpoint == '') {
+        if (equipmentCheckpoint == '' ||
+            bonusCheckpoint == '' ||
+            workoutCheckpoint == '') {
           equipmentCheckpoint = responseData["equipmentCheckpoint"];
           bonusCheckpoint = responseData["bonusCheckpoint"];
           workoutCheckpoint = responseData["workoutCheckpoint"];
         } else {
-          DateTime currentEquipmentCheckpoint = DateTime.parse(equipmentCheckpoint);
+          DateTime currentEquipmentCheckpoint =
+              DateTime.parse(equipmentCheckpoint);
           DateTime currentBonusCheckoutPoint = DateTime.parse(bonusCheckpoint);
           DateTime currentWorkoutCheckPoint = DateTime.parse(workoutCheckpoint);
-          DateTime newEquipmentCheckpoint = DateTime.parse(responseData["equipmentCheckpoint"]);
-          DateTime newBonusCheckpoint = DateTime.parse(responseData["bonusCheckpoint"]);
-          DateTime newWorkoutCheckpoint = DateTime.parse(responseData["workoutCheckpoint"]);
+          DateTime newEquipmentCheckpoint =
+              DateTime.parse(responseData["equipmentCheckpoint"]);
+          DateTime newBonusCheckpoint =
+              DateTime.parse(responseData["bonusCheckpoint"]);
+          DateTime newWorkoutCheckpoint =
+              DateTime.parse(responseData["workoutCheckpoint"]);
 
           if (currentEquipmentCheckpoint.isBefore(newEquipmentCheckpoint)) {
             equipmentCheckpointState = true;
@@ -1078,7 +1288,8 @@ class DataProvider extends ChangeNotifier {
       currentRelatedExercises.clear();
       List<Equipment> equipments = [];
 
-      if (responseData["relatedExercises"] != null && responseData["relatedExercises"].length > 0) {
+      if (responseData["relatedExercises"] != null &&
+          responseData["relatedExercises"].length > 0) {
         for (var singleItem in responseData["relatedExercises"]) {
           Exercise newExercise = Exercise(
               id: singleItem["id"] ?? "",
@@ -1096,7 +1307,8 @@ class DataProvider extends ChangeNotifier {
         }
       }
 
-      if (responseData["usedEquipments"] != null && responseData["usedEquipments"].length > 0) {
+      if (responseData["usedEquipments"] != null &&
+          responseData["usedEquipments"].length > 0) {
         for (var singleItem in responseData["usedEquipments"]) {
           Equipment newEquipment = Equipment(
             id: singleItem["id"] ?? "",
