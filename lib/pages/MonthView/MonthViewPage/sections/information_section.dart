@@ -66,8 +66,7 @@ class _InformationSectionState extends State<InformationSection> {
                       : Padding(
                           padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6))
                               .copyWith(bottom: ScreenUtil.verticalScale(13)),
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) => SizedBox(height: 15),
+                          child: ListView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.zero,
                             physics: NeverScrollableScrollPhysics(),
@@ -78,11 +77,14 @@ class _InformationSectionState extends State<InformationSection> {
                                       value.programInfoModel!.sections[index].formats!.contains(widget.monthProvider.equipmentType) &&
                                       value.programInfoModel!.sections[index].variations!
                                           .contains(widget.monthProvider.splitType?.replaceAll("split", ""))
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
-                                      child: buildExpansionTileItem(
-                                          index, value.programInfoModel!.sections[index], value.programInfoModel!.sections.length),
-                                    )
+                                  ? Padding(
+                                    padding: const EdgeInsets.only(bottom: 15),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                                        child: buildExpansionTileItem(
+                                            index, value.programInfoModel!.sections[index], value.programInfoModel!.sections.length),
+                                      ),
+                                  )
                                   : SizedBox();
                             },
                           ),

@@ -1,5 +1,3 @@
-///my...
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -15,6 +13,8 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
+import 'package:bottom_picker/bottom_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -168,9 +168,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
       'city': locationProvider.selectedCityController.text,
-      'waist': int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
-      'hip': int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
-      'midthigh': int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'waist': int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'hip': int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'midthigh': int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "")),
       'bodyfat': int.parse(selectedBodyFat.text.split(' ')[0]),
     };
     if (kDebugMode) {
@@ -410,32 +410,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Birthday',
                               value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
                               onTap: () async {
-                                DateTime? pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime(1998, 9, 21),
-                                  firstDate: DateTime(1900),
-                                  lastDate: DateTime.now(),
-                                  builder: (BuildContext context, Widget? child) {
-                                    return Theme(
-                                      data: Theme.of(context).copyWith(
-                                        colorScheme: ColorScheme.light(
-                                          primary: AppColors.primaryColor,
-                                          onPrimary: Colors.white,
-                                          onSurface: Colors.black,
-                                        ),
-                                        textButtonTheme: TextButtonThemeData(
-                                          style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
-                                        ),
-                                      ),
-                                      child: child!,
-                                    );
-                                  },
-                                );
-                                if (pickedDate != null && pickedDate != selectedDate) {
-                                  setState(() {
-                                    selectedDate = pickedDate;
-                                  });
-                                }
+                                _showDatePicker(context);
                               },
                             ),
                             _buildDropdownField(
@@ -886,71 +861,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  Widget _waistPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: ScreenUtil.horizontalScale(34.5),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.95),
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            width: ScreenUtil.horizontalScale(50.5),
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(1),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  log('value.text==========>>>>>${value.text}');
-                  final rawText = value.text; // e.g., '39"'
-                  final cleanText = rawText.replaceAll(RegExp(r'[^0-9.]'), ''); // removes non-numeric characters
-                  final parsedValue = double.tryParse(cleanText) ?? 0;
-                  log('double.tryParse(value.text) ?? 0==========>>>>>${double.tryParse(value.text) ?? 0}');
-
-                  await showCupertinoWaistPicker(
-                    initialWaist: parsedValue,
-                    context: context,
-                    canConvertUnit: canConvertUnit,
-                    onWaistChanged: (val) {
-                      setState(() {
-                        log('val==========>>>>>${val}');
-
-                        value.text = '${val.toInt()}"';
-                      });
-                    },
-                  );
-                },
-                child: Text(
-                  value.text.isEmpty ? 'Waist' : value.text,
-                  style: TextStyle(
-                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
-                    fontSize: ScreenUtil.verticalScale(1.95),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _heightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
@@ -1011,6 +921,57 @@ class _MyProfilePageState extends State<MyProfilePage> {
         ],
       ),
     );
+  }
+
+  void _showDatePicker(BuildContext context) {
+    return BottomPicker.date(
+      pickerTextStyle: TextStyle(
+        fontSize: ScreenUtil.verticalScale(1.8),
+        fontWeight: FontWeight.w400,
+        color: AppColors.blackColor,
+      ),
+      dateOrder: DatePickerDateOrder.mdy,
+      initialDateTime: DateTime(2000, 1, 1),
+      maxDateTime: DateTime.now(),
+      minDateTime: DateTime(1950, 1, 1),
+      onSubmit: (dob) {
+        selectedDate = dob;
+        setState(() {});
+      },
+      backgroundColor: Colors.white,
+      height: 320,
+      displayCloseIcon: true,
+      closeIconColor: Colors.black,
+      buttonWidth: ScreenUtil.horizontalScale(80),
+      buttonContent: Center(
+        child: Text(
+          "Select",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: ScreenUtil.verticalScale(1.8),
+          ),
+        ),
+      ),
+      buttonPadding: ScreenUtil.verticalScale(1.3),
+      buttonStyle: BoxDecoration(
+        color: AppColors.primaryColor,
+        borderRadius: BorderRadius.circular(
+          ScreenUtil.verticalScale(1.5),
+        ),
+      ),
+      pickerTitle: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Text(
+          "Select Date of Birth",
+          style: TextStyle(
+            color: AppColors.blackColor,
+            fontWeight: FontWeight.w600,
+            fontSize: ScreenUtil.verticalScale(2),
+          ),
+        ),
+      ),
+    ).show(context);
   }
 
   final FocusNode _nodeText1 = FocusNode();

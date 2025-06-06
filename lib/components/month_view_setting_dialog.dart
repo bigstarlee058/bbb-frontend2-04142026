@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
+import '../pages/MonthView/MonthViewPage/sections/choose_equipment_popup.dart';
+import '../pages/MonthView/MonthViewPage/sections/choose_workoutday_popup.dart';
+
 class MonthSettingDialog extends StatefulWidget {
   const MonthSettingDialog({super.key, required this.monthProvider});
   final MonthProvider monthProvider;
@@ -99,14 +102,42 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                             margin: EdgeInsets.only(
                               left: ScreenUtil.horizontalScale(3),
                             ),
-                            child: Text(
-                              'Choose workout frequency',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: const Color(0xBB888888),
-                                fontSize: ScreenUtil.verticalScale(1.5),
-                                fontWeight: FontWeight.w700,
-                              ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Choose workout frequency',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: const Color(0xBB888888),
+                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),     SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      barrierDismissible: true,
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
+                                          child: ChooseWorkoutDayDialog(),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.info,
+                                      size: ScreenUtil.verticalScale(2.3),
+                                      color: const Color(0xBB888888),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -300,14 +331,43 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                           const SizedBox(height: 20),
                           Container(
                             margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(3)),
-                            child: Text(
-                              'Choose equipment availability',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: const Color(0xBB888888),
-                                fontSize: ScreenUtil.verticalScale(1.5),
-                                fontWeight: FontWeight.w700,
-                              ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Choose equipment availability',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: const Color(0xBB888888),
+                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      barrierDismissible: true,
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
+                                          child: ChooseEquipmentDialog(),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.info,
+                                      size: ScreenUtil.verticalScale(2.3),
+                                      color: const Color(0xBB888888),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                           const SizedBox(height: 5),
