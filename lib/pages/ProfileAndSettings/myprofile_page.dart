@@ -1,5 +1,3 @@
-///my...
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -170,9 +168,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
       'city': locationProvider.selectedCityController.text,
-      'waist': int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
-      'hip': int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
-      'midthigh': int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'waist': int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'hip': int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'midthigh': int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "")),
       'bodyfat': int.parse(selectedBodyFat.text.split(' ')[0]),
     };
     if (kDebugMode) {
@@ -855,71 +853,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _waistPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: ScreenUtil.horizontalScale(34.5),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.95),
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            width: ScreenUtil.horizontalScale(50.5),
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(1),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  log('value.text==========>>>>>${value.text}');
-                  final rawText = value.text; // e.g., '39"'
-                  final cleanText = rawText.replaceAll(RegExp(r'[^0-9.]'), ''); // removes non-numeric characters
-                  final parsedValue = double.tryParse(cleanText) ?? 0;
-                  log('double.tryParse(value.text) ?? 0==========>>>>>${double.tryParse(value.text) ?? 0}');
-
-                  await showCupertinoWaistPicker(
-                    initialWaist: parsedValue,
-                    context: context,
-                    canConvertUnit: canConvertUnit,
-                    onWaistChanged: (val) {
-                      setState(() {
-                        log('val==========>>>>>${val}');
-
-                        value.text = '${val.toInt()}"';
-                      });
-                    },
-                  );
-                },
-                child: Text(
-                  value.text.isEmpty ? 'Waist' : value.text,
-                  style: TextStyle(
-                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
-                    fontSize: ScreenUtil.verticalScale(1.95),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
               ),
             ),
           ),
