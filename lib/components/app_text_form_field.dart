@@ -68,7 +68,8 @@ class AppTextFormField extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.never,
             filled: true,
             fillColor: Colors.grey.withValues(alpha: 0.052),
-            contentPadding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.85), horizontal: 20.0),
+            contentPadding: EdgeInsets.symmetric(
+                vertical: ScreenUtil.verticalScale(1.85), horizontal: 20.0),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
               borderRadius: Utils.buttonRadius,

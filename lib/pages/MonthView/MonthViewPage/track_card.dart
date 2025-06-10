@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -963,23 +965,29 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            (matchingElement.type ?? "").contains("Pump Day")
-                                ? "${matchingElement.title}"
-                                : weekDataModel!.restDayList?[int.parse(
-                                        weekDataModel!.dayList![index]
-                                            .toString()
-                                            .split(" ")
-                                            .toList()
-                                            .last) -
-                                    1],
-                            style: TextStyle(
-                                color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/
-                                    Colors.black,
-                                fontSize: ScreenUtil.verticalScale(1.8),
-                                fontWeight: FontWeight.bold,
-                                height: 1),
-                          ),
+                          Builder(builder: (context) {
+                            int i = int.parse(weekDataModel!.dayList![index]
+                                    .toString()
+                                    .split(" ")
+                                    .toList()
+                                    .last) -
+                                1;
+
+                            return i < weekDataModel!.restDayList!.length
+                                ? Text(
+                                    (matchingElement.type ?? "")
+                                            .contains("Pump Day")
+                                        ? "${matchingElement.title}"
+                                        : weekDataModel!.restDayList?[i],
+                                    style: TextStyle(
+                                        color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/
+                                            Colors.black,
+                                        fontSize: ScreenUtil.verticalScale(1.8),
+                                        fontWeight: FontWeight.bold,
+                                        height: 1),
+                                  )
+                                : SizedBox();
+                          }),
                           Spacer(),
                           monthProvider.weekStatuses[mainIndex!] ==
                                       WeekType.currentWeek &&

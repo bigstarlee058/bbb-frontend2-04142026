@@ -33,7 +33,6 @@ import 'package:bbb/pages/Tools/exercise_library_page.dart';
 import 'package:bbb/pages/Tools/faqs_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
-import 'package:bbb/pages/Tools/seeall_achievement_page.dart';
 import 'package:bbb/pages/Tools/tutorial_page.dart';
 import 'package:bbb/pages/WatchTutorial/app_tutorial.dart';
 import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
@@ -58,7 +57,6 @@ import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
 import 'localstorage/month_database.dart';
 import 'pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'pages/Tools/seeall_achievement_page_new.dart';
@@ -74,19 +72,10 @@ void notificationTapBackground(NotificationResponse notificationResponse) {}
 BuildContext? c;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await preferences.init();
-  await DatabaseHelper().initDatabase();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  if (Platform.isIOS) {
-    await Purchases.configure(
-        PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
-    Offerings offering = await Purchases.getOfferings();
-    await preferences.putString(
-        SharedPreference.offerings, jsonEncode(offering));
-  }
 
   WidgetsFlutterBinding.ensureInitialized();
   await _configureLocalTimeZone();
@@ -181,7 +170,26 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _initialisation();
     _initDeepLinkListener();
+    _initializeRevenueCat();
+  }
+
+  _initialisation() async {
+    await preferences.init();
+    await DatabaseHelper().initDatabase();
+  }
+
+  _initializeRevenueCat() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (Platform.isIOS) {
+        await Purchases.configure(
+            PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
+        Offerings offering = await Purchases.getOfferings();
+        await preferences.putString(
+            SharedPreference.offerings, jsonEncode(offering));
+      }
+    });
   }
 
   Future<void> _initDeepLinkListener() async {

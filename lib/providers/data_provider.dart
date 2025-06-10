@@ -115,7 +115,7 @@ class DataProvider extends ChangeNotifier {
         var data = json.decode(response.body);
         if (data != null) {
           screenBackgroundModel = ScreenBackgroundResponse.fromJson(data);
-
+          notifyListeners();
           allSplashImageList = [
             {
               "image": screenBackgroundModel?.imageLogin ?? "",
@@ -202,13 +202,15 @@ class DataProvider extends ChangeNotifier {
             },
           ];
         }
-        notifyListeners();
+
         await preloadAndCacheImages();
       } else {
         throw Exception('Failed to get screen bg data');
       }
     } catch (e) {
       throw Exception('Failed to get screen bg data');
+    } finally {
+      notifyListeners();
     }
   }
 
@@ -216,9 +218,11 @@ class DataProvider extends ChangeNotifier {
 
   List<AchievementModel> achievementList = [];
 
-  Future getAllAchievement() async {
-    loader = true;
-    notifyListeners();
+  Future getAllAchievement(bool value) async {
+    if (value) {
+      loader = true;
+      notifyListeners();
+    }
 
     List<AchievementsDataModel> achievementsData =
         await ApiRepo.fetchAchievementsList();
@@ -235,44 +239,49 @@ class DataProvider extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
+
         achievementList = List<AchievementModel>.from(
             data.map((x) => AchievementModel.fromJson(x)));
 
         for (var element in achievementList) {
           if (element.achievements!.isNotEmpty) {
             for (var ele in element.achievements!) {
-              if (achievementsData.any(
-                (demo) => demo.achievementsTitle != ele.achievementId,
-              )) {
+              if (achievementsData.isNotEmpty &&
+                  achievementsData.any(
+                    (demo) => demo.achievementsTitle != ele.achievementId,
+                  )) {
                 if ((ele.achievementAchievementId?.value ?? 0) <
                     (element.currentValue ?? 0)) {
                   final data = UpdateAchievementsRequest(
-                      achievementsDate: DateTime.now().toUtc().toString(),
-                      achievementsTitle: ele.achievementId ?? "",
-                      achievementsSubtitle: "SYNC");
+                    achievementsDate: DateTime.now().toUtc().toString(),
+                    achievementsTitle: ele.achievementId ?? "",
+                    achievementsSubtitle: "SYNC",
+                  );
                   await ApiRepo.addAchievementsList(body: data.toJson1());
 
                   ele.achieved = true;
                   ele.achievedDate = DateTime.now().toUtc().toString();
                 }
               } else {
-                AchievementsDataModel? data = achievementsData.firstWhere(
-                    (demo) => demo.achievementsTitle == ele.achievementId);
-                ele.achieved = true;
-                ele.achievedDate = data.achievementsDate.toString();
+                if (achievementsData.isNotEmpty) {
+                  AchievementsDataModel? data = achievementsData.firstWhere(
+                      (demo) => demo.achievementsTitle == ele.achievementId);
+                  ele.achieved = true;
+                  ele.achievedDate = data.achievementsDate.toString();
+                }
               }
             }
           }
         }
-
-        notifyListeners();
       } else {
         throw Exception('Failed to get achievementList');
       }
     } catch (e) {
       throw Exception('Failed to get achievementList');
     } finally {
-      loader = false;
+      if (value) {
+        loader = false;
+      }
       notifyListeners();
     }
   }
@@ -424,7 +433,6 @@ class DataProvider extends ChangeNotifier {
         debugPrint("Image cache failed for $key: $e");
       }
     }
-    notifyListeners();
   }
 
   Future<bool> joinChallenge(String? userid, String? challengeid) async {

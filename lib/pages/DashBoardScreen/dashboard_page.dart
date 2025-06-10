@@ -10,7 +10,6 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/program_phases_widget.dart';
-import 'package:bbb/components/share_achievement_dialog.dart';
 import 'package:bbb/components/share_achievement_new_dialog.dart';
 import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -35,7 +34,6 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -87,10 +85,9 @@ class _DashboardPageState extends State<DashboardPage> {
     loadStaffsData();
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
-    loadAchievementsData();
+    loadAchievementsData(true);
     loadProgramPhaseData();
     requestNotificationPermission();
-
     // _scrollController = ScrollController();
     // _scrollController.addListener(() {
     //   double offset = _scrollController.offset;
@@ -113,10 +110,10 @@ class _DashboardPageState extends State<DashboardPage> {
     await dataProvider?.fetchStaffs();
   }
 
-  void loadAchievementsData() async {
+  void loadAchievementsData(value) async {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
-        await dataProvider?.getAllAchievement();
+        await dataProvider?.getAllAchievement(value);
       },
     );
   }
@@ -330,7 +327,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       loadUserInfo();
                       loadStaffsData();
                       loadFeaturedChallengeData();
-                      loadAchievementsData();
+                      loadAchievementsData(false);
                       loadProgramPhaseData();
                       loadFeaturedCollectionData();
                       if (!context.mounted) return;
@@ -1183,7 +1180,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         SizedBox(
                                           height: ScreenUtil.verticalScale(2.2),
                                         ),
-                                        Consumer<MonthProvider>(
+                                        Consumer<DataProvider>(
                                             builder: (context, value, child) {
                                           List<AchievementModel>? data =
                                               dataProvider?.achievementList
@@ -1192,7 +1189,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       .any((e) =>
                                                           e.achieved == true))
                                                   .toList();
-                                          return dataProvider?.loader ?? false
+                                          return dataProvider!.loader &&
+                                                  dataProvider!
+                                                      .achievementList.isEmpty
                                               ? Center(
                                                   child: Padding(
                                                     padding:
@@ -1267,7 +1266,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               List.generate(
                                                             3,
                                                             (index) =>
-                                                                (data!.length -
+                                                                (data.length -
                                                                             1) <
                                                                         index
                                                                     ? Expanded(

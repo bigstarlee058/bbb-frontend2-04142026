@@ -20,9 +20,12 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../SubscriptionPage/woo_subscription_pay_wall.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -35,6 +38,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  FocusNode focusNode1 = FocusNode();
+  FocusNode focusNode2 = FocusNode();
   DataProvider? dataProvider;
   bool isObscure = true;
   bool isLoading = false;
@@ -73,7 +78,8 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+      final url = Uri.parse(
+          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -103,12 +109,14 @@ class _LoginPageState extends State<LoginPage> {
 
           // Check if the welcome modal has been shown
           bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-
-          if (Platform.isIOS) {
+          await userData.fetchUserInfo();
+          bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
+          if (Platform.isIOS && isAppUser) {
             try {
               CustomerInfo customerInfo = await Purchases.getCustomerInfo();
               if (customerInfo.entitlements.active.isNotEmpty) {
-                customerInfo.entitlements.active.forEach((key, entitlement) async {
+                customerInfo.entitlements.active
+                    .forEach((key, entitlement) async {
                   final latestPurchaseDate = customerInfo.allPurchaseDates;
                   final identifier = entitlement.productIdentifier;
 
@@ -133,15 +141,14 @@ class _LoginPageState extends State<LoginPage> {
           }
 
           await userData.fetchUserInfo();
-
-          if (Platform.isIOS) {
-            Map<String, dynamic> subscriptionData = userData.user["subscription"];
-
+          Map<String, dynamic> subscriptionData = userData.user["subscription"];
+          if (Platform.isIOS && isAppUser) {
             if (subscriptionData["user_subscription_status"] == "free_user") {
               if (mounted) {
                 await Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SubscriptionPayWall()),
+                  MaterialPageRoute(
+                      builder: (context) => SubscriptionPayWall()),
                 );
               }
             } else {
@@ -151,7 +158,38 @@ class _LoginPageState extends State<LoginPage> {
                     MaterialPageRoute(
                         builder: (context) => MainPage(
                             showWelcomeModal: !hasSeenWelcome,
-                            welcomeDescription: descriptionData['description'] ?? "",
+                            welcomeDescription:
+                                descriptionData['description'] ?? "",
+                            welcomeImageUrl: descriptionData['vimeoId'])),
+                    (route) => false);
+              }
+            }
+          } else if (Platform.isIOS && !isAppUser) {
+            DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
+                ? null
+                : DateTime.parse(subscriptionData["end_date"] ?? "");
+
+            DateTime now = await NTP.now();
+
+            if (subscriptionData["user_subscription_status"] == "free_user" ||
+                (endDate != null && now.isAfter(endDate))) {
+              if (mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WooSubscriptionPayWall(),
+                  ),
+                );
+              }
+            } else {
+              if (mounted) {
+                await Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MainPage(
+                            showWelcomeModal: !hasSeenWelcome,
+                            welcomeDescription:
+                                descriptionData['description'] ?? "",
                             welcomeImageUrl: descriptionData['vimeoId'])),
                     (route) => false);
               }
@@ -163,7 +201,8 @@ class _LoginPageState extends State<LoginPage> {
                   MaterialPageRoute(
                       builder: (context) => MainPage(
                           showWelcomeModal: !hasSeenWelcome,
-                          welcomeDescription: descriptionData['description'] ?? "",
+                          welcomeDescription:
+                              descriptionData['description'] ?? "",
                           welcomeImageUrl: descriptionData['vimeoId'])),
                   (route) => false);
             }
@@ -238,7 +277,8 @@ class _LoginPageState extends State<LoginPage> {
         "end_date": endDate,
       };
 
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      Uri url =
+          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(
@@ -268,70 +308,74 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Form(
-        key: _formKey,
-        child: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Utils.appImage(
-                  media,
-                  // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                  dataProvider!.cachedImageMap["imageLogin"],
-                  imageKey: "imageLogin",
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: SafeArea(
-                          child: BackArrowWidget(onPress: () {
-                            Navigator.pop(context);
-                          }),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              top: ScreenUtil.horizontalScale(42),
-              child: Container(
-                // height: 120,
-                height: 150,
-                width: media.width,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
-                ),
-              ),
-            ),
-            Positioned(
-                bottom: -0.7,
+      body: Stack(
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Utils.appImage(
+                media,
+                // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                dataProvider!.cachedImageMap["imageLogin"],
+                imageKey: "imageLogin",
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ClipPath(
-                      clipper: DiagonalClipper(),
-                      child: Container(
-                        height: media.height / 9.8,
-                        width: media.width / 6,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                        ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: SafeArea(
+                        child: BackArrowWidget(onPress: () {
+                          Navigator.pop(context);
+                        }),
                       ),
                     ),
-                    Container(
-                      width: media.width,
-                      decoration: BoxDecoration(
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: ScreenUtil.horizontalScale(42),
+            child: Container(
+              // height: 120,
+              height: 150,
+              width: media.width,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/img/bbb-logo.png'),
+                    fit: BoxFit.fitHeight,
+                    opacity: 1),
+              ),
+            ),
+          ),
+          Positioned(
+              bottom: -0.7,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ClipPath(
+                    clipper: DiagonalClipper(),
+                    child: Container(
+                      height: media.height / 9.8,
+                      width: media.width / 6,
+                      decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                        ),
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                    ),
+                  ),
+                  Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.verticalScale(4.4)),
+                      child: Form(
+                        key: _formKey,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -353,7 +397,7 @@ class _LoginPageState extends State<LoginPage> {
                               hintText: 'Your Email',
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
-                              onChanged: (value) {},
+                              focusNode: focusNode1,
                               // validator: (value) {
                               //   return value!.isEmpty
                               //       ? 'Please, Enter Email Address'
@@ -367,10 +411,8 @@ class _LoginPageState extends State<LoginPage> {
                                 child: IconButton(
                                   onPressed: () {},
                                   style: ButtonStyle(
-                                    minimumSize: WidgetStateProperty.all(
-                                      const Size(48, 48),
-                                    ),
-                                  ),
+                                      minimumSize: WidgetStateProperty.all(
+                                          const Size(48, 48))),
                                   icon: Icon(
                                     Icons.email,
                                     color: Colors.grey.shade400,
@@ -382,8 +424,8 @@ class _LoginPageState extends State<LoginPage> {
                             AppTextFormField(
                               hintText: 'Your Password',
                               keyboardType: TextInputType.visiblePassword,
+                              focusNode: focusNode2,
                               textInputAction: TextInputAction.done,
-                              onChanged: (value) {},
                               // validator: (value) {
                               //   return value!.isEmpty
                               //       ? 'Please, Enter Password'
@@ -397,17 +439,15 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: const EdgeInsets.only(right: 15),
                                 child: IconButton(
                                   onPressed: () {
-                                    setState(() {
-                                      isObscure = !isObscure;
-                                    });
+                                    setState(() => isObscure = !isObscure);
                                   },
                                   style: ButtonStyle(
-                                    minimumSize: WidgetStateProperty.all(
-                                      const Size(48, 48),
-                                    ),
-                                  ),
+                                      minimumSize: WidgetStateProperty.all(
+                                          const Size(48, 48))),
                                   icon: Icon(
-                                    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    isObscure
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
                                     color: Colors.grey.shade400,
                                   ),
                                 ),
@@ -430,7 +470,8 @@ class _LoginPageState extends State<LoginPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (ctx) => const ResetPasswordScreen(
+                                          builder: (ctx) =>
+                                              const ResetPasswordScreen(
                                             image: '',
                                           ),
                                         ),
@@ -474,7 +515,8 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(65, 30),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
                                       alignment: Alignment.center),
                                   child: const Text(
                                     'Sign up',
@@ -493,10 +535,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                  ],
-                ))
-          ],
-        ),
+                  ),
+                ],
+              ))
+        ],
       ),
     );
   }
