@@ -4,12 +4,14 @@ import 'dart:io';
 
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
+import 'package:bbb/pages/SubscriptionPage/woo_subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,71 +49,127 @@ class _SplashScreenState extends State<SplashScreen> {
         bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
         if (isLoggedIn) {
-          if (Platform.isIOS) {
-            try {
-              CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-              if (customerInfo.entitlements.active.isNotEmpty) {
-                customerInfo.entitlements.active.forEach((key, entitlement) async {
-                  final latestPurchaseDate = customerInfo.allPurchaseDates;
-                  final identifier = entitlement.productIdentifier;
+          await userData.fetchUserInfo().then(
+            (value) async {
+              bool isAppUser =
+                  userData.user["singuptype"] != "web" ? true : false;
 
-                  await _updateSubscriptionData(
-                    type: identifier,
-                    endDate: entitlement.expirationDate ?? "",
-                    startDate: latestPurchaseDate[identifier] ?? "",
-                    status: "subscribed_user",
+              if (Platform.isIOS && isAppUser) {
+                try {
+                  CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+                  if (customerInfo.entitlements.active.isNotEmpty) {
+                    customerInfo.entitlements.active
+                        .forEach((key, entitlement) async {
+                      final latestPurchaseDate = customerInfo.allPurchaseDates;
+                      final identifier = entitlement.productIdentifier;
+
+                      await _updateSubscriptionData(
+                        type: identifier,
+                        endDate: entitlement.expirationDate ?? "",
+                        startDate: latestPurchaseDate[identifier] ?? "",
+                        status: "subscribed_user",
+                      );
+                    });
+                  } else {
+                    await _updateSubscriptionData(
+                      type: "",
+                      endDate: "",
+                      startDate: "",
+                      status: "free_user",
+                    );
+                    debugPrint("No active subscriptions found.");
+                  }
+                } catch (e) {
+                  debugPrint("Error fetching subscription: $e");
+                }
+              }
+
+              await userData.fetchUserInfo();
+
+              if (Platform.isIOS && isAppUser) {
+                Map<String, dynamic> subscriptionData =
+                    userData.user["subscription"];
+
+                if (subscriptionData["user_subscription_status"] !=
+                    "free_user") {
+                  if (mounted) {
+                    await Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MainPage(
+                            welcomeDescription: '', welcomeImageUrl: ''),
+                      ),
+                    );
+                  }
+                  await isFromNotification();
+                } else {
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SubscriptionPayWall(),
+                      ),
+                    );
+                  }
+                }
+              } else if (Platform.isIOS && !isAppUser) {
+                Map<String, dynamic> subscriptionData =
+                    userData.user["subscription"];
+
+                DateTime? endDate =
+                    subscriptionData["end_date"].toString().isEmpty
+                        ? null
+                        : DateTime.parse(subscriptionData["end_date"] ?? "");
+
+                DateTime now = await NTP.now();
+
+                if (mounted) {
+                  await Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MainPage(
+                          welcomeDescription: '', welcomeImageUrl: ''),
+                    ),
                   );
-                });
+                }
+
+                // if (subscriptionData["user_subscription_status"] ==
+                //         "free_user" ||
+                //     (endDate != null && now.isAfter(endDate))) {
+                //   if (mounted) {
+                //     Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => const WooSubscriptionPayWall(),
+                //       ),
+                //     );
+                //   }
+                // } else {
+                //   if (mounted) {
+                //     await Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => const MainPage(
+                //             welcomeDescription: '', welcomeImageUrl: ''),
+                //       ),
+                //     );
+                //   }
+                //   await isFromNotification();
+                // }
               } else {
-                await _updateSubscriptionData(
-                  type: "",
-                  endDate: "",
-                  startDate: "",
-                  status: "free_user",
-                );
-                debugPrint("No active subscriptions found.");
+                if (mounted) {
+                  await Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MainPage(
+                          welcomeDescription: '', welcomeImageUrl: ''),
+                    ),
+                  );
+                }
+                await isFromNotification();
               }
-            } catch (e) {
-              debugPrint("Error fetching subscription: $e");
-            }
-          }
-
-          await userData.fetchUserInfo();
-
-          if (Platform.isIOS) {
-            Map<String, dynamic> subscriptionData = userData.user["subscription"];
-
-            if (subscriptionData["user_subscription_status"] != "free_user") {
-              if (mounted) {
-                await Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-                  ),
-                );
-              }
-              await isFromNotification();
-            } else {
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SubscriptionPayWall(),
-                  ),
-                );
-              }
-            }
-          } else {
-            if (mounted) {
-              await Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-                ),
-              );
-            }
-            await isFromNotification();
-          }
+            },
+          );
         } else {
           if (mounted) {
             Navigator.pushReplacementNamed(context, '/onboarding');
@@ -169,7 +227,8 @@ class _SplashScreenState extends State<SplashScreen> {
         "end_date": endDate,
       };
 
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      Uri url =
+          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(

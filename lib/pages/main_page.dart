@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/pages/DashBoardScreen/dashboard_page.dart';
@@ -77,7 +78,9 @@ class _MainPageState extends State<MainPage> {
       (timeStamp) async {
         await userData.fetchUserInfo();
         if (userData.user != null && !widget.isComeFromOnBoarding) {
-          if (userData.user["detail"]['dob'] == null || userData.user["detail"]["weight"] == null) {
+          if (userData.user["detail"] == null ||
+              userData.user["detail"]['dob'] == null ||
+              userData.user["detail"]["weight"] == null) {
             await Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
@@ -92,7 +95,6 @@ class _MainPageState extends State<MainPage> {
         } else {
           if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
             WidgetsBinding.instance.addPostFrameCallback((_) async {
-              ///
               _showWelcomeModal();
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.setBool('hasSeenWelcome', true);
@@ -190,7 +192,8 @@ class _MainPageState extends State<MainPage> {
   Future<void> _initializeFetchData() async {
     debugPrint("this  is initial state func");
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    dataProvider?.monthProvider =
+        Provider.of<MonthProvider>(context, listen: false);
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {
@@ -214,7 +217,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _showWelcomeModal() {
-    Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Go to Dashboard"});
+    Navigator.pushNamed(context, '/watchtutorial',
+        arguments: {"buttontext": "Go to Dashboard"});
   }
 
   @override
@@ -223,7 +227,8 @@ class _MainPageState extends State<MainPage> {
     return AnnotatedRegion(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent, // fully transparent status bar
-        statusBarIconBrightness: Brightness.light, // dark icons for light background
+        statusBarIconBrightness:
+            Brightness.light, // dark icons for light background
       ),
       child: Consumer<MainPageProvider>(
         builder: (context, value, child) => Scaffold(
@@ -264,7 +269,11 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/1-home.svg',
-                        colorFilter: ColorFilter.mode(value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                            value.selectedPage == 0
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -282,7 +291,11 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/2-calendar.svg',
-                        colorFilter: ColorFilter.mode(value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                            value.selectedPage == 1
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -298,7 +311,11 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/3-statistics.svg',
-                        colorFilter: ColorFilter.mode(value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                            value.selectedPage == 2
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -314,7 +331,11 @@ class _MainPageState extends State<MainPage> {
                     icon: Consumer<UserDataProvider>(
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/4-account.svg',
-                        colorFilter: ColorFilter.mode(value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                            value.selectedPage == 3
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(9),
                         height: ScreenUtil.horizontalScale(9),
                       ),

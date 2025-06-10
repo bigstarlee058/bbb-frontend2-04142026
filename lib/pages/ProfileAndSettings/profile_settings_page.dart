@@ -59,7 +59,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       String fileName = basename(image.path);
 
       try {
-        Reference storageRef = FirebaseStorage.instance.ref().child('profile_images/$fileName');
+        Reference storageRef =
+            FirebaseStorage.instance.ref().child('profile_images/$fileName');
         await storageRef.putFile(file);
 
         // Update the state with the image URL
@@ -187,7 +188,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: "setting"),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: "setting"),
                                     )
                                   ],
                                 ),
@@ -207,34 +209,67 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         onTap: _pickAndUploadImage,
                                         child: Consumer<UserDataProvider>(
                                           builder: (context, userData, child) =>
-                                              userData.userData['detail'] != null && userData.userData['detail']['avatarUrl'] != ""
+                                              userData.userData['detail'] !=
+                                                          null &&
+                                                      userData.userData[
+                                                                  'detail']
+                                                              ['avatarUrl'] !=
+                                                          ""
                                                   ? Container(
-                                                      height: ScreenUtil.verticalScale(10.5),
-                                                      width: ScreenUtil.verticalScale(10.5),
+                                                      height: ScreenUtil
+                                                          .verticalScale(10.5),
+                                                      width: ScreenUtil
+                                                          .verticalScale(10.5),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey.withValues(alpha: .9),
-                                                        borderRadius: BorderRadius.all(
-                                                          Radius.circular(ScreenUtil.horizontalScale(12.5)),
+                                                        color: Colors.grey
+                                                            .withValues(
+                                                                alpha: .9),
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(
+                                                              ScreenUtil
+                                                                  .horizontalScale(
+                                                                      12.5)),
                                                         ),
                                                       ),
                                                       child: ClipRRect(
-                                                          borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
+                                                          borderRadius: BorderRadius
+                                                              .circular(ScreenUtil
+                                                                  .horizontalScale(
+                                                                      12.5)),
                                                           child: Image.network(
-                                                            userData.userData['detail']['avatarUrl']
-                                                                    .startsWith('https://storage.cloud.google.com/')
-                                                                ? userData.userData['detail']['avatarUrl'].replaceFirst(
-                                                                    'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                                                : userData.userData['detail']['avatarUrl'],
+                                                            userData.userData[
+                                                                        'detail'][
+                                                                        'avatarUrl']
+                                                                    .startsWith(
+                                                                        'https://storage.cloud.google.com/')
+                                                                ? userData
+                                                                    .userData[
+                                                                        'detail']
+                                                                        [
+                                                                        'avatarUrl']
+                                                                    .replaceFirst(
+                                                                        'https://storage.cloud.google.com/',
+                                                                        'https://storage.googleapis.com/')
+                                                                : userData.userData[
+                                                                        'detail']
+                                                                    [
+                                                                    'avatarUrl'],
                                                             fit: BoxFit.cover,
                                                           )),
                                                     )
                                                   : userData.userName != ""
                                                       ? Text(
-                                                          userData.userName[0], // First character of the name
+                                                          userData.userName[
+                                                              0], // First character of the name
                                                           style: TextStyle(
-                                                            fontSize: ScreenUtil.horizontalScale(12),
-                                                            color: Colors.white, // Adjust size as needed
-                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: ScreenUtil
+                                                                .horizontalScale(
+                                                                    12),
+                                                            color: Colors
+                                                                .white, // Adjust size as needed
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
                                                         )
                                                       : const SizedBox(),
@@ -244,65 +279,88 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         height: ScreenUtil.verticalScale(0.8),
                                       ),
                                       Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) => userData.userName != ""
-                                            ? Text(
-                                                // 'Hi, Nick',
-                                                userData.userName,
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(6),
-                                                  fontWeight: FontWeight.bold,
-                                                  height: 1,
-                                                ),
-                                              )
-                                            : const SizedBox(),
+                                        builder: (context, userData, child) =>
+                                            userData.userName != ""
+                                                ? Text(
+                                                    // 'Hi, Nick',
+                                                    userData.userName,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: ScreenUtil
+                                                          .horizontalScale(6),
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      height: 1,
+                                                    ),
+                                                  )
+                                                : const SizedBox(),
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(0.3),
                                       ),
                                       Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) => userData.userName != ""
-                                            ? Text(
-                                                userData.userEmail,
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(3.5),
-                                                  fontWeight: FontWeight.normal,
-                                                  height: 1,
-                                                ),
-                                              )
-                                            : const SizedBox(),
+                                        builder: (context, userData, child) =>
+                                            userData.userName != ""
+                                                ? Text(
+                                                    userData.userEmail,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: ScreenUtil
+                                                          .horizontalScale(3.5),
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      height: 1,
+                                                    ),
+                                                  )
+                                                : const SizedBox(),
                                       ),
                                       Spacer(),
                                       Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                ScreenUtil.horizontalScale(5)),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             GestureDetector(
                                               onTap: () {
-                                                Navigator.pushNamed(context, "/seeAllAchievementPage");
+                                                Navigator.pushNamed(context,
+                                                    "/seeAllAchievementPage");
                                               },
                                               child: Column(
                                                 children: [
                                                   Container(
-                                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(1.4)),
+                                                    padding: EdgeInsets.all(
+                                                        ScreenUtil
+                                                            .verticalScale(
+                                                                1.4)),
                                                     decoration: BoxDecoration(
-                                                      color: Colors.white.withValues(alpha: 0.35),
+                                                      color: Colors.white
+                                                          .withValues(
+                                                              alpha: 0.35),
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: SvgPicture.asset(
                                                       "assets/img/verified (1).svg",
                                                       height: 22,
-                                                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                                      colorFilter:
+                                                          ColorFilter.mode(
+                                                              Colors.white,
+                                                              BlendMode.srcIn),
                                                     ),
                                                   ),
-                                                  SizedBox(height: ScreenUtil.verticalScale(0.9)),
+                                                  SizedBox(
+                                                      height: ScreenUtil
+                                                          .verticalScale(0.9)),
                                                   Builder(builder: (context) {
                                                     final achievements = context
                                                         .watch<MonthProvider>()
                                                         .items
-                                                        .where((element) => element["isArchived"] == true)
+                                                        .where((element) =>
+                                                            element[
+                                                                "isArchived"] ==
+                                                            true)
                                                         .length;
                                                     return Column(
                                                       children: [
@@ -310,18 +368,28 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                           "$achievements",
                                                           style: TextStyle(
                                                             color: Colors.white,
-                                                            fontSize: ScreenUtil.horizontalScale(3.2),
-                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: ScreenUtil
+                                                                .horizontalScale(
+                                                                    3.2),
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                             height: 1,
                                                           ),
                                                         ),
-                                                        SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                        SizedBox(
+                                                            height: ScreenUtil
+                                                                .verticalScale(
+                                                                    0.25)),
                                                         Text(
                                                           "Achievement${achievements > 1 ? "s" : ""}",
                                                           style: TextStyle(
                                                             color: Colors.white,
-                                                            fontSize: ScreenUtil.horizontalScale(3),
-                                                            fontWeight: FontWeight.normal,
+                                                            fontSize: ScreenUtil
+                                                                .horizontalScale(
+                                                                    3),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
                                                             height: 1,
                                                           ),
                                                         ),
@@ -333,40 +401,69 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             ),
                                             GestureDetector(
                                                 onTap: () {
-                                                  Navigator.pushNamed(context, '/streak-calendar');
+                                                  Navigator.pushNamed(context,
+                                                      '/streak-calendar');
                                                 },
                                                 child: Column(
                                                   children: [
                                                     Container(
-                                                      padding: EdgeInsets.all(ScreenUtil.verticalScale(1.4)),
+                                                      padding: EdgeInsets.all(
+                                                          ScreenUtil
+                                                              .verticalScale(
+                                                                  1.4)),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.white.withValues(alpha: 0.35),
+                                                        color: Colors.white
+                                                            .withValues(
+                                                                alpha: 0.35),
                                                         shape: BoxShape.circle,
                                                       ),
-                                                      child: Icon(Icons.local_fire_department_outlined, color: Colors.white, size: 22),
+                                                      child: Icon(
+                                                          Icons
+                                                              .local_fire_department_outlined,
+                                                          color: Colors.white,
+                                                          size: 22),
                                                     ),
-                                                    SizedBox(height: ScreenUtil.verticalScale(0.9)),
+                                                    SizedBox(
+                                                        height: ScreenUtil
+                                                            .verticalScale(
+                                                                0.9)),
                                                     Builder(builder: (context) {
-                                                      int streak = context.watch<MonthProvider>().streak;
+                                                      int streak = context
+                                                          .watch<
+                                                              MonthProvider>()
+                                                          .streak;
 
                                                       return Column(
                                                         children: [
                                                           Text(
                                                             "$streak Day${streak > 1 ? "s" : ""}",
                                                             style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.horizontalScale(3.2),
-                                                              fontWeight: FontWeight.bold,
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: ScreenUtil
+                                                                  .horizontalScale(
+                                                                      3.2),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
                                                               height: 1,
                                                             ),
                                                           ),
-                                                          SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                          SizedBox(
+                                                              height: ScreenUtil
+                                                                  .verticalScale(
+                                                                      0.25)),
                                                           Text(
                                                             "Streak${streak > 1 ? "s" : ""}",
                                                             style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.horizontalScale(3),
-                                                              fontWeight: FontWeight.normal,
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: ScreenUtil
+                                                                  .horizontalScale(
+                                                                      3),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
                                                               height: 1,
                                                             ),
                                                           ),
@@ -378,40 +475,72 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             Column(
                                               children: [
                                                 Container(
-                                                  padding: EdgeInsets.all(ScreenUtil.verticalScale(1.4)),
+                                                  padding: EdgeInsets.all(
+                                                      ScreenUtil.verticalScale(
+                                                          1.4)),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.white.withValues(alpha: 0.35),
+                                                    color: Colors.white
+                                                        .withValues(
+                                                            alpha: 0.35),
                                                     shape: BoxShape.circle,
                                                   ),
-                                                  child: Icon(Icons.calendar_month, color: Colors.white, size: 22),
+                                                  child: Icon(
+                                                      Icons.calendar_month,
+                                                      color: Colors.white,
+                                                      size: 22),
                                                 ),
-                                                SizedBox(height: ScreenUtil.verticalScale(0.9)),
+                                                SizedBox(
+                                                    height: ScreenUtil
+                                                        .verticalScale(0.9)),
                                                 Builder(
                                                   builder: (context) {
-                                                    String accountCreatedDate = context.watch<UserDataProvider>().userData != null
-                                                        ? context.watch<UserDataProvider>().userData["createdAt"]
+                                                    String accountCreatedDate = context
+                                                                .watch<
+                                                                    UserDataProvider>()
+                                                                .userData !=
+                                                            null
+                                                        ? context
+                                                            .watch<
+                                                                UserDataProvider>()
+                                                            .userData["createdAt"]
                                                         : "";
-                                                    DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
-                                                    DateTime today = DateTime.now();
-                                                    int dayDifference = today.difference(targetDate).inDays;
+                                                    DateTime targetDate =
+                                                        DateTime.parse(
+                                                                accountCreatedDate)
+                                                            .toLocal();
+                                                    DateTime today =
+                                                        DateTime.now();
+                                                    int dayDifference = today
+                                                        .difference(targetDate)
+                                                        .inDays;
                                                     return Column(
                                                       children: [
                                                         Text(
                                                           "$dayDifference Day${dayDifference > 1 ? "s" : ""}",
                                                           style: TextStyle(
                                                             color: Colors.white,
-                                                            fontSize: ScreenUtil.horizontalScale(3.2),
-                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: ScreenUtil
+                                                                .horizontalScale(
+                                                                    3.2),
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                             height: 1,
                                                           ),
                                                         ),
-                                                        SizedBox(height: ScreenUtil.verticalScale(0.25)),
+                                                        SizedBox(
+                                                            height: ScreenUtil
+                                                                .verticalScale(
+                                                                    0.25)),
                                                         Text(
                                                           "Since Joining",
                                                           style: TextStyle(
                                                             color: Colors.white,
-                                                            fontSize: ScreenUtil.horizontalScale(3),
-                                                            fontWeight: FontWeight.normal,
+                                                            fontSize: ScreenUtil
+                                                                .horizontalScale(
+                                                                    3),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
                                                             height: 1,
                                                           ),
                                                         ),
@@ -449,7 +578,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                            topLeft:
+                                Radius.circular(ScreenUtil.verticalScale(7)),
                           ),
                         ),
                         child: Column(
@@ -465,17 +595,29 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   //     () => Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Back"})),
                                   // SizedBox(height: ScreenUtil.verticalScale(2)),
 
-                                  settingsButton('My Profile', Icons.person, () => Navigator.pushNamed(context, '/myprofile')),
+                                  settingsButton(
+                                      'My Profile',
+                                      Icons.person,
+                                      () => Navigator.pushNamed(
+                                          context, '/myprofile')),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
-                                  settingsButton('Settings', Icons.settings, () => Navigator.pushNamed(context, '/SettingPage')),
+                                  settingsButton(
+                                      'Settings',
+                                      Icons.settings,
+                                      () => Navigator.pushNamed(
+                                          context, '/SettingPage')),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
-                                  settingsButton('Subscription', Icons.refresh, () async {
-                                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                                    String? token = prefs.getString('authToken');
+                                  settingsButton('Subscription', Icons.refresh,
+                                      () async {
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    String? token =
+                                        prefs.getString('authToken');
 
-                                    Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/?token=$token');
+                                    Uri url = Uri.parse(
+                                        'https://bbbdev1.wpenginepowered.com/?token=$token');
 
                                     if (await canLaunchUrl(url)) {
                                       await launchUrl(url);
@@ -490,16 +632,19 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
-                                  settingsButton('Support', Icons.handshake, () => toSupportPage()),
+                                  settingsButton('Support', Icons.handshake,
+                                      () => toSupportPage()),
                                   // SizedBox(
                                   //   height: ScreenUtil.horizontalScale(4.5),
                                   // ),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
-                                  settingsButton('Legal', Icons.description, () => {}),
+                                  settingsButton(
+                                      'Legal', Icons.description, () => {}),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
-                                  settingsButton('Log Out', Icons.logout, () => _handleLogout(context)),
+                                  settingsButton('Log Out', Icons.logout,
+                                      () => _handleLogout(context)),
                                   SizedBox(height: ScreenUtil.verticalScale(1)),
                                 ],
                               ),

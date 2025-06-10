@@ -78,7 +78,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   centerTitle: true,
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(
@@ -86,16 +87,6 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                       Navigator.pop(context);
                                     },
                                   ),
-
-                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                                  // Positioned(
-                                  //   left: 0,
-                                  //   child: BackArrowWidget(
-                                  //     onPress: () {
-                                  //       Navigator.pop(context);
-                                  //     },
-                                  //   ),
-                                  // leading: SizedBox(),
                                   title: Text(
                                     'Achievements',
                                     style: TextStyle(
@@ -106,7 +97,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: '/equipmentLibrary'),
                                     )
                                   ],
                                 ),
@@ -117,7 +109,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                   height: media.height * 0.097,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
                                         width: ScreenUtil.horizontalScale(50),
@@ -125,7 +118,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                           "Here's a look at your\nachievements",
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: ScreenUtil.verticalScale(2),
+                                            fontSize:
+                                                ScreenUtil.verticalScale(2),
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
@@ -162,7 +156,9 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                   margin: EdgeInsets.only(top: media.height / 4.6),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: (media.height - (media.height / 8) - (media.height * 0.12)),
+                      minHeight: (media.height -
+                          (media.height / 8) -
+                          (media.height * 0.12)),
                     ),
                     width: media.width,
                     decoration: BoxDecoration(
@@ -173,22 +169,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     ),
                     child: Container(
                       width: media.width,
-                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
-                      // child: GridView.builder(
-                      //   padding: EdgeInsets.only(
-                      //     top: ScreenUtil.verticalScale(3),
-                      //   ),
-                      //   physics: NeverScrollableScrollPhysics(),
-                      //   shrinkWrap: true,
-                      //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      //     crossAxisCount: 2,
-                      //     childAspectRatio: 0.95,
-                      //   ),
-                      //   itemCount: monthProvider?.items.length,
-                      //   itemBuilder: (context, index) {
-                      //     return _buildGridItem(monthProvider!.items[index], index);
-                      //   },
-                      // ),
+                      margin: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(7)),
                       child: GridView.builder(
                         padding: EdgeInsets.only(
                           top: ScreenUtil.verticalScale(3),
@@ -201,7 +183,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                         ),
                         itemCount: dataProvider?.achievementList.length,
                         itemBuilder: (context, index) {
-                          return _buildGridItem(dataProvider!.achievementList[index], index);
+                          return _buildGridItem(
+                              dataProvider!.achievementList[index], index);
                         },
                       ),
                     ),
@@ -232,48 +215,80 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-                height: ScreenUtil.verticalScale(12),
-                width: ScreenUtil.verticalScale(12),
-                child: appShimmerImage(
+            Stack(
+              children: [
+                SizedBox(
+                    height: ScreenUtil.verticalScale(12),
+                    width: ScreenUtil.verticalScale(12),
+                    child: appShimmerImage(
+                      height: ScreenUtil.verticalScale(12),
+                      width: ScreenUtil.verticalScale(12),
+                      networkImageUrl:
+                          "${item.achievements?.first.achievementAchievementId?.image}"
+                                  .startsWith(
+                                      'https://storage.cloud.google.com/')
+                              ? item.achievements?.first
+                                      .achievementAchievementId?.image ??
+                                  "".replaceFirst(
+                                      'https://storage.cloud.google.com/',
+                                      'https://storage.googleapis.com/')
+                              : item.achievements?.first
+                                      .achievementAchievementId?.image ??
+                                  "unknown",
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(ScreenUtil.verticalScale(500)),
+                      ),
+                    )),
+                Container(
                   height: ScreenUtil.verticalScale(12),
                   width: ScreenUtil.verticalScale(12),
-                  networkImageUrl:
-                      "${item.achievements?.first.achievementAchievementId?.image}".startsWith('https://storage.cloud.google.com/')
-                          ? item.achievements?.first.achievementAchievementId?.image ??
-                              "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                          : item.achievements?.first.achievementAchievementId?.image ?? "unknown",
-                  fit: BoxFit.cover,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(ScreenUtil.verticalScale(500)),
+                  decoration: BoxDecoration(
+                    color: item.achievements!
+                            .any((element) => element.achieved != false)
+                        ? Color(0xFFAADDAA).withValues(alpha: 0.8)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(ScreenUtil.verticalScale(500)),
+                    ),
                   ),
-                )),
-            SizedBox(height: 5),
+                  child: Icon(
+                    Icons.check,
+                    color: item.achievements!
+                            .any((element) => element.achieved != false)
+                        ? Colors.white
+                        : Colors.transparent,
+                    size: 30,
+                  ),
+                )
+              ],
+            ),
+            SizedBox(height: 8),
             Text(
               item.title ?? "",
-              maxLines: 1,
+              maxLines: 2,
               textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
+              // overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.8),
+                fontSize: ScreenUtil.verticalScale(1.7),
                 // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 1),
-            Flexible(
-              child: Text(
-                item.description ?? "",
-                maxLines: 1,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.visible,
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.5),
-                  // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+            // SizedBox(height: 1),
+            // Flexible(
+            //   child: Text(
+            //     item.description ?? "",
+            //     maxLines: 1,
+            //     textAlign: TextAlign.center,
+            //     overflow: TextOverflow.visible,
+            //     style: TextStyle(
+            //       fontSize: ScreenUtil.verticalScale(1.5),
+            //       // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
+            //       fontWeight: FontWeight.w500,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

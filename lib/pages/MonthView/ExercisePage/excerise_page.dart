@@ -40,7 +40,8 @@ class ExercisePage extends StatefulWidget {
   State<ExercisePage> createState() => _ExercisePageState();
 }
 
-class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMixin {
+class _ExercisePageState extends State<ExercisePage>
+    with TickerProviderStateMixin {
   MonthProvider? monthProvider;
   bool loading = false;
   bool videoLoader = false;
@@ -103,7 +104,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     );
   }
 
-  final ValueNotifier<Duration> videoProgressValue = ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> videoProgressValue =
+      ValueNotifier(Duration.zero);
   Duration getBufferedPosition() {
     final position = _videoPlayerController.value.position;
     final buffered = _videoPlayerController.value.buffered;
@@ -118,7 +120,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     return buffered.isNotEmpty ? buffered.last.end : Duration.zero;
   }
 
-  final ValueNotifier<Duration> videoProgressValue1 = ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> videoProgressValue1 =
+      ValueNotifier(Duration.zero);
   Future<void> initializeVideo1(String url) async {
     try {
       _videoPlayerController1 = VideoPlayerController.networkUrl(
@@ -135,8 +138,10 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
         aspectRatio: _videoPlayerController1.value.aspectRatio,
       );
 
-      if (_chewieController1 != null && _chewieController1!.videoPlayerController.value.isInitialized) {
-        videoSize1 = calculateVideoSize1(aspectRatio: _chewieController1!.aspectRatio!, context: context);
+      if (_chewieController1 != null &&
+          _chewieController1!.videoPlayerController.value.isInitialized) {
+        videoSize1 = calculateVideoSize1(
+            aspectRatio: _chewieController1!.aspectRatio!, context: context);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           setState(() {});
         });
@@ -145,7 +150,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       _videoPlayerController1.addListener(() async {
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
-        final bool isFinished = position >= duration && !_videoPlayerController.value.isPlaying;
+        final bool isFinished =
+            position >= duration && !_videoPlayerController.value.isPlaying;
         if (isFinished) {
           showControlsOnTapOfPause();
         }
@@ -181,7 +187,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     }
   }
 
-  Size calculateVideoSize1({required BuildContext context, required double aspectRatio}) {
+  Size calculateVideoSize1(
+      {required BuildContext context, required double aspectRatio}) {
     double maxWidth = ScreenUtil.horizontalScale(90);
     double calculatedHeight = maxWidth / aspectRatio;
     return Size(maxWidth, calculatedHeight);
@@ -193,23 +200,28 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     dataProvider1 = Provider.of<DataProvider>(context, listen: false);
 
     WidgetsBinding.instance.scheduleFrameCallback((timeStamp) async {
-      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
+      await preferences.putString(
+          SharedPreference.inTheExerciseScreenOrNot, "YES");
       await preferences.putInt(SharedPreference.fromNotification, 0);
-      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "YES");
+      await preferences.putString(
+          SharedPreference.inTheExerciseScreenOrNot, "YES");
       await preferences.clearValue(SharedPreference.fromNotification);
     });
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+      String isChecked =
+          preferences.getString(SharedPreference.exerciseTutorial) ?? "";
       if (isChecked != "true") {
         await fetchTutorialData().then(
           (value) async {
             argument = ModalRoute.of(context)?.settings.arguments as String?;
             setState(() => loading = true);
             if (argument != "Exercise") {
-              await fromNotification().then((value) => clearNotificationAndNavigateExercise());
+              await fromNotification()
+                  .then((value) => clearNotificationAndNavigateExercise());
             } else {
-              await fetchExercise().then((value) => clearNotificationAndNavigateExercise());
+              await fetchExercise()
+                  .then((value) => clearNotificationAndNavigateExercise());
             }
           },
         );
@@ -228,13 +240,15 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       }
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => monthProvider?.fetchExerciseHistroy());
+    WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) async => monthProvider?.fetchExerciseHistroy());
 
     super.initState();
   }
 
   clearNotificationAndNavigateExercise() async {
-    String isChecked = preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+    String isChecked =
+        preferences.getString(SharedPreference.exerciseTutorial) ?? "";
     await Future.delayed(Duration(seconds: 2)).then(
       (value) async => await NotificationService.clearNotification(10).then(
         (value) {
@@ -260,12 +274,14 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     }
     final payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
 
-    monthProvider!.weekDataModel = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
+    monthProvider!.weekDataModel =
+        monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
     int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
       return element == monthProvider?.todayTitleId;
     });
 
-    final dayIndex = int.parse((monthProvider!.weekDataModel!.dayList?[index ?? 0]
+    final dayIndex = int.parse((monthProvider!
+                .weekDataModel!.dayList?[index ?? 0]
                 .toString()
                 .replaceAll("Workout", "")
                 .replaceAll("Rest", "")
@@ -273,9 +289,12 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                 .replaceAll(" ", "") ??
             "0")) -
         1;
-    DayDataModel dayData = "${monthProvider!.weekDataModel?.dayList![index ?? 0] ?? ""}".toString().contains("Workout")
-        ? monthProvider!.weekDataModel!.days![dayIndex]
-        : DayDataModel();
+    DayDataModel dayData =
+        "${monthProvider!.weekDataModel?.dayList![index ?? 0] ?? ""}"
+                .toString()
+                .contains("Workout")
+            ? monthProvider!.weekDataModel!.days![dayIndex]
+            : DayDataModel();
     monthProvider!.dayDataModel = dayData;
     monthProvider!.isPumpDay = payloadModel.isPumpday!;
     monthProvider!.isCircuit = payloadModel.isCircuit!;
@@ -286,28 +305,41 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     monthProvider!.overviewCurrentWeek = payloadModel.weekIndex!;
     monthProvider!.selectedExIndex = payloadModel.exerciseIndex!;
 
-    isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-    isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
+    isCurrentDayCompleted =
+        monthProvider?.dayHistoryDetails?.status == Status.completed;
+    isCurrentDaySkipped =
+        monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+            (monthProvider?.dayHistoryDetails == null &&
+                monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] ==
+                    WeekType.pastWeek) ||
+            (monthProvider!.actualWeek! > 4 &&
+                monthProvider?.dayHistoryDetails?.status == Status.started);
     if (monthProvider!.isPumpDay) {
       await monthProvider?.fetchDayStatusLocalData();
 
       // final data = monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1].dayList![payloadModel.dayIndex! - 1];
 
-      String split =
-          monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+      String split = monthProvider?.monthDataModel
+              ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+              .toString()
+              .split(" ")[1] ??
+          "";
 
       String dataId =
           "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
       // await monthProvider?.checkForPumpDay(data);
 
-      if (monthProvider!.allDayHistoryModel.any((element) => element.dataId == dataId && element.type!.contains("Pump Day"))) {
+      if (monthProvider!.allDayHistoryModel.any((element) =>
+          element.dataId == dataId && element.type!.contains("Pump Day"))) {
         // monthProvider?.changeIsPumpDay(true);
         // monthProvider?.changeValue(['Start Workout', 'Swap To Rest Day'], "Start Workout");
       }
-      monthProvider!.selectedExercise = monthProvider!.pumpDayModel!.exercises![payloadModel.exerciseIndex!];
+      monthProvider!.selectedExercise =
+          monthProvider!.pumpDayModel!.exercises![payloadModel.exerciseIndex!];
     } else {
-      monthProvider!.selectedExercise = dayData.exercises![payloadModel.exerciseIndex!];
+      monthProvider!.selectedExercise =
+          dayData.exercises![payloadModel.exerciseIndex!];
     }
 
     await fetchExercise(
@@ -320,7 +352,10 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     final data = {"status": "Completed", "dataId": payloadModel.dataId};
     ApiRepo.updateExerciseHistory(body: data);
     await DatabaseHelper().updateSingleValue(
-        tableName: DatabaseHelper.exerciseHistory, id: payloadModel.dataId, columnName: 'status', newValue: Status.completed);
+        tableName: DatabaseHelper.exerciseHistory,
+        id: payloadModel.dataId,
+        columnName: 'status',
+        newValue: Status.completed);
     await monthProvider?.fetchExerciseHistoryLocalData();
 
     NotificationService.clearNotification(10);
@@ -330,9 +365,15 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
   List values = [];
   Timer? _hideControlsTimer;
 
-  Future<void> fetchExercise({String? exerciseId, int? exerciseIndex, bool? isPumpDay, bool? isCircuit, String? circuitIndex}) async {
+  Future<void> fetchExercise(
+      {String? exerciseId,
+      int? exerciseIndex,
+      bool? isPumpDay,
+      bool? isCircuit,
+      String? circuitIndex}) async {
     if (monthProvider?.isWarmup == false) {
-      await monthProvider?.fetchCurrentExercise(exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
+      await monthProvider?.fetchCurrentExercise(
+          exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
       isExercise = 1;
       this.exerciseIndex = exerciseIndex ?? monthProvider!.selectedExIndex;
 
@@ -367,12 +408,16 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
 
     if (monthProvider?.isWarmup == false) {
       if (monthProvider?.exerciseDetailModel != null) {
-        String exId = (isPumpDay ?? monthProvider!.isPumpDay) && (isCircuit ?? monthProvider!.isCircuit)
+        String exId = (isPumpDay ?? monthProvider!.isPumpDay) &&
+                (isCircuit ?? monthProvider!.isCircuit)
             ? "${monthProvider?.exerciseDetailModel?.sId.toString()}-${(circuitIndex ?? monthProvider?.circuitIndex)}"
             : monthProvider!.exerciseDetailModel!.sId.toString();
 
-        String split =
-            monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+        String split = monthProvider?.monthDataModel
+                ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                .toString()
+                .split(" ")[1] ??
+            "";
 
         String dataId =
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
@@ -380,10 +425,19 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
         fetchExtraSetLocalData(dataId);
 
         await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
-        isCurrentDayCompleted = monthProvider?.dayHistoryDetails?.status == Status.completed;
-        isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status == Status.skipped || monthProvider?.dayHistoryDetails == null;
-        isCurrentExerciseCompleted = monthProvider?.exerciseHistoryDetails?.status == Status.completed;
-        isCurrentExerciseSkipped = monthProvider?.exerciseHistoryDetails?.status == Status.skipped;
+        isCurrentDayCompleted =
+            monthProvider?.dayHistoryDetails?.status == Status.completed;
+        isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status ==
+                Status.skipped ||
+            (monthProvider?.dayHistoryDetails == null &&
+                monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] ==
+                    WeekType.pastWeek) ||
+            (monthProvider!.actualWeek! > 4 &&
+                monthProvider?.dayHistoryDetails?.status == Status.started);
+        isCurrentExerciseCompleted =
+            monthProvider?.exerciseHistoryDetails?.status == Status.completed;
+        isCurrentExerciseSkipped =
+            monthProvider?.exerciseHistoryDetails?.status == Status.skipped;
         isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);
         findIsAtLeastOnSet();
       }
@@ -399,7 +453,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       setState(() => videoLoader = true);
       if (monthProvider?.isWarmup == false) {
         if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
-          initializeVideo(monthProvider!.exerciseDetailModel!.files!.first.link!);
+          initializeVideo(
+              monthProvider!.exerciseDetailModel!.files!.first.link!);
         } else {
           videoNotAvailable = true;
           videoNotInitialized = false;
@@ -422,10 +477,13 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
   List<ExtraSetModel> extraSetModel = [];
 
   fetchExtraSetLocalData(String dataId) async {
-    final data =
-        await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.extraSetHistory, where: 'dataId', id: "EXTRA-ADDED$dataId");
+    final data = await DatabaseHelper().getDataFromTable(
+        tableName: DatabaseHelper.extraSetHistory,
+        where: 'dataId',
+        id: "EXTRA-ADDED$dataId");
     if (data.isNotEmpty) {
-      extraSetModel = List<ExtraSetModel>.from(json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
+      extraSetModel = List<ExtraSetModel>.from(
+          json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
     } else {
       extraSetModel = [];
     }
@@ -435,8 +493,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
 
   Future<void> initializeVideo(String url) async {
     try {
-      _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
       await _videoPlayerController.initialize().then(
         (value) {
@@ -454,8 +512,10 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
-        videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
+      if (_chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
+        videoSize = calculateVideoSize(
+            aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
       _videoPlayerController.addListener(() {
@@ -539,13 +599,16 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
     } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
   }
 
-  Size calculateVideoSize({required BuildContext context, required double aspectRatio}) {
+  Size calculateVideoSize(
+      {required BuildContext context, required double aspectRatio}) {
     final screenSize = MediaQuery.of(context).size;
 
     double maxWidth = screenSize.width;
@@ -565,8 +628,10 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       monthProvider?.updateExpandedItem("0:0");
-      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO");
-      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+      await preferences.putString(
+          SharedPreference.inTheExerciseScreenOrNot, "NO");
+      if (_chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
         _chewieController?.dispose();
         _videoPlayerController.dispose();
       }
@@ -574,7 +639,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       monthProvider?.clearWarmupModel();
       _controller.dispose();
 
-      await preferences.putString(SharedPreference.inTheExerciseScreenOrNot, "NO");
+      await preferences.putString(
+          SharedPreference.inTheExerciseScreenOrNot, "NO");
     });
 
     super.dispose();
@@ -584,7 +650,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     if (monthProvider?.selectedExercise?.extra?.isNotEmpty ?? false) {
       for (var element in monthProvider!.selectedExercise!.extra!) {
         final extraItem = element;
-        count = int.parse(extraItem.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
+        count = int.parse(extraItem.sets.toString()) +
+            (extraItem.type == 3 ? (extraSetModel.length) : 0);
       }
       if (mounted) {
         setState(() {});
@@ -610,15 +677,23 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       backgroundColor: Colors.white,
       body: loading &&
               ((isExercise == 1
-                      ? (monthProvider?.exerciseDetailModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null
-                      : (monthProvider?.warmUpModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null) ==
+                      ? (monthProvider
+                                  ?.exerciseDetailModel?.files?.isNotEmpty ??
+                              false) &&
+                          !videoNotInitialized &&
+                          videoSize != null
+                      : (monthProvider?.warmUpModel?.files?.isNotEmpty ??
+                              false) &&
+                          !videoNotInitialized &&
+                          videoSize != null) ==
                   false)
           ? const Center(
               child: CircularProgressIndicator(
                 color: AppColors.primaryColor,
               ),
             )
-          : (isExercise == 1 && monthProvider!.exerciseDetailModel == null) || (isExercise == 0 && monthProvider?.warmUpModel == null)
+          : (isExercise == 1 && monthProvider!.exerciseDetailModel == null) ||
+                  (isExercise == 0 && monthProvider?.warmUpModel == null)
               ? Column(
                   children: [
                     backButton(media, context),
@@ -677,10 +752,14 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                       Container(
                         margin: EdgeInsets.only(
                             top: ((isExercise == 1
-                                        ? (monthProvider?.exerciseDetailModel?.files?.isNotEmpty ?? false) &&
+                                        ? (monthProvider?.exerciseDetailModel
+                                                    ?.files?.isNotEmpty ??
+                                                false) &&
                                             !videoNotInitialized &&
                                             videoSize != null
-                                        : (monthProvider?.warmUpModel?.files?.isNotEmpty ?? false) &&
+                                        : (monthProvider?.warmUpModel?.files
+                                                    ?.isNotEmpty ??
+                                                false) &&
                                             !videoNotInitialized &&
                                             videoSize != null)
                                     ? videoSize!.height
@@ -705,7 +784,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                     child: Container(
                                       height: media.height / 11,
                                       width: media.width / 6,
-                                      decoration: const BoxDecoration(color: Colors.white),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -765,11 +845,17 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
           bottom: media.height * 0.09,
           left: 10,
           right: 10,
-          child: !videoNotInitialized && _chewieController?.videoPlayerController.value.isInitialized == true
+          child: !videoNotInitialized &&
+                  _chewieController
+                          ?.videoPlayerController.value.isInitialized ==
+                      true
               ? Column(
                   children: [
                     Container(
-                      margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
+                      margin: EdgeInsets.only(
+                          bottom: ScreenUtil.verticalScale(6),
+                          left: 20,
+                          right: 20),
                       child: Column(
                         children: [
                           Column(
@@ -785,8 +871,12 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                           }
                                         : null,
                                     child: Icon(
-                                      isMute ? Icons.volume_up : Icons.volume_off,
-                                      color: !showControls ? Colors.transparent : Colors.white70,
+                                      isMute
+                                          ? Icons.volume_up
+                                          : Icons.volume_off,
+                                      color: !showControls
+                                          ? Colors.transparent
+                                          : Colors.white70,
                                       size: 28,
                                     ),
                                   ),
@@ -805,10 +895,12 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                 controller: _controller,
                                 progress: progress,
                                 total: Duration(
-                                  seconds: _videoPlayerController.value.duration.inSeconds,
+                                  seconds: _videoPlayerController
+                                      .value.duration.inSeconds,
                                 ),
                                 onChanged: (value) {
-                                  _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                  _videoPlayerController.seekTo(
+                                      Duration(seconds: value.inSeconds));
                                 },
                                 onSeek: (value) {},
                                 onChangeStart: (value) {
@@ -927,14 +1019,17 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                   ),
                   onPressed: () {
                     _videoPlayerController.seekTo(
-                      _videoPlayerController.value.position - const Duration(seconds: 10),
+                      _videoPlayerController.value.position -
+                          const Duration(seconds: 10),
                     );
                   },
                 ),
                 IconButton(
                   iconSize: 60,
                   icon: Icon(
-                    _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                    _videoPlayerController.value.isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_filled,
                     color: Colors.white70,
                   ),
                   onPressed: () {
@@ -960,7 +1055,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                   ),
                   onPressed: () {
                     _videoPlayerController.seekTo(
-                      _videoPlayerController.value.position + const Duration(seconds: 10),
+                      _videoPlayerController.value.position +
+                          const Duration(seconds: 10),
                     );
                   },
                 ),
@@ -973,8 +1069,13 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
   Widget videoSection(Size media) => Container(
         color: Colors.black,
         child: (isExercise == 1
-                ? (monthProvider?.exerciseDetailModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null
-                : (monthProvider?.warmUpModel?.files?.isNotEmpty ?? false) && !videoNotInitialized && videoSize != null)
+                ? (monthProvider?.exerciseDetailModel?.files?.isNotEmpty ??
+                        false) &&
+                    !videoNotInitialized &&
+                    videoSize != null
+                : (monthProvider?.warmUpModel?.files?.isNotEmpty ?? false) &&
+                    !videoNotInitialized &&
+                    videoSize != null)
             ? Stack(
                 children: [
                   SizedBox(
@@ -999,7 +1100,9 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                 ],
               )
             : Container(
-                height: videoNotAvailable ? media.height * 0.4 : media.height * 0.835,
+                height: videoNotAvailable
+                    ? media.height * 0.4
+                    : media.height * 0.835,
                 color: Colors.black12,
                 child: videoNotAvailable
                     ? const Center(
@@ -1027,8 +1130,11 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       );
 
   Widget warmupButton(BuildContext context) {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider!.warmUpModel?.id.toString()}";
 
@@ -1042,7 +1148,9 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
             : Padding(
                 padding: const EdgeInsets.fromLTRB(30, 16, 30, 35),
                 child: monthProvider!.exerciseHistoryModel.any(
-                  (element) => element.dataId == dataId && element.status == Status.completed,
+                  (element) =>
+                      element.dataId == dataId &&
+                      element.status == Status.completed,
                 )
                     ? ButtonWidget(
                         text: "Completed",
@@ -1070,7 +1178,9 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
   }
 
   Widget mainContent(Size media) => Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
         margin: const EdgeInsets.only(bottom: 50),
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
@@ -1122,8 +1232,11 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                   child: Container(
                                     height: ScreenUtil.verticalScale(4),
                                     width: ScreenUtil.verticalScale(4),
-                                    padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
-                                    decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                    padding: EdgeInsets.all(
+                                        ScreenUtil.verticalScale(1)),
+                                    decoration: BoxDecoration(
+                                        color: Color(0XFFd18a9b),
+                                        shape: BoxShape.circle),
                                     child: Center(
                                       child: SvgPicture.asset(
                                         "assets/icons/bar-chart.svg",
@@ -1149,8 +1262,11 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                             child: Container(
                               height: ScreenUtil.verticalScale(4),
                               width: ScreenUtil.verticalScale(4),
-                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.55)),
-                              decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                              padding: EdgeInsets.all(
+                                  ScreenUtil.verticalScale(0.55)),
+                              decoration: BoxDecoration(
+                                  color: Color(0XFFd18a9b),
+                                  shape: BoxShape.circle),
                               child: Center(
                                 child: SvgPicture.asset(
                                   "assets/icons/note.svg",
@@ -1178,7 +1294,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                   children: [
                     Align(
                       alignment: Alignment.topLeft,
-                      child: (exerciseDesc.trim() != '<p><br></p>' && exerciseDesc.trim().isNotEmpty)
+                      child: (exerciseDesc.trim() != '<p><br></p>' &&
+                              exerciseDesc.trim().isNotEmpty)
                           ? Html(
                               data: exerciseDesc,
                               style: {
@@ -1207,7 +1324,9 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                     Builder(
                       builder: (context) {
                         final dataHistory = monthProvider!.historyDataModel
-                            .where((element) => element.status == Status.completed && element.type != "1")
+                            .where((element) =>
+                                element.status == Status.completed &&
+                                element.type != "1")
                             .toList();
 
                         if (dataHistory.isNotEmpty) {
@@ -1224,20 +1343,27 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                         List subIndexList = [];
 
                         return ListView.builder(
-                          itemCount: monthProvider?.selectedExercise?.extra?.length ?? 0,
+                          itemCount:
+                              monthProvider?.selectedExercise?.extra?.length ??
+                                  0,
                           shrinkWrap: true,
                           padding: EdgeInsets.zero,
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            final extraItem = monthProvider?.selectedExercise!.extra![index];
-                            setCount = int.parse(extraItem!.sets.toString()) + (extraItem.type == 3 ? (extraSetModel.length) : 0);
+                            final extraItem =
+                                monthProvider?.selectedExercise!.extra![index];
+                            setCount = int.parse(extraItem!.sets.toString()) +
+                                (extraItem.type == 3
+                                    ? (extraSetModel.length)
+                                    : 0);
                             return ListView.builder(
                               itemCount: setCount,
                               shrinkWrap: true,
                               padding: EdgeInsets.zero,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, countIndex) {
-                                bool isTimerRunning = monthProvider!.timerAddress ==
+                                bool isTimerRunning = monthProvider!
+                                        .timerAddress ==
                                     "$index-$countIndex-$exerciseIndex-${monthProvider?.overviewCurrentWeek}-${monthProvider?.overviewCurrentDay}";
                                 if (extraItem.type == 1) warmUpIndex++;
                                 if (extraItem.type == 2) backOffIndex++;
@@ -1261,12 +1387,22 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
 
                                 if (dataHistory.isNotEmpty) {
                                   if (lastDataSubIndex ==
-                                      ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
-                                          (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3
+                                      ((monthProvider!
+                                                  .selectedExercise!
+                                                  .extra![lastDataMainIndex]
+                                                  .sets! -
+                                              1) +
+                                          (monthProvider!
+                                                      .selectedExercise!
+                                                      .extra![lastDataMainIndex]
+                                                      .type ==
+                                                  3
                                               ? (extraSetModel.length)
                                               : 0))) {
                                     lastDataMainIndex += 1;
-                                    if (lastDataMainIndex == (monthProvider!.selectedExercise!.extra!.length) &&
+                                    if (lastDataMainIndex ==
+                                            (monthProvider!.selectedExercise!
+                                                .extra!.length) &&
                                         lastDataSubIndex == (setCount - 1)) {
                                     } else {
                                       lastDataSubIndex = 0;
@@ -1277,16 +1413,21 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                 }
                                 int totalSets = 0;
 
-                                if (monthProvider?.selectedExercise!.extra!.isNotEmpty ?? false) {
-                                  for (var element in monthProvider!.selectedExercise!.extra!) {
+                                if (monthProvider
+                                        ?.selectedExercise!.extra!.isNotEmpty ??
+                                    false) {
+                                  for (var element in monthProvider!
+                                      .selectedExercise!.extra!) {
                                     if (element.type != 1) {
-                                      totalSets += int.parse(element.sets.toString());
+                                      totalSets +=
+                                          int.parse(element.sets.toString());
                                     }
                                   }
                                 }
                                 for (var element in extraSetModel) {
                                   if (element.type != 1) {
-                                    totalSets += int.parse(element.sets.toString());
+                                    totalSets +=
+                                        int.parse(element.sets.toString());
                                   }
                                 }
 
@@ -1296,12 +1437,22 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                     totalRIRSet: totalSets,
                                     extraSetLength: extraSetModel.length,
                                     setCount: setCount,
-                                    isFromNotification:
-                                        (lastDataMainIndex == index && lastDataSubIndex == countIndex) && argument != "Exercise",
+                                    isFromNotification: (lastDataMainIndex ==
+                                                index &&
+                                            lastDataSubIndex == countIndex) &&
+                                        argument != "Exercise",
                                     countIndex: countIndex,
                                     completed: exerciseIndex ==
-                                            int.parse((monthProvider!.currentExpandedItem.split(":").toList().length > 2
-                                                ? monthProvider!.currentExpandedItem.split(":").toList()[2]
+                                            int.parse((monthProvider!
+                                                        .currentExpandedItem
+                                                        .split(":")
+                                                        .toList()
+                                                        .length >
+                                                    2
+                                                ? monthProvider!
+                                                    .currentExpandedItem
+                                                    .split(":")
+                                                    .toList()[2]
                                                 : "-1"))
                                         ? isTimerRunning
                                         : false,
@@ -1314,16 +1465,33 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                         : extraItem.type == 1
                                             ? true
                                             : ((extraItem.type == 3 &&
-                                                            monthProvider?.selectedExercise!.extra!.any((element) => element.type == 2) ==
+                                                            monthProvider
+                                                                    ?.selectedExercise!
+                                                                    .extra!
+                                                                    .any((element) =>
+                                                                        element
+                                                                            .type ==
+                                                                        2) ==
                                                                 true &&
                                                             dataHistory.any(
-                                                              (element) => element.type == "2" && element.status == Status.completed,
+                                                              (element) =>
+                                                                  element.type ==
+                                                                      "2" &&
+                                                                  element.status ==
+                                                                      Status
+                                                                          .completed,
                                                             ))
-                                                        ? (int.parse(extraItem.sets.toString()) - 1) < countIndex
+                                                        ? (int.parse(extraItem
+                                                                    .sets
+                                                                    .toString()) -
+                                                                1) <
+                                                            countIndex
                                                         : false) ==
                                                     true
                                                 ? true
-                                                : (lastDataMainIndex == index && lastDataSubIndex == countIndex),
+                                                : (lastDataMainIndex == index &&
+                                                    lastDataSubIndex ==
+                                                        countIndex),
                                     isEditable: isEditable,
                                     makeRefresh: () {
                                       if (mounted) {
@@ -1332,7 +1500,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                     },
                                     extraDataModel: extraItem,
                                     color: extraItem.type == 3
-                                        ? const Color.fromARGB(255, 248, 248, 248)
+                                        ? const Color.fromARGB(
+                                            255, 248, 248, 248)
                                         : extraItem.type == 2
                                             ? AppColors.backOffSetColor
                                             : AppColors.warmupColor,
@@ -1350,10 +1519,13 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                     index: index,
                                     subIndex: List.generate(
                                       extraItem.type == 1
-                                          ? monthProvider!.selectedWarmUpSetTotal
+                                          ? monthProvider!
+                                              .selectedWarmUpSetTotal
                                           : extraItem.type == 2
-                                              ? monthProvider!.selectedBackOffSetTotal
-                                              : monthProvider!.selectedWorkingSetTotal,
+                                              ? monthProvider!
+                                                  .selectedBackOffSetTotal
+                                              : monthProvider!
+                                                  .selectedWorkingSetTotal,
                                       (index) => index,
                                     )[extraItem.type == 1
                                         ? warmUpIndex - 1
@@ -1361,12 +1533,16 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                             ? backOffIndex - 1
                                             : workingIndex - 1],
                                     set: int.parse(extraItem.sets.toString()),
-                                    weight: int.parse(extraItem.weight.toString()),
+                                    weight:
+                                        int.parse(extraItem.weight.toString()),
                                     reps: int.parse(extraItem.reps.toString()),
                                     repsInReverse: 100,
-                                    load: int.parse(extraItem.load == null ? "0" : extraItem.load.toString()),
+                                    load: int.parse(extraItem.load == null
+                                        ? "0"
+                                        : extraItem.load.toString()),
                                     type: int.parse(extraItem.type.toString()),
-                                    restDuration: int.parse(extraItem.rest.toString()),
+                                    restDuration:
+                                        int.parse(extraItem.rest.toString()),
                                   ),
                                 );
                               },
@@ -1380,18 +1556,24 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                     if (monthProvider!.isCurrentMonth == "Future") ...[
                       SizedBox()
                     ] else ...[
-                      count != 0 && !isCurrentDaySkipped && !isCurrentDayCompleted
+                      count != 0 &&
+                              !isCurrentDaySkipped &&
+                              !isCurrentDayCompleted
                           ? Padding(
                               padding: const EdgeInsets.only(bottom: 40),
                               child: TextButton(
                                 onPressed: () async {
                                   setState(() => tempSetAddressLoader = true);
-                                  final data = monthProvider?.selectedExercise!.extra!.where((element) => element.type == 3);
+                                  final data = monthProvider
+                                      ?.selectedExercise!.extra!
+                                      .where((element) => element.type == 3);
                                   if (data!.isNotEmpty) {
-                                    tempSetAddress = monthProvider!.currentExpandedItem;
+                                    tempSetAddress =
+                                        monthProvider!.currentExpandedItem;
                                     monthProvider?.addSetCountInWorkingSet();
                                     _addExtraSet(data.first);
-                                    await Future.delayed(Duration(milliseconds: 200));
+                                    await Future.delayed(
+                                        Duration(milliseconds: 200));
                                   }
                                   setState(() => tempSetAddressLoader = false);
                                 },
@@ -1419,11 +1601,17 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                               ),
                             )
                           : SizedBox(),
-                      Container(height: 0.5, margin: const EdgeInsets.symmetric(horizontal: 40), width: media.width, color: Colors.black12),
+                      Container(
+                          height: 0.5,
+                          margin: const EdgeInsets.symmetric(horizontal: 40),
+                          width: media.width,
+                          color: Colors.black12),
                       if (isCurrentDayCompleted || isCurrentDaySkipped) ...[
                         const SizedBox(height: 40),
                         ButtonWidget(
-                          text: isCurrentExerciseCompleted ? "Completed" : "Skipped",
+                          text: isCurrentExerciseCompleted
+                              ? "Completed"
+                              : "Skipped",
                           textColor: Colors.white,
                           onPress: null,
                           color: AppColors.primaryColor,
@@ -1433,12 +1621,17 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                         const SizedBox(height: 30),
                         Consumer<MonthProvider>(
                           builder: (context, monthProvider, child) {
-                            return monthProvider.exerciseHistoryDetails?.status == Status.skipped
+                            return monthProvider
+                                        .exerciseHistoryDetails?.status ==
+                                    Status.skipped
                                 ? const SizedBox()
                                 : Padding(
                                     padding: const EdgeInsets.only(top: 10),
                                     child: ButtonWidget(
-                                        text: monthProvider.exerciseHistoryDetails?.status == Status.completed
+                                        text: monthProvider
+                                                    .exerciseHistoryDetails
+                                                    ?.status ==
+                                                Status.completed
                                             ? "Save"
                                             : monthProvider.isLastExercise
                                                 ? "Finish"
@@ -1452,15 +1645,26 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                           int count = 0;
                                           await _saveExerciseData(
                                               status: Status.completed,
-                                              id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                              id: monthProvider.isPumpDay &&
+                                                      monthProvider.isCircuit
                                                   ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                                  : monthProvider.exerciseDetailModel!.sId.toString(),
-                                              type: monthProvider.isCircuit ? "Circuit - ${monthProvider.circuitIndex}" : "Exercise");
+                                                  : monthProvider
+                                                      .exerciseDetailModel!.sId
+                                                      .toString(),
+                                              type: monthProvider.isCircuit
+                                                  ? "Circuit - ${monthProvider.circuitIndex}"
+                                                  : "Exercise");
 
-                                          WidgetsBinding.instance.addPostFrameCallback(
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback(
                                             (timeStamp) async {
                                               String split = monthProvider
-                                                      .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                      .monthDataModel
+                                                      ?.weeks?[monthProvider
+                                                              .overviewCurrentWeek -
+                                                          1]
+                                                      .idList
+                                                      ?.first
                                                       .toString()
                                                       .split(" ")[1] ??
                                                   "";
@@ -1468,83 +1672,164 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                                                         Navigator.pop(context);
                                                         return;
                                                       } else*/
-                                              if (monthProvider.isPumpDay && monthProvider.isCircuit) {
-                                                List<String> indexList = monthProvider.circuitIndex.split(":");
+                                              if (monthProvider.isPumpDay &&
+                                                  monthProvider.isCircuit) {
+                                                List<String> indexList =
+                                                    monthProvider.circuitIndex
+                                                        .split(":");
 
-                                                int circuitIndex = int.parse(indexList[0]);
-                                                int circuitRound = int.parse(indexList[1]);
-                                                int exerciseIndex = int.parse(indexList[2]);
+                                                int circuitIndex =
+                                                    int.parse(indexList[0]);
+                                                int circuitRound =
+                                                    int.parse(indexList[1]);
+                                                int exerciseIndex =
+                                                    int.parse(indexList[2]);
 
                                                 var circuitExercises =
-                                                    monthProvider.pumpDayModel!.circuits![circuitIndex].circuitExercises!;
-                                                List<ExerciseHistoryModel> completedExerciseCurrentRound =
-                                                    monthProvider.exerciseHistoryModel.where(
+                                                    monthProvider
+                                                        .pumpDayModel!
+                                                        .circuits![circuitIndex]
+                                                        .circuitExercises!;
+                                                List<ExerciseHistoryModel>
+                                                    completedExerciseCurrentRound =
+                                                    monthProvider
+                                                        .exerciseHistoryModel
+                                                        .where(
                                                   (element) {
-                                                    return element.type!.contains("Circuit - $circuitIndex:$circuitRound") &&
-                                                        (element.status == Status.skipped || element.status == Status.completed);
+                                                    return element.type!.contains(
+                                                            "Circuit - $circuitIndex:$circuitRound") &&
+                                                        (element.status ==
+                                                                Status
+                                                                    .skipped ||
+                                                            element.status ==
+                                                                Status
+                                                                    .completed);
                                                   },
                                                 ).toList();
 
-                                                if (completedExerciseCurrentRound.length == circuitExercises.length) {
-                                                  circuitRound = circuitRound + 1;
+                                                if (completedExerciseCurrentRound
+                                                        .length ==
+                                                    circuitExercises.length) {
+                                                  circuitRound =
+                                                      circuitRound + 1;
                                                   exerciseIndex = 0;
                                                 } else {
-                                                  exerciseIndex = exerciseIndex + 1;
-                                                  if (exerciseIndex == circuitExercises.length) {
+                                                  exerciseIndex =
+                                                      exerciseIndex + 1;
+                                                  if (exerciseIndex ==
+                                                      circuitExercises.length) {
                                                     Navigator.pop(context);
                                                     return;
                                                   }
                                                 }
 
-                                                if (circuitRound > monthProvider.pumpDayModel!.circuits![circuitIndex].round!) {
+                                                if (circuitRound >
+                                                    monthProvider
+                                                        .pumpDayModel!
+                                                        .circuits![circuitIndex]
+                                                        .round!) {
                                                   Navigator.pop(context);
                                                   return;
                                                 }
 
-                                                monthProvider.updateIsCircuit(true);
-                                                monthProvider.updateCircuit("$circuitIndex:$circuitRound:$exerciseIndex", circuitIndex);
+                                                monthProvider
+                                                    .updateIsCircuit(true);
+                                                monthProvider.updateCircuit(
+                                                    "$circuitIndex:$circuitRound:$exerciseIndex",
+                                                    circuitIndex);
                                                 String dataId =
                                                     "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${circuitExercises[exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
-                                                monthProvider.setSelectedExercise(circuitExercises[exerciseIndex], exerciseIndex);
-                                                monthProvider.updateWarmUp(false, "");
-                                                monthProvider.updateIsLastExercise(false);
+                                                monthProvider
+                                                    .setSelectedExercise(
+                                                        circuitExercises[
+                                                            exerciseIndex],
+                                                        exerciseIndex);
+                                                monthProvider.updateWarmUp(
+                                                    false, "");
+                                                monthProvider
+                                                    .updateIsLastExercise(
+                                                        false);
                                                 Navigator.pop(context);
-                                                await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
-                                                monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
+                                                await Navigator.pushNamed(
+                                                    context, '/exercise',
+                                                    arguments: "Exercise");
+                                                monthProvider
+                                                    .fetchExerciseSingleExerciseLocalData(
+                                                        dataId);
                                               } else {
-                                                for (var element in monthProvider.exerciseHistoryModel) {
-                                                  if (element.status.toString() == Status.completed) {
+                                                for (var element
+                                                    in monthProvider
+                                                        .exerciseHistoryModel) {
+                                                  if (element.status
+                                                          .toString() ==
+                                                      Status.completed) {
                                                     count++;
                                                   }
                                                 }
-                                                List<ExerciseDataModel> exerciseList = [];
+                                                List<ExerciseDataModel>
+                                                    exerciseList = [];
 
-                                                exerciseList.addAll(monthProvider.dayDataModel!.exercises!
-                                                    .where((element) => element.formats!.contains(monthProvider.equipmentType)));
+                                                exerciseList.addAll(monthProvider
+                                                    .dayDataModel!.exercises!
+                                                    .where((element) => element
+                                                        .formats!
+                                                        .contains(monthProvider
+                                                            .equipmentType)));
 
-                                                if (exerciseList.length != count &&
-                                                    exerciseList.length != monthProvider.selectedExIndex + 1) {
+                                                if (exerciseList.length !=
+                                                        count &&
+                                                    exerciseList.length !=
+                                                        monthProvider
+                                                                .selectedExIndex +
+                                                            1) {
                                                   Navigator.pop(context);
 
-                                                  await Future.delayed(const Duration(milliseconds: 100));
+                                                  await Future.delayed(
+                                                      const Duration(
+                                                          milliseconds: 100));
 
-                                                  int skipIndex = monthProvider.selectedExIndex + 1;
-                                                  for (int i = skipIndex; i < exerciseList.length; i++) {
-                                                    var elementI = exerciseList[i];
+                                                  int skipIndex = monthProvider
+                                                          .selectedExIndex +
+                                                      1;
+                                                  for (int i = skipIndex;
+                                                      i < exerciseList.length;
+                                                      i++) {
+                                                    var elementI =
+                                                        exerciseList[i];
                                                     String dataId =
                                                         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-                                                    bool val = monthProvider.exerciseHistoryModel
-                                                        .any((element) => element.dataId == dataId && element.status == Status.completed);
+                                                    bool val = monthProvider
+                                                        .exerciseHistoryModel
+                                                        .any((element) =>
+                                                            element.dataId ==
+                                                                dataId &&
+                                                            element.status ==
+                                                                Status
+                                                                    .completed);
                                                     if (val == false) {
-                                                      monthProvider.setSelectedExercise(elementI, i);
-                                                      monthProvider.updateWarmUp(false, "");
+                                                      monthProvider
+                                                          .setSelectedExercise(
+                                                              elementI, i);
+                                                      monthProvider
+                                                          .updateWarmUp(
+                                                              false, "");
 
                                                       bool isLast = i ==
-                                                          exerciseList
-                                                              .indexWhere((element) => element.exerciseId == exerciseList.last.exerciseId);
-                                                      monthProvider.updateIsLastExercise(isLast);
+                                                          exerciseList.indexWhere(
+                                                              (element) =>
+                                                                  element
+                                                                      .exerciseId ==
+                                                                  exerciseList
+                                                                      .last
+                                                                      .exerciseId);
+                                                      monthProvider
+                                                          .updateIsLastExercise(
+                                                              isLast);
 
-                                                      await Navigator.pushNamed(context, '/exercise', arguments: "Exercise");
+                                                      await Navigator.pushNamed(
+                                                          context, '/exercise',
+                                                          arguments:
+                                                              "Exercise");
                                                       break;
                                                     }
                                                   }
@@ -1564,20 +1849,34 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
                         Consumer<MonthProvider>(
                           builder: (context, monthProvider, child) {
                             return ButtonWidget(
-                              text: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip the exercise",
+                              text: monthProvider
+                                          .exerciseHistoryDetails?.status ==
+                                      Status.skipped
+                                  ? "Unskip?"
+                                  : "Skip the exercise",
                               textColor: const Color(0xFFFFFFFF),
                               color: AppColors.skipDayColor,
                               onPress: () async {
                                 WidgetsBinding.instance.addPostFrameCallback(
                                   (timeStamp) async {
                                     HapticFeedBack.buttonClick();
-                                    final status = monthProvider.exerciseHistoryDetails?.status;
+                                    final status = monthProvider
+                                        .exerciseHistoryDetails?.status;
                                     await _saveExerciseData(
-                                      status: monthProvider.exerciseHistoryDetails?.status == Status.skipped ? "" : "Skipped",
-                                      id: monthProvider.isPumpDay && monthProvider.isCircuit
+                                      status: monthProvider
+                                                  .exerciseHistoryDetails
+                                                  ?.status ==
+                                              Status.skipped
+                                          ? ""
+                                          : "Skipped",
+                                      id: monthProvider.isPumpDay &&
+                                              monthProvider.isCircuit
                                           ? "${monthProvider.exerciseDetailModel!.sId.toString()}-${monthProvider.circuitIndex}"
-                                          : monthProvider.exerciseDetailModel!.sId.toString(),
-                                      type: monthProvider.isPumpDay && monthProvider.isCircuit
+                                          : monthProvider
+                                              .exerciseDetailModel!.sId
+                                              .toString(),
+                                      type: monthProvider.isPumpDay &&
+                                              monthProvider.isCircuit
                                           ? "Circuit - ${monthProvider.circuitIndex}"
                                           : "Exercise",
                                     );
@@ -1642,7 +1941,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
             child: Align(
               alignment: Alignment.topLeft,
               child: isExercise == 1
-                  ? (monthProvider!.selectedExercise!.guide == "" || monthProvider!.selectedExercise!.guide == null)
+                  ? (monthProvider!.selectedExercise!.guide == "" ||
+                          monthProvider!.selectedExercise!.guide == null)
                       ? SizedBox()
                       : Container(
                           margin: EdgeInsets.only(top: 5, bottom: 15),
@@ -1676,14 +1976,18 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
         ],
       );
 
-  double calculateHeight(double width, double aspectRatio) => width / aspectRatio;
+  double calculateHeight(double width, double aspectRatio) =>
+      width / aspectRatio;
 
   Future<void> _addExtraSet(ExtraDataModel extra) async {
     String exId = monthProvider!.isPumpDay && monthProvider!.isCircuit
         ? "${monthProvider?.exerciseDetailModel!.sId.toString()}-${monthProvider?.circuitIndex}"
         : monthProvider!.exerciseDetailModel!.sId.toString();
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
@@ -1711,20 +2015,29 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       "dataId": "EXTRA-ADDED$dataId",
     };
     ApiRepo.addExtraSet(body: apiReqBody);
-    await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.extraSetHistory);
+    await DatabaseHelper()
+        .insertData(data: data, tableName: DatabaseHelper.extraSetHistory);
 
     await fetchExtraSetLocalData(dataId);
   }
 
-  Future<void> _saveExerciseData({required String status, required String id, required String type}) async {
+  Future<void> _saveExerciseData(
+      {required String status,
+      required String id,
+      required String type}) async {
     await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchCircuitModelLocalData();
 
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     if (monthProvider!.isPumpDay && monthProvider!.isCircuit) {
-      String exId = monthProvider?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].id ?? "";
+      String exId = monthProvider
+              ?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].id ??
+          "";
 
       String dataId1 =
           "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
@@ -1732,27 +2045,50 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       final data2 = {
         "dataId": dataId1,
         "lastExerciseCount": 1,
-        "lastRound": monthProvider?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].circuitExercises?.length == 1 ? 2 : 1,
-        "exerciseCountList": monthProvider?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].circuitExercises?.length == 1
+        "lastRound": monthProvider
+                    ?.pumpDayModel!
+                    .circuits?[monthProvider!.circuitsIndex]
+                    .circuitExercises
+                    ?.length ==
+                1
+            ? 2
+            : 1,
+        "exerciseCountList": monthProvider
+                    ?.pumpDayModel!
+                    .circuits?[monthProvider!.circuitsIndex]
+                    .circuitExercises
+                    ?.length ==
+                1
             ? ""
             : monthProvider!.exerciseDetailModel!.sId.toString(),
       };
 
       if (monthProvider!.circuitModel.isNotEmpty) {
-        CircuitModel? matchingElement =
-            monthProvider?.circuitModel.firstWhere((element) => element.dataId == dataId1, orElse: () => CircuitModel());
+        CircuitModel? matchingElement = monthProvider?.circuitModel.firstWhere(
+            (element) => element.dataId == dataId1,
+            orElse: () => CircuitModel());
 
         if (matchingElement?.id != null) {
-          if (!matchingElement!.exerciseCountList!.contains(monthProvider!.exerciseDetailModel!.sId.toString())) {
+          if (!matchingElement!.exerciseCountList!
+              .contains(monthProvider!.exerciseDetailModel!.sId.toString())) {
             Map<String, dynamic> data3;
 
-            if (monthProvider?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].circuitExercises?.length == 1) {
+            if (monthProvider
+                    ?.pumpDayModel!
+                    .circuits?[monthProvider!.circuitsIndex]
+                    .circuitExercises
+                    ?.length ==
+                1) {
               data3 = {
                 "lastExerciseCount": 1,
                 "lastRound": (matchingElement.lastRound! + 1),
                 "exerciseCountList": "",
               };
-            } else if (monthProvider?.pumpDayModel!.circuits?[monthProvider!.circuitsIndex].circuitExercises?.length ==
+            } else if (monthProvider
+                    ?.pumpDayModel!
+                    .circuits?[monthProvider!.circuitsIndex]
+                    .circuitExercises
+                    ?.length ==
                 (matchingElement.lastExerciseCount! + 1)) {
               data3 = {
                 "dataId": dataId1,
@@ -1763,20 +2099,30 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
             } else {
               data3 = {
                 "dataId": dataId1,
-                "lastExerciseCount":
-                    matchingElement.exerciseCountList.toString().replaceAll("-", "").isEmpty ? 1 : (matchingElement.lastExerciseCount! + 1),
+                "lastExerciseCount": matchingElement.exerciseCountList
+                        .toString()
+                        .replaceAll("-", "")
+                        .isEmpty
+                    ? 1
+                    : (matchingElement.lastExerciseCount! + 1),
                 "lastRound": matchingElement.lastRound,
-                "exerciseCountList": "${matchingElement.exerciseCountList}-${monthProvider!.exerciseDetailModel!.sId.toString()}",
+                "exerciseCountList":
+                    "${matchingElement.exerciseCountList}-${monthProvider!.exerciseDetailModel!.sId.toString()}",
               };
             }
 
-            await DatabaseHelper().updateData(data: data3, tableName: DatabaseHelper.circuitManager, id: dataId1);
+            await DatabaseHelper().updateData(
+                data: data3,
+                tableName: DatabaseHelper.circuitManager,
+                id: dataId1);
           }
         } else {
-          await DatabaseHelper().insertData(data: data2, tableName: DatabaseHelper.circuitManager);
+          await DatabaseHelper().insertData(
+              data: data2, tableName: DatabaseHelper.circuitManager);
         }
       } else {
-        await DatabaseHelper().insertData(data: data2, tableName: DatabaseHelper.circuitManager);
+        await DatabaseHelper()
+            .insertData(data: data2, tableName: DatabaseHelper.circuitManager);
       }
     }
 
@@ -1791,14 +2137,16 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
           final element = monthProvider!.historyDataModel[i];
           final weight = double.parse(element.weight.toString());
           final reps = double.parse(element.reps.toString());
-          final effort = double.parse(element.effort.toString().replaceAll("+", ""));
+          final effort =
+              double.parse(element.effort.toString().replaceAll("+", ""));
           final cal = weight * (reps + (effort == 100 ? 0 : effort));
           totalWeight += cal;
           totalRIR += (effort == 100 ? 0 : effort);
         }
       }
 
-      final data = monthProvider!.historyDataModel.where((element) => element.type != "1");
+      final data = monthProvider!.historyDataModel
+          .where((element) => element.type != "1");
       if (data.isNotEmpty) {
         totalSet = double.parse(data.first.totalSet.toString());
       }
@@ -1814,7 +2162,8 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
       "exerciseId": id.toString(),
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
@@ -1842,16 +2191,20 @@ class _ExercisePageState extends State<ExercisePage> with TickerProviderStateMix
     };
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
-      if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
+      if (monthProvider!.exerciseHistoryModel
+          .any((element) => element.dataId == dataId)) {
         ApiRepo.updateExerciseStatus(body: apiReqBody);
-        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
+        await DatabaseHelper().updateData(
+            data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
         ApiRepo.addExerciseStatus(body: data);
-        await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+        await DatabaseHelper()
+            .insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
       ApiRepo.addExerciseStatus(body: data);
-      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+      await DatabaseHelper()
+          .insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
 
     await monthProvider?.fetchExerciseStatusLocalData();
