@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/pages/DashBoardScreen/dashboard_page.dart';
@@ -18,8 +17,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// import 'package:vimeo_video_player/vimeo_video_player.dart';
 
 import '../providers/main_page_provider.dart';
 import '../providers/user_data_provider.dart';
@@ -47,7 +44,6 @@ class _MainPageState extends State<MainPage> {
   late MainPageProvider mainPageProvider;
   late MonthProvider monthProvider;
 
-  // VimeoVideoPlayer? vimeoVideoPlayer;
   late List<Widget> _pages;
   Timer? _timer;
 
@@ -67,11 +63,6 @@ class _MainPageState extends State<MainPage> {
         });
       }
     });
-    // vimeoVideoPlayer = VimeoVideoPlayer(
-    // url: 'https://player.vimeo.com/video/953289606',
-    // autoPlay: true,
-    // videoId: "953289606",
-    // );
     userData = Provider.of<UserDataProvider>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback(
@@ -81,15 +72,17 @@ class _MainPageState extends State<MainPage> {
           if (userData.user["detail"] == null ||
               userData.user["detail"]['dob'] == null ||
               userData.user["detail"]["weight"] == null) {
-            await Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfileBoardingScreen(
-                    welcomeDescription: widget.welcomeDescription,
-                    welcomeImageUrl: widget.welcomeImageUrl,
+            if (mounted) {
+              await Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileBoardingScreen(
+                      welcomeDescription: widget.welcomeDescription,
+                      welcomeImageUrl: widget.welcomeImageUrl,
+                    ),
                   ),
-                ),
-                (route) => false);
+                  (route) => false);
+            }
           }
           return;
         } else {
@@ -103,8 +96,18 @@ class _MainPageState extends State<MainPage> {
         }
       },
     );
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async => await _initializeFetchData().then(
+        (value) async {
+          if (monthProvider.monthDataModel == null) {
+            if (mounted) {
+              await monthProvider.onInit(context: context);
+            }
+          }
+        },
+      ),
+    );
 
-    // _initializeData();
     _startPeriodicUpdate();
     // WidgetsBinding.instance.addPostFrameCallback(
     //   (timeStamp) async {
@@ -126,23 +129,12 @@ class _MainPageState extends State<MainPage> {
     //     }
     //   },
     // );
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async => await _initializeFetchData().then(
-        (value) async {
-          if (monthProvider.monthDataModel == null) {
-            await monthProvider.onInit(context: context);
-          }
-        },
-      ),
-    );
 
     _pages = [
       const DashboardPage(),
       const MonthViewNew(),
       const ToolsPage(),
       const ProfileSettingsPage(),
-      // const StreakCalendarPage(),
-      // const TodayPage(),
     ];
   }
 
@@ -183,7 +175,6 @@ class _MainPageState extends State<MainPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      // await dataProvider?.fetchMonthWorkouts(3);
       _initializeFetchData();
       dataProvider?.workoutCheckpointState = false;
     }
@@ -226,10 +217,8 @@ class _MainPageState extends State<MainPage> {
     ScreenUtil.init(context);
     return AnnotatedRegion(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // fully transparent status bar
-        statusBarIconBrightness:
-            Brightness.light, // dark icons for light background
-      ),
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light),
       child: Consumer<MainPageProvider>(
         builder: (context, value, child) => Scaffold(
           backgroundColor: Colors.white,

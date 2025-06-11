@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (descriptionResponse.statusCode == 200) {
           final descriptionData = json.decode(descriptionResponse.body);
-
+          context.read<MainPageProvider>().changeTab(0);
           // Check if the welcome modal has been shown
           bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
           await userData.fetchUserInfo();
@@ -165,34 +165,45 @@ class _LoginPageState extends State<LoginPage> {
               }
             }
           } else if (Platform.isIOS && !isAppUser) {
-            DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
-                ? null
-                : DateTime.parse(subscriptionData["end_date"] ?? "");
-
-            DateTime now = await NTP.now();
-
-            if (subscriptionData["user_subscription_status"] == "free_user" ||
-                (endDate != null && now.isAfter(endDate))) {
-              if (mounted) {
-                Navigator.pushReplacement(
+            // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
+            //     ? null
+            //     : DateTime.parse(subscriptionData["end_date"] ?? "");
+            //
+            // DateTime now = await NTP.now();
+            //
+            // if (subscriptionData["user_subscription_status"] == "free_user" ||
+            //     (endDate != null && now.isAfter(endDate))) {
+            //   if (mounted) {
+            //     Navigator.pushReplacement(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => const WooSubscriptionPayWall(),
+            //       ),
+            //     );
+            //   }
+            // } else {
+            //   if (mounted) {
+            //     await Navigator.pushAndRemoveUntil(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => MainPage(
+            //                 showWelcomeModal: !hasSeenWelcome,
+            //                 welcomeDescription:
+            //                     descriptionData['description'] ?? "",
+            //                 welcomeImageUrl: descriptionData['vimeoId'])),
+            //         (route) => false);
+            //   }
+            // }
+            if (mounted) {
+              await Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const WooSubscriptionPayWall(),
-                  ),
-                );
-              }
-            } else {
-              if (mounted) {
-                await Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MainPage(
-                            showWelcomeModal: !hasSeenWelcome,
-                            welcomeDescription:
-                                descriptionData['description'] ?? "",
-                            welcomeImageUrl: descriptionData['vimeoId'])),
-                    (route) => false);
-              }
+                      builder: (context) => MainPage(
+                          showWelcomeModal: !hasSeenWelcome,
+                          welcomeDescription:
+                              descriptionData['description'] ?? "",
+                          welcomeImageUrl: descriptionData['vimeoId'])),
+                  (route) => false);
             }
           } else {
             if (mounted) {
@@ -224,9 +235,13 @@ class _LoginPageState extends State<LoginPage> {
       }
       debugPrint('this is login page $e');
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) {
+          setState(() {
+            isLoading = false;
+          });
+        },
+      );
     }
   }
 
@@ -245,9 +260,10 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         for (var offeringItem in fetched.all.values) {
           for (var package in offeringItem.availablePackages) {
-            if (package.storeProduct.identifier == "monthly_membership") {
+            if (package.storeProduct.identifier == "monthly_membership_1m_29") {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier == "yearly_membership") {
+            } else if (package.storeProduct.identifier ==
+                "yearly_membership_1y_289") {
               yearPrice = package.storeProduct.priceString;
             }
           }
@@ -270,7 +286,7 @@ class _LoginPageState extends State<LoginPage> {
         "subscription_type": type,
         "price": type == ""
             ? ""
-            : type == "monthly_membership"
+            : type == "monthly_membership_1m_29"
                 ? monthPrice
                 : yearPrice,
         "purchase_date": startDate,

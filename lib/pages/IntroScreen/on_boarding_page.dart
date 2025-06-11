@@ -165,9 +165,24 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       body: Stack(
         clipBehavior: Clip.none,
         children: [
+          SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: Column(
+              children: dataProvider!.cachedSplashImageMap.entries.map((entry) {
+                return Visibility(
+                  visible: true,
+                  child: Utils.appImage(
+                    media,
+                    entry.value,
+                    imageKey: entry.key,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
           SizedBox(
             height: media.height / 1,
-            child: !_isVideoInitialized
+            child: _isVideoInitialized
                 ? Align(
                     alignment: Alignment.topCenter,
                     child: SizedBox(
@@ -185,21 +200,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 
                     imageKey: "imageLogin",
                   )*/
-          ),
-          SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: Column(
-              children: dataProvider!.cachedSplashImageMap.entries.map((entry) {
-                return Visibility(
-                  visible: true,
-                  child: Utils.appImage(
-                    media,
-                    entry.value,
-                    imageKey: entry.key,
-                  ),
-                );
-              }).toList(),
-            ),
           ),
           Positioned(
             top: ScreenUtil.horizontalScale(50),

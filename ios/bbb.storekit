@@ -9,9 +9,38 @@
       }
     ]
   },
-  "identifier" : "F2D31F31",
+  "identifier" : "EF3B37D9",
   "nonRenewingSubscriptions" : [
-
+    {
+      "displayPrice" : "29.95",
+      "familyShareable" : false,
+      "internalID" : "6747090393",
+      "localizations" : [
+        {
+          "description" : "Monthly Membership",
+          "displayName" : "Monthly Membership",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "monthly_membership_1m_29",
+      "referenceName" : "Monthly Membership",
+      "type" : "NonRenewingSubscription"
+    },
+    {
+      "displayPrice" : "289.99",
+      "familyShareable" : false,
+      "internalID" : "6747088299",
+      "localizations" : [
+        {
+          "description" : "Yearly Membership",
+          "displayName" : "Yearly Membership",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "yearly_membership_1y_289",
+      "referenceName" : "Yearly Membership",
+      "type" : "NonRenewingSubscription"
+    }
   ],
   "products" : [
 
@@ -20,7 +49,7 @@
     "_applicationInternalID" : "6746472250",
     "_developerTeamID" : "NGS5G69R62",
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 770748143.41909206,
+    "_lastSynchronizedDate" : 771267024.07296503,
     "_locale" : "en_US",
     "_storefront" : "USA",
     "_storeKitErrors" : [
@@ -72,71 +101,7 @@
     ]
   },
   "subscriptionGroups" : [
-    {
-      "id" : "21696560",
-      "localizations" : [
 
-      ],
-      "name" : "Subscriptions",
-      "subscriptions" : [
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "29.95",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "6746628393",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Monthly Membership",
-              "displayName" : "Monthly Membership",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "monthly_membership",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Monthly Membership",
-          "subscriptionGroupID" : "21696560",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "289.99",
-          "familyShareable" : false,
-          "groupNumber" : 2,
-          "internalID" : "6746630294",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Yearly Membership",
-              "displayName" : "Yearly Membership",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "yearly_membership",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Yearly Membership",
-          "subscriptionGroupID" : "21696560",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
-        }
-      ]
-    }
   ],
   "version" : {
     "major" : 4,

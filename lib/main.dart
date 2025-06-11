@@ -58,6 +58,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'localstorage/month_database.dart';
+import 'pages/ProfileAndSettings/account_deletion_screen.dart';
 import 'pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'pages/Tools/seeall_achievement_page_new.dart';
 import 'providers/month_provider.dart';
@@ -77,7 +78,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  WidgetsFlutterBinding.ensureInitialized();
   await _configureLocalTimeZone();
   const androidInitializationSetting =
       AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -186,8 +186,10 @@ class _MyAppState extends State<MyApp> {
         await Purchases.configure(
             PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
         Offerings offering = await Purchases.getOfferings();
-        await preferences.putString(
-            SharedPreference.offerings, jsonEncode(offering));
+        if (offering.current != null) {
+          await preferences.putString(
+              SharedPreference.offerings, jsonEncode(offering));
+        }
       }
     });
   }
@@ -283,6 +285,7 @@ class _MyAppState extends State<MyApp> {
             // AppRoutes.emailVerificationScreen: (context) =>
             //     const EmailVerificationScreen(),
             AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
+            AppRoutes.accountDeletion: (context) => const AccountDeletion(),
             AppRoutes.todayScreen: (context) => const TodayPage(),
             AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),
             AppRoutes.exerciseScreen: (context) => const ExercisePage(),

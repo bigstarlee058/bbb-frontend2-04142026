@@ -937,6 +937,7 @@ class DataProvider extends ChangeNotifier {
               "REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
         }
         final value = await DatabaseHelper().areAllTablesEmpty();
+
         if (value) {
           List<MonthEnrollmentDataModel> monthEnrollment =
               await ApiRepo.fetchMonthEnrollment();

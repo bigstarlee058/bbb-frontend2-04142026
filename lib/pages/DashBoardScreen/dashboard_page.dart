@@ -64,14 +64,6 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     onInit();
-    // _dateNotifier.stream.listen((newDate) {
-    //   if (_currentDate.day != newDate.day) {
-    //     setState(() {
-    //       _currentDate = newDate;
-    //       monthProvider.onInit(context, isEnabled: false);
-    //     });
-    //   }
-    // });
     super.initState();
   }
 
@@ -81,6 +73,7 @@ class _DashboardPageState extends State<DashboardPage> {
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
+
     loadUserInfo();
     loadStaffsData();
     loadFeaturedChallengeData();
@@ -88,16 +81,6 @@ class _DashboardPageState extends State<DashboardPage> {
     loadAchievementsData(true);
     loadProgramPhaseData();
     requestNotificationPermission();
-    // _scrollController = ScrollController();
-    // _scrollController.addListener(() {
-    //   double offset = _scrollController.offset;
-    //   double newOpacity = (40 - offset) / 40;
-    //   newOpacity = newOpacity.clamp(0.0, 1.0);
-    //
-    //   setState(() {
-    //     _opacity = newOpacity;
-    //   });
-    // });
   }
 
   Future<void> requestNotificationPermission() async {
@@ -189,68 +172,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 }).toList(),
               ),
             ),
-            // Container(
-            //   height: media.height / 1,
-            //   width: media.width,
-            //   decoration: const BoxDecoration(
-            //     image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
-            //   ),
-            // ),
-            // Utils.appImage(
-            //   media,
-            //   // dataProvider?.screenBackgroundResponse?.imageDashboard ?? "",
-            //   dataProvider!.cachedImageMap["imageDashboard"],
-            //   imageKey: "imageDashboard",
-            // ),
-            // Container(
-            //   height: media.height / 1,
-            //   width: media.width,
-            //   decoration: const BoxDecoration(
-            //     image: DecorationImage(
-            //       image: AssetImage('assets/img/back_dark.jpg'),
-            //       fit: BoxFit.cover,
-            //       opacity: 1,
-            //     ),
-            //   ),
-            // ),
             Column(
               children: [
-                // Consumer<ScrollProvider>(builder: (context, value, child) {
-                //   double targetHeight = value.scrollOffset > 0
-                //       ? ScreenUtil.verticalScale(3.5)
-                //       : ScreenUtil.verticalScale(4);
-                //
-                //   return AppBar(
-                //     toolbarHeight: ScreenUtil.verticalScale(4),
-                //     surfaceTintColor: Colors.transparent,
-                //     backgroundColor: Colors.transparent,
-                //     centerTitle: false,
-                //     leading: SizedBox(),
-                //     titleSpacing: ScreenUtil.horizontalScale(6),
-                //     leadingWidth: 0,
-                //     title: Consumer<UserDataProvider>(
-                //         builder: (context, userData, child) {
-                //       return AnimatedOpacity(
-                //         opacity: value.scrollOffset > 0 ? 0 : 1,
-                //         duration: Duration(milliseconds: 300),
-                //         child: Text(
-                //           'Hi ${userData.userName}',
-                //           style: TextStyle(
-                //             color: Colors.white,
-                //             fontSize: ScreenUtil.horizontalScale(5.5),
-                //           ),
-                //         ),
-                //       );
-                //     }),
-                //     actions: [
-                //       Padding(
-                //         padding: const EdgeInsets.only(right: 10),
-                //         child: const CommonStreakWithNotification(
-                //             routeString: '/exerciseLibrary'),
-                //       )
-                //     ],
-                //   );
-                // }),
                 SafeArea(
                   bottom: false,
                   child: Consumer<ScrollProvider>(
@@ -318,7 +241,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     },
                   ),
                 ),
-
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primaryColor,

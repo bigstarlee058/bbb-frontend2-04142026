@@ -15,6 +15,7 @@ class AppRoutes {
   static const String exerciseHistory = '/exerciseHistory';
   static const String nutritionCalculatorScreen = '/nutritionCalculator';
   static const String dayOverviewScreen = '/dayOverview';
+  static const String accountDeletion = '/accountDeletion';
   static const String todayScreen = '/today';
   static const String exerciseLibraryDetailScreen = '/exerciseLibraryDetail';
   static const String programPhaseScreen = '/programPhaseScreen';

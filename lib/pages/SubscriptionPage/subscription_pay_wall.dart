@@ -45,9 +45,10 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
         offering = fetched;
         for (var offeringItem in offering!.all.values) {
           for (var package in offeringItem.availablePackages) {
-            if (package.storeProduct.identifier == "monthly_membership") {
+            if (package.storeProduct.identifier == "monthly_membership_1m_29") {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier == "yearly_membership") {
+            } else if (package.storeProduct.identifier ==
+                "yearly_membership_1y_289") {
               yearPrice = package.storeProduct.priceString;
             }
           }
@@ -74,7 +75,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       final Map<String, String> queryParams = {
         "user_subscription_status": status,
         "subscription_type": type,
-        "price": type == "monthly_membership" ? monthPrice : yearPrice,
+        "price": type == "monthly_membership_1m_29" ? monthPrice : yearPrice,
         "purchase_date": startDate,
         "end_date": endDate,
       };
@@ -125,11 +126,11 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
 
       await _updateSubscriptionData(
         type: selectedPackage!.storeProduct.identifier,
-        endDate:
-            (selectedPackage!.storeProduct.identifier == "monthly_membership"
-                    ? customerInfo.allExpirationDates["monthly_membership"]
-                    : customerInfo.allExpirationDates["yearly_membership"]) ??
-                "",
+        endDate: (selectedPackage!.storeProduct.identifier ==
+                    "monthly_membership_1m_29"
+                ? customerInfo.allExpirationDates["monthly_membership_1m_29"]
+                : customerInfo.allExpirationDates["yearly_membership"]) ??
+            "",
         startDate: now.toString(),
         status: "subscribed_user",
       );
@@ -153,7 +154,10 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             width: double.infinity,
             fit: BoxFit.fitWidth,
           ),
-          Positioned(left: 0,right: 0,top:  MediaQuery.of(context).size.height / 5,
+          Positioned(
+            left: 0,
+            right: 0,
+            top: MediaQuery.of(context).size.height / 5,
             child: Image.asset(
               'assets/img/logo1.png',
               height: 80,
@@ -193,14 +197,14 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                               price: monthPrice,
                               selected:
                                   selectedPackage?.storeProduct.identifier ==
-                                      "monthly_membership",
+                                      "monthly_membership_1m_29",
                               onTap: () {
                                 setState(() {
                                   selectedPackage = offering!
                                       .current?.availablePackages
                                       .firstWhere((p) =>
                                           p.storeProduct.identifier ==
-                                          "monthly_membership");
+                                          "monthly_membership_1m_29");
                                 });
                               },
                             ),
@@ -210,14 +214,14 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                               price: yearPrice,
                               selected:
                                   selectedPackage?.storeProduct.identifier ==
-                                      "yearly_membership",
+                                      "yearly_membership_1y_289",
                               onTap: () {
                                 setState(() {
                                   selectedPackage = offering!
                                       .current?.availablePackages
                                       .firstWhere((p) =>
                                           p.storeProduct.identifier ==
-                                          "yearly_membership");
+                                          "yearly_membership_1y_289");
                                 });
                               },
                               badge: "20% OFF",
@@ -326,7 +330,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
               ],
             ),
             SizedBox(height: ScreenUtil.verticalScale(0.5)),
-            Text("Full access for just $price",
+            Text(
+                "Full access for just $price/${badge != null ? "year" : "month"}",
                 style: TextStyle(fontSize: ScreenUtil.verticalScale(1.5))),
           ],
         ),

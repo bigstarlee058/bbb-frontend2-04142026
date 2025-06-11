@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path1;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -196,49 +197,55 @@ class DatabaseHelper {
   }
 
   Future<bool> areAllTablesEmpty() async {
-    Database db = await database;
-    const tables = [
-      DatabaseHelper.exerciseHistory,
-      DatabaseHelper.exerciseStatus,
-      DatabaseHelper.dayStatus,
-      DatabaseHelper.circuitManager,
-      DatabaseHelper.extraSetHistory,
-      DatabaseHelper.removedExerciseHistory,
-      DatabaseHelper.exerciseNotes,
-      DatabaseHelper.extraExerciseHistory,
-      DatabaseHelper.swapExerciseHistory,
-      DatabaseHelper.achievementHistory,
-    ];
-
     try {
-      for (String table in tables) {
-        final result = await db.rawQuery('SELECT COUNT(*) as count FROM $table');
-        final count = Sqflite.firstIntValue(result);
-        log('Table: $table, Count: $count');
-        if ((count ?? 0) > 0) {
-          return false;
-        }
+      final Database db = await database;
+      const tables = [
+        DatabaseHelper.exerciseHistory,
+        DatabaseHelper.exerciseStatus,
+        DatabaseHelper.dayStatus,
+        DatabaseHelper.circuitManager,
+        DatabaseHelper.extraSetHistory,
+        DatabaseHelper.removedExerciseHistory,
+        DatabaseHelper.exerciseNotes,
+        DatabaseHelper.extraExerciseHistory,
+        DatabaseHelper.swapExerciseHistory,
+        DatabaseHelper.achievementHistory,
+      ];
+
+      for (final table in tables) {
+        final result =
+            await db.rawQuery('SELECT COUNT(*) as count FROM $table');
+        final count = Sqflite.firstIntValue(result) ?? 0;
+        debugPrint('Table: $table, Count: $count');
+        if (count > 0) return false;
       }
+
       return true;
-    } catch (e) {
-      log('Error checking tables: $e');
+    } catch (e, stack) {
+      debugPrint('Error checking tables: $e\n$stack');
       return false;
     }
   }
 
-  Future<int> insertData({required String tableName, required Map<String, dynamic> data}) async {
+  Future<int> insertData(
+      {required String tableName, required Map<String, dynamic> data}) async {
     Database db = await database;
     return await db.insert(tableName, data);
   }
 
-  Future<List<Map<String, dynamic>>> fetchData({required String tableName}) async {
+  Future<List<Map<String, dynamic>>> fetchData(
+      {required String tableName}) async {
     Database db = await database;
     return await db.query(tableName);
   }
 
-  Future<List<Map<String, dynamic>>> getDataFromTable({required String tableName, required String where, required String id}) async {
+  Future<List<Map<String, dynamic>>> getDataFromTable(
+      {required String tableName,
+      required String where,
+      required String id}) async {
     Database db = await database;
-    List<Map<String, dynamic>> results = await db.query(tableName, where: '$where = ?', whereArgs: [id]);
+    List<Map<String, dynamic>> results =
+        await db.query(tableName, where: '$where = ?', whereArgs: [id]);
     return results;
   }
 
@@ -253,7 +260,8 @@ class DatabaseHelper {
 
     List<Map<String, dynamic>> results = await db.query(
       tableName,
-      where: 'exerciseId = ? AND monthId = ? AND dayId = ? AND weekId = ? AND split = ?',
+      where:
+          'exerciseId = ? AND monthId = ? AND dayId = ? AND weekId = ? AND split = ?',
       whereArgs: [exerciseId, monthId, dayId, weekId, split],
     );
 
@@ -261,7 +269,11 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getFilteredWithMWDData(
-      {required String tableName, required String monthId, required String dayId, required String weekId, required String split}) async {
+      {required String tableName,
+      required String monthId,
+      required String dayId,
+      required String weekId,
+      required String split}) async {
     Database db = await database;
 
     List<Map<String, dynamic>> results = await db.query(
@@ -274,7 +286,10 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getFilteredWithMonthWeekDayDData(
-      {required String tableName, required String monthId, required String dayId, required String weekId}) async {
+      {required String tableName,
+      required String monthId,
+      required String dayId,
+      required String weekId}) async {
     Database db = await database;
 
     List<Map<String, dynamic>> results = await db.query(
@@ -287,7 +302,10 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getFilteredWithMWData(
-      {required String tableName, required String monthId, required String weekId, required String split}) async {
+      {required String tableName,
+      required String monthId,
+      required String weekId,
+      required String split}) async {
     Database db = await database;
 
     List<Map<String, dynamic>> results = await db.query(
@@ -300,7 +318,9 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getFilteredWithMData(
-      {required String tableName, required String monthId, required String split}) async {
+      {required String tableName,
+      required String monthId,
+      required String split}) async {
     Database db = await database;
 
     List<Map<String, dynamic>> results = await db.query(
@@ -312,7 +332,8 @@ class DatabaseHelper {
     return results;
   }
 
-  Future<List<Map<String, dynamic>>> getFilteredData({required String tableName, required String monthId}) async {
+  Future<List<Map<String, dynamic>>> getFilteredData(
+      {required String tableName, required String monthId}) async {
     Database db = await database;
 
     List<Map<String, dynamic>> results = await db.query(
@@ -324,25 +345,30 @@ class DatabaseHelper {
     return results;
   }
 
-  Future<Map<String, dynamic>?> getDataByDataId({required String tableName, required String id}) async {
+  Future<Map<String, dynamic>?> getDataByDataId(
+      {required String tableName, required String id}) async {
     Database db = await database;
-    List<Map<String, dynamic>> results = await db.query(tableName, where: 'dataId = ?', whereArgs: [id]);
+    List<Map<String, dynamic>> results =
+        await db.query(tableName, where: 'dataId = ?', whereArgs: [id]);
     if (results.isNotEmpty) {
       return results.first;
     }
     return null;
   }
 
-  Future<Map<String, dynamic>?> getDataByd({required String tableName, required String id}) async {
+  Future<Map<String, dynamic>?> getDataByd(
+      {required String tableName, required String id}) async {
     Database db = await database;
-    List<Map<String, dynamic>> results = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
+    List<Map<String, dynamic>> results =
+        await db.query(tableName, where: 'id = ?', whereArgs: [id]);
     if (results.isNotEmpty) {
       return results.first;
     }
     return null;
   }
 
-  Future<List<Map<String, dynamic>>> getDataByM({required String tableName, required String monthId}) async {
+  Future<List<Map<String, dynamic>>> getDataByM(
+      {required String tableName, required String monthId}) async {
     Database db = await database;
     List<Map<String, dynamic>> results = await db.query(
       tableName,
@@ -355,7 +381,10 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getDataByAnyWithSplitField(
-      {required String tableName, required String fieldName, required String split, required String id}) async {
+      {required String tableName,
+      required String fieldName,
+      required String split,
+      required String id}) async {
     Database db = await database;
     List<Map<String, dynamic>> results = await db.query(
       tableName,
@@ -365,9 +394,13 @@ class DatabaseHelper {
     return results;
   }
 
-  Future<int> updateData({required String tableName, required Map<String, dynamic> data, required String id}) async {
+  Future<int> updateData(
+      {required String tableName,
+      required Map<String, dynamic> data,
+      required String id}) async {
     Database db = await database;
-    return await db.update(tableName, data, where: 'dataId = ?', whereArgs: [id]);
+    return await db
+        .update(tableName, data, where: 'dataId = ?', whereArgs: [id]);
   }
 
   Future<int> updateSingleValue(
@@ -385,7 +418,8 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteSingleData({required String tableName, required String id}) async {
+  Future<int> deleteSingleData(
+      {required String tableName, required String id}) async {
     Database db = await database;
     return await db.delete(
       tableName,

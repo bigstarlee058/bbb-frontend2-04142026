@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
+import 'package:bbb/models/get_all_achivements.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -79,7 +79,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     await DatabaseHelper().clearAllTables();
     await preferences.clearPrefs();
     context.read<MonthProvider>().clearAllValues();
-
+    dataProvider?.achievementList = [];
     // Navigator.popUntil(context, ModalRoute.withName(AppRoutes.onBoardingScreen));
 
     Navigator.of(context).pushNamedAndRemoveUntil(
@@ -89,6 +89,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         return route.settings.name == AppRoutes.onBoardingScreen;
       },
     );
+
     Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 
@@ -101,7 +102,15 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   }
 
   toSupportPage() async {
-    openUrl('bootybybret.com/pages/contact-us');
+    openUrl('https://bootybybret.com/pages/contact-us');
+  }
+
+  toTermsOfUsePage() async {
+    openUrl('https://bootybybret.com/pages/terms-and-conditions');
+  }
+
+  toPrivacyPolicyPage() async {
+    openUrl('https://bootybybret.com/pages/privacy-policy');
   }
 
   @override
@@ -354,14 +363,19 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                       height: ScreenUtil
                                                           .verticalScale(0.9)),
                                                   Builder(builder: (context) {
-                                                    final achievements = context
-                                                        .watch<MonthProvider>()
-                                                        .items
-                                                        .where((element) =>
-                                                            element[
-                                                                "isArchived"] ==
-                                                            true)
-                                                        .length;
+                                                    List<AchievementModel>?
+                                                        data = dataProvider
+                                                            ?.achievementList
+                                                            .where((element) =>
+                                                                element
+                                                                    .achievements!
+                                                                    .any((e) =>
+                                                                        e.achieved ==
+                                                                        true))
+                                                            .toList();
+
+                                                    final achievements =
+                                                        data?.length;
                                                     return Column(
                                                       children: [
                                                         Text(
@@ -381,7 +395,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                                 .verticalScale(
                                                                     0.25)),
                                                         Text(
-                                                          "Achievement${achievements > 1 ? "s" : ""}",
+                                                          "Achievement${(achievements ?? 0) > 1 ? "s" : ""}",
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: ScreenUtil
@@ -640,8 +654,22 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton(
-                                      'Legal', Icons.description, () => {}),
+                                      'Terms of Use',
+                                      Icons.description,
+                                      () => toTermsOfUsePage()),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
+                                  settingsButton(
+                                      'Privacy Policy',
+                                      Icons.privacy_tip_rounded,
+                                      () => toPrivacyPolicyPage()),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
+                                  // settingsButton(
+                                  //     'Account Deletion',
+                                  //     Icons.person_add_disabled_sharp,
+                                  //     () => Navigator.pushNamed(
+                                  //         context, '/accountDeletion')),
+                                  // SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('Log Out', Icons.logout,
                                       () => _handleLogout(context)),
