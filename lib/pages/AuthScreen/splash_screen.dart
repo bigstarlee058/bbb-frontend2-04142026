@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
-import 'package:bbb/pages/SubscriptionPage/woo_subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -12,7 +10,6 @@ import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,8 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _initializeFetchData() async {
     debugPrint("this  is initial state func");
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider =
-        Provider.of<MonthProvider>(context, listen: false);
+    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {
@@ -78,26 +74,20 @@ class _SplashScreenState extends State<SplashScreen> {
                   (value) async {
                     await userData.fetchUserInfo().then(
                       (value) async {
-                        bool isAppUser =
-                            userData.user["singuptype"] != "web" ? true : false;
+                        bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
 
                         if (Platform.isIOS && isAppUser) {
                           try {
-                            CustomerInfo customerInfo =
-                                await Purchases.getCustomerInfo();
-                            if (customerInfo.entitlements.active.isNotEmpty) {
-                              customerInfo.entitlements.active
-                                  .forEach((key, entitlement) async {
-                                final latestPurchaseDate =
-                                    customerInfo.allPurchaseDates;
-                                final identifier =
-                                    entitlement.productIdentifier;
+                            CustomerInfo customerInfo = await Purchases.getCustomerInfo();
 
+                            if (customerInfo.entitlements.active.isNotEmpty) {
+                              customerInfo.entitlements.active.forEach((key, entitlement) async {
+                                final latestPurchaseDate = customerInfo.allPurchaseDates;
+                                final identifier = entitlement.productIdentifier;
                                 await _updateSubscriptionData(
                                   type: identifier,
                                   endDate: entitlement.expirationDate ?? "",
-                                  startDate:
-                                      latestPurchaseDate[identifier] ?? "",
+                                  startDate: latestPurchaseDate[identifier] ?? "",
                                   status: "subscribed_user",
                                 );
                               });
@@ -116,18 +106,14 @@ class _SplashScreenState extends State<SplashScreen> {
                         }
 
                         if (Platform.isIOS && isAppUser) {
-                          Map<String, dynamic> subscriptionData =
-                              userData.user["subscription"];
+                          Map<String, dynamic> subscriptionData = userData.user["subscription"];
 
-                          if (subscriptionData["user_subscription_status"] !=
-                              "free_user") {
+                          if (subscriptionData["user_subscription_status"] != "free_user") {
                             if (mounted) {
                               await Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const MainPage(
-                                      welcomeDescription: '',
-                                      welcomeImageUrl: ''),
+                                  builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
                                 ),
                               );
                             }
@@ -137,8 +123,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SubscriptionPayWall(),
+                                  builder: (context) => const SubscriptionPayWall(),
                                 ),
                               );
                             }
@@ -182,9 +167,7 @@ class _SplashScreenState extends State<SplashScreen> {
                             await Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const MainPage(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: ''),
+                                builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
                               ),
                             );
                           }
@@ -194,9 +177,7 @@ class _SplashScreenState extends State<SplashScreen> {
                             await Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const MainPage(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: ''),
+                                builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
                               ),
                             );
                           }
@@ -240,8 +221,7 @@ class _SplashScreenState extends State<SplashScreen> {
           for (var package in offeringItem.availablePackages) {
             if (package.storeProduct.identifier == "monthly_membership_1m_29") {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier ==
-                "yearly_membership_1y_289") {
+            } else if (package.storeProduct.identifier == "yearly_membership_1y_289") {
               yearPrice = package.storeProduct.priceString;
             }
           }
@@ -271,8 +251,7 @@ class _SplashScreenState extends State<SplashScreen> {
         "end_date": endDate,
       };
 
-      Uri url =
-          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(

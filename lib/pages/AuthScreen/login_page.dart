@@ -10,6 +10,7 @@ import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -20,12 +21,9 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../SubscriptionPage/woo_subscription_pay_wall.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,9 +36,9 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  FocusNode focusNode1 = FocusNode();
-  FocusNode focusNode2 = FocusNode();
+
   DataProvider? dataProvider;
+  MonthProvider? monthProvider;
   bool isObscure = true;
   bool isLoading = false;
   ImageProvider? imageProvider;
@@ -54,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
+    monthProvider = Provider.of<MonthProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         if (Platform.isIOS) {
@@ -61,14 +60,48 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
     );
+    _scrollController = ScrollController();
+    _emailFocusNode = FocusNode();
+    _passwordFocusNode = FocusNode();
+
+    _emailFocusNode.addListener(() {
+      _emailFocusNode.addListener(() {
+        if (_emailFocusNode.hasFocus) {
+          _scrollToField(_emailFieldKey);
+        }
+      });
+
+      _passwordFocusNode.addListener(() {
+        if (_passwordFocusNode.hasFocus) {
+          _scrollToField(_passwordFieldKey);
+        }
+      });
+    });
   }
 
+  final GlobalKey _emailFieldKey = GlobalKey();
+  final GlobalKey _passwordFieldKey = GlobalKey();
   Future<void> _saveLoginState(bool isLoggedIn) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', isLoggedIn);
   }
 
+  Future<void> _initializeFetchData() async {
+    debugPrint("this  is initial state func");
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    if (dataProvider != null) {
+      log('_initializeFetchData=========11111=========>>>>>${DateTime.now()}');
+      await dataProvider?.fetchMonthWorkouts(3);
+      log('_initializeFetchData=========22222=========>>>>>${DateTime.now()}');
+    } else {
+      debugPrint("dataProvider is null");
+    }
+  }
+
   void signInUser(String emailAddress, String password) async {
+    log('responseData=========1111=========>>>>>${DateTime.now()}');
+
     if (emailAddress.isEmpty || password.isEmpty) {
       showBottomAlert(context, 'Please fill out the inputs');
       return;
@@ -78,8 +111,7 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse(
-          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -89,8 +121,9 @@ class _LoginPageState extends State<LoginPage> {
           'password': password,
         },
       );
-
       if (response.statusCode == 200) {
+        log('responseData=========2222=========>>>>>${DateTime.now()}');
+
         final data = json.decode(response.body);
         await _saveLoginState(true);
         String token = data['token'];
@@ -98,143 +131,169 @@ class _LoginPageState extends State<LoginPage> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
 
-        // Fetch additional data for the welcome modal
-        final descriptionResponse = await http.get(
-          Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens'),
-          headers: {"Authorization": "Bearer $token"},
-        );
+        log('responseData=========3333=========>>>>>${DateTime.now()}');
 
-        if (descriptionResponse.statusCode == 200) {
-          final descriptionData = json.decode(descriptionResponse.body);
-          context.read<MainPageProvider>().changeTab(0);
-          // Check if the welcome modal has been shown
-          bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-          await userData.fetchUserInfo();
-          bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
-          if (Platform.isIOS && isAppUser) {
-            try {
-              CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-              if (customerInfo.entitlements.active.isNotEmpty) {
-                customerInfo.entitlements.active
-                    .forEach((key, entitlement) async {
-                  final latestPurchaseDate = customerInfo.allPurchaseDates;
-                  final identifier = entitlement.productIdentifier;
+        context.read<MainPageProvider>().changeTab(0);
+        bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+        await userData.fetchUserInfo();
+        bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
+        WidgetsBinding.instance.addPostFrameCallback(
+          (timeStamp) async => await _initializeFetchData().then(
+            (value) async {
+              log('responseData=========4444=========>>>>>${DateTime.now()}');
 
-                  await _updateSubscriptionData(
-                    type: identifier,
-                    endDate: entitlement.expirationDate ?? "",
-                    startDate: latestPurchaseDate[identifier] ?? "",
-                    status: "subscribed_user",
+              dataProvider?.getAllAchievement(true);
+              log('responseData=========5555=========>>>>>${DateTime.now()}');
+
+              if (monthProvider?.monthDataModel == null) {
+                if (mounted) {
+                  await monthProvider?.onInit(context: context).then(
+                    (value) async {
+                      log('responseData=========6666=========>>>>>${DateTime.now()}');
+
+                      if (Platform.isIOS && isAppUser) {
+                        try {
+                          CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+                          if (customerInfo.entitlements.active.isNotEmpty) {
+                            customerInfo.entitlements.active.forEach((key, entitlement) async {
+                              final latestPurchaseDate = customerInfo.allPurchaseDates;
+                              final identifier = entitlement.productIdentifier;
+
+                              await _updateSubscriptionData(
+                                type: identifier,
+                                endDate: entitlement.expirationDate ?? "",
+                                startDate: latestPurchaseDate[identifier] ?? "",
+                                status: "subscribed_user",
+                              );
+                            });
+                          } else {
+                            await _updateSubscriptionData(
+                              type: "",
+                              endDate: "",
+                              startDate: "",
+                              status: "free_user",
+                            );
+                          }
+                          await userData.fetchUserInfo();
+                        } catch (e) {
+                          debugPrint("Error fetching subscription: $e");
+                        }
+                      }
+
+                      log('responseData=========7777=========>>>>>${DateTime.now()}');
+
+                      Map<String, dynamic> subscriptionData = userData.user["subscription"];
+                      if (Platform.isIOS && isAppUser) {
+                        if (subscriptionData["user_subscription_status"] == "free_user") {
+                          if (mounted) {
+                            await Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => SubscriptionPayWall()),
+                            );
+                          }
+                        } else {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MainPage(
+                                          showWelcomeModal: !hasSeenWelcome,
+                                          welcomeDescription: "",
+                                          welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
+                                        )),
+                                (route) => false);
+                          }
+                        }
+                      } else if (Platform.isIOS && !isAppUser) {
+                        // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
+                        //     ? null
+                        //     : DateTime.parse(subscriptionData["end_date"] ?? "");
+                        //
+                        // DateTime now = await NTP.now();
+                        //
+                        // if (subscriptionData["user_subscription_status"] == "free_user" ||
+                        //     (endDate != null && now.isAfter(endDate))) {
+                        //   if (mounted) {
+                        //     Navigator.pushReplacement(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (context) => const WooSubscriptionPayWall(),
+                        //       ),
+                        //     );
+                        //   }
+                        // } else {
+                        //   if (mounted) {
+                        //     await Navigator.pushAndRemoveUntil(
+                        //         context,
+                        //         MaterialPageRoute(
+                        //             builder: (context) => MainPage(
+                        //                 showWelcomeModal: !hasSeenWelcome,
+                        //                 welcomeDescription:
+                        //                     descriptionData['description'] ?? "",
+                        //                 welcomeImageUrl: descriptionData['vimeoId'])),
+                        //         (route) => false);
+                        //   }
+                        // }
+                        WidgetsBinding.instance.addPostFrameCallback(
+                          (timeStamp) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          },
+                        );
+
+                        if (mounted) {
+                          await Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MainPage(
+                                        showWelcomeModal: !hasSeenWelcome,
+                                        welcomeDescription: "",
+                                        welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
+                                      )),
+                              (route) => false);
+                        }
+                      } else {
+                        if (mounted) {
+                          await Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MainPage(
+                                  showWelcomeModal: !hasSeenWelcome,
+                                  welcomeDescription: "",
+                                  welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
+                                ),
+                              ),
+                              (route) => false);
+                        }
+                        WidgetsBinding.instance.addPostFrameCallback(
+                          (timeStamp) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          },
+                        );
+                      }
+                    },
                   );
-                });
-              } else {
-                await _updateSubscriptionData(
-                  type: "",
-                  endDate: "",
-                  startDate: "",
-                  status: "free_user",
-                );
+                }
               }
-            } catch (e) {
-              debugPrint("Error fetching subscription: $e");
-            }
-          }
-
-          await userData.fetchUserInfo();
-          Map<String, dynamic> subscriptionData = userData.user["subscription"];
-          if (Platform.isIOS && isAppUser) {
-            if (subscriptionData["user_subscription_status"] == "free_user") {
-              if (mounted) {
-                await Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SubscriptionPayWall()),
-                );
-              }
-            } else {
-              if (mounted) {
-                await Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MainPage(
-                            showWelcomeModal: !hasSeenWelcome,
-                            welcomeDescription:
-                                descriptionData['description'] ?? "",
-                            welcomeImageUrl: descriptionData['vimeoId'])),
-                    (route) => false);
-              }
-            }
-          } else if (Platform.isIOS && !isAppUser) {
-            // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
-            //     ? null
-            //     : DateTime.parse(subscriptionData["end_date"] ?? "");
-            //
-            // DateTime now = await NTP.now();
-            //
-            // if (subscriptionData["user_subscription_status"] == "free_user" ||
-            //     (endDate != null && now.isAfter(endDate))) {
-            //   if (mounted) {
-            //     Navigator.pushReplacement(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => const WooSubscriptionPayWall(),
-            //       ),
-            //     );
-            //   }
-            // } else {
-            //   if (mounted) {
-            //     await Navigator.pushAndRemoveUntil(
-            //         context,
-            //         MaterialPageRoute(
-            //             builder: (context) => MainPage(
-            //                 showWelcomeModal: !hasSeenWelcome,
-            //                 welcomeDescription:
-            //                     descriptionData['description'] ?? "",
-            //                 welcomeImageUrl: descriptionData['vimeoId'])),
-            //         (route) => false);
-            //   }
-            // }
-            if (mounted) {
-              await Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MainPage(
-                          showWelcomeModal: !hasSeenWelcome,
-                          welcomeDescription:
-                              descriptionData['description'] ?? "",
-                          welcomeImageUrl: descriptionData['vimeoId'])),
-                  (route) => false);
-            }
-          } else {
-            if (mounted) {
-              await Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MainPage(
-                          showWelcomeModal: !hasSeenWelcome,
-                          welcomeDescription:
-                              descriptionData['description'] ?? "",
-                          welcomeImageUrl: descriptionData['vimeoId'])),
-                  (route) => false);
-            }
-          }
-        } else {
-          if (mounted) {
-            showBottomAlert(context, 'Failed to load description');
-          }
-          debugPrint('this is login page ${descriptionResponse.statusCode}');
-        }
+            },
+          ),
+        );
       } else {
+        WidgetsBinding.instance.addPostFrameCallback(
+          (timeStamp) {
+            setState(() {
+              isLoading = false;
+            });
+          },
+        );
         if (mounted) {
           showBottomAlert(context, 'Login failed');
         }
       }
     } catch (e) {
-      if (mounted) {
-        showBottomAlert(context, 'An error occurred');
-      }
-      debugPrint('this is login page $e');
-    } finally {
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) {
           setState(() {
@@ -242,6 +301,9 @@ class _LoginPageState extends State<LoginPage> {
           });
         },
       );
+      if (mounted) {
+        showBottomAlert(context, 'User not found!');
+      }
     }
   }
 
@@ -262,8 +324,7 @@ class _LoginPageState extends State<LoginPage> {
           for (var package in offeringItem.availablePackages) {
             if (package.storeProduct.identifier == "monthly_membership_1m_29") {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier ==
-                "yearly_membership_1y_289") {
+            } else if (package.storeProduct.identifier == "yearly_membership_1y_289") {
               yearPrice = package.storeProduct.priceString;
             }
           }
@@ -293,8 +354,7 @@ class _LoginPageState extends State<LoginPage> {
         "end_date": endDate,
       };
 
-      Uri url =
-          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(
@@ -318,56 +378,102 @@ class _LoginPageState extends State<LoginPage> {
     return prefs.getString('authToken');
   }
 
+  late ScrollController _scrollController;
+  late FocusNode _emailFocusNode;
+  late FocusNode _passwordFocusNode;
+
+  // void _scrollToField() {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     _scrollController.animateTo(
+  //       _scrollController.position.maxScrollExtent,
+  //       duration: const Duration(milliseconds: 200),
+  //       curve: Curves.easeInOut,
+  //     );
+  //   });
+  // }
+
+  void _scrollToField(GlobalKey key) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = key.currentContext;
+      if (context != null) {
+        Scrollable.ensureVisible(
+          context,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _scrollToField(_emailFieldKey);
+
+    _scrollToField(_passwordFieldKey);
+
+    setState(() {});
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Utils.appImage(
-                media,
-                // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                dataProvider!.cachedImageMap["imageLogin"],
-                imageKey: "imageLogin",
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: SafeArea(
-                        child: BackArrowWidget(onPress: () {
-                          Navigator.pop(context);
-                        }),
+      body: SingleChildScrollView(
+        controller: _scrollController,
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Utils.appImage(
+                  media,
+                  // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                  dataProvider!.cachedImageMap["imageLogin"],
+                  imageKey: "imageLogin",
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: SafeArea(
+                          child: BackArrowWidget(onPress: () {
+                            Navigator.pop(context);
+                          }),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: ScreenUtil.horizontalScale(42),
+              child: Container(
+                // height: 120,
+                height: 150,
+                width: media.width,
+                decoration: const BoxDecoration(
+                  image:
+                      DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
                 ),
               ),
-            ],
-          ),
-          Positioned(
-            top: ScreenUtil.horizontalScale(42),
-            child: Container(
-              // height: 120,
-              height: 150,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/img/bbb-logo.png'),
-                    fit: BoxFit.fitHeight,
-                    opacity: 1),
-              ),
             ),
-          ),
-          Positioned(
-              bottom: -0.7,
+            Padding(
+              padding: EdgeInsets.only(top: ScreenUtil.verticalScale(42)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ClipPath(
                     clipper: DiagonalClipper(),
@@ -388,8 +494,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.verticalScale(4.4)),
+                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
                       child: Form(
                         key: _formKey,
                         child: Column(
@@ -409,62 +514,61 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: ScreenUtil.verticalScale(3.2),
                             ),
-                            AppTextFormField(
-                              hintText: 'Your Email',
-                              keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
-                              focusNode: focusNode1,
-                              // validator: (value) {
-                              //   return value!.isEmpty
-                              //       ? 'Please, Enter Email Address'
-                              //       : AppConstants.emailRegex.hasMatch(value)
-                              //           ? null
-                              //           : 'Invalid Email Address';
-                              // },
-                              controller: emailController,
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.only(right: 15),
-                                child: IconButton(
-                                  onPressed: () {},
-                                  style: ButtonStyle(
-                                      minimumSize: WidgetStateProperty.all(
-                                          const Size(48, 48))),
-                                  icon: Icon(
-                                    Icons.email,
-                                    color: Colors.grey.shade400,
+                            Container(
+                              key: _emailFieldKey,
+                              child: AppTextFormField(
+                                onTap: () {
+                                  _scrollToField(_emailFieldKey);
+                                  setState(() {});
+                                },
+                                hintText: 'Your Email',
+                                focusNode: _emailFocusNode,
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                controller: emailController,
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.only(right: 15),
+                                  child: SizedBox(
+                                    height: 48,
+                                    width: 48,
+                                    child: Center(
+                                      child: GestureDetector(
+                                        onTap: () {},
+                                        child: Icon(Icons.email, color: Colors.grey.shade400),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                             SizedBox(height: ScreenUtil.verticalScale(2.2)),
-                            AppTextFormField(
-                              hintText: 'Your Password',
-                              keyboardType: TextInputType.visiblePassword,
-                              focusNode: focusNode2,
-                              textInputAction: TextInputAction.done,
-                              // validator: (value) {
-                              //   return value!.isEmpty
-                              //       ? 'Please, Enter Password'
-                              //       : value.length <= 5
-                              //           ? 'Password length must be greater than 6'
-                              //           : null;
-                              // },
-                              controller: passwordController,
-                              obscureText: isObscure,
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.only(right: 15),
-                                child: IconButton(
-                                  onPressed: () {
-                                    setState(() => isObscure = !isObscure);
-                                  },
-                                  style: ButtonStyle(
-                                      minimumSize: WidgetStateProperty.all(
-                                          const Size(48, 48))),
-                                  icon: Icon(
-                                    isObscure
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                    color: Colors.grey.shade400,
+                            Container(
+                              key: _passwordFieldKey,
+                              child: AppTextFormField(
+                                onTap: () {
+                                  _scrollToField(_passwordFieldKey);
+                                  setState(() {});
+                                },
+                                hintText: 'Your Password',
+                                keyboardType: TextInputType.visiblePassword,
+                                textInputAction: TextInputAction.done,
+                                controller: passwordController,
+                                obscureText: isObscure,
+                                focusNode: _passwordFocusNode,
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.only(right: 15),
+                                  child: SizedBox(
+                                    width: 48,
+                                    height: 48,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() => isObscure = !isObscure);
+                                      },
+                                      child: Icon(
+                                        isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -486,8 +590,7 @@ class _LoginPageState extends State<LoginPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (ctx) =>
-                                              const ResetPasswordScreen(
+                                          builder: (ctx) => const ResetPasswordScreen(
                                             image: '',
                                           ),
                                         ),
@@ -531,8 +634,7 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(65, 30),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       alignment: Alignment.center),
                                   child: const Text(
                                     'Sign up',
@@ -553,8 +655,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ],
-              ))
-        ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -21,6 +21,7 @@ class AppTextFormField extends StatelessWidget {
     this.maxLines = 1,
     this.expands = false,
     this.textAlignVertical = TextAlignVertical.center,
+    this.onTap,
   });
 
   final void Function(String)? onChanged;
@@ -38,57 +39,54 @@ class AppTextFormField extends StatelessWidget {
   final int? maxLines;
   final bool expands;
   final TextAlignVertical textAlignVertical;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          focusNode: focusNode,
-          onChanged: onChanged,
-          autofocus: autofocus ?? false,
-          validator: validator,
-          obscureText: obscureText ?? false,
-          // obscuringCharacter: '*',
-          onEditingComplete: onEditingComplete,
-          maxLines: maxLines,
-          expands: expands,
-          textAlignVertical: textAlignVertical,
-          decoration: InputDecoration(
-            suffixIcon: suffixIcon,
-            hintText: hintText,
-            hintStyle: GoogleFonts.plusJakartaSans(
-              color: Colors.grey.shade400,
-              fontWeight: FontWeight.w500,
-              fontSize: ScreenUtil.verticalScale(1.82),
-            ),
-            floatingLabelBehavior: FloatingLabelBehavior.never,
-            filled: true,
-            fillColor: Colors.grey.withValues(alpha: 0.052),
-            contentPadding: EdgeInsets.symmetric(
-                vertical: ScreenUtil.verticalScale(1.85), horizontal: 20.0),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: Utils.buttonRadius,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: Utils.buttonRadius,
-            ),
-          ),
-          cursorColor: Colors.black,
-          cursorWidth: 0.5,
-          onTapOutside: (event) => FocusScope.of(context).unfocus(),
-          style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-            fontSize: ScreenUtil.verticalScale(1.82),
-          ),
+    return TextFormField(
+      onTap: onTap,
+      controller: controller,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      focusNode: focusNode,
+      onChanged: onChanged,
+      autofocus: autofocus ?? false,
+      validator: validator,
+      obscureText: obscureText ?? false,
+      // obscuringCharacter: '*',
+      onEditingComplete: onEditingComplete,
+      maxLines: maxLines,
+      expands: expands,
+      textAlignVertical: textAlignVertical,
+      decoration: InputDecoration(
+        suffixIcon: suffixIcon,
+        hintText: hintText,
+        hintStyle: GoogleFonts.plusJakartaSans(
+          color: Colors.grey.shade400,
+          fontWeight: FontWeight.w500,
+          fontSize: ScreenUtil.verticalScale(1.82),
         ),
-      ],
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        filled: true,
+        fillColor: Colors.grey.withValues(alpha: 0.052),
+        contentPadding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.85), horizontal: 20.0),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: Utils.buttonRadius,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: Utils.buttonRadius,
+        ),
+      ),
+      cursorColor: Colors.black,
+      cursorWidth: 0.5,
+      onTapOutside: (event) => FocusScope.of(context).unfocus(),
+      style: GoogleFonts.plusJakartaSans(
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+        fontSize: ScreenUtil.verticalScale(1.82),
+      ),
     );
   }
 }

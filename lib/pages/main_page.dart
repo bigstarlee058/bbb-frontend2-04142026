@@ -96,6 +96,11 @@ class _MainPageState extends State<MainPage> {
         }
       },
     );
+
+    // WidgetsBinding.instance.addPostFrameCallback(
+    //   (timeStamp) async => await monthProvider.updateOnInitMethods(),
+    // );
+
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async => await _initializeFetchData().then(
         (value) async {
@@ -183,8 +188,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _initializeFetchData() async {
     debugPrint("this  is initial state func");
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider =
-        Provider.of<MonthProvider>(context, listen: false);
+    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {
@@ -208,17 +212,14 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _showWelcomeModal() {
-    Navigator.pushNamed(context, '/watchtutorial',
-        arguments: {"buttontext": "Go to Dashboard"});
+    Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Go to Dashboard"});
   }
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return AnnotatedRegion(
-      value: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light),
+      value: const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.light),
       child: Consumer<MainPageProvider>(
         builder: (context, value, child) => Scaffold(
           backgroundColor: Colors.white,
@@ -259,10 +260,7 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/1-home.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 0
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
+                            value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -281,10 +279,7 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/2-calendar.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 1
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
+                            value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -301,10 +296,7 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/3-statistics.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 2
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
+                            value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -321,10 +313,7 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/4-account.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 3
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
+                            value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(9),
                         height: ScreenUtil.horizontalScale(9),
                       ),
