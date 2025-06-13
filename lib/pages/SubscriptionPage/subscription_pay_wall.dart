@@ -1,14 +1,20 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/main_page.dart';
+import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ntp/ntp.dart';
@@ -28,6 +34,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   String monthPrice = "";
   String yearPrice = "";
   UserDataProvider? userDataProvider;
+  DataProvider? dataProvider;
   Package? selectedPackage;
   bool isLoading = false;
 
@@ -35,6 +42,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   void initState() {
     super.initState();
     userDataProvider = Provider.of<UserDataProvider>(context, listen: false);
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) => getOffering());
   }
 
@@ -122,6 +130,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       final CustomerInfo customerInfo = await Purchases.purchasePackage(selectedPackage!);
 
       final DateTime now = await NTP.now();
+      // log(' customerInfo.allExpirationDates==========>>>>>${customerInfo.activeSubscriptions}');
 
       final entitlementId = selectedPackage!.storeProduct.identifier;
       final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
@@ -135,28 +144,42 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
         );
       } else {
         debugPrint('Entitlement not active or expiration date missing.');
-        _showError("Subscription not activated. Please try again.");
+        showBottomAlert(context, "Subscription not activated. Please try again.");
       }
     } on PurchasesError catch (e) {
       if (e.code == PurchasesErrorCode.purchaseCancelledError) {
         debugPrint("❕Purchase cancelled by user.");
-        _showError("Purchase cancelled.");
+        showBottomAlert(context, "Purchase cancelled.");
       } else {
         debugPrint("RevenueCat error: ${e.code} - ${e.message}");
-        _showError("Purchase failed: ${e.message}");
+        showBottomAlert(context, "Purchase failed: ${e.message}");
       }
     } catch (e) {
       debugPrint("Unexpected error: $e");
-      _showError("Something went wrong. Please try again.");
+      showBottomAlert(context, "Purchase failed: Please try again.");
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  void _handleLogout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    await preferences.clearPrefs();
+    await DatabaseHelper().clearAllTables();
+    await preferences.clearPrefs();
+    context.read<MonthProvider>().clearAllValues();
+    dataProvider?.achievementList = [];
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.onBoardingScreen,
+      (Route<dynamic> route) {
+        log("ROUTE NAME ${route.settings.name}");
+        return route.settings.name == AppRoutes.onBoardingScreen;
+      },
     );
+
+    Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 
   @override
@@ -172,6 +195,22 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             height: MediaQuery.of(context).size.height / 1.8,
             width: double.infinity,
             fit: BoxFit.fitWidth,
+          ),
+          Utils.appImage(
+            MediaQuery.of(context).size,
+            imageKey: '',
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: SafeArea(
+                    child: BackArrowWidget(onPress: () {
+                      _handleLogout(context);
+                    }),
+                  ),
+                ),
+              ],
+            ),
           ),
           Positioned(
             left: 0,
@@ -334,4 +373,38 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       ),
     );
   }
+}
+
+void showBottomAlert(BuildContext context, String msg) {
+  OverlayState? overlayState = Overlay.of(context);
+  OverlayEntry overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      bottom: 20.0,
+      left: MediaQuery.of(context).size.width * 0.1,
+      right: MediaQuery.of(context).size.width * 0.1,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Center(
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlayState.insert(overlayEntry);
+
+  // Remove the alert after 3 seconds
+  Future.delayed(const Duration(seconds: 3), () {
+    overlayEntry.remove();
+  });
 }

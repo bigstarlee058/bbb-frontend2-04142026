@@ -13,7 +13,7 @@ class Utils {
 
   static RoundedRectangleBorder buttonStyle = RoundedRectangleBorder(borderRadius: buttonRadius);
 
-  static appImage(Size media, FileImage? image, {Widget? child, required String imageKey}) {
+  static appImage(Size media, {FileImage? image, Widget? child, required String imageKey}) {
     return Center(
       child: Container(
         height: media.height / 1,

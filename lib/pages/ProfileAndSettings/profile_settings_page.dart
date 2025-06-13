@@ -21,6 +21,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -237,7 +238,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageProfile ?? "",
-                          dataProvider!.cachedImageMap["imageProfile"],
+                          image: dataProvider!.cachedImageMap["imageProfile"],
 
                           imageKey: "imageProfile",
                         ),
@@ -282,40 +283,45 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       GestureDetector(
                                         onTap: _pickAndUploadImage,
                                         child: Consumer<UserDataProvider>(
-                                          builder: (context, userData, child) => userData.userData['detail'] != null &&
-                                                  userData.userData['detail']['avatarUrl'] != ""
-                                              ? Container(
-                                                  height: ScreenUtil.verticalScale(10.5),
-                                                  width: ScreenUtil.verticalScale(10.5),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey.withValues(alpha: .9),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(ScreenUtil.horizontalScale(12.5)),
-                                                    ),
-                                                  ),
-                                                  child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
-                                                      child: Image.network(
-                                                        userData.userData['detail']['avatarUrl']
-                                                                .startsWith('https://storage.cloud.google.com/')
-                                                            ? userData.userData['detail']['avatarUrl'].replaceFirst(
-                                                                'https://storage.cloud.google.com/',
-                                                                'https://storage.googleapis.com/')
-                                                            : userData.userData['detail']['avatarUrl'],
-                                                        fit: BoxFit.cover,
-                                                      )),
-                                                )
-                                              : userData.userName != ""
-                                                  ? Text(
-                                                      userData.userName[0], // First character of the name
-                                                      style: TextStyle(
-                                                        fontSize: ScreenUtil.horizontalScale(12),
-                                                        color: Colors.white, // Adjust size as needed
-                                                        fontWeight: FontWeight.bold,
+                                          builder: (context, userData, child) {
+                                            return userData.userData['detail'] != null &&
+                                                    userData.userData['detail']['avatarUrl'] != null &&
+                                                    userData.userData['detail']['avatarUrl'] != ""
+                                                ? Container(
+                                                    height: ScreenUtil.verticalScale(10.5),
+                                                    width: ScreenUtil.verticalScale(10.5),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey.withValues(alpha: .9),
+                                                      borderRadius: BorderRadius.all(
+                                                        Radius.circular(ScreenUtil.horizontalScale(12.5)),
                                                       ),
-                                                    )
-                                                  : const SizedBox(),
+                                                    ),
+                                                    child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
+                                                        child: Image.network(
+                                                          userData.userData['detail'] != null
+                                                              ? userData.userData['detail']['avatarUrl']
+                                                                      .startsWith('https://storage.cloud.google.com/')
+                                                                  ? userData.userData['detail']['avatarUrl']
+                                                                      .replaceFirst('https://storage.cloud.google.com/',
+                                                                          'https://storage.googleapis.com/')
+                                                                  : userData.userData['detail']['avatarUrl']
+                                                              : "",
+                                                          fit: BoxFit.cover,
+                                                        )),
+                                                  )
+                                                : userData.userName != ""
+                                                    ? Text(
+                                                        userData.userName[0], // First character of the name
+                                                        style: TextStyle(
+                                                          fontSize: ScreenUtil.horizontalScale(12),
+                                                          color: Colors.white, // Adjust size as needed
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      )
+                                                    : const SizedBox();
+                                          },
                                         ),
                                       ),
                                       SizedBox(
@@ -555,15 +561,18 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('Subscription', Icons.refresh, () async {
-                                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                                    String? token = prefs.getString('authToken');
-
-                                    Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/?token=$token');
-
-                                    if (await canLaunchUrl(url)) {
-                                      await launchUrl(url);
+                                    bool isAppUser = userData?.user["singuptype"] != "web" ? true : false;
+                                    if (isAppUser) {
+                                      await openAppSettings();
                                     } else {
-                                      throw 'Could not launch $url';
+                                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                                      String? token = prefs.getString('authToken');
+                                      Uri url = Uri.parse('https://bbbdev1.wpenginepowered.com/?token=$token');
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(url);
+                                      } else {
+                                        throw 'Could not launch $url';
+                                      }
                                     }
                                   }),
 

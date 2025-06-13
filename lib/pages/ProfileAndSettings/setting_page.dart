@@ -85,7 +85,7 @@ class _SettingPageState extends State<SettingPage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageSetting ?? "",
-                          dataProvider!.cachedImageMap["imageSetting"],
+                          image: dataProvider!.cachedImageMap["imageSetting"],
 
                           imageKey: "imageSetting",
                         ),
@@ -137,7 +137,8 @@ class _SettingPageState extends State<SettingPage> {
                                 // ),
                                 Container(
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: ScreenUtil.horizontalScale(10), vertical: ScreenUtil.verticalScale(10)),
+                                      horizontal: ScreenUtil.horizontalScale(10),
+                                      vertical: ScreenUtil.verticalScale(10)),
                                   child: Center(
                                     child: Text(
                                       'Settings',
@@ -241,8 +242,10 @@ class _SettingPageState extends State<SettingPage> {
                                   });
                                   await preferences.setBool(SharedPreference.notificationSwitch, isSwitchOn ?? false);
                                   if (isSwitchOn == true) {
-                                    await NotificationService.scheduleMonthlyReminder(20, monthDataModel.endTime ?? DateTime.now().toUtc());
-                                    await NotificationService.scheduleWeekReminder(30, monthDataModel.endTime ?? DateTime.now().toUtc());
+                                    await NotificationService.scheduleMonthlyReminder(
+                                        20, monthDataModel.endTime ?? DateTime.now().toUtc());
+                                    await NotificationService.scheduleWeekReminder(
+                                        30, monthDataModel.endTime ?? DateTime.now().toUtc());
                                   } else {
                                     await NotificationService.clearScheduledNotification();
                                   }
@@ -254,7 +257,8 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(7), 0, ScreenUtil.horizontalScale(7), 0),
+                        padding:
+                            EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(7), 0, ScreenUtil.horizontalScale(7), 0),
                         child: Divider(
                           thickness: 0.3,
                           height: 0,
@@ -286,7 +290,8 @@ class _SettingPageState extends State<SettingPage> {
                                     setState(() {
                                       isHapticFeedbackOn = value; // Update state
                                     });
-                                    await preferences.setBool(SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
+                                    await preferences.setBool(
+                                        SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
                                   },
                                   activeColor: AppColors.primaryColor,
                                 );
@@ -296,7 +301,8 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(7), 0, ScreenUtil.horizontalScale(7), 0),
+                        padding:
+                            EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(7), 0, ScreenUtil.horizontalScale(7), 0),
                         child: Divider(
                           thickness: 0.3,
                           height: 0,
@@ -318,180 +324,6 @@ class _SettingPageState extends State<SettingPage> {
   }
 
 // Profile Field for Birthday and Other Text Inputs
-  Widget _buildProfileField({
-    required BuildContext context,
-    required String label,
-    required bool isFirstSelected,
-    required VoidCallback onFirstTap,
-    required VoidCallback onSecondTap,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: ScreenUtil.horizontalScale(9),
-      ),
-      height: ScreenUtil.verticalScale(8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: AppColors.primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          _buildOption("lb/in", isFirstSelected, onFirstTap),
-          SizedBox(width: 15),
-          _buildOption("kg/cm", !isFirstSelected, onSecondTap),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOption(String text, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque, // Ensure the whole area is clickable
-      child: Column(
-        children: [
-          Container(
-            width: 21, // Outer circle size
-            height: 21,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primaryColor, width: 2), // Outer border
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(2), // Creates space between inner circle and border
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected ? AppColors.primaryColor : Colors.transparent, // Inner circle color
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 4),
-          Text(
-            text,
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
 // Dropdown Field for Gender, Location, etc.
-  Widget _buildDropdownField({
-    required BuildContext context,
-    required String label,
-    required String? value,
-    required List<String> options,
-    required String hint,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(12), vertical: ScreenUtil.verticalScale(0.8)),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 18,
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.horizontalScale(1),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  ScreenUtil.verticalScale(5),
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x20888888),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Center(
-                // Center the dropdown content
-                child: DropdownButton<String>(
-                  value: value,
-                  dropdownColor: const Color.fromARGB(255, 252, 252, 252),
-                  elevation: 12,
-                  hint: Text(hint),
-                  isDense: true,
-                  isExpanded: true,
-                  alignment: Alignment.center,
-                  // Align the dropdown text to the center
-                  items: options.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Center(
-                        // Center the individual items in dropdown
-                        child: Text(value),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: onChanged,
-                  underline: Container(),
-                ),
-
-                // DropdownButton<String>(
-                //   value: value,
-                //   hint: Text(hint),
-                //   isExpanded: true,
-                //   alignment: Alignment.center, // Align the dropdown text to the center
-                //   items: options.map((String value) {
-                //     return DropdownMenuItem<String>(
-                //       value: value,
-                //       child: Center(
-                //         // Center the individual items in dropdown
-                //         child: Text(value),
-                //       ),
-                //     );
-                //   }).toList(),
-                //   onChanged: (String? newValue) {
-                //     setState(() {
-                //       value = newValue;
-                //     });
-                //   },
-                //   underline: Container(),
-                // ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

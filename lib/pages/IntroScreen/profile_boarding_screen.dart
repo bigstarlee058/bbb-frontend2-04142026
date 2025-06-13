@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -84,37 +85,42 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   }
 
   bool isLoading = false;
-  Future<void> _saveUserData() async {
+  Future<void> _saveUserData({bool loader = false}) async {
     setState(() {
-      isLoading = true;
+      isLoading = loader;
     });
 
     final userDetails = {
       'lastName': '',
-      'firstName': nameController.text.toString(),
-      'sex': genderOptions.indexOf(selectedGender!),
+      'firstName':
+          nameController.text.trim().toString().isEmpty ? userData.user["name"] ?? "" : nameController.text.toString(),
+      'sex': (selectedGender ?? "").isNotEmpty ? genderOptions.indexOf(selectedGender!) : "",
       'dob': selectedDate?.toIso8601String(),
       'weight': selectedWeight.text.isEmpty ? "" : int.parse(selectedWeight.text.split(' ')[0]),
-      'height': selectedHeight.text.isEmpty ? "" : int.parse(selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'waist': selectedWaist.text.isEmpty ? "0" : int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
-      'hip': selectedHip.text.isEmpty ? "0" : int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
-      'midthigh': selectedMidThigh.text.isEmpty ? "0" : int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "") ?? "0"),
+      'height':
+          selectedHeight.text.isEmpty ? "" : int.parse(selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'waist':
+          selectedWaist.text.isEmpty ? "0" : int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'hip': selectedHip.text.isEmpty ? "0" : int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'midthigh': selectedMidThigh.text.isEmpty
+          ? "0"
+          : int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "")),
       'bodyfat': selectedBodyFat.text.isEmpty ? "0" : int.parse(selectedBodyFat.text.split(' ')[0]),
     };
     if (kDebugMode) {
-      print('HERE IS USERDETAIL##, $userDetails');
+      print('HERE IS USER DETAIL##, $userDetails');
     }
 
     await userData.addUserInfo(userData.userId, userDetails, image);
-    Fluttertoast.showToast(
-      msg: "Profile saved!",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP_RIGHT,
-      timeInSecForIosWeb: 1,
-      backgroundColor: AppColors.primaryColor,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    // Fluttertoast.showToast(
+    //   msg: "Profile saved!",
+    //   toastLength: Toast.LENGTH_LONG,
+    //   gravity: ToastGravity.TOP_RIGHT,
+    //   timeInSecForIosWeb: 1,
+    //   backgroundColor: AppColors.primaryColor,
+    //   textColor: Colors.white,
+    //   fontSize: 16.0,
+    // );
     setState(() {
       isLoading = false;
     });
@@ -144,259 +150,210 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          "",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: ScreenUtil.horizontalScale(5.5),
+          ),
+        ),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+                if (context.mounted) {
+                  await Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MainPage(
+                        showWelcomeModal: !hasSeenWelcome,
+                        welcomeDescription: widget.welcomeDescription,
+                        welcomeImageUrl: widget.welcomeImageUrl,
+                        isComeFromOnBoarding: true,
+                      ),
+                    ),
+                  );
+                }
+              },
+              icon: Icon(Icons.close)),
+          SizedBox(width: 8)
+        ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(
+          bottom: ScreenUtil.verticalScale(3.2),
+          right: ScreenUtil.horizontalScale(7),
+          left: ScreenUtil.horizontalScale(7),
+        ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Stack(
-              children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: media.height,
-                          width: media.width,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
+            Padding(
+              padding: EdgeInsets.only(
+                right: ScreenUtil.horizontalScale(2),
+                left: ScreenUtil.horizontalScale(2),
+                bottom: ScreenUtil.verticalScale(1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                  4,
+                  (index) => Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(right: index == 3 ? 0 : 5),
+                      height: 5,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: currentPage > (index) ? AppColors.primaryColor : Colors.grey.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: ScreenUtil.verticalScale(1)),
+            ButtonWidget(
+              text: currentPage == 4 ? "Save" : "Next",
+              textColor: Colors.white,
+              color: AppColors.primaryColor,
+              onPress: () async {
+                await preferences.setBool(SharedPreference.isFirstTime, false);
+
+                if (currentPage == 1) {
+                  if (nameController.text.isEmpty) {
+                    showBottomAlert(context, 'Please enter your name to get started!');
+                    return;
+                  } else {
+                    pageController.nextPage(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.fastOutSlowIn,
+                    );
+                    setState(() {});
+
+                    await _saveUserData();
+                  }
+                } else if (currentPage == 2) {
+                  pageController.nextPage(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.fastOutSlowIn,
+                  );
+                  setState(() {});
+                  await _saveUserData();
+                } else if (currentPage == 3) {
+                  pageController.nextPage(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.fastOutSlowIn,
+                  );
+                  setState(() {});
+
+                  await _saveUserData();
+                } else if (currentPage == 4) {
+                  await _saveUserData(loader: true).then(
+                    (value) async {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+                      if (context.mounted) {
+                        await Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MainPage(
+                              showWelcomeModal: !hasSeenWelcome,
+                              welcomeDescription: widget.welcomeDescription,
+                              welcomeImageUrl: widget.welcomeImageUrl,
+                              isComeFromOnBoarding: true,
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: media.height / 4,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                          top: ScreenUtil.verticalScale(1),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Welcome',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 7.99,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                        );
+                      }
+                    },
+                  );
+                }
+              },
+              isLoading: isLoading,
+            ),
+            SizedBox(height: ScreenUtil.verticalScale(1)),
+            currentPage == 1
+                ? SizedBox()
+                : TextButton(
+                    onPressed: () async {
+                      await preferences.setBool(SharedPreference.isFirstTime, false);
+
+                      if (currentPage == 2) {
+                        pageController.nextPage(
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.fastOutSlowIn,
+                        );
+                        setState(() {});
+                      } else if (currentPage == 3) {
+                        pageController.nextPage(
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.fastOutSlowIn,
+                        );
+                        setState(() {});
+                      } else if (currentPage == 4) {
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+                        if (context.mounted) {
+                          await Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainPage(
+                                showWelcomeModal: !hasSeenWelcome,
+                                welcomeDescription: widget.welcomeDescription,
+                                welcomeImageUrl: widget.welcomeImageUrl,
+                                isComeFromOnBoarding: true,
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(
-                    top: media.height / 8,
-                  ),
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                      ),
-                    ),
-                    child: Container(
-                      constraints: BoxConstraints(minHeight: media.height - media.height / 8),
-                      width: media.width,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(55),
-                        ),
-                      ),
-                      child: Stack(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(5),
-                              vertical: ScreenUtil.verticalScale(2),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: media.height * 0.8,
-                                  child: PageView.builder(
-                                    onPageChanged: (value) {
-                                      currentPage = value + 1;
-                                      setState(() {});
-                                    },
-                                    controller: pageController,
-                                    itemCount: 3,
-                                    itemBuilder: (context, index) {
-                                      return index == 0
-                                          ? page1()
-                                          : index == 1
-                                              ? page2(context)
-                                              : page3();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Positioned(
-                            bottom: ScreenUtil.verticalScale(3.2),
-                            right: ScreenUtil.horizontalScale(7),
-                            left: ScreenUtil.horizontalScale(7),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    right: ScreenUtil.horizontalScale(2),
-                                    left: ScreenUtil.horizontalScale(2),
-                                    bottom: ScreenUtil.verticalScale(1),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: List.generate(
-                                      3,
-                                      (index) => Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(right: index == 2 ? 0 : 5),
-                                          height: 5,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(20),
-                                            color: currentPage > (index) ? AppColors.primaryColor : Colors.grey.withValues(alpha: 0.4),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: ScreenUtil.verticalScale(1)),
-                                ButtonWidget(
-                                  text: currentPage == 3 ? "Save" : "Next",
-                                  textColor: Colors.white,
-                                  color: AppColors.primaryColor,
-                                  onPress: () async {
-                                    /// 1
-
-                                    if (currentPage == 1) {
-                                      if (nameController.text.isEmpty) {
-                                        showBottomAlert(context, 'Please enter name');
-                                        return;
-                                      } else {
-                                        pageController.nextPage(
-                                          duration: const Duration(milliseconds: 400),
-                                          curve: Curves.fastOutSlowIn,
-                                        );
-                                        setState(() {});
-                                      }
-                                    }
-
-                                    /// 2
-
-                                    if (currentPage == 2) {
-                                      if (selectedGender == null ||
-                                          selectedDate == null ||
-                                          selectedHeight.text.isEmpty ||
-                                          selectedWeight.text.isEmpty) {
-                                        showBottomAlert(context, 'Please enter details');
-                                        return;
-                                      } else {
-                                        pageController.nextPage(
-                                          duration: const Duration(milliseconds: 400),
-                                          curve: Curves.fastOutSlowIn,
-                                        );
-                                        setState(() {});
-                                      }
-                                    }
-
-                                    /// 3
-
-                                    if (currentPage == 3) {
-                                      if (image == null) {
-                                        showBottomAlert(context, 'Please upload profile image');
-                                        return;
-                                      } else {
-                                        if (nameController.text.isEmpty) {
-                                          showBottomAlert(context, 'Please enter name');
-                                          return;
-                                        }
-                                        if (selectedGender == null ||
-                                            selectedDate == null ||
-                                            selectedHeight.text.isEmpty ||
-                                            selectedWeight.text.isEmpty) {
-                                          showBottomAlert(context, 'Please enter details');
-                                          return;
-                                        }
-
-                                        /// UPDATE DATA
-                                        ///
-                                        await _saveUserData().then(
-                                          (value) async {
-                                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                                            bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-                                            await Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => MainPage(
-                                                  showWelcomeModal: !hasSeenWelcome,
-                                                  welcomeDescription: widget.welcomeDescription,
-                                                  welcomeImageUrl: widget.welcomeImageUrl,
-                                                  isComeFromOnBoarding: true,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      }
-                                    }
-                                  },
-                                  isLoading: isLoading,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          );
+                        }
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(65, 30),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        alignment: Alignment.center),
+                    child: const Text(
+                      'Skip',
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: 16,
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+            SizedBox(height: ScreenUtil.verticalScale(0.5)),
           ],
+        ),
+      ),
+      backgroundColor: Colors.white,
+      body: SizedBox(
+        height: media.height * 0.7,
+        child: PageView.builder(
+          onPageChanged: (value) {
+            currentPage = value + 1;
+            setState(() {});
+          },
+          controller: pageController,
+          itemCount: 4,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+              child: index == 0
+                  ? page1()
+                  : index == 1
+                      ? page2(context)
+                      : index == 2
+                          ? page3(context)
+                          : page4(),
+            );
+          },
         ),
       ),
     );
@@ -404,41 +361,51 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
 
   Widget page1() => Column(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: ScreenUtil.verticalScale(1)),
           Text(
-            "Name",
+            "Welcome!",
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(3),
-              height: 1,
+              height: 1.5,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(4)),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                "Enter your name",
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.8),
-                  height: 1,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
-              ),
+          SizedBox(height: ScreenUtil.verticalScale(3)),
+          Text(
+            "Welcome to the Booty By Bret app. Before we get started, we’re going to ask you a few questions to get to know you and customize your experience.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(2),
+              height: 1.5,
+              color: Color(0xff6f6f6f),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(1.5)),
+          SizedBox(height: ScreenUtil.verticalScale(3)),
+          Text(
+            "Let's start with your name.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(2),
+              height: 1.5,
+              color: Color(0xff6f6f6f),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(4)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: AppTextFormField(
               hintText: 'First Name',
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
-              onChanged: (value) {},
+              onChanged: (value) {
+                if (nameController.text.toString().trim().isEmpty) {
+                  nameController.clear();
+                  setState(() {});
+                }
+              },
               controller: nameController,
               suffixIcon: Padding(
                 padding: const EdgeInsets.only(right: 15),
@@ -457,35 +424,34 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
+          SizedBox(height: ScreenUtil.verticalScale(7)),
         ],
       );
 
   Widget page2(BuildContext context) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: ScreenUtil.verticalScale(1)),
           Text(
-            "Details",
+            "Tell us about you",
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(3),
-              height: 1,
+              height: 1.5,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(3)),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Add your details",
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.8),
-                height: 1,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-              ),
+          SizedBox(height: ScreenUtil.verticalScale(2.5)),
+          Text(
+            "Some basic info to get us started.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(2),
+              height: 1.5,
+              color: Color(0xff6f6f6f),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(0.6)),
+          SizedBox(height: ScreenUtil.verticalScale(3.5)),
           _buildDropdownField(
             context: context,
             label: 'Gender',
@@ -498,6 +464,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               });
             },
           ),
+          SizedBox(height: ScreenUtil.verticalScale(1.5)),
           _buildProfileField(
             context: context,
             label: 'Birthday',
@@ -506,12 +473,14 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               _showDatePicker(context);
             },
           ),
+          SizedBox(height: ScreenUtil.verticalScale(1.5)),
           _heightPicker(
             context: context,
             label: 'Height',
             value: selectedHeight,
             hint: '6\'0"',
           ),
+          SizedBox(height: ScreenUtil.verticalScale(1.5)),
           _numberPicker(
             context: context,
             label: 'Weight',
@@ -519,6 +488,34 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             focusNode: _nodeText1,
             suffix: "lbs",
           ),
+          SizedBox(height: ScreenUtil.verticalScale(7)),
+        ],
+      );
+
+  Widget page3(BuildContext context) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Extra measurements",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(3),
+              height: 1.5,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(2.5)),
+          Text(
+            "For the real data freaks out there.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(2),
+              height: 1.5,
+              color: Color(0xff6f6f6f),
+            ),
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(3.5)),
           _numberPicker(
             context: context,
             label: 'Waist',
@@ -526,6 +523,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             focusNode: _nodeText2,
             suffix: '"',
           ),
+          SizedBox(height: ScreenUtil.verticalScale(1.5)),
           _numberPicker(
             context: context,
             label: 'Hip',
@@ -533,6 +531,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             focusNode: _nodeText3,
             suffix: '"',
           ),
+          SizedBox(height: ScreenUtil.verticalScale(1.5)),
           _numberPicker(
             context: context,
             label: 'Mid-Thigh',
@@ -540,6 +539,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             focusNode: _nodeText4,
             suffix: '"',
           ),
+          SizedBox(height: ScreenUtil.verticalScale(1.5)),
           _numberPicker(
             context: context,
             label: 'Body-Fat',
@@ -547,32 +547,30 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             focusNode: _nodeText5,
             suffix: "%", // hint: '81',
           ),
+          SizedBox(height: ScreenUtil.verticalScale(7)),
         ],
       );
-
-  Widget page3() => Column(
+  Widget page4() => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: ScreenUtil.verticalScale(1)),
           Text(
-            "Profile",
+            "Your profile photo",
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(3),
-              height: 1,
+              height: 1.5,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(4)),
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              "Add your profile image",
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.8),
-                height: 1,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-              ),
+          SizedBox(height: ScreenUtil.verticalScale(3)),
+          Text(
+            "Click to upload a favorite photo of yourself.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: ScreenUtil.verticalScale(2),
+              height: 1.5,
+              color: Color(0xff6f6f6f),
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(4)),
@@ -644,212 +642,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
-          /*SizedBox(height: ScreenUtil.verticalScale(5)),
-          Text(
-            "What’s Your Goal?",
-            style: TextStyle(
-              fontSize: ScreenUtil.verticalScale(2.8),
-              height: 1,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryColor,
-            ),
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(4)),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                "Select your goal",
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.8),
-                  height: 1,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(1.2)),
-          Container(
-            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
-            padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.greyColor,
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: AppColors.primaryColor,
-                  radius: ScreenUtil.verticalScale(2),
-                  child: Text(
-                    "1",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(2.5),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  "Muscle Growth",
-                  style: TextStyle(
-                    color: const Color(0xBB888888),
-                    fontSize: ScreenUtil.verticalScale(1.8),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Spacer(),
-                GestureDetector(
-                  onTap: () => updateSplitIndex(0),
-                  child: Container(
-                    height: ScreenUtil.verticalScale(4),
-                    width: ScreenUtil.verticalScale(4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: goalIndex == 0 ? AppColors.primaryColor : Colors.transparent,
-                      border: Border.all(color: AppColors.primaryColor),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.done,
-                        size: ScreenUtil.verticalScale(2.5),
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          const SizedBox(height: 5),
-          Container(
-            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
-            padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.greyColor,
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: AppColors.primaryColor,
-                  radius: ScreenUtil.verticalScale(2),
-                  child: Text(
-                    "2",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(2.5),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  "Weight Gain",
-                  style: TextStyle(
-                    color: const Color(0xBB888888),
-                    fontSize: ScreenUtil.verticalScale(1.8),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Spacer(),
-                GestureDetector(
-                  onTap: () => updateSplitIndex(1),
-                  child: Container(
-                    height: ScreenUtil.verticalScale(4),
-                    width: ScreenUtil.verticalScale(4),
-                    decoration: BoxDecoration(
-                      color: goalIndex == 1 ? AppColors.primaryColor : Colors.transparent,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primaryColor),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.done,
-                        size: ScreenUtil.verticalScale(2.5),
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          const SizedBox(height: 5),
-          Container(
-            margin: EdgeInsets.all(ScreenUtil.verticalScale(0.6)),
-            padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.greyColor,
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: AppColors.primaryColor,
-                  radius: ScreenUtil.verticalScale(2),
-                  child: Text(
-                    "3",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(2.5),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  "Strength & Performance",
-                  style: TextStyle(
-                    color: const Color(0xBB888888),
-                    fontSize: ScreenUtil.verticalScale(1.8),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Spacer(),
-                GestureDetector(
-                  onTap: () => updateSplitIndex(2),
-                  child: Container(
-                    height: ScreenUtil.verticalScale(4),
-                    width: ScreenUtil.verticalScale(4),
-                    decoration: BoxDecoration(
-                      color: goalIndex == 2 ? AppColors.primaryColor : Colors.transparent,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primaryColor),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.done,
-                        size: ScreenUtil.verticalScale(2.5),
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),*/
+          SizedBox(height: ScreenUtil.verticalScale(7)),
         ],
       );
 
@@ -1115,7 +908,11 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
     );
   }
 
-  Widget _heightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+  Widget _heightPicker(
+      {required BuildContext context,
+      required String label,
+      required TextEditingController value,
+      required String hint}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.6)),
       height: ScreenUtil.verticalScale(6),

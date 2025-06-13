@@ -60,7 +60,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                     child: Utils.appImage(
                       media,
                       // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
-                      dataProvider!.cachedImageMap["imageStreakCalendar"],
+                      image: dataProvider!.cachedImageMap["imageStreakCalendar"],
                       imageKey: "imageStreakCalendar",
                       child: SafeArea(
                         child: SizedBox(
@@ -225,7 +225,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               height: ScreenUtil.verticalScale(4),
                             ),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(14), 1, ScreenUtil.horizontalScale(14), 0),
+                              padding: EdgeInsets.fromLTRB(
+                                  ScreenUtil.horizontalScale(14), 1, ScreenUtil.horizontalScale(14), 0),
                               child: Text(
                                 'Mark a day a complete every day to keep the perfect flame streak going.',
                                 style: TextStyle(
@@ -246,14 +247,16 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               ),
                               child: Consumer<MonthProvider>(
                                 builder: (context, monthProvider, child) {
-                                  String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
+                                  String split = monthProvider
+                                          .monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
                                           .toString()
                                           .split(" ")[1] ??
                                       "";
                                   String dataId =
                                       "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
 
-                                  final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
+                                  final data =
+                                      monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
                                   String status = "";
                                   String title = "";
                                   if (data.isNotEmpty) {
@@ -272,8 +275,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                                                 ? 'Continue Your Workout'
                                                 : 'Start Your Workout',
                                     textColor: Colors.white,
-                                    onPress:
-                                        monthProvider.todayTitleId.isEmpty ? () {} : () => continueWorkoutOnTap(monthProvider, context),
+                                    onPress: monthProvider.todayTitleId.isEmpty
+                                        ? () {}
+                                        : () => continueWorkoutOnTap(monthProvider, context),
                                     color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
                                     isLoading: false,
                                   );
@@ -327,7 +331,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                         },
                         icon: SvgPicture.asset(
                           'assets/img/1-home.svg',
-                          colorFilter: ColorFilter.mode(value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                           width: ScreenUtil.horizontalScale(8.5),
                           height: ScreenUtil.horizontalScale(8.5),
                         ),
@@ -342,7 +347,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                         },
                         icon: SvgPicture.asset(
                           'assets/img/2-calendar.svg',
-                          colorFilter: ColorFilter.mode(value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                           width: ScreenUtil.horizontalScale(8.5),
                           height: ScreenUtil.horizontalScale(8.5),
                         ),
@@ -354,7 +360,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                         },
                         icon: SvgPicture.asset(
                           'assets/img/3-statistics.svg',
-                          colorFilter: ColorFilter.mode(value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                           width: ScreenUtil.horizontalScale(8.5),
                           height: ScreenUtil.horizontalScale(8.5),
                         ),
@@ -366,7 +373,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                         },
                         icon: SvgPicture.asset(
                           'assets/img/4-account.svg',
-                          colorFilter: ColorFilter.mode(value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
                           width: ScreenUtil.horizontalScale(9),
                           height: ScreenUtil.horizontalScale(9),
                         ),
@@ -388,7 +396,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       (element) => element == monthProvider.todayTitleId,
     );
 
-    String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split =
+        monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ??
+            "";
 
     String dataId =
         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
@@ -402,18 +412,23 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
             "0")) -
         1;
     DayDataModel dayData =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Workout")
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                .toString()
+                .contains("Workout")
             ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
             : DayDataModel();
 
-    bool isRestDay =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Rest Day");
+    bool isRestDay = "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+        .toString()
+        .contains("Rest Day");
 
     bool isPumpDay = (isRestDay &&
-            monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+            monthProvider.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             (monthProvider.isPumpDayAvailable &&
-                (monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+                (monthProvider.allDayHistoryModel
+                    .any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
         (isRestDay &&
             monthProvider.isPumpDayAvailable &&
             (monthProvider.allDayHistoryModel
@@ -430,13 +445,13 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
           .toList();
 
       if (dataList.isNotEmpty) {
-        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
-            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
+            (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
         if (index1 != -1) {
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
         } else {
-          int index1 =
-              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          int index1 = monthProvider.pumpDays
+              .indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
               ? 0
               : index1 == 0
@@ -461,15 +476,19 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     final dayIndex1 = monthProvider.overviewCurrentDay;
 
     int nextWorkOutIndex = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
-        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1]
+                .toString()
+                .replaceAll("Day ", "")
+                .replaceAll(" Workout", "")) -
+            1
         : 0;
 
     String currentDayTitle = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
         ? monthProvider.weekDataModel!.days![nextWorkOutIndex].title ?? ""
         : monthProvider.weekDataModel!.dayList![dayIndex1 - 1];
 
-    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel
-        .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
+    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel.any((element) =>
+        (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
 
     if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && isCompletedOrSkipped) {
       return;
@@ -493,11 +512,14 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       // );
     } else {
       if (monthProvider.isPumpDay) {
-        if ((monthProvider.allSplitDayHistoryModel
-                .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+        if ((monthProvider.allSplitDayHistoryModel.any((element) =>
+                (element.status == Status.completed || element.status == Status.skipped) &&
+                element.dataId == dataId)) ==
             false) {
           _saveDayData(
-              type: "Pump Day - ${monthProvider.pumpDayModel?.id}", status: Status.started, title: monthProvider.pumpDayModel?.title);
+              type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+              status: Status.started,
+              title: monthProvider.pumpDayModel?.title);
           if (!context.mounted) return;
           await Navigator.pushNamed(context, '/today').then(
             (value) {
@@ -521,8 +543,10 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
   }
 
   Future<void> _saveDayData({required String status, required String type, String? title}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
@@ -584,9 +608,12 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     monthProvider?.getLiftedWeightGraphData();
   }
 
-  Future<void> _completeRestDay({required String status, required String type, String? title, bool endDate = false}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  Future<void> _completeRestDay(
+      {required String status, required String type, String? title, bool endDate = false}) async {
+    String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
@@ -609,8 +636,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
       "endTime": endDate ? "${DateTime.now().toUtc()}" : "",
     };
 
-    DayHistoryModel? matchingElement =
-        monthProvider?.dayHistoryModel.firstWhere((element) => element.dataId == dataId, orElse: () => DayHistoryModel());
+    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel
+        .firstWhere((element) => element.dataId == dataId, orElse: () => DayHistoryModel());
 
     final data1 = {
       "title": title ?? "",
@@ -621,7 +648,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
+      "endTime":
+          (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
     };
 
     final apiBody = {
@@ -633,7 +661,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
+      "endTime":
+          (status == Status.completed) ? "${DateTime.now().toUtc()}" : (endDate ? "${DateTime.now().toUtc()}" : ""),
       "dataId": dataId
     };
 

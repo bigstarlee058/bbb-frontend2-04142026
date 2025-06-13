@@ -50,7 +50,7 @@ class _TutorialPageState extends State<TutorialPage> {
                       children: [
                         Utils.appImage(
                           media,
-                          dataProvider!.cachedImageMap["imageApparel"],
+                          image: dataProvider!.cachedImageMap["imageApparel"],
                           imageKey: "imageDashboard",
                         ),
                         SizedBox(
@@ -145,7 +145,8 @@ class _TutorialPageState extends State<TutorialPage> {
                   child: Container(
                     width: media.width,
                     constraints: BoxConstraints(minHeight: (media.height - (media.height / 4.6))),
-                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.verticalScale(2)),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.verticalScale(2)),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -207,7 +208,8 @@ class _TutorialPageState extends State<TutorialPage> {
                     image: DecorationImage(
                       image: data.thumbnail!.isNotEmpty
                           ? NetworkImage(data.thumbnail!.startsWith('https://storage.cloud.google.com/')
-                              ? data.thumbnail!.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                              ? data.thumbnail!
+                                  .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                               : data.thumbnail!)
                           : const AssetImage('assets/img/library_placeholder.png'),
                       fit: BoxFit.cover,

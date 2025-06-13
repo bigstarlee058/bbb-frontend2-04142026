@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
@@ -184,6 +185,11 @@ class _LoginPageState extends State<LoginPage> {
 
                       Map<String, dynamic> subscriptionData = userData.user["subscription"];
                       if (Platform.isIOS && isAppUser) {
+                        bool isFirstTime = userData.user["createdAt"] != userData.user["updatedAt"];
+
+                        await preferences.setBool(SharedPreference.isFirstTime, isFirstTime);
+                        bool isFirstTime1 = await preferences.getBool(SharedPreference.isFirstTime) ?? false;
+
                         if (subscriptionData["user_subscription_status"] == "free_user") {
                           if (mounted) {
                             await Navigator.pushReplacement(
@@ -441,7 +447,7 @@ class _LoginPageState extends State<LoginPage> {
                 Utils.appImage(
                   media,
                   // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                  dataProvider!.cachedImageMap["imageLogin"],
+                  image: dataProvider!.cachedImageMap["imageLogin"],
                   imageKey: "imageLogin",
                   child: Column(
                     children: [

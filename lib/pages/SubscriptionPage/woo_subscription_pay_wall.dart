@@ -1,14 +1,20 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/main_page.dart';
+import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ntp/ntp.dart';
@@ -30,6 +36,33 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
     return prefs.getString('authToken');
   }
 
+  DataProvider? dataProvider;
+  @override
+  void initState() {
+    super.initState();
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+  }
+
+  void _handleLogout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    await preferences.clearPrefs();
+    await DatabaseHelper().clearAllTables();
+    await preferences.clearPrefs();
+    context.read<MonthProvider>().clearAllValues();
+    dataProvider?.achievementList = [];
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.onBoardingScreen,
+      (Route<dynamic> route) {
+        log("ROUTE NAME ${route.settings.name}");
+        return route.settings.name == AppRoutes.onBoardingScreen;
+      },
+    );
+
+    Navigator.pushNamed(context, AppRoutes.loginScreen);
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
@@ -44,6 +77,22 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
             width: double.infinity,
             fit: BoxFit.fitWidth,
           ),
+          Utils.appImage(
+            MediaQuery.of(context).size,
+            imageKey: '',
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: SafeArea(
+                    child: BackArrowWidget(onPress: () {
+                      _handleLogout(context);
+                    }),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Positioned(
             left: 0,
             right: 0,
@@ -54,10 +103,8 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
             ),
           ),
           Container(
-            margin:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height / 1.45),
-            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5))
-                .copyWith(bottom: ScreenUtil.verticalScale(3.2)),
+            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height / 1.45),
+            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5)).copyWith(bottom: ScreenUtil.verticalScale(3.2)),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -66,8 +113,7 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: ScreenUtil.verticalScale(1)),
+                  padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1)),
                   child: Center(
                     child: Text(
                       "Your subscription is inactive",
@@ -157,29 +203,21 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                      border: Border.all(
-                          color: !selected
-                              ? Colors.grey.shade300
-                              : AppColors.primaryColor),
+                      border: Border.all(color: !selected ? Colors.grey.shade300 : AppColors.primaryColor),
                       shape: BoxShape.circle),
                   child: Center(
-                    child: Icon(Icons.check_circle,
-                        color: !selected ? Colors.white : Color(0xFF8B2D40),
-                        size: 18),
+                    child: Icon(Icons.check_circle, color: !selected ? Colors.white : Color(0xFF8B2D40), size: 18),
                   ),
                 ),
                 SizedBox(width: 5),
                 Text(
                   title,
-                  style: TextStyle(
-                      fontSize: ScreenUtil.verticalScale(1.8),
-                      fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: ScreenUtil.verticalScale(1.8), fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
                 if (badge != null)
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     decoration: BoxDecoration(
                       color: const Color(0xFF8B2D40),
                       borderRadius: BorderRadius.circular(10),
@@ -187,16 +225,13 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
                     child: Text(
                       badge,
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ScreenUtil.verticalScale(1.2),
-                          fontWeight: FontWeight.bold),
+                          color: Colors.white, fontSize: ScreenUtil.verticalScale(1.2), fontWeight: FontWeight.bold),
                     ),
                   ),
               ],
             ),
             SizedBox(height: ScreenUtil.verticalScale(0.5)),
-            Text("Full access for just $price",
-                style: TextStyle(fontSize: ScreenUtil.verticalScale(1.5))),
+            Text("Full access for just $price", style: TextStyle(fontSize: ScreenUtil.verticalScale(1.5))),
           ],
         ),
       ),

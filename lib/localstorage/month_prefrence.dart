@@ -24,6 +24,7 @@ class SharedPreference {
   static const String isHapticFeedbackOn = "IS-HAPTIC-FEEDBACK-ON";
   static const String monthSettingDone = "MONTH-SETTING-DONE";
   static const String isMute = "IS-MUTE";
+  static const String isFirstTime = "IS-FIRST-TIME";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();

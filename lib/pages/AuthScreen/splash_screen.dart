@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
@@ -59,7 +60,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
+    // if (mounted) {
+    //   Navigator.pushReplacement(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => const WooSubscriptionPayWall(),
+    //     ),
+    //   );
+    // }
+    // return;
     if (isLoggedIn) {
       dataProvider?.getAppBGs();
 
@@ -75,10 +84,12 @@ class _SplashScreenState extends State<SplashScreen> {
                     await userData.fetchUserInfo().then(
                       (value) async {
                         bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
+                        log('userData.user==========>>>>>${userData.user}');
 
                         if (Platform.isIOS && isAppUser) {
                           try {
                             CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+                            log('customerInfo==========>>>>>${customerInfo}');
 
                             if (customerInfo.entitlements.active.isNotEmpty) {
                               customerInfo.entitlements.active.forEach((key, entitlement) async {
@@ -253,6 +264,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
       Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
+      log('userIdToken==========>>>>>$userIdToken');
 
       final response = await http.put(
         url,
