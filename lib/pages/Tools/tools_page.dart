@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/tools_page_button.dart';
 import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -18,11 +19,12 @@ class ToolsPage extends StatefulWidget {
 
 class _ToolsPageState extends State<ToolsPage> {
   DataProvider? dataProvider;
+  UserDataProvider? userData;
 
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-
+    userData = Provider.of<UserDataProvider>(context, listen: false);
     super.initState();
   }
 
@@ -50,7 +52,7 @@ class _ToolsPageState extends State<ToolsPage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageTools ?? "",
-                          dataProvider!.cachedImageMap["imageTools"],
+                          image: dataProvider!.cachedImageMap["imageTools"],
                           imageKey: "imageTools",
                         ),
 
@@ -158,7 +160,8 @@ class _ToolsPageState extends State<ToolsPage> {
                   margin: EdgeInsets.only(top: Platform.isAndroid ? media.height / 8.5 : media.height / 7),
                   child: Container(
                     width: media.width,
-                    constraints: BoxConstraints(minHeight: (media.height - (Platform.isAndroid ? media.height / 8.5 : media.height / 7))),
+                    constraints: BoxConstraints(
+                        minHeight: (media.height - (Platform.isAndroid ? media.height / 8.5 : media.height / 7))),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -213,14 +216,23 @@ class _ToolsPageState extends State<ToolsPage> {
                                 //   icon: 'assets/icons/nutrition.svg',
                                 //   url: '/nutritionCalculator',
                                 // ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(1.3),
-                                ),
-                                const ToolsPageButton(
-                                  title: 'Apparel & Equipment',
-                                  icon: 'assets/icons/apparel.svg',
-                                  url: '/equipmentLibrary',
-                                ),
+                                Builder(builder: (context) {
+                                  bool isAppUser = userData?.user["singuptype"] != "web" ? true : false;
+                                  return isAppUser
+                                      ? SizedBox()
+                                      : Column(
+                                          children: [
+                                            SizedBox(
+                                              height: ScreenUtil.verticalScale(1.3),
+                                            ),
+                                            const ToolsPageButton(
+                                              title: 'Apparel & Equipment',
+                                              icon: 'assets/icons/apparel.svg',
+                                              url: '/equipmentLibrary',
+                                            ),
+                                          ],
+                                        );
+                                }),
 
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(1.3),

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
@@ -60,23 +61,6 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
     );
-    _scrollController = ScrollController();
-    _emailFocusNode = FocusNode();
-    _passwordFocusNode = FocusNode();
-
-    _emailFocusNode.addListener(() {
-      _emailFocusNode.addListener(() {
-        if (_emailFocusNode.hasFocus) {
-          _scrollToField(_emailFieldKey);
-        }
-      });
-
-      _passwordFocusNode.addListener(() {
-        if (_passwordFocusNode.hasFocus) {
-          _scrollToField(_passwordFieldKey);
-        }
-      });
-    });
   }
 
   final GlobalKey _emailFieldKey = GlobalKey();
@@ -91,17 +75,13 @@ class _LoginPageState extends State<LoginPage> {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
     if (dataProvider != null) {
-      log('_initializeFetchData=========11111=========>>>>>${DateTime.now()}');
       await dataProvider?.fetchMonthWorkouts(3);
-      log('_initializeFetchData=========22222=========>>>>>${DateTime.now()}');
     } else {
       debugPrint("dataProvider is null");
     }
   }
 
   void signInUser(String emailAddress, String password) async {
-    log('responseData=========1111=========>>>>>${DateTime.now()}');
-
     if (emailAddress.isEmpty || password.isEmpty) {
       showBottomAlert(context, 'Please fill out the inputs');
       return;
@@ -122,16 +102,12 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
       if (response.statusCode == 200) {
-        log('responseData=========2222=========>>>>>${DateTime.now()}');
-
         final data = json.decode(response.body);
         await _saveLoginState(true);
         String token = data['token'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
-
-        log('responseData=========3333=========>>>>>${DateTime.now()}');
 
         context.read<MainPageProvider>().changeTab(0);
         bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
@@ -140,33 +116,22 @@ class _LoginPageState extends State<LoginPage> {
         WidgetsBinding.instance.addPostFrameCallback(
           (timeStamp) async => await _initializeFetchData().then(
             (value) async {
-              log('responseData=========4444=========>>>>>${DateTime.now()}');
+              bool isFirstTime = userData.user["createdAt"] == userData.user["updatedAt"];
+              await preferences.setBool(SharedPreference.isFirstTime, isFirstTime);
 
               dataProvider?.getAllAchievement(true);
-              log('responseData=========5555=========>>>>>${DateTime.now()}');
-
               if (monthProvider?.monthDataModel == null) {
                 if (mounted) {
                   await monthProvider?.onInit(context: context).then(
                     (value) async {
-                      log('responseData=========6666=========>>>>>${DateTime.now()}');
-
                       if (Platform.isIOS && isAppUser) {
                         try {
-                          CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-                          if (customerInfo.entitlements.active.isNotEmpty) {
-                            customerInfo.entitlements.active.forEach((key, entitlement) async {
-                              final latestPurchaseDate = customerInfo.allPurchaseDates;
-                              final identifier = entitlement.productIdentifier;
-
-                              await _updateSubscriptionData(
-                                type: identifier,
-                                endDate: entitlement.expirationDate ?? "",
-                                startDate: latestPurchaseDate[identifier] ?? "",
-                                status: "subscribed_user",
-                              );
-                            });
-                          } else {
+                          Map<String, dynamic> subscriptionData = userData.user["subscription"];
+                          DateTime now = DateTime.now().toUtc();
+                          DateTime? endDate = (subscriptionData["end_date"] ?? "").toString().isEmpty
+                              ? null
+                              : DateTime.parse(subscriptionData["end_date"]);
+                          if (endDate == null || (now.isAfter(endDate))) {
                             await _updateSubscriptionData(
                               type: "",
                               endDate: "",
@@ -174,36 +139,66 @@ class _LoginPageState extends State<LoginPage> {
                               status: "free_user",
                             );
                           }
-                          await userData.fetchUserInfo();
                         } catch (e) {
                           debugPrint("Error fetching subscription: $e");
                         }
                       }
 
-                      log('responseData=========7777=========>>>>>${DateTime.now()}');
+                      // if (Platform.isIOS && isAppUser) {
+                      //   try {
+                      //     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+                      //     if (customerInfo.entitlements.active.isNotEmpty) {
+                      //       customerInfo.entitlements.active.forEach((key, entitlement) async {
+                      //         final latestPurchaseDate = customerInfo.allPurchaseDates;
+                      //         final identifier = entitlement.productIdentifier;
+                      //
+                      //         await _updateSubscriptionData(
+                      //           type: identifier,
+                      //           endDate: entitlement.expirationDate ?? "",
+                      //           startDate: latestPurchaseDate[identifier] ?? "",
+                      //           status: "subscribed_user",
+                      //         );
+                      //       });
+                      //     } else {
+                      //       await _updateSubscriptionData(
+                      //         type: "",
+                      //         endDate: "",
+                      //         startDate: "",
+                      //         status: "free_user",
+                      //       );
+                      //     }
+                      //   } catch (e) {
+                      //     debugPrint("Error fetching subscription: $e");
+                      //   }
+                      // }
 
-                      Map<String, dynamic> subscriptionData = userData.user["subscription"];
                       if (Platform.isIOS && isAppUser) {
-                        if (subscriptionData["user_subscription_status"] == "free_user") {
-                          if (mounted) {
-                            await Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => SubscriptionPayWall()),
-                            );
-                          }
-                        } else {
-                          if (mounted) {
-                            await Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MainPage(
-                                          showWelcomeModal: !hasSeenWelcome,
-                                          welcomeDescription: "",
-                                          welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
-                                        )),
-                                (route) => false);
-                          }
-                        }
+                        await userData.fetchUserInfo().then(
+                          (value) async {
+                            Map<String, dynamic> subscriptionData = userData.user["subscription"];
+
+                            if (subscriptionData["user_subscription_status"] == "free_user") {
+                              if (mounted) {
+                                await Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => SubscriptionPayWall()),
+                                );
+                              }
+                            } else {
+                              if (mounted) {
+                                await Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => MainPage(
+                                              showWelcomeModal: !hasSeenWelcome,
+                                              welcomeDescription: "",
+                                              welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
+                                            )),
+                                    (route) => false);
+                              }
+                            }
+                          },
+                        );
                       } else if (Platform.isIOS && !isAppUser) {
                         // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
                         //     ? null
@@ -378,287 +373,217 @@ class _LoginPageState extends State<LoginPage> {
     return prefs.getString('authToken');
   }
 
-  late ScrollController _scrollController;
-  late FocusNode _emailFocusNode;
-  late FocusNode _passwordFocusNode;
-
-  // void _scrollToField() {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     _scrollController.animateTo(
-  //       _scrollController.position.maxScrollExtent,
-  //       duration: const Duration(milliseconds: 200),
-  //       curve: Curves.easeInOut,
-  //     );
-  //   });
-  // }
-
-  void _scrollToField(GlobalKey key) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = key.currentContext;
-      if (context != null) {
-        Scrollable.ensureVisible(
-          context,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    _scrollToField(_emailFieldKey);
-
-    _scrollToField(_passwordFieldKey);
-
-    setState(() {});
-    super.didChangeDependencies();
-  }
-
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Utils.appImage(
-                  media,
-                  // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                  dataProvider!.cachedImageMap["imageLogin"],
-                  imageKey: "imageLogin",
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: SafeArea(
-                          child: BackArrowWidget(onPress: () {
-                            Navigator.pop(context);
-                          }),
-                        ),
+      body: Stack(
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Utils.appImage(
+                media,
+                // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                image: dataProvider!.cachedImageMap["imageLogin"],
+                imageKey: "imageLogin",
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: SafeArea(
+                        child: BackArrowWidget(onPress: () {
+                          Navigator.pop(context);
+                        }),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: ScreenUtil.horizontalScale(42),
+            child: Container(
+              // height: 120,
+              height: 150,
+              width: media.width,
+              decoration: const BoxDecoration(
+                image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                ClipPath(
+                  clipper: DiagonalClipper(),
+                  child: Container(
+                    height: media.height / 9.8,
+                    width: media.width / 6,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Container(
+                  width: media.width,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            height: ScreenUtil.verticalScale(3.2),
+                          ),
+                          Text(
+                            'Sign in',
+                            style: TextStyle(
+                              fontSize: ScreenUtil.verticalScale(3.32),
+                              color: AppColors.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            height: ScreenUtil.verticalScale(3.2),
+                          ),
+                          Container(
+                            key: _emailFieldKey,
+                            child: AppTextFormField(
+                              hintText: 'Your Email',
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              controller: emailController,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 15),
+                                child: IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.email, color: Colors.grey.shade400),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: ScreenUtil.verticalScale(2.2)),
+                          Container(
+                            key: _passwordFieldKey,
+                            child: AppTextFormField(
+                              hintText: 'Your Password',
+                              keyboardType: TextInputType.visiblePassword,
+                              textInputAction: TextInputAction.done,
+                              controller: passwordController,
+                              obscureText: isObscure,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 15),
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() => isObscure = !isObscure);
+                                  },
+                                  style: ButtonStyle(minimumSize: WidgetStateProperty.all(const Size(48, 48))),
+                                  icon: Icon(
+                                    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: ScreenUtil.verticalScale(1.5)),
+                          Text.rich(TextSpan(
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                            children: [
+                              TextSpan(
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Color(0xFFA51E22),
+                                ),
+                                text: "Forgot password?",
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (ctx) => const ResetPasswordScreen(
+                                          image: '',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                              ),
+                            ],
+                          )),
+                          SizedBox(
+                            height: ScreenUtil.verticalScale(4.2),
+                          ),
+                          ButtonWidget(
+                            text: 'Sign in',
+                            textColor: Colors.white,
+                            color: AppColors.primaryColor,
+                            onPress: () {
+                              if (_formKey.currentState?.validate() == true) {
+                                signInUser(
+                                  emailController.text,
+                                  passwordController.text,
+                                );
+                              }
+                            },
+                            isLoading: isLoading,
+                          ),
+                          SizedBox(
+                            height: ScreenUtil.verticalScale(0.8),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Don't have an account? ",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Color(0xff888888),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: onPressCreateAccount,
+                                style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(65, 30),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    alignment: Alignment.center),
+                                child: const Text(
+                                  'Sign up',
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: ScreenUtil.verticalScale(3.4),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-            Positioned(
-              top: ScreenUtil.horizontalScale(42),
-              child: Container(
-                // height: 120,
-                height: 150,
-                width: media.width,
-                decoration: const BoxDecoration(
-                  image:
-                      DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: ScreenUtil.verticalScale(42)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  ClipPath(
-                    clipper: DiagonalClipper(),
-                    child: Container(
-                      height: media.height / 9.8,
-                      width: media.width / 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              height: ScreenUtil.verticalScale(3.2),
-                            ),
-                            Text(
-                              'Sign in',
-                              style: TextStyle(
-                                fontSize: ScreenUtil.verticalScale(3.32),
-                                color: AppColors.primaryColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: ScreenUtil.verticalScale(3.2),
-                            ),
-                            Container(
-                              key: _emailFieldKey,
-                              child: AppTextFormField(
-                                onTap: () {
-                                  _scrollToField(_emailFieldKey);
-                                  setState(() {});
-                                },
-                                hintText: 'Your Email',
-                                focusNode: _emailFocusNode,
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.next,
-                                controller: emailController,
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.only(right: 15),
-                                  child: SizedBox(
-                                    height: 48,
-                                    width: 48,
-                                    child: Center(
-                                      child: GestureDetector(
-                                        onTap: () {},
-                                        child: Icon(Icons.email, color: Colors.grey.shade400),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: ScreenUtil.verticalScale(2.2)),
-                            Container(
-                              key: _passwordFieldKey,
-                              child: AppTextFormField(
-                                onTap: () {
-                                  _scrollToField(_passwordFieldKey);
-                                  setState(() {});
-                                },
-                                hintText: 'Your Password',
-                                keyboardType: TextInputType.visiblePassword,
-                                textInputAction: TextInputAction.done,
-                                controller: passwordController,
-                                obscureText: isObscure,
-                                focusNode: _passwordFocusNode,
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.only(right: 15),
-                                  child: SizedBox(
-                                    width: 48,
-                                    height: 48,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() => isObscure = !isObscure);
-                                      },
-                                      child: Icon(
-                                        isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: ScreenUtil.verticalScale(1.5)),
-                            Text.rich(TextSpan(
-                              style: const TextStyle(
-                                fontSize: 16,
-                              ),
-                              children: [
-                                TextSpan(
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xFFA51E22),
-                                  ),
-                                  text: "Forgot password?",
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (ctx) => const ResetPasswordScreen(
-                                            image: '',
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                ),
-                              ],
-                            )),
-                            SizedBox(
-                              height: ScreenUtil.verticalScale(4.2),
-                            ),
-                            ButtonWidget(
-                              text: 'Sign in',
-                              textColor: Colors.white,
-                              color: AppColors.primaryColor,
-                              onPress: () {
-                                if (_formKey.currentState?.validate() == true) {
-                                  signInUser(
-                                    emailController.text,
-                                    passwordController.text,
-                                  );
-                                }
-                              },
-                              isLoading: isLoading,
-                            ),
-                            SizedBox(
-                              height: ScreenUtil.verticalScale(0.8),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Don't have an account? ",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xff888888),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: onPressCreateAccount,
-                                  style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: const Size(65, 30),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      alignment: Alignment.center),
-                                  child: const Text(
-                                    'Sign up',
-                                    style: TextStyle(
-                                      color: AppColors.primaryColor,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: ScreenUtil.verticalScale(3.4),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

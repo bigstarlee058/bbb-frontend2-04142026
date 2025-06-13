@@ -54,7 +54,7 @@ class _FAQsPageState extends State<FAQsPage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageFaQs ?? "",
-                          dataProvider!.cachedImageMap["imageFaQs"],
+                          image: dataProvider!.cachedImageMap["imageFaQs"],
 
                           imageKey: "imageFaQs",
                         ),
@@ -192,7 +192,8 @@ class _FAQsPageState extends State<FAQsPage> {
                                       itemBuilder: (context, index) {
                                         return Padding(
                                           padding: EdgeInsets.only(
-                                            bottom: ScreenUtil.verticalScale(dataProvider!.faQsModel.length - 1 == index ? 2 : 0.5),
+                                            bottom: ScreenUtil.verticalScale(
+                                                dataProvider!.faQsModel.length - 1 == index ? 2 : 0.5),
                                           ),
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
@@ -294,7 +295,9 @@ class _FAQsPageState extends State<FAQsPage> {
                   color: AppColors.primaryColor,
                 ),
                 child: Icon(
-                  _expandedStates[index] == true ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
+                  _expandedStates[index] == true
+                      ? Icons.keyboard_arrow_up_outlined
+                      : Icons.keyboard_arrow_down_outlined,
                   color: Colors.white,
                   size: ScreenUtil.verticalScale(3),
                 ),

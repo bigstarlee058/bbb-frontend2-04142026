@@ -39,7 +39,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             children: [
               Utils.appImage(
                 media,
-                dataProvider!.cachedImageMap["imageEmailConfirm"],
+                image: dataProvider!.cachedImageMap["imageEmailConfirm"],
                 imageKey: "imageEmailConfirm",
                 child: Column(
                   children: [

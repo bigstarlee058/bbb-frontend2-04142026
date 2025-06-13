@@ -117,7 +117,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 Utils.appImage(
                   media,
                   // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
-                  dataProvider!.cachedImageMap["imageForgot"],
+                  image: dataProvider!.cachedImageMap["imageForgot"],
                   imageKey: "imageForgot",
                   child: Column(
                     children: [
@@ -141,7 +141,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 height: 150,
                 width: media.width,
                 decoration: const BoxDecoration(
-                  image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                  image:
+                      DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
                 ),
               ),
             ),

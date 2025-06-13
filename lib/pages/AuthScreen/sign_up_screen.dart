@@ -42,8 +42,7 @@ class _SignupPageState extends State<SignupPage> {
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((timeStamp) async => updateImage());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => updateImage());
 
     super.initState();
   }
@@ -58,12 +57,8 @@ class _SignupPageState extends State<SignupPage> {
     setState(() {});
   }
 
-  void signInUser(String emailAddress, String password, String userName,
-      String lastName) async {
-    if (emailAddress.isEmpty ||
-        password.isEmpty ||
-        userName.isEmpty ||
-        lastName.isEmpty) {
+  void signInUser(String emailAddress, String password, String userName, String lastName) async {
+    if (emailAddress.isEmpty || password.isEmpty || userName.isEmpty || lastName.isEmpty) {
       showBottomAlert(context, 'Please fill out the inputs');
       return;
     }
@@ -72,8 +67,7 @@ class _SignupPageState extends State<SignupPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse(
-          'https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signup_user');
+      final url = Uri.parse('https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signup_user');
 
       final response = await http.post(
         url,
@@ -94,8 +88,7 @@ class _SignupPageState extends State<SignupPage> {
         if (message == "User registered") {
           Navigator.pop(context);
           // await loginUser(emailAddress, password);
-          showBottomAlert(context,
-              'Signup successfully with $emailAddress please login here.');
+          showBottomAlert(context, 'Signup successfully with $emailAddress please login here.');
         } else {
           showBottomAlert(context, 'Failed to signup');
         }
@@ -126,8 +119,7 @@ class _SignupPageState extends State<SignupPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse(
-          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -199,7 +191,7 @@ class _SignupPageState extends State<SignupPage> {
               Utils.appImage(
                 media,
                 // dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
-                dataProvider!.cachedImageMap["imageSignup"],
+                image: dataProvider!.cachedImageMap["imageSignup"],
                 imageKey: "imageSignup",
                 child: Column(
                   children: [
@@ -223,10 +215,7 @@ class _SignupPageState extends State<SignupPage> {
               // height: 120,
               width: media.width,
               decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/img/bbb-logo.png'),
-                    fit: BoxFit.fitHeight,
-                    opacity: 1),
+                image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
               ),
             ),
           ),
@@ -250,13 +239,10 @@ class _SignupPageState extends State<SignupPage> {
                     width: media.width,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft:
-                              Radius.circular(ScreenUtil.verticalScale(8))),
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(ScreenUtil.verticalScale(8))),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.verticalScale(4.4)),
+                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
                       child: Form(
                         key: _formKey,
                         child: Column(
@@ -366,9 +352,7 @@ class _SignupPageState extends State<SignupPage> {
                                     ),
                                   ),
                                   icon: Icon(
-                                    isObscure
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
+                                    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                     color: Colors.grey.shade400,
                                   ),
                                 ),
@@ -394,8 +378,7 @@ class _SignupPageState extends State<SignupPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (ctx) =>
-                                        const ConfirmationScreen(image: ""),
+                                    builder: (ctx) => const ConfirmationScreen(image: ""),
                                   ),
                                 );
                               },
@@ -417,8 +400,7 @@ class _SignupPageState extends State<SignupPage> {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(65, 30),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       alignment: Alignment.center),
                                   child: const Text(
                                     'Sign in',

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/components/haptic_feedback%20.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/DashBoardScreen/dashboard_page.dart';
 import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/month_view_new.dart';
@@ -69,9 +71,9 @@ class _MainPageState extends State<MainPage> {
       (timeStamp) async {
         await userData.fetchUserInfo();
         if (userData.user != null && !widget.isComeFromOnBoarding) {
-          if (userData.user["detail"] == null ||
-              userData.user["detail"]['dob'] == null ||
-              userData.user["detail"]["weight"] == null) {
+          bool isFirstTime = await preferences.getBool(SharedPreference.isFirstTime) ?? false;
+
+          if (isFirstTime) {
             if (mounted) {
               await Navigator.pushAndRemoveUntil(
                   context,
@@ -81,7 +83,11 @@ class _MainPageState extends State<MainPage> {
                       welcomeImageUrl: widget.welcomeImageUrl,
                     ),
                   ),
-                  (route) => false);
+                  (route) => false).then(
+                (value) async {
+                  await preferences.setBool(SharedPreference.isFirstTime, false);
+                },
+              );
             }
           }
           return;

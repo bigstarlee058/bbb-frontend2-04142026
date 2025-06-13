@@ -210,10 +210,11 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
   void dispose() {
     if (_chewieController != null) {
       _chewieController!.dispose();
-    }
-    _controller.dispose();
+      _controller.dispose();
 
-    _videoPlayerController.dispose();
+      _videoPlayerController.dispose();
+    }
+
     AudioManager.abandonAudioFocus();
 
     super.dispose();
@@ -246,7 +247,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                           IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () async {
-                              if(context.mounted) {
+                              if (context.mounted) {
                                 Navigator.of(context).pop();
                               }
                             },
@@ -332,7 +333,9 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                         IconButton(
                                           iconSize: 60,
                                           icon: Icon(
-                                            _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                                            _videoPlayerController.value.isPlaying
+                                                ? Icons.pause_circle_filled
+                                                : Icons.play_circle_filled,
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
@@ -370,11 +373,13 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                             bottom: -5,
                             left: 20,
                             right: 20,
-                            child: !videoNotInitialized && _chewieController?.videoPlayerController.value.isInitialized == true
+                            child: !videoNotInitialized &&
+                                    _chewieController?.videoPlayerController.value.isInitialized == true
                                 ? Column(
                                     children: [
                                       Container(
-                                        margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.3), left: 15, right: 15),
+                                        margin:
+                                            EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.3), left: 15, right: 15),
                                         child: Column(
                                           children: [
                                             Column(
@@ -492,7 +497,10 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                       ),
                       Container(
                         margin: EdgeInsets.only(
-                            left: ScreenUtil.horizontalScale(5), right: ScreenUtil.horizontalScale(5), top: 15.0, bottom: 10.0),
+                            left: ScreenUtil.horizontalScale(5),
+                            right: ScreenUtil.horizontalScale(5),
+                            top: 15.0,
+                            bottom: 10.0),
                         alignment: Alignment.topLeft,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -20,8 +20,7 @@ class ChooseEquipmentDialog extends StatefulWidget {
   State<ChooseEquipmentDialog> createState() => _ChooseEquipmentDialogState();
 }
 
-class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
-    with TickerProviderStateMixin {
+class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog> with TickerProviderStateMixin {
   bool loading = false;
   bool isZoom = false;
 
@@ -51,8 +50,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
       await dataProvider?.getChooseEquipmentData();
     }
     if (dataProvider!.getChooseEquipmentModel!.files!.isNotEmpty) {
-      initializeVideo(
-          dataProvider!.getChooseEquipmentModel!.files![0].link ?? "");
+      initializeVideo(dataProvider!.getChooseEquipmentModel!.files![0].link ?? "");
     } else {
       loading = false;
       videoNotInitialized = true;
@@ -63,8 +61,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
     tutorialTitle = dataProvider!.getChooseEquipmentModel?.title ?? "";
   }
 
-  final ValueNotifier<Duration> videoProgressValue =
-      ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> videoProgressValue = ValueNotifier(Duration.zero);
   Duration getBufferedPosition() {
     final position = _videoPlayerController.value.position;
     final buffered = _videoPlayerController.value.buffered;
@@ -82,8 +79,8 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
   Future<void> initializeVideo(String url) async {
     try {
       // Initialize the video player controller
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
-          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
       await _videoPlayerController.initialize().then(
         (value) {
@@ -102,11 +99,9 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null &&
-          _chewieController!.videoPlayerController.value.isInitialized) {
+      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
-        videoSize = calculateVideoSize(
-            aspectRatio: _chewieController!.aspectRatio!, context: context);
+        videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
       // _videoPlayerController.addListener(() async {
@@ -125,8 +120,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
       _videoPlayerController.addListener(() async {
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
-        final bool isFinished =
-            position >= duration && !_videoPlayerController.value.isPlaying;
+        final bool isFinished = position >= duration && !_videoPlayerController.value.isPlaying;
         if (isFinished) {
           showControlsOnTapOfPause();
         }
@@ -193,11 +187,9 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
     } else {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
   }
 
@@ -218,10 +210,11 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
   void dispose() {
     if (_chewieController != null) {
       _chewieController!.dispose();
+      _videoPlayerController.dispose();
+      _controller.dispose();
     }
-    _videoPlayerController.dispose();
+
     AudioManager.abandonAudioFocus();
-    _controller.dispose();
 
     super.dispose();
   }
@@ -231,8 +224,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.88),
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -254,7 +246,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                           IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () async {
-                              if(context.mounted) {
+                              if (context.mounted) {
                                 Navigator.of(context).pop();
                               }
                             },
@@ -271,9 +263,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                             },
                             child: Column(
                               children: [
-                                dataProvider!.getChooseEquipmentModel!.files!
-                                            .isNotEmpty &&
-                                        !videoNotInitialized
+                                dataProvider!.getChooseEquipmentModel!.files!.isNotEmpty && !videoNotInitialized
                                     ? Stack(
                                         children: [
                                           SizedBox(
@@ -287,12 +277,9 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                           ),
 
                                           AnimatedContainer(
-                                            duration:
-                                                Duration(milliseconds: 1700),
+                                            duration: Duration(milliseconds: 1700),
                                             curve: Curves.easeInOut,
-                                            color: showControls
-                                                ? Colors.black38
-                                                : Colors.transparent,
+                                            color: showControls ? Colors.black38 : Colors.transparent,
                                             height: videoSize.height - 18,
                                             width: videoSize.width - 6,
                                           ),
@@ -327,8 +314,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                     duration: const Duration(milliseconds: 800),
                                     curve: Curves.easeInOut,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
                                         // Skip backward button
                                         IconButton(
@@ -339,34 +325,28 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                           ),
                                           onPressed: () {
                                             _videoPlayerController.seekTo(
-                                              _videoPlayerController
-                                                      .value.position -
-                                                  const Duration(seconds: 10),
+                                              _videoPlayerController.value.position - const Duration(seconds: 10),
                                             );
                                           },
                                         ),
                                         IconButton(
                                           iconSize: 60,
                                           icon: Icon(
-                                            _videoPlayerController
-                                                    .value.isPlaying
+                                            _videoPlayerController.value.isPlaying
                                                 ? Icons.pause_circle_filled
                                                 : Icons.play_circle_filled,
                                             color: Colors.white70,
                                           ),
                                           onPressed: () {
                                             setState(() {
-                                              if (_videoPlayerController
-                                                  .value.isPlaying) {
+                                              if (_videoPlayerController.value.isPlaying) {
                                                 _videoPlayerController.pause();
                                                 showControlsOnTapOfPause();
-                                                AudioManager
-                                                    .abandonAudioFocus();
+                                                AudioManager.abandonAudioFocus();
                                               } else {
                                                 _videoPlayerController.play();
                                                 hideControls();
-                                                AudioManager
-                                                    .requestAudioFocus();
+                                                AudioManager.requestAudioFocus();
                                               }
                                             });
                                           },
@@ -380,9 +360,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                           ),
                                           onPressed: () {
                                             _videoPlayerController.seekTo(
-                                              _videoPlayerController
-                                                      .value.position +
-                                                  const Duration(seconds: 10),
+                                              _videoPlayerController.value.position + const Duration(seconds: 10),
                                             );
                                           },
                                         ),
@@ -395,24 +373,17 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                             left: 20,
                             right: 20,
                             child: !videoNotInitialized &&
-                                    _chewieController?.videoPlayerController
-                                            .value.isInitialized ==
-                                        true
+                                    _chewieController?.videoPlayerController.value.isInitialized == true
                                 ? Column(
                                     children: [
                                       Container(
-                                        margin: EdgeInsets.only(
-                                            bottom:
-                                                ScreenUtil.verticalScale(1.3),
-                                            left: 15,
-                                            right: 15),
+                                        margin:
+                                            EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.3), left: 15, right: 15),
                                         child: Column(
                                           children: [
                                             Column(
                                               children: [
-                                                SizedBox(
-                                                    height: ScreenUtil
-                                                        .verticalScale(0.8)),
+                                                SizedBox(height: ScreenUtil.verticalScale(0.8)),
                                                 Row(
                                                   children: [
                                                     Spacer(),
@@ -423,12 +394,8 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                                             }
                                                           : null,
                                                       child: Icon(
-                                                        isMute
-                                                            ? Icons.volume_up
-                                                            : Icons.volume_off,
-                                                        color: !showControls
-                                                            ? Colors.transparent
-                                                            : Colors.white70,
+                                                        isMute ? Icons.volume_up : Icons.volume_off,
+                                                        color: !showControls ? Colors.transparent : Colors.white70,
                                                         size: 28,
                                                       ),
                                                     ),
@@ -436,10 +403,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(
-                                                height:
-                                                    ScreenUtil.verticalScale(
-                                                        1)),
+                                            SizedBox(height: ScreenUtil.verticalScale(1)),
                                             // ProgressBar(
                                             //   collapsedBufferedBarColor: Colors.white,
                                             //   expandedBufferedBarColor: Colors.white,
@@ -462,30 +426,19 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                             //   },
                                             // ),
                                             ValueListenableBuilder<Duration>(
-                                              valueListenable:
-                                                  videoProgressValue,
+                                              valueListenable: videoProgressValue,
                                               builder: (context, progress, _) {
                                                 return ProgressBar(
-                                                  collapsedBufferedBarColor:
-                                                      Colors.white,
-                                                  expandedBufferedBarColor:
-                                                      Colors.white,
-                                                  buffered:
-                                                      getBufferedPosition(),
+                                                  collapsedBufferedBarColor: Colors.white,
+                                                  expandedBufferedBarColor: Colors.white,
+                                                  buffered: getBufferedPosition(),
                                                   controller: _controller,
                                                   progress: progress,
                                                   total: Duration(
-                                                    seconds:
-                                                        _videoPlayerController
-                                                            .value
-                                                            .duration
-                                                            .inSeconds,
+                                                    seconds: _videoPlayerController.value.duration.inSeconds,
                                                   ),
                                                   onChanged: (value) {
-                                                    _videoPlayerController
-                                                        .seekTo(Duration(
-                                                            seconds: value
-                                                                .inSeconds));
+                                                    _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
                                                   },
                                                   onSeek: (value) {},
                                                   onChangeStart: (value) {
@@ -497,10 +450,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                                 );
                                               },
                                             ),
-                                            SizedBox(
-                                                height:
-                                                    ScreenUtil.verticalScale(
-                                                        2.2)),
+                                            SizedBox(height: ScreenUtil.verticalScale(2.2)),
                                           ],
                                         ),
                                       ),

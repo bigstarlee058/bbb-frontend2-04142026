@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -32,6 +33,7 @@ class UserDataProvider extends ChangeNotifier {
       headers: {'Content-Type': 'application/json; charset=UTF-8', 'AUTH_TOKEN': token ?? ""},
     );
     final jsonResponse = jsonDecode(response.body);
+    log('token==========>>>>>${token}');
 
     if (response.statusCode == 200) {
       getUserDataFromJson(jsonResponse);

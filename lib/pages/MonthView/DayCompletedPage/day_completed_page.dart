@@ -78,8 +78,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
 
     DayHistoryModel? data1 = monthProvider?.allDayHistoryModel.firstWhere(
       (element) {
-        String split =
-            monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+        String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                .toString()
+                .split(" ")[1] ??
+            "";
         String dataId =
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id ?? monthProvider?.monthDataModel?.weeks?[(monthProvider?.overviewCurrentWeek)! - 1].id}-${monthProvider?.currentDayTitleId}";
         return element.dataId == dataId;
@@ -248,7 +250,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                   child: Column(
                     children: [
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3), vertical: ScreenUtil.verticalScale(2.5)),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.verticalScale(3), vertical: ScreenUtil.verticalScale(2.5)),
                         child: Column(
                           children: [
                             IconRow(
@@ -256,7 +259,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               icons: List.generate(
                                 formattedDates.length,
                                 (index) => data.any((element) =>
-                                        DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
+                                        DateFormat('yyyy-MM-dd')
+                                                .format(Utils.formattedDate(element.endTime!.toString())) ==
                                             formattedDates[index] &&
                                         element.status == Status.completed)
                                     ? IconDataWithDot(
@@ -305,7 +309,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         child: Container(
                           width: MediaQuery.of(context).size.width,
                           margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.all(
@@ -345,7 +350,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: ScreenUtil.verticalScale(2.5)),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.horizontalScale(8), vertical: ScreenUtil.verticalScale(2.5)),
                         child: Row(
                           children: [
                             Expanded(
@@ -381,7 +387,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       Text(
                                         '${totalWeight.toStringAsFixed(0)} Lbs',
                                         textAlign: TextAlign.center,
-                                        style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                        style: const TextStyle(
+                                            color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
                                       )
                                     ],
                                   ),
@@ -393,6 +400,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               child: GestureDetector(
                                 onTap: () {
                                   monthProvider?.updateGraphType("RIR");
+
                                   Navigator.pushNamed(context, '/graphAndReports');
                                 },
                                 child: Container(
@@ -422,7 +430,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       Text(
                                         averageRIR == 0 ? "0" : averageRIR.toStringAsFixed(2),
                                         textAlign: TextAlign.center,
-                                        style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                        style: const TextStyle(
+                                            color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
                                       )
                                     ],
                                   ),
@@ -439,6 +448,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                           // textColor: const Color(0x40000000),
                           textColor: Colors.white,
                           onPress: () {
+                            HapticFeedBack.buttonClick();
                             monthProvider?.checkForPumpDay();
                             Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                             mainPageProvider?.changeTab(0);
@@ -456,6 +466,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                           onTap: isOnTap
                               ? null
                               : () async {
+                                  HapticFeedBack.buttonClick();
                                   updateOnTap(true);
                                   try {
                                     await screenshotController.capture(delay: Duration(milliseconds: 200)).then(
@@ -491,14 +502,22 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               borderRadius: Utils.buttonRadius,
                             ),
                             child: Center(
-                              child: Text(
-                                "Share",
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.verticalScale(2.2),
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
+                              child: isOnTap
+                                  ? SizedBox(
+                                      width: ScreenUtil.verticalScale(3.2),
+                                      height: ScreenUtil.verticalScale(3.2),
+                                      child: Theme(
+                                          data: myThemeData.copyWith(platform: TargetPlatform.iOS),
+                                          child: const CircularProgressIndicator.adaptive()),
+                                    )
+                                  : Text(
+                                      "Share",
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil.verticalScale(2.2),
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -514,6 +533,11 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     );
   }
 
+  final myThemeData = ThemeData(
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      color: Colors.red,
+    ),
+  );
   final ScreenshotController screenshotController = ScreenshotController();
 
   captureScreenShot(Size media) {
@@ -652,7 +676,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                     child: Column(
                       children: [
                         Container(
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3), vertical: ScreenUtil.verticalScale(2.5)),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.verticalScale(3), vertical: ScreenUtil.verticalScale(2.5)),
                           child: Column(
                             children: [
                               IconRow(
@@ -660,7 +685,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 icons: List.generate(
                                   formattedDates.length,
                                   (index) => data.any((element) =>
-                                          DateFormat('yyyy-MM-dd').format(Utils.formattedDate(element.endTime!.toString())) ==
+                                          DateFormat('yyyy-MM-dd')
+                                                  .format(Utils.formattedDate(element.endTime!.toString())) ==
                                               formattedDates[index] &&
                                           element.status == Status.completed)
                                       ? IconDataWithDot(
@@ -704,7 +730,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         Container(
                           width: MediaQuery.of(context).size.width,
                           margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.all(
@@ -743,7 +770,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8), vertical: ScreenUtil.verticalScale(2.5)),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(8), vertical: ScreenUtil.verticalScale(2.5)),
                           child: Row(
                             children: [
                               Expanded(
@@ -779,7 +807,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                         Text(
                                           '${totalWeight.toStringAsFixed(0)} Lbs',
                                           textAlign: TextAlign.center,
-                                          style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                          style: const TextStyle(
+                                              color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
                                         )
                                       ],
                                     ),
@@ -820,7 +849,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                         Text(
                                           averageRIR == 0 ? "0" : averageRIR.toStringAsFixed(2),
                                           textAlign: TextAlign.center,
-                                          style: const TextStyle(color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                          style: const TextStyle(
+                                              color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
                                         )
                                       ],
                                     ),
@@ -848,7 +878,9 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       (element) => element == monthProvider.todayTitleId,
     );
 
-    String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split =
+        monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ??
+            "";
 
     String dataId =
         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
@@ -862,18 +894,23 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
             "0")) -
         1;
     DayDataModel dayData =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Workout")
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                .toString()
+                .contains("Workout")
             ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
             : DayDataModel();
 
-    bool isRestDay =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Rest Day");
+    bool isRestDay = "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+        .toString()
+        .contains("Rest Day");
 
     bool isPumpDay = (isRestDay &&
-            monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+            monthProvider.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             (monthProvider.isPumpDayAvailable &&
-                (monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+                (monthProvider.allDayHistoryModel
+                    .any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
         (isRestDay &&
             monthProvider.isPumpDayAvailable &&
             (monthProvider.allDayHistoryModel
@@ -890,13 +927,13 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
           .toList();
 
       if (dataList.isNotEmpty) {
-        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
-            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
+            (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
         if (index1 != -1) {
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
         } else {
-          int index1 =
-              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          int index1 = monthProvider.pumpDays
+              .indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
               ? 0
               : index1 == 0
@@ -920,7 +957,11 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     final dayIndex1 = monthProvider.overviewCurrentDay;
 
     int nextWorkOutIndex = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
-        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1]
+                .toString()
+                .replaceAll("Day ", "")
+                .replaceAll(" Workout", "")) -
+            1
         : 0;
     String currentDayTitle = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
         ? monthProvider.weekDataModel!.days![nextWorkOutIndex].title ?? ""
@@ -930,8 +971,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     //   Navigator.pushNamed(context, '/dayOverview');
     // }
 
-    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel
-        .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
+    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel.any((element) =>
+        (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
 
     if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && isCompletedOrSkipped) {
       return;
@@ -950,11 +991,14 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       // );
     } else {
       if (monthProvider.isPumpDay) {
-        if ((monthProvider.allSplitDayHistoryModel
-                .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+        if ((monthProvider.allSplitDayHistoryModel.any((element) =>
+                (element.status == Status.completed || element.status == Status.skipped) &&
+                element.dataId == dataId)) ==
             false) {
           _saveDayData(
-              type: "Pump Day - ${monthProvider.pumpDayModel?.id}", status: Status.started, title: monthProvider.pumpDayModel?.title);
+              type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+              status: Status.started,
+              title: monthProvider.pumpDayModel?.title);
           if (!context.mounted) return;
           await Navigator.pushNamed(context, '/today').then(
             (value) {
@@ -978,8 +1022,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
   }
 
   Future<void> _saveDayData({required String status, required String type, String? title}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
@@ -1253,8 +1299,9 @@ class IconWithDot extends StatelessWidget {
       padding: iconData.index == 6
           ? EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1))
           : EdgeInsets.zero,
-      decoration:
-          iconData.index == 6 ? BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20)) : BoxDecoration(),
+      decoration: iconData.index == 6
+          ? BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20))
+          : BoxDecoration(),
       child: Column(
         children: [
           Text(iconData.day ?? ""),

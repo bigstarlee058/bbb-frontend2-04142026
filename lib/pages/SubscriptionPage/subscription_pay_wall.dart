@@ -1,17 +1,21 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/main_page.dart';
+import 'package:bbb/providers/data_provider.dart';
+import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +32,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   String monthPrice = "";
   String yearPrice = "";
   UserDataProvider? userDataProvider;
+  DataProvider? dataProvider;
   Package? selectedPackage;
   bool isLoading = false;
 
@@ -35,6 +40,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   void initState() {
     super.initState();
     userDataProvider = Provider.of<UserDataProvider>(context, listen: false);
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) => getOffering());
   }
 
@@ -114,6 +120,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   }
 
   Future<void> _purchasePackage() async {
+    Purchases.setLogLevel(LogLevel.debug);
+
     if (selectedPackage == null) return;
 
     setState(() => isLoading = true);
@@ -121,42 +129,65 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
     try {
       final CustomerInfo customerInfo = await Purchases.purchasePackage(selectedPackage!);
 
-      final DateTime now = await NTP.now();
+      // final DateTime now = await NTP.now();
+      // log(' customerInfo.allExpirationDates==========>>>>>${customerInfo.activeSubscriptions}');
+      // final entitlementId = selectedPackage!.storeProduct.identifier;
+      // final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
 
-      final entitlementId = selectedPackage!.storeProduct.identifier;
-      final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
+      final entitlements = customerInfo.entitlements.active;
 
-      if (expirationDate != null) {
+      if (entitlements.isNotEmpty) {
+        final entitlement = entitlements.values.first;
+        final String planId = entitlement.productIdentifier;
+        final String startDate = entitlement.originalPurchaseDate;
+        final String endDate =
+            DateTime.parse(startDate).add(Duration(days: planId == "monthly_membership_1m_29" ? 28 : 365)).toString();
+        final String status = entitlement.isActive ? "subscribed_user" : "free_user";
+
         await _updateSubscriptionData(
-          type: entitlementId,
-          endDate: expirationDate.toString(),
-          startDate: now.toString(),
-          status: "subscribed_user",
+          type: planId,
+          endDate: endDate,
+          startDate: startDate,
+          status: status,
         );
       } else {
-        debugPrint('Entitlement not active or expiration date missing.');
-        _showError("Subscription not activated. Please try again.");
+        debugPrint('Entitlement not act ive or expiration date missing.');
+        if (mounted) showBottomAlert(context, "Subscription not activated. Please try again.");
       }
     } on PurchasesError catch (e) {
       if (e.code == PurchasesErrorCode.purchaseCancelledError) {
         debugPrint("❕Purchase cancelled by user.");
-        _showError("Purchase cancelled.");
+        if (mounted) showBottomAlert(context, "Purchase cancelled.");
       } else {
         debugPrint("RevenueCat error: ${e.code} - ${e.message}");
-        _showError("Purchase failed: ${e.message}");
+        if (mounted) showBottomAlert(context, "Purchase failed: ${e.message}");
       }
     } catch (e) {
       debugPrint("Unexpected error: $e");
-      _showError("Something went wrong. Please try again.");
+      if (mounted) showBottomAlert(context, "Purchase failed: Please try again.");
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  void _handleLogout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    await preferences.clearPrefs();
+    await DatabaseHelper().clearAllTables();
+    await preferences.clearPrefs();
+    context.read<MonthProvider>().clearAllValues();
+    dataProvider?.achievementList = [];
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.onBoardingScreen,
+      (Route<dynamic> route) {
+        log("ROUTE NAME ${route.settings.name}");
+        return route.settings.name == AppRoutes.onBoardingScreen;
+      },
     );
+
+    Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 
   @override
@@ -172,6 +203,22 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             height: MediaQuery.of(context).size.height / 1.8,
             width: double.infinity,
             fit: BoxFit.fitWidth,
+          ),
+          Utils.appImage(
+            MediaQuery.of(context).size,
+            imageKey: '',
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: SafeArea(
+                    child: BackArrowWidget(onPress: () {
+                      _handleLogout(context);
+                    }),
+                  ),
+                ),
+              ],
+            ),
           ),
           Positioned(
             left: 0,
@@ -334,4 +381,38 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       ),
     );
   }
+}
+
+void showBottomAlert(BuildContext context, String msg) {
+  OverlayState? overlayState = Overlay.of(context);
+  OverlayEntry overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      bottom: 20.0,
+      left: MediaQuery.of(context).size.width * 0.1,
+      right: MediaQuery.of(context).size.width * 0.1,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Center(
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlayState.insert(overlayEntry);
+
+  // Remove the alert after 3 seconds
+  Future.delayed(const Duration(seconds: 3), () {
+    overlayEntry.remove();
+  });
 }

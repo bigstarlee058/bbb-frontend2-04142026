@@ -68,10 +68,11 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
       _currentPage = 0;
       // Filter exercises based on selected equipment, category, and search query
       _filteredExercises = dataProvider!.adminExercises.where((exercise) {
-        bool matchesEquipment =
-            _selectedEquipmentIds.isEmpty || exercise.usedEquipments.any((equip) => _selectedEquipmentIds.contains(equip));
+        bool matchesEquipment = _selectedEquipmentIds.isEmpty ||
+            exercise.usedEquipments.any((equip) => _selectedEquipmentIds.contains(equip));
 
-        bool matchesCategory = _selectedCategoryIds.isEmpty || exercise.categories.any((cat) => _selectedCategoryIds.contains(cat));
+        bool matchesCategory =
+            _selectedCategoryIds.isEmpty || exercise.categories.any((cat) => _selectedCategoryIds.contains(cat));
 
         bool matchesSearch = _searchQuery.isEmpty || exercise.title.toLowerCase().contains(_searchQuery.toLowerCase());
 
@@ -126,7 +127,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
-                          dataProvider!.cachedImageMap["imageExerciseLibrary"],
+                          image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
 
                           imageKey: "imageExerciseLibrary",
                         ),
@@ -219,10 +220,14 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                           selectedEquipmentIds: _selectedEquipmentIds,
                                           selectedCategoryIds: _selectedCategoryIds,
                                           selectedSortBy: _selectedSortBy,
-                                          equipments: dataProvider!.adminEquipment.map((e) => {'id': e.id, 'title': e.title}).toList(),
-                                          categories: dataProvider!.adminCategory.map((c) => {'id': c.id, 'title': c.title}).toList(),
-                                          onApplyFilters:
-                                              (List<String> selectedEquipments, List<String> selectedCategories, String sortBy) {
+                                          equipments: dataProvider!.adminEquipment
+                                              .map((e) => {'id': e.id, 'title': e.title})
+                                              .toList(),
+                                          categories: dataProvider!.adminCategory
+                                              .map((c) => {'id': c.id, 'title': c.title})
+                                              .toList(),
+                                          onApplyFilters: (List<String> selectedEquipments,
+                                              List<String> selectedCategories, String sortBy) {
                                             setState(() {
                                               _selectedEquipmentIds = selectedEquipments;
                                               _selectedCategoryIds = selectedCategories;
@@ -286,7 +291,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                               horizontal: ScreenUtil.horizontalScale(6),
                               vertical: ScreenUtil.verticalScale(2),
                             ),
-                            child: dataProvider == null || dataProvider!.adminExercises.isEmpty || _filteredExercises.isEmpty
+                            child: dataProvider == null ||
+                                    dataProvider!.adminExercises.isEmpty ||
+                                    _filteredExercises.isEmpty
                                 ? Container(
                                     color: Colors.white,
                                     height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
@@ -398,7 +405,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                           ? const AssetImage("assets/img/library_placeholder.png")
                           : NetworkImage(
                               image.startsWith('https://storage.cloud.google.com/')
-                                  ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                  ? image.replaceFirst(
+                                      'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                   : image,
                             ),
                       fit: BoxFit.cover,
@@ -489,7 +497,8 @@ class FilterSortButton extends StatefulWidget {
   final List<String> selectedEquipmentIds;
   final List<String> selectedCategoryIds;
   final String selectedSortBy;
-  final Function(List<String> selectedEquipmentIds, List<String> selectedCategoryIds, String selectedSortBy) onApplyFilters;
+  final Function(List<String> selectedEquipmentIds, List<String> selectedCategoryIds, String selectedSortBy)
+      onApplyFilters;
 
   final List<Map<String, String>> equipments; // Add dynamic equipment data
   final List<Map<String, String>> categories; // Add dynamic category data
@@ -678,7 +687,8 @@ class _FilterSortButtonState extends State<FilterSortButton> {
                           },
                           children: widget.equipments.map((Map<String, String> equipment) {
                             return CheckboxListTile(
-                              title: Text(equipment['title']!, style: const TextStyle(fontSize: 14, color: Colors.black)),
+                              title:
+                                  Text(equipment['title']!, style: const TextStyle(fontSize: 14, color: Colors.black)),
                               value: _selectedEquipmentIds.contains(equipment['id']),
                               onChanged: (bool? value) {
                                 setState(() {
@@ -730,7 +740,8 @@ class _FilterSortButtonState extends State<FilterSortButton> {
                           },
                           children: widget.categories.map((Map<String, String> category) {
                             return CheckboxListTile(
-                              title: Text(category['title']!, style: const TextStyle(fontSize: 14, color: Colors.black)),
+                              title:
+                                  Text(category['title']!, style: const TextStyle(fontSize: 14, color: Colors.black)),
                               value: _selectedCategoryIds.contains(category['id']),
                               onChanged: (bool? value) {
                                 setState(() {

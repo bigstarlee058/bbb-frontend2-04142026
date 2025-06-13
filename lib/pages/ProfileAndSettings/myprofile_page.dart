@@ -89,14 +89,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
       _id = userData1['_id'];
       selectedName = userData1["name"];
       selectedDate = userData1["detail"]['dob'] == null ? null : DateTime.parse(userData1["detail"]['dob']);
-      selectedWeight.text =
-          userData1["detail"]["weight"] == null ? "0" : '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
-      selectedBodyFat.text =
-          userData1["detail"]["bodyfat"] == null ? "0" : '${userData1["detail"]["bodyfat"]}'; //'${userData['detail']['weight']}';
+      selectedWeight.text = userData1["detail"]["weight"] == null
+          ? "0"
+          : '${userData1["detail"]["weight"]}'; //'${userData['detail']['weight']}';
+      selectedBodyFat.text = userData1["detail"]["bodyfat"] == null
+          ? "0"
+          : '${userData1["detail"]["bodyfat"]}'; //'${userData['detail']['weight']}';
       selectedHeight.text = userData1["detail"]["height"] == null || userData1["detail"]["height"].toString() == "0"
           ? "0"
           : '${userData1["detail"]["height"].toString()[0]}\'${userData1["detail"]["height"].toString()[1]}${userData1["detail"]["height"].toString().length > 2 ? userData1["detail"]["height"].toString()[2] : ""}"'; //'${userData['detail']['height']}\'0"';
-      selectedMidThigh.text = userData1["detail"]["midthigh"] == null ? "0" : userData1["detail"]["midthigh"].toString();
+      selectedMidThigh.text =
+          userData1["detail"]["midthigh"] == null ? "0" : userData1["detail"]["midthigh"].toString();
       selectedHip.text = userData1["detail"]["hip"] == null ? "0" : userData1["detail"]["hip"].toString();
       selectedWaist.text = userData1["detail"]["waist"] == null ? "0" : userData1["detail"]["waist"].toString();
 
@@ -136,7 +139,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       if (userData1['detail']['country'] == null || userData1['detail']['country'] == '') {
         locationProvider.setAndCallApi();
       } else {
-        locationProvider.fillDetails(userData1['detail']['country'], userData1['detail']['state'] ?? "", userData1['detail']['city'] ?? "");
+        locationProvider.fillDetails(
+            userData1['detail']['country'], userData1['detail']['state'] ?? "", userData1['detail']['city'] ?? "");
       }
     });
     setState(() => loader = false);
@@ -265,7 +269,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageMyProfle ?? "",
-                          dataProvider!.cachedImageMap["imageMyProfle"],
+                          image: dataProvider!.cachedImageMap["imageMyProfle"],
 
                           imageKey: "imageMyProfle",
                         ),
@@ -312,10 +316,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       Consumer<UserDataProvider>(
                                         builder: (context, userData, child) => userData.userName != ""
                                             ? ProfileImageWidget(
-                                                avatarUrl:
-                                                    userData.userData['detail'] != null && userData.userData['detail']['avatarUrl'] != ""
-                                                        ? userData.userData['detail']['avatarUrl']
-                                                        : "",
+                                                avatarUrl: userData.userData['detail'] != null &&
+                                                        userData.userData['detail']['avatarUrl'] != null &&
+                                                        userData.userData['detail']['avatarUrl'] != ""
+                                                    ? userData.userData['detail']['avatarUrl']
+                                                    : "",
                                                 name: userData.userName,
                                                 callBack: (pickedImage) {
                                                   image = pickedImage!;
@@ -408,7 +413,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             _buildProfileField(
                               context: context,
                               label: 'Birthday',
-                              value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
+                              value: selectedDate != null
+                                  ? DateFormat('MM/dd/yyyy').format(selectedDate!)
+                                  : 'Select Birthday',
                               onTap: () async {
                                 _showDatePicker(context);
                               },
@@ -611,7 +618,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      margin:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -703,9 +711,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Widget _buildTextField(
-      {required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+      {required BuildContext context,
+      required String label,
+      required TextEditingController value,
+      required String hint}) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      margin:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -861,9 +873,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  Widget _heightPicker({required BuildContext context, required String label, required TextEditingController value, required String hint}) {
+  Widget _heightPicker(
+      {required BuildContext context,
+      required String label,
+      required TextEditingController value,
+      required String hint}) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      margin:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

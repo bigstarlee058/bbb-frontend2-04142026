@@ -123,7 +123,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
             Utils.appImage(
               media,
               // dataProvider?.screenBackgroundResponse?.imageGraphs ?? "",
-              dataProvider!.cachedImageMap["imageGraphs"],
+              image: dataProvider!.cachedImageMap["imageGraphs"],
 
               imageKey: "imageGraphs",
             ),
@@ -214,7 +214,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
                     SizedBox(height: ScreenUtil.horizontalScale(4)),
                     Container(
-                      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
+                      margin: EdgeInsets.symmetric(
+                          vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -267,13 +268,15 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                     ),
                     SizedBox(height: ScreenUtil.horizontalScale(2)),
                     Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)), child: const ReportWeightLiftedGraph()),
+                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                        child: const ReportWeightLiftedGraph()),
 
                     /// AVERAGE RIR
 
                     SizedBox(height: ScreenUtil.horizontalScale(4)),
                     Container(
-                      margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
+                      margin: EdgeInsets.symmetric(
+                          vertical: ScreenUtil.verticalScale(1.5), horizontal: ScreenUtil.horizontalScale(8)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -326,7 +329,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                     ),
                     SizedBox(height: ScreenUtil.horizontalScale(2)),
                     Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)), child: const ReportAverageRIRGraph()),
+                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                        child: const ReportAverageRIRGraph()),
 
                     /// TIME SPENT
 
@@ -432,7 +436,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                     Text(
                                       'Total Weight\nLifted',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.horizontalScale(3.6)),
+                                      style:
+                                          TextStyle(color: Colors.black54, fontSize: ScreenUtil.horizontalScale(3.6)),
                                     ),
                                     const SizedBox(height: 10),
                                     Consumer<MonthProvider>(
@@ -624,14 +629,17 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                             children: [
                                               ListView(
                                                 shrinkWrap: true, // Allows ListView to take only the space it needs
-                                                physics: const AlwaysScrollableScrollPhysics(), // Disable scrolling if needed
+                                                physics:
+                                                    const AlwaysScrollableScrollPhysics(), // Disable scrolling if needed
                                                 children: filteredItems.map((item) {
                                                   return ListTile(
                                                     title: Text(
                                                       item,
-                                                      style: const TextStyle(fontSize: 16), // Adjust font size as needed
+                                                      style:
+                                                          const TextStyle(fontSize: 16), // Adjust font size as needed
                                                       maxLines: 3, // Limit to 3 lines; adjust as needed
-                                                      overflow: TextOverflow.ellipsis, // Show ellipsis if text is too long
+                                                      overflow:
+                                                          TextOverflow.ellipsis, // Show ellipsis if text is too long
                                                     ),
                                                     onTap: () => _selectItem(item),
                                                   );
@@ -681,7 +689,9 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList
         ?.indexWhere((element) => element == monthProvider.todayTitleId);
 
-    String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split =
+        monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ??
+            "";
 
     String dataId =
         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
@@ -695,14 +705,17 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
             "0")) -
         1;
 
-    bool isRestDay =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Rest Day");
+    bool isRestDay = "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+        .toString()
+        .contains("Rest Day");
 
     bool isPumpDay = (isRestDay &&
-            monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+            monthProvider.allDayHistoryModel
+                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             (monthProvider.isPumpDayAvailable &&
-                (monthProvider.allDayHistoryModel.any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+                (monthProvider.allDayHistoryModel
+                    .any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
         (isRestDay &&
             monthProvider.isPumpDayAvailable &&
             (monthProvider.allDayHistoryModel
@@ -718,13 +731,13 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
           .toList();
 
       if (dataList.isNotEmpty) {
-        int index1 = monthProvider.pumpDays.indexWhere((el1) =>
-            dataList.any((e1) => (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
+            (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
         if (index1 != -1) {
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
         } else {
-          int index1 =
-              monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          int index1 = monthProvider.pumpDays
+              .indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
               ? 0
               : index1 == 0
@@ -740,7 +753,9 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     }
 
     DayDataModel dayData =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}".toString().contains("Workout")
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+                .toString()
+                .contains("Workout")
             ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
             : DayDataModel();
 
@@ -755,7 +770,11 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     final dayIndex1 = monthProvider.overviewCurrentDay;
 
     int nextWorkOutIndex = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
-        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1]
+                .toString()
+                .replaceAll("Day ", "")
+                .replaceAll(" Workout", "")) -
+            1
         : 0;
     String currentDayTitle = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
         ? monthProvider.weekDataModel!.days![nextWorkOutIndex].title ?? ""
@@ -764,8 +783,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     //   Navigator.pushNamed(context, '/dayOverview');
     // }
 
-    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel
-        .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
+    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel.any((element) =>
+        (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
 
     if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && isCompletedOrSkipped) {
       return;
@@ -784,11 +803,14 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
       // );
     } else {
       if (monthProvider.isPumpDay) {
-        if ((monthProvider.allSplitDayHistoryModel
-                .any((element) => (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId)) ==
+        if ((monthProvider.allSplitDayHistoryModel.any((element) =>
+                (element.status == Status.completed || element.status == Status.skipped) &&
+                element.dataId == dataId)) ==
             false) {
           _saveDayData(
-              type: "Pump Day - ${monthProvider.pumpDayModel?.id}", status: Status.started, title: monthProvider.pumpDayModel?.title);
+              type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+              status: Status.started,
+              title: monthProvider.pumpDayModel?.title);
           if (!context.mounted) return;
           await Navigator.pushNamed(context, '/today').then(
             (value) {
@@ -811,8 +833,10 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   }
 
   Future<void> _saveDayData({required String status, required String type, String? title}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";

@@ -56,7 +56,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
-                          dataProvider!.cachedImageMap["imageAchievement"],
+                          image: dataProvider!.cachedImageMap["imageAchievement"],
 
                           imageKey: "imageAchievement",
                         ),
@@ -97,8 +97,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(
-                                          routeString: '/equipmentLibrary'),
+                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
                                     )
                                   ],
                                 ),
@@ -109,8 +108,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                   height: media.height * 0.097,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
                                         width: ScreenUtil.horizontalScale(50),
@@ -118,8 +116,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                                           "Here's a look at your\nachievements",
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize:
-                                                ScreenUtil.verticalScale(2),
+                                            fontSize: ScreenUtil.verticalScale(2),
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
@@ -156,9 +153,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                   margin: EdgeInsets.only(top: media.height / 4.6),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: (media.height -
-                          (media.height / 8) -
-                          (media.height * 0.12)),
+                      minHeight: (media.height - (media.height / 8) - (media.height * 0.12)),
                     ),
                     width: media.width,
                     decoration: BoxDecoration(
@@ -169,8 +164,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     ),
                     child: Container(
                       width: media.width,
-                      margin: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.horizontalScale(7)),
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
                       child: GridView.builder(
                         padding: EdgeInsets.only(
                           top: ScreenUtil.verticalScale(3),
@@ -183,8 +177,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                         ),
                         itemCount: dataProvider?.achievementList.length,
                         itemBuilder: (context, index) {
-                          return _buildGridItem(
-                              dataProvider!.achievementList[index], index);
+                          return _buildGridItem(dataProvider!.achievementList[index], index);
                         },
                       ),
                     ),
@@ -223,18 +216,11 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     child: appShimmerImage(
                       height: ScreenUtil.verticalScale(12),
                       width: ScreenUtil.verticalScale(12),
-                      networkImageUrl:
-                          "${item.achievements?.first.achievementAchievementId?.image}"
-                                  .startsWith(
-                                      'https://storage.cloud.google.com/')
-                              ? item.achievements?.first
-                                      .achievementAchievementId?.image ??
-                                  "".replaceFirst(
-                                      'https://storage.cloud.google.com/',
-                                      'https://storage.googleapis.com/')
-                              : item.achievements?.first
-                                      .achievementAchievementId?.image ??
-                                  "unknown",
+                      networkImageUrl: "${item.achievements?.first.achievementAchievementId?.image}"
+                              .startsWith('https://storage.cloud.google.com/')
+                          ? item.achievements?.first.achievementAchievementId?.image ??
+                              "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                          : item.achievements?.first.achievementAchievementId?.image ?? "unknown",
                       fit: BoxFit.cover,
                       borderRadius: BorderRadius.all(
                         Radius.circular(ScreenUtil.verticalScale(500)),
@@ -244,8 +230,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                   height: ScreenUtil.verticalScale(12),
                   width: ScreenUtil.verticalScale(12),
                   decoration: BoxDecoration(
-                    color: item.achievements!
-                            .any((element) => element.achieved != false)
+                    color: item.achievements!.any((element) => element.achieved != false)
                         ? Color(0xFFAADDAA).withValues(alpha: 0.8)
                         : Colors.transparent,
                     borderRadius: BorderRadius.all(
@@ -254,8 +239,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                   ),
                   child: Icon(
                     Icons.check,
-                    color: item.achievements!
-                            .any((element) => element.achieved != false)
+                    color: item.achievements!.any((element) => element.achieved != false)
                         ? Colors.white
                         : Colors.transparent,
                     size: 30,

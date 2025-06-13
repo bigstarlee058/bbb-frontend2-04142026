@@ -121,7 +121,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                         Utils.appImage(
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageApparel ?? "",
-                          dataProvider!.cachedImageMap["imageApparel"],
+                          image: dataProvider!.cachedImageMap["imageApparel"],
 
                           imageKey: "imageDashboard",
                         ),
@@ -254,7 +254,9 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(2),
                                 ),
-                                dataProvider == null || dataProvider!.adminEquipmentsData.isEmpty || _filteredEquipments.isEmpty
+                                dataProvider == null ||
+                                        dataProvider!.adminEquipmentsData.isEmpty ||
+                                        _filteredEquipments.isEmpty
                                     ? Container(
                                         color: Colors.white,
                                         height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
@@ -365,7 +367,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                     image: DecorationImage(
                       image: equipment.thumbnail.isNotEmpty
                           ? NetworkImage(equipment.thumbnail.startsWith('https://storage.cloud.google.com/')
-                              ? equipment.thumbnail.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                              ? equipment.thumbnail
+                                  .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                               : equipment.thumbnail)
                           : const AssetImage('assets/img/library_placeholder.png'),
                       fit: BoxFit.cover,
