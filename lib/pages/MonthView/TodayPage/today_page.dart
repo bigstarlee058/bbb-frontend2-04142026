@@ -964,12 +964,22 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
                                                                   onPress: value.dayHistoryDetails?.status ==
                                                                           Status.completed
                                                                       ? () {
-                                                                          _resetDayData(
-                                                                              status: Status.reset,
-                                                                              type: monthProvider!.isPumpDay
-                                                                                  ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
-                                                                                  : "Workout Day",
-                                                                              status1: Status.reset);
+                                                                          AnimatedDialog.showAnimatedDialog(
+                                                                            context: context,
+                                                                            pageBuilder: (c1, anim1, anim2) => resetDay(
+                                                                              context,
+                                                                              c1,
+                                                                              () {
+                                                                                _resetDayData(
+                                                                                    status: Status.reset,
+                                                                                    type: monthProvider!.isPumpDay
+                                                                                        ? "Pump Day - ${monthProvider?.pumpDayModel?.id}"
+                                                                                        : "Workout Day",
+                                                                                    status1: Status.reset);
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                            ),
+                                                                          );
                                                                         }
                                                                       : null,
                                                                   color: AppColors.primaryColor,
@@ -3206,6 +3216,129 @@ class _TodayPageState extends State<TodayPage> with SingleTickerProviderStateMix
     await monthProvider?.updatePumpDayStatus();
     monthProvider?.manageStreak();
     monthProvider?.getLiftedWeightGraphData();
+  }
+
+  Widget resetDay(BuildContext context, BuildContext c1, void Function()? onPressed) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFFFFFF),
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)).copyWith(top: ScreenUtil.verticalScale(2.5)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: ScreenUtil.verticalScale(2)),
+                    Text(
+                      "Are you sure?",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: ScreenUtil.verticalScale(2.4),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
+                      child: Text(
+                        "This action reset your progress for this day. Are you sure you want to proceed?",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ScreenUtil.verticalScale(2),
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (!c1.mounted) return;
+                                Navigator.of(c1).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: ScreenUtil.verticalScale(1.7),
+                                ),
+                                side: BorderSide(width: 2.0, color: AppColors.primaryColor),
+                                backgroundColor: Colors.white,
+                              ),
+                              child: Text(
+                                'No',
+                                style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontSize: ScreenUtil.verticalScale(2),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: ScreenUtil.horizontalScale(2.5)),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: onPressed,
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                backgroundColor: AppColors.primaryColor,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: ScreenUtil.verticalScale(1.7),
+                                ),
+                              ),
+                              child: Text(
+                                "Yes",
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.verticalScale(2),
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.7)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.of(c1).pop();
+                      },
+                    ),
+                    SizedBox(width: ScreenUtil.horizontalScale(2)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

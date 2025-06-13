@@ -3402,318 +3402,319 @@ class MonthProvider extends ChangeNotifier {
         MonthDataModel monthDataModelSplit3 = MonthDataModel.fromJson(responseData);
         MonthDataModel monthDataModelSplit4 = MonthDataModel.fromJson(responseData);
         MonthDataModel monthDataModelSplit5 = MonthDataModel.fromJson(responseData);
+        log(' monthDataModelSplit3.id==========>>>>>${monthDataModelSplit3.id}');
 
         bool val = pastMonthDataList.any(
           (element) => element["monthId"] == monthDataModelSplit3.id,
         );
+        log('val==========>>>>>${val}');
 
-        if (!val) {
-          List split3 = [
-            "Day 1 Workout",
-            "Rest Day 1",
-            "Day 2 Workout",
-            "Rest Day 2",
-            "Day 3 Workout",
-            "Rest Day 3",
-            "Rest Day 4"
+        // if (!val) {
+        List split3 = [
+          "Day 1 Workout",
+          "Rest Day 1",
+          "Day 2 Workout",
+          "Rest Day 2",
+          "Day 3 Workout",
+          "Rest Day 3",
+          "Rest Day 4"
+        ];
+
+        List split4 = [
+          "Day 1 Workout",
+          "Day 2 Workout",
+          "Rest Day 1",
+          "Day 3 Workout",
+          "Day 4 Workout",
+          "Rest Day 2",
+          "Rest Day 3"
+        ];
+
+        List split5 = [
+          "Day 1 Workout",
+          "Day 2 Workout",
+          "Day 3 Workout",
+          "Day 4 Workout",
+          "Day 5 Workout",
+          "Rest Day 1",
+          "Rest Day 2"
+        ];
+
+        monthDataModelSplit3.weeks?.forEach((element) {
+          element.dayList = split3;
+          element.idList = [
+            "${element.id} split3 Day 1 Workout",
+            "${element.id} split3 Rest Day 1",
+            "${element.id} split3 Day 2 Workout",
+            "${element.id} split3 Rest Day 2",
+            "${element.id} split3 Day 3 Workout",
+            "${element.id} split3 Rest Day 3",
+            "${element.id} split3 Rest Day 4",
           ];
+          element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
+          element.days?.removeWhere((element) => !element.formats!.contains("3"));
+          for (var i = 0; i < element.days!.length; i++) {
+            element.days?[i].dayType = split3[i];
+          }
+        });
 
-          List split4 = [
-            "Day 1 Workout",
-            "Day 2 Workout",
-            "Rest Day 1",
-            "Day 3 Workout",
-            "Day 4 Workout",
-            "Rest Day 2",
-            "Rest Day 3"
+        monthDataModelSplit4.weeks?.forEach((element) {
+          element.dayList = split4;
+          element.idList = [
+            "${element.id} split4 Day 1 Workout",
+            "${element.id} split4 Day 2 Workout",
+            "${element.id} split4 Rest Day 1",
+            "${element.id} split4 Day 3 Workout",
+            "${element.id} split4 Day 4 Workout",
+            "${element.id} split4 Rest Day 2",
+            "${element.id} split4 Rest Day 3",
           ];
+          element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
+          element.days?.removeWhere((element) => !element.formats!.contains("4"));
+          for (var i = 0; i < element.days!.length; i++) {
+            element.days?[i].dayType = split4[i];
+          }
+        });
 
-          List split5 = [
-            "Day 1 Workout",
-            "Day 2 Workout",
-            "Day 3 Workout",
-            "Day 4 Workout",
-            "Day 5 Workout",
-            "Rest Day 1",
-            "Rest Day 2"
+        monthDataModelSplit5.weeks?.forEach((element) {
+          element.dayList = split5;
+          element.idList = [
+            "${element.id} split5 Day 1 Workout",
+            "${element.id} split5 Day 2 Workout",
+            "${element.id} split5 Day 3 Workout",
+            "${element.id} split5 Day 4 Workout",
+            "${element.id} split5 Day 5 Workout",
+            "${element.id} split5 Rest Day 1",
+            "${element.id} split5 Rest Day 2",
           ];
+          element.restDayList = ["Rest Day 1", "Rest Day 2"];
+          element.days?.removeWhere((element) => !element.formats!.contains("5"));
+          for (var i = 0; i < element.days!.length; i++) {
+            element.days?[i].dayType = split5[i];
+          }
+        });
 
-          monthDataModelSplit3.weeks?.forEach((element) {
-            element.dayList = split3;
-            element.idList = [
-              "${element.id} split3 Day 1 Workout",
-              "${element.id} split3 Rest Day 1",
-              "${element.id} split3 Day 2 Workout",
-              "${element.id} split3 Rest Day 2",
-              "${element.id} split3 Day 3 Workout",
-              "${element.id} split3 Rest Day 3",
-              "${element.id} split3 Rest Day 4",
-            ];
-            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
-            element.days?.removeWhere((element) => !element.formats!.contains("3"));
-            for (var i = 0; i < element.days!.length; i++) {
-              element.days?[i].dayType = split3[i];
-            }
-          });
+        monthData = [
+          monthDataModelSplit3,
+          monthDataModelSplit4,
+          monthDataModelSplit5,
+        ];
 
-          monthDataModelSplit4.weeks?.forEach((element) {
-            element.dayList = split4;
-            element.idList = [
-              "${element.id} split4 Day 1 Workout",
-              "${element.id} split4 Day 2 Workout",
-              "${element.id} split4 Rest Day 1",
-              "${element.id} split4 Day 3 Workout",
-              "${element.id} split4 Day 4 Workout",
-              "${element.id} split4 Rest Day 2",
-              "${element.id} split4 Rest Day 3",
-            ];
-            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
-            element.days?.removeWhere((element) => !element.formats!.contains("4"));
-            for (var i = 0; i < element.days!.length; i++) {
-              element.days?[i].dayType = split4[i];
-            }
-          });
+        pastMonthDataList.add({"monthId": monthDataModelSplit3.id, "monthData": monthData});
 
-          monthDataModelSplit5.weeks?.forEach((element) {
-            element.dayList = split5;
-            element.idList = [
-              "${element.id} split5 Day 1 Workout",
-              "${element.id} split5 Day 2 Workout",
-              "${element.id} split5 Day 3 Workout",
-              "${element.id} split5 Day 4 Workout",
-              "${element.id} split5 Day 5 Workout",
-              "${element.id} split5 Rest Day 1",
-              "${element.id} split5 Rest Day 2",
-            ];
-            element.restDayList = ["Rest Day 1", "Rest Day 2"];
-            element.days?.removeWhere((element) => !element.formats!.contains("5"));
-            for (var i = 0; i < element.days!.length; i++) {
-              element.days?[i].dayType = split5[i];
-            }
-          });
+        notifyListeners();
 
-          monthData = [
-            monthDataModelSplit3,
-            monthDataModelSplit4,
-            monthDataModelSplit5,
-          ];
+        if (isCurrentMonth != "Current") {
+          List<HistoryDataModel> monthExerciseHistoryStatus = [];
+          final exerciseHistoryLocal = await DatabaseHelper()
+              .getDataByM(tableName: DatabaseHelper.exerciseHistory, monthId: monthDataModel?.id ?? "");
+          List<ExerciseHistoryDataModel> exerciseHistroy =
+              await ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? "");
+          if (exerciseHistroy.isNotEmpty) {
+            monthExerciseHistoryStatus = List<HistoryDataModel>.from(
+                json.decode(jsonEncode(exerciseHistoryLocal)).map((x) => HistoryDataModel.fromJson(x)));
 
-          pastMonthDataList.add({"monthId": monthDataModelSplit3.id, "monthData": monthData});
+            for (var element in exerciseHistroy) {
+              final body = {
+                "split": element.split ?? "",
+                "dataId": element.dataId ?? "",
+                "exerciseId": element.exerciseId ?? "",
+                "extraId": element.extraId ?? "",
+                "monthId": element.monthId ?? "",
+                "weekId": element.weekId ?? "",
+                "dayId": element.dayId ?? "",
+                "sets": element.sets?.toString() ?? "",
+                "reps": element.reps?.toString() ?? "",
+                "weight": element.weight?.toString() ?? "",
+                "rest": element.rest?.toString() ?? "",
+                "load": element.load?.toString() ?? "",
+                "type": element.type ?? "",
+                "effort": element.effort?.toString() ?? "",
+                "date": element.date?.toString() ?? "",
+                "index": int.parse(element.index ?? "0"),
+                "subIndex": int.parse(element.subIndex ?? ""),
+                "status": element.status ?? "",
+                "totalSet": element.totalSet?.toString() ?? "",
+              };
 
-          notifyListeners();
+              HistoryDataModel matchingElement = monthExerciseHistoryStatus.firstWhere(
+                (el1) => element.dataId == el1.dataId,
+                orElse: () => HistoryDataModel(),
+              );
 
-          if (isCurrentMonth == "Past") {
-            List<HistoryDataModel> monthExerciseHistoryStatus = [];
-            final exerciseHistoryLocal = await DatabaseHelper()
-                .getDataByM(tableName: DatabaseHelper.exerciseHistory, monthId: monthDataModel?.id ?? "");
-            List<ExerciseHistoryDataModel> exerciseHistroy =
-                await ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? "");
-            if (exerciseHistroy.isNotEmpty) {
-              monthExerciseHistoryStatus = List<HistoryDataModel>.from(
-                  json.decode(jsonEncode(exerciseHistoryLocal)).map((x) => HistoryDataModel.fromJson(x)));
-
-              for (var element in exerciseHistroy) {
-                final body = {
-                  "split": element.split ?? "",
-                  "dataId": element.dataId ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "extraId": element.extraId ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "sets": element.sets?.toString() ?? "",
-                  "reps": element.reps?.toString() ?? "",
-                  "weight": element.weight?.toString() ?? "",
-                  "rest": element.rest?.toString() ?? "",
-                  "load": element.load?.toString() ?? "",
-                  "type": element.type ?? "",
-                  "effort": element.effort?.toString() ?? "",
-                  "date": element.date?.toString() ?? "",
-                  "index": int.parse(element.index ?? "0"),
-                  "subIndex": int.parse(element.subIndex ?? ""),
-                  "status": element.status ?? "",
-                  "totalSet": element.totalSet?.toString() ?? "",
-                };
-
-                HistoryDataModel matchingElement = monthExerciseHistoryStatus.firstWhere(
-                  (el1) => element.dataId == el1.dataId,
-                  orElse: () => HistoryDataModel(),
-                );
-
-                if (matchingElement.id != null) {
-                  await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
-                }
-              }
-            }
-
-            List<ExerciseHistoryModel> monthExerciseStatus = [];
-            final exerciseStatusLocal = await DatabaseHelper()
-                .getDataByM(tableName: DatabaseHelper.exerciseStatus, monthId: monthDataModel?.id ?? "");
-            List<ExerciseStatusDataModel> exerciseStatus =
-                await ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? "");
-            if (exerciseStatus.isNotEmpty) {
-              monthExerciseStatus = List<ExerciseHistoryModel>.from(
-                  json.decode(jsonEncode(exerciseStatusLocal)).map((x) => ExerciseHistoryModel.fromJson(x)));
-
-              for (var element in exerciseStatus) {
-                final body = {
-                  "dataId": element.dataId ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "split": element.split ?? "",
-                  "date": element.date ?? "",
-                  "status": element.status ?? "",
-                  "type": element.type ?? "",
-                  "totalWeight": element.totalWeight ?? "",
-                  "totalSet": element.totalSet ?? "",
-                  "totalRIR": element.totalRIR ?? "",
-                };
-                ExerciseHistoryModel matchingElement = monthExerciseStatus.firstWhere(
-                  (el1) => element.dataId == el1.dataId,
-                  orElse: () => ExerciseHistoryModel(),
-                );
-                if (matchingElement.id != null) {
-                  await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
-                }
-              }
-            }
-
-            await onInitPastMonth(context, month);
-
-            switchMonthLoader = false;
-            notifyListeners();
-
-            List<RemovedExerciseModel> monthRemovedExercise = [];
-            final removedExerciseLocal = await DatabaseHelper()
-                .getDataByM(tableName: DatabaseHelper.removedExerciseHistory, monthId: monthDataModel?.id ?? "");
-
-            List<RemovedExerciseDataModel> removedExercise =
-                await ApiRepo.fetchRemovedExercise(monthDataModelSplit3.id ?? "");
-            if (removedExercise.isNotEmpty) {
-              monthRemovedExercise = List<RemovedExerciseModel>.from(
-                  json.decode(jsonEncode(removedExerciseLocal)).map((x) => RemovedExerciseModel.fromJson(x)));
-
-              for (var element in removedExercise) {
-                final body = {
-                  "exerciseId": element.exerciseId ?? "",
-                  "dataId": element.dataId ?? "",
-                  "split": element.split ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dataId ?? "",
-                };
-
-                RemovedExerciseModel matchingElement = monthRemovedExercise.firstWhere(
-                  (el1) => element.dataId == el1.dataId,
-                  orElse: () => RemovedExerciseModel(),
-                );
-                if (matchingElement.id != null) {
-                  await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
-                }
-              }
-            }
-
-            List<ExtraExerciseModel> monthExtraExercise = [];
-            final extraExerciseLocal = await DatabaseHelper()
-                .getDataByM(tableName: DatabaseHelper.extraExerciseHistory, monthId: monthDataModel?.id ?? "");
-
-            List<ExtraExerciseDataModel> extraExercise =
-                await ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? "");
-            if (extraExercise.isNotEmpty) {
-              monthExtraExercise = List<ExtraExerciseModel>.from(
-                  json.decode(jsonEncode(extraExerciseLocal)).map((x) => ExtraExerciseModel.fromJson(x)));
-
-              for (var element in extraExercise) {
-                final body = {
-                  "dataId": element.dataId ?? "",
-                  "split": element.split ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "date": element.date ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "exerciseJson": element.exerciseJson ?? ""
-                };
-
-                ExtraExerciseModel matchingElement = monthExtraExercise.firstWhere(
-                  (el1) => element.dataId == el1.dataId,
-                  orElse: () => ExtraExerciseModel(),
-                );
-                if (matchingElement.id != null) {
-                  await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.extraExerciseHistory);
-                }
-              }
-            }
-
-            List<SwapExerciseModel> monthSwapExercise = [];
-            final swapExerciseLocal = await DatabaseHelper()
-                .getDataByM(tableName: DatabaseHelper.swapExerciseHistory, monthId: monthDataModel?.id ?? "");
-
-            List<SwapExerciseDataModel> swapExercise = await ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? "");
-            if (swapExercise.isNotEmpty) {
-              monthSwapExercise = List<SwapExerciseModel>.from(
-                  json.decode(jsonEncode(swapExerciseLocal)).map((x) => SwapExerciseModel.fromJson(x)));
-
-              for (var element in swapExercise) {
-                final body = {
-                  "dataId": element.dataId ?? "",
-                  "split": element.split ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "date": element.date ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "exerciseJson": element.exerciseJson ?? "",
-                  "insertIndex": element.insertIndex ?? ""
-                };
-
-                SwapExerciseModel matchingElement = monthSwapExercise.firstWhere(
-                  (el1) => element.dataId == el1.dataId,
-                  orElse: () => SwapExerciseModel(),
-                );
-                if (matchingElement.id != null) {
-                  await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
-                }
+              if (matchingElement.id != null) {
+                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
               }
             }
           }
 
-          // List<DayHistoryModel> dayLocalStatus = [];
-          // final dayLocal = await DatabaseHelper().getDataByM(tableName: DatabaseHelper.dayStatus, monthId: monthDataModel?.id ?? "");
-          // List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
-          // if (dayStatus.isNotEmpty) {
-          //   dayLocalStatus = List<DayHistoryModel>.from(json.decode(jsonEncode(dayLocal)).map((x) => DayHistoryModel.fromJson(x)));
-          //
-          //   for (var element in dayStatus) {
-          //     final body = {
-          //       "title": element.title ?? "",
-          //       "dataId": element.dataId ?? " ",
-          //       "monthId": element.monthId ?? "",
-          //       "weekId": element.weekId ?? "",
-          //       "dayId": element.dayId ?? "",
-          //       "split": element.split ?? "",
-          //       "date": element.date ?? "",
-          //       "status": element.status ?? "",
-          //       "type": element.type ?? "",
-          //       "startTime": element.startTime ?? "",
-          //       "endTime": element.endTime ?? "",
-          //       "completedExercise": element.completedExerciseCount ?? "",
-          //       "totalWeight": element.totalWeight ?? "",
-          //       "averageRIR": element.averageRIR ?? "",
-          //     };
-          //
-          //     DayHistoryModel matchingElement = dayLocalStatus.firstWhere(
-          //       (el1) => element.dataId == el1.dataId,
-          //       orElse: () => DayHistoryModel(),
-          //     );
-          //     if (matchingElement.id != null) {
-          //       await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.dayStatus);
-          //     }
-          //   }
-          // }
+          List<ExerciseHistoryModel> monthExerciseStatus = [];
+          final exerciseStatusLocal = await DatabaseHelper()
+              .getDataByM(tableName: DatabaseHelper.exerciseStatus, monthId: monthDataModel?.id ?? "");
+          List<ExerciseStatusDataModel> exerciseStatus =
+              await ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? "");
+          if (exerciseStatus.isNotEmpty) {
+            monthExerciseStatus = List<ExerciseHistoryModel>.from(
+                json.decode(jsonEncode(exerciseStatusLocal)).map((x) => ExerciseHistoryModel.fromJson(x)));
+
+            for (var element in exerciseStatus) {
+              final body = {
+                "dataId": element.dataId ?? "",
+                "exerciseId": element.exerciseId ?? "",
+                "monthId": element.monthId ?? "",
+                "weekId": element.weekId ?? "",
+                "dayId": element.dayId ?? "",
+                "split": element.split ?? "",
+                "date": element.date ?? "",
+                "status": element.status ?? "",
+                "type": element.type ?? "",
+                "totalWeight": element.totalWeight ?? "",
+                "totalSet": element.totalSet ?? "",
+                "totalRIR": element.totalRIR ?? "",
+              };
+              ExerciseHistoryModel matchingElement = monthExerciseStatus.firstWhere(
+                (el1) => element.dataId == el1.dataId,
+                orElse: () => ExerciseHistoryModel(),
+              );
+              if (matchingElement.id != null) {
+                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
+              }
+            }
+          }
+
+          await onInitPastMonth(context, month);
+
+          switchMonthLoader = false;
+          notifyListeners();
+
+          List<RemovedExerciseModel> monthRemovedExercise = [];
+          final removedExerciseLocal = await DatabaseHelper()
+              .getDataByM(tableName: DatabaseHelper.removedExerciseHistory, monthId: monthDataModel?.id ?? "");
+
+          List<RemovedExerciseDataModel> removedExercise =
+              await ApiRepo.fetchRemovedExercise(monthDataModelSplit3.id ?? "");
+          if (removedExercise.isNotEmpty) {
+            monthRemovedExercise = List<RemovedExerciseModel>.from(
+                json.decode(jsonEncode(removedExerciseLocal)).map((x) => RemovedExerciseModel.fromJson(x)));
+
+            for (var element in removedExercise) {
+              final body = {
+                "exerciseId": element.exerciseId ?? "",
+                "dataId": element.dataId ?? "",
+                "split": element.split ?? "",
+                "monthId": element.monthId ?? "",
+                "weekId": element.weekId ?? "",
+                "dayId": element.dataId ?? "",
+              };
+
+              RemovedExerciseModel matchingElement = monthRemovedExercise.firstWhere(
+                (el1) => element.dataId == el1.dataId,
+                orElse: () => RemovedExerciseModel(),
+              );
+              if (matchingElement.id != null) {
+                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
+              }
+            }
+          }
+
+          List<ExtraExerciseModel> monthExtraExercise = [];
+          final extraExerciseLocal = await DatabaseHelper()
+              .getDataByM(tableName: DatabaseHelper.extraExerciseHistory, monthId: monthDataModel?.id ?? "");
+
+          List<ExtraExerciseDataModel> extraExercise = await ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? "");
+          if (extraExercise.isNotEmpty) {
+            monthExtraExercise = List<ExtraExerciseModel>.from(
+                json.decode(jsonEncode(extraExerciseLocal)).map((x) => ExtraExerciseModel.fromJson(x)));
+
+            for (var element in extraExercise) {
+              final body = {
+                "dataId": element.dataId ?? "",
+                "split": element.split ?? "",
+                "monthId": element.monthId ?? "",
+                "weekId": element.weekId ?? "",
+                "dayId": element.dayId ?? "",
+                "date": element.date ?? "",
+                "exerciseId": element.exerciseId ?? "",
+                "exerciseJson": element.exerciseJson ?? ""
+              };
+
+              ExtraExerciseModel matchingElement = monthExtraExercise.firstWhere(
+                (el1) => element.dataId == el1.dataId,
+                orElse: () => ExtraExerciseModel(),
+              );
+              if (matchingElement.id != null) {
+                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.extraExerciseHistory);
+              }
+            }
+          }
+
+          List<SwapExerciseModel> monthSwapExercise = [];
+          final swapExerciseLocal = await DatabaseHelper()
+              .getDataByM(tableName: DatabaseHelper.swapExerciseHistory, monthId: monthDataModel?.id ?? "");
+
+          List<SwapExerciseDataModel> swapExercise = await ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? "");
+          if (swapExercise.isNotEmpty) {
+            monthSwapExercise = List<SwapExerciseModel>.from(
+                json.decode(jsonEncode(swapExerciseLocal)).map((x) => SwapExerciseModel.fromJson(x)));
+
+            for (var element in swapExercise) {
+              final body = {
+                "dataId": element.dataId ?? "",
+                "split": element.split ?? "",
+                "monthId": element.monthId ?? "",
+                "weekId": element.weekId ?? "",
+                "dayId": element.dayId ?? "",
+                "date": element.date ?? "",
+                "exerciseId": element.exerciseId ?? "",
+                "exerciseJson": element.exerciseJson ?? "",
+                "insertIndex": element.insertIndex ?? ""
+              };
+
+              SwapExerciseModel matchingElement = monthSwapExercise.firstWhere(
+                (el1) => element.dataId == el1.dataId,
+                orElse: () => SwapExerciseModel(),
+              );
+              if (matchingElement.id != null) {
+                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
+              }
+            }
+          }
         }
+
+        // List<DayHistoryModel> dayLocalStatus = [];
+        // final dayLocal = await DatabaseHelper().getDataByM(tableName: DatabaseHelper.dayStatus, monthId: monthDataModel?.id ?? "");
+        // List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
+        // if (dayStatus.isNotEmpty) {
+        //   dayLocalStatus = List<DayHistoryModel>.from(json.decode(jsonEncode(dayLocal)).map((x) => DayHistoryModel.fromJson(x)));
+        //
+        //   for (var element in dayStatus) {
+        //     final body = {
+        //       "title": element.title ?? "",
+        //       "dataId": element.dataId ?? " ",
+        //       "monthId": element.monthId ?? "",
+        //       "weekId": element.weekId ?? "",
+        //       "dayId": element.dayId ?? "",
+        //       "split": element.split ?? "",
+        //       "date": element.date ?? "",
+        //       "status": element.status ?? "",
+        //       "type": element.type ?? "",
+        //       "startTime": element.startTime ?? "",
+        //       "endTime": element.endTime ?? "",
+        //       "completedExercise": element.completedExerciseCount ?? "",
+        //       "totalWeight": element.totalWeight ?? "",
+        //       "averageRIR": element.averageRIR ?? "",
+        //     };
+        //
+        //     DayHistoryModel matchingElement = dayLocalStatus.firstWhere(
+        //       (el1) => element.dataId == el1.dataId,
+        //       orElse: () => DayHistoryModel(),
+        //     );
+        //     if (matchingElement.id != null) {
+        //       await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.dayStatus);
+        //     }
+        //   }
+        // }
+        // }
       }
 
       notifyListeners();

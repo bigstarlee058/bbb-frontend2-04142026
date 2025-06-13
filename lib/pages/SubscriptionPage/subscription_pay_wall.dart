@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -17,7 +16,6 @@ import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -122,6 +120,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   }
 
   Future<void> _purchasePackage() async {
+    Purchases.setLogLevel(LogLevel.debug);
+
     if (selectedPackage == null) return;
 
     setState(() => isLoading = true);
@@ -129,34 +129,42 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
     try {
       final CustomerInfo customerInfo = await Purchases.purchasePackage(selectedPackage!);
 
-      final DateTime now = await NTP.now();
+      // final DateTime now = await NTP.now();
       // log(' customerInfo.allExpirationDates==========>>>>>${customerInfo.activeSubscriptions}');
+      // final entitlementId = selectedPackage!.storeProduct.identifier;
+      // final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
 
-      final entitlementId = selectedPackage!.storeProduct.identifier;
-      final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
+      final entitlements = customerInfo.entitlements.active;
 
-      if (expirationDate != null) {
+      if (entitlements.isNotEmpty) {
+        final entitlement = entitlements.values.first;
+        final String planId = entitlement.productIdentifier;
+        final String startDate = entitlement.originalPurchaseDate;
+        final String endDate =
+            DateTime.parse(startDate).add(Duration(days: planId == "monthly_membership_1m_29" ? 28 : 365)).toString();
+        final String status = entitlement.isActive ? "subscribed_user" : "free_user";
+
         await _updateSubscriptionData(
-          type: entitlementId,
-          endDate: expirationDate.toString(),
-          startDate: now.toString(),
-          status: "subscribed_user",
+          type: planId,
+          endDate: endDate,
+          startDate: startDate,
+          status: status,
         );
       } else {
-        debugPrint('Entitlement not active or expiration date missing.');
-        showBottomAlert(context, "Subscription not activated. Please try again.");
+        debugPrint('Entitlement not act ive or expiration date missing.');
+        if (mounted) showBottomAlert(context, "Subscription not activated. Please try again.");
       }
     } on PurchasesError catch (e) {
       if (e.code == PurchasesErrorCode.purchaseCancelledError) {
         debugPrint("❕Purchase cancelled by user.");
-        showBottomAlert(context, "Purchase cancelled.");
+        if (mounted) showBottomAlert(context, "Purchase cancelled.");
       } else {
         debugPrint("RevenueCat error: ${e.code} - ${e.message}");
-        showBottomAlert(context, "Purchase failed: ${e.message}");
+        if (mounted) showBottomAlert(context, "Purchase failed: ${e.message}");
       }
     } catch (e) {
       debugPrint("Unexpected error: $e");
-      showBottomAlert(context, "Purchase failed: Please try again.");
+      if (mounted) showBottomAlert(context, "Purchase failed: Please try again.");
     } finally {
       if (mounted) setState(() => isLoading = false);
     }

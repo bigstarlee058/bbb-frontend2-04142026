@@ -24,8 +24,7 @@ class StepProgressBar extends StatelessWidget {
       builder: (context, constraints) {
         final totalWidth = constraints.maxWidth;
         final spacing = 6;
-        final stepWidth =
-            (totalWidth - ((totalSteps - 1) * spacing)) / totalSteps;
+        final stepWidth = (totalWidth - ((totalSteps - 1) * spacing)) / totalSteps;
 
         return Row(
           children: List.generate(totalSteps, (index) {
@@ -44,13 +43,11 @@ class StepProgressBar extends StatelessWidget {
                       width: stepWidth,
                       height: stepHeight ?? ScreenUtil.verticalScale(0.8),
                       decoration: BoxDecoration(
-                        color: AppColors.greyColor,
+                        color: Color(0xFFF2F2F2),
                         borderRadius: index == 0
-                            ? const BorderRadius.horizontal(
-                                left: Radius.circular(20))
+                            ? const BorderRadius.horizontal(left: Radius.circular(20))
                             : index == totalSteps - 1
-                                ? const BorderRadius.horizontal(
-                                    right: Radius.circular(20))
+                                ? const BorderRadius.horizontal(right: Radius.circular(20))
                                 : BorderRadius.zero,
                       ),
                     ),
@@ -59,10 +56,7 @@ class StepProgressBar extends StatelessWidget {
                     ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return LinearGradient(
-                          colors: [
-                            AppColors.backOffSetColor1,
-                            AppColors.primaryColor
-                          ],
+                          colors: [AppColors.backOffSetColor1, AppColors.primaryColor],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ).createShader(Rect.fromLTWH(
@@ -85,11 +79,9 @@ class StepProgressBar extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: index == 0
-                                ? const BorderRadius.horizontal(
-                                    left: Radius.circular(20))
+                                ? const BorderRadius.horizontal(left: Radius.circular(20))
                                 : index == totalSteps - 1
-                                    ? const BorderRadius.horizontal(
-                                        right: Radius.circular(20))
+                                    ? const BorderRadius.horizontal(right: Radius.circular(20))
                                     : BorderRadius.zero,
                           ),
                         ),

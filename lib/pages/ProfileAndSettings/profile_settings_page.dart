@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -7,6 +6,7 @@ import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/get_all_achivements.dart';
+import 'package:bbb/pages/ProfileAndSettings/payment_detail_screen.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -18,14 +18,13 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
+
 import '../../providers/user_data_provider.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
@@ -563,7 +562,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   settingsButton('Subscription', Icons.refresh, () async {
                                     bool isAppUser = userData?.user["singuptype"] != "web" ? true : false;
                                     if (isAppUser) {
-                                      await openAppSettings();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PaymentDetailScreen(),
+                                        ),
+                                      );
+
+                                      // await openAppSettings();
                                     } else {
                                       SharedPreferences prefs = await SharedPreferences.getInstance();
                                       String? token = prefs.getString('authToken');

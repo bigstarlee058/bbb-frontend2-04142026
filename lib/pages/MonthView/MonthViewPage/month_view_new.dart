@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -42,7 +43,6 @@ class _MonthViewNewState extends State<MonthViewNew> {
   DataProvider? dataProvider;
   PageController pageController = PageController();
   ScrollProvider? scrollProvider;
-  final DateStreamNotifier _dateNotifier = DateStreamNotifier();
   DateTime _currentDate = DateTime.now();
   late ProgramInfoProvider provider;
   ScrollController scrollController = ScrollController();
@@ -79,18 +79,8 @@ class _MonthViewNewState extends State<MonthViewNew> {
     });
 
     monthProvider?.mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-    _dateNotifier.stream.listen((newDate) {
-      if (_currentDate.day != newDate.day) {
-        setState(() {
-          _currentDate = newDate;
-          monthProvider?.onInit(context: context, isEnabled: false);
-        });
-      }
-    });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToMiddle();
-    });
+    scrollToMiddle();
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
@@ -108,6 +98,8 @@ class _MonthViewNewState extends State<MonthViewNew> {
   }
 
   void scrollToMiddle() {
+    log('monthProvider!.scrollToRestDay==========>>>>>${monthProvider!.scrollToRestDay}');
+
     if (monthProvider!.scrollToRestDay) {
       final middleOffset = scrollController.position.maxScrollExtent /
           ((monthProvider?.week) == 1
