@@ -1,3 +1,4 @@
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:flutter/material.dart';
 
@@ -35,7 +36,8 @@ class NewspaperLayoutWidget extends StatelessWidget {
     BuildContext context,
     BoxConstraints constraints,
   ) {
-    final defaultTextStyle = textStyle ?? Theme.of(context).textTheme.bodyMedium ?? const TextStyle(fontSize: 16, height: 1.5);
+    final defaultTextStyle =
+        textStyle ?? Theme.of(context).textTheme.bodyMedium ?? const TextStyle(fontSize: 16, height: 1.5);
     final spacing = 18.0;
     final availableWidthNextToImage = constraints.maxWidth - imageWidth - spacing;
     final textPainter = TextPainter(
@@ -69,24 +71,31 @@ class NewspaperLayoutWidget extends StatelessWidget {
                 height: imageHeight,
                 margin: EdgeInsets.only(right: spacing),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(500)),
-                  child: Image.network(
-                    imageUrl,
-                    width: imageWidth,
-                    height: imageHeight,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          color: Colors.grey,
-                          size: 40,
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(500)),
+                    child: appShimmerImage(
+                      height: imageHeight,
+                      width: imageWidth,
+                      networkImageUrl: imageUrl,
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(500)),
+                    )
+                    // Image.network(
+                    //   imageUrl,
+                    //   width: imageWidth,
+                    //   height: imageHeight,
+                    //   fit: BoxFit.cover,
+                    //   errorBuilder: (context, error, stackTrace) {
+                    //     return Container(
+                    //       color: Colors.grey[300],
+                    //       child: const Icon(
+                    //         Icons.image_not_supported,
+                    //         color: Colors.grey,
+                    //         size: 40,
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                    ),
               ),
               Expanded(
                 child: SizedBox(

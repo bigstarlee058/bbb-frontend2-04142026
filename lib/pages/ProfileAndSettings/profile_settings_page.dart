@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -286,7 +287,38 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             return userData.userData['detail'] != null &&
                                                     userData.userData['detail']['avatarUrl'] != null &&
                                                     userData.userData['detail']['avatarUrl'] != ""
-                                                ? Container(
+                                                ? ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
+                                                    child: appShimmerImage(
+                                                      height: ScreenUtil.verticalScale(10.5),
+                                                      width: ScreenUtil.verticalScale(10.5),
+                                                      networkImageUrl: userData.userData['detail'] != null
+                                                          ? userData.userData['detail']['avatarUrl']
+                                                                  .startsWith('https://storage.cloud.google.com/')
+                                                              ? userData.userData['detail']['avatarUrl'].replaceFirst(
+                                                                  'https://storage.cloud.google.com/',
+                                                                  'https://storage.googleapis.com/')
+                                                              : userData.userData['detail']['avatarUrl']
+                                                          : "",
+                                                      fit: BoxFit.cover,
+                                                      borderRadius: BorderRadius.all(
+                                                        Radius.circular(ScreenUtil.horizontalScale(12.5)),
+                                                      ),
+                                                    )
+                                                    // Image.network(
+                                                    //   userData.userData['detail'] != null
+                                                    //       ? userData.userData['detail']['avatarUrl']
+                                                    //               .startsWith('https://storage.cloud.google.com/')
+                                                    //           ? userData.userData['detail']['avatarUrl'].replaceFirst(
+                                                    //               'https://storage.cloud.google.com/',
+                                                    //               'https://storage.googleapis.com/')
+                                                    //           : userData.userData['detail']['avatarUrl']
+                                                    //       : "",
+                                                    //   fit: BoxFit.cover,
+                                                    // ),
+                                                    )
+                                                : Container(
                                                     height: ScreenUtil.verticalScale(10.5),
                                                     width: ScreenUtil.verticalScale(10.5),
                                                     decoration: BoxDecoration(
@@ -295,31 +327,19 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                         Radius.circular(ScreenUtil.horizontalScale(12.5)),
                                                       ),
                                                     ),
-                                                    child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
-                                                        child: Image.network(
-                                                          userData.userData['detail'] != null
-                                                              ? userData.userData['detail']['avatarUrl']
-                                                                      .startsWith('https://storage.cloud.google.com/')
-                                                                  ? userData.userData['detail']['avatarUrl']
-                                                                      .replaceFirst('https://storage.cloud.google.com/',
-                                                                          'https://storage.googleapis.com/')
-                                                                  : userData.userData['detail']['avatarUrl']
-                                                              : "",
-                                                          fit: BoxFit.cover,
-                                                        )),
-                                                  )
-                                                : userData.userName != ""
-                                                    ? Text(
-                                                        userData.userName[0], // First character of the name
-                                                        style: TextStyle(
-                                                          fontSize: ScreenUtil.horizontalScale(12),
-                                                          color: Colors.white, // Adjust size as needed
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      )
-                                                    : const SizedBox();
+                                                    child: Center(
+                                                      child: userData.userName != ""
+                                                          ? Text(
+                                                              userData.userName[0], // First character of the name
+                                                              style: TextStyle(
+                                                                fontSize: ScreenUtil.horizontalScale(12),
+                                                                color: Colors.white, // Adjust size as needed
+                                                                fontWeight: FontWeight.bold,
+                                                              ),
+                                                            )
+                                                          : const SizedBox(),
+                                                    ),
+                                                  );
                                           },
                                         ),
                                       ),

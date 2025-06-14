@@ -1,4 +1,5 @@
 import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/tutorial_model.dart';
 import 'package:bbb/pages/Tools/tutorial_details_page.dart';
@@ -201,26 +202,39 @@ class _TutorialPageState extends State<TutorialPage> {
           children: [
             Row(
               children: [
-                Container(
+                appShimmerImage(
                   height: media.width / 4,
                   width: media.width / 4,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: data.thumbnail!.isNotEmpty
-                          ? NetworkImage(data.thumbnail!.startsWith('https://storage.cloud.google.com/')
-                              ? data.thumbnail!
-                                  .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                              : data.thumbnail!)
-                          : const AssetImage('assets/img/library_placeholder.png'),
-                      fit: BoxFit.cover,
-                      opacity: 1,
-                    ),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                      bottomLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                    ),
+                  networkImageUrl: data.thumbnail!.startsWith('https://storage.cloud.google.com/')
+                      ? data.thumbnail!
+                          .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                      : data.thumbnail!,
+                  fit: BoxFit.cover,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
                   ),
                 ),
+                // Container(
+                //   height: media.width / 4,
+                //   width: media.width / 4,
+                //   decoration: BoxDecoration(
+                //     image: DecorationImage(
+                //       image: data.thumbnail!.isNotEmpty
+                //           ? NetworkImage(data.thumbnail!.startsWith('https://storage.cloud.google.com/')
+                //               ? data.thumbnail!
+                //                   .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                //               : data.thumbnail!)
+                //           : const AssetImage('assets/img/library_placeholder.png'),
+                //       fit: BoxFit.cover,
+                //       opacity: 1,
+                //     ),
+                //     borderRadius: BorderRadius.only(
+                //       topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(
                   width: 10,
                 ),

@@ -1,4 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -88,12 +89,25 @@ class ProgramPhasesWidget extends StatelessWidget {
                         child: value.programPhaseModel != null
                             ? value.programPhaseModel!.phasesmaininfo!.thumbnail!.isEmpty
                                 ? Image.asset("assets/img/program-phase-1.png")
-                                : Image.network(
-                                    value.programPhaseModel!.phasesmaininfo!.thumbnail!.startsWith('https://storage.cloud.google.com/')
-                                        ? value.programPhaseModel!.phasesmaininfo!.thumbnail!
-                                            .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                : appShimmerImage(
+                                    height: media.width / 4,
+                                    width: media.width,
+                                    networkImageUrl: value.programPhaseModel!.phasesmaininfo!.thumbnail!
+                                            .startsWith('https://storage.cloud.google.com/')
+                                        ? value.programPhaseModel!.phasesmaininfo!.thumbnail!.replaceFirst(
+                                            'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                         : value.programPhaseModel!.phasesmaininfo!.thumbnail!,
+                                    fit: BoxFit.cover,
+                                    color: Colors.transparent,
                                   )
+
+                            // Image.network(
+                            //             value.programPhaseModel!.phasesmaininfo!.thumbnail!
+                            //                     .startsWith('https://storage.cloud.google.com/')
+                            //                 ? value.programPhaseModel!.phasesmaininfo!.thumbnail!.replaceFirst(
+                            //                     'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                            //                 : value.programPhaseModel!.phasesmaininfo!.thumbnail!,
+                            //           )
                             : Image.asset("assets/img/program-phase-1.png"),
                       );
                     }),

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -280,7 +281,9 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                   color: Colors.black,
                                   child: Column(
                                     children: [
-                                      dataProvider!.currentExerciseObj.files.isNotEmpty && !videoNotInitialized && videoSize != null
+                                      dataProvider!.currentExerciseObj.files.isNotEmpty &&
+                                              !videoNotInitialized &&
+                                              videoSize != null
                                           ? Stack(
                                               children: [
                                                 SizedBox(
@@ -390,7 +393,9 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                     IconButton(
                                       iconSize: 60,
                                       icon: Icon(
-                                        _videoPlayerController.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                                        _videoPlayerController.value.isPlaying
+                                            ? Icons.pause_circle_filled
+                                            : Icons.play_circle_filled,
                                         color: Colors.white70,
                                       ),
                                       onPressed: () {
@@ -432,7 +437,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                               bottom: media.height * 0.09,
                               left: 10,
                               right: 10,
-                              child: !videoNotInitialized && _chewieController!.videoPlayerController.value.isInitialized == true
+                              child: !videoNotInitialized &&
+                                      _chewieController!.videoPlayerController.value.isInitialized == true
                                   ? Column(
                                       children: [
                                         // Container(
@@ -454,7 +460,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                         //   ),
                                         // ),
                                         Container(
-                                          margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(4), left: 20, right: 20),
+                                          margin:
+                                              EdgeInsets.only(bottom: ScreenUtil.verticalScale(4), left: 20, right: 20),
                                           child: Column(
                                             children: [
                                               Column(
@@ -604,8 +611,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                             children: [
                               Container(
                                 alignment: Alignment.bottomCenter,
-                                decoration:
-                                    const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
+                                decoration: const BoxDecoration(
+                                    color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
                                 padding: const EdgeInsets.symmetric(horizontal: 30),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -767,28 +774,38 @@ class _EquipmentSectionState extends State<EquipmentSection> {
         ),
         child: Row(
           children: [
-            Container(
+            appShimmerImage(
               height: ScreenUtil.verticalScale(11),
               width: ScreenUtil.verticalScale(12),
-
-              // Padding around the background
-              decoration: BoxDecoration(
-                color: AppColors.blackColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                ),
-                image: DecorationImage(
-                  image: image.isNotEmpty
-                      ? NetworkImage(image.startsWith('https://storage.cloud.google.com/')
-                          ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                          : image)
-                      : const AssetImage('assets/img/back.jpg'),
-                  fit: BoxFit.cover,
-                  opacity: 1,
-                ),
+              networkImageUrl: image.startsWith('https://storage.cloud.google.com/')
+                  ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                  : image,
+              fit: BoxFit.cover,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
               ),
             ),
+            // Container(
+            //   height: ScreenUtil.verticalScale(11),
+            //   width: ScreenUtil.verticalScale(12),
+            //   decoration: BoxDecoration(
+            //     color: AppColors.blackColor,
+            //     borderRadius: BorderRadius.only(
+            //       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+            //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+            //     ),
+            //     image: DecorationImage(
+            //       image: image.isNotEmpty
+            //           ? NetworkImage(image.startsWith('https://storage.cloud.google.com/')
+            //               ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+            //               : image)
+            //           : const AssetImage('assets/img/back.jpg'),
+            //       fit: BoxFit.cover,
+            //       opacity: 1,
+            //     ),
+            //   ),
+            // ),
             SizedBox(
               width: ScreenUtil.horizontalScale(2),
             ),

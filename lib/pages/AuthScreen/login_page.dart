@@ -376,7 +376,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-
+    ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(

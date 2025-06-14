@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +12,8 @@ class ProfileImageWidget extends StatefulWidget {
   final bool showPickImageButton;
   final String avatarUrl;
   final Function(File? pickedImage) callBack;
-  const ProfileImageWidget({super.key, this.name, required this.showPickImageButton, required this.avatarUrl, required this.callBack});
+  const ProfileImageWidget(
+      {super.key, this.name, required this.showPickImageButton, required this.avatarUrl, required this.callBack});
 
   @override
   State<ProfileImageWidget> createState() => _ProfileImageWidgetState();
@@ -44,7 +46,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       height: ScreenUtil.verticalScale(10.5),
       width: ScreenUtil.verticalScale(10.5),
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: .9),
+        // color: Colors.grey.withValues(alpha: .9),
         borderRadius: BorderRadius.all(
           Radius.circular(ScreenUtil.horizontalScale(12.5)),
         ),
@@ -57,7 +59,6 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
             height: ScreenUtil.horizontalScale(25),
             width: ScreenUtil.horizontalScale(25),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: .9),
               borderRadius: BorderRadius.all(
                 Radius.circular(ScreenUtil.horizontalScale(12.5)),
               ),
@@ -70,23 +71,43 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
                         fit: BoxFit.cover,
                       )
                     : widget.avatarUrl != ''
-                        ? Image.network(
-                            widget.avatarUrl.startsWith('https://storage.cloud.google.com/')
-                                ? widget.avatarUrl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                        ? appShimmerImage(
+                            height: ScreenUtil.horizontalScale(25),
+                            width: ScreenUtil.horizontalScale(25),
+                            networkImageUrl: widget.avatarUrl.startsWith('https://storage.cloud.google.com/')
+                                ? widget.avatarUrl.replaceFirst(
+                                    'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                 : widget.avatarUrl,
                             fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
                           )
-                        : Center(
-                            child: Text(
-                              widget.name == null
-                                  ? ""
-                                  : widget.name!.isNotEmpty
-                                      ? widget.name![0]
-                                      : "", // First character of the name
-                              style: TextStyle(
-                                fontSize: ScreenUtil.horizontalScale(12),
-                                color: Colors.white, // Adjust size as needed
-                                fontWeight: FontWeight.bold,
+                        // Image.network(
+                        //   widget.avatarUrl.startsWith('https://storage.cloud.google.com/')
+                        //       ? widget.avatarUrl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                        //       : widget.avatarUrl,
+                        //   fit: BoxFit.cover,
+                        // )
+                        : Container(
+                            height: ScreenUtil.horizontalScale(25),
+                            width: ScreenUtil.horizontalScale(25),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withValues(alpha: .9),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(ScreenUtil.horizontalScale(12.5)),
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                widget.name == null
+                                    ? ""
+                                    : widget.name!.isNotEmpty
+                                        ? widget.name![0]
+                                        : "", // First character of the name
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.horizontalScale(12),
+                                  color: Colors.white, // Adjust size as needed
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           )),

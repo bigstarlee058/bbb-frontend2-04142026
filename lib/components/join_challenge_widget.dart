@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class JoinChallengeWidget extends StatelessWidget {
   final Challenges featureChallenge;
-  const   JoinChallengeWidget({super.key, required this.featureChallenge});
+  const JoinChallengeWidget({super.key, required this.featureChallenge});
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +42,8 @@ class JoinChallengeWidget extends StatelessWidget {
                       image: DecorationImage(
                         image: featureChallenge.photo.isNotEmpty
                             ? NetworkImage(featureChallenge.photo.startsWith('https://storage.cloud.google.com/')
-                                ? featureChallenge.photo
-                                    .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                ? featureChallenge.photo.replaceFirst(
+                                    'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                 : featureChallenge.photo)
                             : const AssetImage('assets/img/pp_4.png'),
                         fit: BoxFit.cover,
@@ -65,7 +65,10 @@ class JoinChallengeWidget extends StatelessWidget {
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.white, fontSize: ScreenUtil.horizontalScale(6.7), fontWeight: FontWeight.bold, height: 1.35),
+                        color: Colors.white,
+                        fontSize: ScreenUtil.horizontalScale(6.7),
+                        fontWeight: FontWeight.bold,
+                        height: 1.35),
                   ),
                 ),
                 Container(

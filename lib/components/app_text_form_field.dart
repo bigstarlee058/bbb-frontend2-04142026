@@ -2,6 +2,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 class AppTextFormField extends StatelessWidget {
   const AppTextFormField({
@@ -22,6 +23,7 @@ class AppTextFormField extends StatelessWidget {
     this.expands = false,
     this.textAlignVertical = TextAlignVertical.center,
     this.onTap,
+    this.autofillHints,
   });
 
   final void Function(String)? onChanged;
@@ -40,6 +42,7 @@ class AppTextFormField extends StatelessWidget {
   final bool expands;
   final TextAlignVertical textAlignVertical;
   final void Function()? onTap;
+  final List<String>? autofillHints;
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +56,18 @@ class AppTextFormField extends StatelessWidget {
       autofocus: autofocus ?? false,
       validator: validator,
       obscureText: obscureText ?? false,
-      // obscuringCharacter: '*',
       onEditingComplete: onEditingComplete,
       maxLines: maxLines,
       expands: expands,
       textAlignVertical: textAlignVertical,
+      enableInteractiveSelection: true,
+      enableSuggestions: false,
+      autocorrect: false,
+      autofillHints: autofillHints,
+      textCapitalization: TextCapitalization.none,
+      enableIMEPersonalizedLearning: false,
+      smartDashesType: SmartDashesType.disabled,
+      smartQuotesType: SmartQuotesType.disabled,
       decoration: InputDecoration(
         suffixIcon: suffixIcon,
         hintText: hintText,
