@@ -79,9 +79,11 @@ class _MonthViewNewState extends State<MonthViewNew> {
     });
 
     monthProvider?.mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
-
-    scrollToMiddle();
-
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        scrollToMiddle();
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";

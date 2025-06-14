@@ -1,4 +1,5 @@
 import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
@@ -125,43 +126,56 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                  ),
-                ),
-                child: Center(
-                  child: imageurl.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                            bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                          ),
-                          child: Image.network(
-                            imageurl.startsWith('https://storage.cloud.google.com/')
-                                ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                : imageurl,
-                            width: ScreenUtil.verticalScale(11),
-                            height: ScreenUtil.verticalScale(11),
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                            bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                          ),
-                          child: Image.asset(
-                            'assets/img/warm-up-placeholder.png',
-                            width: ScreenUtil.verticalScale(11),
-                            height: ScreenUtil.verticalScale(11),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+              appShimmerImage(
+                width: ScreenUtil.verticalScale(11),
+                height: ScreenUtil.verticalScale(11),
+                networkImageUrl: imageurl.startsWith('https://storage.cloud.google.com/')
+                    ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                    : imageurl,
+                fit: BoxFit.cover,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                 ),
               ),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.only(
+              //       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+              //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+              //     ),
+              //   ),
+              //   child: Center(
+              //     child: imageurl.isNotEmpty
+              //         ? ClipRRect(
+              //             borderRadius: BorderRadius.only(
+              //               topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+              //               bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+              //             ),
+              //             child: Image.network(
+              //               imageurl.startsWith('https://storage.cloud.google.com/')
+              //                   ? imageurl.replaceFirst(
+              //                       'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+              //                   : imageurl,
+              //               width: ScreenUtil.verticalScale(11),
+              //               height: ScreenUtil.verticalScale(11),
+              //               fit: BoxFit.cover,
+              //             ),
+              //           )
+              //         : ClipRRect(
+              //             borderRadius: BorderRadius.only(
+              //               topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+              //               bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+              //             ),
+              //             child: Image.asset(
+              //               'assets/img/warm-up-placeholder.png',
+              //               width: ScreenUtil.verticalScale(11),
+              //               height: ScreenUtil.verticalScale(11),
+              //               fit: BoxFit.cover,
+              //             ),
+              //           ),
+              //   ),
+              // ),
               SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -242,8 +256,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               image: collectionData!.photo.isNotEmpty
                                   ? NetworkImage(
                                       collectionData.photo.startsWith('https://storage.cloud.google.com/')
-                                          ? collectionData.photo
-                                              .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                          ? collectionData.photo.replaceFirst(
+                                              'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                                           : collectionData.photo,
                                     )
                                   : const AssetImage('assets/img/back.jpg'),
@@ -295,7 +309,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                   child: Container(
                                     height: media.height / 5.6,
                                     margin: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(15), vertical: ScreenUtil.verticalScale(3)),
+                                        horizontal: ScreenUtil.horizontalScale(15),
+                                        vertical: ScreenUtil.verticalScale(3)),
                                     child: Center(
                                       child: Text(
                                         collectionData.title.isNotEmpty ? collectionData.title : 'Collection Title',

@@ -43,7 +43,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(65, 15, 65, 10),
+            padding: const EdgeInsets.fromLTRB(65, 15, 65, 15),
             child: Text(
               'Mark a day a complete every day to keep the perfect flame streak going.',
               style: TextStyle(
@@ -159,7 +159,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         DateTime date = rangeList[outerIndex][innerIndex].endTime ?? rangeList[outerIndex][innerIndex].startTime!;
         DateTime localDate = Utils.formattedDate("$date");
 
-        if (localDate.year == targetDate.year && localDate.month == targetDate.month && localDate.day == targetDate.day) {
+        if (localDate.year == targetDate.year &&
+            localDate.month == targetDate.month &&
+            localDate.day == targetDate.day) {
           return {
             'outerIndex': outerIndex,
             'innerIndex': innerIndex,
@@ -280,8 +282,10 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
             final isRange = data11.any((d) => d.any((element) => _isSameDate(localTime, date)));
 
-            final isCircleP = !isRange ? data.any((d) => d.status == Status.completed && _isSameDate(localTime, date)) : false;
-            final isCircleB = !isRange ? data.any((d) => d.status == Status.skipped && _isSameDate(localTime, date)) : false;
+            final isCircleP =
+                !isRange ? data.any((d) => d.status == Status.completed && _isSameDate(localTime, date)) : false;
+            final isCircleB =
+                !isRange ? data.any((d) => d.status == Status.skipped && _isSameDate(localTime, date)) : false;
 
             if ((isCircleP || isCircleB) && !isRange) {
               return Center(
@@ -333,15 +337,17 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                         height: ScreenUtil.verticalScale(3.2),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.horizontal(
-                            right:
-                                (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]) ? Radius.circular(20) : Radius.circular(0),
+                            right: (data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                                ? Radius.circular(20)
+                                : Radius.circular(0),
                             left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
                           ),
                           color: AppColors.backOffSetColor,
                         ),
                       ),
                     ),
-                  if (data11[data["outerIndex"]!].length > 1 && data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                  if (data11[data["outerIndex"]!].length > 1 &&
+                      data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
                     Positioned(
                       top: ScreenUtil.verticalScale(0.7),
                       right: ScreenUtil.horizontalScale(size > 600 ? 4.5 : 3.5),
@@ -350,8 +356,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                         height: ScreenUtil.verticalScale(3.2),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.horizontal(
-                            right:
-                                (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]) ? Radius.circular(20) : Radius.circular(0),
+                            right: (data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                                ? Radius.circular(20)
+                                : Radius.circular(0),
                             left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
                           ),
                           color: AppColors.backOffSetColor,
@@ -362,18 +369,22 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                     height: ScreenUtil.verticalScale(3.2),
                     margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.7)),
                     decoration: BoxDecoration(
-                      color: ((data["innerIndex"] == 0) || (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
-                          ? Colors.transparent
-                          : AppColors.backOffSetColor,
+                      color:
+                          ((data["innerIndex"] == 0) || (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                              ? Colors.transparent
+                              : AppColors.backOffSetColor,
                       borderRadius: BorderRadius.horizontal(
-                        right: (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]) ? Radius.circular(20) : Radius.circular(0),
+                        right: (data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                            ? Radius.circular(20)
+                            : Radius.circular(0),
                         left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
                       ),
                     ),
                     alignment: Alignment.center,
                     child: Container(
                       decoration: BoxDecoration(
-                          color: ((data["innerIndex"] == 0) || (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                          color: ((data["innerIndex"] == 0) ||
+                                  (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
                               ? AppColors.primaryColor
                               : Colors.transparent,
                           shape: BoxShape.circle),
@@ -381,7 +392,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                         child: Text(
                           '${date.day}',
                           style: TextStyle(
-                              color: ((data["innerIndex"] == 0) || (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                              color: ((data["innerIndex"] == 0) ||
+                                      (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
                                   ? Colors.white
                                   : Colors.black),
                         ),

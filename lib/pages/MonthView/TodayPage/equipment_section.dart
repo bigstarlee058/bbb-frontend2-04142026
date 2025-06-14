@@ -1,3 +1,4 @@
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -62,18 +63,15 @@ class _EquipmentSectionState extends State<EquipmentSection> {
                 Column(
                   children: List.generate(
                     monthProvider.usedEquipments.length,
-                        (index) => Column(
+                    (index) => Column(
                       children: [
                         equipmentCard(
                           monthProvider.usedEquipments[index].title!,
-                          monthProvider
-                              .usedEquipments[index].description!,
+                          monthProvider.usedEquipments[index].description!,
                           monthProvider.usedEquipments[index].link!,
                           monthProvider.usedEquipments[0].thumbnail!,
                         ),
-                        if (index <
-                            monthProvider.usedEquipments.length - 1)
-                          const SizedBox(height: 20),
+                        if (index < monthProvider.usedEquipments.length - 1) const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -83,8 +81,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
     });
   }
 
-  Widget equipmentCard(
-      String title, String description, String link, String image) {
+  Widget equipmentCard(String title, String description, String link, String image) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           disabledBackgroundColor: const Color(0xFFF3F3F3),
@@ -123,31 +120,43 @@ class _EquipmentSectionState extends State<EquipmentSection> {
         ),
         child: Row(
           children: [
-            Container(
-              width: ScreenUtil.verticalScale(11),
+            appShimmerImage(
               height: ScreenUtil.verticalScale(11),
-
-              // Padding around the background
-              decoration: BoxDecoration(
-                color: AppColors.blackColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                ),
-                image: DecorationImage(
-                  image: image.isNotEmpty
-                      ? NetworkImage(
-                          image.startsWith('https://storage.cloud.google.com/')
-                              ? image.replaceFirst(
-                                  'https://storage.cloud.google.com/',
-                                  'https://storage.googleapis.com/')
-                              : image)
-                      : const AssetImage('assets/img/back.jpg'),
-                  fit: BoxFit.cover,
-                  opacity: 1,
-                ),
+              width: ScreenUtil.verticalScale(12),
+              networkImageUrl: image.startsWith('https://storage.cloud.google.com/')
+                  ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                  : image,
+              fit: BoxFit.cover,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
               ),
             ),
+            // Container(
+            //   width: ScreenUtil.verticalScale(11),
+            //   height: ScreenUtil.verticalScale(11),
+            //
+            //   // Padding around the background
+            //   decoration: BoxDecoration(
+            //     color: AppColors.blackColor,
+            //     borderRadius: BorderRadius.only(
+            //       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+            //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+            //     ),
+            //     image: DecorationImage(
+            //       image: image.isNotEmpty
+            //           ? NetworkImage(
+            //               image.startsWith('https://storage.cloud.google.com/')
+            //                   ? image.replaceFirst(
+            //                       'https://storage.cloud.google.com/',
+            //                       'https://storage.googleapis.com/')
+            //                   : image)
+            //           : const AssetImage('assets/img/back.jpg'),
+            //       fit: BoxFit.cover,
+            //       opacity: 1,
+            //     ),
+            //   ),
+            // ),
             const SizedBox(
               width: 10,
             ),

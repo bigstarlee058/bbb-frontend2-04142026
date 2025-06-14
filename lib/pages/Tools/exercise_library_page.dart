@@ -1,4 +1,5 @@
 import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -109,157 +110,153 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
           children: [
             Stack(
               children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: <Widget>[
-                        // Container(
-                        //   height: media.height / 1,
-                        //   width: media.width,
-                        //   decoration: const BoxDecoration(
-                        //     image: DecorationImage(
-                        //       image: AssetImage('assets/img/back.jpg'),
-                        //       fit: BoxFit.cover,
-                        //       opacity: 1,
-                        //     ),
-                        //   ),
-                        // ),
-                        Utils.appImage(
-                          media,
-                          // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
-                          image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
+                Stack(
+                  children: <Widget>[
+                    // Container(
+                    //   height: media.height / 1,
+                    //   width: media.width,
+                    //   decoration: const BoxDecoration(
+                    //     image: DecorationImage(
+                    //       image: AssetImage('assets/img/back.jpg'),
+                    //       fit: BoxFit.cover,
+                    //       opacity: 1,
+                    //     ),
+                    //   ),
+                    // ),
+                    Utils.appImage(
+                      media,
+                      // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
+                      image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
 
-                          imageKey: "imageExerciseLibrary",
-                        ),
-                        SizedBox(
-                          height: media.height / 2.5,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
-                                  backgroundColor: Colors.transparent,
-                                  centerTitle: true,
-                                  leading: BackArrowWidget(
-                                    onPress: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
+                      imageKey: "imageExerciseLibrary",
+                    ),
+                    SizedBox(
+                      height: media.height / 2.5,
+                      width: media.width,
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            AppBar(
+                              toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                              backgroundColor: Colors.transparent,
+                              centerTitle: true,
+                              leading: BackArrowWidget(
+                                onPress: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
 
-                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                                  // Positioned(
-                                  //   left: 0,
-                                  //   child: BackArrowWidget(
-                                  //     onPress: () {
-                                  //       Navigator.pop(context);
-                                  //     },
-                                  //   ),
-                                  // leading: SizedBox(),
-                                  title: Text(
-                                    'Exercise Library',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.horizontalScale(5.5),
-                                    ),
-                                  ),
-                                  actions: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
-                                    )
-                                  ],
-                                ),
-                                // Container(
-                                //   margin: const EdgeInsets.only(right: 10),
-                                //   child: Row(
-                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                //     children: [
-                                //       BackArrowWidget(
-                                //         onPress: () {
-                                //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                                //           mainPageProvider.changeTab(2);
-                                //         },
-                                //       ),
-                                //       Text(
-                                //         'Exercise Library',
-                                //         style: TextStyle(
-                                //           color: Colors.white,
-                                //           fontSize: ScreenUtil.horizontalScale(5.5),
-                                //         ),
-                                //       ),
-                                //       const CommonStreakWithNotification(routeString: '/exerciseLibrary')
-                                //     ],
-                                //   ),
-                                // ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(7),
-                                  ),
-                                  height: media.height * 0.19,
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          height: ScreenUtil.horizontalScale(1),
-                                        ),
-                                        SearchExerciseField(
-                                          onChanged: (query) {
-                                            setState(() {
-                                              _currentPage = 0;
-                                              _searchQuery = query; // Update the search query
-                                              _applyFilters(); // Reset pagination when searching
-                                            });
-                                          },
-                                        ),
-                                        SizedBox(
-                                          height: ScreenUtil.horizontalScale(3),
-                                        ),
-                                        FilterSortButton(
-                                          selectedEquipmentIds: _selectedEquipmentIds,
-                                          selectedCategoryIds: _selectedCategoryIds,
-                                          selectedSortBy: _selectedSortBy,
-                                          equipments: dataProvider!.adminEquipment
-                                              .map((e) => {'id': e.id, 'title': e.title})
-                                              .toList(),
-                                          categories: dataProvider!.adminCategory
-                                              .map((c) => {'id': c.id, 'title': c.title})
-                                              .toList(),
-                                          onApplyFilters: (List<String> selectedEquipments,
-                                              List<String> selectedCategories, String sortBy) {
-                                            setState(() {
-                                              _selectedEquipmentIds = selectedEquipments;
-                                              _selectedCategoryIds = selectedCategories;
-                                              _selectedSortBy = sortBy;
-                                            });
-                                            _applyFilters(); // Apply the filters and sorting
-                                          },
-                                        ),
-                                      ]),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 3.19,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: const BoxDecoration(
+                              /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                              // Positioned(
+                              //   left: 0,
+                              //   child: BackArrowWidget(
+                              //     onPress: () {
+                              //       Navigator.pop(context);
+                              //     },
+                              //   ),
+                              // leading: SizedBox(),
+                              title: Text(
+                                'Exercise Library',
+                                style: TextStyle(
                                   color: Colors.white,
+                                  fontSize: ScreenUtil.horizontalScale(5.5),
                                 ),
                               ),
+                              actions: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                )
+                              ],
+                            ),
+                            // Container(
+                            //   margin: const EdgeInsets.only(right: 10),
+                            //   child: Row(
+                            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //     children: [
+                            //       BackArrowWidget(
+                            //         onPress: () {
+                            //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                            //           mainPageProvider.changeTab(2);
+                            //         },
+                            //       ),
+                            //       Text(
+                            //         'Exercise Library',
+                            //         style: TextStyle(
+                            //           color: Colors.white,
+                            //           fontSize: ScreenUtil.horizontalScale(5.5),
+                            //         ),
+                            //       ),
+                            //       const CommonStreakWithNotification(routeString: '/exerciseLibrary')
+                            //     ],
+                            //   ),
+                            // ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(7),
+                              ),
+                              height: media.height * 0.19,
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      height: ScreenUtil.horizontalScale(1),
+                                    ),
+                                    SearchExerciseField(
+                                      onChanged: (query) {
+                                        setState(() {
+                                          _currentPage = 0;
+                                          _searchQuery = query; // Update the search query
+                                          _applyFilters(); // Reset pagination when searching
+                                        });
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: ScreenUtil.horizontalScale(3),
+                                    ),
+                                    FilterSortButton(
+                                      selectedEquipmentIds: _selectedEquipmentIds,
+                                      selectedCategoryIds: _selectedCategoryIds,
+                                      selectedSortBy: _selectedSortBy,
+                                      equipments: dataProvider!.adminEquipment
+                                          .map((e) => {'id': e.id, 'title': e.title})
+                                          .toList(),
+                                      categories: dataProvider!.adminCategory
+                                          .map((c) => {'id': c.id, 'title': c.title})
+                                          .toList(),
+                                      onApplyFilters: (List<String> selectedEquipments, List<String> selectedCategories,
+                                          String sortBy) {
+                                        setState(() {
+                                          _selectedEquipmentIds = selectedEquipments;
+                                          _selectedCategoryIds = selectedCategories;
+                                          _selectedSortBy = sortBy;
+                                        });
+                                        _applyFilters(); // Apply the filters and sorting
+                                      },
+                                    ),
+                                  ]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: media.height / 3.19,
+                      width: media.width,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: ClipPath(
+                          clipper: DiagonalClipper(),
+                          child: Container(
+                            height: media.height / 11,
+                            width: media.width / 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -396,30 +393,42 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
           children: [
             Row(
               children: [
-                Container(
+                appShimmerImage(
                   height: media.width / 4,
                   width: media.width / 4,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: image == ""
-                          ? const AssetImage("assets/img/library_placeholder.png")
-                          : NetworkImage(
-                              image.startsWith('https://storage.cloud.google.com/')
-                                  ? image.replaceFirst(
-                                      'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                  : image,
-                            ),
-                      fit: BoxFit.cover,
-                      opacity: 1,
-                    ),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                      bottomLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                    ),
+                  networkImageUrl: image.startsWith('https://storage.cloud.google.com/')
+                      ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                      : image,
+                  fit: BoxFit.cover,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
                   ),
                 ),
+                // Container(
+                //   height: media.width / 4,
+                //   width: media.width / 4,
+                //   decoration: BoxDecoration(
+                //     image: DecorationImage(
+                //       image: image == ""
+                //           ? const AssetImage("assets/img/library_placeholder.png")
+                //           : NetworkImage(
+                //               image.startsWith('https://storage.cloud.google.com/')
+                //                   ? image.replaceFirst(
+                //                       'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                //                   : image,
+                //             ),
+                //       fit: BoxFit.cover,
+                //       opacity: 1,
+                //     ),
+                //     borderRadius: BorderRadius.only(
+                //       topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(
-                  width: 20,
+                  width: 15,
                 ),
                 SizedBox(
                   width: media.width / 2.5,

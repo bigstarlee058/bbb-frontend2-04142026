@@ -222,7 +222,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                         Column(
                           children: [
                             SizedBox(
-                              height: ScreenUtil.verticalScale(4),
+                              height: ScreenUtil.verticalScale(3),
                             ),
                             Padding(
                               padding: EdgeInsets.fromLTRB(
@@ -242,7 +242,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             const CustomCalendarWidget(),
                             Container(
                               margin: EdgeInsets.symmetric(
-                                vertical: 25.0, //
+                                vertical: 18.0, //
                                 horizontal: ScreenUtil.horizontalScale(8),
                               ),
                               child: Consumer<MonthProvider>(
