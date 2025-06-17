@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/models/program_info_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
@@ -74,17 +76,18 @@ class _InformationSectionState extends State<InformationSection> {
                             itemBuilder: (context, index) {
                               return value.programInfoModel!.sections[index].formats != null &&
                                       value.programInfoModel!.sections[index].variations != null &&
-                                      value.programInfoModel!.sections[index].formats!.contains(widget.monthProvider.equipmentType) &&
+                                      value.programInfoModel!.sections[index].formats!
+                                          .contains(widget.monthProvider.equipmentType) &&
                                       value.programInfoModel!.sections[index].variations!
                                           .contains(widget.monthProvider.splitType?.replaceAll("split", ""))
                                   ? Padding(
-                                    padding: const EdgeInsets.only(bottom: 15),
-                                    child: ClipRRect(
+                                      padding: const EdgeInsets.only(bottom: 15),
+                                      child: ClipRRect(
                                         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
-                                        child: buildExpansionTileItem(
-                                            index, value.programInfoModel!.sections[index], value.programInfoModel!.sections.length),
+                                        child: buildExpansionTileItem(index, value.programInfoModel!.sections[index],
+                                            value.programInfoModel!.sections.length),
                                       ),
-                                  )
+                                    )
                                   : SizedBox();
                             },
                           ),
@@ -143,11 +146,8 @@ class _InformationSectionState extends State<InformationSection> {
           }
         },
         backgroundColor: AppColors.greyColor,
-        collapsedBackgroundColor: AppColors.greyColor, childrenPadding: EdgeInsets.zero,
-        // decoration: BoxDecoration(
-        //   borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-        //   color: AppColors.greyColor,
-        // ),
+        collapsedBackgroundColor: AppColors.greyColor,
+        childrenPadding: EdgeInsets.zero,
         clipBehavior: Clip.none,
         iconColor: AppColors.primaryColor,
         collapsedIconColor: Colors.white,
@@ -166,7 +166,9 @@ class _InformationSectionState extends State<InformationSection> {
                   color: AppColors.primaryColor,
                 ),
                 child: Icon(
-                  _expandedStates[index] == true ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
+                  _expandedStates[index] == true
+                      ? Icons.keyboard_arrow_up_outlined
+                      : Icons.keyboard_arrow_down_outlined,
                   color: Colors.white,
                   size: ScreenUtil.verticalScale(3),
                 ),
@@ -175,22 +177,26 @@ class _InformationSectionState extends State<InformationSection> {
           ],
         ),
         children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-              child: Text(
-                item.description.capitalizeFirst(),
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.7),
-                  color: const Color(0xFF888888),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                  child: Text(
+                    item.description.trim().capitalizeFirst(),
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.verticalScale(1.7),
+                      color: const Color(0xFF888888),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          SizedBox(height: ScreenUtil.verticalScale(2))
+              SizedBox(height: ScreenUtil.verticalScale(2)),
+            ],
+          )
         ],
       ),
     );

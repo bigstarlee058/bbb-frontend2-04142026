@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -286,12 +289,18 @@ class _SettingPageState extends State<SettingPage> {
                               builder: (context, monthDataModel, child) {
                                 return Switch(
                                   value: isHapticFeedbackOn ?? false, // Boolean value
+
                                   onChanged: (bool value) async {
                                     setState(() {
-                                      isHapticFeedbackOn = value; // Update state
+                                      isHapticFeedbackOn = value;
                                     });
+
                                     await preferences.setBool(
                                         SharedPreference.isHapticFeedbackOn, isHapticFeedbackOn ?? false);
+
+                                    if (value == true) {
+                                      HapticFeedBack.buttonClick();
+                                    }
                                   },
                                   activeColor: AppColors.primaryColor,
                                 );

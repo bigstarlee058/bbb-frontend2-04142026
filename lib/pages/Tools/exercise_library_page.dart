@@ -1,4 +1,5 @@
 import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -594,206 +595,239 @@ class _FilterSortButtonState extends State<FilterSortButton> {
               insetPadding: const EdgeInsets.all(0), // Popup background color
               child: SingleChildScrollView(
                 // Wrap the content in a SingleChildScrollView
-                child: Container(
-                  width: ScreenUtil.horizontalScale(96), // Set the width of the popup to match the button
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: ScreenUtil.horizontalScale(90), // Set the width of the popup to match the button
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            'Filter & Sort Options',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Color(0xFF9a354e), // White text
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Filter & Sort Options',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Color(0xFF9a354e), // White text
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close, color: Color(0xFF9a354e)),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                      // "Sort by" ExpansionTile with Radio buttons
-                      ExpansionTile(
-                        title: const Text(
-                          'Sort by',
-                          style: TextStyle(fontSize: 14), // Small white text
-                        ),
-                        textColor: const Color(0xFF9a354e),
-                        collapsedTextColor: Colors.black,
-                        collapsedShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(color: Color(0xFF9a354e), width: 1),
-                        ),
-                        iconColor: Colors.black,
-                        collapsedIconColor: const Color(0xFF9a354e),
-                        initiallyExpanded: isExpanded[0], // Set initial expanded state
-                        onExpansionChanged: (isExpandedState) {
-                          setState(() {
-                            // Set the current index to true and others to false
-                            isExpanded = [isExpandedState, false, false];
-                          });
-                        },
-                        children: <String>['A-Z', 'Z-A', 'Newest added', 'Oldest added'].map((String option) {
-                          return RadioListTile<String>(
-                            title: Text(option, style: const TextStyle(fontSize: 14, color: Colors.black)),
-                            value: option,
-                            groupValue: _selectedSortBy,
-                            onChanged: (String? value) {
+                          // "Sort by" ExpansionTile with Radio buttons
+                          ExpansionTile(
+                            title: const Text(
+                              'Sort by',
+                              style: TextStyle(fontSize: 14), // Small white text
+                            ),
+                            textColor: const Color(0xFF9a354e),
+                            collapsedTextColor: Colors.black,
+                            collapsedShape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(color: Color(0xFF9a354e), width: 1),
+                            ),
+                            iconColor: Colors.black,
+                            collapsedIconColor: const Color(0xFF9a354e),
+                            initiallyExpanded: isExpanded[0], // Set initial expanded state
+                            onExpansionChanged: (isExpandedState) {
                               setState(() {
-                                _selectedSortBy = value!;
+                                // Set the current index to true and others to false
+                                isExpanded = [isExpandedState, false, false];
                               });
                             },
-                            activeColor: const Color(0xFF9a354e), // Change the checked color here
-                            hoverColor: Colors.white,
-                          );
-                        }).toList(),
-                      ),
+                            children: <String>['A-Z', 'Z-A', 'Newest added', 'Oldest added'].map((String option) {
+                              return RadioListTile<String>(
+                                title: Text(option, style: const TextStyle(fontSize: 14, color: Colors.black)),
+                                value: option,
+                                groupValue: _selectedSortBy,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    _selectedSortBy = value!;
+                                  });
+                                },
+                                activeColor: const Color(0xFF9a354e), // Change the checked color here
+                                hoverColor: Colors.white,
+                              );
+                            }).toList(),
+                          ),
 
-                      const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                      // "Filter by Equipment" ExpansionTile with Checkboxes
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Green background for the tile
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: ExpansionTile(
-                          title: const Text(
-                            'Filter by Equipment',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          textColor: const Color(0xFF9a354e),
-                          collapsedTextColor: Colors.black,
-                          collapsedShape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: const BorderSide(color: Color(0xFF9a354e), width: 1),
-                          ),
-                          iconColor: Colors.black,
-                          collapsedIconColor: const Color(0xFF9a354e),
-                          initiallyExpanded: isExpanded[1], // Set initial expanded state
-                          onExpansionChanged: (isExpandedState) {
-                            setState(() {
-                              // Set the current index to true and others to false
-                              isExpanded = [false, isExpandedState, false];
-                            });
-                          },
-                          children: widget.equipments.map((Map<String, String> equipment) {
-                            return CheckboxListTile(
-                              title:
-                                  Text(equipment['title']!, style: const TextStyle(fontSize: 14, color: Colors.black)),
-                              value: _selectedEquipmentIds.contains(equipment['id']),
-                              onChanged: (bool? value) {
+                          // "Filter by Equipment" ExpansionTile with Checkboxes
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white, // Green background for the tile
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: ExpansionTile(
+                              title: const Text(
+                                'Filter by Equipment',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              textColor: const Color(0xFF9a354e),
+                              collapsedTextColor: Colors.black,
+                              collapsedShape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: const BorderSide(color: Color(0xFF9a354e), width: 1),
+                              ),
+                              iconColor: Colors.black,
+                              collapsedIconColor: const Color(0xFF9a354e),
+                              initiallyExpanded: isExpanded[1], // Set initial expanded state
+                              onExpansionChanged: (isExpandedState) {
                                 setState(() {
-                                  if (value == true) {
-                                    _selectedEquipmentIds.add(equipment['id']!);
-                                  } else {
-                                    _selectedEquipmentIds.remove(equipment['id']);
-                                  }
+                                  // Set the current index to true and others to false
+                                  isExpanded = [false, isExpandedState, false];
                                 });
                               },
-                              activeColor: const Color(0xFF9a354e), // Change the checked color here
-                              checkColor: Colors.white,
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                              children: widget.equipments.map((Map<String, String> equipment) {
+                                return CheckboxListTile(
+                                  title: Text(equipment['title']!,
+                                      style: const TextStyle(fontSize: 14, color: Colors.black)),
+                                  value: _selectedEquipmentIds.contains(equipment['id']),
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (value == true) {
+                                        _selectedEquipmentIds.add(equipment['id']!);
+                                      } else {
+                                        _selectedEquipmentIds.remove(equipment['id']);
+                                      }
+                                    });
+                                  },
+                                  activeColor: const Color(0xFF9a354e), // Change the checked color here
+                                  checkColor: Colors.white,
+                                );
+                              }).toList(),
+                            ),
+                          ),
 
-                      const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                      // "Filter by Categories" ExpansionTile with Checkboxes
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Green background for the tile
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: ExpansionTile(
-                          title: const Text(
-                            'Filter by Categories',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          textColor: const Color(0xFF9a354e),
-                          collapsedTextColor: Colors.black,
-                          collapsedShape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: const BorderSide(color: Color(0xFF9a354e), width: 1),
-                          ),
-                          iconColor: Colors.black,
-                          collapsedIconColor: const Color(0xFF9a354e),
-                          initiallyExpanded: isExpanded[2], // Set initial expanded state
-                          onExpansionChanged: (isExpandedState) {
-                            setState(() {
-                              // Set the current index to true and others to false
-                              isExpanded = [false, false, isExpandedState];
-                            });
-                          },
-                          children: widget.categories.map((Map<String, String> category) {
-                            return CheckboxListTile(
-                              title:
-                                  Text(category['title']!, style: const TextStyle(fontSize: 14, color: Colors.black)),
-                              value: _selectedCategoryIds.contains(category['id']),
-                              onChanged: (bool? value) {
+                          // "Filter by Categories" ExpansionTile with Checkboxes
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white, // Green background for the tile
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: ExpansionTile(
+                              title: const Text(
+                                'Filter by Categories',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              textColor: const Color(0xFF9a354e),
+                              collapsedTextColor: Colors.black,
+                              collapsedShape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: const BorderSide(color: Color(0xFF9a354e), width: 1),
+                              ),
+                              iconColor: Colors.black,
+                              collapsedIconColor: const Color(0xFF9a354e),
+                              initiallyExpanded: isExpanded[2], // Set initial expanded state
+                              onExpansionChanged: (isExpandedState) {
                                 setState(() {
-                                  if (value == true) {
-                                    _selectedCategoryIds.add(category['id']!);
-                                  } else {
-                                    _selectedCategoryIds.remove(category['id']);
-                                  }
+                                  // Set the current index to true and others to false
+                                  isExpanded = [false, false, isExpandedState];
                                 });
                               },
-                              activeColor: const Color(0xFF9a354e), // Change the checked color here
-                              checkColor: Colors.white,
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Apply now button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 80,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF9a354e), // Apply now button color
-                            padding: const EdgeInsets.symmetric(vertical: 10),
+                              children: widget.categories.map((Map<String, String> category) {
+                                return CheckboxListTile(
+                                  title: Text(category['title']!,
+                                      style: const TextStyle(fontSize: 14, color: Colors.black)),
+                                  value: _selectedCategoryIds.contains(category['id']),
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (value == true) {
+                                        _selectedCategoryIds.add(category['id']!);
+                                      } else {
+                                        _selectedCategoryIds.remove(category['id']);
+                                      }
+                                    });
+                                  },
+                                  activeColor: const Color(0xFF9a354e), // Change the checked color here
+                                  checkColor: Colors.white,
+                                );
+                              }).toList(),
+                            ),
                           ),
-                          onPressed: () {
+                          const SizedBox(height: 20),
+
+                          // Apply now button
+                          ButtonWidget(
+                              text: "Apply now",
+                              textColor: Colors.white,
+                              color: AppColors.primaryColor,
+                              onPress: () {
+                                Navigator.of(context).pop();
+                                widget.onApplyFilters(
+                                  _selectedEquipmentIds,
+                                  _selectedCategoryIds,
+                                  _selectedSortBy,
+                                );
+                              },
+                              isLoading: false),
+
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   height: ScreenUtil.verticalScale(7),
+                          //   child: ElevatedButton(
+                          //     style: ElevatedButton.styleFrom(
+                          //       backgroundColor: const Color(0xFF9a354e), // Apply now button color
+                          //       padding: const EdgeInsets.symmetric(vertical: 10),
+                          //     ),
+                          //     onPressed: () {
+                          //       Navigator.of(context).pop();
+                          //       widget.onApplyFilters(
+                          //         _selectedEquipmentIds,
+                          //         _selectedCategoryIds,
+                          //         _selectedSortBy,
+                          //       );
+                          //     },
+                          //     child: const Text(
+                          //       'Apply now',
+                          //       style: TextStyle(color: Colors.white, fontSize: 16),
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      right: -ScreenUtil.verticalScale(1.2),
+                      top: -ScreenUtil.verticalScale(1.2),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
+                            child: Padding(
+                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                              child: Icon(size: ScreenUtil.verticalScale(2.5), Icons.close, color: Colors.white),
+                            ),
+                          ),
+                          onTap: () {
                             Navigator.of(context).pop();
-                            widget.onApplyFilters(
-                              _selectedEquipmentIds,
-                              _selectedCategoryIds,
-                              _selectedSortBy,
-                            );
                           },
-                          child: const Text(
-                            'Apply now',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );

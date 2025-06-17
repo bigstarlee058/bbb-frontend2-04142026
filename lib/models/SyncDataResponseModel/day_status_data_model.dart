@@ -3,7 +3,8 @@ import 'dart:convert';
 List<DayStatusDataModel> dayStatusDataModelFromJson(String str) =>
     List<DayStatusDataModel>.from(json.decode(str).map((x) => DayStatusDataModel.fromJson(x)));
 
-String dayStatusDataModelToJson(List<DayStatusDataModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String dayStatusDataModelToJson(List<DayStatusDataModel> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class DayStatusDataModel {
   String? id;
@@ -66,7 +67,7 @@ class DayStatusDataModel {
         endTime: json["endTime"],
         type: json["type"],
         totalWeight: json["totalWeight"],
-        completedExerciseCount: json["completedExerciseCount"],
+        completedExerciseCount: json["completedExercise"],
         createdAt: json["createdAt"],
         updatedAt: json["updatedAt"],
         v: json["__v"],
@@ -89,7 +90,7 @@ class DayStatusDataModel {
         "endTime": endTime,
         "type": type,
         "totalWeight": totalWeight,
-        "completedExerciseCount": completedExerciseCount,
+        "completedExercise": completedExerciseCount,
         "createdAt": createdAt,
         "updatedAt": updatedAt,
         "__v": v,

@@ -673,123 +673,148 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         borderRadius: BorderRadius.circular(20),
       ),
       insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: BoxDecoration(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            color: const Color(0xFFFFFFFF),
-          ),
-          child: Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)).copyWith(top: ScreenUtil.verticalScale(2.5)),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(height: ScreenUtil.verticalScale(2)),
-                    Text(
-                      "Delete Account",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: ScreenUtil.verticalScale(2.4),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
-                      child: Text(
-                        "Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be lost.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: ScreenUtil.verticalScale(2),
-                          fontWeight: FontWeight.normal,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFFFFFFFF),
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: ScreenUtil.verticalScale(2)),
+                        Text(
+                          "Delete Account",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil.verticalScale(2.4),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                if (!c1.mounted) return;
-                                Navigator.of(c1).pop();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                  vertical: ScreenUtil.verticalScale(1.7),
-                                ),
-                                side: BorderSide(width: 2.0, color: AppColors.primaryColor),
-                                backgroundColor: Colors.white,
-                              ),
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: ScreenUtil.verticalScale(2),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
+                          child: Text(
+                            "Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be lost.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: ScreenUtil.verticalScale(2),
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
-                          SizedBox(width: ScreenUtil.horizontalScale(2.5)),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await _deleteAccount(context);
-                                if (!c1.mounted) return;
-                                Navigator.of(c1).pop();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                backgroundColor: AppColors.primaryColor,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: ScreenUtil.verticalScale(1.7),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (!c1.mounted) return;
+                                    Navigator.of(c1).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(1.7),
+                                    ),
+                                    side: BorderSide(width: 2.0, color: AppColors.primaryColor),
+                                    backgroundColor: Colors.white,
+                                  ),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: ScreenUtil.verticalScale(2),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              child: Text(
-                                "Confirm",
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.verticalScale(2),
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              SizedBox(width: ScreenUtil.horizontalScale(2.5)),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await _deleteAccount(context);
+                                    if (!c1.mounted) return;
+                                    Navigator.of(c1).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    backgroundColor: AppColors.primaryColor,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(1.7),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Confirm",
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil.verticalScale(2),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.7)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        Navigator.of(c1).pop();
-                      },
+                        )
+                      ],
                     ),
-                    SizedBox(width: ScreenUtil.horizontalScale(2)),
-                  ],
-                ),
+                  ),
+                  // Padding(
+                  //   padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.7)),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.end,
+                  //     children: [
+                  //       IconButton(
+                  //         icon: const Icon(Icons.close),
+                  //         onPressed: () {
+                  //           Navigator.of(c1).pop();
+                  //         },
+                  //       ),
+                  //       SizedBox(width: ScreenUtil.horizontalScale(2)),
+                  //     ],
+                  //   ),
+                  // ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            right: -ScreenUtil.verticalScale(1.2),
+            top: -ScreenUtil.verticalScale(1.2),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                child: Container(
+                  decoration: const BoxDecoration(
+                      color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
+                  child: Padding(
+                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                    child: Icon(size: ScreenUtil.verticalScale(2.5), Icons.close, color: Colors.white),
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
