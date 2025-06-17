@@ -21,7 +21,7 @@ class JoinChallengeWidget extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Positioned.fill(
-            top: 0,
+            top: -ScreenUtil.verticalScale(3),
             child: Stack(
               children: [
                 Positioned.fill(
