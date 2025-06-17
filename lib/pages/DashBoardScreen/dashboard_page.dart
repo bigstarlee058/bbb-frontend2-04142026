@@ -23,6 +23,9 @@ import 'package:bbb/pages/Charts/exercise_completed.dart';
 import 'package:bbb/pages/Charts/weight_lifted.dart';
 import 'package:bbb/pages/DashBoardScreen/step_progress_bar.dart';
 import 'package:bbb/pages/DashBoardScreen/week_calender.dart';
+import 'package:bbb/pages/Tools/GraphsReports/Charts/report_average_rir.dart';
+import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
+import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -746,13 +749,22 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                                 Consumer<MonthProvider>(
                                   builder: (context, value, child) {
-                                    final listA = monthProvider.graphHistory
+                                    // reportExerciseCompletedGraphHistory
+                                    // reportAverageRIRGraphHistory
+                                    // reportWeightLiftedGraphHistory
+
+                                    final listA = value.reportExerciseCompletedGraphHistory
                                         .map((e) => e["totalCompletedExercise"].value > 0)
                                         .toList();
-                                    final listB =
-                                        monthProvider.graphHistory.map((e) => e["totalWeight"].value > 0).toList();
+                                    final listB = value.reportWeightLiftedGraphHistory
+                                        .map((e) => e["totalWeight"].value > 0)
+                                        .toList();
+                                    final listC = value.reportAverageRIRGraphHistory
+                                        .map((e) => e["totalAverageRIR"].value > 0)
+                                        .toList();
                                     final isAvailable = listA.any((element) => element == true) ||
-                                        listB.any((element) => element == true);
+                                        listB.any((element) => element == true) ||
+                                        listC.any((element) => element == true);
                                     if (isAvailable) {
                                       return Column(
                                         children: [
@@ -829,12 +841,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                             margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8.5))
                                                 .copyWith(top: 6),
                                             child: selectedChart == "Exercises Completed"
-                                                ? const ExerciseCompletedGraph()
+                                                ? const ReportExerciseCompletedGraph()
                                                 : selectedChart == "Weight Lifted"
-                                                    ? const WeightLiftedGraph()
+                                                    ? const ReportWeightLiftedGraph()
                                                     // : const TimeSpentGraph(),
                                                     : selectedChart == "Average RIR"
-                                                        ? const AverageRIRGraph()
+                                                        ? const ReportAverageRIRGraph()
                                                         // : const TimeSpentGraph(),
                                                         : const SizedBox(),
                                           ),

@@ -43,8 +43,8 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
   @override
   void initState() {
     MonthProvider monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    WidgetsBinding.instance
-        .addPostFrameCallback((timeStamp) => monthProvider.changeWeekExerciseCompleted("Week ${monthProvider.currentWeek}"));
+    WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) => monthProvider.changeWeekExerciseCompleted("Week ${monthProvider.currentWeek}"));
     super.initState();
   }
 
@@ -73,7 +73,9 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: monthProvider.reportMaximumValueOfTotalEx > 32 ? monthProvider.reportMaximumValueOfTotalEx / 10 : 2,
+                    interval: monthProvider.reportMaximumValueOfTotalEx > 32
+                        ? monthProvider.reportMaximumValueOfTotalEx / 10
+                        : 2,
                     reservedSize: 30, // Space for titles
                     getTitlesWidget: getLeftTitles, // Use this method to generate Y-axis titles
                   ),
@@ -82,7 +84,8 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 36,
-                    getTitlesWidget: (value, meta) => getTitles(value, meta, monthProvider), // This method generates titles for the X-axis
+                    getTitlesWidget: (value, meta) =>
+                        getTitles(value, meta, monthProvider), // This method generates titles for the X-axis
                   ),
                 ),
                 rightTitles: const AxisTitles(),
@@ -90,7 +93,8 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
               ),
               gridData: FlGridData(
                 verticalInterval: 0.125,
-                horizontalInterval: monthProvider.reportMaximumValueOfTotalEx > 32 ? monthProvider.reportMaximumValueOfTotalEx / 10 : 2,
+                horizontalInterval:
+                    monthProvider.reportMaximumValueOfTotalEx > 32 ? monthProvider.reportMaximumValueOfTotalEx / 10 : 2,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -131,7 +135,7 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
                       TextStyle(
                         fontWeight: FontWeight.bold,
                         color: rod.color,
-                        fontSize: 18,
+                        fontSize: 14,
                         shadows: const [
                           Shadow(
                             color: Colors.black26,

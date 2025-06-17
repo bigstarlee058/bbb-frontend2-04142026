@@ -43,7 +43,8 @@ class _ReportAverageRIRGraphState extends State<ReportAverageRIRGraph> {
   @override
   void initState() {
     MonthProvider monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider.changeAverageRIR("Week ${monthProvider.currentWeek}"));
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) => monthProvider.changeAverageRIR("Week ${monthProvider.currentWeek}"));
     super.initState();
   }
 
@@ -72,7 +73,9 @@ class _ReportAverageRIRGraphState extends State<ReportAverageRIRGraph> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: monthProvider.reportMaximumValueOfAverageRIR > 14 ? monthProvider.reportMaximumValueOfAverageRIR / 5 : 2,
+                    interval: monthProvider.reportMaximumValueOfAverageRIR > 14
+                        ? monthProvider.reportMaximumValueOfAverageRIR / 5
+                        : 2,
                     reservedSize: 30, // Space for titles
                     getTitlesWidget: getLeftTitles, // Use this method to generate Y-axis titles
                   ),
@@ -81,7 +84,8 @@ class _ReportAverageRIRGraphState extends State<ReportAverageRIRGraph> {
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 36,
-                    getTitlesWidget: (value, meta) => getTitles(value, meta, monthProvider), // This method generates titles for the X-axis
+                    getTitlesWidget: (value, meta) =>
+                        getTitles(value, meta, monthProvider), // This method generates titles for the X-axis
                   ),
                 ),
                 rightTitles: const AxisTitles(),
@@ -89,8 +93,9 @@ class _ReportAverageRIRGraphState extends State<ReportAverageRIRGraph> {
               ),
               gridData: FlGridData(
                 verticalInterval: 0.125,
-                horizontalInterval:
-                    monthProvider.reportMaximumValueOfAverageRIR > 14 ? monthProvider.reportMaximumValueOfAverageRIR / 5 : 2,
+                horizontalInterval: monthProvider.reportMaximumValueOfAverageRIR > 14
+                    ? monthProvider.reportMaximumValueOfAverageRIR / 5
+                    : 2,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -112,7 +117,8 @@ class _ReportAverageRIRGraphState extends State<ReportAverageRIRGraph> {
                 );
               }).toList(),
 
-              maxY: monthProvider.reportMaximumValueOfAverageRIR > 14 ? monthProvider.reportMaximumValueOfAverageRIR : 14,
+              maxY:
+                  monthProvider.reportMaximumValueOfAverageRIR > 14 ? monthProvider.reportMaximumValueOfAverageRIR : 14,
               minY: 0, // Set min Y value
               barTouchData: BarTouchData(
                 enabled: true,
@@ -131,7 +137,7 @@ class _ReportAverageRIRGraphState extends State<ReportAverageRIRGraph> {
                       TextStyle(
                         fontWeight: FontWeight.bold,
                         color: rod.color,
-                        fontSize: 18,
+                        fontSize: 14,
                         shadows: const [
                           Shadow(
                             color: Colors.black26,

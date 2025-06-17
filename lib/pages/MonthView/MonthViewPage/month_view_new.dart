@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -43,7 +44,6 @@ class _MonthViewNewState extends State<MonthViewNew> {
   DataProvider? dataProvider;
   PageController pageController = PageController();
   ScrollProvider? scrollProvider;
-  DateTime _currentDate = DateTime.now();
   late ProgramInfoProvider provider;
   ScrollController scrollController = ScrollController();
   final GlobalKey optionKey = GlobalKey();
@@ -84,6 +84,23 @@ class _MonthViewNewState extends State<MonthViewNew> {
         scrollToMiddle();
       },
     );
+    
+    // Add listener to handle scroll reset when weekExpandedHeight changes
+    monthProvider?.addListener(() {
+      if (monthProvider?.weekExpandedHeight == 0 && scrollController.hasClients) {
+        // Reset scroll when weekExpandedHeight is reset (usually when month changes)
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (scrollController.hasClients && scrollController.position.pixels > 0) {
+            scrollController.animateTo(
+              0.0,
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+            );
+          }
+        });
+      }
+    });
+    
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";
@@ -100,8 +117,6 @@ class _MonthViewNewState extends State<MonthViewNew> {
   }
 
   void scrollToMiddle() {
-    log('monthProvider!.scrollToRestDay==========>>>>>${monthProvider!.scrollToRestDay}');
-
     if (monthProvider!.scrollToRestDay) {
       final middleOffset = scrollController.position.maxScrollExtent /
           ((monthProvider?.week) == 1
@@ -144,7 +159,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
     ScreenUtil.init(context);
     return Scaffold(
       // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => monthProvider?.fetchAllDayStatusLocalData(),
+      //   onPressed: () => monthProvider?.findSplitTypeList(),
       // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
@@ -276,6 +291,19 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                                         duration: Duration(milliseconds: 300),
                                                                         curve: Curves.ease,
                                                                       );
+                                                                      
+                                                                      // Reset scroll position when month changes
+                                                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                                        Future.delayed(Duration(milliseconds: 350), () {
+                                                                          if (scrollController.hasClients) {
+                                                                            scrollController.animateTo(
+                                                                              0.0,
+                                                                              duration: Duration(milliseconds: 300),
+                                                                              curve: Curves.easeOut,
+                                                                            );
+                                                                          }
+                                                                        });
+                                                                      });
                                                                     }
                                                                   },
                                                                   child: Container(
@@ -356,6 +384,19 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                                         duration: Duration(milliseconds: 300),
                                                                         curve: Curves.ease,
                                                                       );
+                                                                      
+                                                                      // Reset scroll position when month changes
+                                                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                                        Future.delayed(Duration(milliseconds: 350), () {
+                                                                          if (scrollController.hasClients) {
+                                                                            scrollController.animateTo(
+                                                                              0.0,
+                                                                              duration: Duration(milliseconds: 300),
+                                                                              curve: Curves.easeOut,
+                                                                            );
+                                                                          }
+                                                                        });
+                                                                      });
                                                                     }
                                                                   },
                                                                   child: Container(
@@ -414,13 +455,19 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                         text: "Watch Video Intro",
                                                         color: Colors.white,
                                                         onPress: () {
-                                                          Navigator.of(context).push(
-                                                            FadePageRoute(
-                                                              page: const VideoIntroWidget(
-                                                                vimeoId: '953289606',
-                                                              ),
+                                                          AnimatedDialog.showAnimatedDialog(
+                                                            context: context,
+                                                            pageBuilder: (c1, anim1, anim2) => VideoIntroWidget(
+                                                              vimeoId: '953289606',
                                                             ),
                                                           );
+                                                          // Navigator.of(context).push(
+                                                          //   FadePageRoute(
+                                                          //     page: const VideoIntroWidget(
+                                                          //       vimeoId: '953289606',
+                                                          //     ),
+                                                          //   ),
+                                                          // );
                                                         },
                                                         textColor: AppColors.primaryColor,
                                                         isLoading: false,

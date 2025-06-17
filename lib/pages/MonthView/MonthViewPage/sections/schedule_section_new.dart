@@ -19,7 +19,8 @@ class ScheduleSectionNew extends StatelessWidget {
     return Consumer<MonthProvider>(
       builder: (context, value, child) {
         return SizedBox(
-          height: ScreenUtil.verticalScale((/*value.isCurrentMonth == "Current" ? 50 :*/ 50) + (value.weekExpandedHeight).toDouble()),
+          height: ScreenUtil.verticalScale(
+              (/*value.isCurrentMonth == "Current" ? 50 :*/ 50) + (value.weekExpandedHeight).toDouble()),
           child: PageView.builder(
             reverse: true,
             physics: NeverScrollableScrollPhysics(),
@@ -44,7 +45,9 @@ class ScheduleSectionNew extends StatelessWidget {
                   ? "${value.splitType}"
                   : value.monthDataModel?.weeks?[value.week! - 1].idList?.first.toString().split(" ")[1] ?? "";
               return value.isFilterLoading
-                  ? Container(constraints: BoxConstraints(minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12))))
+                  ? Container(
+                      constraints:
+                          BoxConstraints(minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12))))
                   : value.weeksDataList.isNotEmpty
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,8 +67,9 @@ class ScheduleSectionNew extends StatelessWidget {
                                       index: index,
                                       monthProvider: value,
                                       pumpDayIds: value.weeksDataList[index].pumpDayIds!,
-                                      title:
-                                          value.weeksDataList[index].title == "" ? "Week ${index + 1}" : value.weeksDataList[index].title!,
+                                      title: value.weeksDataList[index].title == ""
+                                          ? "Week ${index + 1}"
+                                          : value.weeksDataList[index].title!,
                                       thisWeek: ((index + 1) == value.week),
                                       restDayId: value.weeksDataList[index].restdayId!,
                                       weekIndex: index,
@@ -92,14 +96,16 @@ class ScheduleSectionNew extends StatelessWidget {
                                     ),
                                     child: Consumer<MonthProvider>(
                                       builder: (context, monthProvider, child) {
-                                        String split = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
+                                        String split = monthProvider
+                                                .monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
                                                 .toString()
                                                 .split(" ")[1] ??
                                             "";
                                         String dataId =
                                             "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
 
-                                        final data = monthProvider.allDayHistoryModel.where((element) => element.dataId == dataId);
+                                        final data = monthProvider.allDayHistoryModel
+                                            .where((element) => element.dataId == dataId);
                                         String status = "";
                                         String title = "";
                                         if (data.isNotEmpty) {
@@ -119,7 +125,9 @@ class ScheduleSectionNew extends StatelessWidget {
                                                       : 'Start Your Workout',
                                           textColor: Colors.white,
                                           onPress: monthProvider.todayTitleId.isEmpty ? () {} : () => onPress!(),
-                                          color: monthProvider.todayTitleId.isEmpty ? Colors.green : AppColors.primaryColor,
+                                          color: monthProvider.todayTitleId.isEmpty
+                                              ? Colors.green
+                                              : AppColors.primaryColor,
                                           isLoading: false,
                                         );
                                       },
@@ -129,7 +137,8 @@ class ScheduleSectionNew extends StatelessWidget {
                           ],
                         )
                       : Container(
-                          constraints: BoxConstraints(minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12))),
+                          constraints:
+                              BoxConstraints(minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12))),
                           child: const Center(
                             child: Text("No workout data available"),
                           ),

@@ -93,7 +93,10 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider?.updateGraphType(""));
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      monthProvider?.getLiftedWeightGraphData();
+      monthProvider?.updateGraphType("");
+    });
     super.dispose();
   }
 

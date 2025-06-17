@@ -45,7 +45,8 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
   @override
   void initState() {
     MonthProvider monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider.changeWeekWeightLifted("Week ${monthProvider.currentWeek}"));
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) => monthProvider.changeWeekWeightLifted("Week ${monthProvider.currentWeek}"));
     super.initState();
   }
 
@@ -74,16 +75,18 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: monthProvider.reportMaximumValueOfWeight > 8000 ? (monthProvider.reportMaximumValueOfWeight / 8) : 1000,
+                    interval: monthProvider.reportMaximumValueOfWeight > 8000
+                        ? (monthProvider.reportMaximumValueOfWeight / 10)
+                        : 1000,
                     reservedSize: 34,
-                    getTitlesWidget: getLeftTitles, // Use this method to generate Y-axis titles
+                    getTitlesWidget: getLeftTitles,
                   ),
                 ),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 36,
-                    getTitlesWidget: (value, meta) => getTitles(value, meta, monthProvider), // This method generates titles for the X-axis
+                    getTitlesWidget: (value, meta) => getTitles(value, meta, monthProvider),
                   ),
                 ),
                 rightTitles: const AxisTitles(),
@@ -91,7 +94,9 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
               ),
               gridData: FlGridData(
                 verticalInterval: 0.125,
-                horizontalInterval: monthProvider.reportMaximumValueOfWeight > 8000 ? (monthProvider.reportMaximumValueOfWeight / 8) : 1000,
+                horizontalInterval: monthProvider.reportMaximumValueOfWeight > 8000
+                    ? (monthProvider.reportMaximumValueOfWeight / 8)
+                    : 1000,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -119,7 +124,6 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                 handleBuiltInTouches: false,
                 touchTooltipData: BarTouchTooltipData(
                   getTooltipColor: (group1) => Colors.transparent,
-                  // tooltipMargin: 0,
                   getTooltipItem: (
                     BarChartGroupData group,
                     int groupIndex,

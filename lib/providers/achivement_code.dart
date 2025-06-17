@@ -1,7 +1,612 @@
+/// ::::: ACHIEVEMENT
+
+// List<Map<String, dynamic>> items = [];
+// List<AchievementsModel> achievementsModel = [];
+//
+// updateAchievementsData() async {
+//   achievementsModel = [];
+//   final data = await DatabaseHelper()
+//       .fetchData(tableName: DatabaseHelper.achievementHistory);
+//   if (data.isNotEmpty) {
+//     achievementsModel = List<AchievementsModel>.from(json
+//         .decode(jsonEncode(data))
+//         .map((x) => AchievementsModel.fromJson(x)));
+//   } else {
+//     achievementsModel = [];
+//   }
+//   items = [
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "Breaking the Ice",
+//       "subtitle": "Your First Workout Finished",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "I Got This",
+//       "subtitle": "First Week Finished",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "I'm Determined",
+//       "subtitle": "First Month Finished",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "3 in a Row",
+//       "subtitle": "Achieved the streak of 3",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "7 in a Row",
+//       "subtitle": "Achieved the streak of 7",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "14 in a Row",
+//       "subtitle": "Achieved the Streak of 14",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "30 in a row",
+//       "subtitle": "Achieved the streak of 30",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "250k Monster",
+//       "subtitle": "Total Weight Lifted > 250k lbs",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "500k Monster",
+//       "subtitle": "Total Weight Lifted > 500k lbs",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "5 and Done",
+//       "subtitle": "Completed 5 Days",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "10 and Done",
+//       "subtitle": "Completed 10 Days",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "20 and Done",
+//       "subtitle": "Completed 20 Days",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "50 and Done",
+//       "subtitle": "Completed 50 Days",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "100 and Done",
+//       "subtitle": "Completed 100 Days",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "250 and Done",
+//       "subtitle": "Completed 250 Days",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "500 and Done",
+//       "subtitle": "Completed 500 Days",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "Trial Survivor",
+//       "subtitle": "14+ Days in the App",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "1 Month",
+//       "subtitle": "28+ Days in the App",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "Quarter Year",
+//       "subtitle": "3 + Months in the App",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "Half Year",
+//       "subtitle": "6+ Months in the App",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//     {
+//       "image": "assets/img/verified (1).svg",
+//       "active_image": "assets/img/verified (1).svg",
+//       "title": "Yearling",
+//       "subtitle": "12+ Months in the App",
+//       "isArchived": false,
+//       "time": "${DateTime.now().toUtc()}"
+//     },
+//   ];
+//   for (var element in achievementsModel) {
+//     if (element.achievementsTitle == "Breaking the Ice") {
+//       items[0]["isArchived"] = true;
+//       items[0]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "I Got This") {
+//       items[1]["isArchived"] = true;
+//       items[1]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "I'm Determined") {
+//       items[2]["isArchived"] = true;
+//       items[2]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "3 in a Row") {
+//       items[3]["isArchived"] = true;
+//       items[3]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "7 in a Row") {
+//       items[4]["isArchived"] = true;
+//       items[4]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "14 in a Row") {
+//       items[5]["isArchived"] = true;
+//       items[5]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "30 in a Row") {
+//       items[6]["isArchived"] = true;
+//       items[6]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "250k Monster") {
+//       items[7]["isArchived"] = true;
+//       items[7]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "500k Monster") {
+//       items[8]["isArchived"] = true;
+//       items[8]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "5 and Done") {
+//       items[9]["isArchived"] = true;
+//       items[9]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "10 and Done") {
+//       items[10]["isArchived"] = true;
+//       items[10]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "20  and Done") {
+//       items[11]["isArchived"] = true;
+//       items[11]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "50 and Done") {
+//       items[12]["isArchived"] = true;
+//       items[12]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "100 and Done") {
+//       items[13]["isArchived"] = true;
+//       items[13]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "250 and Done") {
+//       items[14]["isArchived"] = true;
+//       items[14]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "500 and Done") {
+//       items[15]["isArchived"] = true;
+//       items[15]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "Trial Survivor") {
+//       items[16]["isArchived"] = true;
+//       items[16]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "1 Month") {
+//       items[17]["isArchived"] = true;
+//       items[17]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "Quarter Year") {
+//       items[18]["isArchived"] = true;
+//       items[18]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "Half Year") {
+//       items[19]["isArchived"] = true;
+//       items[19]["time"] = element.achievementsDate.toString();
+//     }
+//     if (element.achievementsTitle == "Yearling") {
+//       items[20]["isArchived"] = true;
+//       items[20]["time"] = element.achievementsDate.toString();
+//     }
+//   }
+//   notifyListeners();
+// }
+//
+// updateAchievements() async {
+//   updateAchievementsData();
+//
+//   String accountCreatedDate = userDataProvider.userData != null
+//       ? userDataProvider.userData["createdAt"]
+//       : "";
+//   log('accountCreatedDate==========>>>>>${accountCreatedDate}');
+//
+//   DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
+//   DateTime today = DateTime.now();
+//   int dayDifference = today.difference(targetDate).inDays;
+//   if (items[0]["isArchived"] == false) {
+//     if (allDayHistoryModel
+//         .any((element) => element.status == Status.completed)) {
+//       items[0]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "Breaking the Ice",
+//           achievementsSubtitle: "Your First Workout Finished");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[3]["isArchived"] == false) {
+//     if (streak >= 3) {
+//       items[3]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "3 in a Row",
+//           achievementsSubtitle: "Achieved the streak of 3");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[4]["isArchived"] == false) {
+//     if (streak >= 7) {
+//       items[4]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "7 in a Row",
+//           achievementsSubtitle: "Achieved the streak of 7");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[5]["isArchived"] == false) {
+//     if (streak >= 14) {
+//       items[5]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "14 in a Row",
+//           achievementsSubtitle: "Achieved the streak of 14");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[6]["isArchived"] == false) {
+//     if (streak >= 30) {
+//       items[6]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "30 in a Row",
+//           achievementsSubtitle: "Achieved the streak of 30");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[7]["isArchived"] == false ||
+//       items[8]["isArchived"] == false ||
+//       items[2]["isArchived"] == false ||
+//       items[1]["isArchived"] == false) {
+//     List<DayStatusDataModel> dayMainData = await ApiRepo.fetchDayAllStatus();
+//     double totalWeight = 0;
+//
+//     for (var element in dayMainData) {
+//       if (element.status == Status.completed) {
+//         totalWeight += double.parse(element.totalWeight ?? "0");
+//       }
+//     }
+//
+//     if (items[7]["isArchived"] == false && totalWeight >= 250000) {
+//       items[7]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "250k Monster",
+//           achievementsSubtitle: "Total Weight Lifted > 250k lbs");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//
+//     if (items[8]["isArchived"] == false && totalWeight >= 500000) {
+//       items[8]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "500k Monster",
+//           achievementsSubtitle: "Total Weight Lifted > 500k lbs");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//
+//     if (items[1]["isArchived"] == false) {
+//       final startDate = monthDataModel?.startDate ?? DateTime.now();
+//       final endDate = monthDataModel?.endDate ?? DateTime.now();
+//
+//       DateTime weekStart = getWeekStartDate(
+//           DateTime(startDate.year, startDate.month, startDate.day),
+//           week ?? 1);
+//       DateTime weekEnd = getWeekEndDate(
+//           weekStart,
+//           DateTime(endDate.year, endDate.month, endDate.day)
+//               .add(Duration(days: 1))
+//               .subtract(Duration(seconds: 1)));
+//       final data1 = allSplitDayHistoryModel.where((item) {
+//         if (item.status == Status.completed ||
+//             item.status == Status.skipped) {
+//           DateTime endTime = DateTime(
+//               item.endTime!.year, item.endTime!.month, item.endTime!.day);
+//           return (endTime.isAfter(weekStart) && endTime.isBefore(weekEnd) ||
+//               endTime.isAtSameMomentAs(weekStart) ||
+//               endTime.isAtSameMomentAs(weekEnd));
+//         } else {
+//           return false;
+//         }
+//       }).toList();
+//       if (data1.length == 7) {
+//         items[1]["isArchived"] = true;
+//         final data = UpdateAchievementsRequest(
+//             achievementsTitle: "I Got This",
+//             achievementsSubtitle: "First Week Finished");
+//         await DatabaseHelper().insertData(
+//             tableName: DatabaseHelper.achievementHistory,
+//             data: data.toJson());
+//         ApiRepo.addAchievementsList(body: data.toJson1());
+//       }
+//     }
+//
+//     if (items[1]["isArchived"] == false) {
+//       final startDate = monthDataModel?.startDate ?? DateTime.now();
+//       final endDate = monthDataModel?.endDate ?? DateTime.now();
+//       final startDate1 =
+//           DateTime(startDate.year, startDate.month, startDate.day);
+//       final endDate1 = DateTime(endDate.year, endDate.month, endDate.day)
+//           .add(Duration(days: 1))
+//           .subtract(Duration(seconds: 1));
+//       final data1 = allSplitDayHistoryModel.where((item) {
+//         if (item.status == Status.completed ||
+//             item.status == Status.skipped) {
+//           DateTime endTime = DateTime(
+//               item.endTime!.year, item.endTime!.month, item.endTime!.day);
+//           return (endTime.isAfter(startDate1) && endTime.isBefore(endDate1) ||
+//               endTime.isAtSameMomentAs(startDate1) ||
+//               endTime.isAtSameMomentAs(endDate1));
+//         } else {
+//           return false;
+//         }
+//       }).toList();
+//
+//       if (data1.length == 28) {
+//         items[2]["isArchived"] = true;
+//         final data = UpdateAchievementsRequest(
+//             achievementsTitle: "I'm Determined",
+//             achievementsSubtitle: "First Month Finished");
+//         await DatabaseHelper().insertData(
+//             tableName: DatabaseHelper.achievementHistory,
+//             data: data.toJson());
+//         ApiRepo.addAchievementsList(body: data.toJson1());
+//       }
+//     }
+//   }
+//
+//   Map<String, dynamic> filteredData = {};
+//
+//   List<dynamic> uniqueEntries = filteredData.values.toList();
+//
+//   int completedDays = uniqueEntries.length;
+//
+//   if (items[9]["isArchived"] == false) {
+//     if (completedDays >= 5) {
+//       items[9]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "5 and Done",
+//           achievementsSubtitle: "Completed 5 Days");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[10]["isArchived"] == false) {
+//     if (completedDays >= 10) {
+//       items[10]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "10 and Done",
+//           achievementsSubtitle: "Completed 10 Days");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[11]["isArchived"] == false) {
+//     if (completedDays >= 20) {
+//       items[11]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "20  and Done",
+//           achievementsSubtitle: "Completed 20 Days");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[12]["isArchived"] == false) {
+//     if (completedDays >= 50) {
+//       items[12]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "50 and Done",
+//           achievementsSubtitle: "Completed 50 Days");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[13]["isArchived"] == false) {
+//     if (completedDays >= 100) {
+//       items[13]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "100 and Done",
+//           achievementsSubtitle: "Completed 100 Days");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[14]["isArchived"] == false) {
+//     if (completedDays >= 250) {
+//       items[14]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "250 and Done",
+//           achievementsSubtitle: "Completed 250 Days");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   if (items[15]["isArchived"] == false) {
+//     if (completedDays >= 500) {
+//       items[15]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "500 and Done",
+//           achievementsSubtitle: "Completed 500 Days");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//   if (items[16]["isArchived"] == false) {
+//     if (dayDifference >= 14) {
+//       items[16]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "Trial Survivor",
+//           achievementsSubtitle: "14+ Days in the App");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//   if (items[17]["isArchived"] == false) {
+//     if (dayDifference >= 28) {
+//       items[17]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "1 Month",
+//           achievementsSubtitle: "28+ Days in the App");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//   if (items[18]["isArchived"] == false) {
+//     if (dayDifference >= (28 * 3)) {
+//       items[18]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "Quarter Year",
+//           achievementsSubtitle: "3 + Months in the App");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//   if (items[19]["isArchived"] == false) {
+//     if (dayDifference >= (28 * 6)) {
+//       items[19]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "Half Year",
+//           achievementsSubtitle: "6+ Months in the App");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//   if (items[20]["isArchived"] == false) {
+//     if (dayDifference >= (28 * 12)) {
+//       items[20]["isArchived"] = true;
+//       final data = UpdateAchievementsRequest(
+//           achievementsTitle: "Yearling",
+//           achievementsSubtitle: "12+ Months in the App");
+//       await DatabaseHelper().insertData(
+//           tableName: DatabaseHelper.achievementHistory, data: data.toJson());
+//       ApiRepo.addAchievementsList(body: data.toJson1());
+//     }
+//   }
+//
+//   notifyListeners();
+// }
+//
+// DateTime getWeekStartDate(DateTime monthStart, int weekNumber) {
+//   return monthStart.add(Duration(days: (weekNumber - 1) * 7));
+// }
+//
+// DateTime getWeekEndDate(DateTime weekStart, DateTime monthEnd) {
+//   DateTime weekEnd = weekStart.add(Duration(days: 6));
+//   return weekEnd.isAfter(monthEnd) ? monthEnd : weekEnd;
+// }
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:math' as math;
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -1725,202 +2330,191 @@ class MonthProvider extends ChangeNotifier {
   /// CHART =============================++++++++++++++++++++++++++++++++++
 
   String graphType = "";
-  // List<Map<String, dynamic>> graphHistory = [];
-  // double maximumValueOfWeight = 0;
-  // double maximumValueOfTotalEx = 0;
-  // double maximumValueAvgRIR = 0;
-  // double maximumValueOfTotalTime = 0;
-  // List<Map<String, dynamic>> liftedWeightEachDay = [];
-  //
+  List<Map<String, dynamic>> graphHistory = [];
+  double maximumValueOfWeight = 0;
+  double maximumValueOfTotalEx = 0;
+  double maximumValueAvgRIR = 0;
+  double maximumValueOfTotalTime = 0;
+  List<Map<String, dynamic>> liftedWeightEachDay = [];
+
   updateGraphType(String value) {
     graphType = value;
     notifyListeners();
   }
-  //
-  // Map<String, Map<String, dynamic>> filterChartData() {
-  //   maximumValueOfWeight = 0;
-  //   maximumValueOfTotalEx = 0;
-  //   maximumValueAvgRIR = 0;
-  //   maximumValueOfTotalTime = 0;
-  //
-  //   List<Map<String, dynamic>> weeks = getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()),
-  //       Utils.formattedDate(monthDataModel!.endDate!.toString()));
-  //
-  //   var week = weeks.firstWhere((week) => week['weekNumber'] == this.week, orElse: () => {});
-  //   const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
-  //   DateTime startDate = DateTime.parse(week['startDate']);
-  //   DateTime endDate = DateTime.parse(week['endDate']);
-  //   List<DayHistoryModel> filteredData = allSplitDayHistoryModel.where((data) {
-  //     if (data.status != Status.completed) {
-  //       return false;
-  //     }
-  //     DateTime entryDate = data.endTime!;
-  //     return entryDate.isAfter(startDate) && entryDate.isBefore(endDate);
-  //   }).toList();
-  //
-  //   Map<String, Map<String, dynamic>> combinedData = {};
-  //   filteredData.sort(
-  //     (a, b) {
-  //       return a.endTime!.compareTo(b.endTime!);
-  //     },
-  //   );
-  //
-  //   try {
-  //     for (var element in filteredData) {
-  //       if (element.status == Status.completed) {
-  //         // DateTime aDate = element.startTime!;
-  //         // DateTime localTimeADate = Utils.formattedDate("$aDate");
-  //         DateTime bDate = element.endTime!;
-  //         DateTime localTimeBDate = Utils.formattedDate("$bDate");
-  //
-  //         String date = bDate.toIso8601String().split('T')[0];
-  //
-  //         double totalWeight =
-  //             double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
-  //         double totalAverageRIR = element.averageRIR != "NaN"
-  //             ? double.parse((element.averageRIR?.isNotEmpty ?? false ? element.averageRIR : "0") ?? "0")
-  //             : 0;
-  //
-  //         int completedExercise =
-  //             int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
-  //
-  //         int workoutTimeInSeconds = localTimeBDate.difference(localTimeBDate).inSeconds;
-  //
-  //         String day = weekdays[bDate.weekday] ?? "";
-  //
-  //         if (combinedData.containsKey(date)) {
-  //           combinedData[date]!['totalWeight'] += totalWeight;
-  //           combinedData[date]!['totalAverage'] += totalAverageRIR;
-  //           combinedData[date]!['completedExercise'] += completedExercise;
-  //           combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
-  //         } else {
-  //           combinedData[date] = {
-  //             'date': date,
-  //             'totalWeight': totalWeight,
-  //             'day': day,
-  //             'completedExercise': completedExercise,
-  //             'totalAverage': totalAverageRIR,
-  //             'workoutTime': workoutTimeInSeconds,
-  //           };
-  //         }
-  //       }
-  //     }
-  //
-  //     combinedData.forEach((key, value) {
-  //       if (double.parse(value["totalWeight"].toString()) > maximumValueOfWeight) {
-  //         maximumValueOfWeight = double.parse(value["totalWeight"].toString());
-  //       }
-  //       if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
-  //         maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
-  //       }
-  //       if (double.parse(value["totalAverage"].toString()) > maximumValueAvgRIR) {
-  //         maximumValueAvgRIR = double.parse(value["totalAverage"].toString());
-  //       }
-  //
-  //       final timeInSeconds = double.parse(value["workoutTime"].toString());
-  //       int hours = timeInSeconds ~/ 3600;
-  //
-  //       if (double.parse(value["workoutTime"].toString()) > maximumValueOfTotalTime) {
-  //         maximumValueOfTotalTime = double.parse(hours.toString());
-  //       }
-  //     });
-  //
-  //     maximumValueOfWeight += 3000;
-  //     maximumValueOfTotalEx += 6;
-  //     maximumValueAvgRIR += 2;
-  //     maximumValueOfTotalTime += 2;
-  //
-  //     notifyListeners();
-  //     return combinedData;
-  //   } catch (e) {
-  //     debugPrint("Error filtering exercise completed chart data: $e");
-  //     return {};
-  //   }
-  // }
-  //
-  // Future<void> getLiftedWeightGraphData1() async {
-  //   try {
-  //     liftedWeightEachDay = [];
-  //     graphHistory = [];
-  //     await getAllDayStatusData();
-  //     Map<String, Map<String, dynamic>> combinedData = filterChartData();
-  //
-  //     if (combinedData.isNotEmpty) {
-  //       combinedData.forEach(
-  //         (key, value) {
-  //           liftedWeightEachDay.add({
-  //             "day": value['day'],
-  //             "totalCompletedExercise": value['completedExercise'],
-  //             "totalTime": value['workoutTime'],
-  //             "totalAverageRIR": value['totalAverage'],
-  //             "totalWeight": value['totalWeight'],
-  //             "date": key,
-  //           });
-  //         },
-  //       );
-  //     }
-  //
-  //     graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
-  //
-  //     notifyListeners();
-  //   } catch (e) {
-  //     debugPrint("Error getting lifted weight graph data: $e");
-  //   }
-  // }
-  //
-  // List<Map<String, dynamic>> processLiftedWeightGraphData(List<Map<String, dynamic>> data) {
-  //   try {
-  //     List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  //     DateTime today = DateTime.now();
-  //     DateFormat('EEE').format(today);
-  //
-  //     for (String day in allDays) {
-  //       if (!data.any((entry) => entry['day'] == day)) {
-  //         data.add({
-  //           "day": day,
-  //           "totalCompletedExercise": 0,
-  //           "totalTime": 0,
-  //           "totalWeight": 0,
-  //           "totalAverageRIR": 0,
-  //         });
-  //       }
-  //     }
-  //
-  //     Map<String, List<double>> dayToWeight = {
-  //       for (var entry in data)
-  //         entry["day"]: [
-  //           double.parse(entry["totalCompletedExercise"].toString()),
-  //           double.parse(entry["totalTime"].toString()),
-  //           double.parse(entry["totalWeight"].toString()),
-  //           double.parse(entry["totalAverageRIR"].toString()),
-  //         ],
-  //     };
-  //
-  //     final list = allDays.map((day) {
-  //       List<double> dataList = dayToWeight[day]!;
-  //
-  //       return {
-  //         "day": day,
-  //         "totalCompletedExercise": _BarData(AppColors.primaryColor, dataList[0], 0.0),
-  //         "totalTime": _BarData(AppColors.primaryColor, dataList[1], 0.0),
-  //         "totalWeight": _BarData(AppColors.primaryColor, dataList[2], 0.0),
-  //         "totalAverageRIR": _BarData(AppColors.primaryColor, dataList[3], 0.0),
-  //       };
-  //     }).toList();
-  //
-  //     return list;
-  //   } catch (e) {
-  //     debugPrint("Error processing lifted weight graph data: $e");
-  //     return [];
-  //   }
-  // }
 
-  getLiftedWeightGraphData() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      changeWeekExerciseCompleted("Week $currentWeek");
-      changeWeekWeightLifted("Week $currentWeek");
-      changeAverageRIR("Week $currentWeek");
-    });
+  Map<String, Map<String, dynamic>> filterChartData() {
+    maximumValueOfWeight = 0;
+    maximumValueOfTotalEx = 0;
+    maximumValueAvgRIR = 0;
+    maximumValueOfTotalTime = 0;
+    List<Map<String, dynamic>> weeks = getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()),
+        Utils.formattedDate(monthDataModel!.endDate!.toString()));
+    var week = weeks.firstWhere((week) => week['weekNumber'] == this.week, orElse: () => {});
+    const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
+    DateTime startDate = DateTime.parse(week['startDate']);
+    DateTime endDate = DateTime.parse(week['endDate']);
+
+    List<DayHistoryModel> filteredData = allSplitDayHistoryModel.where((data) {
+      if (data.status != Status.completed) {
+        return false;
+      }
+      DateTime entryDate = data.endTime!;
+      return entryDate.isAfter(startDate) && entryDate.isBefore(endDate);
+    }).toList();
+
+    Map<String, Map<String, dynamic>> combinedData = {};
+    filteredData.sort(
+      (a, b) {
+        return a.endTime!.compareTo(b.endTime!);
+      },
+    );
+
+    try {
+      for (var element in filteredData) {
+        if (element.status == Status.completed) {
+          // DateTime aDate = element.startTime!;
+          // DateTime localTimeADate = Utils.formattedDate("$aDate");
+          DateTime bDate = element.endTime!;
+          DateTime localTimeBDate = Utils.formattedDate("$bDate");
+
+          String date = bDate.toIso8601String().split('T')[0];
+
+          double totalWeight =
+              double.parse((element.totalWeight?.isNotEmpty ?? false ? element.totalWeight : "0") ?? "0");
+          double totalAverageRIR = element.averageRIR != "NaN"
+              ? double.parse((element.averageRIR?.isNotEmpty ?? false ? element.averageRIR : "0") ?? "0")
+              : 0;
+
+          int completedExercise =
+              int.parse((element.completedExercise?.isNotEmpty ?? false ? element.completedExercise : "0") ?? "0");
+
+          int workoutTimeInSeconds = localTimeBDate.difference(localTimeBDate).inSeconds;
+
+          String day = weekdays[bDate.weekday] ?? "";
+
+          if (combinedData.containsKey(date)) {
+            combinedData[date]!['totalWeight'] += totalWeight;
+            combinedData[date]!['totalAverage'] += totalAverageRIR;
+            combinedData[date]!['completedExercise'] += completedExercise;
+            combinedData[date]!['workoutTime'] += workoutTimeInSeconds;
+          } else {
+            combinedData[date] = {
+              'date': date,
+              'totalWeight': totalWeight,
+              'day': day,
+              'completedExercise': completedExercise,
+              'totalAverage': totalAverageRIR,
+              'workoutTime': workoutTimeInSeconds,
+            };
+          }
+        }
+      }
+
+      combinedData.forEach((key, value) {
+        if (double.parse(value["totalWeight"].toString()) > maximumValueOfWeight) {
+          maximumValueOfWeight = double.parse(value["totalWeight"].toString());
+        }
+        if (double.parse(value["completedExercise"].toString()) > maximumValueOfTotalEx) {
+          maximumValueOfTotalEx = double.parse(value["completedExercise"].toString());
+        }
+        if (double.parse(value["totalAverage"].toString()) > maximumValueAvgRIR) {
+          maximumValueAvgRIR = double.parse(value["totalAverage"].toString());
+        }
+
+        final timeInSeconds = double.parse(value["workoutTime"].toString());
+        int hours = timeInSeconds ~/ 3600;
+
+        if (double.parse(value["workoutTime"].toString()) > maximumValueOfTotalTime) {
+          maximumValueOfTotalTime = double.parse(hours.toString());
+        }
+      });
+
+      maximumValueOfWeight += 3000;
+      maximumValueOfTotalEx += 6;
+      maximumValueAvgRIR += 2;
+      maximumValueOfTotalTime += 2;
+
+      notifyListeners();
+      return combinedData;
+    } catch (e) {
+      debugPrint("Error filtering exercise completed chart data: $e");
+      return {};
+    }
+  }
+
+  Future<void> getLiftedWeightGraphData() async {
+    try {
+      liftedWeightEachDay = [];
+      graphHistory = [];
+      // await getAllDayStatusData();
+      Map<String, Map<String, dynamic>> combinedData = filterChartData();
+
+      if (combinedData.isNotEmpty) {
+        combinedData.forEach(
+          (key, value) {
+            liftedWeightEachDay.add({
+              "day": value['day'],
+              "totalCompletedExercise": value['completedExercise'],
+              "totalTime": value['workoutTime'],
+              "totalAverageRIR": value['totalAverage'],
+              "totalWeight": value['totalWeight'],
+              "date": key,
+            });
+          },
+        );
+      }
+
+      graphHistory = processLiftedWeightGraphData(liftedWeightEachDay);
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error getting lifted weight graph data: $e");
+    }
+  }
+
+  List<Map<String, dynamic>> processLiftedWeightGraphData(List<Map<String, dynamic>> data) {
+    try {
+      List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+      for (String day in allDays) {
+        if (!data.any((entry) => entry['day'] == day)) {
+          data.add({
+            "day": day,
+            "totalCompletedExercise": 0,
+            "totalTime": 0,
+            "totalWeight": 0,
+            "totalAverageRIR": 0,
+          });
+        }
+      }
+
+      Map<String, List<double>> dayToWeight = {
+        for (var entry in data)
+          entry["day"]: [
+            double.parse(entry["totalCompletedExercise"].toString()),
+            double.parse(entry["totalTime"].toString()),
+            double.parse(entry["totalWeight"].toString()),
+            double.parse(entry["totalAverageRIR"].toString()),
+          ],
+      };
+
+      final list = allDays.map((day) {
+        List<double> dataList = dayToWeight[day]!;
+
+        return {
+          "day": day,
+          "totalCompletedExercise": _BarData(AppColors.primaryColor, dataList[0], 0.0),
+          "totalTime": _BarData(AppColors.primaryColor, dataList[1], 0.0),
+          "totalWeight": _BarData(AppColors.primaryColor, dataList[2], 0.0),
+          "totalAverageRIR": _BarData(AppColors.primaryColor, dataList[3], 0.0),
+        };
+      }).toList();
+
+      return list;
+    } catch (e) {
+      debugPrint("Error processing lifted weight graph data: $e");
+      return [];
+    }
   }
 
   /// ::::: EXERCISE COMPLETED ================================================================================
@@ -1964,9 +2558,6 @@ class MonthProvider extends ChangeNotifier {
 
     List<Map<String, dynamic>> weeks = getWeeks(Utils.formattedDate(monthDataModel!.startDate!.toString()),
         Utils.formattedDate(monthDataModel!.endDate!.toString()));
-
-    log('weeks==========>>>>>$weeks');
-
     var week = weeks.firstWhere((week) => week['weekNumber'] == weekNumber, orElse: () => {});
 
     const weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"};
@@ -1982,12 +2573,6 @@ class MonthProvider extends ChangeNotifier {
     }).toList();
 
     Map<String, Map<String, dynamic>> combinedData = {};
-
-    filteredData.sort(
-      (a, b) {
-        return a.endTime!.compareTo(b.endTime!);
-      },
-    );
 
     try {
       for (var element in filteredData) {
@@ -2252,20 +2837,10 @@ class MonthProvider extends ChangeNotifier {
       }
     });
 
-    reportMaximumValueOfWeight = roundUpToNiceValue(reportMaximumValueOfWeight);
+    reportMaximumValueOfWeight += 3000;
 
     notifyListeners();
     return combinedData;
-  }
-
-  double roundUpToNiceValue(double value) {
-    if (value <= 0) return 0;
-
-    int digits = value.toInt().toString().length;
-    int base = math.pow(10, digits - 1).toInt();
-    int rounded = ((value + base - 1) / base).ceil() * base;
-
-    return rounded.toDouble();
   }
 
   Future<void> weightReportGraphData({int? weekNumber}) async {
@@ -2556,11 +3131,11 @@ class MonthProvider extends ChangeNotifier {
     reportAverageRIREachDay = [];
     totalExerciseCompletedInAWeek = 0;
     averageRIRInAWeek = 0;
-    // graphHistory = [];
-    // maximumValueOfWeight = 0;
-    // maximumValueOfTotalEx = 0;
-    // maximumValueOfTotalTime = 0;
-    // liftedWeightEachDay = [];
+    graphHistory = [];
+    maximumValueOfWeight = 0;
+    maximumValueOfTotalEx = 0;
+    maximumValueOfTotalTime = 0;
+    liftedWeightEachDay = [];
     notifyListeners();
   }
 
