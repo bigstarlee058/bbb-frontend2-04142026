@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -57,7 +59,6 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                           media,
                           // dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
                           image: dataProvider!.cachedImageMap["imageAchievement"],
-
                           imageKey: "imageAchievement",
                         ),
                         // Container(
@@ -164,7 +165,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     ),
                     child: Container(
                       width: media.width,
-                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                      margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7))
+                          .copyWith(bottom: ScreenUtil.verticalScale(3.2)),
                       child: GridView.builder(
                         padding: EdgeInsets.only(
                           top: ScreenUtil.verticalScale(3),
@@ -192,12 +194,34 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
   }
 
   Widget _buildGridItem(AchievementModel item, int index) {
+    final data1 = item.achievements?.where((element) => element.achieved == false).toList();
+    // var data2 = (data1 != null && data1.isEmpty) ? item.achievements?.last : data1?.first;
+
+    Achievement? data2;
+    if ((data1 != null && data1.isEmpty)) {
+      data2 = item.achievements?.last;
+    } else {
+      int? index = item.achievements?.indexWhere((element) =>
+          element.achievementAchievementId?.achievementIdId == data1?.first.achievementAchievementId?.achievementIdId);
+      data2 = item.achievements?[index == 0 ? 0 : (index ?? 0) - 1];
+    }
     return GestureDetector(
       onTap: () {
+        int? index = item.achievements?.indexWhere(
+          (element) =>
+              element.achievementAchievementId?.achievementIdId == data2?.achievementAchievementId?.achievementIdId,
+        );
+
         AnimatedDialog.showAnimatedDialog(
           context: context,
           pageBuilder: (c1, anim1, anim2) => ShareAchievementNewDialog(
+            item: item,
             achievements: item.achievements ?? [],
+            currentPage: index == 0
+                ? 0
+                : ((index! + 1) == (item.achievements?.length ?? 0))
+                    ? index
+                    : index + 1,
           ),
         );
       },
@@ -216,63 +240,57 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     child: appShimmerImage(
                       height: ScreenUtil.verticalScale(12),
                       width: ScreenUtil.verticalScale(12),
-                      networkImageUrl: "${item.achievements?.first.achievementAchievementId?.image}"
+                      networkImageUrl: "${data2?.achievementAchievementId?.image}"
                               .startsWith('https://storage.cloud.google.com/')
-                          ? item.achievements?.first.achievementAchievementId?.image ??
+                          ? data2?.achievementAchievementId?.image ??
                               "".replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                          : item.achievements?.first.achievementAchievementId?.image ?? "unknown",
+                          : data2?.achievementAchievementId?.image ?? "unknown",
                       fit: BoxFit.cover,
                       borderRadius: BorderRadius.all(
                         Radius.circular(ScreenUtil.verticalScale(500)),
                       ),
                     )),
-                Container(
-                  height: ScreenUtil.verticalScale(12),
-                  width: ScreenUtil.verticalScale(12),
-                  decoration: BoxDecoration(
-                    color: item.achievements!.any((element) => element.achieved != false)
-                        ? Color(0xFFAADDAA).withValues(alpha: 0.8)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(ScreenUtil.verticalScale(500)),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.check,
-                    color: item.achievements!.any((element) => element.achieved != false)
-                        ? Colors.white
-                        : Colors.transparent,
-                    size: 30,
-                  ),
-                )
+                // Container(
+                //   height: ScreenUtil.verticalScale(12),
+                //   width: ScreenUtil.verticalScale(12),
+                //   decoration: BoxDecoration(
+                //     color: (data1?.isEmpty ?? false) ? Color(0xFFAADDAA).withValues(alpha: 0.8) : Colors.transparent,
+                //     borderRadius: BorderRadius.all(
+                //       Radius.circular(ScreenUtil.verticalScale(500)),
+                //     ),
+                //   ),
+                //   child: Icon(
+                //     Icons.check,
+                //     color: (data1?.isEmpty ?? false) ? Colors.white : Colors.transparent,
+                //     size: 30,
+                //   ),
+                // )
               ],
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 10),
             Text(
-              item.title ?? "",
+              data2?.achievementAchievementId?.title ?? "",
               maxLines: 2,
               textAlign: TextAlign.center,
               // overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.7),
+                fontSize: ScreenUtil.verticalScale(1.6),
                 // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // SizedBox(height: 1),
-            // Flexible(
-            //   child: Text(
-            //     item.description ?? "",
-            //     maxLines: 1,
-            //     textAlign: TextAlign.center,
-            //     overflow: TextOverflow.visible,
-            //     style: TextStyle(
-            //       fontSize: ScreenUtil.verticalScale(1.5),
-            //       // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
-            //       fontWeight: FontWeight.w500,
-            //     ),
-            //   ),
-            // ),
+            SizedBox(height: 3),
+            Text(
+              "${(data1 != null && data1.isEmpty) ? item.achievements?.length : (item.achievements!.length - (data1?.length ?? 0))} out of ${item.achievements?.length}",
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.visible,
+              style: TextStyle(
+                fontSize: ScreenUtil.verticalScale(1.4),
+                // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),

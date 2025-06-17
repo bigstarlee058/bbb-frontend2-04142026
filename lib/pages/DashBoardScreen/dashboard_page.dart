@@ -77,7 +77,7 @@ class _DashboardPageState extends State<DashboardPage> {
     loadStaffsData();
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
-    loadAchievementsData(true);
+    // loadAchievementsData(true);
     loadProgramPhaseData();
     requestNotificationPermission();
   }
@@ -92,12 +92,8 @@ class _DashboardPageState extends State<DashboardPage> {
     await dataProvider?.fetchStaffs();
   }
 
-  void loadAchievementsData(value) async {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async {
-        await dataProvider?.getAllAchievement(value);
-      },
-    );
+  Future<void> loadAchievementsData(value) async {
+    await dataProvider?.getAllAchievement(value);
   }
 
   void loadFeaturedChallengeData() async {
@@ -235,11 +231,11 @@ class _DashboardPageState extends State<DashboardPage> {
                       loadUserInfo();
                       loadStaffsData();
                       loadFeaturedChallengeData();
-                      loadAchievementsData(false);
                       loadProgramPhaseData();
                       loadFeaturedCollectionData();
                       if (!context.mounted) return;
                       await monthProvider.onInit(context: context, isEnabled: false);
+                      await loadAchievementsData(false);
                     }),
                     child: SingleChildScrollView(
                       physics: NoBottomBounceScrollPhysics(),
@@ -899,6 +895,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           List<AchievementModel>? data = dataProvider?.achievementList
                                               .where((element) => element.achievements!.any((e) => e.achieved == true))
                                               .toList();
+
                                           return dataProvider!.loader && dataProvider!.achievementList.isEmpty
                                               ? Center(
                                                   child: Padding(
@@ -943,83 +940,158 @@ class _DashboardPageState extends State<DashboardPage> {
                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: List.generate(
                                                             3,
-                                                            (index) => (data.length - 1) < index
-                                                                ? Expanded(child: SizedBox())
-                                                                : Expanded(
-                                                                    child: GestureDetector(
-                                                                      onTap: () {
-                                                                        AnimatedDialog.showAnimatedDialog(
-                                                                          context: context,
-                                                                          pageBuilder: (context, anim1, anim2) =>
-                                                                              ShareAchievementNewDialog(
-                                                                            achievements:
-                                                                                data[index].achievements ?? [],
+                                                            (index) {
+                                                              return (data.length - 1) < index
+                                                                  ? Expanded(child: SizedBox())
+                                                                  : Builder(builder: (context) {
+                                                                      final data1 = data[index]
+                                                                          .achievements
+                                                                          ?.where(
+                                                                              (element) => element.achieved == false)
+                                                                          .toList();
+
+                                                                      // var data2 = (data1 != null && data1.isEmpty)
+                                                                      //     ? data[index].achievements?.last
+                                                                      //     : data1?.first;
+
+                                                                      Achievement? data2;
+                                                                      if ((data1 != null && data1.isEmpty)) {
+                                                                        data2 = data[index].achievements?.last;
+                                                                      } else {
+                                                                        int? index1 = data[index]
+                                                                            .achievements
+                                                                            ?.indexWhere((element) =>
+                                                                                element.achievementAchievementId
+                                                                                    ?.achievementIdId ==
+                                                                                data1?.first.achievementAchievementId
+                                                                                    ?.achievementIdId);
+                                                                        data2 = data[index].achievements?[
+                                                                            index1 == 0 ? 0 : (index1 ?? 0) - 1];
+                                                                      }
+
+                                                                      return Expanded(
+                                                                        child: GestureDetector(
+                                                                          onTap: () {
+                                                                            int? index1 =
+                                                                                data[index].achievements?.indexWhere(
+                                                                                      (element) =>
+                                                                                          element
+                                                                                              .achievementAchievementId
+                                                                                              ?.achievementIdId ==
+                                                                                          data2
+                                                                                              ?.achievementAchievementId
+                                                                                              ?.achievementIdId,
+                                                                                    );
+
+                                                                            AnimatedDialog.showAnimatedDialog(
+                                                                              context: context,
+                                                                              pageBuilder: (context, anim1, anim2) =>
+                                                                                  ShareAchievementNewDialog(
+                                                                                item: data[index],
+                                                                                achievements:
+                                                                                    data[index].achievements ?? [],
+                                                                                currentPage: index1 == 0
+                                                                                    ? 0
+                                                                                    : ((index1! + 1) ==
+                                                                                            (data[index]
+                                                                                                    .achievements
+                                                                                                    ?.length ??
+                                                                                                0))
+                                                                                        ? index1
+                                                                                        : index1 + 1,
+                                                                              ),
+                                                                            );
+                                                                          },
+                                                                          child: Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.center,
+                                                                            children: [
+                                                                              // SvgPicture
+                                                                              //     .asset(
+                                                                              //   height:
+                                                                              //       ScreenUtil.verticalScale(8),
+                                                                              //   data[index]
+                                                                              //       [
+                                                                              //       "image"],
+                                                                              //   colorFilter: ColorFilter.mode(
+                                                                              //       AppColors.primaryColor,
+                                                                              //       BlendMode.srcIn),
+                                                                              //   fit: BoxFit
+                                                                              //       .contain,
+                                                                              // ),
+
+                                                                              Stack(
+                                                                                children: [
+                                                                                  SizedBox(
+                                                                                    height: ScreenUtil.verticalScale(8),
+                                                                                    width: ScreenUtil.verticalScale(8),
+                                                                                    child: appShimmerImage(
+                                                                                      height:
+                                                                                          ScreenUtil.verticalScale(8),
+                                                                                      width:
+                                                                                          ScreenUtil.verticalScale(8),
+                                                                                      networkImageUrl: "${data2?.achievementAchievementId?.image}"
+                                                                                              .startsWith(
+                                                                                                  'https://storage.cloud.google.com/')
+                                                                                          ? data2?.achievementAchievementId
+                                                                                                  ?.image ??
+                                                                                              "".replaceFirst(
+                                                                                                  'https://storage.cloud.google.com/',
+                                                                                                  'https://storage.googleapis.com/')
+                                                                                          : data2?.achievementAchievementId
+                                                                                                  ?.image ??
+                                                                                              "unknown",
+                                                                                      fit: BoxFit.cover,
+                                                                                      borderRadius: BorderRadius.all(
+                                                                                        Radius.circular(
+                                                                                            ScreenUtil.verticalScale(
+                                                                                                500)),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                  // Container(
+                                                                                  //   height: ScreenUtil.verticalScale(8),
+                                                                                  //   width: ScreenUtil.verticalScale(8),
+                                                                                  //   decoration: BoxDecoration(
+                                                                                  //     color: (data1?.isEmpty ?? false)
+                                                                                  //         ? Color(0xFFAADDAA)
+                                                                                  //             .withValues(alpha: 0.8)
+                                                                                  //         : Colors.transparent,
+                                                                                  //     borderRadius: BorderRadius.all(
+                                                                                  //       Radius.circular(
+                                                                                  //           ScreenUtil.verticalScale(
+                                                                                  //               500)),
+                                                                                  //     ),
+                                                                                  //   ),
+                                                                                  //   child: Icon(
+                                                                                  //     Icons.check,
+                                                                                  //     color: (data1?.isEmpty ?? false)
+                                                                                  //         ? Colors.white
+                                                                                  //         : Colors.transparent,
+                                                                                  //     size: 20,
+                                                                                  //   ),
+                                                                                  // )
+                                                                                ],
+                                                                              ),
+
+                                                                              // const SizedBox(height: 10),
+                                                                              // Text(
+                                                                              //   data[index]["title"],
+                                                                              //   maxLines: 1,
+                                                                              //   textAlign: TextAlign.center,
+                                                                              //   overflow: TextOverflow.ellipsis,
+                                                                              //   style: TextStyle(
+                                                                              //     fontSize: ScreenUtil.verticalScale(1.45),
+                                                                              //     color: AppColors.primaryColor,
+                                                                              //     fontWeight: FontWeight.bold,
+                                                                              //   ),
+                                                                              // ),
+                                                                            ],
                                                                           ),
-                                                                        );
-                                                                      },
-                                                                      child: Column(
-                                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                                        children: [
-                                                                          // SvgPicture
-                                                                          //     .asset(
-                                                                          //   height:
-                                                                          //       ScreenUtil.verticalScale(8),
-                                                                          //   data[index]
-                                                                          //       [
-                                                                          //       "image"],
-                                                                          //   colorFilter: ColorFilter.mode(
-                                                                          //       AppColors.primaryColor,
-                                                                          //       BlendMode.srcIn),
-                                                                          //   fit: BoxFit
-                                                                          //       .contain,
-                                                                          // ),
-
-                                                                          SizedBox(
-                                                                              height: ScreenUtil.verticalScale(8),
-                                                                              width: ScreenUtil.verticalScale(8),
-                                                                              child: appShimmerImage(
-                                                                                height: ScreenUtil.verticalScale(8),
-                                                                                width: ScreenUtil.verticalScale(8),
-                                                                                networkImageUrl: "${data[index].achievements?.first.achievementAchievementId?.image}"
-                                                                                        .startsWith(
-                                                                                            'https://storage.cloud.google.com/')
-                                                                                    ? data[index]
-                                                                                            .achievements
-                                                                                            ?.first
-                                                                                            .achievementAchievementId
-                                                                                            ?.image ??
-                                                                                        "".replaceFirst(
-                                                                                            'https://storage.cloud.google.com/',
-                                                                                            'https://storage.googleapis.com/')
-                                                                                    : data[index]
-                                                                                            .achievements
-                                                                                            ?.first
-                                                                                            .achievementAchievementId
-                                                                                            ?.image ??
-                                                                                        "unknown",
-                                                                                fit: BoxFit.cover,
-                                                                                borderRadius: BorderRadius.all(
-                                                                                  Radius.circular(
-                                                                                      ScreenUtil.verticalScale(500)),
-                                                                                ),
-                                                                              )),
-
-                                                                          // const SizedBox(height: 10),
-                                                                          // Text(
-                                                                          //   data[index]["title"],
-                                                                          //   maxLines: 1,
-                                                                          //   textAlign: TextAlign.center,
-                                                                          //   overflow: TextOverflow.ellipsis,
-                                                                          //   style: TextStyle(
-                                                                          //     fontSize: ScreenUtil.verticalScale(1.45),
-                                                                          //     color: AppColors.primaryColor,
-                                                                          //     fontWeight: FontWeight.bold,
-                                                                          //   ),
-                                                                          // ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
+                                                                        ),
+                                                                      );
+                                                                    });
+                                                            },
                                                           ),
                                                         );
                                                       },

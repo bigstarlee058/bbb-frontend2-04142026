@@ -25,6 +25,7 @@ class CollectionGrid extends StatelessWidget {
             networkImageUrl: collection.photo.startsWith('https://storage.cloud.google.com/')
                 ? collection.photo.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
                 : collection.photo,
+            fit: BoxFit.cover,
             borderRadius: BorderRadius.all(
               Radius.circular(ScreenUtil.verticalScale(5)),
             ),

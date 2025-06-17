@@ -18,7 +18,7 @@ class ProgramPhasesWidget extends StatelessWidget {
     return Column(
       children: [
         Container(
-          height: media.height / 1.7,
+          height: media.height / 1.6,
           width: media.width,
           color: Colors.white,
           child: Stack(
@@ -76,7 +76,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: -ScreenUtil.verticalScale(1),
+                top: ScreenUtil.verticalScale(1),
                 left: 0,
                 right: 0,
                 child: Column(
@@ -111,6 +111,7 @@ class ProgramPhasesWidget extends StatelessWidget {
                             : Image.asset("assets/img/program-phase-1.png"),
                       );
                     }),
+                    SizedBox(height: ScreenUtil.verticalScale(1)),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(18)),
                       child: ButtonWidget(

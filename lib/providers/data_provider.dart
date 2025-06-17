@@ -165,59 +165,70 @@ class DataProvider extends ChangeNotifier {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/achievements-group/get');
     String? userIdToken = await getAuthToken();
 
-    try {
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
-        },
-      );
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
+    // try {
+    final response = await http.get(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'AUTH_TOKEN': userIdToken ?? "",
+      },
+    );
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
 
-        achievementList = List<AchievementModel>.from(data.map((x) => AchievementModel.fromJson(x)));
+      achievementList = List<AchievementModel>.from(data.map((x) => AchievementModel.fromJson(x)));
 
-        for (var element in achievementList) {
-          if (element.achievements!.isNotEmpty) {
-            for (var ele in element.achievements!) {
-              if (achievementsData.isNotEmpty &&
-                  achievementsData.any(
-                    (demo) => demo.achievementsTitle != ele.achievementId,
-                  )) {
-                if ((ele.achievementAchievementId?.value ?? 0) < (element.currentValue ?? 0)) {
-                  final data = UpdateAchievementsRequest(
-                    achievementsDate: DateTime.now().toUtc().toString(),
-                    achievementsTitle: ele.achievementId ?? "",
-                    achievementsSubtitle: "SYNC",
-                  );
-                  await ApiRepo.addAchievementsList(body: data.toJson1());
+      for (var element in achievementList) {
+        if (element.achievements!.isNotEmpty) {
+          for (var ele in element.achievements!) {
+            if (achievementsData.isEmpty) {
+              if ((ele.achievementAchievementId?.value ?? 0) < (element.currentValue ?? 0)) {
+                await ApiRepo.addAchievementsList(
+                    body: UpdateAchievementsRequest(
+                  achievementsDate: DateTime.now().toUtc().toString(),
+                  achievementsTitle: ele.achievementAchievementId?.achievementIdId ?? "",
+                  achievementsSubtitle: "SYNC",
+                ).toJson1());
 
-                  ele.achieved = true;
-                  ele.achievedDate = DateTime.now().toUtc().toString();
-                }
-              } else {
-                if (achievementsData.isNotEmpty) {
-                  AchievementsDataModel? data =
-                      achievementsData.firstWhere((demo) => demo.achievementsTitle == ele.achievementId);
-                  ele.achieved = true;
-                  ele.achievedDate = data.achievementsDate.toString();
-                }
+                ele.achieved = true;
+                ele.achievedDate = DateTime.now().toUtc().toString();
+              }
+            } else if (achievementsData.isNotEmpty &&
+                (achievementsData.any((z) => z.achievementsTitle == ele.achievementAchievementId?.achievementIdId) ==
+                    false)) {
+              if ((ele.achievementAchievementId!.value)! < (element.currentValue!)) {
+                final data = UpdateAchievementsRequest(
+                  achievementsDate: DateTime.now().toUtc().toString(),
+                  achievementsTitle: ele.achievementAchievementId?.achievementIdId ?? "",
+                  achievementsSubtitle: "SYNC",
+                );
+                await ApiRepo.addAchievementsList(body: data.toJson1());
+
+                ele.achieved = true;
+                ele.achievedDate = DateTime.now().toUtc().toString();
+              }
+            } else {
+              if (achievementsData.isNotEmpty) {
+                AchievementsDataModel? data = achievementsData.firstWhere(
+                    (demo) => demo.achievementsTitle == (ele.achievementAchievementId?.achievementIdId ?? ""));
+                ele.achieved = true;
+                ele.achievedDate = data.achievementsDate.toString();
               }
             }
           }
         }
-      } else {
-        throw Exception('Failed to get achievementList');
       }
-    } catch (e) {
+    } else {
       throw Exception('Failed to get achievementList');
-    } finally {
-      if (value) {
-        loader = false;
-      }
-      notifyListeners();
     }
+    // } catch (e) {
+    //   throw Exception('Failed to get achievementList');
+    // } finally {
+    if (value) {
+      loader = false;
+    }
+    notifyListeners();
+    // }
   }
 
   List<TutorialModel> tutorialList = [];
