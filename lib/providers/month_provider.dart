@@ -2226,6 +2226,7 @@ class MonthProvider extends ChangeNotifier {
       DateTime localTime = Utils.formattedDate("$entryDate");
       return localTime.isAfter(startDate) && localTime.isBefore(endDate);
     }).toList();
+    log('filteredData==========>>>>>${jsonEncode(filteredData)}');
 
     Map<String, Map<String, dynamic>> combinedData = {};
 
@@ -2252,7 +2253,10 @@ class MonthProvider extends ChangeNotifier {
       }
     });
 
+    log('reportMaximumValueOfWeight===1=======>>>>>$reportMaximumValueOfWeight');
+
     reportMaximumValueOfWeight = roundUpToNiceValue(reportMaximumValueOfWeight);
+    log('reportMaximumValueOfWeight==========>>>>>$reportMaximumValueOfWeight');
 
     notifyListeners();
     return combinedData;
@@ -2260,11 +2264,7 @@ class MonthProvider extends ChangeNotifier {
 
   double roundUpToNiceValue(double value) {
     if (value <= 0) return 0;
-
-    int digits = value.toInt().toString().length;
-    int base = math.pow(10, digits - 1).toInt();
-    int rounded = ((value + base - 1) / base).ceil() * base;
-
+    int rounded = ((value + 9999) / 10000).floor() * 10000;
     return rounded.toDouble();
   }
 

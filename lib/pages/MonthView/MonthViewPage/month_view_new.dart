@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
@@ -18,12 +16,10 @@ import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.d
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/schedule_section_new.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/setting_section.dart';
 import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
-import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -84,7 +80,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
         scrollToMiddle();
       },
     );
-    
+
     // Add listener to handle scroll reset when weekExpandedHeight changes
     monthProvider?.addListener(() {
       if (monthProvider?.weekExpandedHeight == 0 && scrollController.hasClients) {
@@ -100,7 +96,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
         });
       }
     });
-    
+
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         String monthId = preferences.getString(SharedPreference.monthSettingDone) ?? "";
@@ -291,7 +287,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                                         duration: Duration(milliseconds: 300),
                                                                         curve: Curves.ease,
                                                                       );
-                                                                      
+
                                                                       // Reset scroll position when month changes
                                                                       WidgetsBinding.instance.addPostFrameCallback((_) {
                                                                         Future.delayed(Duration(milliseconds: 350), () {
@@ -384,7 +380,7 @@ class _MonthViewNewState extends State<MonthViewNew> {
                                                                         duration: Duration(milliseconds: 300),
                                                                         curve: Curves.ease,
                                                                       );
-                                                                      
+
                                                                       // Reset scroll position when month changes
                                                                       WidgetsBinding.instance.addPostFrameCallback((_) {
                                                                         Future.delayed(Duration(milliseconds: 350), () {
