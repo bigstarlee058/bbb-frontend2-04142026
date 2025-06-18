@@ -75,7 +75,7 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: monthProvider.reportMaximumValueOfWeight > 8000
+                    interval: monthProvider.reportMaximumValueOfWeight > 10000
                         ? (monthProvider.reportMaximumValueOfWeight / 10)
                         : 1000,
                     reservedSize: 34,
@@ -94,8 +94,8 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
               ),
               gridData: FlGridData(
                 verticalInterval: 0.125,
-                horizontalInterval: monthProvider.reportMaximumValueOfWeight > 8000
-                    ? (monthProvider.reportMaximumValueOfWeight / 8)
+                horizontalInterval: monthProvider.reportMaximumValueOfWeight > 10000
+                    ? (monthProvider.reportMaximumValueOfWeight / 10)
                     : 1000,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
@@ -117,7 +117,7 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                   data.shadowValue,
                 );
               }).toList(),
-              maxY: monthProvider.reportMaximumValueOfWeight > 8000 ? monthProvider.reportMaximumValueOfWeight : 8000,
+              maxY: monthProvider.reportMaximumValueOfWeight > 10000 ? monthProvider.reportMaximumValueOfWeight : 10000,
               minY: 0,
               barTouchData: BarTouchData(
                 enabled: true,

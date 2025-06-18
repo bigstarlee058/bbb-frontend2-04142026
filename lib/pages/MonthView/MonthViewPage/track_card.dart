@@ -78,7 +78,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (monthProvider!.isCurrentMonth == "Current") {
         if ((mainIndex! + 1) == monthProvider?.week ? true : false) {
-          monthProvider!.updateWeekExpandedHeight((monthProvider!.isCurrentMonth == "Current") ? 84 : 0);
+          monthProvider!.updateWeekExpandedHeight(84);
         }
         await Future.delayed(Duration.zero).then(
           (value) => _isExpanded = (mainIndex! + 1) == monthProvider?.week ? true : false,
@@ -135,6 +135,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       (value) => monthProvider.updateWeekExpandedHeight(monthProvider.weekExpandedHeight - 84),
                     );
                   }
+
+                  setState(() {});
                 },
                 elevation: 0,
                 children: [
