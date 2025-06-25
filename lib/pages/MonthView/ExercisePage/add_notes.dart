@@ -28,7 +28,8 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
   void initState() {
     super.initState();
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await getNotesData());
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) async => await getNotesData());
   }
 
   @override
@@ -38,7 +39,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
   }
 
   List<ExerciseNotesModel> dataList = [];
-
+  ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -137,14 +138,19 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                 SizedBox(
                   height: 150, // You can adjust this height
                   child: Scrollbar(
+                    controller: scrollController,
                     thumbVisibility: true,
                     thickness: 8,
                     radius: const Radius.circular(10),
                     child: ListView.builder(
+                      controller: scrollController,
                       itemCount: dataList.length,
                       itemBuilder: (context, index) {
                         final note = dataList[index];
-                        return _buildNoteRow(DateFormat("MM-dd-yyyy").format(Utils.formattedDate(note.date.toString())), note.note!);
+                        return _buildNoteRow(
+                            DateFormat("MM/dd/yyyy").format(
+                                Utils.formattedDate(note.date.toString())),
+                            note.note!);
                       },
                     ),
                   ),
@@ -187,7 +193,8 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
       "note": _noteController.text.trim(),
     };
     ApiRepo.addExerciseNotes(body: data);
-    await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseNotes);
+    await DatabaseHelper()
+        .insertData(data: data, tableName: DatabaseHelper.exerciseNotes);
     getNotesData();
   }
 
@@ -198,9 +205,12 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
             ? "${monthProvider!.exerciseDetailModel!.sId.toString()}-${monthProvider!.circuitIndex}"
             : monthProvider!.exerciseDetailModel!.sId.toString();
 
-    final data = await DatabaseHelper().getDataFromTable(tableName: DatabaseHelper.exerciseNotes, id: id, where: "exerciseId");
+    final data = await DatabaseHelper().getDataFromTable(
+        tableName: DatabaseHelper.exerciseNotes, id: id, where: "exerciseId");
     if (data.isNotEmpty) {
-      dataList = List<ExerciseNotesModel>.from(json.decode(jsonEncode(data)).map((x) => ExerciseNotesModel.fromJson(x)));
+      dataList = List<ExerciseNotesModel>.from(json
+          .decode(jsonEncode(data))
+          .map((x) => ExerciseNotesModel.fromJson(x)));
     } else {
       dataList = [];
     }

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -13,7 +14,11 @@ class ProfileImageWidget extends StatefulWidget {
   final String avatarUrl;
   final Function(File? pickedImage) callBack;
   const ProfileImageWidget(
-      {super.key, this.name, required this.showPickImageButton, required this.avatarUrl, required this.callBack});
+      {super.key,
+      this.name,
+      required this.showPickImageButton,
+      required this.avatarUrl,
+      required this.callBack});
 
   @override
   State<ProfileImageWidget> createState() => _ProfileImageWidgetState();
@@ -42,6 +47,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    log('widget.name==========>>>>>${widget.name}');
     return Container(
       height: ScreenUtil.verticalScale(10.5),
       width: ScreenUtil.verticalScale(10.5),
@@ -64,7 +70,8 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
               ),
             ),
             child: ClipRRect(
-                borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
+                borderRadius:
+                    BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
                 child: image != null
                     ? Image.file(
                         image!,
@@ -74,26 +81,24 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
                         ? appShimmerImage(
                             height: ScreenUtil.horizontalScale(25),
                             width: ScreenUtil.horizontalScale(25),
-                            networkImageUrl: widget.avatarUrl.startsWith('https://storage.cloud.google.com/')
+                            networkImageUrl: widget.avatarUrl.startsWith(
+                                    'https://storage.cloud.google.com/')
                                 ? widget.avatarUrl.replaceFirst(
-                                    'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                    'https://storage.cloud.google.com/',
+                                    'https://storage.googleapis.com/')
                                 : widget.avatarUrl,
                             fit: BoxFit.cover,
-                            borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil.horizontalScale(12.5)),
                           )
-                        // Image.network(
-                        //   widget.avatarUrl.startsWith('https://storage.cloud.google.com/')
-                        //       ? widget.avatarUrl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                        //       : widget.avatarUrl,
-                        //   fit: BoxFit.cover,
-                        // )
                         : Container(
                             height: ScreenUtil.horizontalScale(25),
                             width: ScreenUtil.horizontalScale(25),
                             decoration: BoxDecoration(
                               color: Colors.grey.withValues(alpha: .9),
                               borderRadius: BorderRadius.all(
-                                Radius.circular(ScreenUtil.horizontalScale(12.5)),
+                                Radius.circular(
+                                    ScreenUtil.horizontalScale(12.5)),
                               ),
                             ),
                             child: Center(
@@ -101,7 +106,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
                                 widget.name == null
                                     ? ""
                                     : widget.name!.isNotEmpty
-                                        ? widget.name![0]
+                                        ? widget.name![0].capitalizeFirst()
                                         : "", // First character of the name
                                 style: TextStyle(
                                   fontSize: ScreenUtil.horizontalScale(12),
@@ -124,12 +129,14 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
                   // Handle camera icon action here
                 },
                 child: CircleAvatar(
-                  radius: ScreenUtil.horizontalScale(3.5), // Adjust size as needed
+                  radius:
+                      ScreenUtil.horizontalScale(3.5), // Adjust size as needed
                   backgroundColor: Colors.black.withValues(alpha: .7),
                   child: Center(
                     child: Icon(
                       Icons.edit,
-                      size: ScreenUtil.horizontalScale(4), // Adjust size as needed
+                      size: ScreenUtil.horizontalScale(
+                          4), // Adjust size as needed
                       color: Colors.white,
                     ),
                   ),

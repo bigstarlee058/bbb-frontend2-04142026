@@ -23,17 +23,6 @@ class _CalendarPageState extends State<CalendarPage> {
   // List<dynamic> monthlyWorkOutSchedule = [];
   int currentMonth = 0;
 
-  List monthOverView = [
-    {"month": 'January', "year": "2024"},
-    {"month": 'February', "year": "2024"},
-    {"month": 'March', "year": "2024"},
-    {"month": 'April', "year": "2024"},
-    {"month": 'May', "year": "2024"},
-    {"month": 'June', "year": "2024"},
-    {"month": 'July1', "year": "2024"},
-    {"month": 'July2', "year": "2024"},
-    {"month": 'August', "year": "2024"},
-  ];
 
   @override
   void initState() {

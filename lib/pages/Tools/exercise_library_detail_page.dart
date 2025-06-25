@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
@@ -22,10 +24,12 @@ class ExerciseLibraryDetailPage extends StatefulWidget {
   const ExerciseLibraryDetailPage({super.key});
 
   @override
-  State<ExerciseLibraryDetailPage> createState() => _ExerciseLibraryDetailPageState();
+  State<ExerciseLibraryDetailPage> createState() =>
+      _ExerciseLibraryDetailPageState();
 }
 
-class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> with TickerProviderStateMixin {
+class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
+    with TickerProviderStateMixin {
   DataProvider? dataProvider;
 
   bool loading = false;
@@ -80,18 +84,20 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
     exerciseDesc = dataProvider?.currentExerciseObj.description ?? "";
   }
 
-  final ValueNotifier<Duration> videoProgressValue = ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> videoProgressValue =
+      ValueNotifier(Duration.zero);
   Future<void> initializeVideo(String url) async {
     try {
       // Initialize the video player controller
-      _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
       await _videoPlayerController.initialize().then(
         (value) {
           AudioManager.requestAudioFocus();
         },
       );
+      await _videoPlayerController.setLooping(true);
 
       // Initialize the ChewieController with custom controls
       _chewieController = ChewieController(
@@ -107,9 +113,11 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
 
-      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+      if (_chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
         // hideControls();
-        videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
+        videoSize = calculateVideoSize(
+            aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
       _videoPlayerController.addListener(() {
@@ -118,11 +126,17 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
 
         if (duration != null && position >= duration) {
           AudioManager.abandonAudioFocus();
+          if (Platform.isIOS) {
+            _videoPlayerController.seekTo(Duration.zero);
+            _videoPlayerController.play();
+          }
         } else {
           AudioManager.requestAudioFocus();
         }
 
-        videoProgressValue.value = position; // 🔁 Update progress
+        videoProgressValue.value = position;
+
+        setState(() {});
       });
       // _videoPlayerController.addListener(() async {
       //   final bool isFinished =
@@ -207,9 +221,11 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
     } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
   }
 
@@ -263,7 +279,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
             )
           : SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
-              child: Column(
+              child: Stack(
                 children: [
                   Stack(
                     clipBehavior: Clip.none,
@@ -281,7 +297,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                   color: Colors.black,
                                   child: Column(
                                     children: [
-                                      dataProvider!.currentExerciseObj.files.isNotEmpty &&
+                                      dataProvider!.currentExerciseObj.files
+                                                  .isNotEmpty &&
                                               !videoNotInitialized &&
                                               videoSize != null
                                           ? Stack(
@@ -290,23 +307,20 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                                   height: videoSize!.height,
                                                   width: videoSize!.width,
                                                   child: Chewie(
-                                                    controller: _chewieController!,
+                                                    controller:
+                                                        _chewieController!,
                                                   ),
                                                 ),
-
                                                 AnimatedContainer(
-                                                  duration: Duration(milliseconds: 1700),
+                                                  duration: Duration(
+                                                      milliseconds: 1300),
                                                   curve: Curves.easeInOut,
-                                                  color: showControls ? Colors.black38 : Colors.transparent,
+                                                  color: showControls
+                                                      ? Colors.black38
+                                                      : Colors.transparent,
                                                   height: videoSize?.height,
                                                   width: videoSize?.width,
                                                 ),
-
-                                                // Container(
-                                                //   color: showControls ? Colors.black38 : Colors.transparent,
-                                                //   height: videoSize?.height,
-                                                //   width: videoSize?.width,
-                                                // ),
                                               ],
                                             )
                                           : Container(
@@ -315,7 +329,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                               child: const Center(
                                                   child: Text(
                                                 'No Video Available',
-                                                style: TextStyle(color: Colors.white),
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               )),
                                             ),
                                     ],
@@ -332,17 +347,21 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                         children: [
                                           Container(
                                             margin: EdgeInsets.only(
-                                              left: ScreenUtil.horizontalScale(4),
+                                              left:
+                                                  ScreenUtil.horizontalScale(4),
                                             ),
                                             decoration: const BoxDecoration(
                                               color: Color(0XFFd18a9b),
                                               shape: BoxShape.circle,
                                             ),
                                             child: SizedBox(
-                                              width: ScreenUtil.verticalScale(4.65),
-                                              height: ScreenUtil.verticalScale(4.65),
+                                              width: ScreenUtil.verticalScale(
+                                                  4.65),
+                                              height: ScreenUtil.verticalScale(
+                                                  4.65),
                                               child: IconButton(
-                                                padding: EdgeInsets.zero, // Removes the default padding
+                                                padding: EdgeInsets
+                                                    .zero, // Removes the default padding
                                                 icon: const Icon(
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
@@ -351,7 +370,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                                   // HapticFeedBack.buttonClick();
                                                   Navigator.pop(context);
                                                 },
-                                                iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
+                                                iconSize: ScreenUtil.verticalScale(
+                                                    4), // Icon size remains the same
                                               ),
                                             ),
                                           ),
@@ -375,7 +395,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                 duration: const Duration(milliseconds: 800),
                                 curve: Curves.easeInOut,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
                                   children: [
                                     // Skip backward button
                                     IconButton(
@@ -384,11 +405,15 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                         Icons.replay_10,
                                         color: Colors.white70,
                                       ),
-                                      onPressed: () {
-                                        _videoPlayerController.seekTo(
-                                          _videoPlayerController.value.position - const Duration(seconds: 10),
-                                        );
-                                      },
+                                      onPressed: showControls
+                                          ? () {
+                                              _videoPlayerController.seekTo(
+                                                _videoPlayerController
+                                                        .value.position -
+                                                    const Duration(seconds: 10),
+                                              );
+                                            }
+                                          : null,
                                     ),
                                     IconButton(
                                       iconSize: 60,
@@ -398,21 +423,40 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                             : Icons.play_circle_filled,
                                         color: Colors.white70,
                                       ),
-                                      onPressed: () {
-                                        setState(() {
-                                          if (_videoPlayerController.value.isPlaying) {
-                                            _videoPlayerController.pause();
-                                            showControlsOnTapOfPause();
+                                      onPressed: showControls
+                                          ? () async {
+                                              if (_videoPlayerController
+                                                  .value.isPlaying) {
+                                                _videoPlayerController.pause();
+                                                setState(() {});
+                                                showControlsOnTapOfPause();
 
-                                            AudioManager.abandonAudioFocus();
-                                          } else {
-                                            _videoPlayerController.play();
-                                            hideControls();
+                                                await Future.delayed(Duration(
+                                                        milliseconds: 100))
+                                                    .then(
+                                                  (value) {
+                                                    AudioManager
+                                                        .abandonAudioFocus();
+                                                    setState(() {});
+                                                  },
+                                                );
+                                              } else {
+                                                _videoPlayerController.play();
+                                                setState(() {});
+                                                hideControls();
 
-                                            AudioManager.requestAudioFocus();
-                                          }
-                                        });
-                                      },
+                                                await Future.delayed(Duration(
+                                                        milliseconds: 100))
+                                                    .then(
+                                                  (value) {
+                                                    AudioManager
+                                                        .requestAudioFocus();
+                                                    setState(() {});
+                                                  },
+                                                );
+                                              }
+                                            }
+                                          : null,
                                     ),
                                     // Skip forward button
                                     IconButton(
@@ -421,11 +465,15 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                         Icons.forward_10,
                                         color: Colors.white70,
                                       ),
-                                      onPressed: () {
-                                        _videoPlayerController.seekTo(
-                                          _videoPlayerController.value.position + const Duration(seconds: 10),
-                                        );
-                                      },
+                                      onPressed: showControls
+                                          ? () {
+                                              _videoPlayerController.seekTo(
+                                                _videoPlayerController
+                                                        .value.position +
+                                                    const Duration(seconds: 10),
+                                              );
+                                            }
+                                          : null,
                                     ),
                                   ],
                                 ),
@@ -438,35 +486,24 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                               left: 10,
                               right: 10,
                               child: !videoNotInitialized &&
-                                      _chewieController!.videoPlayerController.value.isInitialized == true
+                                      _chewieController!.videoPlayerController
+                                              .value.isInitialized ==
+                                          true
                                   ? Column(
                                       children: [
-                                        // Container(
-                                        //   margin: EdgeInsets.only(bottom: media.height * 0.06, left: 20, right: 20),
-                                        //   child: Row(
-                                        //     children: [
-                                        //       Flexible(
-                                        //         child: VideoProgressIndicator(
-                                        //           _videoPlayerController,
-                                        //           allowScrubbing: true,
-                                        //           colors: const VideoProgressColors(
-                                        //             playedColor: AppColors.primaryColor,
-                                        //             bufferedColor: Colors.white,
-                                        //             backgroundColor: Colors.black26,
-                                        //           ),
-                                        //         ),
-                                        //       )
-                                        //     ],
-                                        //   ),
-                                        // ),
                                         Container(
-                                          margin:
-                                              EdgeInsets.only(bottom: ScreenUtil.verticalScale(4), left: 20, right: 20),
+                                          margin: EdgeInsets.only(
+                                              bottom:
+                                                  ScreenUtil.verticalScale(4),
+                                              left: 20,
+                                              right: 20),
                                           child: Column(
                                             children: [
                                               Column(
                                                 children: [
-                                                  SizedBox(height: ScreenUtil.verticalScale(0.8)),
+                                                  SizedBox(
+                                                      height: ScreenUtil
+                                                          .verticalScale(0.8)),
                                                   Row(
                                                     children: [
                                                       Spacer(),
@@ -477,8 +514,14 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                                               }
                                                             : null,
                                                         child: Icon(
-                                                          isMute ? Icons.volume_up : Icons.volume_off,
-                                                          color: !showControls ? Colors.transparent : Colors.white70,
+                                                          isMute
+                                                              ? Icons.volume_up
+                                                              : Icons
+                                                                  .volume_off,
+                                                          color: !showControls
+                                                              ? Colors
+                                                                  .transparent
+                                                              : Colors.white70,
                                                           size: 28,
                                                         ),
                                                       ),
@@ -486,90 +529,58 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                                                   ),
                                                 ],
                                               ),
-                                              SizedBox(height: ScreenUtil.verticalScale(1)),
-                                              // ProgressBar (
-                                              //   collapsedBufferedBarColor: Colors.white,
-                                              //   expandedBufferedBarColor: Colors.white,
-                                              //   buffered: Duration(
-                                              //       seconds: _videoPlayerController.value.buffered.isEmpty
-                                              //           ? 0
-                                              //           : _videoPlayerController.value.buffered.first.end.inSeconds),
-                                              //   controller: _controller,
-                                              //   progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
-                                              //   total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
-                                              //   onChanged: (value) {
-                                              //     _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
-                                              //   },
-                                              //   onSeek: (Duration value) {},
-                                              //   onChangeStart: (value) {
-                                              //     setState(() => isZoom = true);
-                                              //   },
-                                              //   onChangeEnd: (value) {
-                                              //     setState(() => isZoom = false);
-                                              //   },
-                                              // ),
+                                              SizedBox(
+                                                  height:
+                                                      ScreenUtil.verticalScale(
+                                                          1)),
                                               ValueListenableBuilder<Duration>(
-                                                valueListenable: videoProgressValue,
-                                                builder: (context, progress, _) {
+                                                valueListenable:
+                                                    videoProgressValue,
+                                                builder:
+                                                    (context, progress, _) {
                                                   return ProgressBar(
-                                                    collapsedBufferedBarColor: Colors.white,
-                                                    expandedBufferedBarColor: Colors.white,
-                                                    buffered: getBufferedPosition(),
+                                                    collapsedBufferedBarColor:
+                                                        Colors.white,
+                                                    expandedBufferedBarColor:
+                                                        Colors.white,
+                                                    buffered:
+                                                        getBufferedPosition(),
                                                     controller: _controller,
                                                     progress: progress,
                                                     total: Duration(
-                                                      seconds: _videoPlayerController.value.duration.inSeconds,
+                                                      seconds:
+                                                          _videoPlayerController
+                                                              .value
+                                                              .duration
+                                                              .inSeconds,
                                                     ),
                                                     onChanged: (value) {
-                                                      _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                                      _videoPlayerController
+                                                          .seekTo(Duration(
+                                                              seconds: value
+                                                                  .inSeconds));
                                                     },
                                                     onSeek: (value) {},
                                                     onChangeStart: (value) {
-                                                      _videoPlayerController.pause();
+                                                      _videoPlayerController
+                                                          .pause();
                                                       isZoom = true;
                                                     },
                                                     onChangeEnd: (value) {
-                                                      _videoPlayerController.play();
+                                                      _videoPlayerController
+                                                          .play();
                                                       isZoom = false;
                                                     },
                                                   );
                                                 },
                                               ),
-                                              SizedBox(height: ScreenUtil.verticalScale(2.2)),
+                                              SizedBox(
+                                                  height:
+                                                      ScreenUtil.verticalScale(
+                                                          2.2)),
                                             ],
                                           ),
                                         ),
-                                        // Container(
-                                        //   margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
-                                        //   child: Row(
-                                        //     children: [
-                                        //       Expanded(
-                                        //         child: SliderTheme(
-                                        //           data: SliderTheme.of(context).copyWith(
-                                        //             thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
-                                        //             trackHeight: isZoom ? 7 : 4,
-                                        //             trackShape: RectangularSliderTrackShape(),
-                                        //             overlayShape: SliderComponentShape.noOverlay,
-                                        //           ),
-                                        //           child: Slider(
-                                        //             activeColor: Colors.red,
-                                        //             value: _videoPlayerController.value.position.inSeconds.toDouble(),
-                                        //             max: _videoPlayerController.value.duration.inSeconds.toDouble(),
-                                        //             onChangeStart: (value) {
-                                        //               setState(() => isZoom = true);
-                                        //             },
-                                        //             onChangeEnd: (value) {
-                                        //               setState(() => isZoom = false);
-                                        //             },
-                                        //             onChanged: (value) {
-                                        //               _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
-                                        //             },
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ],
-                                        //   ),
-                                        // ),
                                       ],
                                     )
                                   : const SizedBox(),
@@ -596,65 +607,109 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                           ),
                         ),
                       ),
-                      Positioned(
-                        bottom: 0,
-                        child: Container(
-                          height: media.height * 0.12,
-                          width: media.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                alignment: Alignment.bottomCenter,
-                                decoration: const BoxDecoration(
-                                    color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
-                                padding: const EdgeInsets.symmetric(horizontal: 30),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    SizedBox(
-                                      height: media.height * 0.032,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center, // Vertically center the content
-                                      children: [
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(top: 5, right: 10),
-                                            child: Text(
-                                              exerciseName,
-                                              maxLines: 2,
-                                              style: const TextStyle(
-                                                height: 1.3,
-                                                color: AppColors.primaryColor,
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
+                      // Positioned(
+                      //   bottom: 0,
+                      //   child: Container(
+                      //     height: media.height * 0.12,
+                      //     width: media.width,
+                      //     decoration: BoxDecoration(
+                      //       color: Colors.white,
+                      //       borderRadius: BorderRadius.only(
+                      //         topLeft:
+                      //             Radius.circular(ScreenUtil.verticalScale(7)),
+                      //       ),
+                      //     ),
+                      //     child: Column(
+                      //       children: [
+                      //         Container(
+                      //           alignment: Alignment.bottomCenter,
+                      //           decoration: const BoxDecoration(
+                      //               color: Colors.white,
+                      //               borderRadius: BorderRadius.only(
+                      //                   topLeft: Radius.circular(50))),
+                      //           padding:
+                      //               const EdgeInsets.symmetric(horizontal: 30),
+                      //           child: Column(
+                      //             mainAxisAlignment: MainAxisAlignment.end,
+                      //             children: [
+                      //               SizedBox(
+                      //                 height: media.height * 0.032,
+                      //               ),
+                      //               Row(
+                      //                 mainAxisAlignment:
+                      //                     MainAxisAlignment.spaceBetween,
+                      //                 crossAxisAlignment: CrossAxisAlignment
+                      //                     .center, // Vertically center the content
+                      //                 children: [
+                      //                   Expanded(
+                      //                     child: Padding(
+                      //                       padding: const EdgeInsets.only(
+                      //                           top: 5, right: 10),
+                      //                       child: Text(
+                      //                         exerciseName,
+                      //                         maxLines: 2,
+                      //                         style: const TextStyle(
+                      //                           height: 1.3,
+                      //                           color: AppColors.primaryColor,
+                      //                           fontSize: 25,
+                      //                           fontWeight: FontWeight.bold,
+                      //                         ),
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 ],
+                      //               )
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // )
                     ],
                   ),
                   Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 25),
-                    // padding: const EdgeInsets.only(top: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.only(topLeft: Radius.circular(50))),
+                    margin: EdgeInsets.only(
+                        top: videoSize == null
+                            ? media.height * 0.4 - media.height * 0.12
+                            : videoSize!.height - media.height * 0.12),
                     child: Column(
                       children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                              height: media.height * 0.018,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 8, right: 10),
+                                    child: Text(
+                                      exerciseName,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        height: 1.3,
+                                        color: AppColors.primaryColor,
+                                        fontSize: ScreenUtil.verticalScale(2.8),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                         Align(
                           alignment: Alignment.topLeft,
                           child: Html(
@@ -669,7 +724,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage> w
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          padding: EdgeInsets.symmetric(horizontal: 5)
+                              .copyWith(bottom: ScreenUtil.verticalScale(.5)),
                           child: const EquipmentSection(),
                         ),
                       ],
@@ -693,81 +749,118 @@ class _EquipmentSectionState extends State<EquipmentSection> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
-    return Column(
-      children: [
-        Container(
-          height: 0.7,
-          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 20),
-          width: media.width,
-          color: Colors.black12,
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          child: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Equipment used',
-                style: TextStyle(
-                  color: AppColors.primaryColor,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+    return Consumer<DataProvider>(builder: (context, data, child) {
+      return data.currentExerciseObj.usedEquipments.isEmpty
+          ? SizedBox()
+          : Column(
+              children: [
+                Container(
+                  height: 0.7,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 20),
+                  width: media.width,
+                  color: Colors.black12,
                 ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                style: TextStyle(
-                  color: Colors.black54,
-                ),
-              )
-            ],
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Consumer<DataProvider>(
-          builder: (context, data, child) {
-            if (data.currentExerciseObj.usedEquipments.isNotEmpty) {
-              return Column(
-                children: List.generate(
-                  data.currentExerciseObj.usedEquipments.length,
-                  (index) => Column(
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      equipmentCard(
-                          data.currentExerciseObj.usedEquipments[index].title,
-                          data.currentExerciseObj.usedEquipments[index].description,
-                          data.currentExerciseObj.usedEquipments[index].link,
-                          data.currentExerciseObj.usedEquipments[0].thumbnail),
-                      if (index < data.currentExerciseObj.usedEquipments.length - 1) const SizedBox(height: 20),
+                      Text(
+                        'Browse equipment used with this exercise below',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: ScreenUtil.verticalScale(2.5),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                        style: TextStyle(
+                          color: Colors.black54,
+                        ),
+                      )
                     ],
                   ),
                 ),
-              );
-            } else {
-              return const SizedBox();
-            }
-          },
-        ),
-      ],
-    );
+                const SizedBox(
+                  height: 20,
+                ),
+                Consumer<DataProvider>(
+                  builder: (context, data, child) {
+                    if (data.currentExerciseObj.usedEquipments.isNotEmpty) {
+                      return Column(
+                        children: List.generate(
+                          data.currentExerciseObj.usedEquipments.length,
+                          (index) => Column(
+                            children: [
+                              equipmentCard(
+                                  data.currentExerciseObj.usedEquipments[index]
+                                      .title,
+                                  data.currentExerciseObj.usedEquipments[index]
+                                      .description,
+                                  data.currentExerciseObj.usedEquipments[index]
+                                      .link,
+                                  data.currentExerciseObj.usedEquipments[0]
+                                      .thumbnail),
+                              if (index <
+                                  data.currentExerciseObj.usedEquipments
+                                          .length -
+                                      1)
+                                const SizedBox(height: 20),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
+                SizedBox(
+                  height: ScreenUtil.verticalScale(3.2),
+                ),
+              ],
+            );
+    });
   }
 
-  Widget equipmentCard(String title, String description, String link, String image) {
-    return GestureDetector(
-      onTap: () {
+  Widget equipmentCard(
+      String title, String description, String link, String image) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+          disabledBackgroundColor: const Color(0xFFF3F3F3),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(ScreenUtil.verticalScale(12)),
+            ),
+            side: const BorderSide(color: Color(0x12000000), width: 0.5),
+          ),
+          surfaceTintColor: Colors.transparent,
+          overlayColor: Colors.grey.shade400,
+          padding: EdgeInsets.zero),
+      onPressed: () {
         _launchURL(link); // Launch the external URL when tapped
       },
       child: Container(
         width: ScreenUtil.horizontalScale(100),
         height: ScreenUtil.verticalScale(11),
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        // Padding around the background
+
         decoration: BoxDecoration(
-          color: AppColors.primaryColor,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
+          ],
+          color: Colors.white,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(7)),
           ),
@@ -777,86 +870,66 @@ class _EquipmentSectionState extends State<EquipmentSection> {
             appShimmerImage(
               height: ScreenUtil.verticalScale(11),
               width: ScreenUtil.verticalScale(12),
-              networkImageUrl: image.startsWith('https://storage.cloud.google.com/')
-                  ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                  : image,
+              networkImageUrl:
+                  image.startsWith('https://storage.cloud.google.com/')
+                      ? image.replaceFirst('https://storage.cloud.google.com/',
+                          'https://storage.googleapis.com/')
+                      : image,
               fit: BoxFit.cover,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                 bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
               ),
             ),
-            // Container(
-            //   height: ScreenUtil.verticalScale(11),
-            //   width: ScreenUtil.verticalScale(12),
-            //   decoration: BoxDecoration(
-            //     color: AppColors.blackColor,
-            //     borderRadius: BorderRadius.only(
-            //       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-            //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-            //     ),
-            //     image: DecorationImage(
-            //       image: image.isNotEmpty
-            //           ? NetworkImage(image.startsWith('https://storage.cloud.google.com/')
-            //               ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-            //               : image)
-            //           : const AssetImage('assets/img/back.jpg'),
-            //       fit: BoxFit.cover,
-            //       opacity: 1,
-            //     ),
-            //   ),
-            // ),
-            SizedBox(
-              width: ScreenUtil.horizontalScale(2),
+            const SizedBox(
+              width: 10,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: ScreenUtil.horizontalScale(40),
-                  child: Text(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
                     title,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.primaryColor,
                       fontSize: ScreenUtil.verticalScale(2),
                       fontWeight: FontWeight.bold,
                     ),
+                    // maxLines: 1,
+                    // overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Container(
-                  width: ScreenUtil.horizontalScale(40),
-                  child: Text(
-                    description,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                    maxLines: 2,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.verticalScale(1.5),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+                  // SizedBox(height: ScreenUtil.verticalScale(1)),
+                  // Text(
+                  //   description,
+                  //   style: TextStyle(
+                  //     color: Colors.white,
+                  //     fontSize: ScreenUtil.verticalScale(1.7),
+                  //   ),
+                  //   maxLines: 2,
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
+                ],
+              ),
             ),
-            const Spacer(),
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: ScreenUtil.verticalScale(2.5),
-              child: Center(
-                child: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: ScreenUtil.horizontalScale(6),
+            SizedBox(width: 15),
+            GestureDetector(
+              onTap: null,
+              child: Container(
+                margin: EdgeInsets.only(left: 10),
+                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.85)),
+                decoration: BoxDecoration(
                   color: AppColors.primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(
+                  "assets/icons/shopping-bag.svg",
+                  height: ScreenUtil.verticalScale(2.3),
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
             ),
-            SizedBox(
-              width: ScreenUtil.horizontalScale(5),
-            ),
+            SizedBox(width: 15),
           ],
         ), // Ensure the background takes up all available space
       ),

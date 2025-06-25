@@ -34,7 +34,7 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
   void initState() {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     provider = context.read<ProgramInfoProvider>();
-    provider.getProgramInfo(context);
+    provider.getProgramInfo();
     super.initState();
   }
 
@@ -74,7 +74,8 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                 Container(
                                   margin: const EdgeInsets.only(right: 10),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         margin: EdgeInsets.only(
@@ -86,7 +87,8 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                         ),
                                         child: SizedBox(
                                           width: ScreenUtil.verticalScale(4.65),
-                                          height: ScreenUtil.verticalScale(4.65),
+                                          height:
+                                              ScreenUtil.verticalScale(4.65),
                                           child: IconButton(
                                             padding: EdgeInsets.zero,
                                             icon: const Icon(
@@ -95,14 +97,19 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                             ),
                                             onPressed: () {
                                               // HapticFeedBack.buttonClick();
-                                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                              Navigator.pushNamedAndRemoveUntil(
+                                                  context,
+                                                  '/home',
+                                                  (route) => false);
                                               mainPageProvider.changeTab(1);
                                             },
-                                            iconSize: ScreenUtil.verticalScale(4),
+                                            iconSize:
+                                                ScreenUtil.verticalScale(4),
                                           ),
                                         ),
                                       ),
-                                      CommonStreakWithNotification(routeString: "program")
+                                      CommonStreakWithNotification(
+                                          routeString: "program")
                                     ],
                                   ),
                                 ),
@@ -162,7 +169,8 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                         SizedBox(
                           height: ScreenUtil.verticalScale(4),
                         ),
-                        Consumer<ProgramInfoProvider>(builder: (context, value, child) {
+                        Consumer<ProgramInfoProvider>(
+                            builder: (context, value, child) {
                           return value.loading
                               ? SizedBox(
                                   height: media.height / 1.8,
@@ -184,7 +192,9 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                       ),
                                     )
                                   : Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal:
+                                              ScreenUtil.horizontalScale(7)),
                                       child: ExpansionTileGroup(
                                         spaceBetweenItem: 15,
                                         // onExpansionItemChanged: (id, value) {
@@ -194,9 +204,13 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                                         //   });
                                         // },
                                         children: List.generate(
-                                          value.programInfoModel!.sections.length,
+                                          value.programInfoModel!.sections
+                                              .length,
                                           (index) {
-                                            return buildExpansionTileItem(index, value.programInfoModel!.sections[index]);
+                                            return buildExpansionTileItem(
+                                                index,
+                                                value.programInfoModel!
+                                                    .sections[index]);
                                           },
                                         ),
                                       ),
@@ -267,7 +281,9 @@ class _ProgramInfoViewState extends State<ProgramInfoView> {
                 color: AppColors.primaryColor,
               ),
               child: Icon(
-                _expandedStates[index] == true ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
+                _expandedStates[index] == true
+                    ? Icons.keyboard_arrow_up_outlined
+                    : Icons.keyboard_arrow_down_outlined,
                 color: Colors.white,
                 size: ScreenUtil.verticalScale(3),
               ),

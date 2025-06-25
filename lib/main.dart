@@ -62,7 +62,8 @@ import 'pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'pages/Tools/seeall_achievement_page_new.dart';
 import 'providers/month_provider.dart';
 
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
@@ -77,17 +78,21 @@ void main() async {
   );
 
   await _configureLocalTimeZone();
-  const androidInitializationSetting = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const androidInitializationSetting =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
   const iosInitializationSetting = DarwinInitializationSettings();
-  const initSettings = InitializationSettings(android: androidInitializationSetting, iOS: iosInitializationSetting);
+  const initSettings = InitializationSettings(
+      android: androidInitializationSetting, iOS: iosInitializationSetting);
 
   await flutterLocalNotificationsPlugin.initialize(
     initSettings,
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     onDidReceiveNotificationResponse: (details) async {
-      final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
+      final isLastExerciseScreen =
+          preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
       if (isLastExerciseScreen == "NO") {
-        await preferences.putString(SharedPreference.payload, details.payload ?? "{}");
+        await preferences.putString(
+            SharedPreference.payload, details.payload ?? "{}");
         await preferences.putInt(SharedPreference.fromNotification, 1);
         navigatorKey.currentState?.pushNamed('/exercise');
       }
@@ -97,15 +102,18 @@ void main() async {
   final NotificationAppLaunchDetails? notificationAppLaunchDetails =
       await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
-    final isLastExerciseScreen = preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
+    final isLastExerciseScreen =
+        preferences.getString(SharedPreference.inTheExerciseScreenOrNot);
     if (isLastExerciseScreen == "NO") {
-      final String? payload = notificationAppLaunchDetails!.notificationResponse?.payload;
+      final String? payload =
+          notificationAppLaunchDetails!.notificationResponse?.payload;
       await preferences.putString(SharedPreference.payload, payload ?? "{}");
       await preferences.putInt(SharedPreference.fromNotification, 1);
     }
   }
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   runApp(MyApp());
 
@@ -174,10 +182,12 @@ class _MyAppState extends State<MyApp> {
   _initializeRevenueCat() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (Platform.isIOS) {
-        await Purchases.configure(PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
+        await Purchases.configure(
+            PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
         Offerings offering = await Purchases.getOfferings();
         if (offering.current != null) {
-          await preferences.putString(SharedPreference.offerings, jsonEncode(offering));
+          await preferences.putString(
+              SharedPreference.offerings, jsonEncode(offering));
         }
       }
     });
@@ -212,7 +222,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +247,8 @@ class _MyAppState extends State<MyApp> {
           builder: !kReleaseMode ? DevicePreview.appBuilder : null,
           title: 'Booty by Bret',
           theme: ThemeData(
-            appBarTheme: AppBarTheme(titleTextStyle: TextStyle(fontWeight: FontWeight.w400)),
+            appBarTheme: AppBarTheme(
+                titleTextStyle: TextStyle(fontWeight: FontWeight.w400)),
             primaryColor: AppColors.primaryColor,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
@@ -248,40 +260,53 @@ class _MyAppState extends State<MyApp> {
           routes: {
             AppRoutes.splashScreen: (context) => const SplashScreen(),
             AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
-            AppRoutes.mainScreen: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+            AppRoutes.mainScreen: (context) =>
+                const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
             AppRoutes.loginScreen: (context) => const LoginPage(),
             AppRoutes.registerScreen: (context) => const SignupPage(image: ''),
-            AppRoutes.nutritionCalculatorScreen: (context) => const NutritionCalculatorPage(),
-            AppRoutes.programPhaseScreen: (context) => const ProgramPhaseScreen(),
-            AppRoutes.graphAndReportsScreen: (context) => const GraphAndReportsPage(),
+            AppRoutes.nutritionCalculatorScreen: (context) =>
+                const NutritionCalculatorPage(),
+            AppRoutes.programPhaseScreen: (context) =>
+                const ProgramPhaseScreen(),
+            AppRoutes.graphAndReportsScreen: (context) =>
+                const GraphAndReportsPage(),
             AppRoutes.exerciseHistory: (context) => const ExerciseHistoryPage(),
-            AppRoutes.exerciseLibraryDetailScreen: (context) => const ExerciseLibraryDetailPage(),
-            AppRoutes.exerciseLibraryScreen: (context) => const ExerciseLibraryPage(),
-            AppRoutes.equipmentLibraryScreen: (context) => const EquipmentLibraryPage(),
+            AppRoutes.exerciseLibraryDetailScreen: (context) =>
+                const ExerciseLibraryDetailPage(),
+            AppRoutes.exerciseLibraryScreen: (context) =>
+                const ExerciseLibraryPage(),
+            AppRoutes.equipmentLibraryScreen: (context) =>
+                const EquipmentLibraryPage(),
             AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
             AppRoutes.tutorialScreen: (context) => const TutorialPage(),
-            AppRoutes.passwordresetScreen: (context) => const ResetPasswordScreen(image: ''),
+            AppRoutes.passwordresetScreen: (context) =>
+                const ResetPasswordScreen(image: ''),
             // AppRoutes.emailVerificationScreen: (context) =>
             //     const EmailVerificationScreen(),
             AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
             AppRoutes.todayScreen: (context) => const TodayPage(),
-            AppRoutes.dayCompletedScreen: (context) => const DayCompletedPage(),
+            AppRoutes.dayCompletedScreen: (context) =>
+                const DayCompletedPage(dayTitle: ""),
             AppRoutes.exerciseScreen: (context) => const ExercisePage(),
             AppRoutes.recalculateScreen: (context) => const RecalculatePage(),
             // AppRoutes.streakScreen: (context) => const StreakPage(),
             AppRoutes.calendarScreen: (context) => const CalendarPage(),
-            AppRoutes.watchTutorialScreen: (context) => const WatchTutorial(),
             AppRoutes.myProfileScreen: (context) => const MyProfilePage(),
             AppRoutes.languageScreen: (context) => const LanguagePage(),
-            AppRoutes.streakCalendarScreen: (context) => const StreakCalendarPage(),
-            AppRoutes.notificationsScreen: (context) => const NotificationsPage(),
-            AppRoutes.joinChallengeScreen: (context) => const JoinTheChallengePage(),
+            AppRoutes.streakCalendarScreen: (context) =>
+                const StreakCalendarPage(),
+            AppRoutes.notificationsScreen: (context) =>
+                const NotificationsPage(),
+            AppRoutes.joinChallengeScreen: (context) =>
+                const JoinTheChallengePage(),
             AppRoutes.meetOurStaff: (context) => const MeetOurStaff(),
-            AppRoutes.joinedChallengeScreen: (context) => const JoinedChallengePage(),
-            AppRoutes.collectionDetailScreen: (context) => const CollectionDetailPage(),
-            AppRoutes.appTutorialScreen: (context) => const AppTutorial(),
+            AppRoutes.joinedChallengeScreen: (context) =>
+                const JoinedChallengePage(),
+            AppRoutes.collectionDetailScreen: (context) =>
+                const CollectionDetailPage(),
             AppRoutes.settingPage: (context) => const SettingPage(),
-            AppRoutes.seeAllAchievementPage: (context) => const SeeAllAchievementPage(),
+            AppRoutes.seeAllAchievementPage: (context) =>
+                const SeeAllAchievementPage(),
             AppRoutes.faqsPage: (context) => const FAQsPage(),
             AppRoutes.paywall: (context) => const SubscriptionPayWall(),
           },

@@ -70,7 +70,8 @@ class DataProvider extends ChangeNotifier {
   List<FaQsModel> faQsModel = [];
   bool faqLoader = false;
 
-  Collections collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+  Collections collectionData = Collections(
+      id: "", title: "", description: "", photo: "", equipments: []);
   Exercise currentExerciseObj = Exercise(
       id: "",
       title: "",
@@ -84,8 +85,10 @@ class DataProvider extends ChangeNotifier {
       files: []);
   late List<Exercise> currentRelatedExercises = [];
 
-  Challenges featureChallengeData = Challenges(id: '', title: '', description: '', photo: '');
-  Tutorials tutorialData = Tutorials(id: "", title: "", description: "", photo: "", files: []);
+  Challenges featureChallengeData =
+      Challenges(id: '', title: '', description: '', photo: '');
+  Tutorials tutorialData =
+      Tutorials(id: "", title: "", description: "", photo: "", files: []);
 
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -114,29 +117,89 @@ class DataProvider extends ChangeNotifier {
           screenBackgroundModel = ScreenBackgroundResponse.fromJson(data);
           notifyListeners();
           allSplashImageList = [
-            {"image": screenBackgroundModel?.imageLogin ?? "", "key": "imageLogin"},
-            {"image": screenBackgroundModel?.imageSignup ?? "", "key": "imageSignup"},
-            {"image": screenBackgroundModel?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
+            {
+              "image": screenBackgroundModel?.imageLogin ?? "",
+              "key": "imageLogin"
+            },
+            {
+              "image": screenBackgroundModel?.imageSignup ?? "",
+              "key": "imageSignup"
+            },
+            {
+              "image": screenBackgroundModel?.imageEmailConfirm ?? "",
+              "key": "imageEmailConfirm"
+            },
           ];
 
           allImageList = [
-            {"image": screenBackgroundModel?.imageDashboard ?? "", "key": "imageDashboard"},
-            {"image": screenBackgroundModel?.imageLogin ?? "", "key": "imageLogin"},
-            {"image": screenBackgroundModel?.imageSignup ?? "", "key": "imageSignup"},
-            {"image": screenBackgroundModel?.imageEmailConfirm ?? "", "key": "imageEmailConfirm"},
-            {"image": screenBackgroundModel?.imageAchievement ?? "", "key": "imageAchievement"},
-            {"image": screenBackgroundModel?.imageApparel ?? "", "key": "imageApparel"},
-            {"image": screenBackgroundModel?.imageExerciseLibrary ?? "", "key": "imageExerciseLibrary"},
-            {"image": screenBackgroundModel?.imageFaQs ?? "", "key": "imageFaQs"},
-            {"image": screenBackgroundModel?.imageForgot ?? "", "key": "imageForgot"},
-            {"image": screenBackgroundModel?.imageGraphs ?? "", "key": "imageGraphs"},
-            {"image": screenBackgroundModel?.imageMonthView ?? "", "key": "imageMonthView"},
-            {"image": screenBackgroundModel?.imageMyProfle ?? "", "key": "imageMyProfle"},
-            {"image": screenBackgroundModel?.imageProfile ?? "", "key": "imageProfile"},
-            {"image": screenBackgroundModel?.imageSetting ?? "", "key": "imageSetting"},
-            {"image": screenBackgroundModel?.imageStreakCalendar ?? "", "key": "imageStreakCalendar"},
-            {"image": screenBackgroundModel?.imageToday ?? "", "key": "imageToday"},
-            {"image": screenBackgroundModel?.imageTools ?? "", "key": "imageTools"},
+            {
+              "image": screenBackgroundModel?.imageDashboard ?? "",
+              "key": "imageDashboard"
+            },
+            {
+              "image": screenBackgroundModel?.imageLogin ?? "",
+              "key": "imageLogin"
+            },
+            {
+              "image": screenBackgroundModel?.imageSignup ?? "",
+              "key": "imageSignup"
+            },
+            {
+              "image": screenBackgroundModel?.imageEmailConfirm ?? "",
+              "key": "imageEmailConfirm"
+            },
+            {
+              "image": screenBackgroundModel?.imageAchievement ?? "",
+              "key": "imageAchievement"
+            },
+            {
+              "image": screenBackgroundModel?.imageApparel ?? "",
+              "key": "imageApparel"
+            },
+            {
+              "image": screenBackgroundModel?.imageExerciseLibrary ?? "",
+              "key": "imageExerciseLibrary"
+            },
+            {
+              "image": screenBackgroundModel?.imageFaQs ?? "",
+              "key": "imageFaQs"
+            },
+            {
+              "image": screenBackgroundModel?.imageForgot ?? "",
+              "key": "imageForgot"
+            },
+            {
+              "image": screenBackgroundModel?.imageGraphs ?? "",
+              "key": "imageGraphs"
+            },
+            {
+              "image": screenBackgroundModel?.imageMonthView ?? "",
+              "key": "imageMonthView"
+            },
+            {
+              "image": screenBackgroundModel?.imageMyProfle ?? "",
+              "key": "imageMyProfle"
+            },
+            {
+              "image": screenBackgroundModel?.imageProfile ?? "",
+              "key": "imageProfile"
+            },
+            {
+              "image": screenBackgroundModel?.imageSetting ?? "",
+              "key": "imageSetting"
+            },
+            {
+              "image": screenBackgroundModel?.imageStreakCalendar ?? "",
+              "key": "imageStreakCalendar"
+            },
+            {
+              "image": screenBackgroundModel?.imageToday ?? "",
+              "key": "imageToday"
+            },
+            {
+              "image": screenBackgroundModel?.imageTools ?? "",
+              "key": "imageTools"
+            },
           ];
         }
 
@@ -161,7 +224,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
     }
 
-    List<AchievementsDataModel> achievementsData = await ApiRepo.fetchAchievementsList();
+    List<AchievementsDataModel> achievementsData =
+        await ApiRepo.fetchAchievementsList();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/achievements-group/get');
     String? userIdToken = await getAuthToken();
 
@@ -176,17 +240,20 @@ class DataProvider extends ChangeNotifier {
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
 
-      achievementList = List<AchievementModel>.from(data.map((x) => AchievementModel.fromJson(x)));
+      achievementList = List<AchievementModel>.from(
+          data.map((x) => AchievementModel.fromJson(x)));
 
       for (var element in achievementList) {
         if (element.achievements!.isNotEmpty) {
           for (var ele in element.achievements!) {
             if (achievementsData.isEmpty) {
-              if ((ele.achievementAchievementId?.value ?? 0) < (element.currentValue ?? 0)) {
+              if ((ele.achievementAchievementId?.value ?? 0) <
+                  (element.currentValue ?? 0)) {
                 await ApiRepo.addAchievementsList(
                     body: UpdateAchievementsRequest(
                   achievementsDate: DateTime.now().toUtc().toString(),
-                  achievementsTitle: ele.achievementAchievementId?.achievementIdId ?? "",
+                  achievementsTitle:
+                      ele.achievementAchievementId?.achievementIdId ?? "",
                   achievementsSubtitle: "SYNC",
                 ).toJson1());
 
@@ -194,12 +261,16 @@ class DataProvider extends ChangeNotifier {
                 ele.achievedDate = DateTime.now().toUtc().toString();
               }
             } else if (achievementsData.isNotEmpty &&
-                (achievementsData.any((z) => z.achievementsTitle == ele.achievementAchievementId?.achievementIdId) ==
+                (achievementsData.any((z) =>
+                        z.achievementsTitle ==
+                        ele.achievementAchievementId?.achievementIdId) ==
                     false)) {
-              if ((ele.achievementAchievementId!.value)! < (element.currentValue!)) {
+              if ((ele.achievementAchievementId!.value)! <
+                  (element.currentValue!)) {
                 final data = UpdateAchievementsRequest(
                   achievementsDate: DateTime.now().toUtc().toString(),
-                  achievementsTitle: ele.achievementAchievementId?.achievementIdId ?? "",
+                  achievementsTitle:
+                      ele.achievementAchievementId?.achievementIdId ?? "",
                   achievementsSubtitle: "SYNC",
                 );
                 await ApiRepo.addAchievementsList(body: data.toJson1());
@@ -210,13 +281,31 @@ class DataProvider extends ChangeNotifier {
             } else {
               if (achievementsData.isNotEmpty) {
                 AchievementsDataModel? data = achievementsData.firstWhere(
-                    (demo) => demo.achievementsTitle == (ele.achievementAchievementId?.achievementIdId ?? ""));
+                    (demo) =>
+                        demo.achievementsTitle ==
+                        (ele.achievementAchievementId?.achievementIdId ?? ""));
                 ele.achieved = true;
                 ele.achievedDate = data.achievementsDate.toString();
               }
             }
           }
         }
+      }
+      if (achievementList.isNotEmpty) {
+        achievementList.sort((a, b) {
+          final aAchievedCount =
+              (a.achievements)?.where((item) => item.achieved == true).length;
+          final bAchievedCount =
+              (b.achievements)?.where((item) => item.achieved == true).length;
+
+          if (bAchievedCount != aAchievedCount) {
+            return bAchievedCount!.compareTo(aAchievedCount!);
+          }
+
+          final aTitle = a.title?.toString().toLowerCase() ?? '';
+          final bTitle = b.title?.toString().toLowerCase() ?? '';
+          return aTitle.compareTo(bTitle);
+        });
       }
     } else {
       throw Exception('Failed to get achievementList');
@@ -250,7 +339,8 @@ class DataProvider extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        tutorialList = List<TutorialModel>.from(data.map((x) => TutorialModel.fromJson(x)));
+        tutorialList = List<TutorialModel>.from(
+            data.map((x) => TutorialModel.fromJson(x)));
         notifyListeners();
       } else {
         throw Exception('Failed to get tutorialList');
@@ -317,7 +407,8 @@ class DataProvider extends ChangeNotifier {
 
   VimeoToVideoModel? videoModel;
   Future getVideoUsingVimeo(String vimeoId) async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/getVideoUrl/$vimeoId');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/workouts/getVideoUrl/$vimeoId');
     String? userIdToken = await getAuthToken();
     videoModel = null;
     try {
@@ -349,7 +440,8 @@ class DataProvider extends ChangeNotifier {
       String key = element["key"];
 
       final processedUrl = url.startsWith('https://storage.cloud.google.com/')
-          ? url.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          ? url.replaceFirst('https://storage.cloud.google.com/',
+              'https://storage.googleapis.com/')
           : url;
 
       try {
@@ -364,7 +456,8 @@ class DataProvider extends ChangeNotifier {
       String key = element["key"];
 
       final processedUrl = url.startsWith('https://storage.cloud.google.com/')
-          ? url.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          ? url.replaceFirst('https://storage.cloud.google.com/',
+              'https://storage.googleapis.com/')
           : url;
 
       try {
@@ -412,10 +505,14 @@ class DataProvider extends ChangeNotifier {
         final Map<String, dynamic> data = json.decode(response.body);
         if (data['staffs'] is List) {
           // Map the 'staffs' list to Staff objects
-          staffsData =
-              (data['staffs'] as List).where((item) => item['type'] == 1).map((item) => Staffs.fromJson(item)).toList();
-          athletesData =
-              (data['staffs'] as List).where((item) => item['type'] == 2).map((item) => Staffs.fromJson(item)).toList();
+          staffsData = (data['staffs'] as List)
+              .where((item) => item['type'] == 1)
+              .map((item) => Staffs.fromJson(item))
+              .toList();
+          athletesData = (data['staffs'] as List)
+              .where((item) => item['type'] == 2)
+              .map((item) => Staffs.fromJson(item))
+              .toList();
           notifyListeners(); // Notify listeners to update the UI
         }
       } else {
@@ -429,8 +526,10 @@ class DataProvider extends ChangeNotifier {
   Challenges get featureChallenge => featureChallengeData;
 
   Future<void> fetchFeaturedChalleng() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
+    Uri url =
+        Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
+    log('userIdToken==========>>>>>${userIdToken}');
     try {
       final response = await http.get(
         url,
@@ -455,7 +554,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> getChooseWorkoutData() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/popupworkout/get_popupworkout');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/popupworkout/get_popupworkout');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -481,7 +581,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> getChooseEquipmentData() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/popupequipment/get_popupequipment');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/popupequipment/get_popupequipment');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -523,7 +624,8 @@ class DataProvider extends ChangeNotifier {
         var data = json.decode(response.body);
         if (data != null) {
           // faQsModel = FaQsModel.fromJson(data);
-          faQsModel = List<FaQsModel>.from(data.map((x) => FaQsModel.fromJson(x)));
+          faQsModel =
+              List<FaQsModel>.from(data.map((x) => FaQsModel.fromJson(x)));
         }
         faqLoader = false;
         notifyListeners();
@@ -542,7 +644,8 @@ class DataProvider extends ChangeNotifier {
   List<Collections> get collections => collectionsData;
 
   Future<void> fetchFeaturedColllections() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/collections/get-featured');
+    Uri url =
+        Uri.parse('${AppConstants.serverUrl}/api/collections/get-featured');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -556,7 +659,9 @@ class DataProvider extends ChangeNotifier {
         final Map<String, dynamic> data = json.decode(response.body);
         if (data['collections'] is List) {
           // Map the 'staffs' list to Staff objects
-          collectionsData = (data['collections'] as List).map((item) => Collections.fromJson(item)).toList();
+          collectionsData = (data['collections'] as List)
+              .map((item) => Collections.fromJson(item))
+              .toList();
           notifyListeners(); // Notify listeners to update the UI
         }
       } else {
@@ -570,9 +675,11 @@ class DataProvider extends ChangeNotifier {
   Collections get oneCollection => collectionData;
 
   Future<void> fetchOneCollection(String collectionId) async {
-    collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+    collectionData = Collections(
+        id: "", title: "", description: "", photo: "", equipments: []);
     notifyListeners();
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/collections/get/$collectionId');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/collections/get/$collectionId');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -587,7 +694,8 @@ class DataProvider extends ChangeNotifier {
         collectionData = Collections.fromJson(data);
         notifyListeners(); // Notify listeners to update the UI
       } else {
-        collectionData = Collections(id: "", title: "", description: "", photo: "", equipments: []);
+        collectionData = Collections(
+            id: "", title: "", description: "", photo: "", equipments: []);
         throw Exception('Failed to load staff data');
       }
     } catch (e) {
@@ -623,7 +731,8 @@ class DataProvider extends ChangeNotifier {
         }).toList();
 
         List<dynamic> equipmentsData = responseData['equipments'];
-        List<EquipmentTitle> equipmentList = equipmentsData.map((equipmentJson) {
+        List<EquipmentTitle> equipmentList =
+            equipmentsData.map((equipmentJson) {
           return EquipmentTitle.fromJson(equipmentJson);
         }).toList();
 
@@ -633,7 +742,8 @@ class DataProvider extends ChangeNotifier {
 
         notifyListeners();
       } else {
-        throw Exception('Missing data in response (exercises, categories, or equipments)');
+        throw Exception(
+            'Missing data in response (exercises, categories, or equipments)');
       }
     } else {
       throw Exception('Failed to load admin data');
@@ -641,7 +751,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> fetchAdminEquipmentsData() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/equipments/admin/get?perPage=100000');
+    Uri url = Uri.parse(
+        '${AppConstants.serverUrl}/api/equipments/admin/get?perPage=100000');
     String? userIdToken = await getAuthToken();
     final response = await http.get(
       url,
@@ -717,7 +828,10 @@ class DataProvider extends ChangeNotifier {
       final response = await http.post(
         url,
         body: queryParams,
-        headers: <String, String>{'Content-Type': 'application/x-www-form-urlencoded', 'AUTH_TOKEN': userIdToken ?? ""},
+        headers: <String, String>{
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'AUTH_TOKEN': userIdToken ?? ""
+        },
       );
       if (response.statusCode == 200) {
         await getMonthInfoFromJson(responseData: jsonDecode(response.body));
@@ -731,12 +845,16 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getMonthInfoFromJson({Map<String, dynamic>? responseData}) async {
+  Future<void> getMonthInfoFromJson(
+      {Map<String, dynamic>? responseData}) async {
     try {
       if (responseData != null) {
-        MonthDataModel monthDataModelSplit3 = MonthDataModel.fromJson(responseData);
-        MonthDataModel monthDataModelSplit4 = MonthDataModel.fromJson(responseData);
-        MonthDataModel monthDataModelSplit5 = MonthDataModel.fromJson(responseData);
+        MonthDataModel monthDataModelSplit3 =
+            MonthDataModel.fromJson(responseData);
+        MonthDataModel monthDataModelSplit4 =
+            MonthDataModel.fromJson(responseData);
+        MonthDataModel monthDataModelSplit5 =
+            MonthDataModel.fromJson(responseData);
         await monthProvider?.fetchMonthLocalData();
 
         List split3 = [
@@ -769,7 +887,8 @@ class DataProvider extends ChangeNotifier {
           "Rest Day 2"
         ];
 
-        await preferences.putString(SharedPreference.monthId, "${monthDataModelSplit3.id}");
+        await preferences.putString(
+            SharedPreference.monthId, "${monthDataModelSplit3.id}");
         monthDataModelSplit3.weeks?.forEach(
           (element) {
             element.dayList = split3;
@@ -782,15 +901,23 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split3 Rest Day 3",
               "${element.id} split3 Rest Day 4",
             ];
-            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3", "Rest Day 4"];
-            element.days?.removeWhere((element) => !element.formats!.contains("3"));
+            element.restDayList = [
+              "Rest Day 1",
+              "Rest Day 2",
+              "Rest Day 3",
+              "Rest Day 4"
+            ];
+            element.days
+                ?.removeWhere((element) => !element.formats!.contains("3"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split3[i];
             }
           },
         );
 
-        await preferences.putString("${SplitType.split3}-${monthDataModelSplit3.id}", jsonEncode(monthDataModelSplit3));
+        await preferences.putString(
+            "${SplitType.split3}-${monthDataModelSplit3.id}",
+            jsonEncode(monthDataModelSplit3));
         monthDataModelSplit4.weeks?.forEach(
           (element) {
             element.dayList = split4;
@@ -804,13 +931,16 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split4 Rest Day 3",
             ];
             element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
-            element.days?.removeWhere((element) => !element.formats!.contains("4"));
+            element.days
+                ?.removeWhere((element) => !element.formats!.contains("4"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split4[i];
             }
           },
         );
-        await preferences.putString("${SplitType.split4}-${monthDataModelSplit4.id}", jsonEncode(monthDataModelSplit4));
+        await preferences.putString(
+            "${SplitType.split4}-${monthDataModelSplit4.id}",
+            jsonEncode(monthDataModelSplit4));
         monthDataModelSplit5.weeks?.forEach(
           (element) {
             element.dayList = split5;
@@ -824,19 +954,24 @@ class DataProvider extends ChangeNotifier {
               "${element.id} split5 Rest Day 2",
             ];
             element.restDayList = ["Rest Day 1", "Rest Day 2"];
-            element.days?.removeWhere((element) => !element.formats!.contains("5"));
+            element.days
+                ?.removeWhere((element) => !element.formats!.contains("5"));
             for (var i = 0; i < element.days!.length; i++) {
               element.days?[i].dayType = split5[i];
             }
           },
         );
-        await preferences.putString("${SplitType.split5}-${monthDataModelSplit5.id}", jsonEncode(monthDataModelSplit5));
+        await preferences.putString(
+            "${SplitType.split5}-${monthDataModelSplit5.id}",
+            jsonEncode(monthDataModelSplit5));
         final dataList = [];
 
         for (var element in monthDataModelSplit3.weeks ?? []) {
-          final data = await monthProvider?.fetchRestDay(element.restdayId ?? "");
+          final data =
+              await monthProvider?.fetchRestDay(element.restdayId ?? "");
           dataList.add(data);
-          await preferences.putString("REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
+          await preferences.putString(
+              "REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
         }
 
         final value = await DatabaseHelper().areAllTablesEmpty();
@@ -1083,10 +1218,12 @@ class DataProvider extends ChangeNotifier {
             "monthStartDate": element.startDate.toString(),
             "monthEndDate": element.endDate.toString(),
           };
-          await db.insertData(data: body, tableName: DatabaseHelper.monthHistory);
+          await db.insertData(
+              data: body, tableName: DatabaseHelper.monthHistory);
         }
       } else {
-        MonthResponseModel? matchingElement = monthProvider?.monthLocalDataModel.firstWhere(
+        MonthResponseModel? matchingElement =
+            monthProvider?.monthLocalDataModel.firstWhere(
           (element) => element.monthId == monthDataModelSplit3.id,
           orElse: () => MonthResponseModel(),
         );
@@ -1098,7 +1235,8 @@ class DataProvider extends ChangeNotifier {
         };
 
         if (matchingElement?.id == null) {
-          await db.insertData(data: fallbackData, tableName: DatabaseHelper.monthHistory);
+          await db.insertData(
+              data: fallbackData, tableName: DatabaseHelper.monthHistory);
         }
       }
 
@@ -1379,7 +1517,8 @@ class DataProvider extends ChangeNotifier {
             "status": e.status ?? "",
             "totalSet": e.totalSet?.toString() ?? "",
           };
-          return db.insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+          return db.insertData(
+              data: body, tableName: DatabaseHelper.exerciseHistory);
         }),
 
         // Insert Exercise Status
@@ -1398,7 +1537,8 @@ class DataProvider extends ChangeNotifier {
             "totalSet": e.totalSet ?? "",
             "totalRIR": e.totalRIR ?? "",
           };
-          return db.insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
+          return db.insertData(
+              data: body, tableName: DatabaseHelper.exerciseStatus);
         }),
 
         // Insert Exercise Notes
@@ -1408,7 +1548,8 @@ class DataProvider extends ChangeNotifier {
             "date": e.date ?? "",
             "note": e.note ?? "",
           };
-          return db.insertData(data: body, tableName: DatabaseHelper.exerciseNotes);
+          return db.insertData(
+              data: body, tableName: DatabaseHelper.exerciseNotes);
         }),
 
         // Insert Extra Set
@@ -1424,7 +1565,8 @@ class DataProvider extends ChangeNotifier {
             "date": e.date ?? "",
             "dataId": e.dataId ?? "",
           };
-          return db.insertData(data: body, tableName: DatabaseHelper.extraSetHistory);
+          return db.insertData(
+              data: body, tableName: DatabaseHelper.extraSetHistory);
         }),
 
         // Insert Removed Exercise
@@ -1437,7 +1579,8 @@ class DataProvider extends ChangeNotifier {
             "weekId": e.weekId ?? "",
             "dayId": e.dayId ?? "",
           };
-          return db.insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
+          return db.insertData(
+              data: body, tableName: DatabaseHelper.removedExerciseHistory);
         }),
 
         // Insert Extra Exercise
@@ -1452,7 +1595,8 @@ class DataProvider extends ChangeNotifier {
             "exerciseId": e.exerciseId ?? "",
             "exerciseJson": e.exerciseJson ?? "",
           };
-          return db.insertData(data: body, tableName: DatabaseHelper.extraExerciseHistory);
+          return db.insertData(
+              data: body, tableName: DatabaseHelper.extraExerciseHistory);
         }),
 
         // Insert Swap Exercise
@@ -1468,7 +1612,8 @@ class DataProvider extends ChangeNotifier {
             "exerciseJson": e.exerciseJson ?? "",
             "insertIndex": e.insertIndex ?? "",
           };
-          return db.insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
+          return db.insertData(
+              data: body, tableName: DatabaseHelper.swapExerciseHistory);
         }),
       ]);
 
@@ -1498,17 +1643,23 @@ class DataProvider extends ChangeNotifier {
         var data = response.data;
         var responseData = data[0];
 
-        if (equipmentCheckpoint == '' || bonusCheckpoint == '' || workoutCheckpoint == '') {
+        if (equipmentCheckpoint == '' ||
+            bonusCheckpoint == '' ||
+            workoutCheckpoint == '') {
           equipmentCheckpoint = responseData["equipmentCheckpoint"];
           bonusCheckpoint = responseData["bonusCheckpoint"];
           workoutCheckpoint = responseData["workoutCheckpoint"];
         } else {
-          DateTime currentEquipmentCheckpoint = DateTime.parse(equipmentCheckpoint);
+          DateTime currentEquipmentCheckpoint =
+              DateTime.parse(equipmentCheckpoint);
           DateTime currentBonusCheckoutPoint = DateTime.parse(bonusCheckpoint);
           DateTime currentWorkoutCheckPoint = DateTime.parse(workoutCheckpoint);
-          DateTime newEquipmentCheckpoint = DateTime.parse(responseData["equipmentCheckpoint"]);
-          DateTime newBonusCheckpoint = DateTime.parse(responseData["bonusCheckpoint"]);
-          DateTime newWorkoutCheckpoint = DateTime.parse(responseData["workoutCheckpoint"]);
+          DateTime newEquipmentCheckpoint =
+              DateTime.parse(responseData["equipmentCheckpoint"]);
+          DateTime newBonusCheckpoint =
+              DateTime.parse(responseData["bonusCheckpoint"]);
+          DateTime newWorkoutCheckpoint =
+              DateTime.parse(responseData["workoutCheckpoint"]);
 
           if (currentEquipmentCheckpoint.isBefore(newEquipmentCheckpoint)) {
             equipmentCheckpointState = true;
@@ -1600,7 +1751,8 @@ class DataProvider extends ChangeNotifier {
       currentRelatedExercises.clear();
       List<Equipment> equipments = [];
 
-      if (responseData["relatedExercises"] != null && responseData["relatedExercises"].length > 0) {
+      if (responseData["relatedExercises"] != null &&
+          responseData["relatedExercises"].length > 0) {
         for (var singleItem in responseData["relatedExercises"]) {
           Exercise newExercise = Exercise(
               id: singleItem["id"] ?? "",
@@ -1618,7 +1770,8 @@ class DataProvider extends ChangeNotifier {
         }
       }
 
-      if (responseData["usedEquipments"] != null && responseData["usedEquipments"].length > 0) {
+      if (responseData["usedEquipments"] != null &&
+          responseData["usedEquipments"].length > 0) {
         for (var singleItem in responseData["usedEquipments"]) {
           Equipment newEquipment = Equipment(
             id: singleItem["id"] ?? "",

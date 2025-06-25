@@ -57,7 +57,8 @@ class LocationProvider extends ChangeNotifier {
   }
 
   Future<void> getCounties() async {
-    var response = await ApiService().getResponse(apiType: APIType.aGet, url: "/api/location/country");
+    var response = await ApiService()
+        .getResponse(apiType: APIType.aGet, url: "/api/location/country");
     if (response != null) {
       country = CountryModel.fromJson(response);
     }
@@ -66,7 +67,8 @@ class LocationProvider extends ChangeNotifier {
 
   Future<void> getState(String countryName) async {
     if (countryName.isEmpty) return;
-    var response = await ApiService().getResponse(apiType: APIType.aGet, url: "/api/location/states/$countryName");
+    var response = await ApiService().getResponse(
+        apiType: APIType.aGet, url: "/api/location/states/$countryName");
     if (response != null) {
       states = StatesModel.fromJson(response);
     }
@@ -75,7 +77,9 @@ class LocationProvider extends ChangeNotifier {
 
   Future<void> getCity(String countryName, String stateName) async {
     if (countryName.isEmpty || stateName.isEmpty) return;
-    var response = await ApiService().getResponse(apiType: APIType.aGet, url: "/api/location/cities/$countryName/$stateName");
+    var response = await ApiService().getResponse(
+        apiType: APIType.aGet,
+        url: "/api/location/cities/$countryName/$stateName");
     if (response != null) {
       cities = CityModel.fromJson(response);
     }

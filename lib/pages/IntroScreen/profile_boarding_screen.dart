@@ -10,13 +10,11 @@ import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
-import 'package:bbb/values/clip_path.dart';
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
@@ -25,7 +23,10 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileBoardingScreen extends StatefulWidget {
-  const ProfileBoardingScreen({super.key, required this.welcomeDescription, required this.welcomeImageUrl});
+  const ProfileBoardingScreen(
+      {super.key,
+      required this.welcomeDescription,
+      required this.welcomeImageUrl});
   final String welcomeDescription;
   final String welcomeImageUrl;
   @override
@@ -47,8 +48,19 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   TextEditingController selectedMidThigh = TextEditingController();
   TextEditingController selectedWaist = TextEditingController();
   TextEditingController selectedHip = TextEditingController();
-  final List<String> heightOptions = ['5\'0"', '5\'5"', '6\'0"', '6\'5"']; // Example heights
-  final List<String> weightOptions = ['100 lbs', '110 lbs', '121 lbs', '130 lbs', '140 lbs'];
+  final List<String> heightOptions = [
+    '5\'0"',
+    '5\'5"',
+    '6\'0"',
+    '6\'5"'
+  ]; // Example heights
+  final List<String> weightOptions = [
+    '100 lbs',
+    '110 lbs',
+    '121 lbs',
+    '130 lbs',
+    '140 lbs'
+  ];
   final List<String> genderOptions = ['Female', 'Male', 'Other'];
   double heightInCm = 183;
   HeightUnit selectedHeightUnit = HeightUnit.cm;
@@ -92,20 +104,35 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
 
     final userDetails = {
       'lastName': '',
-      'firstName':
-          nameController.text.trim().toString().isEmpty ? userData.user["name"] ?? "" : nameController.text.toString(),
-      'sex': (selectedGender ?? "").isNotEmpty ? genderOptions.indexOf(selectedGender!) : "",
+      'firstName': nameController.text.trim().toString().isEmpty
+          ? userData.user["name"] ?? ""
+          : nameController.text.toString(),
+      'sex': (selectedGender ?? "").isNotEmpty
+          ? genderOptions.indexOf(selectedGender!)
+          : "",
       'dob': selectedDate?.toIso8601String(),
-      'weight': selectedWeight.text.isEmpty ? "" : int.parse(selectedWeight.text.split(' ')[0]),
-      'height':
-          selectedHeight.text.isEmpty ? "" : int.parse(selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'waist':
-          selectedWaist.text.isEmpty ? "0" : int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'hip': selectedHip.text.isEmpty ? "0" : int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'weight': selectedWeight.text.isEmpty
+          ? ""
+          : int.parse(selectedWeight.text.split(' ')[0]),
+      'height': selectedHeight.text.isEmpty
+          ? ""
+          : int.parse(
+              selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'waist': selectedWaist.text.isEmpty
+          ? "0"
+          : int.parse(
+              selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'hip': selectedHip.text.isEmpty
+          ? "0"
+          : int.parse(
+              selectedHip.text.replaceAll('\'', '').replaceAll("\"", "")),
       'midthigh': selectedMidThigh.text.isEmpty
           ? "0"
-          : int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'bodyfat': selectedBodyFat.text.isEmpty ? "0" : int.parse(selectedBodyFat.text.split(' ')[0]),
+          : int.parse(
+              selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'bodyfat': selectedBodyFat.text.isEmpty
+          ? "0"
+          : int.parse(selectedBodyFat.text.split(' ')[0]),
     };
     if (kDebugMode) {
       print('HERE IS USER DETAIL##, $userDetails');
@@ -164,25 +191,38 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ),
         ),
         actions: [
-          IconButton(
-              onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-                if (context.mounted) {
-                  await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MainPage(
-                        showWelcomeModal: !hasSeenWelcome,
-                        welcomeDescription: widget.welcomeDescription,
-                        welcomeImageUrl: widget.welcomeImageUrl,
-                        isComeFromOnBoarding: true,
-                      ),
+          GestureDetector(
+            onTap: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+              if (context.mounted) {
+                await Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      showWelcomeModal: !hasSeenWelcome,
+                      welcomeDescription: widget.welcomeDescription,
+                      welcomeImageUrl: widget.welcomeImageUrl,
+                      isComeFromOnBoarding: true,
                     ),
-                  );
-                }
-              },
-              icon: Icon(Icons.close)),
+                  ),
+                );
+              }
+            },
+            child: Container(
+              margin: EdgeInsets.only(right: ScreenUtil.horizontalScale(2.5)),
+              decoration: const BoxDecoration(
+                  color: AppColors.primaryColor,
+                  borderRadius: BorderRadius.all(Radius.circular(100))),
+              child: Padding(
+                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                child: Icon(
+                    size: ScreenUtil.verticalScale(2.5),
+                    Icons.close,
+                    color: Colors.white),
+              ),
+            ),
+          ),
           SizedBox(width: 8)
         ],
       ),
@@ -211,7 +251,9 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                       height: 5,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: currentPage > (index) ? AppColors.primaryColor : Colors.grey.withValues(alpha: 0.4),
+                        color: currentPage > (index)
+                            ? AppColors.primaryColor
+                            : Colors.grey.withValues(alpha: 0.4),
                       ),
                     ),
                   ),
@@ -220,7 +262,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             ),
             SizedBox(height: ScreenUtil.verticalScale(1)),
             ButtonWidget(
-              text: currentPage == 4 ? "Save" : "Next",
+              text: currentPage == 4 ? "Save & Proceed" : "Next",
               textColor: Colors.white,
               color: AppColors.primaryColor,
               onPress: () async {
@@ -228,7 +270,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
 
                 if (currentPage == 1) {
                   if (nameController.text.isEmpty) {
-                    showBottomAlert(context, 'Please enter your name to get started!');
+                    showBottomAlert(
+                        context, 'Please enter your name to get started!');
                     return;
                   } else {
                     pageController.nextPage(
@@ -257,8 +300,10 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                 } else if (currentPage == 4) {
                   await _saveUserData(loader: true).then(
                     (value) async {
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                      bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      bool hasSeenWelcome =
+                          prefs.getBool('hasSeenWelcome') ?? false;
                       if (context.mounted) {
                         await Navigator.pushReplacement(
                           context,
@@ -283,7 +328,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                 ? SizedBox()
                 : TextButton(
                     onPressed: () async {
-                      await preferences.setBool(SharedPreference.isFirstTime, false);
+                      await preferences.setBool(
+                          SharedPreference.isFirstTime, false);
 
                       if (currentPage == 2) {
                         pageController.nextPage(
@@ -298,8 +344,10 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                         );
                         setState(() {});
                       } else if (currentPage == 4) {
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                        bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        bool hasSeenWelcome =
+                            prefs.getBool('hasSeenWelcome') ?? false;
                         if (context.mounted) {
                           await Navigator.pushReplacement(
                             context,
@@ -328,33 +376,47 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                       ),
                     ),
                   ),
-            SizedBox(height: ScreenUtil.verticalScale(0.5)),
           ],
         ),
       ),
       backgroundColor: Colors.white,
-      body: SizedBox(
-        height: media.height * 0.7,
-        child: PageView.builder(
-          onPageChanged: (value) {
-            currentPage = value + 1;
-            setState(() {});
-          },
-          controller: pageController,
-          itemCount: 4,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-              child: index == 0
-                  ? page1()
-                  : index == 1
-                      ? page2(context)
-                      : index == 2
-                          ? page3(context)
-                          : page4(),
-            );
-          },
-        ),
+      body: Column(
+        children: [
+          Padding(
+            padding:
+                EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(5)),
+            child: Image.asset(
+              "assets/img/logo.png",
+              scale: 1.2,
+            ),
+          ),
+          SizedBox(
+            // color: Colors.red,
+            height: media.height * 0.55,
+            child: PageView.builder(
+              onPageChanged: (value) {
+                currentPage = value + 1;
+                setState(() {});
+              },
+              controller: pageController,
+              itemCount: 4,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(6))
+                      .copyWith(bottom: ScreenUtil.verticalScale(6.5)),
+                  child: index == 0
+                      ? page1()
+                      : index == 1
+                          ? page2(context)
+                          : index == 2
+                              ? page3(context)
+                              : page4(),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -424,7 +486,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(7)),
         ],
       );
 
@@ -468,7 +529,9 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           _buildProfileField(
             context: context,
             label: 'Birthday',
-            value: selectedDate != null ? DateFormat('MM/dd/yyyy').format(selectedDate!) : 'Select Birthday',
+            value: selectedDate != null
+                ? DateFormat('MM/dd/yyyy').format(selectedDate!)
+                : 'Select Birthday',
             onTap: () async {
               _showDatePicker(context);
             },
@@ -488,7 +551,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             focusNode: _nodeText1,
             suffix: "lbs",
           ),
-          SizedBox(height: ScreenUtil.verticalScale(7)),
         ],
       );
 
@@ -547,7 +609,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             focusNode: _nodeText5,
             suffix: "%", // hint: '81',
           ),
-          SizedBox(height: ScreenUtil.verticalScale(7)),
         ],
       );
   Widget page4() => Column(
@@ -598,7 +659,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                       ),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(ScreenUtil.horizontalScale(32)),
+                      borderRadius:
+                          BorderRadius.circular(ScreenUtil.horizontalScale(32)),
                       child: image != null
                           ? Image.file(
                               image!,
@@ -626,12 +688,14 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                         // Handle camera icon action here
                       },
                       child: CircleAvatar(
-                        radius: ScreenUtil.horizontalScale(4), // Adjust size as needed
+                        radius: ScreenUtil.horizontalScale(
+                            4), // Adjust size as needed
                         backgroundColor: Colors.black.withValues(alpha: .7),
                         child: Center(
                           child: Icon(
                             Icons.edit,
-                            size: ScreenUtil.horizontalScale(4), // Adjust size as needed
+                            size: ScreenUtil.horizontalScale(
+                                4), // Adjust size as needed
                             color: Colors.white,
                           ),
                         ),
@@ -642,7 +706,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(7)),
         ],
       );
 
@@ -764,7 +827,9 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                   child: Text(
                     value,
                     style: TextStyle(
-                      color: value == 'Select Birthday' ? Colors.grey.shade700 : Colors.black,
+                      color: value == 'Select Birthday'
+                          ? Colors.grey.shade700
+                          : Colors.black,
                       fontSize: ScreenUtil.verticalScale(1.95),
                       // fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
                       fontWeight: FontWeight.normal,
@@ -809,7 +874,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           Container(
             width: ScreenUtil.horizontalScale(50),
             height: ScreenUtil.verticalScale(6),
-            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+            padding:
+                EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
             decoration: BoxDecoration(
               color: Colors.grey.withOpacity(0.052),
               borderRadius: Utils.buttonRadius,
@@ -863,7 +929,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                           }
                           return TextEditingValue(
                             text: newText,
-                            selection: TextSelection.collapsed(offset: newText.length),
+                            selection:
+                                TextSelection.collapsed(offset: newText.length),
                           );
                         }),
                       ],
@@ -894,7 +961,9 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 8),
                   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: AppColors.primaryColor),
                   child: Text(
                     "Done",
                     style: TextStyle(color: Colors.white, fontSize: 14),
@@ -961,7 +1030,9 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                 child: Text(
                   value.text.isEmpty ? 'Height' : value.text,
                   style: TextStyle(
-                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                    color: value.text.isEmpty
+                        ? Colors.grey.shade700
+                        : Colors.black,
                     fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
                   ),

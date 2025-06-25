@@ -5,9 +5,8 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
-import 'package:expansion_tile_group/expansion_tile_group.dart';
+import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 // import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -53,22 +52,9 @@ class _FAQsPageState extends State<FAQsPage> {
                       children: [
                         Utils.appImage(
                           media,
-                          // dataProvider?.screenBackgroundResponse?.imageFaQs ?? "",
                           image: dataProvider!.cachedImageMap["imageFaQs"],
-
                           imageKey: "imageFaQs",
                         ),
-                        // Container(
-                        //   height: media.height / 1,
-                        //   width: media.width,
-                        //   decoration: const BoxDecoration(
-                        //     image: DecorationImage(
-                        //       image: AssetImage('assets/img/back.jpg'),
-                        //       fit: BoxFit.cover,
-                        //       opacity: 1,
-                        //     ),
-                        //   ),
-                        // ),
                         SizedBox(
                           height: media.height / 2.5,
                           width: media.width,
@@ -76,7 +62,8 @@ class _FAQsPageState extends State<FAQsPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   centerTitle: true,
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(
@@ -84,16 +71,6 @@ class _FAQsPageState extends State<FAQsPage> {
                                       Navigator.pop(context);
                                     },
                                   ),
-
-                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                                  // Positioned(
-                                  //   left: 0,
-                                  //   child: BackArrowWidget(
-                                  //     onPress: () {
-                                  //       Navigator.pop(context);
-                                  //     },
-                                  //   ),
-                                  // leading: SizedBox(),
                                   title: Text(
                                     'FAQs',
                                     style: TextStyle(
@@ -104,7 +81,8 @@ class _FAQsPageState extends State<FAQsPage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: '/equipmentLibrary'),
                                     )
                                   ],
                                 ),
@@ -115,7 +93,8 @@ class _FAQsPageState extends State<FAQsPage> {
                                   height: media.height * 0.097,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "Frequently asked questions",
@@ -156,7 +135,8 @@ class _FAQsPageState extends State<FAQsPage> {
                 Container(
                   margin: EdgeInsets.only(top: media.height / 4.6),
                   child: Container(
-                    constraints: BoxConstraints(minHeight: media.height - (media.height / 4.6)),
+                    constraints: BoxConstraints(
+                        minHeight: media.height - (media.height / 4.6)),
                     width: media.width,
                     padding: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
                     decoration: BoxDecoration(
@@ -169,7 +149,9 @@ class _FAQsPageState extends State<FAQsPage> {
                       builder: (context, value, child) {
                         return Container(
                           width: media.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)).copyWith(bottom: 5),
+                          margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(6))
+                              .copyWith(bottom: 5),
                           child: value.faqLoader && value.faQsModel.isEmpty
                               ? Center(
                                   child: CircularProgressIndicator(
@@ -184,19 +166,28 @@ class _FAQsPageState extends State<FAQsPage> {
                                       ),
                                     )
                                   : ListView.separated(
-                                      separatorBuilder: (context, index) => SizedBox(height: 15),
+                                      separatorBuilder: (context, index) =>
+                                          SizedBox(height: 15),
                                       shrinkWrap: true,
-                                      padding: EdgeInsets.only(top: 0, bottom: ScreenUtil.verticalScale(3.2)),
+                                      padding: EdgeInsets.only(
+                                          top: 0,
+                                          bottom:
+                                              ScreenUtil.verticalScale(3.2)),
                                       physics: NeverScrollableScrollPhysics(),
                                       itemCount: dataProvider!.faQsModel.length,
                                       itemBuilder: (context, index) {
                                         return Padding(
                                           padding: EdgeInsets.only(
                                             bottom: ScreenUtil.verticalScale(
-                                                dataProvider!.faQsModel.length - 1 == index ? 2 : 0.5),
+                                                dataProvider!.faQsModel.length -
+                                                            1 ==
+                                                        index
+                                                    ? 2
+                                                    : 0.5),
                                           ),
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                                            borderRadius: BorderRadius.circular(
+                                                ScreenUtil.verticalScale(4)),
                                             child: buildExpansionTileItem(
                                               index,
                                               dataProvider!.faQsModel[index],
@@ -246,11 +237,6 @@ class _FAQsPageState extends State<FAQsPage> {
           ],
         ),
         initiallyExpanded: _expandedStates[index] ?? false,
-        // onExpansionChanged: (bool value) {
-        //   setState(() {
-        //     _expandedStates[index] = value;
-        //   });
-        // },
         onExpansionChanged: (bool value) {
           setState(() {
             _expandedStates[index] = value;
@@ -270,13 +256,9 @@ class _FAQsPageState extends State<FAQsPage> {
             });
           }
         },
-
         backgroundColor: AppColors.greyColor,
-        collapsedBackgroundColor: AppColors.greyColor, childrenPadding: EdgeInsets.zero,
-        // decoration: BoxDecoration(
-        //   borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-        //   color: AppColors.greyColor,
-        // ),
+        collapsedBackgroundColor: AppColors.greyColor,
+        childrenPadding: EdgeInsets.zero,
         clipBehavior: Clip.none,
         iconColor: AppColors.primaryColor,
         collapsedIconColor: Colors.white,
@@ -326,86 +308,6 @@ class _FAQsPageState extends State<FAQsPage> {
           SizedBox(height: ScreenUtil.verticalScale(1))
         ],
       ),
-    );
-  }
-
-  ExpansionTileItem buildExpansionTileItem1(int index, FaQsModel item) {
-    return ExpansionTileItem(
-      tilePadding: EdgeInsets.symmetric(
-        horizontal: ScreenUtil.horizontalScale(5),
-        vertical: ScreenUtil.verticalScale(0.5),
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              item.question ?? "",
-              style: GoogleFonts.plusJakartaSans(
-                color: AppColors.primaryColor,
-                fontSize: ScreenUtil.verticalScale(1.8),
-                fontWeight: FontWeight.bold,
-              ),
-              // maxLines: 1,
-            ),
-          ),
-        ],
-      ),
-      initiallyExpanded: _expandedStates[index] ?? false,
-      onExpansionChanged: (bool value) {
-        setState(() {
-          _expandedStates[index] = value;
-        });
-      },
-      backgroundColor: const Color(0xFF0D0D0D),
-      collapsedBackgroundColor: const Color(0xFF0D0D0D),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-        color: AppColors.greyColor,
-      ),
-      iconColor: AppColors.primaryColor,
-      collapsedIconColor: Colors.white,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            child: Container(
-              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primaryColor,
-                  width: 2,
-                ),
-                color: AppColors.primaryColor,
-              ),
-              child: Icon(
-                _expandedStates[index] == true ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
-                color: Colors.white,
-                size: ScreenUtil.verticalScale(3),
-              ),
-            ),
-          ),
-        ],
-      ),
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(1),
-            ).copyWith(bottom: ScreenUtil.verticalScale(1)),
-            child: Text(
-              item.answer ?? "",
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.7),
-                color: const Color(0xFF888888),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

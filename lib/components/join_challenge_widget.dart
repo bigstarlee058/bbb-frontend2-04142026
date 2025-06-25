@@ -41,9 +41,11 @@ class JoinChallengeWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: featureChallenge.photo.isNotEmpty
-                            ? NetworkImage(featureChallenge.photo.startsWith('https://storage.cloud.google.com/')
+                            ? NetworkImage(featureChallenge.photo.startsWith(
+                                    'https://storage.cloud.google.com/')
                                 ? featureChallenge.photo.replaceFirst(
-                                    'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                                    'https://storage.cloud.google.com/',
+                                    'https://storage.googleapis.com/')
                                 : featureChallenge.photo)
                             : const AssetImage('assets/img/pp_4.png'),
                         fit: BoxFit.cover,

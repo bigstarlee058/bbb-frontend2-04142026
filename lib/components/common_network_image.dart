@@ -17,11 +17,14 @@ Widget appImage(
   return appShimmerImage(
     height: height,
     width: width,
-    networkImageUrl: networkImageUrl.startsWith('https://storage.cloud.google.com/')
-        ? networkImageUrl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-        : networkImageUrl,
+    networkImageUrl:
+        networkImageUrl.startsWith('https://storage.cloud.google.com/')
+            ? networkImageUrl.replaceFirst('https://storage.cloud.google.com/',
+                'https://storage.googleapis.com/')
+            : networkImageUrl,
     fit: BoxFit.cover,
-    borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+    borderRadius: borderRadius ??
+        BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
     child: child,
   );
 
@@ -57,21 +60,23 @@ Widget appShimmerImage(
     bool? isBlur}) {
   return CachedNetworkImage(
     imageUrl: networkImageUrl.startsWith('https://storage.cloud.google.com/')
-        ? networkImageUrl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+        ? networkImageUrl.replaceFirst('https://storage.cloud.google.com/',
+            'https://storage.googleapis.com/')
         : networkImageUrl,
     height: height,
     width: width,
     fit: fit,
     placeholder: (context, url) {
       return Shimmer.fromColors(
-        baseColor: color ?? Colors.grey.withValues(alpha: 0.35),
-        highlightColor: color ?? Colors.grey.withValues(alpha: 0.2),
+        baseColor: color ?? AppColors.primaryColor.withValues(alpha: 0.9),
+        highlightColor: color ?? AppColors.primaryColor.withValues(alpha: 0.75),
         child: Container(
           height: height,
           width: width,
           decoration: BoxDecoration(
             color: color ?? AppColors.primaryColor,
-            borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+            borderRadius: borderRadius ??
+                BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
           ),
         ),
       );
@@ -81,22 +86,28 @@ Widget appShimmerImage(
         height: height,
         width: width,
         decoration: BoxDecoration(
-          borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
-          image: DecorationImage(image: AssetImage("assets/img/library_placeholder.png"), fit: fit),
+          borderRadius: borderRadius ??
+              BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+          image: DecorationImage(
+              image: AssetImage("assets/img/library_placeholder.png"),
+              fit: fit),
         ),
       );
     },
     imageBuilder: (context,
             imageProvider) => /*true
         ? Shimmer.fromColors(
-            baseColor: color ?? Colors.grey.withValues(alpha: 0.35),
-            highlightColor: color ?? Colors.grey.withValues(alpha: 0.2),
+            baseColor: color ?? AppColors.primaryColor.withValues(alpha: 0.9),
+            highlightColor:
+                color ?? AppColors.primaryColor.withValues(alpha: 0.75),
             child: Container(
               height: height,
               width: width,
               decoration: BoxDecoration(
                 color: color ?? AppColors.primaryColor,
-                borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+                borderRadius: borderRadius ??
+                    BorderRadius.all(
+                        Radius.circular(ScreenUtil.verticalScale(5))),
               ),
             ),
           )
@@ -132,7 +143,9 @@ Widget appShimmerImage(
                 height: height,
                 width: width,
                 decoration: BoxDecoration(
-                  borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+                  borderRadius: borderRadius ??
+                      BorderRadius.all(
+                          Radius.circular(ScreenUtil.verticalScale(5))),
                   image: DecorationImage(image: imageProvider, fit: fit),
                 ),
                 child: child,

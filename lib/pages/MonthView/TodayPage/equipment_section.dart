@@ -34,14 +34,14 @@ class _EquipmentSectionState extends State<EquipmentSection> {
                 const SizedBox(height: 40),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 3),
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Equipment used',
+                        'Browse equipment used with this exercise below',
                         style: TextStyle(
                           color: AppColors.primaryColor,
-                          fontSize: 25,
+                          fontSize: ScreenUtil.verticalScale(2.5),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -71,7 +71,8 @@ class _EquipmentSectionState extends State<EquipmentSection> {
                           monthProvider.usedEquipments[index].link!,
                           monthProvider.usedEquipments[0].thumbnail!,
                         ),
-                        if (index < monthProvider.usedEquipments.length - 1) const SizedBox(height: 20),
+                        if (index < monthProvider.usedEquipments.length - 1)
+                          const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -81,7 +82,8 @@ class _EquipmentSectionState extends State<EquipmentSection> {
     });
   }
 
-  Widget equipmentCard(String title, String description, String link, String image) {
+  Widget equipmentCard(
+      String title, String description, String link, String image) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           disabledBackgroundColor: const Color(0xFFF3F3F3),
@@ -123,9 +125,11 @@ class _EquipmentSectionState extends State<EquipmentSection> {
             appShimmerImage(
               height: ScreenUtil.verticalScale(11),
               width: ScreenUtil.verticalScale(12),
-              networkImageUrl: image.startsWith('https://storage.cloud.google.com/')
-                  ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                  : image,
+              networkImageUrl:
+                  image.startsWith('https://storage.cloud.google.com/')
+                      ? image.replaceFirst('https://storage.cloud.google.com/',
+                          'https://storage.googleapis.com/')
+                      : image,
               fit: BoxFit.cover,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(ScreenUtil.verticalScale(7)),

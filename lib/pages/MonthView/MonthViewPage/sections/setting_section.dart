@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/expansion_panel.dart' as com;
@@ -12,9 +14,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class SettingSection extends StatefulWidget {
-  const SettingSection({super.key, required this.monthProvider, required this.isSetting});
+  const SettingSection(
+      {super.key,
+      required this.monthProvider,
+      required this.isSetting,
+      this.scrollController});
   final MonthProvider monthProvider;
   final bool isSetting;
+  final ScrollController? scrollController;
   @override
   State<SettingSection> createState() => _SettingSectionState();
 }
@@ -43,7 +50,8 @@ class _SettingSectionState extends State<SettingSection> {
             ? 1
             : 2;
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await dataProvider?.fetchTutorialData());
+    WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) async => await dataProvider?.fetchTutorialData());
     super.initState();
   }
 
@@ -84,7 +92,8 @@ class _SettingSectionState extends State<SettingSection> {
     return widget.isSetting == true
         ? Padding(
             padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.horizontalScale(3), vertical: ScreenUtil.verticalScale(2.5)),
+                horizontal: ScreenUtil.horizontalScale(3),
+                vertical: ScreenUtil.verticalScale(2.5)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -94,9 +103,11 @@ class _SettingSectionState extends State<SettingSection> {
                     highlightColor: Colors.transparent,
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(0)),
+                    borderRadius:
+                        BorderRadius.circular(ScreenUtil.verticalScale(0)),
                     child: Padding(
-                      padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(3)),
+                      padding:
+                          EdgeInsets.only(right: ScreenUtil.horizontalScale(3)),
                       child: com.ExpansionPanelList(
                         sidePadding: false,
                         animationDuration: Duration(milliseconds: 300),
@@ -108,6 +119,12 @@ class _SettingSectionState extends State<SettingSection> {
                             isSplit = isExpanded;
                             curExpandedIdx = isExpanded ? 0 : -1;
                           });
+
+                          widget.scrollController?.animateTo(
+                            widget.scrollController!.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 100),
+                            curve: Curves.easeOut,
+                          );
                         },
                         elevation: 0,
                         children: [
@@ -117,7 +134,8 @@ class _SettingSectionState extends State<SettingSection> {
                               canTapOnHeader: true,
                               headerBuilder: (context, isExpanded) {
                                 return Padding(
-                                  padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(0)),
+                                  padding: EdgeInsets.only(
+                                      left: ScreenUtil.horizontalScale(0)),
                                   child: Row(
                                     children: [
                                       Container(
@@ -125,7 +143,7 @@ class _SettingSectionState extends State<SettingSection> {
                                           left: ScreenUtil.horizontalScale(3),
                                         ),
                                         child: Text(
-                                          'Default Split',
+                                          'Default split',
                                           textAlign: TextAlign.left,
                                           style: TextStyle(
                                             color: AppColors.primaryColor,
@@ -155,16 +173,21 @@ class _SettingSectionState extends State<SettingSection> {
                                               textAlign: TextAlign.left,
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
-                                                fontSize: ScreenUtil.verticalScale(1.7),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        1.7),
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ),
                                             SizedBox(width: 4),
                                             GestureDetector(
                                               onTap: () {
-                                                AnimatedDialog.showAnimatedDialog(
+                                                AnimatedDialog
+                                                    .showAnimatedDialog(
                                                   context: context,
-                                                  pageBuilder: (c1, anim1, anim2) => ChooseWorkoutDayDialog(),
+                                                  pageBuilder: (c1, anim1,
+                                                          anim2) =>
+                                                      ChooseWorkoutDayDialog(),
                                                 );
                                                 // showDialog(
                                                 //   barrierDismissible: true,
@@ -184,8 +207,11 @@ class _SettingSectionState extends State<SettingSection> {
                                               child: Center(
                                                 child: Icon(
                                                   Icons.info,
-                                                  size: ScreenUtil.verticalScale(2.3),
-                                                  color: const Color(0xBB888888),
+                                                  size:
+                                                      ScreenUtil.verticalScale(
+                                                          2.3),
+                                                  color:
+                                                      const Color(0xBB888888),
                                                 ),
                                               ),
                                             )
@@ -194,11 +220,14 @@ class _SettingSectionState extends State<SettingSection> {
                                       ),
                                       const SizedBox(height: 10),
                                       Container(
-                                        margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                                        padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                                        margin: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(0.3)),
+                                        padding: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(1.25)),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                          borderRadius: BorderRadius.circular(
+                                              ScreenUtil.verticalScale(5)),
                                           boxShadow: [
                                             BoxShadow(
                                               color: AppColors.greyColor,
@@ -209,13 +238,17 @@ class _SettingSectionState extends State<SettingSection> {
                                         child: Row(
                                           children: [
                                             CircleAvatar(
-                                              backgroundColor: AppColors.primaryColor,
-                                              radius: ScreenUtil.verticalScale(2),
+                                              backgroundColor:
+                                                  AppColors.primaryColor,
+                                              radius:
+                                                  ScreenUtil.verticalScale(2),
                                               child: Text(
                                                 "3",
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: ScreenUtil.verticalScale(2.5),
+                                                  fontSize:
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -225,7 +258,9 @@ class _SettingSectionState extends State<SettingSection> {
                                               "3 days per week",
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
-                                                fontSize: ScreenUtil.verticalScale(1.8),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        1.8),
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
@@ -233,17 +268,24 @@ class _SettingSectionState extends State<SettingSection> {
                                             GestureDetector(
                                               onTap: () => updateSplitIndex(0),
                                               child: Container(
-                                                height: ScreenUtil.verticalScale(4),
-                                                width: ScreenUtil.verticalScale(4),
+                                                height:
+                                                    ScreenUtil.verticalScale(4),
+                                                width:
+                                                    ScreenUtil.verticalScale(4),
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: splitIndex == 0 ? AppColors.primaryColor : Colors.transparent,
-                                                  border: Border.all(color: AppColors.primaryColor),
+                                                  color: splitIndex == 0
+                                                      ? AppColors.primaryColor
+                                                      : Colors.transparent,
+                                                  border: Border.all(
+                                                      color: AppColors
+                                                          .primaryColor),
                                                 ),
                                                 child: Center(
                                                   child: Icon(
                                                     Icons.done,
-                                                    size: ScreenUtil.verticalScale(2.5),
+                                                    size: ScreenUtil
+                                                        .verticalScale(2.5),
                                                     color: Colors.white,
                                                   ),
                                                 ),
@@ -254,11 +296,14 @@ class _SettingSectionState extends State<SettingSection> {
                                       ),
                                       const SizedBox(height: 5),
                                       Container(
-                                        margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                                        padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                                        margin: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(0.3)),
+                                        padding: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(1.25)),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                          borderRadius: BorderRadius.circular(
+                                              ScreenUtil.verticalScale(5)),
                                           boxShadow: [
                                             BoxShadow(
                                               color: AppColors.greyColor,
@@ -269,13 +314,17 @@ class _SettingSectionState extends State<SettingSection> {
                                         child: Row(
                                           children: [
                                             CircleAvatar(
-                                              backgroundColor: AppColors.primaryColor,
-                                              radius: ScreenUtil.verticalScale(2),
+                                              backgroundColor:
+                                                  AppColors.primaryColor,
+                                              radius:
+                                                  ScreenUtil.verticalScale(2),
                                               child: Text(
                                                 "4",
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: ScreenUtil.verticalScale(2.5),
+                                                  fontSize:
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -285,7 +334,9 @@ class _SettingSectionState extends State<SettingSection> {
                                               "4 days per week",
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
-                                                fontSize: ScreenUtil.verticalScale(1.8),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        1.8),
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
@@ -293,17 +344,24 @@ class _SettingSectionState extends State<SettingSection> {
                                             GestureDetector(
                                               onTap: () => updateSplitIndex(1),
                                               child: Container(
-                                                height: ScreenUtil.verticalScale(4),
-                                                width: ScreenUtil.verticalScale(4),
+                                                height:
+                                                    ScreenUtil.verticalScale(4),
+                                                width:
+                                                    ScreenUtil.verticalScale(4),
                                                 decoration: BoxDecoration(
-                                                  color: splitIndex == 1 ? AppColors.primaryColor : Colors.transparent,
+                                                  color: splitIndex == 1
+                                                      ? AppColors.primaryColor
+                                                      : Colors.transparent,
                                                   shape: BoxShape.circle,
-                                                  border: Border.all(color: AppColors.primaryColor),
+                                                  border: Border.all(
+                                                      color: AppColors
+                                                          .primaryColor),
                                                 ),
                                                 child: Center(
                                                   child: Icon(
                                                     Icons.done,
-                                                    size: ScreenUtil.verticalScale(2.5),
+                                                    size: ScreenUtil
+                                                        .verticalScale(2.5),
                                                     color: Colors.white,
                                                   ),
                                                 ),
@@ -314,11 +372,14 @@ class _SettingSectionState extends State<SettingSection> {
                                       ),
                                       const SizedBox(height: 5),
                                       Container(
-                                        margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                                        padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                                        margin: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(0.3)),
+                                        padding: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(1.25)),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                          borderRadius: BorderRadius.circular(
+                                              ScreenUtil.verticalScale(5)),
                                           boxShadow: [
                                             BoxShadow(
                                               color: AppColors.greyColor,
@@ -329,13 +390,17 @@ class _SettingSectionState extends State<SettingSection> {
                                         child: Row(
                                           children: [
                                             CircleAvatar(
-                                              backgroundColor: AppColors.primaryColor,
-                                              radius: ScreenUtil.verticalScale(2),
+                                              backgroundColor:
+                                                  AppColors.primaryColor,
+                                              radius:
+                                                  ScreenUtil.verticalScale(2),
                                               child: Text(
                                                 "5",
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: ScreenUtil.verticalScale(2.5),
+                                                  fontSize:
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -345,7 +410,9 @@ class _SettingSectionState extends State<SettingSection> {
                                               "5 days per week",
                                               style: TextStyle(
                                                 color: const Color(0xBB888888),
-                                                fontSize: ScreenUtil.verticalScale(1.8),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        1.8),
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
@@ -353,17 +420,24 @@ class _SettingSectionState extends State<SettingSection> {
                                             GestureDetector(
                                               onTap: () => updateSplitIndex(2),
                                               child: Container(
-                                                height: ScreenUtil.verticalScale(4),
-                                                width: ScreenUtil.verticalScale(4),
+                                                height:
+                                                    ScreenUtil.verticalScale(4),
+                                                width:
+                                                    ScreenUtil.verticalScale(4),
                                                 decoration: BoxDecoration(
-                                                  color: splitIndex == 2 ? AppColors.primaryColor : Colors.transparent,
+                                                  color: splitIndex == 2
+                                                      ? AppColors.primaryColor
+                                                      : Colors.transparent,
                                                   shape: BoxShape.circle,
-                                                  border: Border.all(color: AppColors.primaryColor),
+                                                  border: Border.all(
+                                                      color: AppColors
+                                                          .primaryColor),
                                                 ),
                                                 child: Center(
                                                   child: Icon(
                                                     Icons.done,
-                                                    size: ScreenUtil.verticalScale(2.5),
+                                                    size: ScreenUtil
+                                                        .verticalScale(2.5),
                                                     color: Colors.white,
                                                   ),
                                                 ),
@@ -383,7 +457,8 @@ class _SettingSectionState extends State<SettingSection> {
                 ),
                 const SizedBox(height: 22),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(3), 0, ScreenUtil.horizontalScale(3), 0),
+                  padding: EdgeInsets.fromLTRB(ScreenUtil.horizontalScale(3), 0,
+                      ScreenUtil.horizontalScale(3), 0),
                   child: Divider(
                     thickness: 0.3,
                     height: 0,
@@ -396,9 +471,11 @@ class _SettingSectionState extends State<SettingSection> {
                     highlightColor: Colors.transparent,
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(0)),
+                    borderRadius:
+                        BorderRadius.circular(ScreenUtil.verticalScale(0)),
                     child: Padding(
-                      padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(3)),
+                      padding:
+                          EdgeInsets.only(right: ScreenUtil.horizontalScale(3)),
                       child: com.ExpansionPanelList(
                         sidePadding: false,
                         animationDuration: Duration(milliseconds: 300),
@@ -419,7 +496,8 @@ class _SettingSectionState extends State<SettingSection> {
                             canTapOnHeader: true,
                             headerBuilder: (context, isExpanded) {
                               return Padding(
-                                padding: EdgeInsets.only(left: ScreenUtil.horizontalScale(0)),
+                                padding: EdgeInsets.only(
+                                    left: ScreenUtil.horizontalScale(0)),
                                 child: Row(
                                   children: [
                                     Container(
@@ -427,7 +505,7 @@ class _SettingSectionState extends State<SettingSection> {
                                         left: ScreenUtil.horizontalScale(3),
                                       ),
                                       child: Text(
-                                        'Default Equipment',
+                                        'Default equipment',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                           color: AppColors.primaryColor,
@@ -458,7 +536,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             textAlign: TextAlign.left,
                                             style: TextStyle(
                                               color: const Color(0xBB888888),
-                                              fontSize: ScreenUtil.verticalScale(1.7),
+                                              fontSize:
+                                                  ScreenUtil.verticalScale(1.7),
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
@@ -467,7 +546,9 @@ class _SettingSectionState extends State<SettingSection> {
                                             onTap: () {
                                               AnimatedDialog.showAnimatedDialog(
                                                 context: context,
-                                                pageBuilder: (c1, anim1, anim2) => ChooseEquipmentDialog(),
+                                                pageBuilder:
+                                                    (c1, anim1, anim2) =>
+                                                        ChooseEquipmentDialog(),
                                               );
 
                                               // showDialog(
@@ -488,7 +569,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             child: Center(
                                               child: Icon(
                                                 Icons.info,
-                                                size: ScreenUtil.verticalScale(2.3),
+                                                size: ScreenUtil.verticalScale(
+                                                    2.3),
                                                 color: const Color(0xBB888888),
                                               ),
                                             ),
@@ -498,11 +580,14 @@ class _SettingSectionState extends State<SettingSection> {
                                     ),
                                     const SizedBox(height: 10),
                                     Container(
-                                      margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                                      padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                                      margin: EdgeInsets.all(
+                                          ScreenUtil.verticalScale(0.3)),
+                                      padding: EdgeInsets.all(
+                                          ScreenUtil.verticalScale(1.25)),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                        borderRadius: BorderRadius.circular(
+                                            ScreenUtil.verticalScale(5)),
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppColors.greyColor,
@@ -513,13 +598,16 @@ class _SettingSectionState extends State<SettingSection> {
                                       child: Row(
                                         children: [
                                           CircleAvatar(
-                                            backgroundColor: AppColors.primaryColor,
+                                            backgroundColor:
+                                                AppColors.primaryColor,
                                             radius: ScreenUtil.verticalScale(2),
                                             child: Text(
                                               "A",
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -529,7 +617,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             "Fully equipped gym",
                                             style: TextStyle(
                                               color: const Color(0xBB888888),
-                                              fontSize: ScreenUtil.verticalScale(1.8),
+                                              fontSize:
+                                                  ScreenUtil.verticalScale(1.8),
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -537,17 +626,25 @@ class _SettingSectionState extends State<SettingSection> {
                                           GestureDetector(
                                             onTap: () => updateEquipments(0),
                                             child: Container(
-                                              height: ScreenUtil.verticalScale(4),
-                                              width: ScreenUtil.verticalScale(4),
+                                              height:
+                                                  ScreenUtil.verticalScale(4),
+                                              width:
+                                                  ScreenUtil.verticalScale(4),
                                               decoration: BoxDecoration(
-                                                color: equipments == 0 ? AppColors.primaryColor : Colors.transparent,
+                                                color: equipments == 0
+                                                    ? AppColors.primaryColor
+                                                    : Colors.transparent,
                                                 shape: BoxShape.circle,
-                                                border: Border.all(color: AppColors.primaryColor),
+                                                border: Border.all(
+                                                    color:
+                                                        AppColors.primaryColor),
                                               ),
                                               child: Center(
                                                 child: Icon(
                                                   Icons.done,
-                                                  size: ScreenUtil.verticalScale(2.5),
+                                                  size:
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
                                                   color: Colors.white,
                                                 ),
                                               ),
@@ -558,11 +655,14 @@ class _SettingSectionState extends State<SettingSection> {
                                     ),
                                     const SizedBox(height: 5),
                                     Container(
-                                      margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                                      padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                                      margin: EdgeInsets.all(
+                                          ScreenUtil.verticalScale(0.3)),
+                                      padding: EdgeInsets.all(
+                                          ScreenUtil.verticalScale(1.25)),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                        borderRadius: BorderRadius.circular(
+                                            ScreenUtil.verticalScale(5)),
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppColors.greyColor,
@@ -573,13 +673,16 @@ class _SettingSectionState extends State<SettingSection> {
                                       child: Row(
                                         children: [
                                           CircleAvatar(
-                                            backgroundColor: AppColors.primaryColor,
+                                            backgroundColor:
+                                                AppColors.primaryColor,
                                             radius: ScreenUtil.verticalScale(2),
                                             child: Text(
                                               "B",
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -589,7 +692,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             "Home gym",
                                             style: TextStyle(
                                               color: const Color(0xBB888888),
-                                              fontSize: ScreenUtil.verticalScale(1.8),
+                                              fontSize:
+                                                  ScreenUtil.verticalScale(1.8),
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -597,17 +701,25 @@ class _SettingSectionState extends State<SettingSection> {
                                           GestureDetector(
                                             onTap: () => updateEquipments(1),
                                             child: Container(
-                                              height: ScreenUtil.verticalScale(4),
-                                              width: ScreenUtil.verticalScale(4),
+                                              height:
+                                                  ScreenUtil.verticalScale(4),
+                                              width:
+                                                  ScreenUtil.verticalScale(4),
                                               decoration: BoxDecoration(
-                                                color: equipments == 1 ? AppColors.primaryColor : Colors.transparent,
+                                                color: equipments == 1
+                                                    ? AppColors.primaryColor
+                                                    : Colors.transparent,
                                                 shape: BoxShape.circle,
-                                                border: Border.all(color: AppColors.primaryColor),
+                                                border: Border.all(
+                                                    color:
+                                                        AppColors.primaryColor),
                                               ),
                                               child: Center(
                                                 child: Icon(
                                                   Icons.done,
-                                                  size: ScreenUtil.verticalScale(2.5),
+                                                  size:
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
                                                   color: Colors.white,
                                                 ),
                                               ),
@@ -618,11 +730,14 @@ class _SettingSectionState extends State<SettingSection> {
                                     ),
                                     const SizedBox(height: 5),
                                     Container(
-                                      margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                                      padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                                      margin: EdgeInsets.all(
+                                          ScreenUtil.verticalScale(0.3)),
+                                      padding: EdgeInsets.all(
+                                          ScreenUtil.verticalScale(1.25)),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                                        borderRadius: BorderRadius.circular(
+                                            ScreenUtil.verticalScale(5)),
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppColors.greyColor,
@@ -633,13 +748,16 @@ class _SettingSectionState extends State<SettingSection> {
                                       child: Row(
                                         children: [
                                           CircleAvatar(
-                                            backgroundColor: AppColors.primaryColor,
+                                            backgroundColor:
+                                                AppColors.primaryColor,
                                             radius: ScreenUtil.verticalScale(2),
                                             child: Text(
                                               "C",
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -649,7 +767,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             "Dumbbells and bands",
                                             style: TextStyle(
                                               color: const Color(0xBB888888),
-                                              fontSize: ScreenUtil.verticalScale(1.8),
+                                              fontSize:
+                                                  ScreenUtil.verticalScale(1.8),
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -657,17 +776,25 @@ class _SettingSectionState extends State<SettingSection> {
                                           GestureDetector(
                                             onTap: () => updateEquipments(2),
                                             child: Container(
-                                              height: ScreenUtil.verticalScale(4),
-                                              width: ScreenUtil.verticalScale(4),
+                                              height:
+                                                  ScreenUtil.verticalScale(4),
+                                              width:
+                                                  ScreenUtil.verticalScale(4),
                                               decoration: BoxDecoration(
-                                                color: equipments == 2 ? AppColors.primaryColor : Colors.transparent,
+                                                color: equipments == 2
+                                                    ? AppColors.primaryColor
+                                                    : Colors.transparent,
                                                 shape: BoxShape.circle,
-                                                border: Border.all(color: AppColors.primaryColor),
+                                                border: Border.all(
+                                                    color:
+                                                        AppColors.primaryColor),
                                               ),
                                               child: Center(
                                                 child: Icon(
                                                   Icons.done,
-                                                  size: ScreenUtil.verticalScale(2.5),
+                                                  size:
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
                                                   color: Colors.white,
                                                 ),
                                               ),
@@ -690,7 +817,8 @@ class _SettingSectionState extends State<SettingSection> {
             ),
           )
         : Padding(
-            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+            padding:
+                EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -715,7 +843,8 @@ class _SettingSectionState extends State<SettingSection> {
                         onTap: () {
                           AnimatedDialog.showAnimatedDialog(
                             context: context,
-                            pageBuilder: (c1, anim1, anim2) => ChooseWorkoutDayDialog(),
+                            pageBuilder: (c1, anim1, anim2) =>
+                                ChooseWorkoutDayDialog(),
                           );
                           // showDialog(
                           //   barrierDismissible: true,
@@ -749,10 +878,12 @@ class _SettingSectionState extends State<SettingSection> {
                       children: [
                         Container(
                           margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil.verticalScale(5)),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.greyColor,
@@ -791,8 +922,11 @@ class _SettingSectionState extends State<SettingSection> {
                                   width: ScreenUtil.verticalScale(4),
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: splitIndex == 0 ? AppColors.primaryColor : Colors.transparent,
-                                    border: Border.all(color: AppColors.primaryColor),
+                                    color: splitIndex == 0
+                                        ? AppColors.primaryColor
+                                        : Colors.transparent,
+                                    border: Border.all(
+                                        color: AppColors.primaryColor),
                                   ),
                                   child: Center(
                                     child: Icon(
@@ -809,10 +943,12 @@ class _SettingSectionState extends State<SettingSection> {
                         const SizedBox(height: 5),
                         Container(
                           margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil.verticalScale(5)),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.greyColor,
@@ -850,9 +986,12 @@ class _SettingSectionState extends State<SettingSection> {
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
                                   decoration: BoxDecoration(
-                                    color: splitIndex == 1 ? AppColors.primaryColor : Colors.transparent,
+                                    color: splitIndex == 1
+                                        ? AppColors.primaryColor
+                                        : Colors.transparent,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.primaryColor),
+                                    border: Border.all(
+                                        color: AppColors.primaryColor),
                                   ),
                                   child: Center(
                                     child: Icon(
@@ -869,10 +1008,12 @@ class _SettingSectionState extends State<SettingSection> {
                         const SizedBox(height: 5),
                         Container(
                           margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil.verticalScale(5)),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.greyColor,
@@ -910,9 +1051,12 @@ class _SettingSectionState extends State<SettingSection> {
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
                                   decoration: BoxDecoration(
-                                    color: splitIndex == 2 ? AppColors.primaryColor : Colors.transparent,
+                                    color: splitIndex == 2
+                                        ? AppColors.primaryColor
+                                        : Colors.transparent,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.primaryColor),
+                                    border: Border.all(
+                                        color: AppColors.primaryColor),
                                   ),
                                   child: Center(
                                     child: Icon(
@@ -962,7 +1106,8 @@ class _SettingSectionState extends State<SettingSection> {
                         onTap: () {
                           AnimatedDialog.showAnimatedDialog(
                             context: context,
-                            pageBuilder: (c1, anim1, anim2) => ChooseEquipmentDialog(),
+                            pageBuilder: (c1, anim1, anim2) =>
+                                ChooseEquipmentDialog(),
                           );
                           // showDialog(
                           //   barrierDismissible: true,
@@ -997,10 +1142,12 @@ class _SettingSectionState extends State<SettingSection> {
                       children: [
                         Container(
                           margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil.verticalScale(5)),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.greyColor,
@@ -1038,9 +1185,12 @@ class _SettingSectionState extends State<SettingSection> {
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
                                   decoration: BoxDecoration(
-                                    color: equipments == 0 ? AppColors.primaryColor : Colors.transparent,
+                                    color: equipments == 0
+                                        ? AppColors.primaryColor
+                                        : Colors.transparent,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.primaryColor),
+                                    border: Border.all(
+                                        color: AppColors.primaryColor),
                                   ),
                                   child: Center(
                                     child: Icon(
@@ -1057,10 +1207,12 @@ class _SettingSectionState extends State<SettingSection> {
                         const SizedBox(height: 5),
                         Container(
                           margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil.verticalScale(5)),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.greyColor,
@@ -1098,9 +1250,12 @@ class _SettingSectionState extends State<SettingSection> {
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
                                   decoration: BoxDecoration(
-                                    color: equipments == 1 ? AppColors.primaryColor : Colors.transparent,
+                                    color: equipments == 1
+                                        ? AppColors.primaryColor
+                                        : Colors.transparent,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.primaryColor),
+                                    border: Border.all(
+                                        color: AppColors.primaryColor),
                                   ),
                                   child: Center(
                                     child: Icon(
@@ -1117,10 +1272,12 @@ class _SettingSectionState extends State<SettingSection> {
                         const SizedBox(height: 5),
                         Container(
                           margin: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil.verticalScale(5)),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.greyColor,
@@ -1158,9 +1315,12 @@ class _SettingSectionState extends State<SettingSection> {
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
                                   decoration: BoxDecoration(
-                                    color: equipments == 2 ? AppColors.primaryColor : Colors.transparent,
+                                    color: equipments == 2
+                                        ? AppColors.primaryColor
+                                        : Colors.transparent,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.primaryColor),
+                                    border: Border.all(
+                                        color: AppColors.primaryColor),
                                   ),
                                   child: Center(
                                     child: Icon(
@@ -1182,7 +1342,8 @@ class _SettingSectionState extends State<SettingSection> {
                 Consumer<MonthProvider>(
                   builder: (context, value, child) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 20, horizontal: 10),
                       child: ButtonWidget(
                         text: "Save",
                         textColor: Colors.white,

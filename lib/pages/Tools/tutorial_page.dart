@@ -1,3 +1,4 @@
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
@@ -61,7 +62,8 @@ class _TutorialPageState extends State<TutorialPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   centerTitle: true,
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(
@@ -89,7 +91,8 @@ class _TutorialPageState extends State<TutorialPage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: '/equipmentLibrary'),
                                     )
                                   ],
                                 ),
@@ -100,7 +103,8 @@ class _TutorialPageState extends State<TutorialPage> {
                                   height: media.height * 0.097,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
                                         width: ScreenUtil.horizontalScale(50),
@@ -108,7 +112,8 @@ class _TutorialPageState extends State<TutorialPage> {
                                           "Here’s a quick tutorial\njust for you",
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: ScreenUtil.verticalScale(2),
+                                            fontSize:
+                                                ScreenUtil.verticalScale(2),
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
@@ -145,9 +150,11 @@ class _TutorialPageState extends State<TutorialPage> {
                   margin: EdgeInsets.only(top: media.height / 4.6),
                   child: Container(
                     width: media.width,
-                    constraints: BoxConstraints(minHeight: (media.height - (media.height / 4.6))),
+                    constraints: BoxConstraints(
+                        minHeight: (media.height - (media.height / 4.6))),
                     padding: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil.horizontalScale(6), vertical: ScreenUtil.verticalScale(2)),
+                        horizontal: ScreenUtil.horizontalScale(6),
+                        vertical: ScreenUtil.verticalScale(2)),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -157,12 +164,15 @@ class _TutorialPageState extends State<TutorialPage> {
                     child: Consumer<DataProvider>(
                       builder: (context, value, child) {
                         return ListView.separated(
-                          separatorBuilder: (context, index) => SizedBox(height: ScreenUtil.verticalScale(2)),
+                          separatorBuilder: (context, index) =>
+                              SizedBox(height: ScreenUtil.verticalScale(2)),
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: value.tutorialList.length,
-                          padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
-                          itemBuilder: (context, index) => tutorialCard(value.tutorialList[index]),
+                          padding: EdgeInsets.symmetric(
+                              vertical: ScreenUtil.verticalScale(2)),
+                          itemBuilder: (context, index) =>
+                              tutorialCard(value.tutorialList[index]),
                         );
                       },
                     ),
@@ -180,10 +190,16 @@ class _TutorialPageState extends State<TutorialPage> {
     var media = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => TutorialDetailsPage(tutorialModel: data)),
+        AnimatedDialog.showAnimatedDialog(
+          context: context,
+          pageBuilder: (c1, anim1, anim2) =>
+              TutorialDetailsPage(tutorialModel: data),
         );
+
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => TutorialDetailsPage(tutorialModel: data)),
+        // );
       },
       child: Container(
         padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
@@ -193,7 +209,11 @@ class _TutorialPageState extends State<TutorialPage> {
             Radius.circular(ScreenUtil.verticalScale(8)),
           ),
           boxShadow: const [
-            BoxShadow(color: Colors.black12, spreadRadius: 1, blurRadius: 5, offset: Offset(0, 1)),
+            BoxShadow(
+                color: Colors.black12,
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 1)),
           ],
         ),
         child: Row(
@@ -205,9 +225,11 @@ class _TutorialPageState extends State<TutorialPage> {
                 appShimmerImage(
                   height: media.width / 4,
                   width: media.width / 4,
-                  networkImageUrl: data.thumbnail!.startsWith('https://storage.cloud.google.com/')
-                      ? data.thumbnail!
-                          .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                  networkImageUrl: data.thumbnail!
+                          .startsWith('https://storage.cloud.google.com/')
+                      ? data.thumbnail!.replaceFirst(
+                          'https://storage.cloud.google.com/',
+                          'https://storage.googleapis.com/')
                       : data.thumbnail!,
                   fit: BoxFit.cover,
                   borderRadius: BorderRadius.only(
@@ -261,7 +283,8 @@ class _TutorialPageState extends State<TutorialPage> {
                 horizontal: ScreenUtil.verticalScale(0.7),
                 vertical: ScreenUtil.verticalScale(0.7),
               ),
-              decoration: const BoxDecoration(color: AppColors.primaryColor, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                  color: AppColors.primaryColor, shape: BoxShape.circle),
               child: Icon(
                 Icons.play_arrow,
                 color: Colors.white,

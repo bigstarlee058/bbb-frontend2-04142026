@@ -24,6 +24,8 @@ import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
 
+import 'number_entry.dart';
+
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
 
@@ -49,18 +51,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   UserDataProvider? userData;
   double heightInCm = 183;
-  double waistInCm = 31;
-  double hipInCm = 30;
-  double midThigh = 30;
   HeightUnit selectedHeightUnit = HeightUnit.cm;
 
-  WaistUnit selectedWaistUnit = WaistUnit.inches;
-  HipUnit selectedHipUnit = HipUnit.inches;
   bool canConvertUnit = true;
   bool showSeparationText = true;
 
   final List<String> genderOptions = ['Female', 'Male', 'Other'];
-  final List<String> goalsOptions = ['Muscle Growth', 'Weight Gain', 'Strength & Performance'];
+  final List<String> goalsOptions = [
+    'Muscle Growth',
+    'Weight Gain',
+    'Strength & Performance'
+  ];
   late LocationProvider locationProvider; // Example locations
   late MainPageProvider mainPageProvider;
 
@@ -82,70 +83,86 @@ class _MyProfilePageState extends State<MyProfilePage> {
     setState(() => loader = true);
     final userData1 = await userData!.fetchUserInfo();
     if (!mounted) return;
-
     setState(() {
       final detail = userData1['detail'];
-      _id = userData1['_id'];
+      _id = userData1['_id'] ?? userData1['id'];
       selectedName = userData1["name"];
 
-      selectedDate = DateTime.tryParse(detail?['dob'] ?? '');
+      if (detail != null) {
+        selectedDate = DateTime.tryParse(detail?['dob'] ?? '');
 
-      selectedWeight.text = '${detail?['weight'] ?? 0}';
-      selectedBodyFat.text = '${detail?['bodyfat'] ?? 0}';
+        if (detail?['weight'] != null && detail['weight'].toString() != "0") {
+          selectedWeight.text = '${detail?['weight'] ?? 0}lbs';
+        }
 
-      final heightStr = (detail?['height'] ?? "0").toString();
-      selectedHeight.text = heightStr == "0"
-          ? "0"
-          : "${heightStr[0]}'${heightStr.length > 1 ? heightStr[1] : ""}${heightStr.length > 2 ? heightStr[2] : ""}\"";
+        if (detail['bodyfat'] != null &&
+            detail['bodyfat'].toString() != "0" &&
+            detail['bodyfat'].toString().isNotEmpty) {
+          selectedBodyFat.text = '${detail?['bodyfat'] ?? 0}%';
+        }
+        final heightStr = (detail?['height'] ?? "0").toString();
 
-      selectedMidThigh.text = '${detail?['midthigh'] ?? 0}';
-      selectedHip.text = '${detail?['hip'] ?? 0}';
-      selectedWaist.text = '${detail?['waist'] ?? 0}';
+        if (detail['height'] != null) {
+          if (heightStr != "0") {
+            selectedHeight.text = heightStr == "0"
+                ? "0"
+                : "${heightStr[0]}'${heightStr.length > 1 ? heightStr[1] : ""}${heightStr.length > 2 ? heightStr[2] : ""}\"";
+          }
+        }
 
-      heightInCm = (heightStr == "0")
-          ? 183
-          : convertToInches(
-              int.parse(heightStr[0]),
-              double.parse(
-                "${heightStr.length > 1 ? heightStr[1] : "0"}${heightStr.length > 2 ? heightStr[2] : ""}",
-              ),
-            );
+        heightInCm = (heightStr == "0")
+            ? 183
+            : convertToInches(
+                int.parse(heightStr[0]),
+                double.parse(
+                  "${heightStr.length > 1 ? heightStr[1] : "0"}${heightStr.length > 2 ? heightStr[2] : ""}",
+                ),
+              );
+        if (detail['midthigh'] != null &&
+            detail['midthigh'].toString() != "0" &&
+            detail['midthigh'].toString().isNotEmpty) {
+          selectedMidThigh.text = '${detail?['midthigh'] ?? 0}"';
+        }
+        if (detail['hip'] != null &&
+            detail['hip'].toString() != "0" &&
+            detail['hip'].toString().isNotEmpty) {
+          selectedHip.text = '${detail?['hip'] ?? 0}"';
+        }
+        if (detail['waist'] != null &&
+            detail['waist'].toString() != "0" &&
+            detail['waist'].toString().isNotEmpty) {
+          selectedWaist.text = '${detail?['waist'] ?? 0}"';
+        }
 
-      final waistStr = (detail?['waist'] ?? "0").toString();
-      waistInCm = (waistStr == "0")
-          ? 31
-          : convertToInches(
-              int.parse(waistStr[0]),
-              double.parse(
-                "${waistStr.length > 1 ? waistStr[1] : "0"}${waistStr.length > 2 ? waistStr[2] : ""}",
-              ),
-            );
+        selectedLocation = detail?['location'] ?? "";
+        _imageUrl = detail?['avatarUrl'] ?? "";
 
-      selectedLocation = detail?['location'] ?? "";
-      _imageUrl = detail?['avatarUrl'] ?? "";
+        final genderIndex = detail == null
+            ? 0
+            : detail['sex'] == null
+                ? 1
+                : detail['sex'] == true
+                    ? 1
+                    : 0;
+        selectedGender = genderOptions[genderIndex];
 
-      final genderIndex = detail == null
-          ? 0
-          : detail['sex'] == null
-              ? 1
-              : detail['sex'] == true
-                  ? 1
-                  : 0;
-      selectedGender = genderOptions[genderIndex];
+        selectedGoal = detail?['mygoal'] ?? "";
 
-      selectedGoal = detail?['mygoal'] ?? "";
-
-      if ((detail?['country'] ?? '').isEmpty) {
-        locationProvider.setAndCallApi();
-      } else {
-        locationProvider.fillDetails(
-          detail?['country'],
-          detail?['state'] ?? "",
-          detail?['city'] ?? "",
-        );
+        if ((detail?['country'] ?? '').isEmpty) {
+          locationProvider.setAndCallApi();
+        } else {
+          locationProvider.fillDetails(
+            detail?['country'],
+            detail?['state'] ?? "",
+            detail?['city'] ?? "",
+          );
+        }
       }
     });
-
+    log('selectedBodyFat==========>>>>>${selectedBodyFat.text}');
+    log('selectedMidThigh==========>>>>>${selectedMidThigh.text}');
+    log('selectedHip==========>>>>>${selectedHip.text}');
+    log('selectedWaist==========>>>>>${selectedWaist.text}');
     setState(() => loader = false);
   }
 
@@ -159,64 +176,92 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   bool isLoading = false;
   Future<void> _saveUserData() async {
-    setState(() {
-      isLoading = true;
-    });
+    // setState(() {
+    //   isLoading = true;
+    // });
+
     final userDetails = {
       // 'firstName': 'Nick',
       // 'lastName': 'Vlacic',
-      'sex': genderOptions.indexOf(selectedGender!),
-      'dob': selectedDate?.toIso8601String(),
-      'weight': int.parse(selectedWeight.text.split(' ')[0]),
-      'height': int.parse(selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
+      'sex':
+          selectedGender != null ? genderOptions.indexOf(selectedGender!) : "",
+      'dob': selectedDate != null ? selectedDate!.toIso8601String() : "",
+      'weight': selectedWeight.text.replaceAll('lbs', "").isNotEmpty
+          ? int.parse(selectedWeight.text.replaceAll('lbs', ""))
+          : "",
+      'height': selectedHeight.text
+              .replaceAll('\'', '')
+              .replaceAll("\"", "")
+              .isNotEmpty
+          ? int.parse(
+              selectedHeight.text.replaceAll('\'', '').replaceAll("\"", ""))
+          : "",
       'location': selectedLocation,
       'mygoal': selectedGoal,
       'avatarUrl': _imageUrl ?? '',
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
       'city': locationProvider.selectedCityController.text,
-      'waist': int.parse(selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'hip': int.parse(selectedHip.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'midthigh': int.parse(selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'bodyfat': int.parse(selectedBodyFat.text.split(' ')[0]),
+      'waist': selectedWaist.text
+              .replaceAll('\'', '')
+              .replaceAll("\"", "")
+              .isNotEmpty
+          ? int.parse(
+              selectedWaist.text.replaceAll('\'', '').replaceAll("\"", ""))
+          : "",
+      'hip':
+          selectedHip.text.replaceAll('\'', '').replaceAll("\"", "").isNotEmpty
+              ? int.parse(selectedHip.text.replaceAll("\"", ""))
+              : "",
+      'midthigh': selectedMidThigh.text
+              .replaceAll('\'', '')
+              .replaceAll("\"", "")
+              .isNotEmpty
+          ? int.parse(
+              selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", ""))
+          : "",
+      'bodyfat': selectedBodyFat.text.replaceAll('%', "").isNotEmpty
+          ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
+          : "",
     };
     if (kDebugMode) {
       print('HERE IS USERDETAIL##, $userDetails');
     }
-
+    log('_id==========>>>>>$_id');
     if (_id != null) {
       await userData!.updateUserInfo(_id!, userDetails, image);
 
       ///
 
-      Fluttertoast.showToast(
-        msg: "Profile updated!",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP_RIGHT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: AppColors.primaryColor,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      // Fluttertoast.showToast(
+      //   msg: "Profile updated!",
+      //   toastLength: Toast.LENGTH_LONG,
+      //   gravity: ToastGravity.TOP_RIGHT,
+      //   timeInSecForIosWeb: 1,
+      //   backgroundColor: AppColors.primaryColor,
+      //   textColor: Colors.white,
+      //   fontSize: 16.0,
+      // );
 
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      //   isLoading = false;
+      // });
     } else {
       if (kDebugMode) {
         print("Error: User ID is null");
       }
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      //   isLoading = false;
+      // });
     }
-    setState(() {
-      isLoading = false;
-    });
+    // setState(() {
+    //   isLoading = false;
+    // });
   }
 
   @override
   void dispose() {
+    _saveUserData();
     _imageUrl = null;
     selectedName = "";
     selectedDate = null;
@@ -230,12 +275,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
     selectedLocation = null;
     selectedGoal = null;
     heightInCm = 183;
-    waistInCm = 31;
-    hipInCm = 30;
-    midThigh = 30;
+
     selectedHeightUnit = HeightUnit.cm;
-    selectedWaistUnit = WaistUnit.inches;
-    selectedHipUnit = HipUnit.inches;
+
     canConvertUnit = true;
     showSeparationText = true;
     super.dispose();
@@ -257,23 +299,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   children: [
                     Stack(
                       children: [
-                        // Container(
-                        //   height: media.height / 1,
-                        //   width: media.width,
-                        //   decoration: const BoxDecoration(
-                        //     image: DecorationImage(
-                        //       image: AssetImage('assets/img/back.jpg'),
-                        //       fit: BoxFit.cover,
-                        //       opacity: 1,
-                        //     ),
-                        //   ),
-                        // ),
-                        // ),
                         Utils.appImage(
                           media,
-                          // dataProvider?.screenBackgroundResponse?.imageMyProfle ?? "",
                           image: dataProvider!.cachedImageMap["imageMyProfle"],
-
                           imageKey: "imageMyProfle",
                         ),
                         SizedBox(
@@ -302,7 +330,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: '/exerciseLibrary'),
                                     )
                                   ],
                                 ),
@@ -317,54 +346,76 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                         height: ScreenUtil.horizontalScale(2),
                                       ),
                                       Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) => userData.userName != ""
-                                            ? ProfileImageWidget(
-                                                avatarUrl: userData.userData['detail'] != null &&
-                                                        userData.userData['detail']['avatarUrl'] != null &&
-                                                        userData.userData['detail']['avatarUrl'] != ""
-                                                    ? userData.userData['detail']['avatarUrl']
-                                                    : "",
-                                                name: userData.userName,
-                                                callBack: (pickedImage) {
-                                                  image = pickedImage!;
-                                                  setState(() {});
-                                                },
-                                                showPickImageButton: true,
-                                              )
-                                            : const SizedBox(),
+                                        builder: (context, userData, child) =>
+                                            userData.user["name"] != ""
+                                                ? ProfileImageWidget(
+                                                    avatarUrl: userData
+                                                                        .userData[
+                                                                    'detail'] !=
+                                                                null &&
+                                                            userData.userData[
+                                                                        'detail']
+                                                                    [
+                                                                    'avatarUrl'] !=
+                                                                null &&
+                                                            userData.userData[
+                                                                        'detail']
+                                                                    [
+                                                                    'avatarUrl'] !=
+                                                                ""
+                                                        ? userData.userData[
+                                                                'detail']
+                                                            ['avatarUrl']
+                                                        : "",
+                                                    name: userData.user["name"]
+                                                        .toString()
+                                                        .replaceAll(" ", ""),
+                                                    callBack: (pickedImage) {
+                                                      image = pickedImage!;
+                                                      setState(() {});
+                                                    },
+                                                    showPickImageButton: true,
+                                                  )
+                                                : const SizedBox(),
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(2.5),
                                       ),
                                       Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) => userData.userName != ""
-                                            ? Text(
-                                                // 'Hi, Nick',
-                                                userData.userName,
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(6),
-                                                  fontWeight: FontWeight.bold,
-                                                  height: 1,
-                                                ),
-                                              )
-                                            : const SizedBox(),
+                                        builder: (context, userData, child) =>
+                                            userData.userName != ""
+                                                ? Text(
+                                                    // 'Hi, Nick',
+                                                    userData.userName,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: ScreenUtil
+                                                          .horizontalScale(6),
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      height: 1,
+                                                    ),
+                                                  )
+                                                : const SizedBox(),
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.horizontalScale(0.7),
                                       ),
                                       Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) => userData.userName != ""
-                                            ? Text(
-                                                userData.userEmail,
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: ScreenUtil.horizontalScale(3.5),
-                                                  fontWeight: FontWeight.normal,
-                                                  height: 1,
-                                                ),
-                                              )
-                                            : const SizedBox(),
+                                        builder: (context, userData, child) =>
+                                            userData.userName != ""
+                                                ? Text(
+                                                    userData.userEmail,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: ScreenUtil
+                                                          .horizontalScale(3.5),
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      height: 1,
+                                                    ),
+                                                  )
+                                                : const SizedBox(),
                                       ),
                                     ],
                                   ),
@@ -396,7 +447,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 Container(
                   width: media.width,
-                  constraints: BoxConstraints(minHeight: media.height - (media.height / 3)),
+                  constraints: BoxConstraints(
+                      minHeight: media.height - (media.height / 3)),
                   margin: EdgeInsets.only(top: media.height / 3),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -417,9 +469,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               context: context,
                               label: 'Birthday',
                               value: selectedDate != null
-                                  ? DateFormat('MM/dd/yyyy').format(selectedDate!)
-                                  : 'Select Birthday',
-                              onTap: () async {
+                                  ? DateFormat('MM/dd/yyyy')
+                                      .format(selectedDate!)
+                                  : 'Enter here',
+                              onTap: () {
                                 _showDatePicker(context);
                               },
                             ),
@@ -428,7 +481,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Gender',
                               value: selectedGender,
                               options: genderOptions,
-                              hint: 'Female',
+                              hint: 'Enter here',
                               onChanged: (String? newValue) {
                                 setState(() {
                                   selectedGender = newValue!;
@@ -455,7 +508,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     label: 'Country',
                                     value: value.selectedCountry,
                                     options: value.country?.countries ?? [],
-                                    hint: 'Country',
+                                    hint: 'Enter here',
                                     onChanged: value.onCountrySelect,
                                   ),
                                   _buildDropdownField(
@@ -463,14 +516,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     label: 'State',
                                     value: value.selectedState,
                                     options: value.states?.states ?? [],
-                                    hint: 'State',
+                                    hint: 'Enter here',
                                     onChanged: value.onStateSelect,
                                   ),
                                   _buildTextField(
                                     context: context,
                                     label: 'City',
                                     value: value.selectedCityController,
-                                    hint: 'City',
+                                    hint: 'Enter here',
                                   ),
                                 ],
                               ),
@@ -481,39 +534,34 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               value: selectedHeight,
                               hint: '6\'0"',
                             ),
-                            _numberPicker(
-                              context: context,
+                            NumberEntry(
                               label: 'Weight',
                               controller: selectedWeight,
                               focusNode: _nodeText1,
                               suffix: "lbs",
                             ),
 
-                            _numberPicker(
-                              context: context,
+                            NumberEntry(
                               label: 'Waist',
                               controller: selectedWaist,
                               focusNode: _nodeText2,
                               suffix: '"',
                             ),
-                            _numberPicker(
-                              context: context,
+                            NumberEntry(
                               label: 'Hip',
                               controller: selectedHip,
                               focusNode: _nodeText3,
                               suffix: '"',
                             ),
 
-                            _numberPicker(
-                              context: context,
+                            NumberEntry(
                               label: 'Mid-Thigh',
                               controller: selectedMidThigh,
                               focusNode: _nodeText4,
                               suffix: '"',
                             ),
 
-                            _numberPicker(
-                              context: context,
+                            NumberEntry(
                               label: 'Body-Fat',
                               controller: selectedBodyFat,
                               focusNode: _nodeText5,
@@ -521,24 +569,24 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             ),
 
                             SizedBox(height: ScreenUtil.verticalScale(2)),
-                            isLoading == true
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                    color: AppColors.primaryColor,
-                                  ))
-                                : Container(
-                                    margin: EdgeInsets.symmetric(
-                                      horizontal: ScreenUtil.horizontalScale(9),
-                                    ),
-                                    child: ButtonWidget(
-                                      text: "Save",
-                                      textColor: Colors.white,
-                                      onPress: _saveUserData,
-                                      color: AppColors.primaryColor,
-                                      isLoading: false,
-                                    ),
-                                  ),
-                            SizedBox(height: ScreenUtil.verticalScale(3.2)),
+                            // isLoading == true
+                            //     ? const Center(
+                            //         child: CircularProgressIndicator(
+                            //         color: AppColors.primaryColor,
+                            //       ))
+                            //     : Container(
+                            //         margin: EdgeInsets.symmetric(
+                            //           horizontal: ScreenUtil.horizontalScale(9),
+                            //         ),
+                            //         child: ButtonWidget(
+                            //           text: "Save",
+                            //           textColor: Colors.white,
+                            //           onPress: _saveUserData,
+                            //           color: AppColors.primaryColor,
+                            //           isLoading: false,
+                            //         ),
+                            //       ),
+                            // SizedBox(height: ScreenUtil.verticalScale(3.2)),
                           ],
                         ),
                 ),
@@ -596,12 +644,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   child: Text(
                     value,
                     style: TextStyle(
-                      color: Colors.black,
+                      color: value == 'Enter here'
+                          ? Colors.grey.shade700
+                          : Colors.black,
                       fontSize: ScreenUtil.verticalScale(1.95),
-                      // fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
                       fontWeight: FontWeight.normal,
                     ),
-                    textAlign: TextAlign.center, // Align the text at the center
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -621,8 +670,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
-      margin:
-          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(
+          horizontal: ScreenUtil.horizontalScale(7.5),
+          vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -684,28 +734,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 onChanged: onChanged,
                 underline: Container(),
               ),
-
-              // DropdownButton<String>(
-              //   value: value,
-              //   hint: Text(hint),
-              //   isExpanded: true,
-              //   alignment: Alignment.center, // Align the dropdown text to the center
-              //   items: options.map((String value) {
-              //     return DropdownMenuItem<String>(
-              //       value: value,
-              //       child: Center(
-              //         // Center the individual items in dropdown
-              //         child: Text(value),
-              //       ),
-              //     );
-              //   }).toList(),
-              //   onChanged: (String? newValue) {
-              //     setState(() {
-              //       value = newValue;
-              //     });
-              //   },
-              //   underline: Container(),
-              // ),
             ),
           ),
         ],
@@ -719,8 +747,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
       required TextEditingController value,
       required String hint}) {
     return Container(
-      margin:
-          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(
+          horizontal: ScreenUtil.horizontalScale(7.5),
+          vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -739,7 +768,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
           Container(
             width: ScreenUtil.horizontalScale(50.5),
             height: ScreenUtil.verticalScale(6),
-            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+            padding:
+                EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
             decoration: BoxDecoration(
               color: Colors.grey.withValues(alpha: 0.052),
               borderRadius: Utils.buttonRadius,
@@ -759,7 +789,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 textInputAction: TextInputAction.done,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
-                  hintText: "City",
+                  hintText: hint,
                   hintStyle: TextStyle(
                     color: Colors.grey.shade700,
                     fontSize: ScreenUtil.verticalScale(1.95),
@@ -777,113 +807,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  Widget _numberPicker({
-    required BuildContext context,
-    required String label,
-    required TextEditingController controller,
-    required String suffix,
-    required FocusNode focusNode,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: ScreenUtil.horizontalScale(7.5),
-        vertical: ScreenUtil.verticalScale(0.8),
-      ),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: ScreenUtil.horizontalScale(34.5),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.95),
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            width: ScreenUtil.horizontalScale(50.5),
-            height: ScreenUtil.verticalScale(6),
-            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: KeyboardActions(
-              autoScroll: false,
-              config: _buildConfig(context, focusNode),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IntrinsicWidth(
-                    child: TextField(
-                      style: TextStyle(
-                        fontSize: ScreenUtil.verticalScale(1.95),
-                        color: Colors.black,
-                      ),
-                      controller: controller,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => FocusScope.of(context).unfocus(),
-                      textAlign: TextAlign.center,
-                      focusNode: focusNode,
-                      maxLength: 3,
-                      decoration: InputDecoration(
-                        counterText: "",
-                        hintText: "0",
-                        hintStyle: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: ScreenUtil.verticalScale(1.95),
-                        ),
-                        suffix: !focusNode.hasFocus && controller.text.isEmpty
-                            ? SizedBox()
-                            : Text(
-                                suffix,
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.verticalScale(1.95),
-                                  color: Colors.black,
-                                ),
-                              ),
-                        border: InputBorder.none,
-                        isCollapsed: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        TextInputFormatter.withFunction((oldValue, newValue) {
-                          String newText = newValue.text;
-                          if (newText.isNotEmpty) {
-                            newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                          }
-                          return TextEditingValue(
-                            text: newText,
-                            selection: TextSelection.collapsed(offset: newText.length),
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _heightPicker(
       {required BuildContext context,
       required String label,
       required TextEditingController value,
       required String hint}) {
     return Container(
-      margin:
-          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7.5), vertical: ScreenUtil.verticalScale(0.8)),
+      margin: EdgeInsets.symmetric(
+          horizontal: ScreenUtil.horizontalScale(7.5),
+          vertical: ScreenUtil.verticalScale(0.8)),
       height: ScreenUtil.verticalScale(6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -899,38 +831,40 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ),
           ),
-          Container(
-            width: ScreenUtil.horizontalScale(50.5),
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(1),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  await showCupertinoHeightPicker(
-                    context: context,
-                    initialHeight: heightInCm,
-                    initialSelectedHeightUnit: selectedHeightUnit,
-                    canConvertUnit: canConvertUnit,
-                    showSeparationText: showSeparationText,
-                    onHeightChanged: (val) {
-                      setState(() {
-                        heightInCm = val;
-                        int feet = (heightInCm / 2.54) ~/ 12;
-                        int inches = ((heightInCm / 2.54) % 12).floor();
-                        value.text = '$feet\'$inches"';
-                      });
-                    },
-                  );
+          GestureDetector(
+            onTap: () async {
+              await showCupertinoHeightPicker(
+                context: context,
+                initialHeight: heightInCm,
+                initialSelectedHeightUnit: selectedHeightUnit,
+                canConvertUnit: canConvertUnit,
+                showSeparationText: showSeparationText,
+                onHeightChanged: (val) {
+                  setState(() {
+                    heightInCm = val;
+                    int feet = (heightInCm / 2.54) ~/ 12;
+                    int inches = ((heightInCm / 2.54) % 12).floor();
+                    value.text = '$feet\'$inches"';
+                  });
                 },
+              );
+            },
+            child: Container(
+              width: ScreenUtil.horizontalScale(50.5),
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil.horizontalScale(1),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.grey.withValues(alpha: 0.052),
+                borderRadius: Utils.buttonRadius,
+              ),
+              child: Center(
                 child: Text(
-                  value.text.isEmpty ? 'Height' : value.text,
+                  value.text.isEmpty ? 'Enter here' : value.text,
                   style: TextStyle(
-                    color: value.text.isEmpty ? Colors.grey.shade700 : Colors.black,
+                    color: value.text.isEmpty
+                        ? Colors.grey.shade700
+                        : Colors.black,
                     fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
                   ),
@@ -951,7 +885,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         color: AppColors.blackColor,
       ),
       dateOrder: DatePickerDateOrder.mdy,
-      initialDateTime: DateTime(2000, 1, 1),
+      initialDateTime: selectedDate ?? DateTime(2000, 1, 1),
       maxDateTime: DateTime.now(),
       minDateTime: DateTime(1950, 1, 1),
       onSubmit: (dob) {
@@ -962,7 +896,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       height: 320,
       displayCloseIcon: true,
       closeIconColor: Colors.black,
-      buttonWidth: ScreenUtil.horizontalScale(80),
+      buttonWidth: ScreenUtil.horizontalScale(73),
       buttonContent: Center(
         child: Text(
           "Select",
@@ -983,7 +917,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       pickerTitle: Padding(
         padding: const EdgeInsets.only(top: 10),
         child: Text(
-          "Select Date of Birth",
+          "",
           style: TextStyle(
             color: AppColors.blackColor,
             fontWeight: FontWeight.w600,
@@ -999,34 +933,4 @@ class _MyProfilePageState extends State<MyProfilePage> {
   final FocusNode _nodeText3 = FocusNode();
   final FocusNode _nodeText4 = FocusNode();
   final FocusNode _nodeText5 = FocusNode();
-
-  KeyboardActionsConfig _buildConfig(BuildContext context, FocusNode nodeText) {
-    return KeyboardActionsConfig(
-      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
-      keyboardBarColor: Colors.white,
-      nextFocus: true,
-      actions: [
-        KeyboardActionsItem(
-          focusNode: nodeText,
-          displayArrows: false,
-          toolbarButtons: [
-            (node) {
-              return GestureDetector(
-                onTap: () => node.unfocus(),
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
-                  child: Text(
-                    "Done",
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
-              );
-            }
-          ],
-        ),
-      ],
-    );
-  }
 }

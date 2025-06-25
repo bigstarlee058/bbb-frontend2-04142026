@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
@@ -20,7 +21,8 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DayCompletedPage extends StatefulWidget {
-  const DayCompletedPage({super.key});
+  const DayCompletedPage({super.key, required this.dayTitle});
+  final String dayTitle;
 
   @override
   State<DayCompletedPage> createState() => _DayCompletedPageState();
@@ -72,13 +74,16 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     averageRIR = 0;
     data = monthProvider!.decodedDataAll();
     DateTime oneWeekAgo = today.subtract(const Duration(days: 6));
-    dateList = List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
-    formattedDates = dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
+    dateList =
+        List.generate(7, (index) => oneWeekAgo.add(Duration(days: index)));
+    formattedDates =
+        dateList.map((date) => DateFormat('yyyy-MM-dd').format(date)).toList();
     last7Days = getLast7DayNames();
 
     DayHistoryModel? data1 = monthProvider?.allDayHistoryModel.firstWhere(
       (element) {
-        String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+        String split = monthProvider?.monthDataModel
+                ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
                 .toString()
                 .split(" ")[1] ??
             "";
@@ -98,7 +103,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       time = formatDuration(duration);
       totalWeight = double.parse(data1.totalWeight ?? "0");
       exerciseCompleted = int.parse(data1.completedExercise ?? "0");
-      averageRIR = double.parse(data1.averageRIR == "NaN" ? "0" : data1.averageRIR ?? "0");
+      averageRIR = double.parse(
+          data1.averageRIR == "NaN" ? "0" : data1.averageRIR ?? "0");
     }
 
     setState(() {});
@@ -127,7 +133,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                 height: media.height,
                 width: media.width,
                 decoration: const BoxDecoration(
-                  image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                  image: DecorationImage(
+                      image: AssetImage('assets/img/back.jpg'),
+                      fit: BoxFit.cover,
+                      opacity: 1),
                 ),
               ),
             ],
@@ -152,13 +161,15 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             children: [
                               Container(
                                 alignment: Alignment.center,
-                                padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                                padding: EdgeInsets.all(
+                                    ScreenUtil.verticalScale(0.65)),
                                 decoration: BoxDecoration(
                                   color: Colors.black12,
                                   shape: BoxShape.circle,
                                   border: Border.all(color: Colors.white),
                                 ),
-                                child: Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                child: Consumer<MonthProvider>(
+                                    builder: (context, monthProvider, child) {
                                   return Text(
                                     monthProvider.streak.toString(),
                                     style: TextStyle(
@@ -186,7 +197,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(height: ScreenUtil.verticalScale(6)),
+                        SizedBox(height: ScreenUtil.verticalScale(4)),
                         Text(
                           'Congratulations!',
                           style: TextStyle(
@@ -196,21 +207,31 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             height: 1,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: ScreenUtil.verticalScale(1)),
                         Text(
                           'You completed',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: ScreenUtil.verticalScale(2),
+                            fontSize: ScreenUtil.verticalScale(1.9),
                           ),
                         ),
+                        SizedBox(height: ScreenUtil.verticalScale(1)),
                         Text(
                           "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: ScreenUtil.verticalScale(3),
+                            fontSize: ScreenUtil.verticalScale(1.9),
                           ),
-                        )
+                        ),
+                        SizedBox(height: ScreenUtil.verticalScale(0.8)),
+                        Text(
+                          "${ModalRoute.of(context)?.settings.arguments as String?}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: ScreenUtil.horizontalScale(6),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -251,7 +272,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                     children: [
                       Container(
                         margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.verticalScale(3), vertical: ScreenUtil.verticalScale(2.5)),
+                            horizontal: ScreenUtil.verticalScale(3),
+                            vertical: ScreenUtil.verticalScale(2.5)),
                         child: Column(
                           children: [
                             IconRow(
@@ -259,8 +281,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               icons: List.generate(
                                 formattedDates.length,
                                 (index) => data.any((element) =>
-                                        DateFormat('yyyy-MM-dd')
-                                                .format(Utils.formattedDate(element.endTime!.toString())) ==
+                                        DateFormat('yyyy-MM-dd').format(
+                                                Utils.formattedDate(element
+                                                    .endTime!
+                                                    .toString())) ==
                                             formattedDates[index] &&
                                         element.status == Status.completed)
                                     ? IconDataWithDot(
@@ -308,9 +332,11 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(8)),
                           padding: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
+                              horizontal: ScreenUtil.verticalScale(4.1),
+                              vertical: ScreenUtil.verticalScale(2)),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.all(
@@ -332,7 +358,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 const Text(
                                   'Exercises Completed',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                  style: TextStyle(
+                                      color: Colors.black54, fontSize: 16.5),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
@@ -351,21 +378,25 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       ),
                       Container(
                         margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(8), vertical: ScreenUtil.verticalScale(2.5)),
+                            horizontal: ScreenUtil.horizontalScale(8),
+                            vertical: ScreenUtil.verticalScale(2.5)),
                         child: Row(
                           children: [
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
                                   monthProvider?.updateGraphType("Weight");
-                                  Navigator.pushNamed(context, '/graphAndReports');
+                                  Navigator.pushNamed(
+                                      context, '/graphAndReports');
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(2)),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.all(
-                                      Radius.circular(ScreenUtil.verticalScale(3)),
+                                      Radius.circular(
+                                          ScreenUtil.verticalScale(3)),
                                     ),
                                     boxShadow: const [
                                       BoxShadow(
@@ -377,18 +408,23 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                     ],
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       const Text(
                                         'Weight Lifted',
-                                        style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                        style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 16.5),
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
-                                        '${totalWeight.toStringAsFixed(0)} Lbs',
+                                        "${NumberFormat.decimalPattern('en_US').format(totalWeight.toInt())}lbs",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
-                                            color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                            color: Color(0xFFDD1166),
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w500),
                                       )
                                     ],
                                   ),
@@ -401,14 +437,17 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 onTap: () {
                                   monthProvider?.updateGraphType("RIR");
 
-                                  Navigator.pushNamed(context, '/graphAndReports');
+                                  Navigator.pushNamed(
+                                      context, '/graphAndReports');
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(2)),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.all(
-                                      Radius.circular(ScreenUtil.verticalScale(3)),
+                                      Radius.circular(
+                                          ScreenUtil.verticalScale(3)),
                                     ),
                                     boxShadow: const [
                                       BoxShadow(
@@ -420,18 +459,25 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                     ],
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       const Text(
                                         'Average RIR',
-                                        style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                        style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 16.5),
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
-                                        averageRIR == 0 ? "0" : averageRIR.toStringAsFixed(2),
+                                        averageRIR == 0
+                                            ? "0"
+                                            : averageRIR.toStringAsFixed(2),
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
-                                            color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                            color: Color(0xFFDD1166),
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w500),
                                       )
                                     ],
                                   ),
@@ -442,7 +488,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.horizontalScale(7)),
                         child: ButtonWidget(
                           text: "Back to Dashboard",
                           // textColor: const Color(0x40000000),
@@ -450,7 +497,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                           onPress: () {
                             HapticFeedBack.buttonClick();
                             monthProvider?.checkForPumpDay();
-                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/home', (route) => false);
                             mainPageProvider?.changeTab(0);
                             // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                           },
@@ -460,8 +508,11 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7))
-                            .copyWith(bottom: ScreenUtil.verticalScale(3.2), top: ScreenUtil.verticalScale(1.5)),
+                        margin: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(7))
+                            .copyWith(
+                                bottom: ScreenUtil.verticalScale(3.2),
+                                top: ScreenUtil.verticalScale(1.5)),
                         child: GestureDetector(
                           onTap: isOnTap
                               ? null
@@ -469,13 +520,21 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                   HapticFeedBack.buttonClick();
                                   updateOnTap(true);
                                   try {
-                                    await screenshotController.capture(delay: Duration(milliseconds: 200)).then(
+                                    await screenshotController
+                                        .capture(
+                                            delay: Duration(milliseconds: 200))
+                                        .then(
                                       (image) async {
                                         if (image == null) return;
-                                        final directory = await getTemporaryDirectory();
-                                        final imagePath = File('${directory.path}/screenshot.png');
+                                        final directory =
+                                            await getTemporaryDirectory();
+                                        final imagePath = File(
+                                            '${directory.path}/screenshot.png');
                                         await imagePath.writeAsBytes(image);
-                                        await Share.shareXFiles([XFile(imagePath.path)], text: 'Congratulations!').then(
+                                        await Share.shareXFiles(
+                                                [XFile(imagePath.path)],
+                                                text: 'Congratulations!')
+                                            .then(
                                           (value) {
                                             updateOnTap(false);
                                           },
@@ -483,7 +542,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       },
                                     );
                                   } catch (e) {
-                                    debugPrint('Error capturing and sharing screenshot: $e');
+                                    debugPrint(
+                                        'Error capturing and sharing screenshot: $e');
                                   }
                                 },
                           // style: ElevatedButton.styleFrom(
@@ -498,7 +558,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               vertical: ScreenUtil.verticalScale(1.7),
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
+                              color: AppColors.blueColor,
                               borderRadius: Utils.buttonRadius,
                             ),
                             child: Center(
@@ -506,16 +566,16 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                   ? SizedBox(
                                       width: ScreenUtil.verticalScale(3.2),
                                       height: ScreenUtil.verticalScale(3.2),
-                                      child: Theme(
-                                          data: myThemeData.copyWith(platform: TargetPlatform.iOS),
-                                          child: const CircularProgressIndicator.adaptive()),
-                                    )
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.0,
+                                      ))
                                   : Text(
                                       "Share",
                                       style: TextStyle(
                                         fontSize: ScreenUtil.verticalScale(2.2),
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey.shade500,
+                                        color: Colors.white,
                                       ),
                                     ),
                             ),
@@ -555,7 +615,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                   height: media.height,
                   width: media.width,
                   decoration: const BoxDecoration(
-                    image: DecorationImage(image: AssetImage('assets/img/back.jpg'), fit: BoxFit.cover, opacity: 1),
+                    image: DecorationImage(
+                        image: AssetImage('assets/img/back.jpg'),
+                        fit: BoxFit.cover,
+                        opacity: 1),
                   ),
                 ),
               ],
@@ -578,13 +641,15 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               children: [
                                 Container(
                                   alignment: Alignment.center,
-                                  padding: EdgeInsets.all(ScreenUtil.verticalScale(0.65)),
+                                  padding: EdgeInsets.all(
+                                      ScreenUtil.verticalScale(0.65)),
                                   decoration: BoxDecoration(
                                     color: Colors.black12,
                                     shape: BoxShape.circle,
                                     border: Border.all(color: Colors.white),
                                   ),
-                                  child: Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                  child: Consumer<MonthProvider>(
+                                      builder: (context, monthProvider, child) {
                                     return Text(
                                       monthProvider.streak.toString(),
                                       style: TextStyle(
@@ -677,7 +742,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       children: [
                         Container(
                           margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.verticalScale(3), vertical: ScreenUtil.verticalScale(2.5)),
+                              horizontal: ScreenUtil.verticalScale(3),
+                              vertical: ScreenUtil.verticalScale(2.5)),
                           child: Column(
                             children: [
                               IconRow(
@@ -685,8 +751,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 icons: List.generate(
                                   formattedDates.length,
                                   (index) => data.any((element) =>
-                                          DateFormat('yyyy-MM-dd')
-                                                  .format(Utils.formattedDate(element.endTime!.toString())) ==
+                                          DateFormat('yyyy-MM-dd').format(
+                                                  Utils.formattedDate(element
+                                                      .endTime!
+                                                      .toString())) ==
                                               formattedDates[index] &&
                                           element.status == Status.completed)
                                       ? IconDataWithDot(
@@ -694,7 +762,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                           day: last7Days[6 - index],
                                           icon: Icons.check,
                                           iconColor: Colors.white,
-                                          backgroundColor: AppColors.primaryColor,
+                                          backgroundColor:
+                                              AppColors.primaryColor,
                                           showDot: true,
                                           dotColor: Colors.transparent)
                                       : IconDataWithDot(
@@ -729,9 +798,11 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         SizedBox(height: ScreenUtil.verticalScale(2.5)),
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(8)),
                           padding: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.verticalScale(4.1), vertical: ScreenUtil.verticalScale(2)),
+                              horizontal: ScreenUtil.verticalScale(4.1),
+                              vertical: ScreenUtil.verticalScale(2)),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.all(
@@ -753,7 +824,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 const Text(
                                   'Exercises Completed',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                  style: TextStyle(
+                                      color: Colors.black54, fontSize: 16.5),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
@@ -771,21 +843,25 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         ),
                         Container(
                           margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(8), vertical: ScreenUtil.verticalScale(2.5)),
+                              horizontal: ScreenUtil.horizontalScale(8),
+                              vertical: ScreenUtil.verticalScale(2.5)),
                           child: Row(
                             children: [
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
                                     monthProvider?.updateGraphType("Weight");
-                                    Navigator.pushNamed(context, '/graphAndReports');
+                                    Navigator.pushNamed(
+                                        context, '/graphAndReports');
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: ScreenUtil.verticalScale(2)),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(ScreenUtil.verticalScale(3)),
+                                        Radius.circular(
+                                            ScreenUtil.verticalScale(3)),
                                       ),
                                       boxShadow: const [
                                         BoxShadow(
@@ -797,18 +873,23 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       ],
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         const Text(
                                           'Weight Lifted',
-                                          style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                          style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 16.5),
                                         ),
                                         const SizedBox(height: 10),
                                         Text(
-                                          '${totalWeight.toStringAsFixed(0)} Lbs',
+                                          "${NumberFormat.decimalPattern('en_US').format(totalWeight.toInt())}lbs",
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
-                                              color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                              color: Color(0xFFDD1166),
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w500),
                                         )
                                       ],
                                     ),
@@ -820,14 +901,17 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                 child: GestureDetector(
                                   onTap: () {
                                     monthProvider?.updateGraphType("RIR");
-                                    Navigator.pushNamed(context, '/graphAndReports');
+                                    Navigator.pushNamed(
+                                        context, '/graphAndReports');
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(2)),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: ScreenUtil.verticalScale(2)),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(ScreenUtil.verticalScale(3)),
+                                        Radius.circular(
+                                            ScreenUtil.verticalScale(3)),
                                       ),
                                       boxShadow: const [
                                         BoxShadow(
@@ -839,18 +923,25 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       ],
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         const Text(
                                           'Average RIR',
-                                          style: TextStyle(color: Colors.black54, fontSize: 16.5),
+                                          style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 16.5),
                                         ),
                                         const SizedBox(height: 10),
                                         Text(
-                                          averageRIR == 0 ? "0" : averageRIR.toStringAsFixed(2),
+                                          averageRIR == 0
+                                              ? "0"
+                                              : averageRIR.toStringAsFixed(2),
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
-                                              color: Color(0xFFDD1166), fontSize: 17, fontWeight: FontWeight.w500),
+                                              color: Color(0xFFDD1166),
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w500),
                                         )
                                       ],
                                     ),
@@ -872,20 +963,26 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     );
   }
 
-  Future<void> continueWorkoutOnTap(MonthProvider monthProvider, BuildContext context) async {
+  Future<void> continueWorkoutOnTap(
+      MonthProvider monthProvider, BuildContext context) async {
     HapticFeedBack.buttonClick();
-    int? index = monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.indexWhere(
+    int? index = monthProvider
+        .monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList
+        ?.indexWhere(
       (element) => element == monthProvider.todayTitleId,
     );
 
-    String split =
-        monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first.toString().split(" ")[1] ??
-            "";
+    String split = monthProvider
+            .monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
 
-    final dayIndex = int.parse((monthProvider.monthDataModel?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
+    final dayIndex = int.parse((monthProvider.monthDataModel
+                ?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
                 .toString()
                 .replaceAll("Workout", "")
                 .replaceAll("Rest", "")
@@ -897,43 +994,56 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
         "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
                 .toString()
                 .contains("Workout")
-            ? monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
+            ? monthProvider.monthDataModel!
+                .weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
             : DayDataModel();
 
-    bool isRestDay = "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-        .toString()
-        .contains("Rest Day");
+    bool isRestDay =
+        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
+            .toString()
+            .contains("Rest Day");
 
     bool isPumpDay = (isRestDay &&
-            monthProvider.allDayHistoryModel
-                .any((element) => element.dataId == dataId && element.type.toString().contains("Pump Day"))) ||
+            monthProvider.allDayHistoryModel.any((element) =>
+                element.dataId == dataId &&
+                element.type.toString().contains("Pump Day"))) ||
         (isRestDay &&
             (monthProvider.isPumpDayAvailable &&
-                (monthProvider.allDayHistoryModel
-                    .any((element) => element.dataId == dataId && element.type != "Rest Day")))) ||
+                (monthProvider.allDayHistoryModel.any((element) =>
+                    element.dataId == dataId &&
+                    element.type != "Rest Day")))) ||
         (isRestDay &&
             monthProvider.isPumpDayAvailable &&
-            (monthProvider.allDayHistoryModel
-                .any((element) => element.dataId == dataId && element.type == "Rest Day" && element.status == ""))) ||
+            (monthProvider.allDayHistoryModel.any((element) =>
+                element.dataId == dataId &&
+                element.type == "Rest Day" &&
+                element.status == ""))) ||
         (isRestDay &&
             monthProvider.isPumpDayAvailable &&
-            (!monthProvider.allDayHistoryModel.map((e) => e.dataId).toList().contains(dataId)));
+            (!monthProvider.allDayHistoryModel
+                .map((e) => e.dataId)
+                .toList()
+                .contains(dataId)));
 
     monthProvider.changeIsPumpDay(isPumpDay);
 
     if (isPumpDay) {
       final dataList = monthProvider.dayHistoryModel
-          .where((element) => element.type?.contains("Pump Day") == true && element.status != Status.empty)
+          .where((element) =>
+              element.type?.contains("Pump Day") == true &&
+              element.status != Status.empty)
           .toList();
 
       if (dataList.isNotEmpty) {
-        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any((e1) =>
-            (e1.dayId == monthProvider.todayTitleId && e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
+        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any(
+            (e1) => (e1.dayId == monthProvider.todayTitleId &&
+                e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
         if (index1 != -1) {
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
         } else {
-          int index1 = monthProvider.pumpDays
-              .indexWhere((el1) => dataList.any((e1) => e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
+          int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any(
+              (e1) =>
+                  e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
           monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
               ? 0
               : index1 == 0
@@ -951,19 +1061,27 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
     monthProvider.dayDataModel = dayData;
     // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
-    monthProvider.weekDataModel = monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
-    monthProvider.updateIsPastWeek(monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] == WeekType.pastWeek);
+    monthProvider.weekDataModel =
+        monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
+    monthProvider.updateIsPastWeek(
+        monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] ==
+            WeekType.pastWeek);
 
     final dayIndex1 = monthProvider.overviewCurrentDay;
 
-    int nextWorkOutIndex = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
+    int nextWorkOutIndex = monthProvider.weekDataModel!.dayList![dayIndex1 - 1]
+            .toString()
+            .contains("Workout")
         ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1]
                 .toString()
                 .replaceAll("Day ", "")
                 .replaceAll(" Workout", "")) -
             1
         : 0;
-    String currentDayTitle = monthProvider.weekDataModel!.dayList![dayIndex1 - 1].toString().contains("Workout")
+    String currentDayTitle = monthProvider
+            .weekDataModel!.dayList![dayIndex1 - 1]
+            .toString()
+            .contains("Workout")
         ? monthProvider.weekDataModel!.days![nextWorkOutIndex].title ?? ""
         : monthProvider.weekDataModel!.dayList![dayIndex1 - 1];
 
@@ -971,12 +1089,19 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     //   Navigator.pushNamed(context, '/dayOverview');
     // }
 
-    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel.any((element) =>
-        (element.status == Status.completed || element.status == Status.skipped) && element.dataId == dataId));
+    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel.any(
+        (element) =>
+            (element.status == Status.completed ||
+                element.status == Status.skipped) &&
+            element.dataId == dataId));
 
-    if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && isCompletedOrSkipped) {
+    if (currentDayTitle.contains("Rest Day") &&
+        (!monthProvider.isPumpDay) &&
+        isCompletedOrSkipped) {
       return;
-    } else if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay) && !isCompletedOrSkipped) {
+    } else if (currentDayTitle.contains("Rest Day") &&
+        (!monthProvider.isPumpDay) &&
+        !isCompletedOrSkipped) {
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       context.read<MainPageProvider>().changeTab(1);
       monthProvider.updateIsOnMonthPage(false);
@@ -992,7 +1117,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     } else {
       if (monthProvider.isPumpDay) {
         if ((monthProvider.allSplitDayHistoryModel.any((element) =>
-                (element.status == Status.completed || element.status == Status.skipped) &&
+                (element.status == Status.completed ||
+                    element.status == Status.skipped) &&
                 element.dataId == dataId)) ==
             false) {
           _saveDayData(
@@ -1002,7 +1128,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
           if (!context.mounted) return;
           await Navigator.pushNamed(context, '/today').then(
             (value) {
-              WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await monthProvider.checkForPumpDay());
+              WidgetsBinding.instance.addPostFrameCallback(
+                  (timeStamp) async => await monthProvider.checkForPumpDay());
             },
           );
         } else {
@@ -1010,7 +1137,9 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
           await Navigator.pushNamed(context, '/today');
         }
       } else {
-        if ((monthProvider.dayHistoryModel.any((element) => element.dataId == dataId)) == false) {
+        if ((monthProvider.dayHistoryModel
+                .any((element) => element.dataId == dataId)) ==
+            false) {
           _saveDayData(status: Status.started, type: 'Workout Day');
         }
         if (!context.mounted) return;
@@ -1021,8 +1150,10 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     // Navigator.pushNamed(context, '/dayOverview');
   }
 
-  Future<void> _saveDayData({required String status, required String type, String? title}) async {
-    String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+  Future<void> _saveDayData(
+      {required String status, required String type, String? title}) async {
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()
             .split(" ")[1] ??
         "";
@@ -1035,7 +1166,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       "dataId": dataId,
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
@@ -1044,7 +1176,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
       "endTime": "",
     };
 
-    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+    DayHistoryModel? matchingElement =
+        monthProvider?.dayHistoryModel.firstWhere(
       (element) => element.dataId == dataId,
       orElse: () => DayHistoryModel(),
     );
@@ -1058,7 +1191,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime":
+          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
     };
 
     final apiBody = {
@@ -1070,16 +1204,19 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime":
+          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
       "dataId": dataId
     };
 
     if (matchingElement?.id != null) {
       ApiRepo.updateDayStatus(body: apiBody);
-      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+      await DatabaseHelper().updateData(
+          tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
       ApiRepo.addDayStatus(body: data);
-      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+      await DatabaseHelper()
+          .insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
     await monthProvider?.fetchAllDayStatusLocalData();
     monthProvider?.findWeekStatuses();
@@ -1253,7 +1390,9 @@ class IconRow extends StatelessWidget {
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return Row(
-      mainAxisAlignment: fromHomeScreen ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: fromHomeScreen
+          ? MainAxisAlignment.spaceBetween
+          : MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: icons
           .map(
@@ -1297,10 +1436,14 @@ class IconWithDot extends StatelessWidget {
     return Container(
       // color: iconData.index == 6 ? Colors.red : Colors.transparent,
       padding: iconData.index == 6
-          ? EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1))
+          ? EdgeInsets.symmetric(
+              horizontal: ScreenUtil.horizontalScale(2),
+              vertical: ScreenUtil.verticalScale(1))
           : EdgeInsets.zero,
       decoration: iconData.index == 6
-          ? BoxDecoration(color: AppColors.backOffSetColor, borderRadius: BorderRadius.circular(20))
+          ? BoxDecoration(
+              color: AppColors.backOffSetColor,
+              borderRadius: BorderRadius.circular(20))
           : BoxDecoration(),
       child: Column(
         children: [
@@ -1311,7 +1454,9 @@ class IconWithDot extends StatelessWidget {
             decoration: BoxDecoration(
               color: iconData.backgroundColor,
               shape: BoxShape.circle,
-              border: iconData.borderColor != null ? Border.all(color: iconData.borderColor!) : null,
+              border: iconData.borderColor != null
+                  ? Border.all(color: iconData.borderColor!)
+                  : null,
             ),
             child: iconData.icon != null
                 ? Icon(

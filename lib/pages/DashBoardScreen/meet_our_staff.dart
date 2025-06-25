@@ -67,6 +67,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        physics: ClampingScrollPhysics(),
         child: Column(
           children: [
             Stack(
@@ -79,8 +80,11 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: staffData != null
-                              ? NetworkImage(staffData.photo.startsWith('https://storage.cloud.google.com/')
-                                  ? staffData.photo.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                              ? NetworkImage(staffData.photo.startsWith(
+                                      'https://storage.cloud.google.com/')
+                                  ? staffData.photo.replaceFirst(
+                                      'https://storage.cloud.google.com/',
+                                      'https://storage.googleapis.com/')
                                   : staffData.photo)
                               : const AssetImage('assets/img/back.jpg'),
                           fit: BoxFit.cover,
@@ -97,7 +101,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                             Container(
                               margin: const EdgeInsets.only(right: 10),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Stack(
                                     children: [
@@ -113,9 +118,11 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                         ),
                                         child: SizedBox(
                                           width: ScreenUtil.verticalScale(4.65),
-                                          height: ScreenUtil.verticalScale(4.65),
+                                          height:
+                                              ScreenUtil.verticalScale(4.65),
                                           child: IconButton(
-                                            padding: EdgeInsets.zero, // Removes the default padding
+                                            padding: EdgeInsets
+                                                .zero, // Removes the default padding
                                             icon: const Icon(
                                               Icons.keyboard_arrow_left,
                                               color: Colors.white,
@@ -124,7 +131,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                               // HapticFeedBack.buttonClick();
                                               Navigator.pop(context);
                                             },
-                                            iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
+                                            iconSize: ScreenUtil.verticalScale(
+                                                4), // Icon size remains the same
                                           ),
                                         ),
                                       ),
@@ -134,7 +142,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(7)),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(7)),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -170,7 +179,10 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                   ],
                 ),
                 Container(
-                  constraints: BoxConstraints(minHeight: (media.height - (media.height / 2) - (media.height * 0.12))),
+                  constraints: BoxConstraints(
+                      minHeight: (media.height -
+                          (media.height / 2) -
+                          (media.height * 0.12))),
                   margin: EdgeInsets.only(
                     top: media.height / 1.905, //2.65,
                   ),
@@ -184,7 +196,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                   child: Container(
                     margin: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(9)),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(9)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -201,21 +214,27 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                               staffData!.instagram.isEmpty
                                   ? SizedBox()
                                   : Padding(
-                                      padding: const EdgeInsets.only(right: 6, bottom: 10, top: 10),
+                                      padding: const EdgeInsets.only(
+                                          right: 6, bottom: 10, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
-                                          await launchUrls("https://www.instagram.com");
+                                          await launchUrls(
+                                              "https://www.instagram.com");
                                         },
                                         child: Container(
                                           height: ScreenUtil.verticalScale(4),
                                           width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
                                           child: Center(
                                             child: SvgPicture.asset(
                                               "assets/icons/instagram.svg",
                                               color: Colors.white,
-                                              height: ScreenUtil.verticalScale(2.5),
+                                              height:
+                                                  ScreenUtil.verticalScale(2.5),
                                             ),
                                           ),
                                         ),
@@ -224,7 +243,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                               staffData.facebook.isEmpty
                                   ? SizedBox()
                                   : Padding(
-                                      padding: const EdgeInsets.only(right: 6, bottom: 10, top: 10),
+                                      padding: const EdgeInsets.only(
+                                          right: 6, bottom: 10, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.facebook);
@@ -232,13 +252,17 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                         child: Container(
                                           height: ScreenUtil.verticalScale(4),
                                           width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
                                           child: Center(
                                             child: SvgPicture.asset(
                                               "assets/icons/facebook.svg",
                                               color: Colors.white,
-                                              height: ScreenUtil.verticalScale(2.5),
+                                              height:
+                                                  ScreenUtil.verticalScale(2.5),
                                             ),
                                           ),
                                         ),
@@ -247,7 +271,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                               staffData.twitter.isEmpty
                                   ? SizedBox()
                                   : Padding(
-                                      padding: const EdgeInsets.only(right: 6, bottom: 10, top: 10),
+                                      padding: const EdgeInsets.only(
+                                          right: 6, bottom: 10, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.twitter);
@@ -255,13 +280,17 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                         child: Container(
                                           height: ScreenUtil.verticalScale(4),
                                           width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
                                           child: Center(
                                             child: Image.asset(
                                               "assets/icons/twitter.png",
                                               color: Colors.white,
-                                              height: ScreenUtil.verticalScale(1.5),
+                                              height:
+                                                  ScreenUtil.verticalScale(1.5),
                                             ),
                                           ),
                                         ),
@@ -270,7 +299,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                               staffData.tiktok.isEmpty
                                   ? SizedBox()
                                   : Padding(
-                                      padding: const EdgeInsets.only(right: 6, bottom: 10, top: 10),
+                                      padding: const EdgeInsets.only(
+                                          right: 6, bottom: 10, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.tiktok);
@@ -278,13 +308,17 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                         child: Container(
                                           height: ScreenUtil.verticalScale(4),
                                           width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
                                           child: Center(
                                             child: SvgPicture.asset(
                                               "assets/icons/tiktoksvg.svg",
                                               color: Colors.white,
-                                              height: ScreenUtil.verticalScale(2.5),
+                                              height:
+                                                  ScreenUtil.verticalScale(2.5),
                                             ),
                                           ),
                                         ),
@@ -293,7 +327,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                               staffData.linkedin.isEmpty
                                   ? SizedBox()
                                   : Padding(
-                                      padding: const EdgeInsets.only(right: 6, bottom: 10, top: 10),
+                                      padding: const EdgeInsets.only(
+                                          right: 6, bottom: 10, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.linkedin);
@@ -301,13 +336,17 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                         child: Container(
                                           height: ScreenUtil.verticalScale(4),
                                           width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
                                           child: Center(
                                             child: SvgPicture.asset(
                                               "assets/icons/linkedin.svg",
                                               color: Colors.white,
-                                              height: ScreenUtil.verticalScale(2.5),
+                                              height:
+                                                  ScreenUtil.verticalScale(2.5),
                                             ),
                                           ),
                                         ),
@@ -317,7 +356,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                           ),
                           Container(
                             margin: const EdgeInsets.only(top: 10.0),
-                            alignment: Alignment.centerLeft, // Center-align the header text
+                            alignment: Alignment
+                                .centerLeft, // Center-align the header text
                             child: Text(
                               staffData != null
                                   ? staffData.bio
@@ -325,16 +365,19 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                       "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
 
                               style: const TextStyle(
-                                fontSize: 16, // Customize font size for better readability
+                                fontSize:
+                                    16, // Customize font size for better readability
                                 color: Colors.grey,
                               ),
-                              textAlign: TextAlign.left, // Center align the description
+                              textAlign: TextAlign
+                                  .left, // Center align the description
                             ),
                           ),
                           staffData.link.isEmpty
                               ? SizedBox()
                               : Container(
-                                  margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(4)),
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(4)),
                                   child: ButtonWidget(
                                     text: 'View Details',
                                     textColor: Colors.white,

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -19,10 +21,11 @@ class VideoIntroWidget extends StatefulWidget {
   const VideoIntroWidget({super.key, required this.vimeoId});
 
   @override
-  _VideoIntroWidgetState createState() => _VideoIntroWidgetState();
+  State<VideoIntroWidget> createState() => _VideoIntroWidgetState();
 }
 
-class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProviderStateMixin {
+class _VideoIntroWidgetState extends State<VideoIntroWidget>
+    with TickerProviderStateMixin {
   bool loading = false;
   bool videoNotInitialized = false;
   String tutorialDesc = "";
@@ -57,7 +60,8 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
     tutorialDesc = dataProvider?.tutorialData.description ?? "";
   }
 
-  final ValueNotifier<Duration> videoProgressValue = ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> videoProgressValue =
+      ValueNotifier(Duration.zero);
   Duration getBufferedPosition() {
     final position = _videoPlayerController.value.position;
     final buffered = _videoPlayerController.value.buffered;
@@ -75,14 +79,15 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
   Future<void> initializeVideo(String url) async {
     try {
       // Initialize the video player controller
-      _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
       await _videoPlayerController.initialize().then(
         (value) {
           AudioManager.requestAudioFocus();
         },
       );
+      await _videoPlayerController.setLooping(true);
 
       // Initialize the ChewieController with custom controls
       _chewieController = ChewieController(
@@ -94,11 +99,14 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
         // Disable default controls// Use custom controls here
       );
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      log('rawData==========>>>>>${rawData}');
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+      if (_chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
-        videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
+        videoSize = calculateVideoSize(
+            aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
       // _videoPlayerController.addListener(() async {
@@ -117,12 +125,17 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
       _videoPlayerController.addListener(() async {
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
-        final bool isFinished = position >= duration && !_videoPlayerController.value.isPlaying;
+        final bool isFinished =
+            position >= duration && !_videoPlayerController.value.isPlaying;
         if (isFinished) {
           showControlsOnTapOfPause();
         }
         if (duration != null && position >= duration) {
           AudioManager.abandonAudioFocus();
+          if (Platform.isIOS) {
+            _videoPlayerController.seekTo(Duration.zero);
+            _videoPlayerController.play();
+          }
         } else {
           AudioManager.requestAudioFocus();
         }
@@ -187,9 +200,11 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
     } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
   }
 
@@ -227,17 +242,19 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6.7)),
+      insetPadding:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6.7)),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(25),
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.87),
+              constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.825),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -251,7 +268,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                       )
                     : Column(
                         children: [
-                          SizedBox(height: ScreenUtil.verticalScale(4.5)),
+                          // SizedBox(height: ScreenUtil.verticalScale(4.5)),
                           Stack(
                             children: [
                               GestureDetector(
@@ -262,32 +279,48 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                   color: Colors.black,
                                   child: Column(
                                     children: [
-                                      dataProvider!.tutorialData.files.isNotEmpty && !videoNotInitialized
+                                      dataProvider!.tutorialData.files
+                                                  .isNotEmpty &&
+                                              !videoNotInitialized
                                           ? Stack(
                                               children: [
                                                 SizedBox(
-                                                  height: videoSize.height + ScreenUtil.verticalScale(2.5),
-                                                  width: videoSize.width + ScreenUtil.verticalScale(1.5),
+                                                  height: videoSize.height +
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
+                                                  width: videoSize.width +
+                                                      ScreenUtil.verticalScale(
+                                                          1.5),
                                                   child: Chewie(
-                                                    controller: _chewieController!,
+                                                    controller:
+                                                        _chewieController!,
                                                   ),
                                                 ),
                                                 AnimatedContainer(
-                                                  duration: Duration(milliseconds: 1700),
+                                                  duration: Duration(
+                                                      milliseconds: 1300),
                                                   curve: Curves.easeInOut,
-                                                  color: showControls ? Colors.black38 : Colors.transparent,
-                                                  height: videoSize.height + ScreenUtil.verticalScale(2.5),
-                                                  width: videoSize.width + ScreenUtil.verticalScale(1.5),
+                                                  color: showControls
+                                                      ? Colors.black38
+                                                      : Colors.transparent,
+                                                  height: videoSize.height +
+                                                      ScreenUtil.verticalScale(
+                                                          2.5),
+                                                  width: videoSize.width +
+                                                      ScreenUtil.verticalScale(
+                                                          1.5),
                                                 ),
                                               ],
                                             )
                                           : Container(
-                                              height: ScreenUtil.verticalScale(40),
+                                              height:
+                                                  ScreenUtil.verticalScale(40),
                                               color: Colors.black12,
                                               child: const Center(
                                                   child: Text(
                                                 'No Video Available',
-                                                style: TextStyle(color: Colors.white),
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               )),
                                             ),
                                     ],
@@ -303,7 +336,8 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                   duration: const Duration(milliseconds: 800),
                                   curve: Curves.easeInOut,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       // Skip backward button
                                       IconButton(
@@ -312,11 +346,16 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                           Icons.replay_10,
                                           color: Colors.white70,
                                         ),
-                                        onPressed: () {
-                                          _videoPlayerController.seekTo(
-                                            _videoPlayerController.value.position - const Duration(seconds: 10),
-                                          );
-                                        },
+                                        onPressed: showControls
+                                            ? () {
+                                                _videoPlayerController.seekTo(
+                                                  _videoPlayerController
+                                                          .value.position -
+                                                      const Duration(
+                                                          seconds: 10),
+                                                );
+                                              }
+                                            : null,
                                       ),
                                       IconButton(
                                         iconSize: 60,
@@ -326,21 +365,40 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                               : Icons.play_circle_filled,
                                           color: Colors.white70,
                                         ),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (_videoPlayerController.value.isPlaying) {
-                                              _videoPlayerController.pause();
-                                              showControlsOnTapOfPause();
+                                        onPressed: showControls
+                                            ? () async {
+                                                if (_videoPlayerController
+                                                    .value.isPlaying) {
+                                                  _videoPlayerController
+                                                      .pause();
+                                                  setState(() {});
+                                                  showControlsOnTapOfPause();
+                                                  await Future.delayed(Duration(
+                                                          milliseconds: 100))
+                                                      .then(
+                                                    (value) {
+                                                      AudioManager
+                                                          .abandonAudioFocus();
+                                                      setState(() {});
+                                                    },
+                                                  );
+                                                } else {
+                                                  _videoPlayerController.play();
+                                                  setState(() {});
+                                                  hideControls();
 
-                                              AudioManager.abandonAudioFocus();
-                                            } else {
-                                              _videoPlayerController.play();
-                                              hideControls();
-
-                                              AudioManager.requestAudioFocus();
-                                            }
-                                          });
-                                        },
+                                                  await Future.delayed(Duration(
+                                                          milliseconds: 100))
+                                                      .then(
+                                                    (value) {
+                                                      AudioManager
+                                                          .requestAudioFocus();
+                                                      setState(() {});
+                                                    },
+                                                  );
+                                                }
+                                              }
+                                            : null,
                                       ),
                                       // Skip forward button
                                       IconButton(
@@ -349,11 +407,16 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                           Icons.forward_10,
                                           color: Colors.white70,
                                         ),
-                                        onPressed: () {
-                                          _videoPlayerController.seekTo(
-                                            _videoPlayerController.value.position + const Duration(seconds: 10),
-                                          );
-                                        },
+                                        onPressed: showControls
+                                            ? () {
+                                                _videoPlayerController.seekTo(
+                                                  _videoPlayerController
+                                                          .value.position +
+                                                      const Duration(
+                                                          seconds: 10),
+                                                );
+                                              }
+                                            : null,
                                       ),
                                     ],
                                   ),
@@ -364,17 +427,26 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                 left: 10,
                                 right: 10,
                                 child: !videoNotInitialized &&
-                                        _chewieController!.videoPlayerController.value.isInitialized == true
+                                        _chewieController!.videoPlayerController
+                                                .value.isInitialized ==
+                                            true
                                     ? Column(
                                         children: [
                                           Container(
                                             margin: EdgeInsets.only(
-                                                bottom: ScreenUtil.verticalScale(1.3), left: 20, right: 20),
+                                                bottom:
+                                                    ScreenUtil.verticalScale(
+                                                        1.3),
+                                                left: 20,
+                                                right: 20),
                                             child: Column(
                                               children: [
                                                 Column(
                                                   children: [
-                                                    SizedBox(height: ScreenUtil.verticalScale(0.8)),
+                                                    SizedBox(
+                                                        height: ScreenUtil
+                                                            .verticalScale(
+                                                                0.8)),
                                                     Row(
                                                       children: [
                                                         Spacer(),
@@ -385,8 +457,16 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                                                 }
                                                               : null,
                                                           child: Icon(
-                                                            isMute ? Icons.volume_up : Icons.volume_off,
-                                                            color: !showControls ? Colors.transparent : Colors.white70,
+                                                            isMute
+                                                                ? Icons
+                                                                    .volume_up
+                                                                : Icons
+                                                                    .volume_off,
+                                                            color: !showControls
+                                                                ? Colors
+                                                                    .transparent
+                                                                : Colors
+                                                                    .white70,
                                                             size: 28,
                                                           ),
                                                         ),
@@ -394,36 +474,54 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
                                                     ),
                                                   ],
                                                 ),
-                                                SizedBox(height: ScreenUtil.verticalScale(1)),
-                                                ValueListenableBuilder<Duration>(
-                                                  valueListenable: videoProgressValue,
-                                                  builder: (context, progress, _) {
+                                                SizedBox(
+                                                    height: ScreenUtil
+                                                        .verticalScale(1)),
+                                                ValueListenableBuilder<
+                                                    Duration>(
+                                                  valueListenable:
+                                                      videoProgressValue,
+                                                  builder:
+                                                      (context, progress, _) {
                                                     return ProgressBar(
-                                                      collapsedBufferedBarColor: Colors.white,
-                                                      expandedBufferedBarColor: Colors.white,
-                                                      buffered: getBufferedPosition(),
+                                                      collapsedBufferedBarColor:
+                                                          Colors.white,
+                                                      expandedBufferedBarColor:
+                                                          Colors.white,
+                                                      buffered:
+                                                          getBufferedPosition(),
                                                       controller: _controller,
                                                       progress: progress,
                                                       total: Duration(
-                                                        seconds: _videoPlayerController.value.duration.inSeconds,
+                                                        seconds:
+                                                            _videoPlayerController
+                                                                .value
+                                                                .duration
+                                                                .inSeconds,
                                                       ),
                                                       onChanged: (value) {
                                                         _videoPlayerController
-                                                            .seekTo(Duration(seconds: value.inSeconds));
+                                                            .seekTo(Duration(
+                                                                seconds: value
+                                                                    .inSeconds));
                                                       },
                                                       onSeek: (value) {},
                                                       onChangeStart: (value) {
-                                                        _videoPlayerController.pause();
+                                                        _videoPlayerController
+                                                            .pause();
                                                         isZoom = true;
                                                       },
                                                       onChangeEnd: (value) {
-                                                        _videoPlayerController.play();
+                                                        _videoPlayerController
+                                                            .play();
                                                         isZoom = false;
                                                       },
                                                     );
                                                   },
                                                 ),
-                                                SizedBox(height: ScreenUtil.verticalScale(2.2)),
+                                                SizedBox(
+                                                    height: ScreenUtil
+                                                        .verticalScale(2.2)),
                                               ],
                                             ),
                                           ),
@@ -463,10 +561,14 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
               child: GestureDetector(
                 child: Container(
                   decoration: const BoxDecoration(
-                      color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(100))),
                   child: Padding(
                     padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
-                    child: Icon(size: ScreenUtil.verticalScale(2.5), Icons.close, color: Colors.white),
+                    child: Icon(
+                        size: ScreenUtil.verticalScale(2.5),
+                        Icons.close,
+                        color: Colors.white),
                   ),
                 ),
                 onTap: () {
@@ -522,7 +624,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget> with TickerProvider
       //                                   ),
       //                                 ),
       //                                 AnimatedContainer(
-      //                                   duration: Duration(milliseconds: 1700),
+      //                                   duration: Duration(milliseconds: 1300),
       //                                   curve: Curves.easeInOut,
       //                                   color: showControls ? Colors.black38 : Colors.transparent,
       //                                   height: videoSize.height,

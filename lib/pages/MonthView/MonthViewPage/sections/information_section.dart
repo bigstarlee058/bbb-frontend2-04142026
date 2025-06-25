@@ -31,7 +31,7 @@ class _InformationSectionState extends State<InformationSection> {
 
   @override
   void initState() {
-    widget.programInfoProvider.getProgramInfo(context);
+    widget.programInfoProvider.getProgramInfo();
     super.initState();
   }
 
@@ -45,14 +45,17 @@ class _InformationSectionState extends State<InformationSection> {
           builder: (context, value, child) {
             return Container(
               constraints: BoxConstraints(
-                minHeight: (media.height - (media.height / 2.55) - (media.height * 0.12)),
+                minHeight: (media.height -
+                    (media.height / 2.55) -
+                    (media.height * 0.12)),
               ),
               color: Colors.white,
               child: value.loading
                   ? Padding(
                       padding: EdgeInsets.only(bottom: media.height * 0.1),
                       child: const Center(
-                        child: CircularProgressIndicator(color: AppColors.primaryColor),
+                        child: CircularProgressIndicator(
+                            color: AppColors.primaryColor),
                       ),
                     )
                   : value.programInfoModel == null
@@ -66,7 +69,8 @@ class _InformationSectionState extends State<InformationSection> {
                           ),
                         )
                       : Padding(
-                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6))
+                          padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(6))
                               .copyWith(bottom: ScreenUtil.verticalScale(13)),
                           child: ListView.builder(
                             shrinkWrap: true,
@@ -74,18 +78,33 @@ class _InformationSectionState extends State<InformationSection> {
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: value.programInfoModel!.sections.length,
                             itemBuilder: (context, index) {
-                              return value.programInfoModel!.sections[index].formats != null &&
-                                      value.programInfoModel!.sections[index].variations != null &&
-                                      value.programInfoModel!.sections[index].formats!
-                                          .contains(widget.monthProvider.equipmentType) &&
-                                      value.programInfoModel!.sections[index].variations!
-                                          .contains(widget.monthProvider.splitType?.replaceAll("split", ""))
+                              return value.programInfoModel!.sections[index]
+                                              .formats !=
+                                          null &&
+                                      value.programInfoModel!.sections[index]
+                                              .variations !=
+                                          null &&
+                                      value.programInfoModel!.sections[index]
+                                          .formats!
+                                          .contains(widget
+                                              .monthProvider.equipmentType) &&
+                                      value.programInfoModel!.sections[index]
+                                          .variations!
+                                          .contains(widget
+                                              .monthProvider.splitType
+                                              ?.replaceAll("split", ""))
                                   ? Padding(
-                                      padding: const EdgeInsets.only(bottom: 15),
+                                      padding:
+                                          const EdgeInsets.only(bottom: 15),
                                       child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
-                                        child: buildExpansionTileItem(index, value.programInfoModel!.sections[index],
-                                            value.programInfoModel!.sections.length),
+                                        borderRadius: BorderRadius.circular(
+                                            ScreenUtil.verticalScale(4)),
+                                        child: buildExpansionTileItem(
+                                            index,
+                                            value.programInfoModel!
+                                                .sections[index],
+                                            value.programInfoModel!.sections
+                                                .length),
                                       ),
                                     )
                                   : SizedBox();
@@ -183,7 +202,8 @@ class _InformationSectionState extends State<InformationSection> {
               SizedBox(
                 width: double.infinity,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil.horizontalScale(6)),
                   child: Text(
                     item.description.trim().capitalizeFirst(),
                     textAlign: TextAlign.start,

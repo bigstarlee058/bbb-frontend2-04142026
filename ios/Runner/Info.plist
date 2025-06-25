@@ -23,15 +23,15 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>89</string>
+	<string>93</string>
 	<key>FLTEnableImpeller</key>
+	<false/>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
 	<false/>
 	<key>FlutterImpeller</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>FirebaseAutomaticScreenReportingEnabled</key>
-	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>App wants to capture profile photo please grant camera access</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

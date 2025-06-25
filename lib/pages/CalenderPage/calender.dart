@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:bbb/components/custom_table_calender.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -86,7 +89,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 0.3),
+        border:
+            Border.all(color: Colors.black.withValues(alpha: 0.05), width: 0.3),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withValues(alpha: 0.27),
@@ -117,16 +121,23 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
               headerPadding: const EdgeInsets.only(bottom: 10, top: 5),
               formatButtonVisible: false,
               titleCentered: false,
-              leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.primaryColor),
-              rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded, size: 20, color: AppColors.primaryColor),
-              titleTextFormatter: (date, locale) => DateFormat.yMMMM().format(date),
-              titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+              leftChevronIcon: const Icon(Icons.arrow_back_ios_rounded,
+                  size: 20, color: AppColors.primaryColor),
+              rightChevronIcon: const Icon(Icons.arrow_forward_ios_rounded,
+                  size: 20, color: AppColors.primaryColor),
+              titleTextFormatter: (date, locale) =>
+                  DateFormat.yMMMM().format(date),
+              titleTextStyle: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor),
               decoration: BoxDecoration()),
           calendarStyle: CalendarStyle(
             defaultTextStyle: TextStyle(fontSize: 14.0),
             weekendTextStyle: TextStyle(fontSize: 14.0),
             outsideDecoration: BoxDecoration(color: Colors.transparent),
-            outsideTextStyle: TextStyle(fontSize: 14.0, color: Colors.grey.shade500),
+            outsideTextStyle:
+                TextStyle(fontSize: 14.0, color: Colors.grey.shade500),
           ),
           onRangeSelected: (start, end, focusedDay) {},
           onDaySelected: null,
@@ -135,7 +146,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
               return _buildDayState(day);
             },
             todayBuilder: (context, day, date) {
-              return _buildDayState(day) ?? _buildCurrentWorkoutDay(day, day: DateTime.now().day);
+              return _buildDayState(day) ??
+                  _buildCurrentWorkoutDay(day, day: DateTime.now().day);
             },
             outsideBuilder: (context, day, date) {
               return _buildDayState(day, isOutSide: true);
@@ -153,10 +165,14 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  Map<String, int>? findDateIndex(DateTime targetDate, List<List<DayHistoryModel>> rangeList) {
+  Map<String, int>? findDateIndex(
+      DateTime targetDate, List<List<DayHistoryModel>> rangeList) {
     for (int outerIndex = 0; outerIndex < rangeList.length; outerIndex++) {
-      for (int innerIndex = 0; innerIndex < rangeList[outerIndex].length; innerIndex++) {
-        DateTime date = rangeList[outerIndex][innerIndex].endTime ?? rangeList[outerIndex][innerIndex].startTime!;
+      for (int innerIndex = 0;
+          innerIndex < rangeList[outerIndex].length;
+          innerIndex++) {
+        DateTime date = rangeList[outerIndex][innerIndex].endTime ??
+            rangeList[outerIndex][innerIndex].startTime!;
         DateTime localDate = Utils.formattedDate("$date");
 
         if (localDate.year == targetDate.year &&
@@ -172,68 +188,38 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     return null;
   }
 
-  // List<List<DayHistoryModel>> groupCompletedByConsecutiveDates(List<DayHistoryModel> dataList) {
-  //   List<DayHistoryModel> completedList = dataList.where((e) => e.status == Status.completed).toList();
-  //
-  //   log('completedList :::::::::::::::::: ${jsonEncode(completedList)}');
-  //   completedList.sort((a, b) {
-  //     final aDate = a.endTime ?? a.startTime!;
-  //     final bDate = b.endTime ?? b.startTime!;
-  //     return DateTime(aDate.year, aDate.month, aDate.day).compareTo(DateTime(bDate.year, bDate.month, bDate.day));
-  //   });
-  //
-  //   List<List<DayHistoryModel>> grouped = [];
-  //   List<DayHistoryModel> currentGroup = [];
-  //
-  //   for (int i = 0; i < completedList.length; i++) {
-  //     final current = completedList[i];
-  //     final currentDate = current.endTime ?? current.startTime!;
-  //     DateTime localTime = Utils.formattedDate("$currentDate");
-  //
-  //     final currentDay = DateTime(localTime.year, localTime.month, localTime.day);
-  //     if (currentGroup.isEmpty) {
-  //       currentGroup.add(current);
-  //     } else {
-  //       final lastDate = currentGroup.last.endTime ?? currentGroup.last.startTime!;
-  //       final lastDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
-  //
-  //       if (currentDay.difference(lastDay).inDays == 1) {
-  //         currentGroup.add(current);
-  //       } else {
-  //         grouped.add(List<DayHistoryModel>.from(currentGroup));
-  //         currentGroup = [current];
-  //       }
-  //     }
-  //   }
-  //
-  //   if (currentGroup.isNotEmpty) {
-  //     grouped.add(currentGroup);
-  //   }
-  //
-  //   return grouped;
-  // }
-  List<List<DayHistoryModel>> groupCompletedByConsecutiveDates(List<DayHistoryModel> dataList) {
-    List<DayHistoryModel> completedList = dataList.where((e) => e.status == Status.completed).toList();
+  List<List<DayHistoryModel>> groupCompletedByConsecutiveDates(
+      List<DayHistoryModel> dataList) {
+    List<DayHistoryModel> completedList =
+        dataList.where((e) => e.status == Status.completed).toList();
 
     completedList.sort((a, b) {
       final aDate = (a.endTime ?? a.startTime)!;
       final bDate = (b.endTime ?? b.startTime)!;
-      return DateTime(aDate.year, aDate.month, aDate.day).compareTo(DateTime(bDate.year, bDate.month, bDate.day));
+
+      DateTime localTimeBDate = Utils.formattedDate("$bDate");
+      DateTime localTimeADate = Utils.formattedDate("$aDate");
+
+      return DateTime(
+              localTimeADate.year, localTimeADate.month, localTimeADate.day)
+          .compareTo(DateTime(
+              localTimeBDate.year, localTimeBDate.month, localTimeBDate.day));
     });
 
     List<List<DayHistoryModel>> grouped = [];
     List<DayHistoryModel> currentGroup = [];
 
     DateTime normalizeDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
-
     for (var i = 0; i < completedList.length; i++) {
       final current = completedList[i];
-      final currentDate = normalizeDate(Utils.formattedDate("${current.endTime ?? current.startTime!}"));
+      final currentDate = normalizeDate(
+          Utils.formattedDate("${current.endTime ?? current.startTime!}"));
       if (currentGroup.isEmpty) {
         currentGroup.add(current);
       } else {
         final last = currentGroup.last;
-        final lastDate = normalizeDate(Utils.formattedDate("${last.endTime ?? last.startTime!}"));
+        final lastDate = normalizeDate(
+            Utils.formattedDate("${last.endTime ?? last.startTime!}"));
         if (currentDate.difference(lastDate).inDays == 1) {
           currentGroup.add(current);
         } else {
@@ -246,7 +232,6 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     if (currentGroup.isNotEmpty) {
       grouped.add(currentGroup);
     }
-
     return grouped;
   }
 
@@ -265,8 +250,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       ).reduce((a, b) => a.isBefore(b) ? a : b);
       List<DayHistoryModel> data = monthProvider!.decodedDataAll();
       final data11 = groupCompletedByConsecutiveDates(data);
-      bool isCurrentDay = date.year == now.year && date.month == now.month && date.day == now.day;
-
+      bool isCurrentDay = date.year == now.year &&
+          date.month == now.month &&
+          date.day == now.day;
       if (data11.isEmpty) {
         if (isCurrentDay) {
           return _buildCurrentWorkoutDay(date);
@@ -274,18 +260,27 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           return _buildCustomDayCircle(date, Colors.blue);
         }
       }
-      DateTime futureDay = DateTime(now.year, now.month, now.day).add(Duration(days: 1));
+      DateTime futureDay =
+          DateTime(now.year, now.month, now.day).add(Duration(days: 1));
       if (date.isBefore(futureDay)) {
         for (var day in data) {
           final workoutDate = day.endTime!;
           DateTime localTime = Utils.formattedDate("$workoutDate");
-          if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
-            final isRange = data11.any((d) => d.any((element) => _isSameDate(localTime, date)));
+          if ((localTime.day == date.day &&
+              localTime.month == date.month &&
+              localTime.year == date.year)) {
+            final isRange = data11
+                .any((d) => d.any((element) => _isSameDate(localTime, date)));
+            final isCircleP = !isRange
+                ? data.any((d) =>
+                    d.status == Status.completed &&
+                    _isSameDate(localTime, date))
+                : false;
 
-            final isCircleP =
-                !isRange ? data.any((d) => d.status == Status.completed && _isSameDate(localTime, date)) : false;
-            final isCircleB =
-                !isRange ? data.any((d) => d.status == Status.skipped && _isSameDate(localTime, date)) : false;
+            final isCircleB = !isRange
+                ? data.any((d) =>
+                    d.status == Status.skipped && _isSameDate(localTime, date))
+                : false;
 
             if ((isCircleP || isCircleB) && !isRange) {
               return Center(
@@ -328,7 +323,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  if (data11[data["outerIndex"]!].length > 1 && data["innerIndex"] == 0)
+                  if (data11[data["outerIndex"]!].length > 1 &&
+                      data["innerIndex"] == 0)
                     Positioned(
                       top: ScreenUtil.verticalScale(0.7),
                       left: ScreenUtil.horizontalScale(size > 600 ? 4.5 : 3.5),
@@ -337,17 +333,21 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                         height: ScreenUtil.verticalScale(3.2),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.horizontal(
-                            right: (data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                            right: (data11[data["outerIndex"]!].length - 1 ==
+                                    data["innerIndex"])
                                 ? Radius.circular(20)
                                 : Radius.circular(0),
-                            left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
+                            left: (data["innerIndex"] == 0)
+                                ? Radius.circular(20)
+                                : Radius.circular(0),
                           ),
                           color: AppColors.backOffSetColor,
                         ),
                       ),
                     ),
                   if (data11[data["outerIndex"]!].length > 1 &&
-                      data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                      data11[data["outerIndex"]!].length - 1 ==
+                          data["innerIndex"])
                     Positioned(
                       top: ScreenUtil.verticalScale(0.7),
                       right: ScreenUtil.horizontalScale(size > 600 ? 4.5 : 3.5),
@@ -356,10 +356,13 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                         height: ScreenUtil.verticalScale(3.2),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.horizontal(
-                            right: (data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                            right: (data11[data["outerIndex"]!].length - 1 ==
+                                    data["innerIndex"])
                                 ? Radius.circular(20)
                                 : Radius.circular(0),
-                            left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
+                            left: (data["innerIndex"] == 0)
+                                ? Radius.circular(20)
+                                : Radius.circular(0),
                           ),
                           color: AppColors.backOffSetColor,
                         ),
@@ -367,24 +370,30 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                     ),
                   Container(
                     height: ScreenUtil.verticalScale(3.2),
-                    margin: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(0.7)),
+                    margin: EdgeInsets.symmetric(
+                        vertical: ScreenUtil.verticalScale(0.7)),
                     decoration: BoxDecoration(
-                      color:
-                          ((data["innerIndex"] == 0) || (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
-                              ? Colors.transparent
-                              : AppColors.backOffSetColor,
+                      color: ((data["innerIndex"] == 0) ||
+                              (data11[data["outerIndex"]!].length - 1 ==
+                                  data["innerIndex"]))
+                          ? Colors.transparent
+                          : AppColors.backOffSetColor,
                       borderRadius: BorderRadius.horizontal(
-                        right: (data11[data["outerIndex"]!].length - 1 == data["innerIndex"])
+                        right: (data11[data["outerIndex"]!].length - 1 ==
+                                data["innerIndex"])
                             ? Radius.circular(20)
                             : Radius.circular(0),
-                        left: (data["innerIndex"] == 0) ? Radius.circular(20) : Radius.circular(0),
+                        left: (data["innerIndex"] == 0)
+                            ? Radius.circular(20)
+                            : Radius.circular(0),
                       ),
                     ),
                     alignment: Alignment.center,
                     child: Container(
                       decoration: BoxDecoration(
                           color: ((data["innerIndex"] == 0) ||
-                                  (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                  (data11[data["outerIndex"]!].length - 1 ==
+                                      data["innerIndex"]))
                               ? AppColors.primaryColor
                               : Colors.transparent,
                           shape: BoxShape.circle),
@@ -393,7 +402,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                           '${date.day}',
                           style: TextStyle(
                               color: ((data["innerIndex"] == 0) ||
-                                      (data11[data["outerIndex"]!].length - 1 == data["innerIndex"]))
+                                      (data11[data["outerIndex"]!].length - 1 ==
+                                          data["innerIndex"]))
                                   ? Colors.white
                                   : Colors.black),
                         ),
@@ -413,7 +423,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         for (var day in data) {
           final workoutDate = day.endTime!;
           DateTime localTime = Utils.formattedDate("$workoutDate");
-          if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+          if ((localTime.day == date.day &&
+              localTime.month == date.month &&
+              localTime.year == date.year)) {
             if (day.status == Status.completed) {
               return _buildCustomDayCircle(date, AppColors.primaryColor);
             } else if (day.status == Status.skipped) {
@@ -427,13 +439,16 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       }
 
       if (oldestStartDate.isBefore(date) && now.isAfter(date)) {
-        if (DateTime(futureDay.year, futureDay.month, futureDay.day) != DateTime(date.year, date.month, date.day)) {
+        if (DateTime(futureDay.year, futureDay.month, futureDay.day) !=
+            DateTime(date.year, date.month, date.day)) {
           return _buildCustomDayCircle(date, Colors.blue);
         }
       }
     } else {
       final nowUtc = DateTime.now();
-      bool isCurrentDay = date.year == nowUtc.year && date.month == nowUtc.month && date.day == nowUtc.day;
+      bool isCurrentDay = date.year == nowUtc.year &&
+          date.month == nowUtc.month &&
+          date.day == nowUtc.day;
       if (isCurrentDay) {
         return _buildCurrentWorkoutDay(date);
       } else {

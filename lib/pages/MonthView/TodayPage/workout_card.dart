@@ -61,7 +61,8 @@ class WorkoutCard extends StatefulWidget {
 class _WorkoutCardState extends State<WorkoutCard> {
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await getTotalSets());
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) async => await getTotalSets());
     super.initState();
   }
 
@@ -124,9 +125,12 @@ class _WorkoutCardState extends State<WorkoutCard> {
   List<ExtraSetModel> extraSetModel = [];
   fetchExtraSetLocalData() async {
     final data = await DatabaseHelper().getDataFromTable(
-        tableName: DatabaseHelper.extraSetHistory, where: 'dataId', id: "EXTRA-ADDED${widget.dataId}");
+        tableName: DatabaseHelper.extraSetHistory,
+        where: 'dataId',
+        id: "EXTRA-ADDED${widget.dataId}");
     if (data.isNotEmpty) {
-      extraSetModel = List<ExtraSetModel>.from(json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
+      extraSetModel = List<ExtraSetModel>.from(
+          json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
     } else {
       extraSetModel = [];
     }
@@ -143,7 +147,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
     var media = MediaQuery.of(context).size;
 
     return Slidable(
-      enabled: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted ? false : true,
+      enabled: widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted
+          ? false
+          : true,
       endActionPane: widget.isEditMode
           ? null
           : widget.isCircuit || widget.isDaySkipped || widget.isDayCompleted
@@ -167,7 +173,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 backgroundColor: Colors.blue,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.all(0),
-                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                                borderRadius: BorderRadius.circular(
+                                    ScreenUtil.verticalScale(3)),
                               ),
                             ],
                           ),
@@ -186,7 +193,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 backgroundColor: Colors.red,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.all(0),
-                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                                borderRadius: BorderRadius.circular(
+                                    ScreenUtil.verticalScale(3)),
                               ),
                             ],
                           ),
@@ -212,11 +220,13 @@ class _WorkoutCardState extends State<WorkoutCard> {
           onPressed: widget.enabled && widget.onPress != null
               ? () async {
                   await getTotalSets();
-                  final provider = Provider.of<MonthProvider>(context, listen: false);
+                  final provider =
+                      Provider.of<MonthProvider>(context, listen: false);
                   widget.onPress!(
                     () async => await getTotalSets(),
                   );
-                  provider.updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal);
+                  provider.updateSetValue(
+                      warmUpSetTotal, backOffSetTotal, workingSetTotal);
                 }
               : null,
           style: ElevatedButton.styleFrom(
@@ -260,41 +270,53 @@ class _WorkoutCardState extends State<WorkoutCard> {
                           ? BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
-                                  const Color(0xFFAADDAA).withValues(alpha: 0.8),
+                                  const Color(0xFFAADDAA)
+                                      .withValues(alpha: 0.8),
+                                  const Color(0xFFAADDAA)
+                                      .withValues(alpha: 0.8),
                                 ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                topLeft: Radius.circular(
+                                    ScreenUtil.verticalScale(12)),
+                                bottomLeft: Radius.circular(
+                                    ScreenUtil.verticalScale(12)),
                               ),
                             )
                           : widget.isSkipped
                               ? BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      AppColors.secondColor.withValues(alpha: 0.8),
-                                      AppColors.secondColor.withValues(alpha: 0.8),
+                                      AppColors.secondColor
+                                          .withValues(alpha: 0.8),
+                                      AppColors.secondColor
+                                          .withValues(alpha: 0.8),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
                                   ),
                                   borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                    topLeft: Radius.circular(
+                                        ScreenUtil.verticalScale(12)),
+                                    bottomLeft: Radius.circular(
+                                        ScreenUtil.verticalScale(12)),
                                   ),
                                 )
                               : BoxDecoration(
                                   borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
-                                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
+                                    topLeft: Radius.circular(
+                                        ScreenUtil.verticalScale(12)),
+                                    bottomLeft: Radius.circular(
+                                        ScreenUtil.verticalScale(12)),
                                   ),
                                 ),
                       child: Icon(
                         widget.isCompleted ? Icons.check : Icons.close,
-                        color: widget.isCompleted || widget.isSkipped ? Colors.white : Colors.transparent,
+                        color: widget.isCompleted || widget.isSkipped
+                            ? Colors.white
+                            : Colors.transparent,
                         size: 30,
                       ),
                     ),
@@ -321,19 +343,21 @@ class _WorkoutCardState extends State<WorkoutCard> {
                         widget.isCircuit
                             ? SizedBox()
                             : Padding(
-                                padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.5)),
+                                padding: EdgeInsets.only(
+                                    top: ScreenUtil.verticalScale(1.5)),
                                 child: Row(
                                   children: [
                                     SvgPicture.asset(
                                       "assets/icons/trend.svg",
-                                      colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                      colorFilter: const ColorFilter.mode(
+                                          Colors.grey, BlendMode.srcIn),
                                       width: 20,
                                     ),
                                     SizedBox(
                                       width: 8,
                                     ),
                                     Text(
-                                      "$totalSets working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
+                                      "$totalSets Working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
                                       style: TextStyle(
                                         color: Colors.grey,
                                         fontSize: widget.isCircuit
@@ -352,15 +376,19 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       onTap: widget.enabled
                           ? () async {
                               await getTotalSets();
-                              final provider = Provider.of<MonthProvider>(context, listen: false);
+                              final provider = Provider.of<MonthProvider>(
+                                  context,
+                                  listen: false);
                               widget.onPress!(
                                 () async => await getTotalSets(),
                               );
-                              provider.updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal);
+                              provider.updateSetValue(warmUpSetTotal,
+                                  backOffSetTotal, workingSetTotal);
                             }
                           : null,
                       child: Container(
-                        padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)).copyWith(right: 5),
+                        padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5))
+                            .copyWith(right: 5),
                         decoration: BoxDecoration(
                           color: (widget.exercise.isAddedUpdated ?? false)
                               ? AppColors.skipDayColor
@@ -382,7 +410,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                         GestureDetector(
                           onTap: () => widget.onRemove(),
                           child: Container(
-                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
+                            padding:
+                                EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
                             decoration: BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle,
@@ -398,7 +427,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                         GestureDetector(
                           onTap: () => widget.openSwapModal!(),
                           child: Container(
-                            padding: EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
+                            padding:
+                                EdgeInsets.all(ScreenUtil.verticalScale(0.8)),
                             decoration: BoxDecoration(
                               color: Colors.blue,
                               shape: BoxShape.circle,

@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
-import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/DashBoardScreen/dashboard_page.dart';
-import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
-import 'package:bbb/pages/MonthView/MonthViewPage/month_view_new.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
 import 'package:bbb/pages/Tools/tools_page.dart';
+import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/date_notifier.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -69,36 +68,13 @@ class _MainPageState extends State<MainPage> {
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
-        await userData.fetchUserInfo();
-        if (userData.user != null && !widget.isComeFromOnBoarding) {
-          bool isFirstTime = await preferences.getBool(SharedPreference.isFirstTime) ?? false;
-
-          if (isFirstTime) {
-            if (mounted) {
-              await Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileBoardingScreen(
-                      welcomeDescription: widget.welcomeDescription,
-                      welcomeImageUrl: widget.welcomeImageUrl,
-                    ),
-                  ),
-                  (route) => false).then(
-                (value) async {
-                  await preferences.setBool(SharedPreference.isFirstTime, false);
-                },
-              );
-            }
-          }
-          return;
-        } else {
-          if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              _showWelcomeModal();
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.setBool('hasSeenWelcome', true);
-            });
-          }
+        userData.fetchUserInfo();
+        if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            _showWelcomeModal();
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('hasSeenWelcome', true);
+          });
         }
       },
     );
@@ -143,7 +119,7 @@ class _MainPageState extends State<MainPage> {
 
     _pages = [
       const DashboardPage(),
-      const MonthViewNew(),
+      const MonthView(),
       const ToolsPage(),
       const ProfileSettingsPage(),
     ];
@@ -194,7 +170,8 @@ class _MainPageState extends State<MainPage> {
   Future<void> _initializeFetchData() async {
     debugPrint("this  is initial state func");
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    dataProvider?.monthProvider =
+        Provider.of<MonthProvider>(context, listen: false);
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {
@@ -218,14 +195,26 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _showWelcomeModal() {
-    Navigator.pushNamed(context, '/watchtutorial', arguments: {"buttontext": "Go to Dashboard"});
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        AnimatedDialog.showAnimatedDialog(
+          context: context,
+          pageBuilder: (c1, anim1, anim2) => WatchTutorial(),
+        );
+      },
+    );
+
+    // Navigator.pushNamed(context, '/watchtutorial',
+    //     arguments: {"buttontext": "Go to Dashboard"});
   }
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return AnnotatedRegion(
-      value: const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.light),
+      value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light),
       child: Consumer<MainPageProvider>(
         builder: (context, value, child) => Scaffold(
           backgroundColor: Colors.white,
@@ -266,7 +255,10 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/1-home.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 0 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                            value.selectedPage == 0
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -285,7 +277,10 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/2-calendar.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 1 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                            value.selectedPage == 1
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -302,7 +297,10 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/3-statistics.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 2 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                            value.selectedPage == 2
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(8.5),
                         height: ScreenUtil.horizontalScale(8.5),
                       ),
@@ -319,7 +317,10 @@ class _MainPageState extends State<MainPage> {
                       builder: (context, userData, child) => SvgPicture.asset(
                         'assets/img/4-account.svg',
                         colorFilter: ColorFilter.mode(
-                            value.selectedPage == 3 ? AppColors.primaryColor : Colors.grey, BlendMode.srcIn),
+                            value.selectedPage == 3
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                            BlendMode.srcIn),
                         width: ScreenUtil.horizontalScale(9),
                         height: ScreenUtil.horizontalScale(9),
                       ),

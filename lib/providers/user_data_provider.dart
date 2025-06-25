@@ -30,10 +30,12 @@ class UserDataProvider extends ChangeNotifier {
     String? token = await getAuthToken();
     final response = await http.get(
       url,
-      headers: {'Content-Type': 'application/json; charset=UTF-8', 'AUTH_TOKEN': token ?? ""},
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'AUTH_TOKEN': token ?? ""
+      },
     );
     final jsonResponse = jsonDecode(response.body);
-    log('token==========>>>>>${token}');
 
     if (response.statusCode == 200) {
       getUserDataFromJson(jsonResponse);
@@ -45,7 +47,8 @@ class UserDataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addUserInfo(String? id, Map<String, dynamic> userDetails, File? imageFile) async {
+  Future<void> addUserInfo(
+      String? id, Map<String, dynamic> userDetails, File? imageFile) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
@@ -76,16 +79,19 @@ class UserDataProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
+        log('responseBody==========>>>>>$responseBody');
         updateUserData();
       } else {
-        debugPrint('Failed to update user data. Status: ${response.statusCode}');
+        debugPrint(
+            'Failed to update user data. Status: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Error updating user info: $e');
     }
   }
 
-  Future<void> updateUserInfo(String? id, Map<String, dynamic> userDetails, File? imageFile) async {
+  Future<void> updateUserInfo(
+      String? id, Map<String, dynamic> userDetails, File? imageFile) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
@@ -119,7 +125,8 @@ class UserDataProvider extends ChangeNotifier {
         jsonDecode(responseBody);
         updateUserData();
       } else {
-        debugPrint('Failed to update user data. Status: ${response.statusCode}');
+        debugPrint(
+            'Failed to update user data. Status: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Error updating user info: $e');
@@ -131,7 +138,8 @@ class UserDataProvider extends ChangeNotifier {
     userName = responseData["name"];
     userEmail = responseData["email"];
     userData = responseData;
-    await preferences.putString(SharedPreference.role, (responseData["role"] ?? 0).toString());
+    await preferences.putString(
+        SharedPreference.role, (responseData["role"] ?? 0).toString());
     notifyListeners();
   }
 

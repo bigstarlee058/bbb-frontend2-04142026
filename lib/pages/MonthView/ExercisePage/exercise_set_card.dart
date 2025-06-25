@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/choice_clip.dart';
@@ -78,7 +80,8 @@ class ExerciseSetCard extends StatefulWidget {
   State<ExerciseSetCard> createState() => _ExerciseSetCardState();
 }
 
-class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAliveClientMixin {
+class _ExerciseSetCardState extends State<ExerciseSetCard>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
   MonthProvider? monthProvider;
@@ -97,6 +100,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   int index = 0;
   int subIndex = 0;
   final FocusNode _nodeText1 = FocusNode();
+  final FocusNode _nodeText2 = FocusNode();
 
   late TextEditingController _weightController;
   late TextEditingController _repsController;
@@ -108,9 +112,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
 
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     weight = widget.weight;
-    _weightController = TextEditingController(text: weight.toString().isEmpty ? "0" : weight.toString());
+    _weightController = TextEditingController(
+        text: weight.toString().isEmpty ? "0" : weight.toString());
     reps = widget.reps;
-    _repsController = TextEditingController(text: reps.toString().isEmpty ? "0" : reps.toString());
+    _repsController = TextEditingController(
+        text: reps.toString().isEmpty ? "0" : reps.toString());
     effort = widget.repsInReverse;
     _restDuration = widget.restDuration;
     type = widget.type;
@@ -127,8 +133,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   String indexString = "";
 
   setCompletedOrNot() async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
     dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
     await monthProvider?.fetchSingleSetLocalData(dataId).then(
@@ -148,24 +157,36 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
 
     await preferences.putString(SharedPreference.isPause, "false");
 
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
     dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${monthProvider?.exerciseDetailModel?.sId}-$index-$subIndex-${monthProvider?.circuitIndex}";
-    HistoryDataModel? expandedDataHistory = monthProvider?.historyDataModel.firstWhere(
+    HistoryDataModel? expandedDataHistory =
+        monthProvider?.historyDataModel.firstWhere(
       (element) => element.dataId == dataId,
       orElse: () => HistoryDataModel(),
     );
     if (expandedDataHistory?.id != null && expandedDataHistory != null) {
       _repsController.text = expandedDataHistory.reps ?? "5";
       _weightController.text = expandedDataHistory.weight ?? "5";
-      effort = (expandedDataHistory.effort == null ? widget.repsInReverse : int.parse(expandedDataHistory.effort ?? "0"));
-      weight = int.parse(expandedDataHistory.weight!.isEmpty ? "0" : expandedDataHistory.weight ?? "5");
-      reps = int.parse(expandedDataHistory.reps!.isEmpty ? "0" : expandedDataHistory.reps ?? "5");
+      effort = (expandedDataHistory.effort == null
+          ? widget.repsInReverse
+          : int.parse(expandedDataHistory.effort ?? "0"));
+      weight = int.parse(expandedDataHistory.weight!.isEmpty
+          ? "0"
+          : expandedDataHistory.weight ?? "5");
+      reps = int.parse(expandedDataHistory.reps!.isEmpty
+          ? "0"
+          : expandedDataHistory.reps ?? "5");
       // setCompleted = expandedDataHistory.status == "Completed";
     } else {
-      _weightController = TextEditingController(text: weight.toString().isEmpty ? "0" : weight.toString());
-      _repsController = TextEditingController(text: reps.toString().isEmpty ? "0" : reps.toString());
+      _weightController = TextEditingController(
+          text: weight.toString().isEmpty ? "0" : weight.toString());
+      _repsController = TextEditingController(
+          text: reps.toString().isEmpty ? "0" : reps.toString());
       effort = widget.repsInReverse;
       weight = widget.weight;
       reps = widget.reps;
@@ -245,7 +266,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
   Future<void> _handleCloseTimer() async {
     _showTimer = false;
     await monthProvider?.setShowTimerIndex(-1, -1, -1);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) => setState(() {}));
     widget.makeRefresh();
   }
 
@@ -260,10 +282,16 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     int lastDataMainIndex = widget.index;
     int lastDataSubIndex = widget.countIndex;
     if (lastDataSubIndex ==
-        ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! - 1) +
-            (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type == 3 ? (widget.extraSetLength) : 0))) {
+        ((monthProvider!.selectedExercise!.extra![lastDataMainIndex].sets! -
+                1) +
+            (monthProvider!.selectedExercise!.extra![lastDataMainIndex].type ==
+                    3
+                ? (widget.extraSetLength)
+                : 0))) {
       lastDataMainIndex += 1;
-      if (lastDataMainIndex == (monthProvider!.selectedExercise!.extra!.length) && lastDataSubIndex == (widget.setCount - 1)) {
+      if (lastDataMainIndex ==
+              (monthProvider!.selectedExercise!.extra!.length) &&
+          lastDataSubIndex == (widget.setCount - 1)) {
       } else {
         lastDataSubIndex = 0;
       }
@@ -276,8 +304,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     reps = int.tryParse(_repsController.text) ?? 0;
     weight = int.tryParse(_weightController.text) ?? 0;
 
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     final body = {
       "dataId": dataId,
@@ -286,10 +317,14 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "extraId": widget.extraDataModel.id.toString(),
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "sets": widget.extraDataModel.sets.toString(),
-      "reps": _repsController.text.isEmpty ? 0 : _repsController.text.toString(),
-      "weight": _weightController.text.isEmpty ? 0 : _weightController.text.toString(),
+      "reps":
+          _repsController.text.isEmpty ? 0 : _repsController.text.toString(),
+      "weight": _weightController.text.isEmpty
+          ? 0
+          : _weightController.text.toString(),
       "rest": widget.extraDataModel.rest.toString(),
       "load": load.toString(),
       "type": widget.extraDataModel.type.toString(),
@@ -309,10 +344,14 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       "extraId": widget.extraDataModel.id.toString(),
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "sets": widget.extraDataModel.sets.toString(),
-      "reps": _repsController.text.isEmpty ? 0 : _repsController.text.toString(),
-      "weight": _weightController.text.isEmpty ? 0 : _weightController.text.toString(),
+      "reps":
+          _repsController.text.isEmpty ? 0 : _repsController.text.toString(),
+      "weight": _weightController.text.isEmpty
+          ? 0
+          : _weightController.text.toString(),
       "rest": widget.extraDataModel.rest.toString(),
       "load": load.toString(),
       "type": widget.extraDataModel.type.toString(),
@@ -326,13 +365,17 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     };
 
     await monthProvider?.fetchExerciseHistoryLocalData();
-    HistoryDataModel? matchingElement =
-        monthProvider?.historyDataModel.firstWhere((element) => element.dataId == dataId, orElse: () => HistoryDataModel());
+    HistoryDataModel? matchingElement = monthProvider?.historyDataModel
+        .firstWhere((element) => element.dataId == dataId,
+            orElse: () => HistoryDataModel());
 
     final data1 = {
       "sets": widget.extraDataModel.sets.toString(),
-      "reps": _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
-      "weight": _weightController.text.isEmpty ? "0" : _weightController.text.toString(),
+      "reps":
+          _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
+      "weight": _weightController.text.isEmpty
+          ? "0"
+          : _weightController.text.toString(),
       "rest": widget.extraDataModel.rest.toString(),
       "load": load.toString(),
       "type": widget.extraDataModel.type.toString(),
@@ -345,8 +388,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
 
     final apiReqBody1 = {
       "sets": widget.extraDataModel.sets.toString(),
-      "reps": _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
-      "weight": _weightController.text.isEmpty ? "0" : _weightController.text.toString(),
+      "reps":
+          _repsController.text.isEmpty ? "0" : _repsController.text.toString(),
+      "weight": _weightController.text.isEmpty
+          ? "0"
+          : _weightController.text.toString(),
       "rest": widget.extraDataModel.rest.toString(),
       "load": load.toString(),
       "type": widget.extraDataModel.type.toString(),
@@ -360,13 +406,17 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
 
     if (matchingElement?.id != null) {
       ApiRepo.updateExerciseHistory(body: apiReqBody1);
-      await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
+      await DatabaseHelper().updateData(
+          data: data1, tableName: DatabaseHelper.exerciseHistory, id: dataId);
     } else {
       ApiRepo.addExerciseHistory(body: apiReqBody);
-      await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
+      await DatabaseHelper()
+          .insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
     }
 
-    monthProvider?.setShowTimerIndex(index, widget.countIndex, monthProvider!.selectedExIndex, removeVal: true);
+    monthProvider?.setShowTimerIndex(
+        index, widget.countIndex, monthProvider!.selectedExIndex,
+        removeVal: true);
     if (_restDuration != 0) {
       _showTimer = true;
       setCompleted = true;
@@ -379,7 +429,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
       await monthProvider?.fetchExerciseSingleSetLocalData(dataId);
       await monthProvider?.fetchExerciseHistoryLocalData();
     }
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => monthProvider?.fetchExerciseHistroy());
+    WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) async => monthProvider?.fetchExerciseHistroy());
   }
 
   // Future<void> fromNotification() async {
@@ -395,36 +446,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     super.dispose();
   }
 
-  KeyboardActionsConfig _buildConfig(BuildContext context) {
-    return KeyboardActionsConfig(
-      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
-      keyboardBarColor: Colors.white,
-      nextFocus: true,
-      actions: [
-        KeyboardActionsItem(
-          focusNode: _nodeText1,
-          displayArrows: false,
-          toolbarButtons: [
-            (node) {
-              return GestureDetector(
-                onTap: () => node.unfocus(),
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.primaryColor),
-                  child: Text(
-                    "Done",
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
-              );
-            }
-          ],
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -434,12 +455,14 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
     _isExpanded =
         "$index:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}" ==
             monthProvider!.currentExpandedItem;
-
-    if (monthProvider!.timerAddress.isNotEmpty && _restDuration != 0 && monthProvider!.timerAddress != "") {
+    if (monthProvider!.timerAddress.isNotEmpty &&
+        _restDuration != 0 &&
+        monthProvider!.timerAddress != "") {
       _showTimer = monthProvider!.timerAddress ==
           "$index-${widget.countIndex}-${monthProvider!.selectedExIndex}-${monthProvider!.overviewCurrentWeek}-${monthProvider!.overviewCurrentDay}";
       if (_showTimer) {
-        monthProvider!.setShowTimerIndex(index, widget.countIndex, monthProvider!.selectedExIndex);
+        monthProvider!.setShowTimerIndex(
+            index, widget.countIndex, monthProvider!.selectedExIndex);
       }
     } else {
       _showTimer = false;
@@ -450,9 +473,12 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
         : Column(
             children: [
               Theme(
-                data: ThemeData().copyWith(splashColor: Colors.transparent, highlightColor: Colors.transparent),
+                data: ThemeData().copyWith(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
+                  borderRadius:
+                      BorderRadius.circular(ScreenUtil.verticalScale(3)),
                   child: ExpansionPanelList(
                     sidePadding: false,
                     animationDuration: Duration(milliseconds: 900),
@@ -460,12 +486,15 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                     materialGapSize: 10,
                     expandedHeaderPadding: EdgeInsets.zero,
                     expansionCallback: (panelIndex, isExpanded) {
-                      if (widget.available || widget.completed || setCompleted) {
+                      if (widget.available ||
+                          widget.completed ||
+                          setCompleted) {
                         // _showTimer = false;
                         setState(() {
                           _isExpanded = !_isExpanded;
                         });
                         monthProvider?.setShowTimerIndex(-1, -1, -1);
+
                         monthProvider?.updateExpandedItem(!_isExpanded
                             ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
                             : "");
@@ -483,20 +512,34 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                         canTapOnHeader: true,
                         headerBuilder: (BuildContext context, bool isExpanded) {
                           return ColorFiltered(
-                            colorFilter: widget.available || widget.completed || setCompleted || _showTimer || timerCompleted || _isExpanded
-                                ? ColorFilter.mode(Colors.transparent, BlendMode.saturation)
-                                : ColorFilter.mode(Colors.white.withValues(alpha: 0.55), BlendMode.saturation),
+                            colorFilter: widget.available ||
+                                    widget.completed ||
+                                    setCompleted ||
+                                    _showTimer ||
+                                    timerCompleted ||
+                                    _isExpanded
+                                ? ColorFilter.mode(
+                                    Colors.transparent, BlendMode.saturation)
+                                : ColorFilter.mode(
+                                    Colors.white.withValues(alpha: 0.55),
+                                    BlendMode.saturation),
                             child: Container(
                               color: widget.color,
-                              padding: EdgeInsets.symmetric(vertical: 15, horizontal: ScreenUtil.horizontalScale(4)),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                  horizontal: ScreenUtil.horizontalScale(4)),
                               child: GestureDetector(
                                 onTap: () async {
-                                  if (widget.available || widget.completed || setCompleted) {
+                                  if (widget.available ||
+                                      widget.completed ||
+                                      setCompleted) {
                                     _showTimer = false;
-                                    await monthProvider?.setShowTimerIndex(-1, -1, -1);
-                                    await monthProvider?.updateExpandedItem(!_isExpanded
-                                        ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
-                                        : "");
+                                    await monthProvider?.setShowTimerIndex(
+                                        -1, -1, -1);
+                                    await monthProvider?.updateExpandedItem(
+                                        !_isExpanded
+                                            ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
+                                            : "");
 
                                     setState(() {
                                       _isExpanded = !_isExpanded;
@@ -509,11 +552,13 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                       child: Row(
                                         children: [
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 "${widget.title} ${widget.subIndex + 1}",
-                                                style: GoogleFonts.plusJakartaSans(
+                                                style:
+                                                    GoogleFonts.plusJakartaSans(
                                                   color: AppColors.primaryColor,
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.bold,
@@ -525,7 +570,9 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                           Text(
                                             _isExpanded ? "" : '$reps reps',
                                             style: GoogleFonts.plusJakartaSans(
-                                              color: _isExpanded ? Colors.transparent : Colors.black38,
+                                              color: _isExpanded
+                                                  ? Colors.transparent
+                                                  : Colors.black38,
                                               fontSize: 13,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -533,22 +580,34 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                         ],
                                       ),
                                     ),
-                                    if (widget.completed || timerCompleted || setCompleted)
+                                    if (widget.completed ||
+                                        timerCompleted ||
+                                        setCompleted)
                                       Container(
-                                        padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-                                        margin: const EdgeInsets.only(right: 10),
+                                        padding: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(0.5)),
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.green, width: 3),
+                                          border: Border.all(
+                                              color: Colors.green, width: 3),
                                           color: Colors.green,
                                         ),
-                                        child: Icon(Icons.check, size: ScreenUtil.verticalScale(2.2), color: Colors.white),
+                                        child: Icon(Icons.check,
+                                            size: ScreenUtil.verticalScale(2.2),
+                                            color: Colors.white),
                                       ),
                                     Container(
                                       decoration: const BoxDecoration(
-                                          color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(25))),
+                                          color: AppColors.primaryColor,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(25))),
                                       child: Icon(
-                                        _isExpanded ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
+                                        _isExpanded
+                                            ? Icons.keyboard_arrow_up_outlined
+                                            : Icons
+                                                .keyboard_arrow_down_outlined,
                                         color: Colors.white,
                                         size: 33,
                                       ),
@@ -562,7 +621,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                         body: Container(
                           color: widget.color,
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(4)),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -574,35 +634,47 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                     children: [
                                       const Text(
                                         'LOAD :',
-                                        style: TextStyle(color: Colors.black54, fontSize: 13),
+                                        style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 13),
                                       ),
                                       Text(
                                         ' $load% ${widget.type == 1 ? "of the working load" : ""}',
-                                        style: const TextStyle(color: Colors.black54, fontSize: 14),
+                                        style: const TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 14),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
                                 ],
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           const Text(
                                             'WEIGHT (LB)',
-                                            style: TextStyle(color: Colors.black54, fontSize: 13),
+                                            style: TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 13),
                                           ),
                                           const SizedBox(height: 8),
                                           Container(
-                                            constraints: BoxConstraints(minWidth: ScreenUtil.horizontalScale(30)),
+                                            constraints: BoxConstraints(
+                                                minWidth:
+                                                    ScreenUtil.horizontalScale(
+                                                        30)),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.03),
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.03),
                                                   spreadRadius: 2,
                                                   blurRadius: 5,
                                                   offset: const Offset(0, 3),
@@ -610,86 +682,118 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                               ],
                                             ),
                                             padding: EdgeInsets.symmetric(
-                                              horizontal: ScreenUtil.horizontalScale(1.5),
-                                              vertical: ScreenUtil.verticalScale(0.3),
+                                              horizontal:
+                                                  ScreenUtil.horizontalScale(
+                                                      1.5),
+                                              vertical:
+                                                  ScreenUtil.verticalScale(0.3),
                                             ),
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
                                               children: [
-                                                // SizedBox(
-                                                //   width: 38,
-                                                //   child: IconButton(
-                                                //     icon: const Icon(Icons.remove),
-                                                //     color: AppColors.primaryColor,
-                                                //     onPressed: widget.isEditable ? decrementWeight : null,
-                                                //   ),
-                                                // ),
                                                 Expanded(
-                                                  child: KeyboardActions(
-                                                    autoScroll: false,
-                                                    config: _buildConfig(context),
-                                                    child: TextField(
-                                                      controller: _weightController,
-                                                      keyboardType: TextInputType.number,
-                                                      onSubmitted: (value) {
-                                                        FocusScope.of(context).unfocus();
-                                                      },
-                                                      textInputAction: TextInputAction.done,
-                                                      textAlign: TextAlign.center,
-                                                      focusNode: _nodeText1,
-                                                      readOnly: widget.isEditable ? false : true,
-                                                      decoration: const InputDecoration(
-                                                        border: InputBorder.none,
-                                                      ),
-                                                      onTap: () {
-                                                        if (_weightController.text == "0") {
-                                                          _weightController.clear();
-                                                        }
-                                                      },
-                                                      onEditingComplete: () {
-                                                        if (_weightController.text == "0") {
-                                                          _weightController.clear();
-                                                        }
-                                                        if (_weightController.text.isEmpty) {
-                                                          _weightController.text = "0";
-                                                          setState(() {});
-                                                        }
-                                                      },
-                                                      onChanged: (value) {
-                                                        if (value == "0") {
-                                                          _weightController.clear();
-                                                        }
-                                                        if (value.isEmpty) {
-                                                          _weightController.text = "0";
-                                                          setState(() {});
-                                                        }
-                                                      },
-                                                      inputFormatters: [
-                                                        FilteringTextInputFormatter.digitsOnly,
-                                                        TextInputFormatter.withFunction(
-                                                          (oldValue, newValue) {
-                                                            String newText = newValue.text;
-                                                            if (newText.isNotEmpty) {
-                                                              newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                                                            }
-                                                            return TextEditingValue(
-                                                              text: newText,
-                                                              selection: TextSelection.collapsed(offset: newText.length),
-                                                            );
-                                                          },
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      TextField(
+                                                        maxLines: 1,
+                                                        controller:
+                                                            _weightController,
+                                                        keyboardType: Platform
+                                                                .isAndroid
+                                                            ? TextInputType
+                                                                .number
+                                                            : const TextInputType
+                                                                .numberWithOptions(
+                                                                decimal: false,
+                                                                signed: true),
+                                                        onSubmitted: (value) {
+                                                          FocusScope.of(context)
+                                                              .unfocus();
+                                                        },
+                                                        textInputAction:
+                                                            TextInputAction
+                                                                .done,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        focusNode: _nodeText1,
+                                                        cursorColor: AppColors
+                                                            .primaryColor,
+                                                        readOnly:
+                                                            widget.isEditable
+                                                                ? false
+                                                                : true,
+                                                        decoration:
+                                                            const InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
                                                         ),
-                                                      ],
-                                                    ),
+                                                        onTap: () {
+                                                          if (_weightController
+                                                                  .text ==
+                                                              "0") {
+                                                            _weightController
+                                                                .clear();
+                                                          }
+                                                        },
+                                                        onEditingComplete: () {
+                                                          if (_weightController
+                                                                  .text ==
+                                                              "0") {
+                                                            _weightController
+                                                                .clear();
+                                                          }
+                                                          if (_weightController
+                                                              .text.isEmpty) {
+                                                            _weightController
+                                                                .text = "0";
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                        onChanged: (value) {
+                                                          if (value == "0") {
+                                                            _weightController
+                                                                .clear();
+                                                          }
+                                                          if (value.isEmpty) {
+                                                            _weightController
+                                                                .text = "0";
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                        inputFormatters: [
+                                                          FilteringTextInputFormatter
+                                                              .digitsOnly,
+                                                          TextInputFormatter
+                                                              .withFunction(
+                                                            (oldValue,
+                                                                newValue) {
+                                                              String newText =
+                                                                  newValue.text;
+                                                              if (newText
+                                                                  .isNotEmpty) {
+                                                                newText = newText
+                                                                    .replaceFirst(
+                                                                        RegExp(
+                                                                            r'^0+'),
+                                                                        '');
+                                                              }
+                                                              return TextEditingValue(
+                                                                text: newText,
+                                                                selection: TextSelection
+                                                                    .collapsed(
+                                                                        offset:
+                                                                            newText.length),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                                // SizedBox(
-                                                //   width: 38,
-                                                //   child: IconButton(
-                                                //     icon: const Icon(Icons.add),
-                                                //     color: AppColors.primaryColor,
-                                                //     onPressed: widget.isEditable ? incrementWeight : null,
-                                                //   ),
-                                                // ),
                                               ],
                                             ),
                                           ),
@@ -699,23 +803,30 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                     SizedBox(width: 15),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           const Text(
                                             'REPS',
-                                            style: TextStyle(color: Colors.black54, fontSize: 13),
+                                            style: TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 13),
                                           ),
                                           const SizedBox(height: 8),
                                           Container(
                                             padding: EdgeInsets.symmetric(
-                                              horizontal: ScreenUtil.horizontalScale(1.5),
-                                              vertical: ScreenUtil.verticalScale(0.3),
+                                              horizontal:
+                                                  ScreenUtil.horizontalScale(
+                                                      1.5),
+                                              vertical:
+                                                  ScreenUtil.verticalScale(0.3),
                                             ),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.03),
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.03),
                                                   spreadRadius: 2,
                                                   blurRadius: 5,
                                                   offset: const Offset(0, 3),
@@ -727,38 +838,65 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                 SizedBox(
                                                   width: 38,
                                                   child: IconButton(
-                                                    icon: const Icon(Icons.remove),
-                                                    color: AppColors.primaryColor,
-                                                    onPressed: widget.isEditable ? decrementReps : null,
+                                                    icon: const Icon(
+                                                        Icons.remove),
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                    onPressed: widget.isEditable
+                                                        ? decrementReps
+                                                        : null,
                                                   ),
                                                 ),
                                                 Expanded(
                                                   child: TextFormField(
                                                     controller: _repsController,
-                                                    keyboardType: const TextInputType.numberWithOptions(decimal: false, signed: true),
-                                                    textInputAction: TextInputAction.done,
+                                                    focusNode: _nodeText2,
+                                                    cursorColor:
+                                                        AppColors.primaryColor,
+                                                    keyboardType: Platform
+                                                            .isAndroid
+                                                        ? TextInputType.number
+                                                        : const TextInputType
+                                                            .numberWithOptions(
+                                                            decimal: false,
+                                                            signed: true),
+                                                    textInputAction:
+                                                        TextInputAction.done,
                                                     textAlign: TextAlign.center,
-                                                    readOnly: true,
-                                                    decoration: const InputDecoration(
+                                                    readOnly: false,
+                                                    decoration:
+                                                        const InputDecoration(
                                                       border: InputBorder.none,
                                                     ),
                                                     onChanged: (value) {
                                                       if (value.isEmpty) {
-                                                        _repsController.text = "0";
+                                                        _repsController.text =
+                                                            "0";
                                                         setState(() {});
                                                       }
                                                     },
                                                     inputFormatters: [
-                                                      FilteringTextInputFormatter.digitsOnly,
-                                                      TextInputFormatter.withFunction(
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly,
+                                                      TextInputFormatter
+                                                          .withFunction(
                                                         (oldValue, newValue) {
-                                                          String newText = newValue.text;
-                                                          if (newText.isNotEmpty) {
-                                                            newText = newText.replaceFirst(RegExp(r'^0+'), '');
+                                                          String newText =
+                                                              newValue.text;
+                                                          if (newText
+                                                              .isNotEmpty) {
+                                                            newText = newText
+                                                                .replaceFirst(
+                                                                    RegExp(
+                                                                        r'^0+'),
+                                                                    '');
                                                           }
                                                           return TextEditingValue(
                                                             text: newText,
-                                                            selection: TextSelection.collapsed(offset: newText.length),
+                                                            selection: TextSelection
+                                                                .collapsed(
+                                                                    offset: newText
+                                                                        .length),
                                                           );
                                                         },
                                                       ),
@@ -769,8 +907,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                   width: 38,
                                                   child: IconButton(
                                                     icon: const Icon(Icons.add),
-                                                    color: AppColors.primaryColor,
-                                                    onPressed: widget.isEditable ? incrementReps : null,
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                    onPressed: widget.isEditable
+                                                        ? incrementReps
+                                                        : null,
                                                   ),
                                                 ),
                                               ],
@@ -787,19 +928,24 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                     : Column(
                                         children: [
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               const Text(
                                                 'REPS IN RESERVE',
-                                                style: TextStyle(color: Colors.black54, fontSize: 13),
+                                                style: TextStyle(
+                                                    color: Colors.black54,
+                                                    fontSize: 13),
                                               ),
                                               GestureDetector(
                                                 onTap: () {
                                                   showModalBottomSheet(
-                                                    backgroundColor: Colors.white,
+                                                    backgroundColor:
+                                                        Colors.white,
                                                     context: context,
                                                     isScrollControlled: true,
-                                                    builder: (BuildContext context) {
+                                                    builder:
+                                                        (BuildContext context) {
                                                       return const NotesSlideout();
                                                     },
                                                   );
@@ -807,7 +953,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                 child: const Text(
                                                   "WHAT'S RIR?",
                                                   style: TextStyle(
-                                                    color: AppColors.skipDayColor,
+                                                    color:
+                                                        AppColors.skipDayColor,
                                                     fontSize: 13,
                                                   ),
                                                 ),
@@ -816,7 +963,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                           ),
                                           const SizedBox(height: 8),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: List.generate(
                                               5,
                                               (index) {
@@ -824,25 +972,23 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                                   clipBehavior: Clip.none,
                                                   children: [
                                                     ChoiceChip1(
-                                                      width: ScreenUtil.verticalScale(6),
+                                                      width: ScreenUtil
+                                                          .verticalScale(6),
                                                       label: effortValue[index],
                                                       selected: effort == index,
                                                       onSelected: () {
-                                                        widget.isEditable ? selectEffort(effort != index ? index : 100) : null;
+                                                        widget.isEditable
+                                                            ? selectEffort(
+                                                                effort != index
+                                                                    ? index
+                                                                    : 100)
+                                                            : null;
                                                       },
-                                                      labelStyle: TextStyle(color: effort == index ? Colors.white : Colors.black),
+                                                      labelStyle: TextStyle(
+                                                          color: effort == index
+                                                              ? Colors.white
+                                                              : Colors.black),
                                                     ),
-                                                    // Positioned(
-                                                    //   top: 0.5,
-                                                    //   left: index == 4 ? 0.5 : 3,
-                                                    //   child: RotatedBox(
-                                                    //     quarterTurns: 2,
-                                                    //     child: CustomPaint(
-                                                    //       size: Size(index == 4 ? 50 : 42, 12),
-                                                    //       painter: TrianglePainter(),
-                                                    //     ),
-                                                    //   ),
-                                                    // ),
                                                   ],
                                                 );
                                               },
@@ -851,9 +997,12 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                           const SizedBox(height: 30),
                                         ],
                                       ),
-                                if (widget.isEditable && monthProvider!.isCurrentMonth != "Future")
+                                if (widget.isEditable &&
+                                    monthProvider!.isCurrentMonth != "Future")
                                   ButtonWidget(
-                                    text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                                    text: _restDuration != 0
+                                        ? "Save & start rest timer"
+                                        : "Save",
                                     // text: "Save",
                                     textColor: Colors.white,
                                     onPress: _saveData,
@@ -862,7 +1011,9 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                                   )
                                 else
                                   ButtonWidget(
-                                    text: _restDuration != 0 ? "Save & start rest timer" : "Save",
+                                    text: _restDuration != 0
+                                        ? "Save & start rest timer"
+                                        : "Save",
                                     // text: "Save",
                                     textColor: Colors.white,
                                     onPress: null,
@@ -881,407 +1032,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
                   ),
                 ),
               ),
-              // ColorFiltered(
-              //   colorFilter: widget.available || widget.completed || setCompleted || _showTimer || timerCompleted
-              //       ? ColorFilter.mode(Colors.transparent, BlendMode.saturation)
-              //       : ColorFilter.mode(Colors.white.withValues(alpha: 0.45), BlendMode.saturation),
-              //   child: Container(
-              //     decoration: /*_showTimer
-              //         ? BoxDecoration(
-              //             borderRadius: const BorderRadius.only(
-              //               topLeft: Radius.circular(30),
-              //               topRight: Radius.circular(30),
-              //               bottomLeft: Radius.zero,
-              //               bottomRight: Radius.zero,
-              //             ),
-              //             color: widget.color,
-              //           )
-              //         :*/
-              //         BoxDecoration(
-              //       borderRadius: BorderRadius.circular(30),
-              //       color: widget.color,
-              //     ),
-              //     child: Column(
-              //       children: [
-              //         Container(
-              //           padding: EdgeInsets.symmetric(vertical: 15, horizontal: ScreenUtil.horizontalScale(4)),
-              //           child: GestureDetector(
-              //             onTap: () async {
-              //               if (widget.available || widget.completed || setCompleted) {
-              //                 _showTimer = false;
-              //                 await monthProvider?.setShowTimerIndex(-1, -1, -1);
-              //                 await monthProvider?.updateExpandedItem(!_isExpanded
-              //                     ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
-              //                     : "");
-              //
-              //                 setState(() {
-              //                   _isExpanded = !_isExpanded;
-              //                 });
-              //               }
-              //             },
-              //             child: Row(
-              //               children: [
-              //                 Expanded(
-              //                   child: Row(
-              //                     children: [
-              //                       Column(
-              //                         crossAxisAlignment: CrossAxisAlignment.start,
-              //                         children: [
-              //                           Text(
-              //                             "${widget.title} ${widget.subIndex + 1}",
-              //                             style: GoogleFonts.plusJakartaSans(
-              //                               color: AppColors.primaryColor,
-              //                               fontSize: 13,
-              //                               fontWeight: FontWeight.bold,
-              //                             ),
-              //                           ),
-              //                         ],
-              //                       ),
-              //                       const SizedBox(width: 20),
-              //                       Text(
-              //                         _isExpanded ? "" : '$reps reps',
-              //                         style: GoogleFonts.plusJakartaSans(
-              //                           color: _isExpanded ? Colors.transparent : Colors.black38,
-              //                           fontSize: 13,
-              //                           fontWeight: FontWeight.bold,
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),
-              //                 ),
-              //                 if (widget.completed || timerCompleted || setCompleted)
-              //                   Container(
-              //                     padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5)),
-              //                     margin: const EdgeInsets.only(right: 10),
-              //                     decoration: BoxDecoration(
-              //                       shape: BoxShape.circle,
-              //                       border: Border.all(color: Colors.green, width: 3),
-              //                       color: Colors.green,
-              //                     ),
-              //                     child: Icon(Icons.check, size: ScreenUtil.verticalScale(2.2), color: Colors.white),
-              //                   ),
-              //                 Container(
-              //                   decoration: const BoxDecoration(
-              //                       color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(25))),
-              //                   child: Icon(
-              //                     _isExpanded ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
-              //                     color: Colors.white,
-              //                     size: 33,
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-              //         if (_isExpanded)
-              //           Padding(
-              //             padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(4)),
-              //             child: Column(
-              //               mainAxisAlignment: MainAxisAlignment.start,
-              //               crossAxisAlignment: CrossAxisAlignment.start,
-              //               children: [
-              //                 if (load == 0 && widget.type == 3)
-              //                   SizedBox()
-              //                 else ...[
-              //                   Row(
-              //                     children: [
-              //                       const Text(
-              //                         'LOAD :',
-              //                         style: TextStyle(color: Colors.black54, fontSize: 13),
-              //                       ),
-              //                       Text(
-              //                         ' $load% ${widget.type == 1 ? "of the working load" : ""}',
-              //                         style: const TextStyle(color: Colors.black54, fontSize: 14),
-              //                       ),
-              //                     ],
-              //                   ),
-              //                   const SizedBox(height: 20),
-              //                 ],
-              //                 Row(
-              //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //                   children: [
-              //                     Column(
-              //                       crossAxisAlignment: CrossAxisAlignment.start,
-              //                       children: [
-              //                         const Text(
-              //                           'WEIGHT (LB)',
-              //                           style: TextStyle(color: Colors.black54, fontSize: 13),
-              //                         ),
-              //                         const SizedBox(height: 8),
-              //                         Container(
-              //                           decoration: BoxDecoration(
-              //                             color: Colors.white,
-              //                             boxShadow: [
-              //                               BoxShadow(
-              //                                 color: Colors.black.withValues(alpha: 0.03),
-              //                                 spreadRadius: 2,
-              //                                 blurRadius: 5,
-              //                                 offset: const Offset(0, 3),
-              //                               ),
-              //                             ],
-              //                           ),
-              //                           padding: EdgeInsets.symmetric(
-              //                             horizontal: ScreenUtil.horizontalScale(1.5),
-              //                             vertical: ScreenUtil.verticalScale(0.3),
-              //                           ),
-              //                           child: Row(
-              //                             children: [
-              //                               SizedBox(
-              //                                 width: 38,
-              //                                 child: IconButton(
-              //                                   icon: const Icon(Icons.remove),
-              //                                   color: AppColors.primaryColor,
-              //                                   onPressed: widget.isEditable ? decrementWeight : null,
-              //                                 ),
-              //                               ),
-              //                               SizedBox(
-              //                                 width: 35,
-              //                                 child: KeyboardActions(
-              //                                   autoScroll: false,
-              //                                   config: _buildConfig(context),
-              //                                   child: TextField(
-              //                                     controller: _weightController,
-              //                                     keyboardType: TextInputType.number,
-              //                                     onSubmitted: (value) {
-              //                                       FocusScope.of(context).unfocus();
-              //                                     },
-              //                                     textInputAction: TextInputAction.done,
-              //                                     textAlign: TextAlign.center,
-              //                                     focusNode: _nodeText1,
-              //                                     readOnly: widget.isEditable ? false : true,
-              //                                     decoration: const InputDecoration(
-              //                                       border: InputBorder.none,
-              //                                     ),
-              //                                     onChanged: (value) {
-              //                                       if (value.isEmpty) {
-              //                                         _weightController.text = "0";
-              //                                         setState(() {});
-              //                                       }
-              //                                     },
-              //                                     inputFormatters: [
-              //                                       FilteringTextInputFormatter.digitsOnly,
-              //                                       TextInputFormatter.withFunction(
-              //                                         (oldValue, newValue) {
-              //                                           String newText = newValue.text;
-              //                                           if (newText.isNotEmpty) {
-              //                                             newText = newText.replaceFirst(RegExp(r'^0+'), '');
-              //                                           }
-              //                                           return TextEditingValue(
-              //                                             text: newText,
-              //                                             selection: TextSelection.collapsed(offset: newText.length),
-              //                                           );
-              //                                         },
-              //                                       ),
-              //                                     ],
-              //                                   ),
-              //                                 ),
-              //                               ),
-              //                               SizedBox(
-              //                                 width: 38,
-              //                                 child: IconButton(
-              //                                   icon: const Icon(Icons.add),
-              //                                   color: AppColors.primaryColor,
-              //                                   onPressed: widget.isEditable ? incrementWeight : null,
-              //                                 ),
-              //                               ),
-              //                             ],
-              //                           ),
-              //                         ),
-              //                       ],
-              //                     ),
-              //                     Column(
-              //                       crossAxisAlignment: CrossAxisAlignment.start,
-              //                       children: [
-              //                         const Text(
-              //                           'REPS',
-              //                           style: TextStyle(color: Colors.black54, fontSize: 13),
-              //                         ),
-              //                         const SizedBox(height: 8),
-              //                         Container(
-              //                           padding: EdgeInsets.symmetric(
-              //                             horizontal: ScreenUtil.horizontalScale(1.5),
-              //                             vertical: ScreenUtil.verticalScale(0.3),
-              //                           ),
-              //                           decoration: BoxDecoration(
-              //                             color: Colors.white,
-              //                             boxShadow: [
-              //                               BoxShadow(
-              //                                 color: Colors.black.withValues(alpha: 0.03),
-              //                                 spreadRadius: 2,
-              //                                 blurRadius: 5,
-              //                                 offset: const Offset(0, 3),
-              //                               ),
-              //                             ],
-              //                           ),
-              //                           child: Row(
-              //                             children: [
-              //                               SizedBox(
-              //                                 width: 38,
-              //                                 child: IconButton(
-              //                                   icon: const Icon(Icons.remove),
-              //                                   color: AppColors.primaryColor,
-              //                                   onPressed: widget.isEditable ? decrementReps : null,
-              //                                 ),
-              //                               ),
-              //                               SizedBox(
-              //                                 width: 35,
-              //                                 child: TextFormField(
-              //                                   controller: _repsController,
-              //                                   keyboardType: const TextInputType.numberWithOptions(decimal: false, signed: true),
-              //                                   textInputAction: TextInputAction.done,
-              //                                   textAlign: TextAlign.center,
-              //                                   readOnly: true,
-              //                                   decoration: const InputDecoration(
-              //                                     border: InputBorder.none,
-              //                                   ),
-              //                                   onChanged: (value) {
-              //                                     if (value.isEmpty) {
-              //                                       _repsController.text = "0";
-              //                                       setState(() {});
-              //                                     }
-              //                                   },
-              //                                   inputFormatters: [
-              //                                     FilteringTextInputFormatter.digitsOnly,
-              //                                     TextInputFormatter.withFunction(
-              //                                       (oldValue, newValue) {
-              //                                         String newText = newValue.text;
-              //                                         if (newText.isNotEmpty) {
-              //                                           newText = newText.replaceFirst(RegExp(r'^0+'), '');
-              //                                         }
-              //                                         return TextEditingValue(
-              //                                           text: newText,
-              //                                           selection: TextSelection.collapsed(offset: newText.length),
-              //                                         );
-              //                                       },
-              //                                     ),
-              //                                   ],
-              //                                 ),
-              //                               ),
-              //                               SizedBox(
-              //                                 width: 38,
-              //                                 child: IconButton(
-              //                                   icon: const Icon(Icons.add),
-              //                                   color: AppColors.primaryColor,
-              //                                   onPressed: widget.isEditable ? incrementReps : null,
-              //                                 ),
-              //                               ),
-              //                             ],
-              //                           ),
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ],
-              //                 ),
-              //                 const SizedBox(height: 24),
-              //                 widget.type == 1
-              //                     ? SizedBox()
-              //                     : Column(
-              //                         children: [
-              //                           Row(
-              //                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //                             children: [
-              //                               const Text(
-              //                                 'REPS IN RESERVE',
-              //                                 style: TextStyle(color: Colors.black54, fontSize: 13),
-              //                               ),
-              //                               GestureDetector(
-              //                                 onTap: () {
-              //                                   showModalBottomSheet(
-              //                                     backgroundColor: Colors.white,
-              //                                     context: context,
-              //                                     isScrollControlled: true,
-              //                                     builder: (BuildContext context) {
-              //                                       return const NotesSlideout();
-              //                                     },
-              //                                   );
-              //                                 },
-              //                                 child: const Text(
-              //                                   "WHAT'S RIR?",
-              //                                   style: TextStyle(
-              //                                     color: AppColors.skipDayColor,
-              //                                     fontSize: 13,
-              //                                   ),
-              //                                 ),
-              //                               ),
-              //                             ],
-              //                           ),
-              //                           const SizedBox(height: 8),
-              //                           Row(
-              //                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //                             children: List.generate(
-              //                               5,
-              //                               (index) {
-              //                                 return Stack(
-              //                                   clipBehavior: Clip.none,
-              //                                   children: [
-              //                                     ChoiceChip(
-              //                                       label: Text(effortValue[index]),
-              //                                       selected: effort == index,
-              //                                       onSelected: (bool selected) {
-              //                                         widget.isEditable ? selectEffort(selected ? index : 100) : null;
-              //                                       },
-              //                                       padding: EdgeInsets.symmetric(
-              //                                         horizontal: ScreenUtil.horizontalScale(2),
-              //                                         vertical: ScreenUtil.verticalScale(2),
-              //                                       ),
-              //                                       shape: const RoundedRectangleBorder(
-              //                                         side: BorderSide(color: Colors.white),
-              //                                       ),
-              //                                       backgroundColor: Colors.white,
-              //                                       selectedColor: AppColors.primaryColor,
-              //                                       labelStyle: TextStyle(
-              //                                         color: effort == index ? Colors.white : Colors.black,
-              //                                       ),
-              //                                       checkmarkColor: Colors.white,
-              //                                       showCheckmark: true,
-              //                                     ),
-              //                                     // Positioned(
-              //                                     //   top: 0.5,
-              //                                     //   left: index == 4 ? 0.5 : 3,
-              //                                     //   child: RotatedBox(
-              //                                     //     quarterTurns: 2,
-              //                                     //     child: CustomPaint(
-              //                                     //       size: Size(index == 4 ? 50 : 42, 12),
-              //                                     //       painter: TrianglePainter(),
-              //                                     //     ),
-              //                                     //   ),
-              //                                     // ),
-              //                                   ],
-              //                                 );
-              //                               },
-              //                             ),
-              //                           ),
-              //                           const SizedBox(height: 30),
-              //                         ],
-              //                       ),
-              //                 if (widget.isEditable)
-              //                   ButtonWidget(
-              //                     text: _restDuration != 0 ? "Save & start rest timer" : "Save",
-              //                     // text: "Save",
-              //                     textColor: Colors.white,
-              //                     onPress: _saveData,
-              //                     color: AppColors.primaryColor,
-              //                     isLoading: false,
-              //                   )
-              //                 else
-              //                   ButtonWidget(
-              //                     text: _restDuration != 0 ? "Save & start rest timer" : "Save",
-              //                     // text: "Save",
-              //                     textColor: Colors.white,
-              //                     onPress: null,
-              //                     color: AppColors.primaryColor,
-              //                     isLoading: false,
-              //                   ),
-              //                 SizedBox(
-              //                   height: ScreenUtil.verticalScale(2),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
               if (_showTimer && _restDuration != 0) ...[
                 TimerWithProgressBar(
                   makeRefresh: () {
@@ -1301,27 +1051,5 @@ class _ExerciseSetCardState extends State<ExerciseSetCard> with AutomaticKeepAli
               ],
             ],
           );
-  }
-}
-
-class TrianglePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = AppColors.primaryColor
-      ..style = PaintingStyle.fill;
-
-    Path path = Path();
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(0, size.height);
-    path.lineTo(size.width, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }

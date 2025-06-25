@@ -25,8 +25,6 @@ class AppRoutes {
   static const String recalculateScreen = '/recalculate';
   static const String calendarScreen = '/calendar';
   static const String myProfileScreen = '/myprofile';
-  static const String watchTutorialScreen = '/watchtutorial';
-  static const String appTutorialScreen = '/appTutorialScreen';
   static const String languageScreen = '/languageScreen';
   static const String streakCalendarScreen = '/streak-calendar';
   static const String notificationsScreen = '/notifications';

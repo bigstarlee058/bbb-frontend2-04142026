@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -10,6 +11,7 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -20,7 +22,8 @@ class ChooseWorkoutDayDialog extends StatefulWidget {
   State<ChooseWorkoutDayDialog> createState() => _ChooseWorkoutDayDialogState();
 }
 
-class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with TickerProviderStateMixin {
+class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog>
+    with TickerProviderStateMixin {
   bool loading = false;
   bool isZoom = false;
 
@@ -50,7 +53,8 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
       await dataProvider?.getChooseWorkoutData();
     }
     if (dataProvider!.getChooseWorkoutModel!.files!.isNotEmpty) {
-      initializeVideo(dataProvider!.getChooseWorkoutModel!.files![0].link ?? "");
+      initializeVideo(
+          dataProvider!.getChooseWorkoutModel!.files![0].link ?? "");
     } else {
       loading = false;
       videoNotInitialized = true;
@@ -61,7 +65,8 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
     tutorialTitle = dataProvider!.getChooseWorkoutModel?.title ?? "";
   }
 
-  final ValueNotifier<Duration> videoProgressValue = ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> videoProgressValue =
+      ValueNotifier(Duration.zero);
   Duration getBufferedPosition() {
     final position = _videoPlayerController.value.position;
     final buffered = _videoPlayerController.value.buffered;
@@ -79,14 +84,16 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
   Future<void> initializeVideo(String url) async {
     try {
       // Initialize the video player controller
-      _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
       await _videoPlayerController.initialize().then(
         (value) {
           AudioManager.requestAudioFocus();
         },
       );
+      await _videoPlayerController.setLooping(true);
+
       // Initialize the ChewieController with custom controls
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -99,9 +106,11 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null && _chewieController!.videoPlayerController.value.isInitialized) {
+      if (_chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
-        videoSize = calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!, context: context);
+        videoSize = calculateVideoSize(
+            aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
       // _videoPlayerController.addListener(() async {
@@ -120,12 +129,17 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
       _videoPlayerController.addListener(() async {
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
-        final bool isFinished = position >= duration && !_videoPlayerController.value.isPlaying;
+        final bool isFinished =
+            position >= duration && !_videoPlayerController.value.isPlaying;
         if (isFinished) {
           showControlsOnTapOfPause();
         }
         if (duration != null && position >= duration) {
           AudioManager.abandonAudioFocus();
+          if (Platform.isIOS) {
+            _videoPlayerController.seekTo(Duration.zero);
+            _videoPlayerController.play();
+          }
         } else {
           AudioManager.requestAudioFocus();
         }
@@ -188,22 +202,24 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
     } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
   }
 
-  Size calculateVideoSize({
-    required BuildContext context,
-    required double aspectRatio, // Aspect ratio of the video (width/height)
-  }) {
-    // Maximum allowable width and height based on screen dimensions
-    double maxWidth = ScreenUtil.horizontalScale(90);
-
-    // Calculate height dynamically based on width and aspect ratio
+  Size calculateVideoSize(
+      {required BuildContext context, required double aspectRatio}) {
+    double maxWidth =
+        ScreenUtil.horizontalScale(100) - ScreenUtil.horizontalScale(12);
+    double maxHeight = MediaQuery.of(context).size.height * 0.825;
     double calculatedHeight = maxWidth / aspectRatio;
-
+    if (calculatedHeight > maxHeight) {
+      calculatedHeight = maxHeight;
+      maxWidth = maxHeight * aspectRatio;
+    }
     return Size(maxWidth, calculatedHeight);
   }
 
@@ -224,7 +240,8 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+      insetPadding:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -234,7 +251,10 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.825,
+                // minHeight: MediaQuery.of(context).size.height * 0.825,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -249,7 +269,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                     : SingleChildScrollView(
                         child: Column(
                           children: [
-                            SizedBox(height: ScreenUtil.verticalScale(4.5)),
+                            // SizedBox(height: ScreenUtil.verticalScale(4.5)),
                             // Row(
                             //   mainAxisAlignment: MainAxisAlignment.end,
                             //   children: [
@@ -272,25 +292,31 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                   },
                                   child: Column(
                                     children: [
-                                      dataProvider!.getChooseWorkoutModel!.files!.isNotEmpty && !videoNotInitialized
+                                      dataProvider!.getChooseWorkoutModel!
+                                                  .files!.isNotEmpty &&
+                                              !videoNotInitialized
                                           ? Stack(
                                               children: [
                                                 SizedBox(
-                                                  height: videoSize.height - 18,
-                                                  width: videoSize.width - 6,
+                                                  height: videoSize.height,
+                                                  width: videoSize.width,
                                                   child: Center(
                                                     child: Chewie(
-                                                      controller: _chewieController!,
+                                                      controller:
+                                                          _chewieController!,
                                                     ),
                                                   ),
                                                 ),
 
                                                 AnimatedContainer(
-                                                  duration: Duration(milliseconds: 1700),
+                                                  duration: Duration(
+                                                      milliseconds: 1300),
                                                   curve: Curves.easeInOut,
-                                                  color: showControls ? Colors.black38 : Colors.transparent,
-                                                  height: videoSize.height - 18,
-                                                  width: videoSize.width - 6,
+                                                  color: showControls
+                                                      ? Colors.black38
+                                                      : Colors.transparent,
+                                                  height: videoSize.height,
+                                                  width: videoSize.width,
                                                 ),
 
                                                 // Container(
@@ -300,15 +326,19 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                                 // ),
                                               ],
                                             )
-                                          : Container(
-                                              height: ScreenUtil.verticalScale(40),
-                                              color: Colors.black12,
-                                              child: const Center(
-                                                  child: Text(
-                                                'No Video Available',
-                                                style: TextStyle(color: Colors.white),
-                                              )),
-                                            ),
+                                          : SizedBox() ??
+                                              Container(
+                                                height:
+                                                    ScreenUtil.verticalScale(
+                                                        40),
+                                                color: Colors.black12,
+                                                child: const Center(
+                                                    child: Text(
+                                                  'No Video Available',
+                                                  style: TextStyle(
+                                                      color: Colors.black),
+                                                )),
+                                              ),
                                     ],
                                   ),
                                 ),
@@ -320,10 +350,12 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                         right: 15,
                                         child: AnimatedOpacity(
                                           opacity: showControls ? 1.0 : 0.0,
-                                          duration: const Duration(milliseconds: 800),
+                                          duration:
+                                              const Duration(milliseconds: 800),
                                           curve: Curves.easeInOut,
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
                                             children: [
                                               // Skip backward button
                                               IconButton(
@@ -332,33 +364,69 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                                   Icons.replay_10,
                                                   color: Colors.white70,
                                                 ),
-                                                onPressed: () {
-                                                  _videoPlayerController.seekTo(
-                                                    _videoPlayerController.value.position - const Duration(seconds: 10),
-                                                  );
-                                                },
+                                                onPressed: showControls
+                                                    ? () {
+                                                        _videoPlayerController
+                                                            .seekTo(
+                                                          _videoPlayerController
+                                                                  .value
+                                                                  .position -
+                                                              const Duration(
+                                                                  seconds: 10),
+                                                        );
+                                                      }
+                                                    : null,
                                               ),
                                               IconButton(
                                                 iconSize: 60,
                                                 icon: Icon(
-                                                  _videoPlayerController.value.isPlaying
-                                                      ? Icons.pause_circle_filled
-                                                      : Icons.play_circle_filled,
+                                                  _videoPlayerController
+                                                          .value.isPlaying
+                                                      ? Icons
+                                                          .pause_circle_filled
+                                                      : Icons
+                                                          .play_circle_filled,
                                                   color: Colors.white70,
                                                 ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    if (_videoPlayerController.value.isPlaying) {
-                                                      _videoPlayerController.pause();
-                                                      showControlsOnTapOfPause();
-                                                      AudioManager.abandonAudioFocus();
-                                                    } else {
-                                                      _videoPlayerController.play();
-                                                      hideControls();
-                                                      AudioManager.requestAudioFocus();
-                                                    }
-                                                  });
-                                                },
+                                                onPressed: showControls
+                                                    ? () async {
+                                                        if (_videoPlayerController
+                                                            .value.isPlaying) {
+                                                          _videoPlayerController
+                                                              .pause();
+                                                          setState(() {});
+                                                          showControlsOnTapOfPause();
+
+                                                          await Future.delayed(
+                                                                  Duration(
+                                                                      milliseconds:
+                                                                          100))
+                                                              .then(
+                                                            (value) {
+                                                              AudioManager
+                                                                  .abandonAudioFocus();
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        } else {
+                                                          _videoPlayerController
+                                                              .play();
+                                                          setState(() {});
+                                                          hideControls();
+                                                          await Future.delayed(
+                                                                  Duration(
+                                                                      milliseconds:
+                                                                          100))
+                                                              .then(
+                                                            (value) {
+                                                              AudioManager
+                                                                  .requestAudioFocus();
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        }
+                                                      }
+                                                    : null,
                                               ),
                                               // Skip forward button
                                               IconButton(
@@ -367,11 +435,18 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                                   Icons.forward_10,
                                                   color: Colors.white70,
                                                 ),
-                                                onPressed: () {
-                                                  _videoPlayerController.seekTo(
-                                                    _videoPlayerController.value.position + const Duration(seconds: 10),
-                                                  );
-                                                },
+                                                onPressed: showControls
+                                                    ? () {
+                                                        _videoPlayerController
+                                                            .seekTo(
+                                                          _videoPlayerController
+                                                                  .value
+                                                                  .position +
+                                                              const Duration(
+                                                                  seconds: 10),
+                                                        );
+                                                      }
+                                                    : null,
                                               ),
                                             ],
                                           ),
@@ -382,17 +457,28 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                   left: 20,
                                   right: 20,
                                   child: !videoNotInitialized &&
-                                          _chewieController?.videoPlayerController.value.isInitialized == true
+                                          _chewieController
+                                                  ?.videoPlayerController
+                                                  .value
+                                                  .isInitialized ==
+                                              true
                                       ? Column(
                                           children: [
                                             Container(
                                               margin: EdgeInsets.only(
-                                                  bottom: ScreenUtil.verticalScale(1.3), left: 15, right: 15),
+                                                  bottom:
+                                                      ScreenUtil.verticalScale(
+                                                          1.3),
+                                                  left: 15,
+                                                  right: 15),
                                               child: Column(
                                                 children: [
                                                   Column(
                                                     children: [
-                                                      SizedBox(height: ScreenUtil.verticalScale(0.8)),
+                                                      SizedBox(
+                                                          height: ScreenUtil
+                                                              .verticalScale(
+                                                                  0.8)),
                                                       Row(
                                                         children: [
                                                           Spacer(),
@@ -403,9 +489,16 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                                                   }
                                                                 : null,
                                                             child: Icon(
-                                                              isMute ? Icons.volume_up : Icons.volume_off,
-                                                              color:
-                                                                  !showControls ? Colors.transparent : Colors.white70,
+                                                              isMute
+                                                                  ? Icons
+                                                                      .volume_up
+                                                                  : Icons
+                                                                      .volume_off,
+                                                              color: !showControls
+                                                                  ? Colors
+                                                                      .transparent
+                                                                  : Colors
+                                                                      .white70,
                                                               size: 28,
                                                             ),
                                                           ),
@@ -413,7 +506,9 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                                       ),
                                                     ],
                                                   ),
-                                                  SizedBox(height: ScreenUtil.verticalScale(1)),
+                                                  SizedBox(
+                                                      height: ScreenUtil
+                                                          .verticalScale(1)),
                                                   // ProgressBar(
                                                   //   collapsedBufferedBarColor: Colors.white,
                                                   //   expandedBufferedBarColor: Colors.white,
@@ -435,35 +530,51 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                                                   //     setState(() => isZoom = false);
                                                   //   },
                                                   // ),
-                                                  ValueListenableBuilder<Duration>(
-                                                    valueListenable: videoProgressValue,
-                                                    builder: (context, progress, _) {
+                                                  ValueListenableBuilder<
+                                                      Duration>(
+                                                    valueListenable:
+                                                        videoProgressValue,
+                                                    builder:
+                                                        (context, progress, _) {
                                                       return ProgressBar(
-                                                        collapsedBufferedBarColor: Colors.white,
-                                                        expandedBufferedBarColor: Colors.white,
-                                                        buffered: getBufferedPosition(),
+                                                        collapsedBufferedBarColor:
+                                                            Colors.white,
+                                                        expandedBufferedBarColor:
+                                                            Colors.white,
+                                                        buffered:
+                                                            getBufferedPosition(),
                                                         controller: _controller,
                                                         progress: progress,
                                                         total: Duration(
-                                                          seconds: _videoPlayerController.value.duration.inSeconds,
+                                                          seconds:
+                                                              _videoPlayerController
+                                                                  .value
+                                                                  .duration
+                                                                  .inSeconds,
                                                         ),
                                                         onChanged: (value) {
                                                           _videoPlayerController
-                                                              .seekTo(Duration(seconds: value.inSeconds));
+                                                              .seekTo(Duration(
+                                                                  seconds: value
+                                                                      .inSeconds));
                                                         },
                                                         onSeek: (value) {},
                                                         onChangeStart: (value) {
-                                                          _videoPlayerController.pause();
+                                                          _videoPlayerController
+                                                              .pause();
                                                           isZoom = true;
                                                         },
                                                         onChangeEnd: (value) {
-                                                          _videoPlayerController.play();
+                                                          _videoPlayerController
+                                                              .play();
                                                           isZoom = false;
                                                         },
                                                       );
                                                     },
                                                   ),
-                                                  SizedBox(height: ScreenUtil.verticalScale(2.2)),
+                                                  SizedBox(
+                                                      height: ScreenUtil
+                                                          .verticalScale(2.2)),
                                                 ],
                                               ),
                                             ),
@@ -509,39 +620,73 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
                               margin: EdgeInsets.only(
                                   left: ScreenUtil.horizontalScale(5),
                                   right: ScreenUtil.horizontalScale(5),
-                                  top: 15.0,
-                                  bottom: 10.0),
+                                  top: 15.0),
                               alignment: Alignment.topLeft,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 5),
-                                    child: Text(
-                                      tutorialTitle,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        fontSize: ScreenUtil.verticalScale(2.2),
-                                        height: 1.0,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 12),
-                                  Text(
-                                    tutorialDesc,
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil.verticalScale(1.7),
-                                      height: 1.5,
-                                      color: Color(0xff6f6f6f),
-                                    ),
-                                  ),
+                                  !videoNotInitialized
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5),
+                                          child: Center(
+                                            child: Text(
+                                              tutorialTitle,
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        2.2),
+                                                height: 1.0,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 4),
+                                          child: Center(
+                                            child: Text(
+                                              tutorialTitle,
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
+                                                height: 1.0,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                  // SizedBox(height: 12),
+                                  Html(
+                                    data: tutorialDesc,
+                                    style: {
+                                      "p": Style(
+                                          padding: HtmlPaddings.zero,
+                                          color: Color(0xff6f6f6f),
+                                          textAlign: TextAlign.left,
+                                          fontSize: FontSize(
+                                              ScreenUtil.verticalScale(1.8))),
+                                    },
+                                  )
+                                  // Text(
+                                  //   tutorialDesc,
+                                  //   textAlign: TextAlign.start,
+                                  //   style: TextStyle(
+                                  //     fontSize: ScreenUtil.verticalScale(1.7),
+                                  //     height: 1.5,
+                                  //     color: Color(0xff6f6f6f),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),
-                            SizedBox(height: ScreenUtil.verticalScale(1.2)),
+                            // SizedBox(height: ScreenUtil.verticalScale(1.2)),
                             Container(
                               margin: EdgeInsets.only(
                                 bottom: ScreenUtil.verticalScale(3),
@@ -572,10 +717,14 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog> with Ti
               child: GestureDetector(
                 child: Container(
                   decoration: const BoxDecoration(
-                      color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(100))),
                   child: Padding(
                     padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
-                    child: Icon(size: ScreenUtil.verticalScale(2.5), Icons.close, color: Colors.white),
+                    child: Icon(
+                        size: ScreenUtil.verticalScale(2.5),
+                        Icons.close,
+                        color: Colors.white),
                   ),
                 ),
                 onTap: () {

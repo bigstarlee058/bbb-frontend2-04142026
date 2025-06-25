@@ -7,6 +7,7 @@ import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
+import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -73,7 +74,8 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _initializeFetchData() async {
     debugPrint("this  is initial state func");
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    dataProvider?.monthProvider =
+        Provider.of<MonthProvider>(context, listen: false);
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {
@@ -91,7 +93,8 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+      final url = Uri.parse(
+          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -116,8 +119,11 @@ class _LoginPageState extends State<LoginPage> {
         WidgetsBinding.instance.addPostFrameCallback(
           (timeStamp) async => await _initializeFetchData().then(
             (value) async {
-              bool isFirstTime = userData.user["createdAt"] == userData.user["updatedAt"];
-              await preferences.setBool(SharedPreference.isFirstTime, isFirstTime);
+              bool isFirstTime =
+                  userData.user["createdAt"] == userData.user["updatedAt"] ||
+                      userData.user["detail"] == null;
+              await preferences.setBool(
+                  SharedPreference.isFirstTime, isFirstTime);
 
               dataProvider?.getAllAchievement(true);
               if (monthProvider?.monthDataModel == null) {
@@ -126,9 +132,13 @@ class _LoginPageState extends State<LoginPage> {
                     (value) async {
                       if (Platform.isIOS && isAppUser) {
                         try {
-                          Map<String, dynamic> subscriptionData = userData.user["subscription"];
+                          Map<String, dynamic> subscriptionData =
+                              userData.user["subscription"];
                           DateTime now = DateTime.now().toUtc();
-                          DateTime? endDate = (subscriptionData["end_date"] ?? "").toString().isEmpty
+                          DateTime? endDate = (subscriptionData["end_date"] ??
+                                      "")
+                                  .toString()
+                                  .isEmpty
                               ? null
                               : DateTime.parse(subscriptionData["end_date"]);
                           if (endDate == null || (now.isAfter(endDate))) {
@@ -175,26 +185,54 @@ class _LoginPageState extends State<LoginPage> {
                       if (Platform.isIOS && isAppUser) {
                         await userData.fetchUserInfo().then(
                           (value) async {
-                            Map<String, dynamic> subscriptionData = userData.user["subscription"];
+                            Map<String, dynamic> subscriptionData =
+                                userData.user["subscription"];
 
-                            if (subscriptionData["user_subscription_status"] == "free_user") {
+                            if (subscriptionData["user_subscription_status"] ==
+                                "free_user") {
                               if (mounted) {
                                 await Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (context) => SubscriptionPayWall()),
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          SubscriptionPayWall()),
                                 );
                               }
                             } else {
-                              if (mounted) {
-                                await Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => MainPage(
-                                              showWelcomeModal: !hasSeenWelcome,
-                                              welcomeDescription: "",
-                                              welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
-                                            )),
-                                    (route) => false);
+                              if (isFirstTime) {
+                                if (mounted) {
+                                  await Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProfileBoardingScreen(
+                                          welcomeDescription: '',
+                                          welcomeImageUrl: '',
+                                        ),
+                                      ),
+                                      (route) => false).then(
+                                    (value) async {
+                                      await preferences.setBool(
+                                          SharedPreference.isFirstTime, false);
+                                    },
+                                  );
+                                }
+                              } else {
+                                if (mounted) {
+                                  await Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MainPage(
+                                                showWelcomeModal:
+                                                    !hasSeenWelcome,
+                                                welcomeDescription: "",
+                                                welcomeImageUrl: dataProvider
+                                                        ?.screenBackgroundModel
+                                                        ?.vimeoId ??
+                                                    "",
+                                              )),
+                                      (route) => false);
+                                }
                               }
                             }
                           },
@@ -237,30 +275,74 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         );
 
-                        if (mounted) {
-                          await Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MainPage(
-                                        showWelcomeModal: !hasSeenWelcome,
-                                        welcomeDescription: "",
-                                        welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
-                                      )),
-                              (route) => false);
+                        if (isFirstTime) {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProfileBoardingScreen(
+                                    welcomeDescription: '',
+                                    welcomeImageUrl: '',
+                                  ),
+                                ),
+                                (route) => false).then(
+                              (value) async {
+                                await preferences.setBool(
+                                    SharedPreference.isFirstTime, false);
+                              },
+                            );
+                          }
+                        } else {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MainPage(
+                                          showWelcomeModal: !hasSeenWelcome,
+                                          welcomeDescription: "",
+                                          welcomeImageUrl: dataProvider
+                                                  ?.screenBackgroundModel
+                                                  ?.vimeoId ??
+                                              "",
+                                        )),
+                                (route) => false);
+                          }
                         }
                       } else {
-                        if (mounted) {
-                          await Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MainPage(
-                                  showWelcomeModal: !hasSeenWelcome,
-                                  welcomeDescription: "",
-                                  welcomeImageUrl: dataProvider?.screenBackgroundModel?.vimeoId ?? "",
+                        if (isFirstTime) {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProfileBoardingScreen(
+                                    welcomeDescription: '',
+                                    welcomeImageUrl: '',
+                                  ),
                                 ),
-                              ),
-                              (route) => false);
+                                (route) => false).then(
+                              (value) async {
+                                await preferences.setBool(
+                                    SharedPreference.isFirstTime, false);
+                              },
+                            );
+                          }
+                        } else {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MainPage(
+                                    showWelcomeModal: !hasSeenWelcome,
+                                    welcomeDescription: "",
+                                    welcomeImageUrl: dataProvider
+                                            ?.screenBackgroundModel?.vimeoId ??
+                                        "",
+                                  ),
+                                ),
+                                (route) => false);
+                          }
                         }
+
                         WidgetsBinding.instance.addPostFrameCallback(
                           (timeStamp) {
                             setState(() {
@@ -319,7 +401,8 @@ class _LoginPageState extends State<LoginPage> {
           for (var package in offeringItem.availablePackages) {
             if (package.storeProduct.identifier == "monthly_membership_1m_29") {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier == "yearly_membership_1y_289") {
+            } else if (package.storeProduct.identifier ==
+                "yearly_membership_1y_289") {
               yearPrice = package.storeProduct.priceString;
             }
           }
@@ -349,7 +432,8 @@ class _LoginPageState extends State<LoginPage> {
         "end_date": endDate,
       };
 
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      Uri url =
+          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(
@@ -411,7 +495,10 @@ class _LoginPageState extends State<LoginPage> {
               height: 150,
               width: media.width,
               decoration: const BoxDecoration(
-                image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                image: DecorationImage(
+                    image: AssetImage('assets/img/bbb-logo.png'),
+                    fit: BoxFit.fitHeight,
+                    opacity: 1),
               ),
             ),
           ),
@@ -439,7 +526,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: ScreenUtil.verticalScale(4.4)),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -470,7 +558,8 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: const EdgeInsets.only(right: 15),
                                 child: IconButton(
                                   onPressed: () {},
-                                  icon: Icon(Icons.email, color: Colors.grey.shade400),
+                                  icon: Icon(Icons.email,
+                                      color: Colors.grey.shade400),
                                 ),
                               ),
                             ),
@@ -490,9 +579,13 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () {
                                     setState(() => isObscure = !isObscure);
                                   },
-                                  style: ButtonStyle(minimumSize: WidgetStateProperty.all(const Size(48, 48))),
+                                  style: ButtonStyle(
+                                      minimumSize: WidgetStateProperty.all(
+                                          const Size(48, 48))),
                                   icon: Icon(
-                                    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    isObscure
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
                                     color: Colors.grey.shade400,
                                   ),
                                 ),
@@ -516,7 +609,8 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (ctx) => const ResetPasswordScreen(
+                                        builder: (ctx) =>
+                                            const ResetPasswordScreen(
                                           image: '',
                                         ),
                                       ),
@@ -560,7 +654,8 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(65, 30),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                     alignment: Alignment.center),
                                 child: const Text(
                                   'Sign up',

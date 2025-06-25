@@ -38,19 +38,22 @@ class ExerciseTutorialScreen extends StatefulWidget {
   State<ExerciseTutorialScreen> createState() => _ExerciseTutorialScreenState();
 }
 
-class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with TickerProviderStateMixin {
+class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
+    with TickerProviderStateMixin {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
-        bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+        bool rawData =
+            await preferences.getBool(SharedPreference.isMute) ?? true;
         widget.videoPlayerController.setVolume(rawData ? 1 : 0);
         isMute1 = rawData;
       },
     );
     widget.videoPlayerController.play();
     widget.videoPlayerController.addListener(() {
-      widget.videoProgressValue.value = widget.videoPlayerController.value.position;
+      widget.videoProgressValue.value =
+          widget.videoPlayerController.value.position;
       setState(() {});
     });
     hideControls1();
@@ -96,16 +99,19 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
       isFullscreen1 = !isFullscreen1;
     });
     if (isFullscreen1) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
     } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
   }
 
   updateDonTShowAgain(value) async {
     dontShowAgain1 = value;
     if (value == true) {
-      await preferences.putString(SharedPreference.exerciseTutorial, value.toString());
+      await preferences.putString(
+          SharedPreference.exerciseTutorial, value.toString());
     }
     setState(() {});
   }
@@ -113,20 +119,22 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+      insetPadding:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6.7)),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(25),
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+              constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.825),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(20),
                   color: const Color(0xFFFFFFFF),
                 ),
                 child: widget.loading
@@ -138,20 +146,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                     : SingleChildScrollView(
                         child: Column(
                           children: [
-                            SizedBox(height: ScreenUtil.verticalScale(4.5)),
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.end,
-                            //   children: [
-                            //     IconButton(
-                            //       icon: const Icon(Icons.close),
-                            //       onPressed: () {
-                            //         Navigator.of(context).pop();
-                            //       },
-                            //     ),
-                            //     SizedBox(width: ScreenUtil.horizontalScale(3)),
-                            //   ],
-                            // ),
-                            // SizedBox(height: ScreenUtil.verticalScale(2)),
+                            // SizedBox(height: ScreenUtil.verticalScale(4.5)),
                             Stack(
                               children: [
                                 GestureDetector(
@@ -160,32 +155,42 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                   },
                                   child: Column(
                                     children: [
-                                      widget.dataProvider.tutorialData.files.isNotEmpty && !widget.videoNotInitialized
+                                      widget.dataProvider.tutorialData.files
+                                                  .isNotEmpty &&
+                                              !widget.videoNotInitialized
                                           ? Stack(
                                               children: [
                                                 SizedBox(
-                                                  height: widget.videoSize.height - 18,
-                                                  width: widget.videoSize.width - 6,
-                                                  child: Center(
-                                                    child: Chewie(
-                                                      controller: widget.chewieController,
-                                                    ),
+                                                  height:
+                                                      widget.videoSize.height,
+                                                  width: widget.videoSize.width,
+                                                  child: Chewie(
+                                                    controller:
+                                                        widget.chewieController,
                                                   ),
                                                 ),
-                                                Container(
-                                                  color: showControls1 ? Colors.black38 : Colors.transparent,
-                                                  height: widget.videoSize.height - 18,
-                                                  width: widget.videoSize.width - 6,
+                                                AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 1300),
+                                                  curve: Curves.easeInOut,
+                                                  color: showControls1
+                                                      ? Colors.black38
+                                                      : Colors.transparent,
+                                                  height:
+                                                      widget.videoSize.height,
+                                                  width: widget.videoSize.width,
                                                 ),
                                               ],
                                             )
                                           : Container(
-                                              height: ScreenUtil.verticalScale(40),
+                                              height:
+                                                  ScreenUtil.verticalScale(40),
                                               color: Colors.black12,
                                               child: const Center(
                                                   child: Text(
                                                 'No Video Available',
-                                                style: TextStyle(color: Colors.white),
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               )),
                                             ),
                                     ],
@@ -194,13 +199,17 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                 widget.videoNotInitialized
                                     ? const SizedBox()
                                     : Positioned(
-                                        bottom: widget.videoSize.height / 2.25,
-                                        left: 15,
-                                        right: 15,
-                                        child: Visibility(
-                                          visible: showControls1,
+                                        bottom: widget.videoSize.height / 2,
+                                        left: 10,
+                                        right: 10,
+                                        child: AnimatedOpacity(
+                                          opacity: showControls1 ? 1.0 : 0.0,
+                                          duration:
+                                              const Duration(milliseconds: 800),
+                                          curve: Curves.easeInOut,
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
                                             children: [
                                               // Skip backward button
                                               IconButton(
@@ -209,36 +218,76 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                                   Icons.replay_10,
                                                   color: Colors.white70,
                                                 ),
-                                                onPressed: () {
-                                                  widget.videoPlayerController.seekTo(
-                                                    widget.videoPlayerController.value.position -
-                                                        const Duration(seconds: 10),
-                                                  );
-                                                },
+                                                onPressed: showControls1
+                                                    ? () {
+                                                        widget
+                                                            .videoPlayerController
+                                                            .seekTo(
+                                                          widget
+                                                                  .videoPlayerController
+                                                                  .value
+                                                                  .position -
+                                                              const Duration(
+                                                                  seconds: 10),
+                                                        );
+                                                      }
+                                                    : null,
                                               ),
                                               IconButton(
                                                 iconSize: 60,
                                                 icon: Icon(
-                                                  widget.videoPlayerController.value.isPlaying
-                                                      ? Icons.pause_circle_filled
-                                                      : Icons.play_circle_filled,
+                                                  widget.videoPlayerController
+                                                          .value.isPlaying
+                                                      ? Icons
+                                                          .pause_circle_filled
+                                                      : Icons
+                                                          .play_circle_filled,
                                                   color: Colors.white70,
                                                 ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    if (widget.videoPlayerController.value.isPlaying) {
-                                                      widget.videoPlayerController.pause();
-                                                      showControlsOnTapOfPause1();
+                                                onPressed: showControls1
+                                                    ? () async {
+                                                        if (widget
+                                                            .videoPlayerController
+                                                            .value
+                                                            .isPlaying) {
+                                                          widget
+                                                              .videoPlayerController
+                                                              .pause();
+                                                          setState(() {});
+                                                          showControlsOnTapOfPause1();
 
-                                                      AudioManager.abandonAudioFocus();
-                                                    } else {
-                                                      widget.videoPlayerController.play();
-                                                      hideControls1();
+                                                          await Future.delayed(
+                                                                  Duration(
+                                                                      milliseconds:
+                                                                          100))
+                                                              .then(
+                                                            (value) {
+                                                              AudioManager
+                                                                  .abandonAudioFocus();
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        } else {
+                                                          widget
+                                                              .videoPlayerController
+                                                              .play();
+                                                          setState(() {});
+                                                          hideControls1();
 
-                                                      AudioManager.requestAudioFocus();
-                                                    }
-                                                  });
-                                                },
+                                                          await Future.delayed(
+                                                                  Duration(
+                                                                      milliseconds:
+                                                                          100))
+                                                              .then(
+                                                            (value) {
+                                                              AudioManager
+                                                                  .requestAudioFocus();
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        }
+                                                      }
+                                                    : null,
                                               ),
                                               // Skip forward button
                                               IconButton(
@@ -247,33 +296,53 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                                   Icons.forward_10,
                                                   color: Colors.white70,
                                                 ),
-                                                onPressed: () {
-                                                  widget.videoPlayerController.seekTo(
-                                                    widget.videoPlayerController.value.position +
-                                                        const Duration(seconds: 10),
-                                                  );
-                                                },
+                                                onPressed: showControls1
+                                                    ? () {
+                                                        widget
+                                                            .videoPlayerController
+                                                            .seekTo(
+                                                          widget
+                                                                  .videoPlayerController
+                                                                  .value
+                                                                  .position +
+                                                              const Duration(
+                                                                  seconds: 10),
+                                                        );
+                                                      }
+                                                    : null,
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
                                 Positioned(
-                                  bottom: -5,
-                                  left: 20,
-                                  right: 20,
+                                  bottom: ScreenUtil.verticalScale(1),
+                                  left: 10,
+                                  right: 10,
                                   child: !widget.videoNotInitialized &&
-                                          widget.chewieController.videoPlayerController.value.isInitialized == true
+                                          widget
+                                                  .chewieController
+                                                  .videoPlayerController
+                                                  .value
+                                                  .isInitialized ==
+                                              true
                                       ? Column(
                                           children: [
                                             Container(
                                               margin: EdgeInsets.only(
-                                                  bottom: ScreenUtil.verticalScale(1.3), left: 15, right: 15),
+                                                  bottom:
+                                                      ScreenUtil.verticalScale(
+                                                          1.3),
+                                                  left: 20,
+                                                  right: 20),
                                               child: Column(
                                                 children: [
                                                   Column(
                                                     children: [
-                                                      SizedBox(height: ScreenUtil.verticalScale(0.8)),
+                                                      SizedBox(
+                                                          height: ScreenUtil
+                                                              .verticalScale(
+                                                                  0.8)),
                                                       Row(
                                                         children: [
                                                           Spacer(),
@@ -284,9 +353,16 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                                                   }
                                                                 : null,
                                                             child: Icon(
-                                                              isMute1 ? Icons.volume_up : Icons.volume_off,
-                                                              color:
-                                                                  !showControls1 ? Colors.transparent : Colors.white70,
+                                                              isMute1
+                                                                  ? Icons
+                                                                      .volume_up
+                                                                  : Icons
+                                                                      .volume_off,
+                                                              color: !showControls1
+                                                                  ? Colors
+                                                                      .transparent
+                                                                  : Colors
+                                                                      .white70,
                                                               size: 28,
                                                             ),
                                                           ),
@@ -294,7 +370,9 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                                       ),
                                                     ],
                                                   ),
-                                                  SizedBox(height: ScreenUtil.verticalScale(1)),
+                                                  SizedBox(
+                                                      height: ScreenUtil
+                                                          .verticalScale(1)),
                                                   // ProgressBar(
                                                   //   collapsedBufferedBarColor: Colors.white,
                                                   //   expandedBufferedBarColor: Colors.white,
@@ -316,26 +394,47 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                                   //     setState(() => isZoom1 = false);
                                                   //   },
                                                   // ),
-                                                  ValueListenableBuilder<Duration>(
-                                                    valueListenable: widget.videoProgressValue,
-                                                    builder: (context, progress, _) {
+                                                  ValueListenableBuilder<
+                                                      Duration>(
+                                                    valueListenable: widget
+                                                        .videoProgressValue,
+                                                    builder:
+                                                        (context, progress, _) {
                                                       return ProgressBar(
-                                                        collapsedBufferedBarColor: Colors.white,
-                                                        expandedBufferedBarColor: Colors.white,
+                                                        collapsedBufferedBarColor:
+                                                            Colors.white,
+                                                        expandedBufferedBarColor:
+                                                            Colors.white,
                                                         buffered: Duration(
-                                                            seconds: widget.videoPlayerController.value.buffered.isEmpty
+                                                            seconds: widget
+                                                                    .videoPlayerController
+                                                                    .value
+                                                                    .buffered
+                                                                    .isEmpty
                                                                 ? 0
-                                                                : widget.videoPlayerController.value.buffered.first.end
+                                                                : widget
+                                                                    .videoPlayerController
+                                                                    .value
+                                                                    .buffered
+                                                                    .first
+                                                                    .end
                                                                     .inSeconds),
-                                                        controller: widget.controller,
+                                                        controller:
+                                                            widget.controller,
                                                         progress: progress,
                                                         total: Duration(
-                                                          seconds:
-                                                              widget.videoPlayerController.value.duration.inSeconds,
+                                                          seconds: widget
+                                                              .videoPlayerController
+                                                              .value
+                                                              .duration
+                                                              .inSeconds,
                                                         ),
                                                         onChanged: (value) {
-                                                          widget.videoPlayerController
-                                                              .seekTo(Duration(seconds: value.inSeconds));
+                                                          widget
+                                                              .videoPlayerController
+                                                              .seekTo(Duration(
+                                                                  seconds: value
+                                                                      .inSeconds));
                                                         },
                                                         onSeek: (value) {},
                                                         onChangeStart: (value) {
@@ -347,7 +446,9 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
                                                       );
                                                     },
                                                   ),
-                                                  SizedBox(height: ScreenUtil.verticalScale(2.2)),
+                                                  SizedBox(
+                                                      height: ScreenUtil
+                                                          .verticalScale(2.2)),
                                                 ],
                                               ),
                                             ),
@@ -460,10 +561,14 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen> with Ti
               child: GestureDetector(
                 child: Container(
                   decoration: const BoxDecoration(
-                      color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(100))),
                   child: Padding(
                     padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
-                    child: Icon(size: ScreenUtil.verticalScale(2.5), Icons.close, color: Colors.white),
+                    child: Icon(
+                        size: ScreenUtil.verticalScale(2.5),
+                        Icons.close,
+                        color: Colors.white),
                   ),
                 ),
                 onTap: () {

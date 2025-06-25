@@ -1,3 +1,4 @@
+import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class NotesSlideout extends StatelessWidget {
@@ -12,22 +13,24 @@ class NotesSlideout extends StatelessWidget {
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard height
+              bottom: MediaQuery.of(context)
+                  .viewInsets
+                  .bottom, // Adjust for keyboard height
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Close Button
+                const SizedBox(height: 17),
                 Align(
                   alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
+                  child: GestureDetector(
+                    child: const Icon(Icons.close),
+                    onTap: () {
                       Navigator.pop(context); // Close the modal
                     },
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 7),
 
                 // Add a New Note text
                 const Center(
@@ -58,13 +61,12 @@ class NotesSlideout extends StatelessWidget {
                 const SizedBox(height: 25),
 
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Padding inside the container
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Color(0xFF2196F3), // Background color
-                    border: Border.all(
-                      color: Color(0xFF2196F3), // Border color
-                      width: 1, // Border width
-                    ),
+                    color: AppColors.primaryColor, // Background color
+
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                   ),
                   child: const Row(
@@ -109,13 +111,12 @@ class NotesSlideout extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Padding inside the container
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Color(0xFF5D79C3), // Background color
-                    border: Border.all(
-                      color: Color(0xFF5D79C3), // Border color
-                      width: 1, // Border width
-                    ),
+                    color: Color(0xFFB7436B), // Background color
+
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                   ),
                   child: const Row(
@@ -160,13 +161,11 @@ class NotesSlideout extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   decoration: BoxDecoration(
                     color: Color(0xFFCD5A77), // Background color
-                    border: Border.all(
-                      color: Color(0xFFCD5A77), // Border color
-                      width: 1, // Border width
-                    ),
+
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                   ),
                   child: const Row(
@@ -211,13 +210,13 @@ class NotesSlideout extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Padding inside the container
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Color(0xFFB7436B), // Background color
-                    border: Border.all(
-                      color: Color(0xFFB7436B), // Border color
-                      width: 1, // Border width
-                    ),
+                    color: AppColors.blueColor
+                        .withValues(alpha: .75), // Background color
+
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                   ),
                   child: const Row(
@@ -262,13 +261,12 @@ class NotesSlideout extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Padding inside the container
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 20), // Padding inside the container
                   decoration: BoxDecoration(
-                    color: Color(0xFF9A354E), // Background color
-                    border: Border.all(
-                      color: Color(0xFF9A354E), // Border color
-                      width: 1, // Border width
-                    ),
+                    color: AppColors.blueColor, // Background color
+
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                   ),
                   child: const Row(

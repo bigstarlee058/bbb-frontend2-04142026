@@ -1,3 +1,4 @@
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/MonthView/TodayPage/slider_video_page.dart';
@@ -75,11 +76,13 @@ class _VideoSliderState extends State<VideoSlider> {
                       setState(() {});
                     },
                     itemBuilder: (context, index) => Padding(
-                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.verticalScale(3)),
                       child: videoData[index]["image"].toString().isEmpty
                           ? Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                                borderRadius: BorderRadius.circular(
+                                    ScreenUtil.verticalScale(4)),
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
                                   image: AssetImage("assets/img/pp_4.png"),
@@ -92,20 +95,25 @@ class _VideoSliderState extends State<VideoSlider> {
                                   color: Colors.white70,
                                 ),
                                 onPressed: () {
-                                  Navigator.of(context).push(
-                                    FadePageRoute(
-                                      page: SliderVideoPage(videoUrl: videoData[index]["vimeo"]),
-                                    ),
-                                  );
+                                  AnimatedDialog.showAnimatedDialog(
+                                      context: context,
+                                      pageBuilder: (c1, anim1, anim2) =>
+                                          SliderVideoPage(
+                                              videoUrl: videoData[index]
+                                                  ["vimeo"]));
                                 },
                               ),
                             )
                           : appShimmerImage(
-                              networkImageUrl: videoData[index]["image"].startsWith('https://storage.cloud.google.com/')
-                                  ? videoData[index]["image"]
-                                      .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                              networkImageUrl: videoData[index]["image"]
+                                      .startsWith(
+                                          'https://storage.cloud.google.com/')
+                                  ? videoData[index]["image"].replaceFirst(
+                                      'https://storage.cloud.google.com/',
+                                      'https://storage.googleapis.com/')
                                   : videoData[index]["image"],
-                              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+                              borderRadius: BorderRadius.circular(
+                                  ScreenUtil.verticalScale(4)),
                               fit: BoxFit.cover,
                               child: IconButton(
                                 iconSize: 60,
@@ -114,11 +122,12 @@ class _VideoSliderState extends State<VideoSlider> {
                                   color: Colors.white70,
                                 ),
                                 onPressed: () {
-                                  Navigator.of(context).push(
-                                    FadePageRoute(
-                                      page: SliderVideoPage(videoUrl: videoData[index]["vimeo"]),
-                                    ),
-                                  );
+                                  AnimatedDialog.showAnimatedDialog(
+                                      context: context,
+                                      pageBuilder: (c1, anim1, anim2) =>
+                                          SliderVideoPage(
+                                              videoUrl: videoData[index]
+                                                  ["vimeo"]));
                                 },
                               ),
                             ),
@@ -142,7 +151,9 @@ class _VideoSliderState extends State<VideoSlider> {
                             width: 10,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: currentVideoIndex == index ? AppColors.primaryColor : Colors.transparent,
+                              color: currentVideoIndex == index
+                                  ? AppColors.primaryColor
+                                  : Colors.transparent,
                               border: Border.all(color: AppColors.primaryColor),
                             ),
                           ),

@@ -12,7 +12,7 @@ class ProgramInfoProvider extends ChangeNotifier {
 
   bool loading = false;
 
-  void getProgramInfo(BuildContext context) async {
+  void getProgramInfo() async {
     if (programInfoModel != null) {
       return;
     }
@@ -23,7 +23,8 @@ class ProgramInfoProvider extends ChangeNotifier {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('authToken');
       String split = preferences.getString(SharedPreference.split) ?? "";
-      String equipmentType = preferences.getString(SharedPreference.equipmentType) ?? "";
+      String equipmentType =
+          preferences.getString(SharedPreference.equipmentType) ?? "";
       final response = await http.get(
         Uri.parse('${AppConstants.serverUrl}/api/program-info').replace(
           queryParameters: {
@@ -38,13 +39,11 @@ class ProgramInfoProvider extends ChangeNotifier {
         debugPrint('success getProgramInfo');
         programInfoModel = programInfoModelFromJson(response.body);
       } else {
-        showBottomAlert(context, 'Failed to load description');
         debugPrint('this is programInfo ${response.statusCode}');
       }
       loading = false;
       notifyListeners();
     } catch (e) {
-      showBottomAlert(context, 'An error occurred');
       debugPrint('this is programInfo  $e');
     } finally {
       loading = false;

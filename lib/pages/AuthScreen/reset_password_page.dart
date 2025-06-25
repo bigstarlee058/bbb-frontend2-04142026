@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
@@ -28,8 +29,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   DataProvider? dataProvider;
 
-  bool isLoading = false;
-
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -42,63 +41,101 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     super.dispose();
   }
 
-  resetPassword(String emailAddress) async {
-    if (emailAddress.isNotEmpty) {
-      if (AppConstants.emailRegex.hasMatch(emailAddress)) {
-        var response = await http.post(
-          Uri.parse('https://bbbdev1.wpenginepowered.com/wp-json/custom/v1/send-password-reset'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(<String, String>{
-            'email': emailAddress,
-          }),
-        );
+  bool loader = false;
 
-        if (response.statusCode == 200) {
-          // Assuming the API returns 200 for a successful operation
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const AppAlertDialog(
-                title: "Success",
-                description: "Please check your email inbox for the password reset email.",
-              );
+  resetPassword(String emailAddress) async {
+    try {
+      if (emailAddress.isNotEmpty) {
+        loader = true;
+        setState(() {});
+        if (AppConstants.emailRegex.hasMatch(emailAddress)) {
+          var response = await http.post(
+            Uri.parse(
+                'https://bbbdev1.wpenginepowered.com/wp-json/custom/v1/send-password-reset'),
+            headers: <String, String>{
+              'Content-Type': 'application/json',
             },
+            body: jsonEncode(<String, String>{
+              'email': emailAddress,
+            }),
           );
+
+          if (response.statusCode == 200) {
+            // Assuming the API returns 200 for a successful operation
+
+            showBottomAlert(
+              context,
+              "Please check your email inbox for the password reset email.",
+            );
+
+            // showDialog(
+            //   context: context,
+            //   builder: (BuildContext context) {
+            //     return const AppAlertDialog(
+            //       title: "Success",
+            //       description:
+            //           "Please check your email inbox for the password reset email.",
+            //     );
+            //   },
+            // );
+          } else {
+            // Handle error or unsuccessful operation
+
+            final data = jsonDecode(response.body);
+
+            showBottomAlert(
+              context,
+              "Failed to send reset email: ${data["message"]}",
+            );
+
+            // showDialog(
+            //   context: context,
+            //   builder: (BuildContext context) {
+            //     return AppAlertDialog(
+            //       title: "Error",
+            //       description: "Failed to send reset email: ${response.body}",
+            //     );
+            //   },
+            // );
+          }
         } else {
-          // Handle error or unsuccessful operation
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AppAlertDialog(
-                title: "Error",
-                description: "Failed to send reset email: ${response.body}",
-              );
-            },
+          showBottomAlert(
+            context,
+            "Invalid email format, Please check your email format.",
           );
+
+          // showDialog(
+          //   context: context,
+          //   builder: (BuildContext context) {
+          //     return const AppAlertDialog(
+          //       title: "Warning",
+          //       description: "Invalid email format",
+          //     );
+          //   },
+          // );
         }
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return const AppAlertDialog(
-              title: "Warning",
-              description: "Invalid email format",
-            );
-          },
+        showBottomAlert(
+          context,
+          "Please enter your email address to receive a password reset email.",
         );
+
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return const AppAlertDialog(
+        //       title: "Warning",
+        //       description:
+        //           "Please enter your email address to receive a password reset email.",
+        //     );
+        //   },
+        // );
       }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const AppAlertDialog(
-            title: "Warning",
-            description: "Please enter your email address to receive a password reset email.",
-          );
-        },
-      );
+    } catch (e) {
+      log('e==========>>>>>${e}');
+    } finally {
+      loader = false;
+      setState(() {});
     }
   }
 
@@ -141,8 +178,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 height: 150,
                 width: media.width,
                 decoration: const BoxDecoration(
-                  image:
-                      DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                  image: DecorationImage(
+                      image: AssetImage('assets/img/bbb-logo.png'),
+                      fit: BoxFit.fitHeight,
+                      opacity: 1),
                 ),
               ),
             ),
@@ -169,11 +208,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                              topLeft:
+                                  Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.verticalScale(4.4)),
                             child: Column(
                               children: [
                                 SizedBox(
@@ -239,12 +280,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   text: 'Send a request',
                                   textColor: Colors.white,
                                   color: AppColors.primaryColor,
-                                  onPress: () {
-                                    if (_formKey.currentState?.validate() == true) {
-                                      resetPassword(emailInputController.text);
-                                    }
-                                  },
-                                  isLoading: isLoading,
+                                  onPress: loader
+                                      ? () {}
+                                      : () {
+                                          if (_formKey.currentState
+                                                  ?.validate() ==
+                                              true) {
+                                            resetPassword(
+                                                emailInputController.text);
+                                          }
+                                        },
+                                  isLoading: loader,
                                 ),
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(4),
