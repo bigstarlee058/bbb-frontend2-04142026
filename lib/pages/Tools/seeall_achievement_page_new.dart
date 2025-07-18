@@ -10,11 +10,10 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/utils.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
-// import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../utils/screen_util.dart';
 
 class SeeAllAchievementPage extends StatefulWidget {
@@ -36,7 +35,67 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
 
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        if (dataProvider!.openDaySinceJoin) {
+          final itemList = dataProvider!.achievementList
+              .where((element) => element.title == "Days since joining")
+              .toList();
+
+          if (itemList.isNotEmpty) {
+            final item = itemList.first;
+            final data1 = item.achievements
+                ?.where((element) => element.achieved == false)
+                .toList();
+
+            Achievement? data2;
+            if ((data1 != null && data1.isEmpty)) {
+              data2 = item.achievements?.last;
+            } else {
+              int? index = item.achievements?.indexWhere((element) =>
+                  element.achievementAchievementId?.achievementIdId ==
+                  data1?.first.achievementAchievementId?.achievementIdId);
+              data2 = item.achievements?[index == 0 ? 0 : (index ?? 0) - 1];
+            }
+
+            int? index = item.achievements?.indexWhere(
+              (element) =>
+                  element.achievementAchievementId?.achievementIdId ==
+                  data2?.achievementAchievementId?.achievementIdId,
+            );
+
+            await Future.delayed(Duration(milliseconds: 100)).then(
+              (value) {
+                AnimatedDialog.showAnimatedDialog(
+                  context: context,
+                  pageBuilder: (c1, anim1, anim2) => ShareAchievementNewDialog(
+                      item: item,
+                      achievements: item.achievements ?? [],
+                      currentPage: index == 0
+                          ? 0
+                          : ((index! + 1) == (item.achievements?.length ?? 0))
+                              ? index
+                              : index + 1),
+                );
+              },
+            );
+          }
+        }
+      },
+    );
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        dataProvider?.updateOpenDaySinceJoin(false);
+      },
+    );
+    super.dispose();
   }
 
   @override
@@ -55,13 +114,17 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                   children: [
                     Stack(
                       children: [
-                        Utils.appImage(
-                          media,
-                          // dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
-                          image:
-                              dataProvider!.cachedImageMap["imageAchievement"],
-                          imageKey: "imageAchievement",
-                        ),
+                        AppImage.imageAchievement(
+                            // media,
+                            // // dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
+                            // image: dataProvider!.allImageList
+                            //     .where((element) =>
+                            //         element["key"] == "imageAchievement")
+                            //     .first["image"],
+                            // // image:
+                            // //     dataProvider!.cachedImageMap["imageAchievement"],
+                            // imageKey: "imageAchievement",
+                            ),
                         // Container(
                         //   height: media.height / 1,
                         //   width: media.width,
@@ -223,7 +286,6 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               element.achievementAchievementId?.achievementIdId ==
               data2?.achievementAchievementId?.achievementIdId,
         );
-
         AnimatedDialog.showAnimatedDialog(
           context: context,
           pageBuilder: (c1, anim1, anim2) => ShareAchievementNewDialog(
@@ -247,27 +309,33 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
             Stack(
               children: [
                 SizedBox(
-                    height: ScreenUtil.verticalScale(12),
-                    width: ScreenUtil.verticalScale(12),
-                    child: appShimmerImage(
-                      color: Colors.transparent,
-                      height: ScreenUtil.verticalScale(12),
-                      width: ScreenUtil.verticalScale(12),
-                      networkImageUrl:
-                          "${data2?.achievementAchievementId?.image}"
-                                  .startsWith(
-                                      'https://storage.cloud.google.com/')
-                              ? data2?.achievementAchievementId?.image ??
-                                  "".replaceFirst(
-                                      'https://storage.cloud.google.com/',
-                                      'https://storage.googleapis.com/')
-                              : data2?.achievementAchievementId?.image ??
-                                  "unknown",
-                      fit: BoxFit.cover,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(ScreenUtil.verticalScale(500)),
-                      ),
-                    )),
+                  height: ScreenUtil.verticalScale(12),
+                  width: ScreenUtil.verticalScale(12),
+                  child: Builder(
+                    builder: (context) {
+                      String url = data2?.achieved == true
+                          ? (data2?.achievementAchievementId?.image ?? "")
+                          : (item.thumbnail ?? "");
+                      return appShimmerImage(
+                        color: Colors.transparent,
+                        height: ScreenUtil.verticalScale(12),
+                        width: ScreenUtil.verticalScale(12),
+                        networkImageUrl:
+                            url.startsWith('https://storage.cloud.google.com/')
+                                ? url.replaceFirst(
+                                    'https://storage.cloud.google.com/',
+                                    'https://storage.googleapis.com/')
+                                : url,
+                        fit: BoxFit.cover,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(
+                            ScreenUtil.verticalScale(500),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 // Container(
                 //   height: ScreenUtil.verticalScale(12),
                 //   width: ScreenUtil.verticalScale(12),

@@ -11,10 +11,12 @@ import 'package:provider/provider.dart';
 class ReportExerciseCompletedGraph extends StatefulWidget {
   const ReportExerciseCompletedGraph({super.key});
   @override
-  State<ReportExerciseCompletedGraph> createState() => _ReportExerciseCompletedGraphState();
+  State<ReportExerciseCompletedGraph> createState() =>
+      _ReportExerciseCompletedGraphState();
 }
 
-class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGraph> {
+class _ReportExerciseCompletedGraphState
+    extends State<ReportExerciseCompletedGraph> {
   BarChartGroupData generateBarGroup(
     int x,
     Color color,
@@ -42,9 +44,10 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
   int touchedGroupIndex = -1;
   @override
   void initState() {
-    MonthProvider monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) => monthProvider.changeWeekExerciseCompleted("Week ${monthProvider.currentWeek}"));
+    MonthProvider monthProvider =
+        Provider.of<MonthProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => monthProvider
+        .changeWeekExerciseCompleted("Week ${monthProvider.currentWeek}"));
     super.initState();
   }
 
@@ -77,15 +80,16 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
                         ? monthProvider.reportMaximumValueOfTotalEx / 10
                         : 2,
                     reservedSize: 30, // Space for titles
-                    getTitlesWidget: getLeftTitles, // Use this method to generate Y-axis titles
+                    getTitlesWidget:
+                        getLeftTitles, // Use this method to generate Y-axis titles
                   ),
                 ),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 36,
-                    getTitlesWidget: (value, meta) =>
-                        getTitles(value, meta, monthProvider), // This method generates titles for the X-axis
+                    getTitlesWidget: (value, meta) => getTitles(value, meta,
+                        monthProvider), // This method generates titles for the X-axis
                   ),
                 ),
                 rightTitles: const AxisTitles(),
@@ -94,7 +98,9 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
               gridData: FlGridData(
                 verticalInterval: 0.125,
                 horizontalInterval:
-                    monthProvider.reportMaximumValueOfTotalEx > 32 ? monthProvider.reportMaximumValueOfTotalEx / 10 : 2,
+                    monthProvider.reportMaximumValueOfTotalEx > 32
+                        ? monthProvider.reportMaximumValueOfTotalEx / 10
+                        : 2,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -105,7 +111,10 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
                   strokeWidth: 1,
                 ),
               ),
-              barGroups: monthProvider.reportExerciseCompletedGraphHistory.asMap().entries.map((e) {
+              barGroups: monthProvider.reportExerciseCompletedGraphHistory
+                  .asMap()
+                  .entries
+                  .map((e) {
                 final index = e.key;
                 final data = e.value['totalCompletedExercise'];
                 return generateBarGroup(
@@ -116,14 +125,18 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
                 );
               }).toList(),
 
-              maxY: monthProvider.reportMaximumValueOfTotalEx > 16 ? monthProvider.reportMaximumValueOfTotalEx : 16,
+              maxY: monthProvider.reportMaximumValueOfTotalEx > 16
+                  ? monthProvider.reportMaximumValueOfTotalEx
+                  : 16,
               minY: 0, // Set min Y value
               barTouchData: BarTouchData(
                 enabled: true,
                 handleBuiltInTouches: false,
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (group) => Colors.transparent,
-                  tooltipMargin: 0,
+                  tooltipPadding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  tooltipMargin: 8, // space between bar and tooltip
+                  getTooltipColor: (_) => Colors.black87,
                   getTooltipItem: (
                     BarChartGroupData group,
                     int groupIndex,
@@ -132,22 +145,18 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
                   ) {
                     return BarTooltipItem(
                       rod.toY.toStringAsFixed(0),
-                      TextStyle(
+                      const TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        color: rod.color,
-                        fontSize: 14,
-                        shadows: const [
-                          Shadow(
-                            color: Colors.black26,
-                            blurRadius: 12,
-                          ),
-                        ],
+                        fontSize: 12,
                       ),
                     );
                   },
                 ),
                 touchCallback: (event, response) {
-                  if (event.isInterestedForInteractions && response != null && response.spot != null) {
+                  if (event.isInterestedForInteractions &&
+                      response != null &&
+                      response.spot != null) {
                     setState(() {
                       touchedGroupIndex = response.spot!.touchedBarGroupIndex;
                     });
@@ -166,10 +175,15 @@ class _ReportExerciseCompletedGraphState extends State<ReportExerciseCompletedGr
   }
 
   Widget getTitles(double value, TitleMeta meta, MonthProvider monthProvider) {
-    List titles = monthProvider.reportExerciseCompletedGraphHistory.asMap().entries.map((e) {
+    List titles = monthProvider.reportExerciseCompletedGraphHistory
+        .asMap()
+        .entries
+        .map((e) {
       return e.value['day'];
     }).toList();
-    final isd = int.parse(monthProvider.reportExerciseCompletedWeek.toString().replaceAll("Week ", ""));
+    final isd = int.parse(monthProvider.reportExerciseCompletedWeek
+        .toString()
+        .replaceAll("Week ", ""));
     DateTime today = DateTime.now();
     String todayDayName = DateFormat('EEE').format(today);
     int index = -1;
@@ -243,7 +257,8 @@ class _IconWidget extends ImplicitlyAnimatedWidget {
   final bool isSelected;
 
   @override
-  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() => _IconWidgetState();
+  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() =>
+      _IconWidgetState();
 }
 
 class _IconWidgetState extends AnimatedWidgetBaseState<_IconWidget> {

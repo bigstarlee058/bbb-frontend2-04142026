@@ -36,15 +36,16 @@ class _CommonStreakWithNotificationState
             // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
             // mainPageProvider.changeTab(4);
           },
-          child: SizedBox(
+          child: Container(
+            // color: Colors.red,
             height: ScreenUtil.verticalScale(2.8),
             width: ScreenUtil.verticalScale(5),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  height: ScreenUtil.verticalScale(2),
-                  width: ScreenUtil.verticalScale(2),
+                  height: ScreenUtil.verticalScale(1.9),
+                  width: ScreenUtil.verticalScale(1.9),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white),
@@ -53,7 +54,7 @@ class _CommonStreakWithNotificationState
                     child: Text(
                       '${streak.streak}',
                       style: TextStyle(
-                        fontSize: ScreenUtil.verticalScale(1.4),
+                        fontSize: ScreenUtil.verticalScale(1.1),
                         height: 0,
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
@@ -62,12 +63,12 @@ class _CommonStreakWithNotificationState
                   ),
                 ),
                 SizedBox(
-                  height: ScreenUtil.verticalScale(2),
-                  width: ScreenUtil.verticalScale(2),
+                  height: ScreenUtil.verticalScale(2.5),
+                  width: ScreenUtil.verticalScale(2.5),
                   child: Icon(
                     Icons.local_fire_department_outlined,
                     color: Colors.white,
-                    size: ScreenUtil.verticalScale(2.3),
+                    size: ScreenUtil.verticalScale(2.5),
                   ),
                 )
               ],

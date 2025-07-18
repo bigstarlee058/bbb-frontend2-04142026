@@ -1,21 +1,20 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/main.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/avhievements_data_model.dart';
-import 'package:bbb/models/SyncDataResponseModel/day_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_notes_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_status_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/extra_exercise_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/extra_set_data_model.dart';
-import 'package:bbb/models/SyncDataResponseModel/month_enrollment_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/removed_exercise_data_model.dart';
-import 'package:bbb/models/SyncDataResponseModel/streak_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/swap_exercise_data_model.dart';
 import 'package:bbb/models/bonuses.dart';
 import 'package:bbb/models/category.dart';
@@ -41,6 +40,7 @@ import 'package:bbb/values/app_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/exercise_model.dart';
@@ -70,9 +70,17 @@ class DataProvider extends ChangeNotifier {
   List<FaQsModel> faQsModel = [];
   bool faqLoader = false;
 
+  bool openDaySinceJoin = false;
+
+  updateOpenDaySinceJoin(bool val) {
+    openDaySinceJoin = val;
+    notifyListeners();
+  }
+
   Collections collectionData = Collections(
       id: "", title: "", description: "", photo: "", equipments: []);
   Exercise currentExerciseObj = Exercise(
+      videoThumbnail: "",
       id: "",
       title: "",
       vimeoId: "",
@@ -97,7 +105,6 @@ class DataProvider extends ChangeNotifier {
   }
 
   List<Map<String, dynamic>> allImageList = [];
-  List<Map<String, dynamic>> allSplashImageList = [];
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
     String? userIdToken = await getAuthToken();
@@ -116,20 +123,6 @@ class DataProvider extends ChangeNotifier {
         if (data != null) {
           screenBackgroundModel = ScreenBackgroundResponse.fromJson(data);
           notifyListeners();
-          allSplashImageList = [
-            {
-              "image": screenBackgroundModel?.imageLogin ?? "",
-              "key": "imageLogin"
-            },
-            {
-              "image": screenBackgroundModel?.imageSignup ?? "",
-              "key": "imageSignup"
-            },
-            {
-              "image": screenBackgroundModel?.imageEmailConfirm ?? "",
-              "key": "imageEmailConfirm"
-            },
-          ];
 
           allImageList = [
             {
@@ -204,6 +197,7 @@ class DataProvider extends ChangeNotifier {
         }
 
         await preloadAndCacheImages();
+        allImages = allImageList;
       } else {
         throw Exception('Failed to get screen bg data');
       }
@@ -237,6 +231,7 @@ class DataProvider extends ChangeNotifier {
         'AUTH_TOKEN': userIdToken ?? "",
       },
     );
+
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
 
@@ -291,6 +286,7 @@ class DataProvider extends ChangeNotifier {
           }
         }
       }
+
       if (achievementList.isNotEmpty) {
         achievementList.sort((a, b) {
           final aAchievedCount =
@@ -422,6 +418,7 @@ class DataProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         videoModel = VimeoToVideoModel.fromJson(data);
+
         notifyListeners();
       } else {
         throw Exception('Failed to get videoModel');
@@ -432,25 +429,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Map<String, FileImage> cachedImageMap = {};
-  Map<String, FileImage> cachedSplashImageMap = {};
 
   Future<void> preloadAndCacheImages() async {
-    for (var element in allSplashImageList) {
-      String url = element["image"];
-      String key = element["key"];
-
-      final processedUrl = url.startsWith('https://storage.cloud.google.com/')
-          ? url.replaceFirst('https://storage.cloud.google.com/',
-              'https://storage.googleapis.com/')
-          : url;
-
-      try {
-        final file = await CustomCacheManager().getSingleFile(processedUrl);
-        cachedSplashImageMap[key] = FileImage(file);
-      } catch (e) {
-        debugPrint("Image cache failed for $key: $e");
-      }
-    }
     for (var element in allImageList) {
       String url = element["image"];
       String key = element["key"];
@@ -491,7 +471,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> fetchStaffs() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/staffs/admin/get');
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/staffs/get');
     String? userIdToken = await getAuthToken();
     try {
       final response = await http.get(
@@ -502,19 +482,34 @@ class DataProvider extends ChangeNotifier {
         },
       );
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        if (data['staffs'] is List) {
-          // Map the 'staffs' list to Staff objects
-          staffsData = (data['staffs'] as List)
-              .where((item) => item['type'] == 1)
-              .map((item) => Staffs.fromJson(item))
-              .toList();
-          athletesData = (data['staffs'] as List)
-              .where((item) => item['type'] == 2)
-              .map((item) => Staffs.fromJson(item))
-              .toList();
-          notifyListeners(); // Notify listeners to update the UI
-        }
+        final res = jsonDecode(response.body) as List;
+        staffsData = res
+            .where((item) => item['type'] == 1)
+            .map((item) => Staffs.fromJson(item))
+            .toList();
+        athletesData = res
+            .where((item) => item['type'] == 2)
+            .map((item) => Staffs.fromJson(item))
+            .toList();
+
+        athletesData.add(
+          Staffs(
+            id: '',
+            title: '',
+            location: '',
+            type: 2,
+            bio: '',
+            photo: '',
+            link: '',
+            facebook: '',
+            linkedin: '',
+            tiktok: '',
+            twitter: '',
+            instagram: '',
+          ),
+        );
+
+        notifyListeners();
       } else {
         throw Exception('Failed to load staff data');
       }
@@ -529,7 +524,7 @@ class DataProvider extends ChangeNotifier {
     Uri url =
         Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
-    log('userIdToken==========>>>>>${userIdToken}');
+    log('userIdToken==========>>>>>$userIdToken');
     try {
       final response = await http.get(
         url,
@@ -627,7 +622,7 @@ class DataProvider extends ChangeNotifier {
           faQsModel =
               List<FaQsModel>.from(data.map((x) => FaQsModel.fromJson(x)));
         }
-        faqLoader = false;
+        // faqLoader = false;
         notifyListeners();
       } else {
         faqLoader = false;
@@ -639,6 +634,11 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       throw Exception('Failed to get FAQs data');
     }
+  }
+
+  updateFaqLoader(value) {
+    faqLoader = value;
+    notifyListeners();
   }
 
   List<Collections> get collections => collectionsData;
@@ -1736,6 +1736,7 @@ class DataProvider extends ChangeNotifier {
 
   void getExerciseFromJson(responseData) {
     currentExerciseObj = Exercise(
+        videoThumbnail: "",
         id: "",
         title: "",
         vimeoId: "",
@@ -1759,6 +1760,7 @@ class DataProvider extends ChangeNotifier {
               title: singleItem["title"] ?? "",
               vimeoId: singleItem["vimeoId"] ?? "",
               thumbnail: singleItem["thumbnail"] ?? "",
+              videoThumbnail: singleItem["videoThumbnail"] ?? "",
               description: singleItem["description"] ?? "",
               guide: singleItem["guide"] ?? "",
               relatedExercises: singleItem["relatedExercises"] ?? [],
@@ -1790,6 +1792,7 @@ class DataProvider extends ChangeNotifier {
           title: responseData["title"] ?? "",
           vimeoId: responseData["vimeoId"] ?? "",
           thumbnail: responseData["thumbnail"] ?? "",
+          videoThumbnail: responseData["videoThumbnail"] ?? "",
           description: responseData["description"] ?? "",
           guide: responseData["guide"] ?? "",
           relatedExercises: currentRelatedExercises,
@@ -1801,5 +1804,48 @@ class DataProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  bool storyLoader = false;
+  Future<void> addOwnSpotlight(
+      String title, String description, File? imageFile) async {
+    storyLoader = true;
+    notifyListeners();
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/staffs/addOwnSpotsligt');
+
+    String? userIdToken = await getAuthToken();
+
+    try {
+      http.MultipartRequest request = http.MultipartRequest("POST", url);
+      request.fields['title'] = title;
+      request.fields['description'] = description;
+
+      if (imageFile != null) {
+        final stream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
+        final length = await imageFile.length();
+        final multipartFile = http.MultipartFile(
+          'image',
+          stream,
+          length,
+          filename: basename(imageFile.path),
+        );
+        request.files.add(multipartFile);
+      }
+      request.headers
+          .addAll({'AUTH_TOKEN': userIdToken!, 'Accept': 'application/json'});
+      http.StreamedResponse response = await request.send();
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        final decoded = jsonDecode(responseBody);
+        debugPrint('Spotlight added successfully: $decoded');
+      } else {
+        debugPrint('Failed to add spotlight. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error adding spotlight: $e');
+    } finally {
+      storyLoader = false;
+      notifyListeners();
+    }
   }
 }

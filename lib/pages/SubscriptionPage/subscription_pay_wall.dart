@@ -53,7 +53,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
           for (var package in offeringItem.availablePackages) {
             if (package.storeProduct.identifier == "monthly_membership_1m_29") {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier == "yearly_membership_1y_289") {
+            } else if (package.storeProduct.identifier ==
+                "yearly_membership_1y_289") {
               yearPrice = package.storeProduct.priceString;
             }
           }
@@ -85,7 +86,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
         "end_date": endDate,
       };
 
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+      Uri url =
+          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(
@@ -102,7 +104,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+            builder: (context) =>
+                const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
           ),
         );
         await isFromNotification();
@@ -127,7 +130,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
     setState(() => isLoading = true);
 
     try {
-      final CustomerInfo customerInfo = await Purchases.purchasePackage(selectedPackage!);
+      final CustomerInfo customerInfo =
+          await Purchases.purchasePackage(selectedPackage!);
 
       // final DateTime now = await NTP.now();
       // log(' customerInfo.allExpirationDates==========>>>>>${customerInfo.activeSubscriptions}');
@@ -140,9 +144,12 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
         final entitlement = entitlements.values.first;
         final String planId = entitlement.productIdentifier;
         final String startDate = entitlement.originalPurchaseDate;
-        final String endDate =
-            DateTime.parse(startDate).add(Duration(days: planId == "monthly_membership_1m_29" ? 28 : 365)).toString();
-        final String status = entitlement.isActive ? "subscribed_user" : "free_user";
+        final String endDate = DateTime.parse(startDate)
+            .add(
+                Duration(days: planId == "monthly_membership_1m_29" ? 28 : 365))
+            .toString();
+        final String status =
+            entitlement.isActive ? "subscribed_user" : "free_user";
 
         await _updateSubscriptionData(
           type: planId,
@@ -152,7 +159,9 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
         );
       } else {
         debugPrint('Entitlement not act ive or expiration date missing.');
-        if (mounted) showBottomAlert(context, "Subscription not activated. Please try again.");
+        if (mounted)
+          showBottomAlert(
+              context, "Subscription not activated. Please try again.");
       }
     } on PurchasesError catch (e) {
       if (e.code == PurchasesErrorCode.purchaseCancelledError) {
@@ -164,7 +173,8 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       }
     } catch (e) {
       debugPrint("Unexpected error: $e");
-      if (mounted) showBottomAlert(context, "Purchase failed: Please try again.");
+      if (mounted)
+        showBottomAlert(context, "Purchase failed: Please try again.");
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -205,6 +215,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             fit: BoxFit.fitWidth,
           ),
           Utils.appImage(
+            image: '',
             MediaQuery.of(context).size,
             imageKey: '',
             child: Column(
@@ -230,8 +241,10 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.2),
-            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5)).copyWith(bottom: ScreenUtil.verticalScale(3.2)),
+            margin:
+                EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.2),
+            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5))
+                .copyWith(bottom: ScreenUtil.verticalScale(3.2)),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -259,11 +272,16 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                             _planOption(
                               title: "Monthly",
                               price: monthPrice,
-                              selected: selectedPackage?.storeProduct.identifier == "monthly_membership_1m_29",
+                              selected:
+                                  selectedPackage?.storeProduct.identifier ==
+                                      "monthly_membership_1m_29",
                               onTap: () {
                                 setState(() {
-                                  selectedPackage = offering!.current?.availablePackages
-                                      .firstWhere((p) => p.storeProduct.identifier == "monthly_membership_1m_29");
+                                  selectedPackage = offering!
+                                      .current?.availablePackages
+                                      .firstWhere((p) =>
+                                          p.storeProduct.identifier ==
+                                          "monthly_membership_1m_29");
                                 });
                               },
                             ),
@@ -271,11 +289,16 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                             _planOption(
                               title: "Annual",
                               price: yearPrice,
-                              selected: selectedPackage?.storeProduct.identifier == "yearly_membership_1y_289",
+                              selected:
+                                  selectedPackage?.storeProduct.identifier ==
+                                      "yearly_membership_1y_289",
                               onTap: () {
                                 setState(() {
-                                  selectedPackage = offering!.current?.availablePackages
-                                      .firstWhere((p) => p.storeProduct.identifier == "yearly_membership_1y_289");
+                                  selectedPackage = offering!
+                                      .current?.availablePackages
+                                      .firstWhere((p) =>
+                                          p.storeProduct.identifier ==
+                                          "yearly_membership_1y_289");
                                 });
                               },
                               badge: "20% OFF",
@@ -346,21 +369,29 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: !selected ? Colors.grey.shade300 : AppColors.primaryColor),
+                      border: Border.all(
+                          color: !selected
+                              ? Colors.grey.shade300
+                              : AppColors.primaryColor),
                       shape: BoxShape.circle),
                   child: Center(
-                    child: Icon(Icons.check_circle, color: !selected ? Colors.white : Color(0xFF8B2D40), size: 18),
+                    child: Icon(Icons.check_circle,
+                        color: !selected ? Colors.white : Color(0xFF8B2D40),
+                        size: 18),
                   ),
                 ),
                 SizedBox(width: 5),
                 Text(
                   title,
-                  style: TextStyle(fontSize: ScreenUtil.verticalScale(1.8), fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: ScreenUtil.verticalScale(1.8),
+                      fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
                 if (badge != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     decoration: BoxDecoration(
                       color: const Color(0xFF8B2D40),
                       borderRadius: BorderRadius.circular(10),
@@ -368,13 +399,16 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                     child: Text(
                       badge,
                       style: TextStyle(
-                          color: Colors.white, fontSize: ScreenUtil.verticalScale(1.2), fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontSize: ScreenUtil.verticalScale(1.2),
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
               ],
             ),
             SizedBox(height: ScreenUtil.verticalScale(0.5)),
-            Text("Full access for just $price/${badge != null ? "year" : "month"}",
+            Text(
+                "Full access for just $price/${badge != null ? "year" : "month"}",
                 style: TextStyle(fontSize: ScreenUtil.verticalScale(1.5))),
           ],
         ),

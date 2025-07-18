@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 
-PumpDayModel pumpDayModelFromJson(String str) => PumpDayModel.fromJson(json.decode(str));
+PumpDayModel pumpDayModelFromJson(String str) =>
+    PumpDayModel.fromJson(json.decode(str));
 
 String pumpDayModelToJson(PumpDayModel data) => json.encode(data.toJson());
 
@@ -12,6 +13,11 @@ class PumpDayModel {
   String? title;
   String? description;
   String? vimeoId;
+  String? vimeoId2;
+  String? vimeoId3;
+  String? thumbnailOne;
+  String? thumbnailTwo;
+  String? thumbnailThree;
   dynamic thumbnail;
   List<String>? formats;
   List<WarmupDataModel>? warmups;
@@ -25,7 +31,12 @@ class PumpDayModel {
     this.title,
     this.description,
     this.vimeoId,
+    this.vimeoId2,
+    this.vimeoId3,
     this.thumbnail,
+    this.thumbnailOne,
+    this.thumbnailTwo,
+    this.thumbnailThree,
     this.formats,
     this.warmups,
     this.exercises,
@@ -39,12 +50,27 @@ class PumpDayModel {
         title: json["title"],
         description: json["description"],
         vimeoId: json["vimeoId"],
+        vimeoId2: json["vimeoIdTwo"] ?? "",
+        vimeoId3: json["vimeoIdThree"] ?? "",
         thumbnail: json["thumbnail"],
-        formats: json["formats"] == null ? [] : List<String>.from(json["formats"]!.map((x) => x)),
-        warmups: json["warmups"] == null ? [] : List<WarmupDataModel>.from(json["warmups"]!.map((x) => WarmupDataModel.fromJson(x))),
-        exercises:
-            json["exercises"] == null ? [] : List<ExerciseDataModel>.from(json["exercises"]!.map((x) => ExerciseDataModel.fromJson(x))),
-        circuits: json["circuits"] == null ? [] : List<PumpCircuit>.from(json["circuits"]!.map((x) => PumpCircuit.fromJson(x))),
+        thumbnailOne: json["thumbnailOne"] ?? "",
+        thumbnailTwo: json["thumbnailTwo"] ?? "",
+        thumbnailThree: json["thumbnailThree"] ?? "",
+        formats: json["formats"] == null
+            ? []
+            : List<String>.from(json["formats"]!.map((x) => x)),
+        warmups: json["warmups"] == null
+            ? []
+            : List<WarmupDataModel>.from(
+                json["warmups"]!.map((x) => WarmupDataModel.fromJson(x))),
+        exercises: json["exercises"] == null
+            ? []
+            : List<ExerciseDataModel>.from(
+                json["exercises"]!.map((x) => ExerciseDataModel.fromJson(x))),
+        circuits: json["circuits"] == null
+            ? []
+            : List<PumpCircuit>.from(
+                json["circuits"]!.map((x) => PumpCircuit.fromJson(x))),
         v: json["__v"],
       );
 
@@ -54,11 +80,23 @@ class PumpDayModel {
         "title": title,
         "description": description,
         "vimeoId": vimeoId,
+        "vimeoIdTwo": vimeoId2,
+        "vimeoIdThree": vimeoId3,
         "thumbnail": thumbnail,
-        "formats": formats == null ? [] : List<dynamic>.from(formats!.map((x) => x)),
-        "warmups": warmups == null ? [] : List<dynamic>.from(warmups!.map((x) => x.toJson())),
-        "exercises": exercises == null ? [] : List<dynamic>.from(exercises!.map((x) => x.toJson())),
-        "circuits": circuits == null ? [] : List<dynamic>.from(circuits!.map((x) => x.toJson())),
+        "thumbnailThree": thumbnailThree,
+        "thumbnailTwo": thumbnailTwo,
+        "thumbnailOne": thumbnailOne,
+        "formats":
+            formats == null ? [] : List<dynamic>.from(formats!.map((x) => x)),
+        "warmups": warmups == null
+            ? []
+            : List<dynamic>.from(warmups!.map((x) => x.toJson())),
+        "exercises": exercises == null
+            ? []
+            : List<dynamic>.from(exercises!.map((x) => x.toJson())),
+        "circuits": circuits == null
+            ? []
+            : List<dynamic>.from(circuits!.map((x) => x.toJson())),
         "__v": v,
       };
 }
@@ -83,10 +121,13 @@ class PumpCircuit {
   factory PumpCircuit.fromJson(Map<String, dynamic> json) => PumpCircuit(
         round: json["round"],
         typeId: json["typeId"],
-        formats: json["formats"] == null ? [] : List<String>.from(json["formats"]!.map((x) => x)),
+        formats: json["formats"] == null
+            ? []
+            : List<String>.from(json["formats"]!.map((x) => x)),
         circuitExercises: json["circuitExercises"] == null
             ? []
-            : List<ExerciseDataModel>.from(json["circuitExercises"]!.map((x) => ExerciseDataModel.fromJson(x))),
+            : List<ExerciseDataModel>.from(json["circuitExercises"]!
+                .map((x) => ExerciseDataModel.fromJson(x))),
         id: json["_id"],
         selectedDot: json["selectedDot"] ?? 0,
       );
@@ -94,8 +135,11 @@ class PumpCircuit {
   Map<String, dynamic> toJson() => {
         "round": round,
         "typeId": typeId,
-        "formats": formats == null ? [] : List<dynamic>.from(formats!.map((x) => x)),
-        "circuitExercises": circuitExercises == null ? [] : List<dynamic>.from(circuitExercises!.map((x) => x.toJson())),
+        "formats":
+            formats == null ? [] : List<dynamic>.from(formats!.map((x) => x)),
+        "circuitExercises": circuitExercises == null
+            ? []
+            : List<dynamic>.from(circuitExercises!.map((x) => x.toJson())),
         "_id": id,
         "selectedDot": selectedDot,
       };

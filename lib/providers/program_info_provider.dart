@@ -12,7 +12,9 @@ class ProgramInfoProvider extends ChangeNotifier {
 
   bool loading = false;
 
-  void getProgramInfo() async {
+  final List<GlobalKey> tileKeys = [];
+
+  Future<void> getProgramInfo() async {
     if (programInfoModel != null) {
       return;
     }
@@ -38,6 +40,11 @@ class ProgramInfoProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         debugPrint('success getProgramInfo');
         programInfoModel = programInfoModelFromJson(response.body);
+
+        final phaseCount = programInfoModel?.sections.length ?? 0;
+        for (int i = 0; i < phaseCount; i++) {
+          tileKeys.add(GlobalKey());
+        }
       } else {
         debugPrint('this is programInfo ${response.statusCode}');
       }

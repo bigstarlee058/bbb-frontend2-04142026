@@ -23,21 +23,25 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>93</string>
+	<string>104</string>
 	<key>FLTEnableImpeller</key>
 	<false/>
 	<key>FirebaseAutomaticScreenReportingEnabled</key>
 	<false/>
 	<key>FlutterImpeller</key>
 	<false/>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>App wants to capture profile photo please grant camera access</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>App needs access to save screenshots</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App wants to access to photo lib for profile images </string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>This app uses notifications to alert you about workout compilation reminder.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

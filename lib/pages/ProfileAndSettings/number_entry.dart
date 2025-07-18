@@ -14,12 +14,14 @@ class NumberEntry extends StatefulWidget {
     required this.controller,
     required this.suffix,
     required this.focusNode,
+    this.zeroPadding,
   });
 
   final String label;
   final TextEditingController controller;
   final String suffix;
   final FocusNode focusNode;
+  final bool? zeroPadding;
 
   @override
   State<NumberEntry> createState() => _NumberEntryState();
@@ -81,7 +83,8 @@ class _NumberEntryState extends State<NumberEntry> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: ScreenUtil.horizontalScale(7.5),
+        horizontal:
+            ScreenUtil.horizontalScale(widget.zeroPadding == true ? 0 : 7.5),
         vertical: ScreenUtil.verticalScale(0.8),
       ),
       height: ScreenUtil.verticalScale(6),
@@ -116,10 +119,12 @@ class _NumberEntryState extends State<NumberEntry> {
               child: TextField(
                 controller: widget.controller,
                 focusNode: widget.focusNode,
-                keyboardType: Platform.isAndroid
-                    ? TextInputType.number
-                    : const TextInputType.numberWithOptions(
-                        decimal: false, signed: true),
+                keyboardType: /*Platform.isAndroid
+                    ?*/
+                    TextInputType.number
+                /*  : const TextInputType.numberWithOptions(
+                        decimal: false, signed: true)*/
+                ,
                 textInputAction: TextInputAction.done,
                 maxLength: 6,
                 textAlign: TextAlign.center,
@@ -149,7 +154,22 @@ class _NumberEntryState extends State<NumberEntry> {
                         const TextSelection.collapsed(offset: 0);
                   }
                 },
-                onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                onTapOutside: (event) {
+                  FocusScope.of(context).unfocus();
+                  if (widget.controller.text
+                      .replaceAll(widget.suffix, "")
+                      .isEmpty) {
+                    widget.controller.clear();
+                  }
+                },
+                onSubmitted: (_) {
+                  FocusScope.of(context).unfocus();
+                  if (widget.controller.text
+                      .replaceAll(widget.suffix, "")
+                      .isEmpty) {
+                    widget.controller.clear();
+                  }
+                },
               ),
             ),
           ),

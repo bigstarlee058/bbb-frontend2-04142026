@@ -25,6 +25,7 @@ class SharedPreference {
   static const String monthSettingDone = "MONTH-SETTING-DONE";
   static const String isMute = "IS-MUTE";
   static const String isFirstTime = "IS-FIRST-TIME";
+  static const String isScreenAwake = "IS-SCREEN-AWAKE";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();
@@ -35,7 +36,9 @@ class SharedPreference {
   }
 
   String? getString(String key, {String defValue = ""}) {
-    return _preferences == null ? defValue : _preferences!.getString(key) ?? defValue;
+    return _preferences == null
+        ? defValue
+        : _preferences!.getString(key) ?? defValue;
   }
 
   Future<bool?> putInt(String key, int value) async {
@@ -51,7 +54,9 @@ class SharedPreference {
   }
 
   int? getInt(String key, {int defValue = 0}) {
-    return _preferences == null ? defValue : _preferences!.getInt(key) ?? defValue;
+    return _preferences == null
+        ? defValue
+        : _preferences!.getInt(key) ?? defValue;
   }
 
   clearValue(String key) {

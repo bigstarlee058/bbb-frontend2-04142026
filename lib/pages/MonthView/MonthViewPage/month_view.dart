@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 
@@ -25,6 +24,7 @@ import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -46,27 +46,32 @@ class _MonthViewState extends State<MonthView> {
   ScrollController scrollController = ScrollController();
   final GlobalKey optionKey = GlobalKey();
 
-  bool _isPrecached = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isPrecached) {
-      precacheImage(dataProvider!.cachedImageMap["imageMonthView"]!, context);
-      _isPrecached = true;
+  List<GlobalKey> keys = List.generate(4, (_) => GlobalKey());
+  void scrollToTop() {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+      );
     }
   }
-
-  List<GlobalKey> keys = List.generate(4, (_) => GlobalKey());
 
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
+
     provider = context.read<ProgramInfoProvider>();
     provider.getProgramInfo();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollProvider?.updateOffSet1(0.0);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToTop();
+    });
     int index = monthProvider?.monthLocalDataModel.indexWhere(
           (element) => element.monthId == monthProvider?.monthDataModel?.id,
         ) ??
@@ -86,11 +91,9 @@ class _MonthViewState extends State<MonthView> {
       },
     );
 
-    // Add listener to handle scroll reset when weekExpandedHeight changes
     monthProvider?.addListener(() {
       if (monthProvider?.weekExpandedHeight == 0 &&
           scrollController.hasClients) {
-        // Reset scroll when weekExpandedHeight is reset (usually when month changes)
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (scrollController.hasClients &&
               scrollController.position.pixels > 0) {
@@ -147,6 +150,8 @@ class _MonthViewState extends State<MonthView> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         WidgetsBinding.instance.addPostFrameCallback(
+            (timeStamp) => scrollProvider?.updateOffSet1(0.0));
+        WidgetsBinding.instance.addPostFrameCallback(
             (timeStamp) => monthProvider?.onInit(isEnabled: false));
         monthProvider?.expandWeeks.clear();
         monthProvider?.updateSelectedSection(0);
@@ -165,9 +170,6 @@ class _MonthViewState extends State<MonthView> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => monthProvider?.findSplitTypeList(),
-      // ),
       backgroundColor: Colors.white,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -183,11 +185,13 @@ class _MonthViewState extends State<MonthView> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Utils.appImage(
-              media,
-              image: dataProvider!.cachedImageMap["imageMonthView"],
-              imageKey: "imageMonthView",
-            ),
+            AppImage.imageMonthView(
+                // media,
+                // image: dataProvider!.allImageList
+                //     .where((element) => element["key"] == "imageMonthView")
+                //     .first["image"],
+                // imageKey: "imageMonthView",
+                ),
             RefreshIndicator(
               color: AppColors.primaryColor,
               onRefresh: () async {
@@ -237,7 +241,7 @@ class _MonthViewState extends State<MonthView> {
                                                 Padding(
                                                   padding: EdgeInsets.symmetric(
                                                       horizontal: ScreenUtil
-                                                          .horizontalScale(10)),
+                                                          .horizontalScale(8)),
                                                   child: Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -249,101 +253,19 @@ class _MonthViewState extends State<MonthView> {
                                                                       .monthLocalDataModel
                                                                       .length -
                                                                   1
-                                                          ? GestureDetector(
-                                                              onTap: () {
-                                                                if (monthProvider
-                                                                        .currentMonthIndex <
-                                                                    monthProvider
-                                                                            .monthLocalDataModel
-                                                                            .length -
-                                                                        1) {
-                                                                  monthProvider
-                                                                      .updateCurrentMonthIndex(
-                                                                          monthProvider.currentMonthIndex +
-                                                                              1);
-
-                                                                  monthProvider.fetchPastMonth(
-                                                                      monthProvider
-                                                                              .monthLocalDataModel[
-                                                                          monthProvider
-                                                                              .currentMonthIndex],
-                                                                      context);
-
-                                                                  pageController
-                                                                      .animateToPage(
-                                                                    monthProvider
-                                                                        .currentMonthIndex,
-                                                                    duration: Duration(
-                                                                        milliseconds:
-                                                                            300),
-                                                                    curve: Curves
-                                                                        .ease,
-                                                                  );
-
-                                                                  // Reset scroll position when month changes
-                                                                  WidgetsBinding
-                                                                      .instance
-                                                                      .addPostFrameCallback(
-                                                                          (_) {
-                                                                    Future.delayed(
-                                                                        Duration(
-                                                                            milliseconds:
-                                                                                350),
-                                                                        () {
-                                                                      if (scrollController
-                                                                          .hasClients) {
-                                                                        scrollController
-                                                                            .animateTo(
-                                                                          0.0,
-                                                                          duration:
-                                                                              Duration(milliseconds: 300),
-                                                                          curve:
-                                                                              Curves.easeOut,
-                                                                        );
-                                                                      }
-                                                                    });
-                                                                  });
-                                                                }
-                                                              },
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                    color: AppColors
-                                                                        .primaryColor,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            10)),
-                                                                width: ScreenUtil
-                                                                    .horizontalScale(
-                                                                        20),
-                                                                padding: EdgeInsets
-                                                                    .all(ScreenUtil
-                                                                        .verticalScale(
-                                                                            0.5)),
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    "Previous",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          ScreenUtil.verticalScale(
-                                                                              1.8),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
+                                                          ? previousButton(
+                                                              monthProvider,
+                                                              context)
                                                           : SizedBox(
                                                               width: ScreenUtil
                                                                   .horizontalScale(
-                                                                      20)),
+                                                                      21)),
                                                       Expanded(
                                                         child: Container(
                                                           padding: EdgeInsets.symmetric(
                                                               vertical: ScreenUtil
                                                                   .verticalScale(
-                                                                      0.5)),
+                                                                      .75)),
                                                           margin: EdgeInsets
                                                               .symmetric(
                                                                   horizontal:
@@ -380,7 +302,7 @@ class _MonthViewState extends State<MonthView> {
                                                                         color: Colors
                                                                             .white,
                                                                         fontSize:
-                                                                            ScreenUtil.verticalScale(1.8),
+                                                                            ScreenUtil.verticalScale(1.6),
                                                                       ),
                                                                     ),
                                                                     Text(
@@ -395,7 +317,7 @@ class _MonthViewState extends State<MonthView> {
                                                                         color: Colors
                                                                             .white,
                                                                         fontSize:
-                                                                            ScreenUtil.verticalScale(1.8),
+                                                                            ScreenUtil.verticalScale(1.6),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -406,92 +328,13 @@ class _MonthViewState extends State<MonthView> {
                                                       monthProvider
                                                                   .currentMonthIndex >
                                                               0
-                                                          ? GestureDetector(
-                                                              onTap: () {
-                                                                if (monthProvider
-                                                                        .currentMonthIndex >
-                                                                    0) {
-                                                                  monthProvider
-                                                                      .updateCurrentMonthIndex(
-                                                                          monthProvider.currentMonthIndex -
-                                                                              1);
-
-                                                                  monthProvider.fetchPastMonth(
-                                                                      monthProvider
-                                                                              .monthLocalDataModel[
-                                                                          monthProvider
-                                                                              .currentMonthIndex],
-                                                                      context);
-
-                                                                  pageController
-                                                                      .animateToPage(
-                                                                    monthProvider
-                                                                        .currentMonthIndex,
-                                                                    duration: Duration(
-                                                                        milliseconds:
-                                                                            300),
-                                                                    curve: Curves
-                                                                        .ease,
-                                                                  );
-
-                                                                  // Reset scroll position when month changes
-                                                                  WidgetsBinding
-                                                                      .instance
-                                                                      .addPostFrameCallback(
-                                                                          (_) {
-                                                                    Future.delayed(
-                                                                        Duration(
-                                                                            milliseconds:
-                                                                                350),
-                                                                        () {
-                                                                      if (scrollController
-                                                                          .hasClients) {
-                                                                        scrollController
-                                                                            .animateTo(
-                                                                          0.0,
-                                                                          duration:
-                                                                              Duration(milliseconds: 300),
-                                                                          curve:
-                                                                              Curves.easeOut,
-                                                                        );
-                                                                      }
-                                                                    });
-                                                                  });
-                                                                }
-                                                              },
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                    color: AppColors
-                                                                        .primaryColor,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            10)),
-                                                                width: ScreenUtil
-                                                                    .horizontalScale(
-                                                                        20),
-                                                                padding: EdgeInsets
-                                                                    .all(ScreenUtil
-                                                                        .verticalScale(
-                                                                            0.5)),
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    "Next",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          ScreenUtil.verticalScale(
-                                                                              1.8),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
+                                                          ? nextButton(
+                                                              monthProvider,
+                                                              context)
                                                           : SizedBox(
                                                               width: ScreenUtil
                                                                   .horizontalScale(
-                                                                      20)),
+                                                                      21)),
                                                     ],
                                                   ),
                                                 ),
@@ -516,8 +359,8 @@ class _MonthViewState extends State<MonthView> {
                                                           height: media.height /
                                                               7.5,
                                                           child: Center(
-                                                            child:
-                                                                Utils.appImage(
+                                                            child: Utils
+                                                                .appFileImage(
                                                               Size(
                                                                   media.width,
                                                                   media.height /
@@ -759,30 +602,35 @@ class _MonthViewState extends State<MonthView> {
             ),
             Consumer<ScrollProvider>(
               builder: (context, scrollValue, child) {
-                double blurValue =
+                final scrollRatio =
                     (scrollValue.scrollOffset1 / ScreenUtil.verticalScale(35))
-                            .clamp(0, 1) *
-                        5;
-                double targetHeight = ScreenUtil.verticalScale(4.5);
+                        .clamp(0.0, 1.0);
 
+                final minHeight = ScreenUtil.verticalScale(3.15);
+                final maxHeight = ScreenUtil.verticalScale(5);
+                final dynamicHeight =
+                    maxHeight - (maxHeight - minHeight) * scrollRatio;
+
+                final blurValue = scrollRatio * 5;
+                final opacityValue = scrollRatio * 0.7;
+                final topPadding = MediaQuery.of(context).padding.top *
+                    (Platform.isIOS ? .8 : 1);
                 return ClipRRect(
                   child: BackdropFilter(
                     filter:
                         ImageFilter.blur(sigmaX: blurValue, sigmaY: blurValue),
                     child: Container(
-                      color: Colors.black.withOpacity(
-                          (scrollValue.scrollOffset1 /
-                                      ScreenUtil.verticalScale(35))
-                                  .clamp(0, 1) *
-                              0.7),
-                      height: targetHeight + MediaQuery.of(context).padding.top,
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.top *
+                              (Platform.isIOS ? .08 : .1)),
+                      color: Colors.black.withOpacity(opacityValue),
+                      height: dynamicHeight + topPadding,
                       child: Padding(
-                        padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top),
+                        padding: EdgeInsets.only(top: topPadding),
                         child: AnimatedContainer(
                           margin: EdgeInsets.zero,
-                          duration: Duration(milliseconds: 300),
-                          height: targetHeight,
+                          duration: const Duration(milliseconds: 300),
+                          height: dynamicHeight,
                           width: media.width,
                           decoration: BoxDecoration(color: Colors.transparent),
                           child: Row(
@@ -816,6 +664,146 @@ class _MonthViewState extends State<MonthView> {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget nextButton(MonthProvider monthProvider, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (monthProvider.currentMonthIndex > 0) {
+          monthProvider
+              .updateCurrentMonthIndex(monthProvider.currentMonthIndex - 1);
+
+          monthProvider.fetchPastMonth(
+              monthProvider
+                  .monthLocalDataModel[monthProvider.currentMonthIndex],
+              context);
+
+          pageController.animateToPage(
+            monthProvider.currentMonthIndex,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.ease,
+          );
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Future.delayed(Duration(milliseconds: 350), () {
+              if (scrollController.hasClients) {
+                scrollController.animateTo(
+                  0.0,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+          });
+          monthProvider.expandWeeks.clear();
+          monthProvider.updateWeekExpandedHeight(
+              0, (monthProvider.week ?? 1) - 1);
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+            borderRadius: BorderRadius.circular(10)),
+        width: ScreenUtil.horizontalScale(21),
+        padding: EdgeInsets.all(ScreenUtil.verticalScale(.75)).copyWith(
+          right: ScreenUtil.horizontalScale(2),
+          left: ScreenUtil.horizontalScale(2),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Spacer(),
+              Spacer(),
+              Text(
+                "Next",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: ScreenUtil.verticalScale(1.6),
+                ),
+              ),
+              Spacer(),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.white,
+                size: ScreenUtil.verticalScale(1.6),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget previousButton(MonthProvider monthProvider, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (monthProvider.currentMonthIndex <
+            monthProvider.monthLocalDataModel.length - 1) {
+          monthProvider
+              .updateCurrentMonthIndex(monthProvider.currentMonthIndex + 1);
+
+          monthProvider.fetchPastMonth(
+              monthProvider
+                  .monthLocalDataModel[monthProvider.currentMonthIndex],
+              context);
+
+          pageController.animateToPage(
+            monthProvider.currentMonthIndex,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.ease,
+          );
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Future.delayed(Duration(milliseconds: 350), () {
+              if (scrollController.hasClients) {
+                scrollController.animateTo(
+                  0.0,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+          });
+          monthProvider.expandWeeks.clear();
+          monthProvider.updateWeekExpandedHeight(
+              0, (monthProvider.week ?? 1) - 1);
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+            borderRadius: BorderRadius.circular(10)),
+        width: ScreenUtil.horizontalScale(21),
+        padding: EdgeInsets.all(ScreenUtil.verticalScale(.75)).copyWith(
+          right: ScreenUtil.horizontalScale(2),
+          left: ScreenUtil.horizontalScale(2),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Colors.white,
+                size: ScreenUtil.verticalScale(1.6),
+              ),
+              Spacer(),
+              Text(
+                "Prev",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: ScreenUtil.verticalScale(1.6),
+                ),
+              ),
+              Spacer(),
+              Spacer(),
+            ],
+          ),
         ),
       ),
     );

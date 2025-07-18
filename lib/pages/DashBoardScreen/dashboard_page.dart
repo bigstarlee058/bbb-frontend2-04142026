@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/athletes_list_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -9,19 +8,19 @@ import 'package:bbb/components/collection_grid.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
-import 'package:bbb/components/join_challenge_widget.dart';
 import 'package:bbb/components/program_phases_widget.dart';
 import 'package:bbb/components/share_achievement_new_dialog.dart';
 import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/main.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/get_all_achivements.dart';
+import 'package:bbb/pages/DashBoardScreen/add_member_spotlight.dart';
+import 'package:bbb/pages/DashBoardScreen/featured_collection.dart';
 import 'package:bbb/pages/DashBoardScreen/step_progress_bar.dart';
 import 'package:bbb/pages/DashBoardScreen/week_calender.dart';
-import 'package:bbb/pages/Tools/GraphsReports/Charts/report_average_rir.dart';
-import 'package:bbb/pages/Tools/GraphsReports/Charts/report_exercise_completed.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
@@ -31,6 +30,7 @@ import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -46,9 +46,6 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final today = DateTime.now();
-
-  // double _opacity = 1.0;
-  // UserDataManager userManager = UserDataManager();
   List<String> title = [];
   int focusedIndexStuff = 0;
   UserDataProvider? userData;
@@ -56,13 +53,22 @@ class _DashboardPageState extends State<DashboardPage> {
   late MainPageProvider mainPageProvider;
   late MonthProvider monthProvider;
   late ScrollProvider scrollProvider;
-  String selectedChart = "Exercises Completed";
-
+  String selectedChart = "Weight Lifted";
+  ScrollController scrollController = ScrollController();
   @override
   void initState() {
-    super.initState();
     onInit();
     super.initState();
+  }
+
+  void scrollToTop() {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   Future<void> onInit() async {
@@ -71,12 +77,17 @@ class _DashboardPageState extends State<DashboardPage> {
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollProvider.updateOffSet(0.0);
+    });
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToTop();
+    });
     loadUserInfo();
     loadStaffsData();
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
-    // loadAchievementsData(true);
     loadProgramPhaseData();
     requestNotificationPermission();
   }
@@ -121,6 +132,13 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) => scrollProvider.updateOffSet(0.0));
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (dataProvider == null || userData == null) {
       return const Center(
@@ -145,31 +163,71 @@ class _DashboardPageState extends State<DashboardPage> {
           clipBehavior: Clip.none,
           children: [
             imageLoad(media),
+            if (allImages.isNotEmpty) ...[
+              AppImage.imageMonthView(),
+              AppImage.imageStreakCalendar(),
+              AppImage.imageTools(),
+              AppImage.imageProfile(),
+              AppImage.imageMyProfle(),
+              AppImage.imageToday(),
+              AppImage.imageExerciseLibrary(),
+              AppImage.imageGraphs(),
+              AppImage.imageAchievement(),
+              AppImage.imageFaQs(),
+              AppImage.imageLogin(),
+              AppImage.imageSignup(),
+              AppImage.imageEmailConfirm(),
+              AppImage.imageForgot(),
+              AppImage.imageSetting(),
+              AppImage.imageApparel(),
+            ],
+            Consumer<DataProvider>(
+              builder: (context, value, child) {
+                return Utils.appImage(
+                  val: true,
+                  media,
+                  image: value.allImageList.isEmpty
+                      ? ""
+                      : value.allImageList
+                          .where(
+                              (element) => element["key"] == "imageDashboard")
+                          .first["image"],
+                  imageKey: "imageDashboard",
+                );
+              },
+            ),
             mainContent(context, media),
             Consumer<ScrollProvider>(
               builder: (context, scrollValue, child) {
-                double blurValue =
+                final scrollRatio =
                     (scrollValue.scrollOffset / ScreenUtil.verticalScale(35))
-                            .clamp(0, 1) *
-                        5;
-                double targetHeight = ScreenUtil.verticalScale(4.5);
+                        .clamp(0.0, 1.0);
+                final minHeight = ScreenUtil.verticalScale(3.3);
+                final maxHeight = ScreenUtil.verticalScale(5);
+
+                final dynamicHeight =
+                    maxHeight - (maxHeight - minHeight) * scrollRatio;
+
+                final blurValue = scrollRatio * 5;
+                final opacityValue = scrollRatio * 0.7;
+                final topPadding = MediaQuery.of(context).padding.top *
+                    (Platform.isIOS ? .8 : 1);
+
                 return ClipRRect(
                   child: BackdropFilter(
                     filter:
                         ImageFilter.blur(sigmaX: blurValue, sigmaY: blurValue),
                     child: Container(
-                      color: Colors.black.withOpacity(
-                          (scrollValue.scrollOffset /
-                                      ScreenUtil.verticalScale(35))
-                                  .clamp(0, 1) *
-                              0.7),
-                      height: targetHeight + MediaQuery.of(context).padding.top,
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.top *
+                              (Platform.isIOS ? .08 : .1)),
+                      color: Colors.black.withValues(alpha: opacityValue),
+                      height: dynamicHeight + topPadding,
                       child: Padding(
-                        padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top),
+                        padding: EdgeInsets.only(top: topPadding),
                         child: AnimatedContainer(
                           duration: Duration(milliseconds: 300),
-                          height: targetHeight,
+                          height: dynamicHeight,
                           width: media.width,
                           padding: EdgeInsets.only(
                             left: ScreenUtil.horizontalScale(6),
@@ -186,24 +244,24 @@ class _DashboardPageState extends State<DashboardPage> {
                                 children: [
                                   Consumer<UserDataProvider>(
                                     builder: (context, userData, child) {
-                                      return AnimatedOpacity(
-                                        opacity: scrollValue.scrollOffset > 0
-                                            ? 0
-                                            : 1,
-                                        duration: Duration(milliseconds: 300),
+                                      return GestureDetector(
+                                        onTap: () {
+                                          mainPageProvider.changeTab(3);
+                                        },
                                         child: Text(
-                                          'Hi ${userData.userName}',
+                                          'Hi ${userData.userName.trimLeft()}',
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize:
-                                                ScreenUtil.horizontalScale(5.5),
+                                                ScreenUtil.verticalScale(2.1),
                                           ),
                                         ),
                                       );
                                     },
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(right: 10),
+                                    padding: const EdgeInsets.only(
+                                        right: 10, top: 2),
                                     child: CommonStreakWithNotification(
                                       routeString: '/exerciseLibrary',
                                     ),
@@ -226,21 +284,26 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget imageLoad(Size media) {
-    return SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      child: Column(
-        children: dataProvider!.cachedImageMap.entries.map((entry) {
-          return Visibility(
-            visible: true,
-            child: Utils.appImage(
-              media,
-              image: entry.value,
-              imageKey: entry.key,
-            ),
-          );
-        }).toList(),
+    return Visibility(
+      visible: true,
+      child: Utils.appImage(
+        media,
+        image: dataProvider!.allImageList[0]["image"],
+        imageKey: dataProvider!.allImageList[0]["key"],
       ),
     );
+    // return Column(
+    //   children: dataProvider!.allImageList.map((entry) {
+    //     return Visibility(
+    //       visible: true,
+    //       child: Utils.appImage(
+    //         media,
+    //         image: entry["image"],
+    //         imageKey: entry["key"],
+    //       ),
+    //     );
+    //   }).toList(),
+    // );
   }
 
   Widget mainContent(BuildContext context, Size media) {
@@ -257,6 +320,7 @@ class _DashboardPageState extends State<DashboardPage> {
         await loadAchievementsData(false);
       }),
       child: SingleChildScrollView(
+        controller: scrollController,
         physics: NoBottomBounceScrollPhysics(),
         child: Stack(
           children: [
@@ -661,26 +725,31 @@ class _DashboardPageState extends State<DashboardPage> {
 
                   /// JOIN CHALLENGE
 
-                  Consumer<DataProvider>(builder: (context, value, child) {
-                    return value.featureChallengeData.id != ""
-
-                        ///Please recheck this multiple
-                        ? JoinChallengeWidget(
-                            featureChallenge: value.featureChallengeData)
-                        : SizedBox(height: ScreenUtil.verticalScale(5));
-                  }),
-
-                  /// PROGRAM WIDGET
-
-                  ProgramPhasesWidget(),
+                  // Consumer<DataProvider>(builder: (context, value, child) {
+                  //   return value.featureChallengeData.id != ""
+                  //
+                  //       ///Please recheck this multiple
+                  //       ? JoinChallengeWidget(
+                  //           featureChallenge: value.featureChallengeData)
+                  //       : SizedBox(height: ScreenUtil.verticalScale(5));
+                  // }),
 
                   /// PERIODIZATION CYCLE
 
-                  periodizationCycle(media),
+                  ProgramPhasesWidget(),
+
+                  memberSpotlight(media),
 
                   ///Featured Collections
 
-                  featuredCollections(media),
+                  Builder(builder: (context) {
+                    bool isAppUser =
+                        userData?.user["singuptype"] != "web" ? true : false;
+
+                    return isAppUser ? SizedBox() : FeaturedCollectionWidget();
+                  }),
+
+                  // featuredCollections(media),
 
                   /// MEET OUR TEAM
 
@@ -749,7 +818,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       padding:
                           EdgeInsets.only(top: ScreenUtil.verticalScale(1.2)),
                       child: Text(
-                        "Current Month Status",
+                        "Current Program Status",
                         style: TextStyle(
                           color: AppColors.primaryColor,
                           fontSize: ScreenUtil.horizontalScale(5),
@@ -815,7 +884,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 padding: const EdgeInsets.symmetric(vertical: 18),
               ),
               child: Text(
-                'Month View',
+                'Program View',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil.verticalScale(2),
@@ -889,7 +958,10 @@ class _DashboardPageState extends State<DashboardPage> {
               },
               child: Container(
                 color: Colors.transparent,
-                child: WeekCalender(monthProvider: monthProvider),
+                child: WeekCalender(
+                  monthProvider: monthProvider,
+                  userData: userData!,
+                ),
               ),
             ),
           ],
@@ -901,22 +973,21 @@ class _DashboardPageState extends State<DashboardPage> {
   Consumer<MonthProvider> graphs() {
     return Consumer<MonthProvider>(
       builder: (context, value, child) {
-        // reportExerciseCompletedGraphHistory
-        // reportAverageRIRGraphHistory
-        // reportWeightLiftedGraphHistory
-
-        final listA = value.reportExerciseCompletedGraphHistory
-            .map((e) => e["totalCompletedExercise"].value > 0)
+        final listA = value.reportWeightLiftedGraphHistory
+            .map((e) => e["totalWeight"].value > 1)
             .toList();
-        final listB = value.reportWeightLiftedGraphHistory
-            .map((e) => e["totalWeight"].value > 0)
-            .toList();
-        final listC = value.reportAverageRIRGraphHistory
-            .map((e) => e["totalAverageRIR"].value > 0)
-            .toList();
-        final isAvailable = listA.any((element) => element == true) ||
+        // final listB = value.reportExerciseCompletedGraphHistory
+        //     .map((e) => e["totalCompletedExercise"].value > 0)
+        //     .toList();
+        // final listC = value.reportAverageRIRGraphHistory
+        //     .map((e) => e["totalAverageRIR"].value > 0)
+        //     .toList();
+        final isAvailable = listA.any((element) =>
+                element ==
+                true /*) ||
             listB.any((element) => element == true) ||
-            listC.any((element) => element == true);
+            listC.any((element) => element == true*/
+            );
         if (isAvailable) {
           return Column(
             children: [
@@ -937,72 +1008,80 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                     ),
-                    PopupMenuButton<String>(
-                      color: const Color.fromARGB(255, 252, 252, 252),
-                      elevation: 10,
-                      shadowColor: Colors.black.withValues(alpha: 0.2),
-                      itemBuilder: (context) {
-                        return [
-                          "Exercises Completed",
-                          // "Time Spent",
-                          "Weight Lifted",
-                          "Average RIR",
-                        ].map((str) {
-                          return PopupMenuItem(
-                              value: str,
-                              child: Material(
-                                elevation: 0,
-                                color: const Color.fromARGB(255, 252, 252, 252),
-                                child: Text(
-                                  str,
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: ScreenUtil.verticalScale(1.5),
-                                  ),
-                                ),
-                              ));
-                        }).toList();
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            selectedChart,
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: ScreenUtil.verticalScale(1.5),
-                            ),
-                          ),
-                          const Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Colors.grey,
-                          ),
-                        ],
+                    Text(
+                      selectedChart,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: ScreenUtil.verticalScale(1.5),
                       ),
-                      onSelected: (v) {
-                        setState(() {
-                          selectedChart = v;
-                        });
-                      },
-                    )
+                    ),
+                    // PopupMenuButton<String>(
+                    //   color: const Color.fromARGB(255, 252, 252, 252),
+                    //   elevation: 10,
+                    //   shadowColor: Colors.black.withValues(alpha: 0.2),
+                    //   itemBuilder: (context) {
+                    //     return [
+                    //       // "Exercises Completed",
+                    //       // "Time Spent",
+                    //       "Weight Lifted",
+                    //       // "Average RIR",
+                    //     ].map((str) {
+                    //       return PopupMenuItem(
+                    //           value: str,
+                    //           child: Material(
+                    //             elevation: 0,
+                    //             color: const Color.fromARGB(255, 252, 252, 252),
+                    //             child: Text(
+                    //               str,
+                    //               style: TextStyle(
+                    //                 color: Colors.grey,
+                    //                 fontSize: ScreenUtil.verticalScale(1.5),
+                    //               ),
+                    //             ),
+                    //           ));
+                    //     }).toList();
+                    //   },
+                    //   child: Row(
+                    //     mainAxisSize: MainAxisSize.min,
+                    //     crossAxisAlignment: CrossAxisAlignment.center,
+                    //     children: <Widget>[
+                    //       Text(
+                    //         selectedChart,
+                    //         style: TextStyle(
+                    //           color: Colors.grey,
+                    //           fontSize: ScreenUtil.verticalScale(1.5),
+                    //         ),
+                    //       ),
+                    //       const Icon(
+                    //         Icons.keyboard_arrow_down_rounded,
+                    //         color: Colors.grey,
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   onSelected: (v) {
+                    //     setState(() {
+                    //       selectedChart = v;
+                    //     });
+                    //   },
+                    // )
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil.horizontalScale(8.5))
-                    .copyWith(top: 6),
-                child: selectedChart == "Exercises Completed"
-                    ? const ReportExerciseCompletedGraph()
-                    : selectedChart == "Weight Lifted"
-                        ? const ReportWeightLiftedGraph()
-                        // : const TimeSpentGraph(),
-                        : selectedChart == "Average RIR"
-                            ? const ReportAverageRIRGraph()
-                            // : const TimeSpentGraph(),
-                            : const SizedBox(),
-              ),
+                  margin: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(8.5))
+                      .copyWith(top: 6),
+                  child: ReportWeightLiftedGraph()
+                  // selectedChart == "Exercises Completed"
+                  //   ? const ReportExerciseCompletedGraph()
+                  //   : selectedChart == "Weight Lifted"
+                  //       ? const ReportWeightLiftedGraph()
+                  //       // : const TimeSpentGraph(),
+                  //       : selectedChart == "Average RIR"
+                  //           ? const ReportAverageRIRGraph()
+                  //           // : const TimeSpentGraph(),
+                  //           : const SizedBox(),
+                  ),
               Container(
                 margin: EdgeInsets.symmetric(
                   horizontal: ScreenUtil.horizontalScale(9),
@@ -1029,11 +1108,24 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Consumer<DataProvider> achievementSection() {
     return Consumer<DataProvider>(builder: (context, value, child) {
-      List<AchievementModel>? data = dataProvider?.achievementList
-          .where(
-              (element) => element.achievements!.any((e) => e.achieved == true))
-          .toList();
-      return dataProvider!.achievementList.isEmpty || data!.isEmpty
+      List<AchievementModel> data = [];
+
+      data.addAll(dataProvider!.achievementList);
+
+      data.removeWhere(
+        (element) => element.achievements!.any(
+          (e1) => e1.achieved == true,
+        ),
+      );
+
+      if (data.isEmpty) {
+        data.addAll(dataProvider!.achievementList);
+      }
+      // List<AchievementModel>? data = dataProvider?.achievementList
+      //     .where(
+      //         (element) => element.achievements!.any((e) => e.achieved == true))
+      //     .toList();
+      return dataProvider!.achievementList.isEmpty || data.isEmpty
           ? SizedBox()
           : Column(
               children: [
@@ -1142,38 +1234,46 @@ class _DashboardPageState extends State<DashboardPage> {
                                             children: [
                                               Stack(
                                                 children: [
-                                                  SizedBox(
-                                                    height: ScreenUtil
-                                                        .verticalScale(8),
-                                                    width: ScreenUtil
-                                                        .verticalScale(8),
-                                                    child: appShimmerImage(
-                                                      color: Colors.transparent,
+                                                  Builder(builder: (context) {
+                                                    String url = data2
+                                                                ?.achieved ==
+                                                            true
+                                                        ? (data2?.achievementAchievementId
+                                                                ?.image ??
+                                                            "")
+                                                        : (data[index]
+                                                                .thumbnail ??
+                                                            "");
+                                                    return SizedBox(
                                                       height: ScreenUtil
                                                           .verticalScale(8),
                                                       width: ScreenUtil
                                                           .verticalScale(8),
-                                                      networkImageUrl: "${data2?.achievementAchievementId?.image}"
-                                                              .startsWith(
-                                                                  'https://storage.cloud.google.com/')
-                                                          ? data2?.achievementAchievementId
-                                                                  ?.image ??
-                                                              "".replaceFirst(
-                                                                  'https://storage.cloud.google.com/',
-                                                                  'https://storage.googleapis.com/')
-                                                          : data2?.achievementAchievementId
-                                                                  ?.image ??
-                                                              "unknown",
-                                                      fit: BoxFit.cover,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(
-                                                            ScreenUtil
-                                                                .verticalScale(
-                                                                    500)),
+                                                      child: appShimmerImage(
+                                                        color:
+                                                            Colors.transparent,
+                                                        height: ScreenUtil
+                                                            .verticalScale(8),
+                                                        width: ScreenUtil
+                                                            .verticalScale(8),
+                                                        networkImageUrl: url
+                                                                .startsWith(
+                                                                    'https://storage.cloud.google.com/')
+                                                            ? url.replaceFirst(
+                                                                'https://storage.cloud.google.com/',
+                                                                'https://storage.googleapis.com/')
+                                                            : url,
+                                                        fit: BoxFit.cover,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(
+                                                              ScreenUtil
+                                                                  .verticalScale(
+                                                                      500)),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
+                                                    );
+                                                  }),
                                                 ],
                                               ),
                                             ],
@@ -1207,52 +1307,98 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  Widget periodizationCycle(Size media) {
+  Widget memberSpotlight(Size media) {
     return SizedBox(
       width: media.width,
-      child: Column(
-        children: [
-          SizedBox(
-            height: ScreenUtil.verticalScale(2.5),
-          ),
-          Consumer<DataProvider>(builder: (context, dataProvider, child) {
-            return dataProvider.athletesData.isNotEmpty
-                ? CarouselSlider.builder(
-                    itemCount: dataProvider.athletesData.length,
-                    options: CarouselOptions(
-                      height: ScreenUtil.verticalScale(38),
-                      viewportFraction: 0.65,
-                      enlargeCenterPage: true,
-                      enlargeFactor: 0.4,
-                      enableInfiniteScroll: true,
-                      autoPlay: false,
-                      onPageChanged: (index, reason) {},
-                      scrollDirection: Axis.horizontal,
+      child: Consumer<DataProvider>(builder: (context, dataProvider, child) {
+        return dataProvider.athletesData.isNotEmpty
+            ? CarouselSlider.builder(
+                itemCount: dataProvider.athletesData.length,
+                options: CarouselOptions(
+                  height: ScreenUtil.verticalScale(38),
+                  viewportFraction: 0.65,
+                  enlargeCenterPage: true,
+                  enlargeFactor: 0.4,
+                  enableInfiniteScroll: true,
+                  autoPlay: false,
+                  onPageChanged: (index, reason) {},
+                  scrollDirection: Axis.horizontal,
+                ),
+                itemBuilder: (context, index, realIndex) {
+                  return Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        // Navigator.pushNamed(context, '/meetOurStaff');
+                      },
+                      child: AnimatedContainer(
+                        width: media.width,
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        duration: const Duration(milliseconds: 300),
+                        child: index + 1 == dataProvider.athletesData.length
+                            ? GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddMemberSpotlight(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  height: ScreenUtil.verticalScale(38),
+                                  width: ScreenUtil.horizontalScale(60),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(
+                                            ScreenUtil.verticalScale(5))),
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(
+                                            ScreenUtil.verticalScale(1.2)),
+                                        decoration: BoxDecoration(
+                                            color: AppColors.backOffSetColor1
+                                                .withValues(alpha: 0.3),
+                                            shape: BoxShape.circle),
+                                        child: Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                          size: ScreenUtil.verticalScale(4),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: ScreenUtil.verticalScale(1.5),
+                                      ),
+                                      Text(
+                                        "Upload your own",
+                                        style: TextStyle(
+                                            fontSize:
+                                                ScreenUtil.verticalScale(2.15),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : AthletesListWidget(
+                                height: ScreenUtil.verticalScale(38),
+                                width: ScreenUtil.horizontalScale(60),
+                                oneAthlete: dataProvider.athletesData[index],
+                              ),
+                      ),
                     ),
-                    itemBuilder: (context, index, realIndex) {
-                      return Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            // Navigator.pushNamed(context, '/meetOurStaff');
-                          },
-                          child: AnimatedContainer(
-                            width: media.width,
-                            margin: const EdgeInsets.symmetric(horizontal: 5),
-                            duration: const Duration(milliseconds: 300),
-                            child: AthletesListWidget(
-                              height: ScreenUtil.verticalScale(38),
-                              width: ScreenUtil.horizontalScale(60),
-                              oneAthlete: dataProvider.athletesData[index],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                : const SizedBox();
-          }),
-        ],
-      ),
+                  );
+                },
+              )
+            : const SizedBox();
+      }),
     );
   }
 
@@ -1271,24 +1417,24 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     child: Column(
                       children: [
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: ScreenUtil.horizontalScale(7),
-                              right: ScreenUtil.horizontalScale(7),
-                              bottom: ScreenUtil.verticalScale(2.4)),
-                          width: media.width,
-                          child: Center(
-                            child: Text(
-                              "Featured Collections",
-                              style: TextStyle(
-                                color: AppColors.primaryColor,
-                                fontSize: ScreenUtil.horizontalScale(5),
-                                fontWeight: FontWeight.w800,
-                              ),
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                        ),
+                        // Container(
+                        //   margin: EdgeInsets.only(
+                        //       left: ScreenUtil.horizontalScale(7),
+                        //       right: ScreenUtil.horizontalScale(7),
+                        //       bottom: ScreenUtil.verticalScale(2.4)),
+                        //   width: media.width,
+                        //   child: Center(
+                        //     child: Text(
+                        //       "Featured Collections",
+                        //       style: TextStyle(
+                        //         color: AppColors.primaryColor,
+                        //         fontSize: ScreenUtil.horizontalScale(5),
+                        //         fontWeight: FontWeight.w800,
+                        //       ),
+                        //       textAlign: TextAlign.start,
+                        //     ),
+                        //   ),
+                        // ),
                         CarouselSlider.builder(
                           itemCount: dataProvider.staffsData.length,
                           options: CarouselOptions(
@@ -1316,29 +1462,31 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget meetOurTeam(Size media) {
+    bool isAppUser = userData?.user["singuptype"] != "web" ? true : false;
     return SizedBox(
       width: media.width,
       child: Column(
         children: [
-          Container(
-            width: media.width,
-            margin: EdgeInsets.only(
-              left: ScreenUtil.horizontalScale(7),
-              right: ScreenUtil.horizontalScale(7),
-              bottom: ScreenUtil.verticalScale(2.4),
-            ),
-            child: Center(
-              child: Text(
-                "Meet our team",
-                style: TextStyle(
-                  color: AppColors.primaryColor,
-                  fontSize: ScreenUtil.horizontalScale(5),
-                  fontWeight: FontWeight.w800,
-                ),
-                textAlign: TextAlign.start,
-              ),
-            ),
-          ),
+          isAppUser
+              ? Container(
+                  width: media.width,
+                  margin: EdgeInsets.symmetric(
+                    horizontal: ScreenUtil.horizontalScale(7),
+                    vertical: ScreenUtil.verticalScale(2.4),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Meet our team",
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: ScreenUtil.horizontalScale(5),
+                        fontWeight: FontWeight.w800,
+                      ),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                )
+              : SizedBox(height: ScreenUtil.verticalScale(2)),
           Consumer<DataProvider>(
             builder: (context, dataProvider, child) {
               return (dataProvider.staffsData.isNotEmpty)

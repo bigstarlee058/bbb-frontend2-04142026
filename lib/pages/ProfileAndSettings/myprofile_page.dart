@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
-import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/profile_image_handler.dart';
 import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
@@ -13,15 +12,13 @@ import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
 
 import 'number_entry.dart';
@@ -159,10 +156,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         }
       }
     });
-    log('selectedBodyFat==========>>>>>${selectedBodyFat.text}');
-    log('selectedMidThigh==========>>>>>${selectedMidThigh.text}');
-    log('selectedHip==========>>>>>${selectedHip.text}');
-    log('selectedWaist==========>>>>>${selectedWaist.text}');
+
     setState(() => loader = false);
   }
 
@@ -224,10 +218,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
           : "",
     };
-    if (kDebugMode) {
-      print('HERE IS USERDETAIL##, $userDetails');
-    }
-    log('_id==========>>>>>$_id');
+
     if (_id != null) {
       await userData!.updateUserInfo(_id!, userDetails, image);
 
@@ -299,11 +290,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   children: [
                     Stack(
                       children: [
-                        Utils.appImage(
-                          media,
-                          image: dataProvider!.cachedImageMap["imageMyProfle"],
-                          imageKey: "imageMyProfle",
-                        ),
+                        AppImage.imageMyProfle(
+                            // media,
+                            // image: dataProvider!.allImageList
+                            //     .where((element) =>
+                            //         element["key"] == "imageMyProfle")
+                            //     .first["image"],
+                            // // image: dataProvider!.cachedImageMap["imageMyProfle"],
+                            // imageKey: "imageMyProfle",
+                            ),
                         SizedBox(
                           height: media.height / 1.5,
                           width: media.width,

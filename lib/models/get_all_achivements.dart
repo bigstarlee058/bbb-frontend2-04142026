@@ -14,6 +14,8 @@ String achievementModelToJson(List<AchievementModel> data) =>
 class AchievementModel {
   String? id;
   String? title;
+  String? thumbnail;
+  String? description;
   int? currentValue;
   List<Achievement>? achievements;
 
@@ -22,6 +24,8 @@ class AchievementModel {
     this.title,
     this.currentValue,
     this.achievements,
+    this.thumbnail,
+    this.description,
   });
 
   factory AchievementModel.fromJson(Map<String, dynamic> json) =>
@@ -29,6 +33,8 @@ class AchievementModel {
         id: json["id"],
         title: json["title"],
         currentValue: json["currentValue"],
+        description: json["description"],
+        thumbnail: json["thumbnail"],
         achievements: json["achievements"] == null
             ? []
             : List<Achievement>.from(
@@ -37,6 +43,8 @@ class AchievementModel {
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        "description": description,
+        "thumbnail": thumbnail,
         "title": title,
         "currentValue": currentValue,
         "achievements": achievements == null

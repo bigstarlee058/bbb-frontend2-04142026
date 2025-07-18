@@ -62,12 +62,11 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                   },
                 ),
               ),
-              const SizedBox(height: 10),
 
               // Add a New Note text
               const Center(
                 child: Text(
-                  "Add a New Note",
+                  "Journal & Reminders",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -81,7 +80,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                 controller: _noteController,
                 maxLines: 5,
                 decoration: const InputDecoration(
-                  hintText: 'Enter your note here',
+                  hintText: 'Enter here',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -89,7 +88,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
 
               // Save Note Button
               ButtonWidget(
-                text: "Save Note",
+                text: "Save",
                 textColor: Colors.white,
                 onPress: () {
                   if (_noteController.text.isEmpty) {
@@ -125,13 +124,13 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
       builder: (context, userData, child) => dataList.isEmpty
           ? const Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
-              child: Text("No notes added yet."),
+              child: Text("No journal & reminders added yet."),
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Previously Added Notes:",
+                  "Previously Added Entries:",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),

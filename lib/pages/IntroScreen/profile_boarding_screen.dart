@@ -5,6 +5,7 @@ import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
+import 'package:bbb/pages/ProfileAndSettings/number_entry.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -18,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:keyboard_actions/keyboard_actions_config.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -107,32 +109,41 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       'firstName': nameController.text.trim().toString().isEmpty
           ? userData.user["name"] ?? ""
           : nameController.text.toString(),
-      'sex': (selectedGender ?? "").isNotEmpty
+      'sex': selectedGender != null
           ? genderOptions.indexOf(selectedGender!)
+          : false,
+      'dob': selectedDate != null ? selectedDate!.toIso8601String() : "",
+      'weight': selectedWeight.text.replaceAll('lbs', "").isNotEmpty
+          ? int.parse(selectedWeight.text.replaceAll('lbs', ""))
           : "",
-      'dob': selectedDate?.toIso8601String(),
-      'weight': selectedWeight.text.isEmpty
-          ? ""
-          : int.parse(selectedWeight.text.split(' ')[0]),
-      'height': selectedHeight.text.isEmpty
-          ? ""
-          : int.parse(
-              selectedHeight.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'waist': selectedWaist.text.isEmpty
-          ? "0"
-          : int.parse(
-              selectedWaist.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'hip': selectedHip.text.isEmpty
-          ? "0"
-          : int.parse(
-              selectedHip.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'midthigh': selectedMidThigh.text.isEmpty
-          ? "0"
-          : int.parse(
-              selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", "")),
-      'bodyfat': selectedBodyFat.text.isEmpty
-          ? "0"
-          : int.parse(selectedBodyFat.text.split(' ')[0]),
+      'height': selectedHeight.text
+              .replaceAll('\'', '')
+              .replaceAll("\"", "")
+              .isNotEmpty
+          ? int.parse(
+              selectedHeight.text.replaceAll('\'', '').replaceAll("\"", ""))
+          : "",
+      'waist': selectedWaist.text
+              .replaceAll('\'', '')
+              .replaceAll("\"", "")
+              .isNotEmpty
+          ? int.parse(
+              selectedWaist.text.replaceAll('\'', '').replaceAll("\"", ""))
+          : "",
+      'hip':
+          selectedHip.text.replaceAll('\'', '').replaceAll("\"", "").isNotEmpty
+              ? int.parse(selectedHip.text.replaceAll("\"", ""))
+              : "",
+      'midthigh': selectedMidThigh.text
+              .replaceAll('\'', '')
+              .replaceAll("\"", "")
+              .isNotEmpty
+          ? int.parse(
+              selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", ""))
+          : "",
+      'bodyfat': selectedBodyFat.text.replaceAll('%', "").isNotEmpty
+          ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
+          : "",
     };
     if (kDebugMode) {
       print('HERE IS USER DETAIL##, $userDetails');
@@ -380,43 +391,46 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Padding(
-            padding:
-                EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(5)),
-            child: Image.asset(
-              "assets/img/logo.png",
-              scale: 1.2,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding:
+                  EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(5)),
+              child: Image.asset(
+                "assets/img/logo.png",
+                scale: 1.2,
+              ),
             ),
-          ),
-          SizedBox(
-            // color: Colors.red,
-            height: media.height * 0.55,
-            child: PageView.builder(
-              onPageChanged: (value) {
-                currentPage = value + 1;
-                setState(() {});
-              },
-              controller: pageController,
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.horizontalScale(6))
-                      .copyWith(bottom: ScreenUtil.verticalScale(6.5)),
-                  child: index == 0
-                      ? page1()
-                      : index == 1
-                          ? page2(context)
-                          : index == 2
-                              ? page3(context)
-                              : page4(),
-                );
-              },
+            SizedBox(
+              // color: Colors.red,
+              height: media.height * 0.55,
+              child: PageView.builder(
+                physics: NeverScrollableScrollPhysics(),
+                onPageChanged: (value) {
+                  currentPage = value + 1;
+                  setState(() {});
+                },
+                controller: pageController,
+                itemCount: 4,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.horizontalScale(6))
+                        .copyWith(bottom: ScreenUtil.verticalScale(6.5)),
+                    child: index == 0
+                        ? page1()
+                        : index == 1
+                            ? page2(context)
+                            : index == 2
+                                ? page3(context)
+                                : page4(),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -544,8 +558,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             hint: '6\'0"',
           ),
           SizedBox(height: ScreenUtil.verticalScale(1.5)),
-          _numberPicker(
-            context: context,
+          NumberEntry(
+            zeroPadding: true,
             label: 'Weight',
             controller: selectedWeight,
             focusNode: _nodeText1,
@@ -578,32 +592,32 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(3.5)),
-          _numberPicker(
-            context: context,
+          NumberEntry(
+            zeroPadding: true,
             label: 'Waist',
             controller: selectedWaist,
             focusNode: _nodeText2,
             suffix: '"',
           ),
           SizedBox(height: ScreenUtil.verticalScale(1.5)),
-          _numberPicker(
-            context: context,
+          NumberEntry(
+            zeroPadding: true,
             label: 'Hip',
             controller: selectedHip,
             focusNode: _nodeText3,
             suffix: '"',
           ),
           SizedBox(height: ScreenUtil.verticalScale(1.5)),
-          _numberPicker(
-            context: context,
+          NumberEntry(
+            zeroPadding: true,
             label: 'Mid-Thigh',
             controller: selectedMidThigh,
             focusNode: _nodeText4,
             suffix: '"',
           ),
           SizedBox(height: ScreenUtil.verticalScale(1.5)),
-          _numberPicker(
-            context: context,
+          NumberEntry(
+            zeroPadding: true,
             label: 'Body-Fat',
             controller: selectedBodyFat,
             focusNode: _nodeText5,

@@ -800,23 +800,28 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
             top: -ScreenUtil.verticalScale(1.2),
             child: Align(
               alignment: Alignment.centerRight,
-              child: GestureDetector(
-                child: Container(
-                  decoration: const BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
-                  child: Padding(
-                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
-                    child: Icon(
-                        size: ScreenUtil.verticalScale(2.5),
-                        Icons.close,
-                        color: Colors.white),
+              child: Consumer<MonthProvider>(builder: (context, value, child) {
+                return GestureDetector(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.all(Radius.circular(100))),
+                    child: Padding(
+                      padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                      child: Icon(
+                          size: ScreenUtil.verticalScale(2.5),
+                          Icons.close,
+                          color: Colors.white),
+                    ),
                   ),
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await preferences.putString(
+                        SharedPreference.monthSettingDone,
+                        value.monthDataModel?.id ?? "");
+                  },
+                );
+              }),
             ),
           ),
         ],

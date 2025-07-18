@@ -14,11 +14,13 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -51,6 +53,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       this.context,
       listen: false,
     );
+
     super.didChangeDependencies();
   }
 
@@ -96,6 +99,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
 
     Navigator.pushNamed(context, AppRoutes.loginScreen);
+  }
+
+  Future<void> launchUrls(String urls) async {
+    final Uri url = Uri.parse(urls);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
   }
 
   openUrl(String url) async {
@@ -187,34 +197,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      /// TEST VERSION AVAILABLE SCREEN
-      // floatingActionButton: Padding(
-      //   padding: EdgeInsets.only(bottom: 75),
-      //   child: ElevatedButton(
-      //     style: ElevatedButton.styleFrom(
-      //       backgroundColor: AppColors.primaryColor,
-      //       shape: Utils.buttonStyle,
-      //       padding: EdgeInsets.symmetric(
-      //         vertical: ScreenUtil.verticalScale(1.7),
-      //       ),
-      //     ),
-      //     child: Container(
-      //       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 05),
-      //       child: Text(
-      //         "New Version Available",
-      //         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      //       ),
-      //     ),
-      //     onPressed: () async {
-      //       await Navigator.push(
-      //         context,
-      //         MaterialPageRoute(
-      //           builder: (context) => VersionUpdateScreen(),
-      //         ),
-      //       );
-      //     },
-      //   ),
-      // ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -226,24 +208,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   children: [
                     Stack(
                       children: [
-                        // Container(
-                        //   height: media.height / 1,
-                        //   width: media.width,
-                        //   decoration: const BoxDecoration(
-                        //     image: DecorationImage(
-                        //       image: AssetImage('assets/img/back.jpg'),
-                        //       fit: BoxFit.cover,
-                        //       opacity: 1,
-                        //     ),
-                        //   ),
-                        // ),
-                        Utils.appImage(
-                          media,
-                          // dataProvider?.screenBackgroundResponse?.imageProfile ?? "",
-                          image: dataProvider!.cachedImageMap["imageProfile"],
-
-                          imageKey: "imageProfile",
-                        ),
+                        AppImage.imageProfile(
+                            // media,
+                            // image: dataProvider!.allImageList
+                            //     .where(
+                            //         (element) => element["key"] == "imageProfile")
+                            //     .first["image"],
+                            // imageKey: "imageProfile",
+                            ),
                         SizedBox(
                           height: media.height / 1.5,
                           width: media.width,
@@ -594,83 +566,97 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                     })
                                                   ],
                                                 )),
-                                            Column(
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.all(
-                                                      ScreenUtil.verticalScale(
-                                                          1.4)),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white
-                                                        .withValues(
-                                                            alpha: 0.35),
-                                                    shape: BoxShape.circle,
+                                            GestureDetector(
+                                              onTap: () {
+                                                dataProvider
+                                                    ?.updateOpenDaySinceJoin(
+                                                        true);
+                                                Navigator.pushNamed(context,
+                                                    "/seeAllAchievementPage");
+                                              },
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.all(
+                                                        ScreenUtil
+                                                            .verticalScale(
+                                                                1.4)),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white
+                                                          .withValues(
+                                                              alpha: 0.35),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                        Icons.calendar_month,
+                                                        color: Colors.white,
+                                                        size: 22),
                                                   ),
-                                                  child: Icon(
-                                                      Icons.calendar_month,
-                                                      color: Colors.white,
-                                                      size: 22),
-                                                ),
-                                                SizedBox(
-                                                    height: ScreenUtil
-                                                        .verticalScale(0.9)),
-                                                Builder(
-                                                  builder: (context) {
-                                                    String accountCreatedDate = context
-                                                                .watch<
-                                                                    UserDataProvider>()
-                                                                .userData !=
-                                                            null
-                                                        ? context
-                                                            .watch<
-                                                                UserDataProvider>()
-                                                            .userData["createdAt"]
-                                                        : "";
-                                                    DateTime targetDate =
-                                                        DateTime.parse(
-                                                                accountCreatedDate)
-                                                            .toLocal();
-                                                    DateTime today =
-                                                        DateTime.now();
-                                                    int dayDifference = today
-                                                        .difference(targetDate)
-                                                        .inDays;
-                                                    return Column(
-                                                      children: [
-                                                        Text(
-                                                          "$dayDifference Day${(dayDifference != 1) ? "s" : ""}",
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: ScreenUtil
-                                                                .horizontalScale(
-                                                                    3.2),
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            height: 1,
+                                                  SizedBox(
+                                                      height: ScreenUtil
+                                                          .verticalScale(0.9)),
+                                                  Builder(
+                                                    builder: (context) {
+                                                      String accountCreatedDate = context
+                                                                  .watch<
+                                                                      UserDataProvider>()
+                                                                  .userData !=
+                                                              null
+                                                          ? context
+                                                              .watch<
+                                                                  UserDataProvider>()
+                                                              .userData["createdAt"]
+                                                          : "";
+                                                      DateTime targetDate =
+                                                          DateTime.parse(
+                                                                  accountCreatedDate)
+                                                              .toLocal();
+                                                      DateTime today =
+                                                          DateTime.now();
+                                                      int dayDifference = today
+                                                          .difference(
+                                                              targetDate)
+                                                          .inDays;
+                                                      return Column(
+                                                        children: [
+                                                          Text(
+                                                            "$dayDifference Day${(dayDifference != 1) ? "s" : ""}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: ScreenUtil
+                                                                  .horizontalScale(
+                                                                      3.2),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              height: 1,
+                                                            ),
                                                           ),
-                                                        ),
-                                                        SizedBox(
-                                                            height: ScreenUtil
-                                                                .verticalScale(
-                                                                    0.25)),
-                                                        Text(
-                                                          "Since Joining",
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: ScreenUtil
-                                                                .horizontalScale(
-                                                                    3),
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                            height: 1,
+                                                          SizedBox(
+                                                              height: ScreenUtil
+                                                                  .verticalScale(
+                                                                      0.25)),
+                                                          Text(
+                                                            "Since Joining",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: ScreenUtil
+                                                                  .horizontalScale(
+                                                                      3),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              height: 1,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                )
-                                              ],
+                                                        ],
+                                                      );
+                                                    },
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -798,6 +784,96 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
                                   settingsButton('Log Out', Icons.logout,
                                       () => _handleLogout(context)),
+                                  SizedBox(height: ScreenUtil.verticalScale(3)),
+
+                                  Text(
+                                    "Follow us @bootybybret",
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade600,
+                                      fontSize: ScreenUtil.verticalScale(1.35),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height: ScreenUtil.verticalScale(1.5)),
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await launchUrls(
+                                              "https://www.instagram.com/bootybybretofficial/");
+                                        },
+                                        child: Container(
+                                          height: ScreenUtil.verticalScale(4),
+                                          width: ScreenUtil.verticalScale(4),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              "assets/icons/instagram.svg",
+                                              color: Colors.white,
+                                              height:
+                                                  ScreenUtil.verticalScale(2.5),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await launchUrls(
+                                              "https://www.facebook.com/groups/336166653826868/");
+                                        },
+                                        child: Container(
+                                          height: ScreenUtil.verticalScale(4),
+                                          width: ScreenUtil.verticalScale(4),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              "assets/icons/facebook.svg",
+                                              color: Colors.white,
+                                              height:
+                                                  ScreenUtil.verticalScale(2.5),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await launchUrls(
+                                              "https://bootybybret.com/");
+                                        },
+                                        child: Container(
+                                          height: ScreenUtil.verticalScale(4),
+                                          width: ScreenUtil.verticalScale(4),
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(1)),
+                                          decoration: BoxDecoration(
+                                              color: Color(0XFFd18a9b),
+                                              shape: BoxShape.circle),
+                                          child: Center(
+                                            child: Image.asset(
+                                              "assets/img/website.png",
+                                              color: Colors.white,
+                                              height:
+                                                  ScreenUtil.verticalScale(2.5),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
                                 ],
                               ),
                             ),
@@ -873,7 +949,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               horizontal: ScreenUtil.horizontalScale(2),
                               vertical: ScreenUtil.verticalScale(1)),
                           child: Text(
-                            "This action will completely delete your account and all of your data. If you're experiencing an issue we can fix, please try to contact us first and we'll be happy to resolve it.",
+                            "This action will completely delete your account, all of your data and you will immediately lose access to the app. If you're experiencing an issue then please feel free to contact us and we'll be happy to help you.",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,
@@ -920,9 +996,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                    await _deleteAccount(context);
                                     if (!c1.mounted) return;
                                     Navigator.of(c1).pop();
+
+                                    AnimatedDialog.showAnimatedDialog(
+                                      context: context,
+                                      pageBuilder: (c1, anim1, anim2) =>
+                                          deleteAccountSecond(context, c1),
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(
@@ -937,6 +1018,152 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                     "Delete Account",
                                     style: TextStyle(
                                       fontSize: ScreenUtil.verticalScale(1.9),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            right: -ScreenUtil.verticalScale(1.2),
+            top: -ScreenUtil.verticalScale(1.2),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                child: Container(
+                  decoration: const BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                  child: Padding(
+                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                    child: Icon(
+                        size: ScreenUtil.verticalScale(2.5),
+                        Icons.close,
+                        color: Colors.white),
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget deleteAccountSecond(BuildContext context, BuildContext c1) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      insetPadding:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFFFFFFFF),
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: ScreenUtil.verticalScale(2)),
+                        Text(
+                          "Delete Account",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil.verticalScale(2.4),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(2),
+                              vertical: ScreenUtil.verticalScale(1)),
+                          child: Text(
+                            "Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be lost.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: ScreenUtil.verticalScale(2),
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding:
+                              EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (!c1.mounted) return;
+                                    Navigator.of(c1).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(1.7),
+                                    ),
+                                    side: BorderSide(
+                                        width: 2.0,
+                                        color: AppColors.primaryColor),
+                                    backgroundColor: Colors.white,
+                                  ),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: ScreenUtil.verticalScale(2),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: ScreenUtil.horizontalScale(2.5)),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await _deleteAccount(context);
+                                    if (!c1.mounted) return;
+                                    Navigator.of(c1).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    backgroundColor: AppColors.primaryColor,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(1.7),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Confirm",
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil.verticalScale(2),
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -1008,22 +1235,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         padding: EdgeInsets.all(
           ScreenUtil.verticalScale(1.5),
         ),
-        // decoration: BoxDecoration(
-        //   color: const Color(0xFFFAFAFA),
-        //   borderRadius: BorderRadius.all(
-        //     Radius.circular(
-        //       ScreenUtil.verticalScale(7),
-        //     ),
-        //   ),
-        //   boxShadow: [
-        //     BoxShadow(
-        //       color: const Color(0xFF000000).withValues(alpha: 0.05),
-        //       spreadRadius: 1,
-        //       blurRadius: 3,
-        //       offset: const Offset(0, 1),
-        //     ),
-        //   ],
-        // ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

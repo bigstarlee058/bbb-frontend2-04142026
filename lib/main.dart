@@ -34,8 +34,6 @@ import 'package:bbb/pages/Tools/faqs_page.dart';
 import 'package:bbb/pages/Tools/nutrition_calculator_page.dart';
 import 'package:bbb/pages/Tools/recalculate_page.dart';
 import 'package:bbb/pages/Tools/tutorial_page.dart';
-import 'package:bbb/pages/WatchTutorial/app_tutorial.dart';
-import 'package:bbb/pages/WatchTutorial/watch_tutorial.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
@@ -57,15 +55,17 @@ import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
 import 'localstorage/month_database.dart';
 import 'pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'pages/Tools/seeall_achievement_page_new.dart';
 import 'providers/month_provider.dart';
+import 'providers/video_initiase_loader.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+List<Map<String, dynamic>> allImages = [];
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {}
 
@@ -80,7 +80,11 @@ void main() async {
   await _configureLocalTimeZone();
   const androidInitializationSetting =
       AndroidInitializationSettings('@mipmap/ic_launcher');
-  const iosInitializationSetting = DarwinInitializationSettings();
+  const iosInitializationSetting = DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
   const initSettings = InitializationSettings(
       android: androidInitializationSetting, iOS: iosInitializationSetting);
 
@@ -116,13 +120,6 @@ void main() async {
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   runApp(MyApp());
-
-  // runApp(
-  //   DevicePreview(
-  //     enabled: !kReleaseMode,
-  //     builder: (context) => MyApp(),
-  //   ),
-  // );
 }
 
 Future<void> _configureLocalTimeZone() async {
@@ -163,6 +160,10 @@ class _MyAppState extends State<MyApp> {
   final scrollProvider = ChangeNotifierProvider<ScrollProvider>(
     create: (context) => ScrollProvider(),
   );
+  final videoInitialiseProvider =
+      ChangeNotifierProvider<VideoInitialiseProvider>(
+    create: (context) => VideoInitialiseProvider(),
+  );
 
   late AppLinks _appLinks;
 
@@ -194,12 +195,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initDeepLinkListener() async {
-    // Initialize AppLinks and handle the deep link in the callback
-    // _appLinks = AppLinks(
-    //   onAppLink: (Uri uri, String? stringUri) {
-    //     _handleDeepLink(uri.toString());
-    //   },
-    // );
     _appLinks = AppLinks();
     _appLinks.uriLinkStream.listen((Uri uri) {
       _handleDeepLink(uri.toString());
@@ -208,14 +203,10 @@ class _MyAppState extends State<MyApp> {
 
   void _handleDeepLink(String? deepLink) {
     if (deepLink != null) {
-      // Parse the deep link and navigate to the appropriate page
       Uri uri = Uri.parse(deepLink);
-      // Check if the scheme and host are correct
       if (uri.scheme == 'https' && uri.host == 'bbbdev1.wpenginepowered.com') {
-        // Example: Check the path
         Navigator.of(context).pushNamed(AppRoutes.mainScreen);
       } else {
-        // Handle unsupported schemes or hosts if necessary
         debugPrint('Unsupported deep link: $deepLink');
       }
     }
@@ -239,6 +230,7 @@ class _MyAppState extends State<MyApp> {
           programInfoProvider,
           monthProvider,
           scrollProvider,
+          videoInitialiseProvider
         ],
         child: MaterialApp(
           navigatorObservers: <NavigatorObserver>[observer],

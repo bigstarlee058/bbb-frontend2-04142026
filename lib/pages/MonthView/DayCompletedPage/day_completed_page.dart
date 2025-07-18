@@ -197,7 +197,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(height: ScreenUtil.verticalScale(4)),
+                        SizedBox(height: ScreenUtil.verticalScale(5)),
                         Text(
                           'Congratulations!',
                           style: TextStyle(
@@ -215,14 +215,14 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             fontSize: ScreenUtil.verticalScale(1.9),
                           ),
                         ),
-                        SizedBox(height: ScreenUtil.verticalScale(1)),
-                        Text(
-                          "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: ScreenUtil.verticalScale(1.9),
-                          ),
-                        ),
+                        // SizedBox(height: ScreenUtil.verticalScale(1)),
+                        // Text(
+                        //   "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
+                        //   style: TextStyle(
+                        //     color: Colors.white,
+                        //     fontSize: ScreenUtil.verticalScale(1.9),
+                        //   ),
+                        // ),
                         SizedBox(height: ScreenUtil.verticalScale(0.8)),
                         Text(
                           "${ModalRoute.of(context)?.settings.arguments as String?}",
@@ -463,22 +463,23 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       const Text(
-                                        'Average RIR',
+                                        'Streak Achieved',
                                         style: TextStyle(
                                             color: Colors.black54,
                                             fontSize: 16.5),
                                       ),
                                       const SizedBox(height: 10),
-                                      Text(
-                                        averageRIR == 0
-                                            ? "0"
-                                            : averageRIR.toStringAsFixed(2),
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                            color: Color(0xFFDD1166),
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w500),
-                                      )
+                                      Consumer<MonthProvider>(
+                                          builder: (context, value, c) {
+                                        return Text(
+                                          "${value.streak}",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              color: Color(0xFFDD1166),
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w500),
+                                        );
+                                      })
                                     ],
                                   ),
                                 ),
@@ -531,9 +532,9 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                         final imagePath = File(
                                             '${directory.path}/screenshot.png');
                                         await imagePath.writeAsBytes(image);
-                                        await Share.shareXFiles(
-                                                [XFile(imagePath.path)],
-                                                text: 'Congratulations!')
+                                        await Share.shareXFiles([
+                                          XFile(imagePath.path)
+                                        ], text: 'I just completed ${ModalRoute.of(context)?.settings.arguments as String?} of Booty By Bret! Join me in the app at https://bootybybret.com')
                                             .then(
                                           (value) {
                                             updateOnTap(false);
@@ -695,13 +696,23 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               fontSize: ScreenUtil.verticalScale(2),
                             ),
                           ),
+                          // Text(
+                          //   "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
+                          //   style: TextStyle(
+                          //     color: Colors.white,
+                          //     fontSize: ScreenUtil.verticalScale(3),
+                          //   ),
+                          // )
+                          SizedBox(height: ScreenUtil.verticalScale(0.8)),
+
                           Text(
-                            "Week ${monthProvider?.overviewCurrentWeek}, Day ${monthProvider?.overviewCurrentDay}",
+                            "${ModalRoute.of(context)?.settings.arguments as String?}",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: ScreenUtil.verticalScale(3),
+                              fontWeight: FontWeight.bold,
+                              fontSize: ScreenUtil.horizontalScale(6),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -927,21 +938,23 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                           CrossAxisAlignment.center,
                                       children: [
                                         const Text(
-                                          'Average RIR',
+                                          'Streak Achieved',
                                           style: TextStyle(
                                               color: Colors.black54,
                                               fontSize: 16.5),
                                         ),
                                         const SizedBox(height: 10),
-                                        Text(
-                                          averageRIR == 0
-                                              ? "0"
-                                              : averageRIR.toStringAsFixed(2),
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                              color: Color(0xFFDD1166),
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w500),
+                                        Consumer<MonthProvider>(
+                                          builder: (context, value, c) {
+                                            return Text(
+                                              "${value.streak}",
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                  color: Color(0xFFDD1166),
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w500),
+                                            );
+                                          },
                                         )
                                       ],
                                     ),

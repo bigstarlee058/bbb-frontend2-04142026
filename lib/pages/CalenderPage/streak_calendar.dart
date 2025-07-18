@@ -12,9 +12,11 @@ import 'package:bbb/pages/CalenderPage/calender.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,11 +33,13 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
   MonthProvider? monthProvider;
   late MainPageProvider mainPageProvider;
   DataProvider? dataProvider;
+  UserDataProvider? userDataProvider;
 
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
+    userDataProvider = Provider.of<UserDataProvider>(context, listen: false);
 
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     super.initState();
@@ -59,12 +63,16 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                 Positioned(
                   top: 0,
                   child: FittedBox(
-                    child: Utils.appImage(
-                      media,
-                      // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
-                      image:
-                          dataProvider!.cachedImageMap["imageStreakCalendar"],
-                      imageKey: "imageStreakCalendar",
+                    child: AppImage.imageStreakCalendar(
+                      // media,
+                      // image: dataProvider!.allImageList
+                      //     .where((element) =>
+                      //         element["key"] == "imageStreakCalendar")
+                      //     .first["image"],
+                      // // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
+                      // // image:
+                      // //     dataProvider!.cachedImageMap["imageStreakCalendar"],
+                      // imageKey: "imageStreakCalendar",
                       child: SafeArea(
                         child: SizedBox(
                           height: media.height / 1.8,
@@ -257,7 +265,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             SizedBox(
                               height: ScreenUtil.verticalScale(2),
                             ),
-                            const CustomCalendarWidget(),
+                            CustomCalendarWidget(
+                                userDataProvider: userDataProvider!),
                             Container(
                               margin: EdgeInsets.symmetric(
                                 vertical: 18.0, //

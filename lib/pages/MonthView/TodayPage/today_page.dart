@@ -8,12 +8,14 @@ import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/custom_slide_to_act.dart';
-import 'package:bbb/components/expansion_panel.dart';
+import 'package:bbb/custom/custom_slide_to_act.dart';
+import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
 import 'package:bbb/components/select_dropdown.dart';
 import 'package:bbb/localstorage/month_database.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
+import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/excersie_detail_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_exercise_model.dart';
@@ -31,12 +33,13 @@ import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
 import 'package:provider/provider.dart';
-
+import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../models/MonthResponseModel/all_exercise_model.dart';
 
 class TodayPage extends StatefulWidget {
@@ -62,27 +65,85 @@ class _TodayPageState extends State<TodayPage>
   MainPageProvider? mainPageProvider;
   bool loader = false;
   final GlobalKey<CustomSlideActionState> key = GlobalKey();
-
+  ScrollController scrollController = ScrollController();
   bool isInit = true;
 
   bool isEditMode = false;
+
+  void scrollToTop() {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void onWorkoutStart() async {
+    final raw3 =
+        await preferences.getBool(SharedPreference.isScreenAwake) ?? false;
+    if (raw3) {
+      await WakelockPlus.enable();
+    } else {
+      await WakelockPlus.disable();
+    }
+  }
 
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
-
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onWorkoutStart();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollProvider?.updateOffSet2(0.0);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToTop();
+    });
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) async => await initData());
     super.initState();
   }
 
+  List<ExerciseDataModel> exerciseList = [];
+
+  fetchRealExerciseList() {
+    final monthId = preferences.getString(SharedPreference.monthId) ?? "";
+    final split = preferences.getString(SharedPreference.split) ?? "";
+    final rawTempData = preferences.getString("$split-$monthId");
+
+    if (rawTempData?.isNotEmpty == true) {
+      final monthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData!));
+      final dayIndex = monthProvider!.overviewCurrentDay;
+
+      int nextWorkOutIndex = monthProvider!
+              .weekDataModel!.dayList![dayIndex - 1]
+              .toString()
+              .contains("Workout")
+          ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1]
+                  .toString()
+                  .replaceAll("Day ", "")
+                  .replaceAll(" Workout", "")) -
+              1
+          : 0;
+
+      exerciseList = monthDataModel
+              .weeks?[monthProvider!.overviewCurrentWeek - 1]
+              .days?[nextWorkOutIndex]
+              .exercises ??
+          [];
+    }
+  }
+
   Future<void> initData() async {
     mainPageProvider?.changeTab(1);
-
+    await fetchRealExerciseList();
     final dayIndex = monthProvider!.overviewCurrentDay;
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.fetchDayStatusLocalData();
@@ -360,10 +421,14 @@ class _TodayPageState extends State<TodayPage>
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (monthProvider?.isCurrentMonth != "Future") {
-        monthProvider?.fetchAllDayStatusLocalData();
-        monthProvider?.checkForPumpDay();
+        await monthProvider?.fetchAllDayStatusLocalData();
+        await monthProvider?.checkForPumpDay();
       }
+      await WakelockPlus.disable();
     });
+    WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) => scrollProvider?.updateOffSet2(0.0));
+
     super.dispose();
   }
 
@@ -372,7 +437,6 @@ class _TodayPageState extends State<TodayPage>
     var media = MediaQuery.of(context).size;
     context.watch<MainPageProvider>();
     ScreenUtil.init(context);
-
     return NotificationListener(
       onNotification: (ScrollNotification notification) {
         if (notification.metrics.axis == Axis.vertical) {
@@ -395,11 +459,14 @@ class _TodayPageState extends State<TodayPage>
               backgroundColor: Colors.white,
               body: Stack(
                 children: [
-                  Utils.appImage(
-                    media,
-                    image: dataProvider!.cachedImageMap["imageToday"],
-                    imageKey: "imageToday",
-                  ),
+                  AppImage.imageToday(
+                      // media,
+                      // image: dataProvider!.allImageList
+                      //     .where((element) => element["key"] == "imageToday")
+                      //     .first["image"],
+                      // // image: dataProvider!.cachedImageMap["imageToday"],
+                      // imageKey: "imageToday",
+                      ),
                   SizedBox(
                     height: media.height,
                     child: SingleChildScrollView(
@@ -552,11 +619,12 @@ class _TodayPageState extends State<TodayPage>
                                     children: [
                                       monthProvider!.isPumpDay ||
                                               monthProvider!.isCircuit
-                                          ? SizedBox()
+                                          ? PumpVideoSlider(
+                                              pumpDayModel:
+                                                  monthProvider!.pumpDayModel!)
                                           : VideoSlider(
                                               dayDataModel:
-                                                  monthProvider!.dayDataModel!,
-                                            ),
+                                                  monthProvider!.dayDataModel!),
                                       isEditMode
                                           ? Container(
                                               margin: EdgeInsets.symmetric(
@@ -740,6 +808,15 @@ class _TodayPageState extends State<TodayPage>
                                                                           3)),
                                                               child:
                                                                   WorkoutCard(
+                                                                exerciseList: exerciseList
+                                                                    .where((element) =>
+                                                                        element.typeId ==
+                                                                            exercises[i]
+                                                                                .typeId &&
+                                                                        (element.formats ??
+                                                                                [])
+                                                                            .contains(monthProvider!.equipmentType))
+                                                                    .toList(),
                                                                 isEditMode:
                                                                     isEditMode,
                                                                 image: exercises[
@@ -809,7 +886,8 @@ class _TodayPageState extends State<TodayPage>
                                                                   await swipeExerciseDialog(
                                                                       i,
                                                                       exercises[
-                                                                          i]);
+                                                                          i],
+                                                                      exercises);
                                                                 },
                                                                 exercise:
                                                                     exercises[
@@ -948,7 +1026,8 @@ class _TodayPageState extends State<TodayPage>
                                                 margin: EdgeInsets.symmetric(
                                                     horizontal: ScreenUtil
                                                         .horizontalScale(6),
-                                                    vertical: 20),
+                                                    vertical:
+                                                        media.height * 0.04),
                                                 width: media.width * 0.75,
                                                 color: Colors.black12,
                                               ),
@@ -1176,8 +1255,9 @@ class _TodayPageState extends State<TodayPage>
                                                                           : () async {
                                                                               HapticFeedBack.buttonClick();
                                                                               await _saveDayData(status: Status.skipped, type: monthProvider!.isPumpDay ? "Pump Day - ${monthProvider?.pumpDayModel?.id}" : "Workout Day", status1: Status.completed);
-                                                                              if (!context.mounted)
+                                                                              if (!context.mounted) {
                                                                                 return;
+                                                                              }
                                                                               value.updateCurrentDayTitleId(value.weekDataModel?.idList![value.overviewCurrentDay - 1]);
                                                                               Navigator.pushNamed(context, '/dayCompleted', arguments: currentDayTitle);
                                                                             },
@@ -1250,33 +1330,38 @@ class _TodayPageState extends State<TodayPage>
                   ),
                   Consumer<ScrollProvider>(
                     builder: (context, scrollValue, child) {
-                      double blurValue = (scrollValue.scrollOffset2 /
-                                  ScreenUtil.verticalScale(35))
-                              .clamp(0, 1) *
-                          5;
-                      double targetHeight = ScreenUtil.verticalScale(4.5);
+                      final scrollRatio = (scrollValue.scrollOffset2 /
+                              ScreenUtil.verticalScale(35))
+                          .clamp(0.0, 1.0);
+
+                      final minHeight = ScreenUtil.verticalScale(3.15);
+                      final maxHeight = ScreenUtil.verticalScale(5);
+                      final dynamicHeight =
+                          maxHeight - (maxHeight - minHeight) * scrollRatio;
+
+                      final blurValue = scrollRatio * 5;
+                      final opacityValue = scrollRatio * 0.7;
+                      final topPadding = MediaQuery.of(context).padding.top *
+                          (Platform.isIOS ? .8 : 1);
 
                       return ClipRRect(
                         child: BackdropFilter(
                           filter: ImageFilter.blur(
                               sigmaX: blurValue, sigmaY: blurValue),
                           child: Container(
-                            color: Colors.black.withOpacity(
-                                (scrollValue.scrollOffset2 /
-                                            ScreenUtil.verticalScale(35))
-                                        .clamp(0, 1) *
-                                    0.7),
-                            height: targetHeight +
-                                MediaQuery.of(context).padding.top,
+                            padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).padding.top *
+                                    (Platform.isIOS ? .08 : .1)),
+                            color: Colors.black.withValues(alpha: opacityValue),
+                            height: dynamicHeight + topPadding,
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: MediaQuery.of(context).padding.top),
+                              padding: EdgeInsets.only(top: topPadding),
                               child: AnimatedContainer(
-                                duration: Duration(milliseconds: 300),
-                                height: targetHeight,
+                                duration: const Duration(milliseconds: 300),
+                                height: dynamicHeight,
                                 width: media.width,
-                                decoration:
-                                    BoxDecoration(color: Colors.transparent),
+                                decoration: const BoxDecoration(
+                                    color: Colors.transparent),
                                 child: Align(
                                   alignment: Alignment.bottomCenter,
                                   child: Row(
@@ -1286,7 +1371,7 @@ class _TodayPageState extends State<TodayPage>
                                       Align(
                                         alignment: Alignment.centerLeft,
                                         child: BackArrowWidget(
-                                          bigSize: 4.8,
+                                          bigSize: 5.3,
                                           position: scrollValue.scrollOffset2,
                                           onPress: () {
                                             Navigator.pop(context);
@@ -1299,34 +1384,35 @@ class _TodayPageState extends State<TodayPage>
                                               isCurrentDaySkipped ||
                                               monthProvider!.isCircuit ||
                                               monthProvider!.isPumpDay
-                                          ? SizedBox()
+                                          ? const SizedBox()
                                           : Row(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                AnimatedContainer(
-                                                  duration: Duration(
-                                                      milliseconds: 500),
-                                                  margin: EdgeInsets.only(
-                                                    left: ScreenUtil
-                                                        .horizontalScale(1.5),
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: (scrollValue
-                                                                .scrollOffset2) >
-                                                            25
-                                                        ? Colors.transparent
-                                                        : Color(0XFFd18a9b),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: SizedBox(
-                                                    width: ScreenUtil
-                                                        .verticalScale(4.4),
-                                                    height: ScreenUtil
-                                                        .verticalScale(4.4),
-                                                    child: Center(
-                                                      child: GestureDetector(
-                                                        onTap: toggleEditMode,
+                                                GestureDetector(
+                                                  onTap: toggleEditMode,
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(
+                                                        milliseconds: 500),
+                                                    margin: EdgeInsets.only(
+                                                      left: ScreenUtil
+                                                          .horizontalScale(1.5),
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: scrollValue
+                                                                  .scrollOffset2 >
+                                                              25
+                                                          ? Colors.transparent
+                                                          : const Color(
+                                                              0XFFd18a9b),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: SizedBox(
+                                                      width: ScreenUtil
+                                                          .verticalScale(5.3),
+                                                      height: ScreenUtil
+                                                          .verticalScale(5.3),
+                                                      child: Center(
                                                         child: isEditMode
                                                             ? Image.asset(
                                                                 "assets/icons/Group 2693 (1).png",
@@ -1334,53 +1420,41 @@ class _TodayPageState extends State<TodayPage>
                                                                     .white,
                                                                 height: ScreenUtil
                                                                     .verticalScale(
-                                                                        2))
+                                                                        2),
+                                                              )
                                                             : Icon(
-                                                                isEditMode
-                                                                    ? Icons
-                                                                        .close
-                                                                    : Icons
-                                                                        .edit,
+                                                                Icons.edit,
                                                                 color: Colors
                                                                     .white,
                                                                 size: ScreenUtil
                                                                     .verticalScale(
-                                                                        2.2),
-                                                                // size: ScreenUtil
-                                                                //     .verticalScale(
-                                                                //         isEditMode
-                                                                //             ? 2.5
-                                                                //             : 2),
+                                                                        2),
                                                               ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                                isEditMode
-                                                    ? Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 10),
-                                                        child: Text(
-                                                          "Edit Mode",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: ScreenUtil
-                                                                  .verticalScale(
-                                                                      2),
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600),
-                                                        ),
-                                                      )
-                                                    : SizedBox()
+                                                if (isEditMode)
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10),
+                                                    child: Text(
+                                                      "Edit Mode",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil
+                                                            .verticalScale(2),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  )
                                               ],
                                             ),
-                                      Spacer(),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
+                                      const Spacer(),
+                                      const Padding(
+                                        padding: EdgeInsets.only(right: 10),
                                         child: CommonStreakWithNotification(
                                             routeString: "today"),
                                       ),
@@ -1564,6 +1638,10 @@ class _TodayPageState extends State<TodayPage>
 
   Future<void> onSwipe(MonthProvider value) async {
     HapticFeedBack.buttonClick();
+
+    NotificationService.clearNotification(10);
+
+    await value.setShowTimerIndex(-1, -1, -1);
     await _saveDayData(
         status: Status.skipped,
         type: monthProvider!.isPumpDay
@@ -1588,7 +1666,7 @@ class _TodayPageState extends State<TodayPage>
         builder: (BuildContext context) {
           var media = MediaQuery.of(context).size;
           int? selectExerciseSwapIndex;
-          int itemsPerPage = 5;
+          int itemsPerPage = 4;
           int currentPageAll = 0;
 
           return StatefulBuilder(
@@ -1618,7 +1696,7 @@ class _TodayPageState extends State<TodayPage>
                             width: ScreenUtil.horizontalScale(96),
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
-                                maxHeight: ScreenUtil.verticalScale(65),
+                                maxHeight: ScreenUtil.verticalScale(68),
                               ),
                               child: Builder(builder: (context) {
                                 List<Widget> buildExerciseList(
@@ -1936,15 +2014,18 @@ class _TodayPageState extends State<TodayPage>
                                                           .isNotEmpty) {
                                                         newDayExercise =
                                                             ExerciseDataModel(
-                                                          isAddedUpdated: true,
+                                                          newAddedExercise:
+                                                              true,
                                                           id: "",
                                                           exerciseId: monthProvider
                                                                   ?.allFilterExercises[
                                                                       selectExerciseSwapIndex!]
                                                                   .id ??
                                                               "",
-                                                          typeId: exercises[0]
-                                                                  .typeId ??
+                                                          typeId: (monthProvider
+                                                                      ?.allFilterExercises
+                                                                      .length ??
+                                                                  0) +
                                                               1,
                                                           name: monthProvider
                                                                   ?.allFilterExercises[
@@ -1966,9 +2047,11 @@ class _TodayPageState extends State<TodayPage>
                                                           weight: exercises[0]
                                                                   .weight ??
                                                               0,
-                                                          formats: exercises[0]
-                                                                  .formats ??
-                                                              [],
+                                                          formats: [
+                                                            monthProvider
+                                                                    ?.equipmentType ??
+                                                                "A"
+                                                          ],
                                                           thumbnail: monthProvider
                                                                   ?.allFilterExercises[
                                                                       selectExerciseSwapIndex!]
@@ -1981,14 +2064,19 @@ class _TodayPageState extends State<TodayPage>
                                                       } else {
                                                         newDayExercise =
                                                             ExerciseDataModel(
-                                                          isAddedUpdated: true,
+                                                          newAddedExercise:
+                                                              true,
                                                           id: "",
                                                           exerciseId: monthProvider
                                                                   ?.allFilterExercises[
                                                                       selectExerciseSwapIndex!]
                                                                   .id ??
                                                               "",
-                                                          typeId: 1,
+                                                          typeId: (monthProvider
+                                                                      ?.allFilterExercises
+                                                                      .length ??
+                                                                  0) +
+                                                              1,
                                                           name: monthProvider
                                                                   ?.allFilterExercises[
                                                                       selectExerciseSwapIndex!]
@@ -2005,9 +2093,9 @@ class _TodayPageState extends State<TodayPage>
                                                           rest: 3,
                                                           weight: 30,
                                                           formats: [
-                                                            "A",
-                                                            "B",
-                                                            "C"
+                                                            monthProvider
+                                                                    ?.equipmentType ??
+                                                                "A"
                                                           ],
                                                           extra: [
                                                             ExtraDataModel(
@@ -2101,8 +2189,9 @@ class _TodayPageState extends State<TodayPage>
                                                       await monthProvider
                                                           ?.fetchExtraAddedExerciseData();
                                                       setState(() {});
-                                                      if (!context.mounted)
+                                                      if (!context.mounted) {
                                                         return;
+                                                      }
                                                       Navigator.pop(context);
                                                     },
                                                     isLoading: false),
@@ -2127,9 +2216,11 @@ class _TodayPageState extends State<TodayPage>
     }
   }
 
-  Future<void> swipeExerciseDialog(int selectedIndex, dynamic exercise) async {
+  Future<void> swipeExerciseDialog(int selectedIndex, dynamic exercise,
+      List<ExerciseDataModel> exercises) async {
     monthProvider?.fetchAllExercise();
-    monthProvider?.fetchRelatedExercise(exercise.exerciseId ?? "");
+    monthProvider?.fetchRelatedExercise(exercise.exerciseId ?? "",
+        exercise.formats, exercises, exercise.typeId, exercise.name);
     searchQuery = "";
     if (mounted) {
       return showDialog(
@@ -2138,16 +2229,17 @@ class _TodayPageState extends State<TodayPage>
         builder: (BuildContext context) {
           var media = MediaQuery.of(context).size;
           int? selectRelatedExerciseSwapIndex;
+          int? selectSwapOptionExerciseIndex;
           int? selectExerciseSwapIndex;
-          int itemsPerPage = monthProvider!.relatedExercises.isEmpty
+          int itemsPerPage = monthProvider!.relatedExercises.isEmpty &&
+                  monthProvider!.swapOptionExercises.isEmpty
               ? 4
-              : monthProvider!.relatedExercises.length > 2
-                  ? 2
-                  : 3;
-          int itemsPerPageRelated = 2;
+              : 2;
+          int itemsPerPageRelated = 1;
+          // int itemsPerPageSwapOption = 2;
           int currentPageRelated = 0;
           int currentPageAll = 0;
-
+          // int currentPageSwapOption = 0;
           return StatefulBuilder(
             builder: (context, setState) {
               return Dialog(
@@ -2173,7 +2265,7 @@ class _TodayPageState extends State<TodayPage>
                           width: ScreenUtil.horizontalScale(96),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
-                              maxHeight: ScreenUtil.verticalScale(70),
+                              maxHeight: ScreenUtil.verticalScale(85),
                             ),
                             child: Builder(builder: (context) {
                               List<Widget> buildExerciseList(
@@ -2192,6 +2284,7 @@ class _TodayPageState extends State<TodayPage>
                                       onTap: () {
                                         setState(() {
                                           selectRelatedExerciseSwapIndex = null;
+                                          selectSwapOptionExerciseIndex = null;
                                           selectExerciseSwapIndex = i;
                                         });
                                       },
@@ -2343,6 +2436,7 @@ class _TodayPageState extends State<TodayPage>
                                       onTap: () {
                                         setState(() {
                                           selectExerciseSwapIndex = null;
+                                          selectSwapOptionExerciseIndex = null;
 
                                           selectRelatedExerciseSwapIndex = i;
                                         });
@@ -2479,24 +2573,257 @@ class _TodayPageState extends State<TodayPage>
                                 );
                               }
 
-                              monthProvider!.allFilterExercises.removeWhere(
-                                  (element) =>
-                                      monthProvider!.addedExerciseList.any(
-                                          (ele) =>
-                                              ele.exerciseId == element.id) ||
-                                      exercises.any((ele) =>
-                                          ele.exerciseId == element.id));
+                              List<Widget> buildSwapOptionExerciseList(
+                                  List<ExerciseDataModel>
+                                      exercises /*,
+                                  int currentPage*/
+                                  ) {
+                                // int startIndex =
+                                //     currentPage * itemsPerPageSwapOption;
+                                // int endIndex =
+                                //     (startIndex + itemsPerPageSwapOption) >
+                                //             exercises.length
+                                //         ? exercises.length
+                                //         : startIndex + itemsPerPageSwapOption;
 
-                              monthProvider!.relatedExercises.removeWhere(
-                                  (element) =>
-                                      monthProvider!.swapExerciseList.any(
-                                          (ele) =>
-                                              ele.exerciseId == element.sId) ||
-                                      monthProvider!.addedExerciseList.any(
-                                          (ele) =>
-                                              ele.exerciseId == element.sId) ||
-                                      exercises.any((ele) =>
-                                          ele.exerciseId == element.sId));
+                                return [
+                                  for (int i = 0;
+                                      i < exercises.length;
+                                      i++) ...[
+                                    (exercises[i].formats ?? []).isEmpty
+                                        ? SizedBox()
+                                        : GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectExerciseSwapIndex = null;
+                                                selectRelatedExerciseSwapIndex =
+                                                    null;
+
+                                                selectSwapOptionExerciseIndex =
+                                                    i;
+                                              });
+                                            },
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                    width: ScreenUtil
+                                                        .horizontalScale(5)),
+                                                Expanded(
+                                                  child: Row(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        backgroundColor:
+                                                            AppColors
+                                                                .primaryColor,
+                                                        radius: ScreenUtil
+                                                            .verticalScale(2),
+                                                        child: Text(
+                                                          exercises[i]
+                                                              .formats!
+                                                              .first,
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: ScreenUtil
+                                                                .verticalScale(
+                                                                    2.5),
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      // appShimmerImage(
+                                                      //   width: ScreenUtil
+                                                      //       .horizontalScale(10),
+                                                      //   height: ScreenUtil
+                                                      //       .horizontalScale(10),
+                                                      //   networkImageUrl:
+                                                      //       exercises[i].thumbnail ??
+                                                      //           "unknown",
+                                                      //   fit: BoxFit.cover,
+                                                      //   borderRadius:
+                                                      //       BorderRadius.all(
+                                                      //     Radius.circular(ScreenUtil
+                                                      //         .horizontalScale(1)),
+                                                      //   ),
+                                                      // ),
+                                                      SizedBox(
+                                                          width: ScreenUtil
+                                                              .horizontalScale(
+                                                                  4)),
+                                                      Flexible(
+                                                          child: Text(
+                                                        exercises[i].name ?? "",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: ScreenUtil
+                                                              .verticalScale(2),
+                                                        ),
+                                                      )),
+                                                      SizedBox(
+                                                          width: ScreenUtil
+                                                              .horizontalScale(
+                                                                  2)),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding: EdgeInsets.all(
+                                                    ScreenUtil.verticalScale(1),
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                      width: 2,
+                                                    ),
+                                                    color:
+                                                        selectSwapOptionExerciseIndex ==
+                                                                i
+                                                            ? AppColors
+                                                                .primaryColor
+                                                            : Colors.white,
+                                                  ),
+                                                  child:
+                                                      selectSwapOptionExerciseIndex ==
+                                                              i
+                                                          ? Icon(
+                                                              Icons.check,
+                                                              size: ScreenUtil
+                                                                  .verticalScale(
+                                                                      2),
+                                                              color:
+                                                                  Colors.white,
+                                                            )
+                                                          : Icon(
+                                                              null,
+                                                              size: ScreenUtil
+                                                                  .verticalScale(
+                                                                      2),
+                                                            ),
+                                                ),
+                                                SizedBox(
+                                                    width: ScreenUtil
+                                                        .horizontalScale(5)),
+                                              ],
+                                            ),
+                                          ),
+                                    const SizedBox(height: 10),
+                                  ],
+                                ];
+                              }
+
+                              // Widget buildPaginationControlsSwapOption(
+                              //     int currentPage,
+                              //     int totalItems,
+                              //     Function(int) onPageChange) {
+                              //   int totalPages =
+                              //       (totalItems / itemsPerPageSwapOption)
+                              //           .ceil();
+                              //   return Padding(
+                              //     padding: EdgeInsets.symmetric(
+                              //         horizontal: ScreenUtil.horizontalScale(
+                              //             8)), // Add horizontal padding here
+                              //     child: Row(
+                              //       mainAxisAlignment:
+                              //           MainAxisAlignment.spaceBetween,
+                              //       children: [
+                              //         IconButton(
+                              //           onPressed: currentPage > 0
+                              //               ? () => onPageChange(0)
+                              //               : null,
+                              //           icon: const Icon(Icons.first_page),
+                              //         ),
+                              //         IconButton(
+                              //           onPressed: currentPage > 0
+                              //               ? () =>
+                              //                   onPageChange(currentPage - 1)
+                              //               : null,
+                              //           icon: const Icon(Icons.arrow_back),
+                              //         ),
+                              //         Text(
+                              //             'Page ${currentPage + 1} of $totalPages'),
+                              //         IconButton(
+                              //           onPressed: (currentPage + 1) <
+                              //                   totalPages
+                              //               ? () =>
+                              //                   onPageChange(currentPage + 1)
+                              //               : null,
+                              //           icon: const Icon(Icons.arrow_forward),
+                              //         ),
+                              //         IconButton(
+                              //           onPressed: (currentPage + 1) <
+                              //                   totalPages
+                              //               ? () => onPageChange(totalPages - 1)
+                              //               : null,
+                              //           icon: const Icon(Icons.last_page),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   );
+                              // }
+
+                              if (exercises.isNotEmpty) {
+                                monthProvider!.allFilterExercises.removeWhere(
+                                    (element) => exercises.any(
+                                        (ele) => ele.exerciseId == element.id));
+
+                                monthProvider!.relatedExercises.removeWhere(
+                                    (element) => exercises.any((ele) =>
+                                        ele.exerciseId == element.sId));
+                                monthProvider!.swapOptionExercises.removeWhere(
+                                    (element) => exercises.any((ele) {
+                                          return ele.exerciseId ==
+                                                      element.exerciseId &&
+                                                  ((element.formats ?? [])
+                                                      .contains(monthProvider
+                                                          ?.equipmentType)) ||
+                                              element.formats!.isEmpty;
+                                        }));
+                              }
+                              if (monthProvider!.addedExerciseList.isNotEmpty) {
+                                monthProvider!.allFilterExercises.removeWhere(
+                                    (element) => monthProvider!
+                                        .addedExerciseList
+                                        .any((ele) =>
+                                            ele.exerciseId == element.id));
+                                monthProvider!.relatedExercises.removeWhere(
+                                    (element) => monthProvider!
+                                        .addedExerciseList
+                                        .any((ele) =>
+                                            ele.exerciseId == element.sId));
+
+                                monthProvider!.swapOptionExercises.removeWhere(
+                                    (element) => monthProvider!
+                                        .addedExerciseList
+                                        .any((ele) =>
+                                            ele.exerciseId ==
+                                                    element.exerciseId &&
+                                                ((element.formats ?? [])
+                                                    .contains(monthProvider
+                                                        ?.equipmentType)) ||
+                                            element.formats!.isEmpty));
+                              }
+
+                              if (monthProvider!.swapExerciseList.isNotEmpty) {
+                                monthProvider!.allFilterExercises.removeWhere(
+                                    (element) => monthProvider!.swapExerciseList
+                                        .any((ele) =>
+                                            ele.exerciseId == element.id));
+                                monthProvider!.relatedExercises.removeWhere(
+                                    (element) => monthProvider!.swapExerciseList
+                                        .any((ele) =>
+                                            ele.exerciseId == element.sId));
+                                monthProvider!.swapOptionExercises.removeWhere(
+                                    (element) => monthProvider!.swapExerciseList
+                                        .any((ele) =>
+                                            ele.exerciseId ==
+                                                    element.exerciseId &&
+                                                ((element.formats ?? [])
+                                                    .contains(monthProvider
+                                                        ?.equipmentType)) ||
+                                            element.formats!.isEmpty));
+                              }
 
                               return AnimatedSize(
                                 duration: const Duration(milliseconds: 300),
@@ -2506,89 +2833,155 @@ class _TodayPageState extends State<TodayPage>
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Container(
-                                        width: media.width,
-                                        padding: const EdgeInsets.symmetric(
-                                                horizontal: 24)
-                                            .copyWith(top: 20, bottom: 8),
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            'Swap exercise option',
-                                            style: TextStyle(
-                                              fontSize:
-                                                  ScreenUtil.horizontalScale(
-                                                      5.5),
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryColor,
+                                      SizedBox(height: 20),
+                                      if (monthProvider!
+                                          .swapOptionExercises.isNotEmpty) ...[
+                                        Container(
+                                          width: media.width,
+                                          padding: const EdgeInsets.symmetric(
+                                                  horizontal: 24)
+                                              .copyWith(bottom: 8),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Swap Exercise',
+                                              style: TextStyle(
+                                                fontSize:
+                                                    ScreenUtil.horizontalScale(
+                                                        5.5),
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryColor,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      monthProvider!.relatedExercises.isNotEmpty
-                                          ? Column(
-                                              children: [
-                                                ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                    maxHeight: ScreenUtil
-                                                        .verticalScale(60),
+                                        Column(
+                                          children: [
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxHeight:
+                                                    ScreenUtil.verticalScale(
+                                                        60),
+                                              ),
+                                              child: SingleChildScrollView(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Builder(
+                                                    builder: (context) {
+                                                      final seenIds =
+                                                          <String>{};
+                                                      final filteredList =
+                                                          monthProvider!
+                                                              .swapOptionExercises
+                                                              .where((item) {
+                                                        return seenIds.add(
+                                                            item.exerciseId!);
+                                                      }).toList();
+                                                      return Column(
+                                                        children: [
+                                                          Column(
+                                                            children:
+                                                                buildSwapOptionExerciseList(
+                                                              filteredList, /*currentPageSwapOption*/
+                                                            ),
+                                                          ),
+                                                          // buildPaginationControlsSwapOption(
+                                                          //   currentPageSwapOption,
+                                                          //   monthProvider!
+                                                          //       .swapOptionExercises
+                                                          //       .length,
+                                                          //   (page) {
+                                                          //     setState(() {
+                                                          //       currentPageSwapOption =
+                                                          //           page;
+                                                          //     });
+                                                          //   },
+                                                          // ),
+                                                        ],
+                                                      );
+                                                    },
                                                   ),
-                                                  child: SingleChildScrollView(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Builder(
-                                                        builder: (context) {
-                                                          final seenIds =
-                                                              <String>{};
-                                                          final filteredList =
-                                                              monthProvider!
-                                                                  .relatedExercises
-                                                                  .where(
-                                                                      (item) {
-                                                            return seenIds
-                                                                .add(item.sId!);
-                                                          }).toList();
-                                                          return Column(
-                                                            children: [
-                                                              Column(
-                                                                children: buildRelatedExerciseList(
-                                                                    filteredList,
-                                                                    currentPageRelated),
-                                                              ),
-                                                              buildPaginationControlsRelatedExercise(
-                                                                currentPageRelated,
-                                                                monthProvider!
-                                                                    .relatedExercises
-                                                                    .length,
-                                                                (page) {
-                                                                  setState(() {
-                                                                    currentPageRelated =
-                                                                        page;
-                                                                  });
-                                                                },
-                                                              ),
-                                                            ],
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          : const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    top: 12, bottom: 18),
-                                                child: Text(
-                                                  "No exercise available!",
-                                                  style:
-                                                      TextStyle(fontSize: 17),
                                                 ),
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                      ],
+                                      if (monthProvider!
+                                          .relatedExercises.isNotEmpty) ...[
+                                        Container(
+                                          width: media.width,
+                                          padding: const EdgeInsets.symmetric(
+                                                  horizontal: 24)
+                                              .copyWith(bottom: 8),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Related Exercises',
+                                              style: TextStyle(
+                                                fontSize:
+                                                    ScreenUtil.horizontalScale(
+                                                        5.5),
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Column(
+                                          children: [
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxHeight:
+                                                    ScreenUtil.verticalScale(
+                                                        60),
+                                              ),
+                                              child: SingleChildScrollView(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Builder(
+                                                    builder: (context) {
+                                                      final seenIds =
+                                                          <String>{};
+                                                      final filteredList =
+                                                          monthProvider!
+                                                              .relatedExercises
+                                                              .where((item) {
+                                                        return seenIds
+                                                            .add(item.sId!);
+                                                      }).toList();
+                                                      return Column(
+                                                        children: [
+                                                          Column(
+                                                            children:
+                                                                buildRelatedExerciseList(
+                                                                    filteredList,
+                                                                    currentPageRelated),
+                                                          ),
+                                                          buildPaginationControlsRelatedExercise(
+                                                            currentPageRelated,
+                                                            monthProvider!
+                                                                .relatedExercises
+                                                                .length,
+                                                            (page) {
+                                                              setState(() {
+                                                                currentPageRelated =
+                                                                    page;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                       Container(
                                         width: media.width,
                                         padding: const EdgeInsets.only(
@@ -2596,7 +2989,9 @@ class _TodayPageState extends State<TodayPage>
                                         child: Align(
                                           alignment: Alignment.center,
                                           child: Text(
-                                            'Or search our library',
+                                            itemsPerPage == 4
+                                                ? "Search from our library"
+                                                : 'Or search from our library',
                                             style: TextStyle(
                                                 fontSize:
                                                     ScreenUtil.horizontalScale(
@@ -2704,169 +3099,16 @@ class _TodayPageState extends State<TodayPage>
                                                   text: "Confirm",
                                                   textColor: Colors.white,
                                                   color: AppColors.primaryColor,
-                                                  onPress: () async {
-                                                    RelatedExercises?
-                                                        relatedExerciseData;
-                                                    Exercise? exerciseDataModel;
-
-                                                    if (selectRelatedExerciseSwapIndex ==
-                                                        null) {
-                                                      exerciseDataModel = monthProvider!
-                                                              .allFilterExercises[
-                                                          selectExerciseSwapIndex!];
-                                                    } else {
-                                                      relatedExerciseData =
-                                                          monthProvider!
-                                                                  .relatedExercises[
-                                                              selectRelatedExerciseSwapIndex!];
-                                                    }
-
-                                                    ExerciseDataModel
-                                                        newDayExercise =
-                                                        ExerciseDataModel(
-                                                      isAddedUpdated: true,
-                                                      id: "",
-                                                      exerciseId:
-                                                          exerciseDataModel
-                                                                  ?.id ??
-                                                              relatedExerciseData
-                                                                  ?.sId ??
-                                                              "",
-                                                      typeId: exercises[
-                                                                  selectedIndex]
-                                                              .typeId ??
-                                                          1,
-                                                      thumbnail:
-                                                          exerciseDataModel
-                                                                  ?.thumbnail ??
-                                                              relatedExerciseData
-                                                                  ?.thumbnail ??
-                                                              "unknown",
-                                                      name: exerciseDataModel
-                                                              ?.title ??
-                                                          relatedExerciseData
-                                                              ?.title ??
-                                                          "Exercise ${exercises.length + 1}",
-                                                      guide: exercises[
-                                                                  selectedIndex]
-                                                              .guide ??
-                                                          "",
-                                                      sets: exercises[
-                                                                  selectedIndex]
-                                                              .sets ??
-                                                          0,
-                                                      reps: exercises[
-                                                                  selectedIndex]
-                                                              .reps ??
-                                                          0,
-                                                      rest: exercises[
-                                                                  selectedIndex]
-                                                              .rest ??
-                                                          0,
-                                                      weight: exercises[
-                                                                  selectedIndex]
-                                                              .weight ??
-                                                          0,
-                                                      formats: exercises[
-                                                                  selectedIndex]
-                                                              .formats ??
-                                                          [],
-                                                      extra: exercises[
-                                                                  selectedIndex]
-                                                              .extra ??
-                                                          [],
-                                                    );
-
-                                                    String split = monthProvider
-                                                            ?.monthDataModel
-                                                            ?.weeks?[monthProvider!
-                                                                    .overviewCurrentWeek -
-                                                                1]
-                                                            .idList
-                                                            ?.first
-                                                            .toString()
-                                                            .split(" ")[1] ??
-                                                        "";
-
-                                                    String dataId =
-                                                        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseDataModel?.id ?? relatedExerciseData?.sId ?? ""}";
-
-                                                    Map<String, dynamic> data =
-                                                        {
-                                                      "dataId": dataId,
-                                                      "split": split,
-                                                      "monthId": monthProvider
-                                                          ?.monthDataModel?.id,
-                                                      "weekId": monthProvider
-                                                          ?.weekDataModel?.id,
-                                                      "dayId": monthProvider
-                                                          ?.weekDataModel
-                                                          ?.idList![monthProvider!
-                                                              .overviewCurrentDay -
-                                                          1],
-                                                      "date":
-                                                          "${DateTime.now().toUtc()}",
-                                                      "exerciseId":
-                                                          exerciseDataModel
-                                                                  ?.id ??
-                                                              relatedExerciseData
-                                                                  ?.sId ??
-                                                              "",
-                                                      "exerciseJson":
-                                                          jsonEncode(
-                                                              newDayExercise),
-                                                      "insertIndex":
-                                                          selectedIndex
-                                                              .toString()
-                                                    };
-
-                                                    RemovedExerciseModel
-                                                        removedDataExit =
-                                                        removedExercise
-                                                            .firstWhere(
-                                                      (element) =>
-                                                          element.dataId ==
-                                                          dataId,
-                                                      orElse: () =>
-                                                          RemovedExerciseModel(),
-                                                    );
-
-                                                    if (removedDataExit.id !=
-                                                        null) {
-                                                      ApiRepo.deleteRemovedExercise(
-                                                          dataId:
-                                                              removedDataExit
-                                                                      .dataId ??
-                                                                  "");
-                                                      await DatabaseHelper()
-                                                          .deleteSingleData(
-                                                              tableName:
-                                                                  DatabaseHelper
-                                                                      .removedExerciseHistory,
-                                                              id: removedDataExit
-                                                                  .dataId!);
-                                                    }
-                                                    exercises.removeAt(
-                                                        selectedIndex);
-                                                    exercises.insert(
-                                                        selectedIndex,
-                                                        newDayExercise);
-                                                    ApiRepo.addSwapExercise(
-                                                        body: data);
-                                                    await DatabaseHelper().insertData(
-                                                        tableName: DatabaseHelper
-                                                            .swapExerciseHistory,
-                                                        data: data);
-                                                    await monthProvider
-                                                        ?.fetchSwapExerciseData();
-                                                    await removeExercise(
-                                                        exercise.exerciseId ??
-                                                            "");
-                                                    setState(() {});
-                                                    if (!context.mounted)
-                                                      return;
-                                                    Navigator.pop(context);
-                                                  },
+                                                  onPress: () async =>
+                                                      await onSwapExercise(
+                                                          selectExerciseSwapIndex,
+                                                          selectRelatedExerciseSwapIndex,
+                                                          selectSwapOptionExerciseIndex,
+                                                          exercises,
+                                                          selectedIndex,
+                                                          exercise,
+                                                          setState,
+                                                          context),
                                                   isLoading: false),
                                             ),
                                           ],
@@ -2886,6 +3128,172 @@ class _TodayPageState extends State<TodayPage>
         },
       );
     }
+  }
+
+  Future<void> onSwapExercise(
+      int? selectExerciseSwapIndex,
+      int? selectRelatedExerciseSwapIndex,
+      int? selectSwapOptionExerciseIndex,
+      List<ExerciseDataModel> exercises,
+      int selectedIndex,
+      exercise,
+      StateSetter setState,
+      BuildContext context) async {
+    RelatedExercises? relatedExerciseData;
+    Exercise? exerciseDataModel;
+    ExerciseDataModel? swapOption;
+
+    if (selectExerciseSwapIndex != null) {
+      exerciseDataModel =
+          monthProvider!.allFilterExercises[selectExerciseSwapIndex];
+    } else if (selectRelatedExerciseSwapIndex != null) {
+      relatedExerciseData =
+          monthProvider!.relatedExercises[selectRelatedExerciseSwapIndex];
+    } else if (selectSwapOptionExerciseIndex != null) {
+      swapOption =
+          monthProvider!.swapOptionExercises[selectSwapOptionExerciseIndex];
+    }
+    String? exerciseId = selectSwapOptionExerciseIndex == null
+        ? (selectRelatedExerciseSwapIndex == null
+            ? exerciseDataModel?.id ?? ""
+            : relatedExerciseData?.sId)
+        : swapOption?.exerciseId ?? "";
+
+    ExerciseDataModel newDayExercise = ExerciseDataModel(
+      isAddedUpdated: true,
+      id: "",
+      exerciseId: exerciseId ?? "",
+      typeId: selectSwapOptionExerciseIndex == null
+          ? exercises[selectedIndex].typeId ?? 1
+          : swapOption?.typeId ?? 1,
+      thumbnail: selectSwapOptionExerciseIndex == null
+          ? (selectRelatedExerciseSwapIndex == null
+              ? exerciseDataModel?.thumbnail ?? ""
+              : relatedExerciseData?.thumbnail)
+          : swapOption?.thumbnail ?? "unknown",
+      name: selectSwapOptionExerciseIndex == null
+          ? (selectRelatedExerciseSwapIndex == null
+              ? exerciseDataModel?.title ?? ""
+              : relatedExerciseData?.title)
+          : swapOption?.name ?? "Exercise ${exercises.length + 1}",
+      guide: selectSwapOptionExerciseIndex == null
+          ? (selectRelatedExerciseSwapIndex == null
+              ? exerciseDataModel?.guide ?? ""
+              : relatedExerciseData?.guide)
+          : swapOption?.guide ?? "",
+      sets: selectSwapOptionExerciseIndex == null
+          ? exercises[selectedIndex].sets ?? 1
+          : swapOption?.sets ?? 1,
+      reps: selectSwapOptionExerciseIndex == null
+          ? exercises[selectedIndex].reps ?? 1
+          : swapOption?.reps ?? 1,
+      rest: selectSwapOptionExerciseIndex == null
+          ? exercises[selectedIndex].rest ?? 0
+          : swapOption?.rest ?? 0,
+      weight: selectSwapOptionExerciseIndex == null
+          ? exercises[selectedIndex].weight ?? 0
+          : swapOption?.weight ?? 0,
+      // formats: [
+      //   "${selectSwapOptionExerciseIndex == null ? exercises[selectedIndex].formats?.first ?? "A" : swapOption?.formats?.first ?? "A"}(OLD-${monthProvider?.equipmentType ?? "A"})"
+      // ],
+      formats: selectSwapOptionExerciseIndex == null
+          ? exercises[selectedIndex].formats ?? []
+          : swapOption?.formats ?? [],
+      extra: selectSwapOptionExerciseIndex == null
+          ? exercises[selectedIndex].extra ?? []
+          : swapOption?.extra ?? [],
+    );
+
+    // ExerciseDataModel newDayExercise = ExerciseDataModel(
+    //   isAddedUpdated: true,
+    //   id: "",
+    //   exerciseId: exerciseDataModel?.id ?? relatedExerciseData?.sId ?? "",
+    //   typeId: exercises[selectedIndex].typeId ?? 1,
+    //   thumbnail: exerciseDataModel?.thumbnail ??
+    //       relatedExerciseData?.thumbnail ??
+    //       "unknown",
+    //   name: exerciseDataModel?.title ??
+    //       relatedExerciseData?.title ??
+    //       "Exercise ${exercises.length + 1}",
+    //   guide: exercises[selectedIndex].guide ?? "",
+    //   sets: exercises[selectedIndex].sets ?? 0,
+    //   reps: exercises[selectedIndex].reps ?? 0,
+    //   rest: exercises[selectedIndex].rest ?? 0,
+    //   weight: exercises[selectedIndex].weight ?? 0,
+    //   formats: [monthProvider?.equipmentType ?? "A"],
+    //   extra: exercises[selectedIndex].extra ?? [],
+    // );
+
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
+
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}"; /*-${exerciseId ?? ""}*/
+
+    Map<String, dynamic> data = {
+      "dataId": dataId,
+      "split": split,
+      "monthId": monthProvider?.monthDataModel?.id,
+      "weekId": monthProvider?.weekDataModel?.id,
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "date": "${DateTime.now().toUtc()}",
+      "exerciseId": selectSwapOptionExerciseIndex == null
+          ? (selectRelatedExerciseSwapIndex == null
+              ? exerciseDataModel?.id ?? ""
+              : relatedExerciseData?.sId)
+          : swapOption?.exerciseId ?? "",
+      "exerciseJson": jsonEncode(newDayExercise),
+      "insertIndex": selectedIndex.toString()
+    };
+
+    RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => RemovedExerciseModel(),
+    );
+
+    if (removedDataExit.id != null) {
+      ApiRepo.deleteRemovedExercise(dataId: removedDataExit.dataId ?? "");
+      await DatabaseHelper().deleteSingleData(
+          tableName: DatabaseHelper.removedExerciseHistory,
+          id: removedDataExit.dataId!);
+    }
+    exercises.removeAt(selectedIndex);
+    exercises.insert(selectedIndex, newDayExercise);
+
+    SwapExerciseModel? matchingElement =
+        monthProvider?.swapExerciseList.firstWhere(
+      (element) => element.dataId == dataId,
+      orElse: () => SwapExerciseModel(),
+    );
+
+    if (matchingElement?.id != null) {
+      await ApiRepo.deleteSwapExercise(dataId: dataId).then(
+        (value) {
+          ApiRepo.addSwapExercise(body: data);
+        },
+      );
+
+      await DatabaseHelper().updateData(
+          tableName: DatabaseHelper.swapExerciseHistory,
+          data: data,
+          id: dataId);
+    } else {
+      ApiRepo.addSwapExercise(body: data);
+      await DatabaseHelper().insertData(
+          tableName: DatabaseHelper.swapExerciseHistory, data: data);
+    }
+
+    await monthProvider?.fetchSwapExerciseData();
+    await removeExercise(exercise.exerciseId ?? "");
+    setState(() {});
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.pop(context);
   }
 
   /// SAVE DATA INTO SQL
@@ -3681,301 +4089,349 @@ class _TodayPageState extends State<TodayPage>
         );
       },
       backgroundColor: Colors.transparent,
-      body: ListView.separated(
+      body: ListView.builder(
         itemCount: warmUps.length,
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3))
-            .copyWith(top: 20, bottom: 20),
-        separatorBuilder: (context, index) =>
-            SizedBox(height: ScreenUtil.verticalScale(3)),
+            .copyWith(bottom: ScreenUtil.verticalScale(3)),
+        // separatorBuilder: (context, index) =>
+        //     (warmUps[index].formats ?? []).contains(monthProvider.equipmentType)
+        //         ? SizedBox(height: ScreenUtil.verticalScale(3))
+        //         : SizedBox(),
         itemBuilder: (context, index) {
-          return Consumer<MonthProvider>(
-            builder: (context, monthProvider, child) {
-              String split = monthProvider
-                      .monthDataModel
-                      ?.weeks?[monthProvider.overviewCurrentWeek - 1]
-                      .idList
-                      ?.first
-                      .toString()
-                      .split(" ")[1] ??
-                  "";
+          return (warmUps[index].formats ?? [])
+                  .contains(monthProvider.equipmentType)
+              ? Padding(
+                  padding: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
+                  child: Consumer<MonthProvider>(
+                    builder: (context, monthProvider, child) {
+                      String split = monthProvider
+                              .monthDataModel
+                              ?.weeks?[monthProvider.overviewCurrentWeek - 1]
+                              .idList
+                              ?.first
+                              .toString()
+                              .split(" ")[1] ??
+                          "";
 
-              String warmUpDataId =
-                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${warmUps[index].warmupId ?? ""}";
+                      String warmUpDataId =
+                          "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${warmUps[index].warmupId ?? ""}";
 
-              bool isExist = (!monthProvider.exerciseHistoryModel
-                      .any((item) => item.dataId != warmUpDataId)) &&
-                  monthProvider.isPastWeek;
+                      bool isExist = (!monthProvider.exerciseHistoryModel
+                              .any((item) => item.dataId != warmUpDataId)) &&
+                          monthProvider.isPastWeek;
 
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(ScreenUtil.verticalScale(12)),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      spreadRadius: 1,
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (isEditMode) {
-                      return;
-                    } else {
-                      monthProvider.updateWarmUp(
-                          true, warmUps[index].warmupId ?? '');
-                      monthProvider.updateIsLastExercise(false);
-                      Navigator.pushNamed(context, '/exercise',
-                          arguments: "Exercise");
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    disabledBackgroundColor: const Color(0xFFF3F3F3),
-                    backgroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(ScreenUtil.verticalScale(12)),
-                      ),
-                      side: const BorderSide(
-                          color: Color(0x12000000), width: 0.5),
-                    ),
-                    surfaceTintColor: Colors.transparent,
-                    overlayColor: Colors.grey.shade400,
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: Container(
-                    width: media.width,
-                    padding:
-                        EdgeInsets.only(right: ScreenUtil.verticalScale(2)),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(ScreenUtil.verticalScale(12)),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Consumer<MonthProvider>(
-                            builder: (context, value, child) {
-                          return Row(
-                            children: [
-                              Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Positioned(
-                                    child: appShimmerImage(
-                                      height: media.width / 4,
-                                      width: media.width / 4,
-                                      networkImageUrl: "${warmUps[index].thumbnail}"
-                                              .startsWith(
-                                                  'https://storage.cloud.google.com/')
-                                          ? warmUps[index].thumbnail ??
-                                              "".replaceFirst(
-                                                  'https://storage.cloud.google.com/',
-                                                  'https://storage.googleapis.com/')
-                                          : warmUps[index].thumbnail ??
-                                              "unknown",
-                                      fit: BoxFit.cover,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(
-                                            ScreenUtil.verticalScale(12)),
-                                        bottomLeft: Radius.circular(
-                                            ScreenUtil.verticalScale(12)),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: media.width / 4,
-                                    width: media.width / 4,
-                                    decoration: monthProvider
-                                            .exerciseHistoryModel
-                                            .any((element) =>
-                                                element.dataId ==
-                                                    warmUpDataId &&
-                                                element.status ==
-                                                    Status.completed)
-                                        ? BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                const Color(0xFFAADDAA)
-                                                    .withValues(alpha: 0.8),
-                                                const Color(0xFFAADDAA)
-                                                    .withValues(alpha: 0.8),
-                                              ],
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(ScreenUtil.verticalScale(12)),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              spreadRadius: 1,
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (isEditMode) {
+                              return;
+                            } else {
+                              monthProvider.updateWarmUp(
+                                  true, warmUps[index].warmupId ?? '');
+                              monthProvider.updateIsLastExercise(false);
+                              Navigator.pushNamed(context, '/exercise',
+                                  arguments: "Exercise");
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            disabledBackgroundColor: const Color(0xFFF3F3F3),
+                            backgroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(ScreenUtil.verticalScale(12)),
+                              ),
+                              side: const BorderSide(
+                                  color: Color(0x12000000), width: 0.5),
+                            ),
+                            surfaceTintColor: Colors.transparent,
+                            overlayColor: Colors.grey.shade400,
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: Container(
+                            width: media.width,
+                            padding: EdgeInsets.only(
+                                right: ScreenUtil.verticalScale(2)),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(ScreenUtil.verticalScale(12)),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Consumer<MonthProvider>(
+                                    builder: (context, value, child) {
+                                  return Row(
+                                    children: [
+                                      Stack(
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          Positioned(
+                                            child: appShimmerImage(
+                                              height: media.width / 4,
+                                              width: media.width / 4,
+                                              networkImageUrl: "${warmUps[index].thumbnail}"
+                                                      .startsWith(
+                                                          'https://storage.cloud.google.com/')
+                                                  ? warmUps[index].thumbnail ??
+                                                      "".replaceFirst(
+                                                          'https://storage.cloud.google.com/',
+                                                          'https://storage.googleapis.com/')
+                                                  : warmUps[index].thumbnail ??
+                                                      "unknown",
+                                              fit: BoxFit.cover,
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(
+                                                    ScreenUtil.verticalScale(
+                                                        12)),
+                                                bottomLeft: Radius.circular(
+                                                    ScreenUtil.verticalScale(
+                                                        12)),
+                                              ),
                                             ),
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(
-                                                  ScreenUtil.verticalScale(12)),
-                                              bottomLeft: Radius.circular(
-                                                  ScreenUtil.verticalScale(12)),
-                                            ),
-                                          )
-                                        : monthProvider.exerciseHistoryModel
+                                          ),
+                                          Container(
+                                            height: media.width / 4,
+                                            width: media.width / 4,
+                                            decoration: monthProvider
+                                                    .exerciseHistoryModel
                                                     .any((element) =>
                                                         element.dataId ==
                                                             warmUpDataId &&
                                                         element.status ==
-                                                            Status.skipped) ||
-                                                isExist
-                                            ? BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    AppColors.secondColor
-                                                        .withValues(alpha: 0.8),
-                                                    AppColors.secondColor
-                                                        .withValues(alpha: 0.8),
-                                                  ],
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                ),
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(
-                                                      ScreenUtil.verticalScale(
-                                                          12)),
-                                                  bottomLeft: Radius.circular(
-                                                      ScreenUtil.verticalScale(
-                                                          12)),
-                                                ),
-                                              )
-                                            : BoxDecoration(
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(
-                                                      ScreenUtil.verticalScale(
-                                                          12)),
-                                                  bottomLeft: Radius.circular(
-                                                      ScreenUtil.verticalScale(
-                                                          12)),
-                                                ),
-                                              ),
-                                    child: Icon(
-                                      monthProvider.exerciseHistoryModel.any(
-                                              (element) =>
-                                                  element.dataId ==
-                                                      warmUpDataId &&
-                                                  element.status ==
-                                                      Status.completed)
-                                          ? Icons.check
-                                          : Icons.close,
-                                      color: monthProvider.exerciseHistoryModel
-                                                  .any((element) =>
-                                                      element.dataId ==
-                                                          warmUpDataId &&
-                                                      element.status ==
-                                                          Status.completed) ||
-                                              (monthProvider
-                                                      .exerciseHistoryModel
+                                                            Status.completed)
+                                                ? BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        const Color(0xFFAADDAA)
+                                                            .withValues(
+                                                                alpha: 0.8),
+                                                        const Color(0xFFAADDAA)
+                                                            .withValues(
+                                                                alpha: 0.8),
+                                                      ],
+                                                      begin:
+                                                          Alignment.topCenter,
+                                                      end: Alignment
+                                                          .bottomCenter,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      topLeft: Radius.circular(
+                                                          ScreenUtil
+                                                              .verticalScale(
+                                                                  12)),
+                                                      bottomLeft: Radius
+                                                          .circular(ScreenUtil
+                                                              .verticalScale(
+                                                                  12)),
+                                                    ),
+                                                  )
+                                                : monthProvider
+                                                            .exerciseHistoryModel
+                                                            .any((element) =>
+                                                                element.dataId ==
+                                                                    warmUpDataId &&
+                                                                element.status ==
+                                                                    Status
+                                                                        .skipped) ||
+                                                        isExist
+                                                    ? BoxDecoration(
+                                                        gradient:
+                                                            LinearGradient(
+                                                          colors: [
+                                                            AppColors
+                                                                .secondColor
+                                                                .withValues(
+                                                                    alpha: 0.8),
+                                                            AppColors
+                                                                .secondColor
+                                                                .withValues(
+                                                                    alpha: 0.8),
+                                                          ],
+                                                          begin: Alignment
+                                                              .topCenter,
+                                                          end: Alignment
+                                                              .bottomCenter,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft: Radius
+                                                              .circular(ScreenUtil
+                                                                  .verticalScale(
+                                                                      12)),
+                                                          bottomLeft: Radius
+                                                              .circular(ScreenUtil
+                                                                  .verticalScale(
+                                                                      12)),
+                                                        ),
+                                                      )
+                                                    : BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft: Radius
+                                                              .circular(ScreenUtil
+                                                                  .verticalScale(
+                                                                      12)),
+                                                          bottomLeft: Radius
+                                                              .circular(ScreenUtil
+                                                                  .verticalScale(
+                                                                      12)),
+                                                        ),
+                                                      ),
+                                            child: Icon(
+                                              monthProvider.exerciseHistoryModel
                                                       .any((element) =>
                                                           element.dataId ==
                                                               warmUpDataId &&
                                                           element.status ==
-                                                              Status.skipped) ||
-                                                  isExist)
-                                          ? Colors.white
-                                          : Colors.transparent,
-                                      size: 30,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Builder(builder: (context) {
-                                    return SizedBox(
-                                      width: media.width / 2.5,
-                                      child: Text(
-                                        (warmUps[index].title!.isEmpty
-                                            ? "Warmup"
-                                            : warmUps[index].title ?? "Warmup"),
-                                        maxLines: 2,
-                                        style: TextStyle(
-                                          color: AppColors.primaryColor,
-                                          fontSize:
-                                              ScreenUtil.horizontalScale(3.8),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.2,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                  SizedBox(
-                                    height: ScreenUtil.verticalScale(1.5),
-                                  ),
-                                  SizedBox(
-                                    width: media.width / 2.5,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              0, 0, 8, 2),
-                                          child: SvgPicture.asset(
-                                            "assets/icons/trend.svg",
-                                            colorFilter: const ColorFilter.mode(
-                                                Colors.grey, BlendMode.srcIn),
-                                            width: 20,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            (warmUps[index].guide!.isEmpty
-                                                ? ""
-                                                : warmUps[index].guide ?? ""),
-                                            maxLines: 1,
-                                            style: TextStyle(
-                                              overflow: TextOverflow.ellipsis,
-                                              color: Colors.grey,
-                                              fontSize:
-                                                  ScreenUtil.verticalScale(1.5),
+                                                              Status.completed)
+                                                  ? Icons.check
+                                                  : Icons.close,
+                                              color: monthProvider
+                                                          .exerciseHistoryModel
+                                                          .any((element) =>
+                                                              element.dataId ==
+                                                                  warmUpDataId &&
+                                                              element.status ==
+                                                                  Status
+                                                                      .completed) ||
+                                                      (monthProvider
+                                                              .exerciseHistoryModel
+                                                              .any((element) =>
+                                                                  element.dataId ==
+                                                                      warmUpDataId &&
+                                                                  element.status ==
+                                                                      Status
+                                                                          .skipped) ||
+                                                          isExist)
+                                                  ? Colors.white
+                                                  : Colors.transparent,
+                                              size: 30,
                                             ),
                                           ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Builder(builder: (context) {
+                                            return SizedBox(
+                                              width: media.width / 2.5,
+                                              child: Text(
+                                                (warmUps[index].title!.isEmpty
+                                                    ? "Warmup"
+                                                    : warmUps[index].title ??
+                                                        "Warmup"),
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                  color: AppColors.primaryColor,
+                                                  fontSize: ScreenUtil
+                                                      .horizontalScale(3.8),
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1.2,
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                          // SizedBox(
+                                          //   height:
+                                          //       ScreenUtil.verticalScale(1.5),
+                                          // ),
+                                          // SizedBox(
+                                          //   width: media.width / 2.5,
+                                          //   child: Row(
+                                          //     crossAxisAlignment:
+                                          //         CrossAxisAlignment.center,
+                                          //     children: [
+                                          //       Padding(
+                                          //         padding:
+                                          //             const EdgeInsets.fromLTRB(
+                                          //                 0, 0, 8, 2),
+                                          //         child: SvgPicture.asset(
+                                          //           "assets/icons/trend.svg",
+                                          //           colorFilter:
+                                          //               const ColorFilter.mode(
+                                          //                   Colors.grey,
+                                          //                   BlendMode.srcIn),
+                                          //           width: 20,
+                                          //         ),
+                                          //       ),
+                                          //       Expanded(
+                                          //         child: Text(
+                                          //           (warmUps[index]
+                                          //                   .guide!
+                                          //                   .isEmpty
+                                          //               ? ""
+                                          //               : warmUps[index]
+                                          //                       .guide ??
+                                          //                   ""),
+                                          //           maxLines: 1,
+                                          //           style: TextStyle(
+                                          //             overflow:
+                                          //                 TextOverflow.ellipsis,
+                                          //             color: Colors.grey,
+                                          //             fontSize: ScreenUtil
+                                          //                 .verticalScale(1.5),
+                                          //           ),
+                                          //         ),
+                                          //       ),
+                                          //     ],
+                                          //   ),
+                                          // )
+                                        ],
+                                      ),
+                                    ],
+                                  );
+                                }),
+                                isEditMode
+                                    ? SizedBox()
+                                    : GestureDetector(
+                                        onTap: null,
+                                        child: Container(
+                                          padding: EdgeInsets.all(
+                                              ScreenUtil.verticalScale(0.5)),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.play_arrow,
+                                            color: Colors.white,
+                                            size: ScreenUtil.verticalScale(3),
+                                          ),
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          );
-                        }),
-                        isEditMode
-                            ? SizedBox()
-                            : GestureDetector(
-                                onTap: null,
-                                child: Container(
-                                  padding: EdgeInsets.all(
-                                      ScreenUtil.verticalScale(0.5)),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.play_arrow,
-                                    color: Colors.white,
-                                    size: ScreenUtil.verticalScale(3),
-                                  ),
-                                ),
-                              ),
-                      ],
-                    ),
+                                      ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              );
-            },
-          );
+                )
+              : SizedBox();
         },
       ),
     );
@@ -4119,7 +4575,7 @@ class _TodayPageState extends State<TodayPage>
                               horizontal: ScreenUtil.horizontalScale(2),
                               vertical: ScreenUtil.verticalScale(1.5)),
                           child: Text(
-                            "This action reset your progress for this day. Are you sure you want to proceed?",
+                            "This action will reset your progress for this day. Are you sure you want to proceed?",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,

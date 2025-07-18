@@ -1,12 +1,17 @@
+import 'dart:developer';
+
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
+import 'package:bbb/components/filter_sort_exercise_library.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ExpansionPanel;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:provider/provider.dart';
 
@@ -61,7 +66,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
 
     return _filteredExercises.sublist(
       startIndex,
-      endIndex < _filteredExercises.length ? endIndex : _filteredExercises.length,
+      endIndex < _filteredExercises.length
+          ? endIndex
+          : _filteredExercises.length,
     );
   }
 
@@ -71,12 +78,15 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
       // Filter exercises based on selected equipment, category, and search query
       _filteredExercises = dataProvider!.adminExercises.where((exercise) {
         bool matchesEquipment = _selectedEquipmentIds.isEmpty ||
-            exercise.usedEquipments.any((equip) => _selectedEquipmentIds.contains(equip));
+            exercise.usedEquipments
+                .any((equip) => _selectedEquipmentIds.contains(equip));
 
-        bool matchesCategory =
-            _selectedCategoryIds.isEmpty || exercise.categories.any((cat) => _selectedCategoryIds.contains(cat));
+        bool matchesCategory = _selectedCategoryIds.isEmpty ||
+            exercise.categories
+                .any((cat) => _selectedCategoryIds.contains(cat));
 
-        bool matchesSearch = _searchQuery.isEmpty || exercise.title.toLowerCase().contains(_searchQuery.toLowerCase());
+        bool matchesSearch = _searchQuery.isEmpty ||
+            exercise.title.toLowerCase().contains(_searchQuery.toLowerCase());
 
         return matchesEquipment && matchesCategory && matchesSearch;
       }).toList();
@@ -124,13 +134,17 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                     //     ),
                     //   ),
                     // ),
-                    Utils.appImage(
-                      media,
-                      // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
-                      image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
-
-                      imageKey: "imageExerciseLibrary",
-                    ),
+                    AppImage.imageExerciseLibrary(
+                        // media,
+                        // image: dataProvider!.allImageList
+                        //     .where((element) =>
+                        //         element["key"] == "imageExerciseLibrary")
+                        //     .first["image"],
+                        // // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
+                        // // image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
+                        //
+                        // imageKey: "imageExerciseLibrary",
+                        ),
                     SizedBox(
                       height: media.height / 2.5,
                       width: media.width,
@@ -138,7 +152,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                         child: Column(
                           children: [
                             AppBar(
-                              toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                              toolbarHeight: ScreenUtil.verticalScale(5.1),
+                              surfaceTintColor: Colors.transparent,
                               backgroundColor: Colors.transparent,
                               centerTitle: true,
                               leading: BackArrowWidget(
@@ -166,7 +181,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                               actions: [
                                 Padding(
                                   padding: const EdgeInsets.only(right: 10),
-                                  child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                  child: const CommonStreakWithNotification(
+                                      routeString: '/exerciseLibrary'),
                                 )
                               ],
                             ),
@@ -208,7 +224,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                       onChanged: (query) {
                                         setState(() {
                                           _currentPage = 0;
-                                          _searchQuery = query; // Update the search query
+                                          _searchQuery =
+                                              query; // Update the search query
                                           _applyFilters(); // Reset pagination when searching
                                         });
                                       },
@@ -217,20 +234,27 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                       height: ScreenUtil.horizontalScale(3),
                                     ),
                                     FilterSortButton(
-                                      selectedEquipmentIds: _selectedEquipmentIds,
+                                      selectedEquipmentIds:
+                                          _selectedEquipmentIds,
                                       selectedCategoryIds: _selectedCategoryIds,
                                       selectedSortBy: _selectedSortBy,
                                       equipments: dataProvider!.adminEquipment
-                                          .map((e) => {'id': e.id, 'title': e.title})
+                                          .map((e) =>
+                                              {'id': e.id, 'title': e.title})
                                           .toList(),
                                       categories: dataProvider!.adminCategory
-                                          .map((c) => {'id': c.id, 'title': c.title})
+                                          .map((c) =>
+                                              {'id': c.id, 'title': c.title})
                                           .toList(),
-                                      onApplyFilters: (List<String> selectedEquipments, List<String> selectedCategories,
-                                          String sortBy) {
+                                      onApplyFilters:
+                                          (List<String> selectedEquipments,
+                                              List<String> selectedCategories,
+                                              String sortBy) {
                                         setState(() {
-                                          _selectedEquipmentIds = selectedEquipments;
-                                          _selectedCategoryIds = selectedCategories;
+                                          _selectedEquipmentIds =
+                                              selectedEquipments;
+                                          _selectedCategoryIds =
+                                              selectedCategories;
                                           _selectedSortBy = sortBy;
                                         });
                                         _applyFilters(); // Apply the filters and sorting
@@ -265,7 +289,9 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                   margin: EdgeInsets.only(top: media.height / 3.2),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: (media.height - (media.height / 4) - (media.height * 0.12)),
+                      minHeight: (media.height -
+                          (media.height / 4) -
+                          (media.height * 0.12)),
                     ),
                     width: media.width,
                     decoration: BoxDecoration(
@@ -294,7 +320,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                     _filteredExercises.isEmpty
                                 ? Container(
                                     color: Colors.white,
-                                    height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
+                                    height: ScreenUtil.verticalScale(
+                                        (media.height - media.height / 3.2)),
                                   )
                                 : Column(
                                     children: [
@@ -302,16 +329,19 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                         height: ScreenUtil.verticalScale(2),
                                       ),
                                       Column(
-                                        children: _getPaginatedExercises().map((exercise) {
+                                        children: _getPaginatedExercises()
+                                            .map((exercise) {
                                           return Column(
                                             children: [
                                               exerciseCard(
                                                 exercise.id,
                                                 exercise.title,
-                                                exercise.thumbnail, // Dynamically display exercise titles
+                                                exercise
+                                                    .thumbnail, // Dynamically display exercise titles
                                               ),
                                               SizedBox(
-                                                height: ScreenUtil.verticalScale(2),
+                                                height:
+                                                    ScreenUtil.verticalScale(2),
                                               ),
                                             ],
                                           );
@@ -341,7 +371,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
         color: Colors.white,
         height: 65,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
           child: _numPages > 0
               ? NumberPaginator(
                   numberPages: _numPages,
@@ -370,7 +401,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
     var media = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/exerciseLibraryDetail', arguments: [id, title]);
+        Navigator.pushNamed(context, '/exerciseLibraryDetail',
+            arguments: [id, title]);
       },
       child: Container(
         padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
@@ -397,9 +429,12 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                 appShimmerImage(
                   height: media.width / 4,
                   width: media.width / 4,
-                  networkImageUrl: image.startsWith('https://storage.cloud.google.com/')
-                      ? image.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                      : image,
+                  networkImageUrl:
+                      image.startsWith('https://storage.cloud.google.com/')
+                          ? image.replaceFirst(
+                              'https://storage.cloud.google.com/',
+                              'https://storage.googleapis.com/')
+                          : image,
                   fit: BoxFit.cover,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(ScreenUtil.verticalScale(12)),
@@ -449,7 +484,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                 horizontal: ScreenUtil.verticalScale(0.7),
                 vertical: ScreenUtil.verticalScale(0.7),
               ),
-              decoration: const BoxDecoration(color: AppColors.primaryColor, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                  color: AppColors.primaryColor, shape: BoxShape.circle),
               child: Icon(
                 Icons.play_arrow,
                 color: Colors.white,
@@ -507,8 +543,8 @@ class FilterSortButton extends StatefulWidget {
   final List<String> selectedEquipmentIds;
   final List<String> selectedCategoryIds;
   final String selectedSortBy;
-  final Function(List<String> selectedEquipmentIds, List<String> selectedCategoryIds, String selectedSortBy)
-      onApplyFilters;
+  final Function(List<String> selectedEquipmentIds,
+      List<String> selectedCategoryIds, String selectedSortBy) onApplyFilters;
 
   final List<Map<String, String>> equipments; // Add dynamic equipment data
   final List<Map<String, String>> categories; // Add dynamic category data
@@ -547,7 +583,31 @@ class _FilterSortButtonState extends State<FilterSortButton> {
       width: media.width,
       child: ElevatedButton(
         onPressed: () {
-          _showFilterSortDialog(context, media.width);
+          showDialog(
+            context: context,
+            builder: (_) => FilterSortDialog(
+              selectedCategoryIds: _selectedCategoryIds,
+              selectedEquipmentIds: _selectedEquipmentIds,
+              selectedSortBy: _selectedSortBy,
+              equipments: widget.equipments,
+              categories: widget.categories,
+              onApplyFilters: (equipments, categories, sort) {
+                // Navigator.of(context).pop();
+                widget.onApplyFilters(
+                  equipments,
+                  categories,
+                  sort,
+                );
+
+                _selectedCategoryIds = categories;
+                _selectedEquipmentIds = equipments;
+                _selectedSortBy = sort;
+                setState(() {});
+              },
+            ),
+          );
+
+          // _showFilterSortDialog(context, media.width);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF9a354e),
@@ -580,260 +640,6 @@ class _FilterSortButtonState extends State<FilterSortButton> {
           ],
         ),
       ),
-    );
-  }
-
-  void _showFilterSortDialog(BuildContext context, double dialogWidth) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            List<bool> isExpanded = [true, false, false];
-            return Dialog(
-              backgroundColor: Colors.white,
-              insetPadding: const EdgeInsets.all(0), // Popup background color
-              child: SingleChildScrollView(
-                // Wrap the content in a SingleChildScrollView
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: ScreenUtil.horizontalScale(90), // Set the width of the popup to match the button
-                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Filter & Sort Options',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color(0xFF9a354e), // White text
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-
-                          // "Sort by" ExpansionTile with Radio buttons
-                          ExpansionTile(
-                            title: const Text(
-                              'Sort by',
-                              style: TextStyle(fontSize: 14), // Small white text
-                            ),
-                            textColor: const Color(0xFF9a354e),
-                            collapsedTextColor: Colors.black,
-                            collapsedShape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(color: Color(0xFF9a354e), width: 1),
-                            ),
-                            iconColor: Colors.black,
-                            collapsedIconColor: const Color(0xFF9a354e),
-                            initiallyExpanded: isExpanded[0], // Set initial expanded state
-                            onExpansionChanged: (isExpandedState) {
-                              setState(() {
-                                // Set the current index to true and others to false
-                                isExpanded = [isExpandedState, false, false];
-                              });
-                            },
-                            children: <String>['A-Z', 'Z-A', 'Newest added', 'Oldest added'].map((String option) {
-                              return RadioListTile<String>(
-                                title: Text(option, style: const TextStyle(fontSize: 14, color: Colors.black)),
-                                value: option,
-                                groupValue: _selectedSortBy,
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    _selectedSortBy = value!;
-                                  });
-                                },
-                                activeColor: const Color(0xFF9a354e), // Change the checked color here
-                                hoverColor: Colors.white,
-                              );
-                            }).toList(),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // "Filter by Equipment" ExpansionTile with Checkboxes
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white, // Green background for the tile
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: ExpansionTile(
-                              title: const Text(
-                                'Filter by Equipment',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              textColor: const Color(0xFF9a354e),
-                              collapsedTextColor: Colors.black,
-                              collapsedShape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: const BorderSide(color: Color(0xFF9a354e), width: 1),
-                              ),
-                              iconColor: Colors.black,
-                              collapsedIconColor: const Color(0xFF9a354e),
-                              initiallyExpanded: isExpanded[1], // Set initial expanded state
-                              onExpansionChanged: (isExpandedState) {
-                                setState(() {
-                                  // Set the current index to true and others to false
-                                  isExpanded = [false, isExpandedState, false];
-                                });
-                              },
-                              children: widget.equipments.map((Map<String, String> equipment) {
-                                return CheckboxListTile(
-                                  title: Text(equipment['title']!,
-                                      style: const TextStyle(fontSize: 14, color: Colors.black)),
-                                  value: _selectedEquipmentIds.contains(equipment['id']),
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      if (value == true) {
-                                        _selectedEquipmentIds.add(equipment['id']!);
-                                      } else {
-                                        _selectedEquipmentIds.remove(equipment['id']);
-                                      }
-                                    });
-                                  },
-                                  activeColor: const Color(0xFF9a354e), // Change the checked color here
-                                  checkColor: Colors.white,
-                                );
-                              }).toList(),
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // "Filter by Categories" ExpansionTile with Checkboxes
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white, // Green background for the tile
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: ExpansionTile(
-                              title: const Text(
-                                'Filter by Categories',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              textColor: const Color(0xFF9a354e),
-                              collapsedTextColor: Colors.black,
-                              collapsedShape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: const BorderSide(color: Color(0xFF9a354e), width: 1),
-                              ),
-                              iconColor: Colors.black,
-                              collapsedIconColor: const Color(0xFF9a354e),
-                              initiallyExpanded: isExpanded[2], // Set initial expanded state
-                              onExpansionChanged: (isExpandedState) {
-                                setState(() {
-                                  // Set the current index to true and others to false
-                                  isExpanded = [false, false, isExpandedState];
-                                });
-                              },
-                              children: widget.categories.map((Map<String, String> category) {
-                                return CheckboxListTile(
-                                  title: Text(category['title']!,
-                                      style: const TextStyle(fontSize: 14, color: Colors.black)),
-                                  value: _selectedCategoryIds.contains(category['id']),
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      if (value == true) {
-                                        _selectedCategoryIds.add(category['id']!);
-                                      } else {
-                                        _selectedCategoryIds.remove(category['id']);
-                                      }
-                                    });
-                                  },
-                                  activeColor: const Color(0xFF9a354e), // Change the checked color here
-                                  checkColor: Colors.white,
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Apply now button
-                          ButtonWidget(
-                              text: "Apply now",
-                              textColor: Colors.white,
-                              color: AppColors.primaryColor,
-                              onPress: () {
-                                Navigator.of(context).pop();
-                                widget.onApplyFilters(
-                                  _selectedEquipmentIds,
-                                  _selectedCategoryIds,
-                                  _selectedSortBy,
-                                );
-                              },
-                              isLoading: false),
-
-                          // SizedBox(
-                          //   width: double.infinity,
-                          //   height: ScreenUtil.verticalScale(7),
-                          //   child: ElevatedButton(
-                          //     style: ElevatedButton.styleFrom(
-                          //       backgroundColor: const Color(0xFF9a354e), // Apply now button color
-                          //       padding: const EdgeInsets.symmetric(vertical: 10),
-                          //     ),
-                          //     onPressed: () {
-                          //       Navigator.of(context).pop();
-                          //       widget.onApplyFilters(
-                          //         _selectedEquipmentIds,
-                          //         _selectedCategoryIds,
-                          //         _selectedSortBy,
-                          //       );
-                          //     },
-                          //     child: const Text(
-                          //       'Apply now',
-                          //       style: TextStyle(color: Colors.white, fontSize: 16),
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      right: -ScreenUtil.verticalScale(1.2),
-                      top: -ScreenUtil.verticalScale(1.2),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: GestureDetector(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
-                            child: Padding(
-                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
-                              child: Icon(size: ScreenUtil.verticalScale(2.5), Icons.close, color: Colors.white),
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

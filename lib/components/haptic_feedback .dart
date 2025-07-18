@@ -6,7 +6,8 @@ import 'package:vibration/vibration.dart';
 
 class HapticFeedBack {
   static Future buttonClick() async {
-    final rawData = await preferences.getBool(SharedPreference.isHapticFeedbackOn);
+    final rawData =
+        await preferences.getBool(SharedPreference.isHapticFeedbackOn);
     if (rawData == true || rawData == null) {
       if (await Vibration.hasVibrator()) {
         await Vibration.vibrate(

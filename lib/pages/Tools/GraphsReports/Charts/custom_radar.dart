@@ -3,16 +3,37 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class CustomRadarChart extends StatelessWidget {
-  final List<String> features = ["Squat", "HipThrust", "Bench", "Deadlift", "Press", "Chinup"];
+  final List<String> features = [
+    "Back Squat",
+    "Barbell\nBench Press",
+    "Conventional\nDeadlift",
+    "Weighted\nChin-Up",
+    "Barbell\nHip Thrust",
+    "Chinup"
+  ];
 
   final List<List<double>> data = [
-    [20, 60, 22, 28, 60, 50],
-    [40, 72, 35, 36, 74, 70],
+    [140, 172, 135, 136, 174, 170],
+    [100, 100, 100, 100, 100, 100],
   ];
 
   final List<List<String>> dataDates = [
-    ["2025-05-01", "2025-05-02", "2025-05-03", "2025-05-04", "2025-05-05", "2025-05-06"],
-    ["2025-06-01", "2025-06-02", "2025-06-03", "2025-06-04", "2025-06-05", "2025-06-06"],
+    [
+      "2025-05-01",
+      "2025-05-02",
+      "2025-05-03",
+      "2025-05-04",
+      "2025-05-05",
+      "2025-05-06"
+    ],
+    [
+      "2025-06-01",
+      "2025-06-02",
+      "2025-06-03",
+      "2025-06-04",
+      "2025-06-05",
+      "2025-06-06"
+    ],
   ];
 
   CustomRadarChart({super.key});
@@ -23,7 +44,7 @@ class CustomRadarChart extends StatelessWidget {
       child: AspectRatio(
         aspectRatio: 1,
         child: RadarChart(
-          ticks: List.generate(10, (index) => 10 * (index + 1)),
+          ticks: List.generate(10, (index) => 20 * (index + 1)),
           features: features,
           data: data,
           dataDates: dataDates,
@@ -31,7 +52,7 @@ class CustomRadarChart extends StatelessWidget {
           axisColor: Colors.grey.shade400,
           graphColors: [
             Colors.pink.shade100,
-            Colors.pink.shade800.withOpacity(0.5),
+            Colors.pink.shade800.withValues(alpha: 0.5),
           ],
         ),
       ),
@@ -73,7 +94,7 @@ class RadarChart extends StatefulWidget {
     required this.dataDates,
     this.reverseAxis = false,
     this.ticksTextStyle = const TextStyle(color: Colors.grey, fontSize: 12),
-    this.featuresTextStyle = const TextStyle(color: Colors.black, fontSize: 16),
+    this.featuresTextStyle = const TextStyle(color: Colors.black, fontSize: 11),
     this.outlineColor = Colors.black,
     this.axisColor = Colors.grey,
     this.graphColors = defaultGraphColors,
@@ -84,7 +105,8 @@ class RadarChart extends StatefulWidget {
   State<RadarChart> createState() => _RadarChartState();
 }
 
-class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateMixin {
+class _RadarChartState extends State<RadarChart>
+    with SingleTickerProviderStateMixin {
   double fraction = 0;
   late Animation<double> animation;
   late AnimationController animationController;
@@ -127,7 +149,8 @@ class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateM
           GestureDetector(
             onTapDown: (details) {
               final RenderBox box = context.findRenderObject() as RenderBox;
-              final Offset localPosition = box.globalToLocal(details.globalPosition);
+              final Offset localPosition =
+                  box.globalToLocal(details.globalPosition);
 
               double closestDistance = double.infinity;
               Offset? closestPoint;
@@ -140,7 +163,10 @@ class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateM
 
               for (int i = 0; i < widget.data.length; i++) {
                 for (int j = 0; j < widget.data[i].length; j++) {
-                  final scaled = radius * widget.data[i][j] * fraction / widget.ticks.last.toDouble();
+                  final scaled = radius *
+                      widget.data[i][j] *
+                      fraction /
+                      widget.ticks.last.toDouble();
                   final angle = angleIncrement * j - math.pi / 2;
                   final x = centerX + scaled * math.cos(angle);
                   final y = centerY + scaled * math.sin(angle);
@@ -149,7 +175,8 @@ class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateM
                   if (distance < 15 && distance < closestDistance) {
                     closestDistance = distance;
                     closestPoint = Offset(x, y);
-                    closestTooltipText = "${widget.data[i][j]}%\n${widget.dataDates[i][j]}";
+                    closestTooltipText =
+                        "${widget.data[i][j]}%\n${widget.dataDates[i][j]}";
                   }
                 }
               }
@@ -183,7 +210,8 @@ class _RadarChartState extends State<RadarChart> with SingleTickerProviderStateM
               child: Material(
                 color: Colors.transparent,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.pink.shade900,
                     borderRadius: BorderRadius.circular(5),
@@ -279,9 +307,9 @@ class RadarChartPainter extends CustomPainter {
       final tick = ticks[reverseAxis ? ticks.length - i : i - 1];
       final textPainter = TextPainter(
         text: TextSpan(
-          text: '$tick',
+          text: '$tick%',
           style: ticksTextStyle.copyWith(
-            color: ticksTextStyle.color?.withOpacity(fraction),
+            color: ticksTextStyle.color?.withValues(alpha: fraction),
           ),
         ),
         textDirection: TextDirection.ltr,
@@ -329,7 +357,7 @@ class RadarChartPainter extends CustomPainter {
       path.close();
 
       final fillPaint = Paint()
-        ..color = graphColors[d % graphColors.length].withOpacity(0.3)
+        ..color = graphColors[d % graphColors.length].withValues(alpha: 0.3)
         ..style = PaintingStyle.fill;
       final strokePaint = Paint()
         ..color = graphColors[d % graphColors.length]

@@ -32,7 +32,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     // loadWelcomeContent();
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     // _checkLoginStatus();
-    _videoController = VideoPlayerController.asset('assets/videos/welcome_new.mp4',
+    _videoController = VideoPlayerController.asset(
+        'assets/videos/welcome_new.mp4',
         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
       ..initialize().then((_) {
         setState(() {
@@ -167,13 +168,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           SingleChildScrollView(
             physics: NeverScrollableScrollPhysics(),
             child: Column(
-              children: dataProvider!.cachedSplashImageMap.entries.map((entry) {
+              children: dataProvider!.allImageList.map((entry) {
                 return Visibility(
                   visible: true,
                   child: Utils.appImage(
                     media,
-                    image: entry.value,
-                    imageKey: entry.key,
+                    image: entry["image"],
+                    imageKey: entry["key"],
                   ),
                 );
               }).toList(),
@@ -184,7 +185,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
             child: _isVideoInitialized
                 ? Align(
                     alignment: Alignment.topCenter,
-                    child: SizedBox(height: media.height / 1.37, child: VideoPlayer(_videoController)),
+                    child: SizedBox(
+                        height: media.height / 1.37,
+                        child: VideoPlayer(_videoController)),
                   )
                 : Image.asset(
                     width: double.infinity,
@@ -205,7 +208,10 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               height: 150,
               width: media.width,
               decoration: const BoxDecoration(
-                image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                image: DecorationImage(
+                    image: AssetImage('assets/img/bbb-logo.png'),
+                    fit: BoxFit.fitHeight,
+                    opacity: 1),
               ),
             ),
           ),
@@ -243,7 +249,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4.4)),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.verticalScale(4.4)),
                         child: Column(
                           children: [
                             SizedBox(
@@ -254,7 +261,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                                     height: media.height * .28,
                                   )
                                 : TextSlider(
-                                    slide: dataProvider!.screenBackgroundModel?.slides ?? [],
+                                    slide: dataProvider!
+                                            .screenBackgroundModel?.slides ??
+                                        [],
                                   ),
                             ButtonWidget(
                               text: 'Sign in',
@@ -273,7 +282,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                                   "Don't have an account? ",
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: Color(0xff888888),
+                                    color: AppColors.appGreyColor,
                                   ),
                                 ),
                                 TextButton(
@@ -281,7 +290,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(65, 30),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
                                       alignment: Alignment.center),
                                   child: const Text(
                                     'Sign up',
@@ -353,12 +363,15 @@ class _TextSliderState extends State<TextSlider> {
           ? Container(
               height: 8, //ScreenUtil.horizontalScale(5),
               width: 8,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.primaryColor),
+              decoration: const BoxDecoration(
+                  shape: BoxShape.circle, color: AppColors.primaryColor),
             )
           : Container(
               height: ScreenUtil.horizontalScale(5),
               width: 8,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primaryColor.withValues(alpha: .2)),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primaryColor.withValues(alpha: .2)),
             ),
     );
   }
@@ -402,7 +415,7 @@ class _TextSliderState extends State<TextSlider> {
                         style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(1.65),
                           height: 1.5,
-                          color: Color(0xff6f6f6f),
+                          color: AppColors.appGreyColor,
                         ),
                       ),
                     ),

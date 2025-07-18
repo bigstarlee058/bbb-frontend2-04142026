@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -72,57 +73,45 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
       }
     }
 
-    // fallback to last buffered range or zero
     return buffered.isNotEmpty ? buffered.last.end : Duration.zero;
   }
 
   Future<void> initializeVideo(String url) async {
+    if (hasClosedPopup) return;
     try {
-      // Initialize the video player controller
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
-      await _videoPlayerController.initialize().then(
-        (value) {
-          AudioManager.requestAudioFocus();
-        },
-      );
-      await _videoPlayerController.setLooping(true);
+      await _videoPlayerController.initialize();
+      if (hasClosedPopup || !mounted) {
+        await _videoPlayerController.dispose();
+        return;
+      }
 
-      // Initialize the ChewieController with custom controls
+      await _videoPlayerController.setLooping(true);
+      AudioManager.requestAudioFocus();
+
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
         looping: true,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
-        // Disable default controls// Use custom controls here
       );
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
-      log('rawData==========>>>>>${rawData}');
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null &&
+      if (!hasClosedPopup &&
+          _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
         videoSize = calculateVideoSize(
             aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
-      // _videoPlayerController.addListener(() async {
-      //   final bool isFinished =
-      //       _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
-      //   if (isFinished) {
-      //     showControlsOnTapOfPause();
-      //   }
-      //   if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
-      //     AudioManager.abandonAudioFocus();
-      //   } else {
-      //     AudioManager.requestAudioFocus();
-      //   }
-      //   setState(() {});
-      // });
+
       _videoPlayerController.addListener(() async {
+        if (hasClosedPopup || !mounted) return;
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
         final bool isFinished =
@@ -149,17 +138,24 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
         thumbAnimationDuration: const Duration(milliseconds: 200),
         waitingDuration: const Duration(milliseconds: 1800),
       );
-      setState(() {
-        loading = false;
-      });
+      if (!hasClosedPopup && mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        videoNotInitialized = true;
-        loading = false;
-      });
+      if (!hasClosedPopup) {
+        setState(() {
+          videoNotInitialized = true;
+          loading = false;
+        });
+      }
+
       debugPrint("VIDEO NOT INITIALIZED: $e");
     }
   }
+
+  bool hasClosedPopup = false;
 
   bool isZoom = false;
 
@@ -184,9 +180,11 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
   }
 
   void showControlsOnTap() {
-    setState(() => showControls = !showControls);
     if (_videoPlayerController.value.isPlaying) {
-      hideControls();
+      setState(() => showControls = !showControls);
+      if (_videoPlayerController.value.isPlaying) {
+        hideControls();
+      }
     }
   }
 
@@ -195,31 +193,54 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
     setState(() => showControls = true);
   }
 
-  void toggleFullscreen() {
+  Future<void> toggleFullscreen() async {
     setState(() {
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
-    } else {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      final screenSize = MediaQuery.of(context).size;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoFullScreenView(
+              makeRefresh: () {
+                setState(() {});
+              },
+              isFullscreen: isFullscreen,
+              toggleFullscreen: toggleFullscreen,
+              controller: _controller,
+              isMute: isMute,
+              changeZoom: changeZoom,
+              chewieController: _chewieController!,
+              hideControls: hideControls,
+              isZoom: isZoom,
+              media: screenSize,
+              videoSize: videoSize,
+              muteUnMute: muteUnMute,
+              showControls: showControls,
+              showControlsOnTap: showControlsOnTap,
+              showControlsOnTapOfPause: showControlsOnTapOfPause,
+              videoNotInitialized: videoNotInitialized,
+              videoPlayerController: _videoPlayerController,
+              videoProgressValue: videoProgressValue,
+            ),
+          ));
     }
+  }
+
+  changeZoom(value) {
+    isZoom = value;
   }
 
   Size calculateVideoSize({
     required BuildContext context,
-    required double aspectRatio, // Aspect ratio of the video (width/height)
+    required double aspectRatio,
   }) {
-    // Maximum allowable width and height based on screen dimensions
     double maxWidth = ScreenUtil.horizontalScale(100);
     double maxHeight = ScreenUtil.verticalScale(70);
 
-    // Calculate height dynamically based on width and aspect ratio
     double calculatedHeight = maxWidth / aspectRatio;
 
-    // If calculated height exceeds maxHeight, adjust width instead
     if (calculatedHeight > maxHeight) {
       calculatedHeight = maxHeight;
       maxWidth = maxHeight * aspectRatio;
@@ -230,11 +251,25 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
 
   @override
   void dispose() {
-    if (_chewieController != null) {
-      _chewieController!.dispose();
+    hasClosedPopup = true;
+
+    try {
+      _videoPlayerController.pause();
       _videoPlayerController.dispose();
-      AudioManager.abandonAudioFocus();
-    }
+    } catch (_) {}
+
+    try {
+      _chewieController?.dispose();
+    } catch (_) {}
+
+    AudioManager.abandonAudioFocus();
+    _hideControlsTimer?.cancel();
+
+    // if (_chewieController != null) {
+    //   _chewieController!.dispose();
+    //   _videoPlayerController.dispose();
+    //   AudioManager.abandonAudioFocus();
+    // }
 
     super.dispose();
   }
@@ -268,7 +303,6 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                       )
                     : Column(
                         children: [
-                          // SizedBox(height: ScreenUtil.verticalScale(4.5)),
                           Stack(
                             children: [
                               GestureDetector(
@@ -354,6 +388,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                                       const Duration(
                                                           seconds: 10),
                                                 );
+                                                _controller.forward();
                                               }
                                             : null,
                                       ),
@@ -415,6 +450,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                                       const Duration(
                                                           seconds: 10),
                                                 );
+                                                _controller.forward();
                                               }
                                             : null,
                                       ),
@@ -447,30 +483,52 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                                         height: ScreenUtil
                                                             .verticalScale(
                                                                 0.8)),
-                                                    Row(
-                                                      children: [
-                                                        Spacer(),
-                                                        GestureDetector(
-                                                          onTap: showControls
-                                                              ? () {
-                                                                  muteUnMute();
-                                                                }
-                                                              : null,
-                                                          child: Icon(
-                                                            isMute
-                                                                ? Icons
-                                                                    .volume_up
-                                                                : Icons
-                                                                    .volume_off,
-                                                            color: !showControls
-                                                                ? Colors
-                                                                    .transparent
-                                                                : Colors
-                                                                    .white70,
-                                                            size: 28,
+                                                    AnimatedOpacity(
+                                                      opacity: showControls
+                                                          ? 1.0
+                                                          : 0.0,
+                                                      duration: const Duration(
+                                                          milliseconds: 800),
+                                                      child: Row(
+                                                        children: [
+                                                          Spacer(),
+                                                          GestureDetector(
+                                                            onTap: showControls
+                                                                ? () {
+                                                                    toggleFullscreen();
+                                                                  }
+                                                                : null,
+                                                            child: Icon(
+                                                              !isFullscreen
+                                                                  ? Icons
+                                                                      .fullscreen
+                                                                  : Icons
+                                                                      .fullscreen_exit,
+                                                              color: Colors
+                                                                  .white70,
+                                                              size: 28,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
+                                                          SizedBox(width: 10),
+                                                          GestureDetector(
+                                                            onTap: showControls
+                                                                ? () {
+                                                                    muteUnMute();
+                                                                  }
+                                                                : null,
+                                                            child: Icon(
+                                                              isMute
+                                                                  ? Icons
+                                                                      .volume_up
+                                                                  : Icons
+                                                                      .volume_off,
+                                                              color: Colors
+                                                                  .white70,
+                                                              size: 28,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -571,239 +629,27 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                         color: Colors.white),
                   ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
+                onTap: () async {
+                  hasClosedPopup = true;
+
+                  try {
+                    await _videoPlayerController.pause();
+                    await _videoPlayerController.dispose();
+                  } catch (_) {}
+
+                  try {
+                    _chewieController?.dispose();
+                  } catch (_) {}
+
+                  if (mounted) Navigator.of(context).pop();
+
+                  AudioManager.abandonAudioFocus();
                 },
               ),
             ),
           ),
         ],
       ),
-      // child: loading
-      //     ? const Center(
-      //         child: CircularProgressIndicator(
-      //           color: AppColors.primaryColor,
-      //         ),
-      //       )
-      //     : Column(
-      //         children: [
-      //           SizedBox(height: ScreenUtil.verticalScale(5)),
-      //           Row(
-      //             mainAxisAlignment: MainAxisAlignment.start,
-      //             children: [
-      //               SizedBox(
-      //                 width: ScreenUtil.horizontalScale(3),
-      //               ),
-      //               IconButton(
-      //                 icon: const Icon(Icons.close),
-      //                 onPressed: () {
-      //                   Navigator.of(context).pop();
-      //                 },
-      //               ),
-      //             ],
-      //           ),
-      //           Expanded(child: Container()),
-      //           Stack(
-      //             children: [
-      //               GestureDetector(
-      //                 onTap: () {
-      //                   showControlsOnTap();
-      //                 },
-      //                 child: Container(
-      //                   color: Colors.black,
-      //                   child: Column(
-      //                     children: [
-      //                       dataProvider!.tutorialData.files.isNotEmpty && !videoNotInitialized
-      //                           ? Stack(
-      //                               children: [
-      //                                 SizedBox(
-      //                                   height: videoSize.height,
-      //                                   width: videoSize.width,
-      //                                   child: Chewie(
-      //                                     controller: _chewieController!,
-      //                                   ),
-      //                                 ),
-      //                                 AnimatedContainer(
-      //                                   duration: Duration(milliseconds: 1300),
-      //                                   curve: Curves.easeInOut,
-      //                                   color: showControls ? Colors.black38 : Colors.transparent,
-      //                                   height: videoSize.height,
-      //                                   width: videoSize.width,
-      //                                 ),
-      //                               ],
-      //                             )
-      //                           : Container(
-      //                               height: ScreenUtil.verticalScale(40),
-      //                               color: Colors.black12,
-      //                               child: const Center(
-      //                                   child: Text(
-      //                                 'No Video Available',
-      //                                 style: TextStyle(color: Colors.white),
-      //                               )),
-      //                             ),
-      //                     ],
-      //                   ),
-      //                 ),
-      //               ),
-      //               Positioned(
-      //                 bottom: videoSize.height / 2,
-      //                 left: 10,
-      //                 right: 10,
-      //                 child: AnimatedOpacity(
-      //                   opacity: showControls ? 1.0 : 0.0,
-      //                   duration: const Duration(milliseconds: 800),
-      //                   curve: Curves.easeInOut,
-      //                   child: Row(
-      //                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //                     children: [
-      //                       // Skip backward button
-      //                       IconButton(
-      //                         iconSize: 40,
-      //                         icon: const Icon(
-      //                           Icons.replay_10,
-      //                           color: Colors.white70,
-      //                         ),
-      //                         onPressed: () {
-      //                           _videoPlayerController.seekTo(
-      //                             _videoPlayerController.value.position - const Duration(seconds: 10),
-      //                           );
-      //                         },
-      //                       ),
-      //                       IconButton(
-      //                         iconSize: 60,
-      //                         icon: Icon(
-      //                           _videoPlayerController.value.isPlaying
-      //                               ? Icons.pause_circle_filled
-      //                               : Icons.play_circle_filled,
-      //                           color: Colors.white70,
-      //                         ),
-      //                         onPressed: () {
-      //                           setState(() {
-      //                             if (_videoPlayerController.value.isPlaying) {
-      //                               _videoPlayerController.pause();
-      //                               showControlsOnTapOfPause();
-      //
-      //                               AudioManager.abandonAudioFocus();
-      //                             } else {
-      //                               _videoPlayerController.play();
-      //                               hideControls();
-      //
-      //                               AudioManager.requestAudioFocus();
-      //                             }
-      //                           });
-      //                         },
-      //                       ),
-      //                       // Skip forward button
-      //                       IconButton(
-      //                         iconSize: 40,
-      //                         icon: const Icon(
-      //                           Icons.forward_10,
-      //                           color: Colors.white70,
-      //                         ),
-      //                         onPressed: () {
-      //                           _videoPlayerController.seekTo(
-      //                             _videoPlayerController.value.position + const Duration(seconds: 10),
-      //                           );
-      //                         },
-      //                       ),
-      //                     ],
-      //                   ),
-      //                 ),
-      //               ),
-      //               Positioned(
-      //                 bottom: ScreenUtil.verticalScale(1),
-      //                 left: 10,
-      //                 right: 10,
-      //                 child: !videoNotInitialized &&
-      //                         _chewieController!.videoPlayerController.value.isInitialized == true
-      //                     ? Column(
-      //                         children: [
-      //                           Container(
-      //                             margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.3), left: 20, right: 20),
-      //                             child: Column(
-      //                               children: [
-      //                                 Column(
-      //                                   children: [
-      //                                     SizedBox(height: ScreenUtil.verticalScale(0.8)),
-      //                                     Row(
-      //                                       children: [
-      //                                         Spacer(),
-      //                                         GestureDetector(
-      //                                           onTap: showControls
-      //                                               ? () {
-      //                                                   muteUnMute();
-      //                                                 }
-      //                                               : null,
-      //                                           child: Icon(
-      //                                             isMute ? Icons.volume_up : Icons.volume_off,
-      //                                             color: !showControls ? Colors.transparent : Colors.white70,
-      //                                             size: 28,
-      //                                           ),
-      //                                         ),
-      //                                       ],
-      //                                     ),
-      //                                   ],
-      //                                 ),
-      //                                 SizedBox(height: ScreenUtil.verticalScale(1)),
-      //                                 ValueListenableBuilder<Duration>(
-      //                                   valueListenable: videoProgressValue,
-      //                                   builder: (context, progress, _) {
-      //                                     return ProgressBar(
-      //                                       collapsedBufferedBarColor: Colors.white,
-      //                                       expandedBufferedBarColor: Colors.white,
-      //                                       buffered: getBufferedPosition(),
-      //                                       controller: _controller,
-      //                                       progress: progress,
-      //                                       total: Duration(
-      //                                         seconds: _videoPlayerController.value.duration.inSeconds,
-      //                                       ),
-      //                                       onChanged: (value) {
-      //                                         _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
-      //                                       },
-      //                                       onSeek: (value) {},
-      //                                       onChangeStart: (value) {
-      //                                         _videoPlayerController.pause();
-      //                                         isZoom = true;
-      //                                       },
-      //                                       onChangeEnd: (value) {
-      //                                         _videoPlayerController.play();
-      //                                         isZoom = false;
-      //                                       },
-      //                                     );
-      //                                   },
-      //                                 ),
-      //                                 SizedBox(height: ScreenUtil.verticalScale(2.2)),
-      //                               ],
-      //                             ),
-      //                           ),
-      //                         ],
-      //                       )
-      //                     : const SizedBox(),
-      //               ),
-      //             ],
-      //           ),
-      //
-      //           Expanded(child: Container()),
-      //           // Button at the bottom
-      //           Container(
-      //             margin: EdgeInsets.only(
-      //               top: ScreenUtil.verticalScale(2),
-      //               bottom: ScreenUtil.verticalScale(3),
-      //               left: ScreenUtil.horizontalScale(10),
-      //               right: ScreenUtil.horizontalScale(10),
-      //             ),
-      //             child: ButtonWidget(
-      //               text: "Continue Working Out",
-      //               textColor: Colors.white,
-      //               onPress: () {
-      //                 Navigator.pop(context);
-      //               },
-      //               color: AppColors.primaryColor,
-      //               isLoading: false,
-      //             ),
-      //           ),
-      //         ],
-      //       ),
     );
   }
 }

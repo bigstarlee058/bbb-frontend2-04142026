@@ -15,9 +15,9 @@ import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
-import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/gestures.dart';
@@ -468,11 +468,14 @@ class _LoginPageState extends State<LoginPage> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Utils.appImage(
-                media,
-                // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                image: dataProvider!.cachedImageMap["imageLogin"],
-                imageKey: "imageLogin",
+              AppImage.imageLogin(
+                // media,
+                // image: dataProvider!.allImageList
+                //     .where((element) => element["key"] == "imageLogin")
+                //     .first["image"],
+                // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                // // image: dataProvider!.cachedImageMap["imageLogin"],
+                // imageKey: "imageLogin",
                 child: Column(
                   children: [
                     Align(
@@ -496,9 +499,10 @@ class _LoginPageState extends State<LoginPage> {
               width: media.width,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/img/bbb-logo.png'),
-                    fit: BoxFit.fitHeight,
-                    opacity: 1),
+                  image: AssetImage('assets/img/bbb-logo.png'),
+                  fit: BoxFit.fitHeight,
+                  opacity: 1,
+                ),
               ),
             ),
           ),
@@ -522,12 +526,15 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                      topLeft: Radius.circular(
+                        ScreenUtil.verticalScale(7),
+                      ),
                     ),
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil.verticalScale(4.4)),
+                      horizontal: ScreenUtil.verticalScale(4.4),
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(

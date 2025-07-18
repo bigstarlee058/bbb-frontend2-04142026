@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/components/expansion_panel.dart' as com;
+import 'package:bbb/custom/expansion_panel.dart' as com;
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/choose_equipment_popup.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/choose_workoutday_popup.dart';
 import 'package:bbb/providers/data_provider.dart';

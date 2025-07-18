@@ -2,7 +2,8 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:flutter/material.dart';
 
 class BackArrowWidget extends StatelessWidget {
-  const BackArrowWidget({super.key, required this.onPress, this.position, this.bigSize});
+  const BackArrowWidget(
+      {super.key, required this.onPress, this.position, this.bigSize});
 
   final Function() onPress;
   final double? position;
@@ -28,7 +29,7 @@ class BackArrowWidget extends StatelessWidget {
             child: Icon(
               Icons.keyboard_arrow_left,
               color: Colors.white,
-              size: ScreenUtil.verticalScale(3.3),
+              size: ScreenUtil.verticalScale((position ?? 0) > 25 ? 3 : 3.3),
             ),
           ),
         ),

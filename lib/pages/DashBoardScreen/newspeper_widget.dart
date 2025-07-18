@@ -1,5 +1,6 @@
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class NewspaperLayoutWidget extends StatelessWidget {
@@ -36,10 +37,12 @@ class NewspaperLayoutWidget extends StatelessWidget {
     BuildContext context,
     BoxConstraints constraints,
   ) {
-    final defaultTextStyle =
-        textStyle ?? Theme.of(context).textTheme.bodyMedium ?? const TextStyle(fontSize: 16, height: 1.5);
+    final defaultTextStyle = textStyle ??
+        Theme.of(context).textTheme.bodyMedium ??
+        const TextStyle(fontSize: 16, height: 1.5);
     final spacing = 18.0;
-    final availableWidthNextToImage = constraints.maxWidth - imageWidth - spacing;
+    final availableWidthNextToImage =
+        constraints.maxWidth - imageWidth - spacing;
     final textPainter = TextPainter(
       // textAlign: TextAlign.left,
       text: TextSpan(
@@ -71,13 +74,16 @@ class NewspaperLayoutWidget extends StatelessWidget {
                 height: imageHeight,
                 margin: EdgeInsets.only(right: spacing),
                 child: ClipRRect(
-                    borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(500)),
+                    borderRadius:
+                        BorderRadius.circular(ScreenUtil.verticalScale(500)),
                     child: appShimmerImage(
+                      color: Colors.transparent,
                       height: imageHeight,
                       width: imageWidth,
                       networkImageUrl: imageUrl,
                       fit: BoxFit.cover,
-                      borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(500)),
+                      borderRadius:
+                          BorderRadius.circular(ScreenUtil.verticalScale(500)),
                     )
                     // Image.network(
                     //   imageUrl,
@@ -102,7 +108,8 @@ class NewspaperLayoutWidget extends StatelessWidget {
                   height: imageHeight,
                   child: Text(
                     textNextToImage,
-                    style: defaultTextStyle.copyWith(color: const Color(0xFF888888)),
+                    style: defaultTextStyle.copyWith(
+                        color: AppColors.appGreyColor),
                     // textAlign: TextAlign.justify,
                     overflow: TextOverflow.visible,
                   ),
@@ -115,7 +122,7 @@ class NewspaperLayoutWidget extends StatelessWidget {
               padding: const EdgeInsets.only(top: 1),
               child: Text(
                 remainingText,
-                style: defaultTextStyle.copyWith(color: const Color(0xFF888888)),
+                style: defaultTextStyle.copyWith(color: AppColors.appGreyColor),
                 // textAlign: TextAlign.justify,
               ),
             ),
@@ -148,7 +155,8 @@ class NewspaperLayoutWidget extends StatelessWidget {
       textPainter.text = TextSpan(text: testText, style: style);
       textPainter.layout(maxWidth: maxWidth);
 
-      if (textPainter.didExceedMaxLines || textPainter.height > maxLines * textPainter.preferredLineHeight) {
+      if (textPainter.didExceedMaxLines ||
+          textPainter.height > maxLines * textPainter.preferredLineHeight) {
         high = mid - 1;
       } else {
         result = testText;

@@ -4,6 +4,7 @@ import 'package:bbb/models/faqs_model.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 // import 'package:fl_chart/fl_chart.dart';
@@ -28,10 +29,19 @@ class _FAQsPageState extends State<FAQsPage> {
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async => await dataProvider?.getFAQs(),
+      (timeStamp) async {
+        await dataProvider?.getFAQs();
+        final phaseCount = dataProvider?.faQsModel.length ?? 0;
+        for (int i = 0; i < phaseCount; i++) {
+          _tileKeys.add(GlobalKey());
+        }
+        dataProvider?.updateFaqLoader(false);
+      },
     );
     super.initState();
   }
+
+  final List<GlobalKey> _tileKeys = [];
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +60,14 @@ class _FAQsPageState extends State<FAQsPage> {
                   children: [
                     Stack(
                       children: [
-                        Utils.appImage(
-                          media,
-                          image: dataProvider!.cachedImageMap["imageFaQs"],
-                          imageKey: "imageFaQs",
-                        ),
+                        AppImage.imageFaQs(
+                            // media,
+                            // image: dataProvider!.allImageList
+                            //     .where((element) => element["key"] == "imageFaQs")
+                            //     .first["image"],
+                            // // image: dataProvider!.cachedImageMap["imageFaQs"],
+                            // imageKey: "imageFaQs",
+                            ),
                         SizedBox(
                           height: media.height / 2.5,
                           width: media.width,
@@ -152,7 +165,8 @@ class _FAQsPageState extends State<FAQsPage> {
                           margin: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(6))
                               .copyWith(bottom: 5),
-                          child: value.faqLoader && value.faQsModel.isEmpty
+                          child: value.faqLoader && value.faQsModel.isEmpty ||
+                                  _tileKeys.isEmpty
                               ? Center(
                                   child: CircularProgressIndicator(
                                     color: AppColors.primaryColor,
@@ -177,6 +191,7 @@ class _FAQsPageState extends State<FAQsPage> {
                                       itemCount: dataProvider!.faQsModel.length,
                                       itemBuilder: (context, index) {
                                         return Padding(
+                                          key: _tileKeys[index],
                                           padding: EdgeInsets.only(
                                             bottom: ScreenUtil.verticalScale(
                                                 dataProvider!.faQsModel.length -
@@ -242,17 +257,22 @@ class _FAQsPageState extends State<FAQsPage> {
             _expandedStates[index] = value;
           });
 
-          if (value && index == dataProvider!.faQsModel.length - 1) {
+          // if (value && index == dataProvider!.faQsModel.length - 1) {
+          //   WidgetsBinding.instance.addPostFrameCallback((_) {
+          //     Future.delayed(const Duration(milliseconds: 200), () {
+          //       if (_scrollController.hasClients) {
+          //         _scrollController.animateTo(
+          //           _scrollController.position.maxScrollExtent,
+          //           duration: const Duration(milliseconds: 100),
+          //           curve: Curves.easeOut,
+          //         );
+          //       }
+          //     });
+          //   });
+          // }
+          if (value) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Future.delayed(const Duration(milliseconds: 200), () {
-                if (_scrollController.hasClients) {
-                  _scrollController.animateTo(
-                    _scrollController.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 100),
-                    curve: Curves.easeOut,
-                  );
-                }
-              });
+              _scrollToTile(index);
             });
           }
         },
@@ -300,7 +320,7 @@ class _FAQsPageState extends State<FAQsPage> {
                 item.answer ?? "",
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.7),
-                  color: const Color(0xFF888888),
+                  color: AppColors.appGreyColor,
                 ),
               ),
             ),
@@ -309,5 +329,46 @@ class _FAQsPageState extends State<FAQsPage> {
         ],
       ),
     );
+  }
+
+  void _scrollToTile(int index) {
+    // final context = _tileKeys[index].currentContext;
+    // if (context != null) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     Future.delayed(const Duration(milliseconds: 200), () {
+    //       if (_scrollController.hasClients) {
+    //         Scrollable.ensureVisible(
+    //           context,
+    //           duration: const Duration(milliseconds: 200),
+    //           curve: Curves.easeInOut,
+    //           alignment: 0.1,
+    //         );
+    //       }
+    //     });
+    //   });
+    // }
+
+    final context = _tileKeys[index].currentContext;
+    if (context != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(Duration(milliseconds: 200), () {
+          final RenderBox renderBox = context.findRenderObject() as RenderBox;
+          final position = renderBox.localToGlobal(Offset.zero);
+          final tileHeight = renderBox.size.height;
+          final screenHeight = MediaQuery.of(context).size.height;
+          final desiredOffset = _scrollController.offset +
+              position.dy +
+              tileHeight -
+              screenHeight +
+              50;
+          final maxScroll = _scrollController.position.maxScrollExtent;
+          _scrollController.animateTo(
+            desiredOffset.clamp(0, maxScroll),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+          );
+        });
+      });
+    }
   }
 }

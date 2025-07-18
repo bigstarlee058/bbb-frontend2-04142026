@@ -7,6 +7,7 @@ import 'package:bbb/pages/Tools/tutorial_details_page.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,11 +51,15 @@ class _TutorialPageState extends State<TutorialPage> {
                   children: [
                     Stack(
                       children: [
-                        Utils.appImage(
-                          media,
-                          image: dataProvider!.cachedImageMap["imageApparel"],
-                          imageKey: "imageDashboard",
-                        ),
+                        AppImage.imageApparel(
+                            // media,
+                            // image: dataProvider!.allImageList
+                            //     .where(
+                            //         (element) => element["key"] == "imageApparel")
+                            //     .first["image"],
+                            // // image: dataProvider!.cachedImageMap["imageApparel"],
+                            // imageKey: "imageApparel",
+                            ),
                         SizedBox(
                           height: media.height / 2.5,
                           width: media.width,

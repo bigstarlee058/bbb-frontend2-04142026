@@ -1,7 +1,5 @@
-import 'dart:developer';
-
 import 'package:bbb/components/animated_dialog.dart';
-import 'package:bbb/components/expansion_panel.dart';
+import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
@@ -60,7 +58,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
 
   MonthProvider? monthProvider;
   int? mainIndex;
-  WeekDataModel? weekDataModel;
+  // WeekDataModel? weekDataModel;
   List<DayDataModel> dayDataList = [];
   // int curExpandedIdx = 0;
   bool ischecked = false;
@@ -73,13 +71,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     super.initState();
     monthProvider = widget.monthProvider;
     mainIndex = widget.index;
-    weekDataModel = widget.monthProvider?.weeksDataList[mainIndex!];
+    // weekDataModel = widget.monthProvider?.weeksDataList[mainIndex!];
     thisWeek = ((mainIndex! + 1) == monthProvider?.week);
     // _isExpanded = false;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (monthProvider!.isCurrentMonth == "Current") {
         if ((mainIndex! + 1) == monthProvider?.week ? true : false) {
-          monthProvider!.updateWeekExpandedHeight(86, mainIndex ?? 0);
+          monthProvider!.updateWeekExpandedHeight(89, mainIndex ?? 0);
         }
         await Future.delayed(Duration.zero).then(
           (value) {
@@ -97,8 +95,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             monthProvider?.weekStatuses[mainIndex ?? 0] == WeekType.futureWeek;
 
         if ((mainIndex! + 1) == 1 ? true : false) {
-          monthProvider!
-              .updateWeekExpandedHeight(isFuture ? 89 : 86, mainIndex ?? 0);
+          monthProvider!.updateWeekExpandedHeight(89, mainIndex ?? 0);
         }
         await Future.delayed(Duration.zero).then(
           (value) {
@@ -113,7 +110,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       }
     });
 
-    dayDataList = weekDataModel!.days!;
+    dayDataList = widget.monthProvider!.weeksDataList[mainIndex!].days!;
   }
 
   @override
@@ -147,13 +144,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 // materialGapSize: 10,
                 expandedHeaderPadding: EdgeInsets.zero,
                 expansionCallback: (panelIndex, isExpanded) async {
-                  log('isExpanded==========>>>>>$isExpanded');
-                  bool isFuture =
-                      monthProvider.weekStatuses[widget.weekIndex] ==
-                          WeekType.futureWeek;
                   if (isExpanded) {
                     monthProvider.updateWeekExpandedHeight(
-                        monthProvider.weekExpandedHeight + (isFuture ? 89 : 86),
+                        monthProvider.weekExpandedHeight + (89),
                         mainIndex ?? 0);
                     setState(() {});
                     await Future.delayed(Duration(milliseconds: 100)).then(
@@ -170,8 +163,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     setState(() {});
                     await Future.delayed(Duration(milliseconds: 310)).then(
                       (value) => monthProvider.updateWeekExpandedHeight(
-                          monthProvider.weekExpandedHeight -
-                              (isFuture ? 89 : 86),
+                          monthProvider.weekExpandedHeight - (89),
                           mainIndex ?? 0),
                     );
                   }
@@ -289,15 +281,17 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                           //   color: Colors.grey.shade600,
                           // ),
                           // SizedBox(width: 2),
-                          Text(
-                            "This week finishes on ${DateFormat("MM/dd/yyyy").format(widget.startDate.add(Duration(days: 6)))}",
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: ScreenUtil.verticalScale(1.5),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
+                          Builder(builder: (context) {
+                            return Text(
+                              "This week finishes on ${DateFormat("MM/dd/yyyy").format(widget.startDate.add(Duration(days: 6)))}",
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: ScreenUtil.verticalScale(1.5),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade600,
+                              ),
+                            );
+                          }),
                         ],
                       ),
                     )
@@ -336,9 +330,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: weekDataModel!.dayList!.length,
+            itemCount:
+                widget.monthProvider!.weeksDataList[mainIndex!].dayList!.length,
             itemBuilder: (context, index) {
-              final dayIndex = int.parse(weekDataModel!.dayList![index]
+              final dayIndex = int.parse(widget
+                      .monthProvider!.weeksDataList[mainIndex!].dayList![index]
                       .toString()
                       .replaceAll("Workout", "")
                       .replaceAll("Rest", "")
@@ -346,12 +342,15 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       .replaceAll(" ", "")) -
                   1;
 
-              DayDataModel dayData =
-                  weekDataModel!.dayList![index].toString().contains("Workout")
-                      ? dayDataList[dayIndex]
-                      : DayDataModel();
-              bool isRestDay =
-                  weekDataModel?.dayList?[index].contains("Rest Day");
+              DayDataModel dayData = widget
+                      .monthProvider!.weeksDataList[mainIndex!].dayList![index]
+                      .toString()
+                      .contains("Workout")
+                  ? dayDataList[dayIndex]
+                  : DayDataModel();
+              bool isRestDay = widget
+                  .monthProvider!.weeksDataList[mainIndex!].dayList?[index]
+                  .contains("Rest Day");
 
               final exerciseDetails = isRestDay ? null : dayData.exercises!;
 
@@ -388,18 +387,22 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                   "";
 
               String dataId =
-                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel!.weeks![mainIndex!].id}-${weekDataModel!.idList![index]}";
+                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel!.weeks![mainIndex!].id}-${widget.monthProvider!.weeksDataList[mainIndex!].idList![index]}";
 
-              int nextWorkOutIndex =
-                  weekDataModel!.dayList![index].toString().contains("Workout")
-                      ? int.parse(weekDataModel!.dayList![index]
-                              .toString()
-                              .replaceAll("Day ", "")
-                              .replaceAll(" Workout", "")) -
-                          1
-                      : 0;
+              int nextWorkOutIndex = widget
+                      .monthProvider!.weeksDataList[mainIndex!].dayList![index]
+                      .toString()
+                      .contains("Workout")
+                  ? int.parse(widget.monthProvider!.weeksDataList[mainIndex!]
+                          .dayList![index]
+                          .toString()
+                          .replaceAll("Day ", "")
+                          .replaceAll(" Workout", "")) -
+                      1
+                  : 0;
               return SizedBox(
-                child: weekDataModel!.dayList![index]
+                child: widget.monthProvider!.weeksDataList[mainIndex!]
+                        .dayList![index]
                         .toString()
                         .contains("Workout")
                     ? workoutday(monthProvider, isRestDay, dataId, index,
@@ -409,8 +412,14 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                             (monthProvider.allSplitDayHistoryModel
                                 .where((e) => e.dataId == dataId)
                                 .isEmpty)
-                        ? selection(monthProvider, index, dayData, context,
-                            weekDataModel!.idList![index], dataId)
+                        ? selection(
+                            monthProvider,
+                            index,
+                            dayData,
+                            context,
+                            widget.monthProvider!.weeksDataList[mainIndex!]
+                                .idList![index],
+                            dataId)
                         : pumpDayRestday(
                             monthProvider, dataId, index, isRestDay, dayData),
               );
@@ -440,7 +449,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               color: Colors.black.withValues(alpha: 0.1), width: 0.3),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withValues(alpha: 0.07),
               blurRadius: 10,
               spreadRadius: 2,
               offset: Offset(0, 2),
@@ -449,16 +458,16 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
               Colors.grey[50],
           borderRadius: BorderRadius.circular(
-            ScreenUtil.verticalScale(1),
+            ScreenUtil.verticalScale(2),
           ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              height: ScreenUtil.verticalScale(7.8),
-              width: ScreenUtil.verticalScale(7.8),
-              margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
+              height: ScreenUtil.verticalScale(8.8),
+              width: ScreenUtil.verticalScale(8.8),
+              // margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
               decoration: BoxDecoration(
                 color: monthProvider.weekStatuses[mainIndex!] ==
                         WeekType.futureWeek
@@ -479,8 +488,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                     WeekType.currentWeek
                                 ? AppColors.greyColor1
                                 : AppColors.skipDayColor,
-                borderRadius:
-                    BorderRadius.circular(ScreenUtil.verticalScale(1)),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+                ),
               ),
               child: Padding(
                 padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
@@ -507,13 +518,14 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                   color: Colors.white,
                                 )
                               : Image.asset(
-                                  "assets/img/workoutday.png",
+                                  "assets/img/workout1.png",
                                   color: Colors.black,
+                                  height: ScreenUtil.verticalScale(3.8),
                                 ),
                 ),
               ),
             ),
-            const SizedBox(width: 3),
+            SizedBox(width: 3 + ScreenUtil.verticalScale(1)),
             Expanded(
               child: SizedBox(
                 height: 60,
@@ -529,7 +541,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                           dayData,
                           context,
                           mainIndex!,
-                          weekDataModel!.idList![index]),
+                          widget.monthProvider!.weeksDataList[mainIndex!]
+                              .idList![index]),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -543,7 +556,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                             child: Builder(
                               builder: (context) {
                                 return Text(
-                                  "${weekDataModel!.days![nextWorkOutIndex].title}",
+                                  "${widget.monthProvider!.weeksDataList[mainIndex!].days![nextWorkOutIndex].title}",
                                   style: TextStyle(
                                       color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/
                                           Colors.black,
@@ -557,8 +570,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                           const SizedBox(height: 4),
                           if (!isRestDay) ...[
                             Builder(builder: (context) {
-                              int exCount = weekDataModel!
-                                  .days![nextWorkOutIndex].exercises!
+                              int exCount = widget
+                                  .monthProvider!
+                                  .weeksDataList[mainIndex!]
+                                  .days![nextWorkOutIndex]
+                                  .exercises!
                                   .where((element) => (element.formats!
                                           .contains(
                                               monthProvider.equipmentType) ||
@@ -700,7 +716,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               monthProvider.overviewCurrentDay = index + 1;
               monthProvider.dayDataModel = dayData;
               // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
-              monthProvider.weekDataModel = weekDataModel;
+              monthProvider.weekDataModel =
+                  widget.monthProvider!.weeksDataList[mainIndex!];
               monthProvider.updateIsPastWeek(
                   monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
@@ -715,6 +732,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                   title: monthProvider.pumpDayModel?.title,
                 );
                 if (!context.mounted) return;
+                await monthProvider.fetchAllDayStatusLocalData();
                 await Navigator.pushNamed(context, '/today').then(
                   (value) {
                     WidgetsBinding.instance.addPostFrameCallback(
@@ -724,6 +742,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 );
               } else {
                 if (!context.mounted) return;
+                await monthProvider.fetchAllDayStatusLocalData();
                 await Navigator.pushNamed(context, '/today');
               }
 
@@ -738,7 +757,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       color: Colors.black.withValues(alpha: 0.1), width: 0.3),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Colors.black.withValues(alpha: 0.07),
                       blurRadius: 10,
                       spreadRadius: 2,
                       offset: Offset(0, 2),
@@ -747,32 +766,32 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                   color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
                       Colors.grey[50],
                   borderRadius: BorderRadius.circular(
-                    ScreenUtil.verticalScale(1),
+                    ScreenUtil.verticalScale(2),
                   ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(width: ScreenUtil.verticalScale(1)),
+                    // SizedBox(width: ScreenUtil.verticalScale(1)),
                     Container(
-                      height: ScreenUtil.verticalScale(7.8),
-                      width: ScreenUtil.verticalScale(7.8),
-                      margin: EdgeInsets.symmetric(
-                          vertical: ScreenUtil.verticalScale(1)),
+                      height: ScreenUtil.verticalScale(8.8),
+                      width: ScreenUtil.verticalScale(8.8),
+                      // margin: EdgeInsets.symmetric(
+                      //     vertical: ScreenUtil.verticalScale(1)),
                       decoration: BoxDecoration(
                         color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.backOffSetColor :*/
                             AppColors.greyColor1,
-                        borderRadius: BorderRadius.circular(
-                          ScreenUtil.verticalScale(1),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+                          bottomLeft:
+                              Radius.circular(ScreenUtil.verticalScale(2)),
                         ),
                       ),
                       child: Center(
                         child: Image.asset(
-                          height: ScreenUtil.verticalScale(4),
-                          width: ScreenUtil.verticalScale(4),
-                          "assets/img/pumpday.png",
-                        ),
+                            height: ScreenUtil.verticalScale(4.2),
+                            "assets/img/pumpday.png"),
                       ),
                     ),
                     Expanded(
@@ -811,7 +830,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
               monthProvider.overviewCurrentDay = index + 1;
               monthProvider.dayDataModel = dayData;
-              monthProvider.weekDataModel = weekDataModel;
+              monthProvider.weekDataModel =
+                  widget.monthProvider!.weeksDataList[mainIndex!];
               monthProvider.updateIsPastWeek(
                   monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek);
               AnimatedDialog.showAnimatedDialog(
@@ -829,7 +849,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       color: Colors.black.withValues(alpha: 0.1), width: 0.3),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Colors.black.withValues(alpha: 0.07),
                       blurRadius: 10,
                       spreadRadius: 2,
                       offset: Offset(0, 2),
@@ -837,33 +857,35 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                   ],
                   color: Colors.grey[50],
                   borderRadius: BorderRadius.circular(
-                    ScreenUtil.verticalScale(1),
+                    ScreenUtil.verticalScale(2),
                   ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(width: ScreenUtil.verticalScale(1)),
+                    // SizedBox(width: ScreenUtil.verticalScale(1)),
                     Container(
-                      height: ScreenUtil.verticalScale(7.8),
-                      width: ScreenUtil.verticalScale(7.8),
-                      margin: EdgeInsets.symmetric(
-                          vertical: ScreenUtil.verticalScale(1)),
+                      height: ScreenUtil.verticalScale(8.8),
+                      width: ScreenUtil.verticalScale(8.8),
+                      // margin: EdgeInsets.symmetric(
+                      //     vertical: ScreenUtil.verticalScale(1)),
                       decoration: BoxDecoration(
                         color: AppColors.greyColor1,
-                        borderRadius: BorderRadius.circular(
-                          ScreenUtil.verticalScale(1),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+                          bottomLeft:
+                              Radius.circular(ScreenUtil.verticalScale(2)),
                         ),
                       ),
                       child: Center(
                         child: Image.asset(
-                          height: ScreenUtil.verticalScale(4),
-                          width: ScreenUtil.verticalScale(4),
+                          height: ScreenUtil.verticalScale(4.2),
                           "assets/img/restday.png",
                         ),
                       ),
                     ),
+
                     Expanded(
                       child: Center(
                         child: Text(
@@ -900,7 +922,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     color: Colors.black.withValues(alpha: 0.1), width: 0.3),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withValues(alpha: 0.07),
                     blurRadius: 10,
                     spreadRadius: 2,
                     offset: Offset(0, 2),
@@ -908,22 +930,24 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 ],
                 color: Colors.grey[50],
                 borderRadius: BorderRadius.circular(
-                  ScreenUtil.verticalScale(1),
+                  ScreenUtil.verticalScale(2),
                 ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    height: ScreenUtil.verticalScale(7.8),
-                    width: ScreenUtil.verticalScale(7.8),
+                    height: ScreenUtil.verticalScale(8.8),
+                    width: ScreenUtil.verticalScale(8.8),
                     decoration: BoxDecoration(
                       color: AppColors.greyColor1,
-                      borderRadius: BorderRadius.circular(
-                        ScreenUtil.verticalScale(1),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+                        bottomLeft:
+                            Radius.circular(ScreenUtil.verticalScale(2)),
                       ),
                     ),
-                    margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
+                    // margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
                     child: Padding(
                       padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
                       child: Center(
@@ -932,7 +956,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 3),
+                  SizedBox(width: 3 + ScreenUtil.verticalScale(1)),
                   Expanded(
                     child: SizedBox(
                       height: 60,
@@ -972,16 +996,24 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                         element.dataId == dataId &&
                         element.type!.contains("Pump Day"),
                     orElse: () => DayHistoryModel());
-
             return Slidable(
-              enabled: (matchingElement.type ?? "").contains("Pump Day") &&
-                  monthProvider.weekStatuses[mainIndex!] ==
-                      WeekType.currentWeek &&
-                  ((monthProvider.allSplitDayHistoryModel.any((e) =>
-                          (e.status == Status.completed ||
-                              e.status == Status.skipped) &&
-                          e.dataId == dataId) ==
-                      false)),
+              enabled: isRestDay &&
+                      matchingElement.id == null &&
+                      ((monthProvider.allSplitDayHistoryModel.any((e) =>
+                              (e.status == Status.completed ||
+                                  e.status == Status.skipped) &&
+                              e.dataId == dataId) ==
+                          true)) &&
+                      monthProvider.isPumpDayAvailable
+                  ? true
+                  : (matchingElement.type ?? "").contains("Pump Day") &&
+                      monthProvider.weekStatuses[mainIndex!] ==
+                          WeekType.currentWeek &&
+                      ((monthProvider.allSplitDayHistoryModel.any((e) =>
+                              (e.status == Status.completed ||
+                                  e.status == Status.skipped) &&
+                              e.dataId == dataId) ==
+                          false)),
               endActionPane: ActionPane(
                 extentRatio: 0.22,
                 motion: const ScrollMotion(),
@@ -1004,21 +1036,51 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                       WeekType.currentWeek) {
                                     return;
                                   }
-                                  await Future.delayed(
-                                          Duration(milliseconds: 300))
-                                      .then(
-                                    (v) async {
-                                      monthProvider.changeIsPumpDay(false);
-                                      monthProvider.overviewCurrentWeek =
-                                          widget.weekIndex + 1;
-                                      monthProvider.overviewCurrentDay =
-                                          index + 1;
-                                      monthProvider.dayDataModel = dayData;
-                                      monthProvider.weekDataModel =
-                                          weekDataModel;
-                                      await deletePumpDayData();
-                                    },
-                                  );
+                                  if (isRestDay &&
+                                      matchingElement.id == null &&
+                                      ((monthProvider.allSplitDayHistoryModel
+                                              .any((e) =>
+                                                  (e.status ==
+                                                          Status.completed ||
+                                                      e.status ==
+                                                          Status.skipped) &&
+                                                  e.dataId == dataId) ==
+                                          true)) &&
+                                      monthProvider.isPumpDayAvailable) {
+                                    await Future.delayed(
+                                            Duration(milliseconds: 300))
+                                        .then(
+                                      (v) async {
+                                        monthProvider.changeIsPumpDay(false);
+                                        monthProvider.overviewCurrentWeek =
+                                            widget.weekIndex + 1;
+                                        monthProvider.overviewCurrentDay =
+                                            index + 1;
+                                        monthProvider.dayDataModel = dayData;
+                                        monthProvider.weekDataModel = widget
+                                            .monthProvider!
+                                            .weeksDataList[mainIndex!];
+                                        await deletePumpDayData();
+                                      },
+                                    );
+                                  } else {
+                                    await Future.delayed(
+                                            Duration(milliseconds: 300))
+                                        .then(
+                                      (v) async {
+                                        monthProvider.changeIsPumpDay(false);
+                                        monthProvider.overviewCurrentWeek =
+                                            widget.weekIndex + 1;
+                                        monthProvider.overviewCurrentDay =
+                                            index + 1;
+                                        monthProvider.dayDataModel = dayData;
+                                        monthProvider.weekDataModel = widget
+                                            .monthProvider!
+                                            .weeksDataList[mainIndex!];
+                                        await deletePumpDayData();
+                                      },
+                                    );
+                                  }
                                 },
                                 icon: Icons.swap_horiz,
                                 backgroundColor: Colors.blue,
@@ -1067,7 +1129,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                         color: Colors.black.withValues(alpha: 0.1), width: 0.3),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withValues(alpha: 0.07),
                         blurRadius: 10,
                         spreadRadius: 2,
                         offset: Offset(0, 2),
@@ -1076,15 +1138,15 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
                         Colors.grey[50],
                     borderRadius:
-                        BorderRadius.circular(ScreenUtil.verticalScale(1)),
+                        BorderRadius.circular(ScreenUtil.verticalScale(2)),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        height: ScreenUtil.verticalScale(7.8),
-                        width: ScreenUtil.verticalScale(7.8),
-                        margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
+                        height: ScreenUtil.verticalScale(8.8),
+                        width: ScreenUtil.verticalScale(8.8),
+                        // margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
                         decoration: BoxDecoration(
                           color: monthProvider.weekStatuses[mainIndex!] ==
                                   WeekType.futureWeek
@@ -1108,8 +1170,12 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                               WeekType.currentWeek
                                           ? AppColors.greyColor1
                                           : AppColors.skipDayColor,
-                          borderRadius: BorderRadius.circular(
-                              ScreenUtil.verticalScale(1)),
+                          borderRadius: BorderRadius.only(
+                            topLeft:
+                                Radius.circular(ScreenUtil.verticalScale(2)),
+                            bottomLeft:
+                                Radius.circular(ScreenUtil.verticalScale(2)),
+                          ),
                         ),
                         child: Padding(
                           padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
@@ -1146,11 +1212,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                                 ? "assets/img/pumpday.png"
                                                 : "assets/img/restday.png",
                                             color: Colors.black,
+                                            height:
+                                                ScreenUtil.verticalScale(4.2),
                                           ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 3),
+                      SizedBox(width: 3 + ScreenUtil.verticalScale(1)),
                       Expanded(
                         child: SizedBox(
                           height: 60,
@@ -1165,13 +1233,18 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                     dayData,
                                     context,
                                     mainIndex!,
-                                    weekDataModel!.idList![index]),
+                                    widget
+                                        .monthProvider!
+                                        .weeksDataList[mainIndex!]
+                                        .idList![index]),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Builder(builder: (context) {
-                                  int i = int.parse(weekDataModel!
+                                  int i = int.parse(widget
+                                          .monthProvider!
+                                          .weeksDataList[mainIndex!]
                                           .dayList![index]
                                           .toString()
                                           .split(" ")
@@ -1179,12 +1252,27 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                           .last) -
                                       1;
 
-                                  return i < weekDataModel!.restDayList!.length
+                                  // log('weekDataModel!.restDayList?==========>>>>>${weekDataModel!.restDayList}');
+                                  return i <
+                                          widget
+                                              .monthProvider!
+                                              .weeksDataList[mainIndex!]
+                                              .restDayList!
+                                              .length
                                       ? Text(
-                                          (matchingElement.type ?? "")
-                                                  .contains("Pump Day")
-                                              ? "${matchingElement.title}"
-                                              : weekDataModel!.restDayList?[i],
+                                          matchingElement.type == null
+                                              ? (widget
+                                                      .monthProvider!
+                                                      .weeksDataList[mainIndex!]
+                                                      .restDayList?[i] ??
+                                                  "Rest Day")
+                                              : (matchingElement.type ?? "")
+                                                      .contains("Pump Day")
+                                                  ? "${matchingElement.title}"
+                                                  : widget
+                                                      .monthProvider!
+                                                      .weeksDataList[mainIndex!]
+                                                      .restDayList?[i],
                                           style: TextStyle(
                                               color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white :*/
                                                   Colors.black,
@@ -1218,56 +1306,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                           color: AppColors.blackColor,
                                           size: ScreenUtil.verticalScale(3),
                                         ),
-                                      ) /*Theme(
-                                  data: ThemeData(popupMenuTheme: PopupMenuThemeData(color: Colors.white)),
-                                  child: PopupMenuButton(
-                                    icon: Icon(
-                                      Icons.more_horiz,
-                                      color: monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? Colors.white : Colors.black,
-                                    ),
-                                    itemBuilder: (context) {
-                                      return [
-                                        if (monthProvider.allSplitDayHistoryModel.any(
-                                                (e) => (e.status != Status.skipped && e.status != Status.completed) && e.dataId == dataId) ||
-                                            monthProvider.allSplitDayHistoryModel.where((e) => e.dataId == dataId).isEmpty) ...[
-                                          PopupMenuItem(
-                                            child: Text("Mark Skip"),
-                                          ),
-                                          PopupMenuItem(
-                                            child: Text("Mark Complete"),
-                                          ),
-                                          PopupMenuItem(
-                                            onTap: () async {
-                                              if (monthProvider.weekStatuses[mainIndex!] != WeekType.currentWeek) return;
-                                              await Future.delayed(Duration(milliseconds: 300)).then(
-                                                (v) async {
-                                                  monthProvider.changeIsPumpDay(false);
-                                                  monthProvider.overviewCurrentWeek = widget.weekIndex + 1;
-                                                  monthProvider.overviewCurrentDay = index + 1;
-                                                  monthProvider.dayDataModel = dayData;
-                                                  monthProvider.weekDataModel = weekDataModel;
-                                                  await deletePumpDayData();
-                                                },
-                                              );
-                                            },
-                                            child: Text("Swap to Rest Day"),
-                                          ),
-                                        ],
-                                        PopupMenuItem(
-                                          onTap: () async {
-                                            await Future.delayed(Duration(milliseconds: 300)).then(
-                                              (v) {
-                                                continueWorkoutOnTap(
-                                                    isRestDay, dataId, index, dayData, context, mainIndex!, weekDataModel!.idList![index]);
-                                              },
-                                            );
-                                          },
-                                          child: Text("View the Day"),
-                                        ),
-                                      ];
-                                    },
-                                  ),
-                                )*/
+                                      )
                                     : SizedBox(),
                                 SizedBox(width: 5)
                               ],
@@ -1378,7 +1417,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     monthProvider?.overviewCurrentDay = index + 1;
     monthProvider?.dayDataModel = dayData;
     // monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
-    monthProvider?.weekDataModel = weekDataModel;
+    monthProvider?.weekDataModel =
+        widget.monthProvider!.weeksDataList[mainIndex!];
     monthProvider?.updateIsPastWeek(
         monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
@@ -1433,6 +1473,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 title: monthProvider!.pumpDayModel?.title);
           }
           if (!context.mounted) return;
+          await monthProvider?.fetchAllDayStatusLocalData();
           await Navigator.pushNamed(context, '/today').then(
             (value) {
               WidgetsBinding.instance.addPostFrameCallback(
@@ -1441,6 +1482,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           );
         } else {
           if (!context.mounted) return;
+          await monthProvider?.fetchAllDayStatusLocalData();
           await Navigator.pushNamed(context, '/today');
         }
       } else {
@@ -1452,6 +1494,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           }
         }
         if (!context.mounted) return;
+        await monthProvider?.fetchAllDayStatusLocalData();
         await Navigator.pushNamed(context, '/today');
       }
     }
@@ -1810,7 +1853,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
     monthProvider?.overviewCurrentDay = index + 1;
     monthProvider?.dayDataModel = dayData;
     // monthProvider?.alternateEquipmentType = monthProvider!.equipmentType;
-    monthProvider?.weekDataModel = weekDataModel;
+    monthProvider?.weekDataModel =
+        widget.monthProvider!.weeksDataList[mainIndex!];
     monthProvider?.updateIsPastWeek(
         monthProvider!.weekStatuses[mainIndex!] == WeekType.pastWeek);
 
@@ -1863,6 +1907,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               status: Status.started,
               title: monthProvider!.pumpDayModel?.title);
           if (!context.mounted) return;
+          await monthProvider?.fetchAllDayStatusLocalData();
           await Navigator.pushNamed(context, '/today').then(
             (value) {
               WidgetsBinding.instance.addPostFrameCallback(
@@ -1871,6 +1916,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           );
         } else {
           if (!context.mounted) return;
+          await monthProvider?.fetchAllDayStatusLocalData();
           await Navigator.pushNamed(context, '/today');
         }
       } else {
@@ -1880,6 +1926,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           _saveDayData(status: Status.started, type: 'Workout Day');
         }
         if (!context.mounted) return;
+        await monthProvider?.fetchAllDayStatusLocalData();
         await Navigator.pushNamed(context, '/today');
       }
     }
