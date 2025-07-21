@@ -147,7 +147,7 @@ class _DashboardPageState extends State<DashboardPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
           if (notification.metrics.axis == Axis.vertical) {
@@ -679,8 +679,8 @@ class _DashboardPageState extends State<DashboardPage> {
                       child: Container(
                         height: media.height / 11,
                         width: media.width / 6,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
                         ),
                       ),
                     ),
@@ -696,7 +696,7 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Container(
                 width: media.width,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                   ),
@@ -767,7 +767,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return Container(
       width: media.width,
       decoration: const BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(55),
         ),
@@ -907,7 +906,7 @@ class _DashboardPageState extends State<DashboardPage> {
               style: ElevatedButton.styleFrom(
                 shape: Utils.buttonStyle,
                 side: BorderSide(width: 2.0, color: AppColors.primaryColor),
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 padding: const EdgeInsets.symmetric(vertical: 18),
               ),
               child: Text(
@@ -1138,7 +1137,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         horizontal: ScreenUtil.horizontalScale(3.5),
                         vertical: ScreenUtil.horizontalScale(5)),
                     decoration: BoxDecoration(
-                      color: AppColors.greyColor,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(15),
                     ),
                     alignment: Alignment.center,

@@ -95,13 +95,13 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
             Border.all(color: Colors.black.withValues(alpha: 0.05), width: 0.3),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.27),
+            color: Theme.of(context).scaffoldBackgroundColor,
             blurRadius: 10,
             spreadRadius: 2,
             offset: Offset(0, 2),
           ),
         ],
-        color: AppColors.greyColor,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(
           ScreenUtil.verticalScale(2),
         ),

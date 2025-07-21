@@ -248,7 +248,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
     ScreenUtil.init(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -351,9 +351,9 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -371,7 +371,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                             padding: EdgeInsets.only(
                                 top: ScreenUtil.verticalScale(2)),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).scaffoldBackgroundColor,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(
                                     ScreenUtil.horizontalScale(15)),
@@ -407,7 +407,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               width: media.width,
                               height: media.height * 0.3,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(
                                       ScreenUtil.horizontalScale(15)),

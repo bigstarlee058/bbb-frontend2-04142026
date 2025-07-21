@@ -197,7 +197,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -684,7 +684,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       Container(
                         width: media.width,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.only(
                             topLeft:
                                 Radius.circular(ScreenUtil.verticalScale(7)),
@@ -707,14 +707,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       'My Profile',
                                       Icons.person,
                                       () => Navigator.pushNamed(
-                                          context, '/myprofile')),
+                                          context, '/myprofile'),
+                                      context),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton(
                                       'Settings',
                                       Icons.settings,
                                       () => Navigator.pushNamed(
-                                          context, '/SettingPage')),
+                                          context, '/SettingPage'),
+                                      context),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('Subscription', Icons.refresh,
@@ -746,7 +748,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         throw 'Could not launch $url';
                                       }
                                     }
-                                  }),
+                                  }, context),
 
                                   /// IF PUT BACK LANGUAGE SELECTION PART UNCOMMENT THIS
 
@@ -755,7 +757,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('Support', Icons.handshake,
-                                      () => toSupportPage()),
+                                      () => toSupportPage(), context),
                                   // SizedBox(
                                   //   height: ScreenUtil.horizontalScale(4.5),
                                   // ),
@@ -764,12 +766,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   settingsButton(
                                       'Terms of Use',
                                       Icons.description,
-                                      () => toTermsOfUsePage()),
+                                      () => toTermsOfUsePage(),
+                                      context),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
                                   settingsButton(
                                       'Privacy Policy',
                                       Icons.privacy_tip_rounded,
-                                      () => toPrivacyPolicyPage()),
+                                      () => toPrivacyPolicyPage(),
+                                      context),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton(
@@ -779,11 +783,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       pageBuilder: (c1, anim1, anim2) =>
                                           deleteAccount(context, c1),
                                     );
-                                  }),
+                                  }, context),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('Log Out', Icons.logout,
-                                      () => _handleLogout(context)),
+                                      () => _handleLogout(context), context),
                                   SizedBox(height: ScreenUtil.verticalScale(3)),
 
                                   Text(
@@ -892,9 +896,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -926,7 +930,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: const Color(0xFFFFFFFF),
+                color: Theme.of(context).cardColor,
               ),
               child: Stack(
                 children: [
@@ -980,7 +984,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                     side: BorderSide(
                                         width: 2.0,
                                         color: AppColors.primaryColor),
-                                    backgroundColor: Colors.white,
+                                    backgroundColor:
+                                        Theme.of(context).cardColor,
                                   ),
                                   child: Text(
                                     'Send a Message',
@@ -1078,7 +1083,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: const Color(0xFFFFFFFF),
+                color: Theme.of(context).cardColor,
               ),
               child: Stack(
                 children: [
@@ -1131,7 +1136,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                     side: BorderSide(
                                         width: 2.0,
                                         color: AppColors.primaryColor),
-                                    backgroundColor: Colors.white,
+                                    backgroundColor:
+                                        Theme.of(context).cardColor,
                                   ),
                                   child: Text(
                                     'Cancel',
@@ -1224,12 +1230,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
-  Widget settingsButton(String title, IconData icon, VoidCallback onPressed) {
+  Widget settingsButton(
+      String title, IconData icon, VoidCallback onPressed, context) {
     return InkWell(
       onTap: onPressed,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.greyColor,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
         ),
         padding: EdgeInsets.all(

@@ -8,6 +8,7 @@ import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/theme.dart';
 // import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -131,10 +132,15 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       child: Column(
         children: [
           Theme(
-            data: ThemeData().copyWith(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
+            data: Theme.of(context).brightness == Brightness.light
+                ? lightTheme.copyWith(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                  )
+                : darkTheme.copyWith(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                  ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(0)),
               child: ExpansionPanelList(
@@ -237,7 +243,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           ),
         );
       },
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           monthProvider.weekStatuses[widget.weekIndex] == WeekType.futureWeek
@@ -456,7 +462,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
             ),
           ],
           color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
-              Colors.grey[50],
+              Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(
             ScreenUtil.verticalScale(2),
           ),
@@ -471,7 +477,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               decoration: BoxDecoration(
                 color: monthProvider.weekStatuses[mainIndex!] ==
                         WeekType.futureWeek
-                    ? AppColors.greyColor1
+                    ? Theme.of(context).brightness == Brightness.light
+                        ? AppColors.greyColor1
+                        : Theme.of(context).canvasColor
                     : (monthProvider.weekStatuses[mainIndex!] ==
                                     WeekType.pastWeek &&
                                 monthProvider
@@ -486,7 +494,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                             ? Colors.green
                             : monthProvider.weekStatuses[mainIndex!] ==
                                     WeekType.currentWeek
-                                ? AppColors.greyColor1
+                                ? Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? AppColors.greyColor1
+                                    : Theme.of(context).canvasColor
                                 : AppColors.skipDayColor,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
@@ -764,7 +775,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     ),
                   ],
                   color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
-                      Colors.grey[50],
+                      Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(
                     ScreenUtil.verticalScale(2),
                   ),
@@ -781,7 +792,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       //     vertical: ScreenUtil.verticalScale(1)),
                       decoration: BoxDecoration(
                         color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.backOffSetColor :*/
-                            AppColors.greyColor1,
+                            Theme.of(context).brightness == Brightness.light
+                                ? AppColors.greyColor1
+                                : Theme.of(context).canvasColor,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
                           bottomLeft:
@@ -855,7 +868,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       offset: Offset(0, 2),
                     ),
                   ],
-                  color: Colors.grey[50],
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(
                     ScreenUtil.verticalScale(2),
                   ),
@@ -871,7 +884,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       // margin: EdgeInsets.symmetric(
                       //     vertical: ScreenUtil.verticalScale(1)),
                       decoration: BoxDecoration(
-                        color: AppColors.greyColor1,
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? AppColors.greyColor1
+                            : Theme.of(context).canvasColor,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
                           bottomLeft:
@@ -928,7 +943,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     offset: Offset(0, 2),
                   ),
                 ],
-                color: Colors.grey[50],
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(
                   ScreenUtil.verticalScale(2),
                 ),
@@ -940,7 +955,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                     height: ScreenUtil.verticalScale(8.8),
                     width: ScreenUtil.verticalScale(8.8),
                     decoration: BoxDecoration(
-                      color: AppColors.greyColor1,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? AppColors.greyColor1
+                          : Theme.of(context).canvasColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
                         bottomLeft:
@@ -1019,7 +1036,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 motion: const ScrollMotion(),
                 children: [
                   Container(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     child: Row(
                       children: [
                         SizedBox(
@@ -1136,7 +1153,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                       ),
                     ],
                     color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
-                        Colors.grey[50],
+                        Theme.of(context).cardColor,
                     borderRadius:
                         BorderRadius.circular(ScreenUtil.verticalScale(2)),
                   ),
@@ -1150,7 +1167,9 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                         decoration: BoxDecoration(
                           color: monthProvider.weekStatuses[mainIndex!] ==
                                   WeekType.futureWeek
-                              ? AppColors.greyColor1
+                              ? Theme.of(context).brightness == Brightness.light
+                                  ? AppColors.greyColor1
+                                  : Theme.of(context).canvasColor
                               : (monthProvider.weekStatuses[mainIndex!] ==
                                               WeekType.pastWeek &&
                                           monthProvider.allSplitDayHistoryModel
@@ -1168,7 +1187,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                       : monthProvider
                                                   .weekStatuses[mainIndex!] ==
                                               WeekType.currentWeek
-                                          ? AppColors.greyColor1
+                                          ? Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? AppColors.greyColor1
+                                              : Theme.of(context).canvasColor
                                           : AppColors.skipDayColor,
                           borderRadius: BorderRadius.only(
                             topLeft:

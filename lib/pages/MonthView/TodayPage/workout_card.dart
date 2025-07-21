@@ -236,7 +236,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                   : null,
           style: ElevatedButton.styleFrom(
             disabledBackgroundColor: const Color(0xFFF3F3F3),
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).cardColor,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(

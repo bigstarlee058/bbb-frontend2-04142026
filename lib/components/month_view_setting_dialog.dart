@@ -69,7 +69,7 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: Stack(
                   children: [
@@ -176,15 +176,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -240,7 +241,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: splitIndex == 0
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -255,15 +258,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -319,7 +323,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: splitIndex == 1
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -334,15 +340,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -398,7 +405,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: splitIndex == 2
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -472,15 +481,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -536,7 +546,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: equipments == 0
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -551,15 +563,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -615,7 +628,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: equipments == 1
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -630,15 +645,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -694,7 +710,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: equipments == 2
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),

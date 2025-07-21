@@ -228,7 +228,7 @@ class _MainPageState extends State<MainPage> {
               horizontal: ScreenUtil.verticalScale(1),
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
               boxShadow: const [
                 BoxShadow(

@@ -64,7 +64,6 @@ class _InformationSectionState extends State<InformationSection> {
                     (media.height / 2.55) -
                     (media.height * 0.12)),
               ),
-              color: Colors.white,
               child: value.loading
                   ? Padding(
                       padding: EdgeInsets.only(bottom: media.height * 0.1),
@@ -193,8 +192,8 @@ class _InformationSectionState extends State<InformationSection> {
           //   });
           // }
         },
-        backgroundColor: AppColors.greyColor,
-        collapsedBackgroundColor: AppColors.greyColor,
+        backgroundColor: Theme.of(context).cardColor,
+        collapsedBackgroundColor: Theme.of(context).cardColor,
         childrenPadding: EdgeInsets.zero,
         clipBehavior: Clip.none,
         iconColor: AppColors.primaryColor,

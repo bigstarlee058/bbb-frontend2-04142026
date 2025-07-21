@@ -34,7 +34,7 @@ class _FilterSortDialogShopState extends State<FilterSortDialogShop>
   Widget build(BuildContext context) {
     return Dialog(
       insetPadding: const EdgeInsets.all(0),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -126,7 +126,7 @@ class _FilterSortDialogShopState extends State<FilterSortDialogShop>
     final isOpen = _expandedIndex == index;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.greyColor,
+        color: Theme.of(context).canvasColor,
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
       ),
       padding: EdgeInsets.symmetric(

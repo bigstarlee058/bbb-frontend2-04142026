@@ -305,7 +305,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: loading
           ? const Center(
               child: CircularProgressIndicator(
@@ -690,9 +690,9 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -762,7 +762,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius:
                             BorderRadius.only(topLeft: Radius.circular(50))),
                     margin: EdgeInsets.only(

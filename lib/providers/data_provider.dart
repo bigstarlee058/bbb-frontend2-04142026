@@ -1807,7 +1807,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   bool storyLoader = false;
-  Future<void> addOwnSpotlight(
+  Future<bool> addOwnSpotlight(
       String title, String description, File? imageFile) async {
     storyLoader = true;
     notifyListeners();
@@ -1838,11 +1838,14 @@ class DataProvider extends ChangeNotifier {
         final responseBody = await response.stream.bytesToString();
         final decoded = jsonDecode(responseBody);
         debugPrint('Spotlight added successfully: $decoded');
+        return true;
       } else {
         debugPrint('Failed to add spotlight. Status: ${response.statusCode}');
+        return false;
       }
     } catch (e) {
       debugPrint('Error adding spotlight: $e');
+      return false;
     } finally {
       storyLoader = false;
       notifyListeners();

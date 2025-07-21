@@ -292,6 +292,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog>
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Theme.of(context).cardColor,
       insetPadding:
           EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
       shape: RoundedRectangleBorder(
@@ -310,7 +311,7 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(

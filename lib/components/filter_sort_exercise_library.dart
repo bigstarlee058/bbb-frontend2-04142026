@@ -50,7 +50,7 @@ class _FilterSortDialogState extends State<FilterSortDialog>
   Widget build(BuildContext context) {
     return Dialog(
       insetPadding: const EdgeInsets.all(0),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -140,10 +140,13 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                                     border: Border.all(
                                         color: isChecked
                                             ? AppColors.primaryColor
-                                            : Colors.grey.shade800,
+                                            : Theme.of(context).brightness ==
+                                                    Brightness.light
+                                                ? Colors.grey.shade800
+                                                : AppColors.backOffSetColor
+                                                    .withValues(alpha: 0.9),
                                         width: 1.8),
-                                    color:
-                                        isChecked ? Colors.white : Colors.white,
+                                    color: Theme.of(context).canvasColor,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(2),
@@ -154,7 +157,7 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                                         shape: BoxShape.circle,
                                         color: isChecked
                                             ? const Color(0xFF9a354e)
-                                            : Colors.white,
+                                            : Theme.of(context).canvasColor,
                                       ),
                                       child: Center(
                                         child: isChecked
@@ -239,12 +242,15 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isChecked
-                                        ? AppColors.primaryColor
-                                        : Colors.grey.shade800,
-                                    width: 1.8,
-                                  ),
-                                  color: Colors.white,
+                                      color: isChecked
+                                          ? AppColors.primaryColor
+                                          : Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Colors.grey.shade800
+                                              : AppColors.backOffSetColor
+                                                  .withValues(alpha: 0.9),
+                                      width: 1.8),
+                                  color: Theme.of(context).canvasColor,
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2),
@@ -255,7 +261,7 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                                       shape: BoxShape.circle,
                                       color: isChecked
                                           ? const Color(0xFF9a354e)
-                                          : Colors.white,
+                                          : Theme.of(context).canvasColor,
                                     ),
                                     child: Center(
                                       child: isChecked
@@ -356,7 +362,7 @@ class _FilterSortDialogState extends State<FilterSortDialog>
     return Container(
       key: key,
       decoration: BoxDecoration(
-        color: AppColors.greyColor,
+        color: Theme.of(context).canvasColor,
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
       ),
       padding: EdgeInsets.symmetric(

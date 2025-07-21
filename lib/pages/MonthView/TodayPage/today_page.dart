@@ -35,6 +35,7 @@ import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
@@ -302,7 +303,7 @@ class _TodayPageState extends State<TodayPage>
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
   }
 
-  fetchRemovedExerciseLocalData() async {
+  Future<void> fetchRemovedExerciseLocalData() async {
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()
@@ -394,11 +395,10 @@ class _TodayPageState extends State<TodayPage>
     super.didChangeDependencies();
   }
 
-  int getTextLineCount({
-    required String text,
-    required TextStyle style,
-    required double maxWidth,
-  }) {
+  int getTextLineCount(
+      {required String text,
+      required TextStyle style,
+      required double maxWidth}) {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       textDirection: TextDirection.ltr,
@@ -411,11 +411,7 @@ class _TodayPageState extends State<TodayPage>
     return lineCount;
   }
 
-  void toggleEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-    });
-  }
+  void toggleEditMode() => setState(() => isEditMode = !isEditMode);
 
   @override
   void dispose() {
@@ -428,7 +424,6 @@ class _TodayPageState extends State<TodayPage>
     });
     WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) => scrollProvider?.updateOffSet2(0.0));
-
     super.dispose();
   }
 
@@ -450,7 +445,7 @@ class _TodayPageState extends State<TodayPage>
       },
       child: isInit
           ? Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: const Center(
                 child: CircularProgressIndicator(color: AppColors.primaryColor),
               ),
@@ -569,8 +564,9 @@ class _TodayPageState extends State<TodayPage>
                                   MediaQuery.of(context).padding.top,
                             ),
                             decoration: BoxDecoration(
-                              color:
-                                  isEditMode ? Color(0xffe5f0f9) : Colors.white,
+                              color: isEditMode
+                                  ? Color(0xffe5f0f9)
+                                  : Theme.of(context).scaffoldBackgroundColor,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(
                                     ScreenUtil.verticalScale(7)),
@@ -606,7 +602,8 @@ class _TodayPageState extends State<TodayPage>
                                           width: media.width / 6,
                                           color: isEditMode
                                               ? Color(0xffe5f0f9)
-                                              : Colors.white,
+                                              : Theme.of(context)
+                                                  .scaffoldBackgroundColor,
                                         ),
                                       ),
                                     ),
@@ -993,7 +990,8 @@ class _TodayPageState extends State<TodayPage>
                                                       .horizontalScale(6),
                                                   vertical: 20),
                                               width: media.width * 0.75,
-                                              color: Colors.black12,
+                                              color: Theme.of(context)
+                                                  .dividerColor,
                                             ),
                                             SizedBox(
                                                 height: media.height * 0.025),
@@ -1029,7 +1027,8 @@ class _TodayPageState extends State<TodayPage>
                                                     vertical:
                                                         media.height * 0.04),
                                                 width: media.width * 0.75,
-                                                color: Colors.black12,
+                                                color: Theme.of(context)
+                                                    .dividerColor,
                                               ),
                                         SizedBox(height: media.height * 0.025),
                                         Consumer<MonthProvider>(
@@ -3988,10 +3987,19 @@ class _TodayPageState extends State<TodayPage>
                 height: ScreenUtil.verticalScale(1),
               ),
               Theme(
-                data: ThemeData().copyWith(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                ),
+                data: lightTheme.brightness == Brightness.light
+                    ? lightTheme.copyWith(
+                        dividerColor: Theme.of(context).dividerColor,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        cardColor: Theme.of(context).cardColor,
+                      )
+                    : darkTheme.copyWith(
+                        cardColor: Theme.of(context).cardColor,
+                        dividerColor: Theme.of(context).dividerColor,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                      ),
                 child: ClipRRect(
                   borderRadius:
                       BorderRadius.circular(ScreenUtil.verticalScale(0)),
@@ -4031,7 +4039,7 @@ class _TodayPageState extends State<TodayPage>
                   vertical: ScreenUtil.verticalScale(1.5),
                 ),
                 width: media.width * 0.75,
-                color: Colors.black12,
+                color: Theme.of(context).dividerColor,
               ),
               SizedBox(
                 height: ScreenUtil.verticalScale(1.5),
@@ -4077,7 +4085,7 @@ class _TodayPageState extends State<TodayPage>
                       top: BorderSide(
                           color: isEditMode
                               ? Colors.grey.shade700
-                              : Colors.grey.shade400,
+                              : Theme.of(context).dividerColor,
                           width: 1.5),
                     ),
                   ),
@@ -4150,7 +4158,7 @@ class _TodayPageState extends State<TodayPage>
                           },
                           style: ElevatedButton.styleFrom(
                             disabledBackgroundColor: const Color(0xFFF3F3F3),
-                            backgroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).cardColor,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(

@@ -305,7 +305,6 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
                         if (widget.videoPlayerController.value.isPlaying) {
                           widget.videoPlayerController.pause();
                           setState(() {});
-                          log('widget.videoPlayerController.value.isPlaying====11======>>>>>${widget.videoPlayerController.value.isPlaying}');
                           widget.showControlsOnTapOfPause();
                           showControlsOnTapOfPause();
                           await Future.delayed(Duration(milliseconds: 100))

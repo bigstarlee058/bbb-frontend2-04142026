@@ -134,9 +134,9 @@ class _FAQsPageState extends State<FAQsPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -153,7 +153,7 @@ class _FAQsPageState extends State<FAQsPage> {
                     width: media.width,
                     padding: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -276,8 +276,8 @@ class _FAQsPageState extends State<FAQsPage> {
             });
           }
         },
-        backgroundColor: AppColors.greyColor,
-        collapsedBackgroundColor: AppColors.greyColor,
+        backgroundColor: Theme.of(context).cardColor,
+        collapsedBackgroundColor: Theme.of(context).cardColor,
         childrenPadding: EdgeInsets.zero,
         clipBehavior: Clip.none,
         iconColor: AppColors.primaryColor,

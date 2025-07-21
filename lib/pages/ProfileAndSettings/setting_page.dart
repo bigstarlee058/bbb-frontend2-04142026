@@ -9,10 +9,12 @@ import 'package:bbb/pages/MonthView/MonthViewPage/sections/choose_workoutday_pop
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/theme_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,11 +33,13 @@ class _SettingPageState extends State<SettingPage> {
   bool isMute = true;
   late MainPageProvider mainPageProvider;
   late MonthProvider monthProvider;
+  late ThemeProvider themeProvider;
   DataProvider? dataProvider;
   final ScrollController _scrollController = ScrollController();
   bool isSplit = false;
   bool isEquipment = false;
   bool isScreenAwake = false;
+  bool isDarkMode = false;
   int curExpandedIdx = 0;
 
   @override
@@ -52,6 +56,7 @@ class _SettingPageState extends State<SettingPage> {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
+    themeProvider = Provider.of<ThemeProvider>(context, listen: false);
 
     String split = monthProvider.splitType ?? "split3";
     String equipment = monthProvider.equipmentType;
@@ -115,6 +120,7 @@ class _SettingPageState extends State<SettingPage> {
     final raw1 = await preferences.getBool(SharedPreference.notificationSwitch);
     final raw2 = await preferences.getBool(SharedPreference.isHapticFeedbackOn);
     final raw3 = await preferences.getBool(SharedPreference.isScreenAwake);
+    final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
     bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
     if (raw1 != null) {
       isSwitchOn = raw1;
@@ -127,6 +133,12 @@ class _SettingPageState extends State<SettingPage> {
       isScreenAwake = raw3;
     } else {
       await preferences.setBool(SharedPreference.isScreenAwake, isScreenAwake);
+    }
+
+    if (raw4 != null) {
+      isDarkMode = raw4;
+    } else {
+      await preferences.setBool(SharedPreference.isDarkMode, isDarkMode);
     }
 
     if (raw2 != null) {
@@ -145,7 +157,7 @@ class _SettingPageState extends State<SettingPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         controller: _scrollController,
         physics: const ClampingScrollPhysics(),
@@ -219,9 +231,9 @@ class _SettingPageState extends State<SettingPage> {
                           child: Container(
                             height: media.height / 11,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                            ),
+                            decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor),
                           ),
                         ),
                       ),
@@ -236,7 +248,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                   // height: ScreenUtil.verticalScale((media.height - media.height / 2)),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
@@ -465,6 +477,57 @@ class _SettingPageState extends State<SettingPage> {
                                 height: 0,
                               ),
                             ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: ScreenUtil.horizontalScale(6),
+                                right: ScreenUtil.horizontalScale(6),
+                              ),
+                              height: ScreenUtil.verticalScale(8),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Dark mode",
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: ScreenUtil.verticalScale(2.2),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Consumer<MonthProvider>(
+                                    builder: (context, monthDataModel, child) {
+                                      return Switch(
+                                        value: isDarkMode, // Boolean value
+
+                                        onChanged: (bool value) async {
+                                          themeProvider.toggleTheme(value);
+                                          setState(() {
+                                            isDarkMode = value;
+                                          });
+
+                                          await preferences.setBool(
+                                              SharedPreference.isDarkMode,
+                                              isDarkMode);
+                                        },
+                                        activeColor: AppColors.primaryColor,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                  ScreenUtil.horizontalScale(7),
+                                  0,
+                                  ScreenUtil.horizontalScale(7),
+                                  0),
+                              child: Divider(
+                                thickness: 0.3,
+                                height: 0,
+                              ),
+                            ),
                             Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(3),
@@ -473,10 +536,16 @@ class _SettingPageState extends State<SettingPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Theme(
-                                    data: ThemeData().copyWith(
-                                      splashColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                    ),
+                                    data: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? lightTheme.copyWith(
+                                            splashColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                          )
+                                        : darkTheme.copyWith(
+                                            splashColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                          ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(
                                           ScreenUtil.verticalScale(0)),
@@ -522,7 +591,9 @@ class _SettingPageState extends State<SettingPage> {
                                           elevation: 0,
                                           children: [
                                             com.ExpansionPanel(
-                                                backgroundColor: Colors.white,
+                                                backgroundColor: Theme.of(
+                                                        context)
+                                                    .scaffoldBackgroundColor,
                                                 isExpanded: isSplit,
                                                 canTapOnHeader: true,
                                                 headerBuilder:
@@ -639,112 +710,118 @@ class _SettingPageState extends State<SettingPage> {
                                                         ),
                                                         const SizedBox(
                                                             height: 10),
-                                                        Container(
-                                                          margin: EdgeInsets
-                                                              .all(ScreenUtil
-                                                                  .verticalScale(
-                                                                      0.3)),
-                                                          padding: EdgeInsets
-                                                              .all(ScreenUtil
-                                                                  .verticalScale(
-                                                                      1.25)),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                    ScreenUtil
-                                                                        .verticalScale(
-                                                                            5)),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: AppColors
-                                                                    .greyColor,
-                                                                blurRadius: 10,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: Row(
-                                                            children: [
-                                                              CircleAvatar(
-                                                                backgroundColor:
-                                                                    AppColors
-                                                                        .primaryColor,
-                                                                radius: ScreenUtil
+                                                        ClipRRect(
+                                                          child: Container(
+                                                            margin: EdgeInsets
+                                                                .all(ScreenUtil
                                                                     .verticalScale(
-                                                                        2),
-                                                                child: Text(
-                                                                  "3",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize: ScreenUtil
-                                                                        .verticalScale(
-                                                                            2.5),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                  width: 10),
-                                                              Text(
-                                                                "3 days per week",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: const Color(
-                                                                      0xBB888888),
-                                                                  fontSize: ScreenUtil
-                                                                      .verticalScale(
-                                                                          1.8),
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                              ),
-                                                              Spacer(),
-                                                              GestureDetector(
-                                                                onTap: () =>
-                                                                    updateSplitIndex(
-                                                                        0),
-                                                                child:
-                                                                    Container(
-                                                                  height: ScreenUtil
-                                                                      .verticalScale(
-                                                                          4),
-                                                                  width: ScreenUtil
-                                                                      .verticalScale(
-                                                                          4),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    shape: BoxShape
-                                                                        .circle,
-                                                                    color: splitIndex ==
-                                                                            0
-                                                                        ? AppColors
-                                                                            .primaryColor
-                                                                        : Colors
-                                                                            .transparent,
-                                                                    border: Border.all(
-                                                                        color: AppColors
-                                                                            .primaryColor),
-                                                                  ),
-                                                                  child: Center(
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .done,
-                                                                      size: ScreenUtil
+                                                                        0.3)),
+                                                            padding: EdgeInsets
+                                                                .all(ScreenUtil
+                                                                    .verticalScale(
+                                                                        1.25)),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .cardColor,
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                      ScreenUtil
                                                                           .verticalScale(
-                                                                              2.5),
+                                                                              5)),
+                                                              // boxShadow: [
+                                                              //   BoxShadow(
+                                                              //     color: AppColors
+                                                              //         .greyColor,
+                                                              //     blurRadius: 10,
+                                                              //   ),
+                                                              // ],
+                                                            ),
+                                                            child: Row(
+                                                              children: [
+                                                                CircleAvatar(
+                                                                  backgroundColor:
+                                                                      AppColors
+                                                                          .primaryColor,
+                                                                  radius: ScreenUtil
+                                                                      .verticalScale(
+                                                                          2),
+                                                                  child: Text(
+                                                                    "3",
+                                                                    style:
+                                                                        TextStyle(
                                                                       color: Colors
                                                                           .white,
+                                                                      fontSize:
+                                                                          ScreenUtil.verticalScale(
+                                                                              2.5),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              )
-                                                            ],
+                                                                const SizedBox(
+                                                                    width: 10),
+                                                                Text(
+                                                                  "3 days per week",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: const Color(
+                                                                        0xBB888888),
+                                                                    fontSize: ScreenUtil
+                                                                        .verticalScale(
+                                                                            1.8),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                  ),
+                                                                ),
+                                                                Spacer(),
+                                                                GestureDetector(
+                                                                  onTap: () =>
+                                                                      updateSplitIndex(
+                                                                          0),
+                                                                  child:
+                                                                      Container(
+                                                                    height: ScreenUtil
+                                                                        .verticalScale(
+                                                                            4),
+                                                                    width: ScreenUtil
+                                                                        .verticalScale(
+                                                                            4),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      color: splitIndex == 0
+                                                                          ? AppColors
+                                                                              .primaryColor
+                                                                          : Colors
+                                                                              .transparent,
+                                                                      border: Border.all(
+                                                                          color:
+                                                                              AppColors.primaryColor),
+                                                                    ),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .done,
+                                                                        size: ScreenUtil.verticalScale(
+                                                                            2.5),
+                                                                        color: splitIndex ==
+                                                                                0
+                                                                            ? Colors.white
+                                                                            : Colors.transparent,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
                                                         const SizedBox(
@@ -760,19 +837,21 @@ class _SettingPageState extends State<SettingPage> {
                                                                       1.25)),
                                                           decoration:
                                                               BoxDecoration(
-                                                            color: Colors.white,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .cardColor,
                                                             borderRadius:
                                                                 BorderRadius.circular(
                                                                     ScreenUtil
                                                                         .verticalScale(
                                                                             5)),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: AppColors
-                                                                    .greyColor,
-                                                                blurRadius: 10,
-                                                              ),
-                                                            ],
+                                                            // boxShadow: [
+                                                            //   BoxShadow(
+                                                            //     color: AppColors
+                                                            //         .greyColor,
+                                                            //     blurRadius: 10,
+                                                            //   ),
+                                                            // ],
                                                           ),
                                                           child: Row(
                                                             children: [
@@ -848,8 +927,11 @@ class _SettingPageState extends State<SettingPage> {
                                                                       size: ScreenUtil
                                                                           .verticalScale(
                                                                               2.5),
-                                                                      color: Colors
-                                                                          .white,
+                                                                      color: splitIndex == 1
+                                                                          ? Colors
+                                                                              .white
+                                                                          : Colors
+                                                                              .transparent,
                                                                     ),
                                                                   ),
                                                                 ),
@@ -870,19 +952,21 @@ class _SettingPageState extends State<SettingPage> {
                                                                       1.25)),
                                                           decoration:
                                                               BoxDecoration(
-                                                            color: Colors.white,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .cardColor,
                                                             borderRadius:
                                                                 BorderRadius.circular(
                                                                     ScreenUtil
                                                                         .verticalScale(
                                                                             5)),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: AppColors
-                                                                    .greyColor,
-                                                                blurRadius: 10,
-                                                              ),
-                                                            ],
+                                                            // boxShadow: [
+                                                            //   BoxShadow(
+                                                            //     color: AppColors
+                                                            //         .greyColor,
+                                                            //     blurRadius: 10,
+                                                            //   ),
+                                                            // ],
                                                           ),
                                                           child: Row(
                                                             children: [
@@ -958,8 +1042,11 @@ class _SettingPageState extends State<SettingPage> {
                                                                       size: ScreenUtil
                                                                           .verticalScale(
                                                                               2.5),
-                                                                      color: Colors
-                                                                          .white,
+                                                                      color: splitIndex == 2
+                                                                          ? Colors
+                                                                              .white
+                                                                          : Colors
+                                                                              .transparent,
                                                                     ),
                                                                   ),
                                                                 ),
@@ -990,10 +1077,16 @@ class _SettingPageState extends State<SettingPage> {
                                   ),
                                   const SizedBox(height: 22),
                                   Theme(
-                                    data: ThemeData().copyWith(
-                                      splashColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                    ),
+                                    data: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? lightTheme.copyWith(
+                                            splashColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                          )
+                                        : darkTheme.copyWith(
+                                            splashColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                          ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(
                                           ScreenUtil.verticalScale(0)),
@@ -1039,7 +1132,8 @@ class _SettingPageState extends State<SettingPage> {
                                           elevation: 0,
                                           children: [
                                             com.ExpansionPanel(
-                                              backgroundColor: Colors.white,
+                                              backgroundColor: Theme.of(context)
+                                                  .scaffoldBackgroundColor,
                                               isExpanded: isEquipment,
                                               canTapOnHeader: true,
                                               headerBuilder:
@@ -1162,18 +1256,20 @@ class _SettingPageState extends State<SettingPage> {
                                                                     1.25)),
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: Colors.white,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .cardColor,
                                                           borderRadius: BorderRadius
                                                               .circular(ScreenUtil
                                                                   .verticalScale(
                                                                       5)),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: AppColors
-                                                                  .greyColor,
-                                                              blurRadius: 10,
-                                                            ),
-                                                          ],
+                                                          // boxShadow: [
+                                                          //   BoxShadow(
+                                                          //     color: AppColors
+                                                          //         .greyColor,
+                                                          //     blurRadius: 10,
+                                                          //   ),
+                                                          // ],
                                                         ),
                                                         child: Row(
                                                           children: [
@@ -1246,8 +1342,12 @@ class _SettingPageState extends State<SettingPage> {
                                                                     size: ScreenUtil
                                                                         .verticalScale(
                                                                             2.5),
-                                                                    color: Colors
-                                                                        .white,
+                                                                    color: equipments ==
+                                                                            0
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .transparent,
                                                                   ),
                                                                 ),
                                                               ),
@@ -1267,18 +1367,20 @@ class _SettingPageState extends State<SettingPage> {
                                                                     1.25)),
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: Colors.white,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .cardColor,
                                                           borderRadius: BorderRadius
                                                               .circular(ScreenUtil
                                                                   .verticalScale(
                                                                       5)),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: AppColors
-                                                                  .greyColor,
-                                                              blurRadius: 10,
-                                                            ),
-                                                          ],
+                                                          // boxShadow: [
+                                                          //   BoxShadow(
+                                                          //     color: AppColors
+                                                          //         .greyColor,
+                                                          //     blurRadius: 10,
+                                                          //   ),
+                                                          // ],
                                                         ),
                                                         child: Row(
                                                           children: [
@@ -1351,8 +1453,12 @@ class _SettingPageState extends State<SettingPage> {
                                                                     size: ScreenUtil
                                                                         .verticalScale(
                                                                             2.5),
-                                                                    color: Colors
-                                                                        .white,
+                                                                    color: equipments ==
+                                                                            1
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .transparent,
                                                                   ),
                                                                 ),
                                                               ),
@@ -1372,18 +1478,20 @@ class _SettingPageState extends State<SettingPage> {
                                                                     1.25)),
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: Colors.white,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .cardColor,
                                                           borderRadius: BorderRadius
                                                               .circular(ScreenUtil
                                                                   .verticalScale(
                                                                       5)),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: AppColors
-                                                                  .greyColor,
-                                                              blurRadius: 10,
-                                                            ),
-                                                          ],
+                                                          // boxShadow: [
+                                                          //   BoxShadow(
+                                                          //     color: AppColors
+                                                          //         .greyColor,
+                                                          //     blurRadius: 10,
+                                                          //   ),
+                                                          // ],
                                                         ),
                                                         child: Row(
                                                           children: [
@@ -1456,8 +1564,12 @@ class _SettingPageState extends State<SettingPage> {
                                                                     size: ScreenUtil
                                                                         .verticalScale(
                                                                             2.5),
-                                                                    color: Colors
-                                                                        .white,
+                                                                    color: equipments ==
+                                                                            2
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .transparent,
                                                                   ),
                                                                 ),
                                                               ),

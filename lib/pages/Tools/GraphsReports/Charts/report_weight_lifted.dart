@@ -65,10 +65,10 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                 show: true,
                 border: Border.symmetric(
                   horizontal: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Theme.of(context).cardColor,
                   ),
                   vertical: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Theme.of(context).cardColor,
                   ),
                 ),
               ),
@@ -103,11 +103,11 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                         : 1000,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).cardColor,
                   strokeWidth: 1,
                 ),
                 getDrawingVerticalLine: (value) => FlLine(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).cardColor,
                   strokeWidth: 1,
                 ),
               ),

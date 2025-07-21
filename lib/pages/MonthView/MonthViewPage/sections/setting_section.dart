@@ -881,15 +881,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -932,7 +932,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: splitIndex == 0
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -946,15 +948,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -997,7 +999,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: splitIndex == 1
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1011,15 +1015,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1062,7 +1066,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: splitIndex == 2
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1145,15 +1151,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1196,7 +1202,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: equipments == 0
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1210,15 +1218,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1261,7 +1269,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: equipments == 1
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1275,15 +1285,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1326,7 +1336,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: equipments == 2
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),

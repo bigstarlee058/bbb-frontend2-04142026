@@ -17,10 +17,9 @@ class ProgramPhasesWidget extends StatelessWidget {
 
     return Column(
       children: [
-        Container(
+        SizedBox(
           height: media.height / 1.36,
           width: media.width,
-          color: Colors.white,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -29,7 +28,8 @@ class ProgramPhasesWidget extends StatelessWidget {
                 child: ClipPath(
                   clipper: MiddleClipper(),
                   child: Container(
-                    decoration: BoxDecoration(color: AppColors.greyColor),
+                    decoration:
+                        BoxDecoration(color: Theme.of(context).cardColor),
                   ),
                 ),
               ),

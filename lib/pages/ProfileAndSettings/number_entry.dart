@@ -112,7 +112,7 @@ class _NumberEntryState extends State<NumberEntry> {
               horizontal: ScreenUtil.horizontalScale(1),
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.052),
+              color: Theme.of(context).cardColor,
               borderRadius: Utils.buttonRadius,
             ),
             child: Center(

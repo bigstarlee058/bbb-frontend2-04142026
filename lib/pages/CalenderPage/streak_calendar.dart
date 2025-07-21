@@ -52,7 +52,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     ScreenUtil.init(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           SizedBox(
@@ -220,7 +220,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                   child: Container(
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -236,8 +236,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             child: Container(
                               height: media.height / 9.8,
                               width: media.width / 6,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                               ),
                             ),
                           ),

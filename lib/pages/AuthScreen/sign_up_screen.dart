@@ -243,15 +243,15 @@ class _SignupPageState extends State<SignupPage> {
                     child: Container(
                       height: media.height / 9.8,
                       width: media.width / 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
                       ),
                     ),
                   ),
                   Container(
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                           topLeft:
                               Radius.circular(ScreenUtil.verticalScale(8))),

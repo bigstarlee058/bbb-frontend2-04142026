@@ -317,7 +317,7 @@ class _AppTutorialState extends State<AppTutorial>
               child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: const Color(0xFFFFFFFF),
+                    color: Theme.of(context).cardColor,
                   ),
                   child: loading
                       ? const Center(

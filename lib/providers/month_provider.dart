@@ -681,6 +681,7 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchWarmUp(String warmUpId) async {
     try {
+      log('warmUpId==========>>>>>${warmUpId}');
       Uri url =
           Uri.parse('${AppConstants.serverUrl}/api/warmups/get/$warmUpId');
       url = Uri.http(url.authority, url.path);
@@ -1030,40 +1031,27 @@ class MonthProvider extends ChangeNotifier {
     return authToken;
   }
 
-  Future fetchCurrentExercise(String id) async {
-    usedEquipments = [];
-    exerciseDetailModel = null;
-    notifyListeners();
+  Future<void> fetchCurrentExercise(String id) async {
     try {
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$id');
+      final userIdToken = await getAuthToken();
 
-      url = Uri.http(url.authority, url.path);
-      String? userIdToken = await getAuthToken();
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'AUTH_TOKEN': userIdToken ?? "",
-        },
-      );
+      final url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$id');
+      final response =
+          await http.get(url, headers: {'AUTH_TOKEN': userIdToken ?? ""});
 
       if (response.statusCode == 200) {
-        getExerciseFromJson(jsonDecode(response.body));
-        notifyListeners();
+        final data = jsonDecode(response.body);
+        final model = ExerciseDetailModel.fromJson(data);
+        exerciseDetailModel = model;
+        usedEquipments = List.from(model.usedEquipments ?? []);
+
+        notifyListeners(); // Single rebuild
       } else {
         throw Exception('Failed to load exercise info');
       }
     } catch (e) {
-      log("fetchCurrentEx ERROR $e ");
+      log("fetchCurrentExercise ERROR: $e");
     }
-  }
-
-  void getExerciseFromJson(responseData) {
-    exerciseDetailModel = null;
-    if (responseData != null) {
-      exerciseDetailModel = ExerciseDetailModel.fromJson(responseData);
-      usedEquipments.addAll(exerciseDetailModel!.usedEquipments!);
-    }
-    notifyListeners();
   }
 
   updateWarmUp(bool val, String id) {
@@ -2142,7 +2130,6 @@ class MonthProvider extends ChangeNotifier {
             double.parse(entry["totalCompletedExercise"].toString())
           ],
       };
-      log('exerciseData==========>>>>>${exerciseData}');
 
       final list = allDays.map((day) {
         List<double> dataList = exerciseData[day]!;
