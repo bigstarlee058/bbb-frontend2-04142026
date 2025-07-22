@@ -170,7 +170,7 @@ class _MonthViewState extends State<MonthView> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NotificationListener(
         onNotification: (ScrollNotification notification) {
           if (notification.metrics.axis == Axis.vertical) {
@@ -417,9 +417,9 @@ class _MonthViewState extends State<MonthView> {
                                     child: Container(
                                       height: media.height / 11,
                                       width: media.width / 6,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                      ),
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
                                     ),
                                   ),
                                 ),
@@ -431,7 +431,7 @@ class _MonthViewState extends State<MonthView> {
                       Container(
                         width: media.width,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.only(
                             topLeft:
                                 Radius.circular(ScreenUtil.verticalScale(7)),
@@ -505,7 +505,8 @@ class _MonthViewState extends State<MonthView> {
                                                             controller
                                                                 .selectedSection
                                                         ? AppColors.primaryColor
-                                                        : AppColors.greyColor,
+                                                        : Theme.of(context)
+                                                            .cardColor,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             ScreenUtil
@@ -524,7 +525,10 @@ class _MonthViewState extends State<MonthView> {
                                                               controller
                                                                   .selectedSection
                                                           ? Colors.white
-                                                          : Colors.black,
+                                                          : Theme.of(context)
+                                                              .textTheme
+                                                              .bodyLarge
+                                                              ?.color,
                                                       fontSize: ScreenUtil
                                                           .verticalScale(1.75),
                                                       fontWeight:
@@ -545,7 +549,8 @@ class _MonthViewState extends State<MonthView> {
                             Consumer<MonthProvider>(
                               builder: (context, monthProvider, child) {
                                 return Container(
-                                  color: Colors.white,
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
                                   constraints: BoxConstraints(
                                     minHeight: (media.height -
                                         (media.height / 2.55) -

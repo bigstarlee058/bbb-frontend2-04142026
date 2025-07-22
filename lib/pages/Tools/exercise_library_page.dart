@@ -114,7 +114,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
     // Fetch the exercises for the current page
     // List<ExerciseLibrary> paginatedExercises = _getPaginatedExercises();
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -276,8 +276,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                           child: Container(
                             height: media.height / 11,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                         ),
@@ -295,7 +295,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                     ),
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -304,8 +304,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                       children: [
                         Container(
                           width: media.width,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(55),
                             ),
@@ -319,7 +319,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                     dataProvider!.adminExercises.isEmpty ||
                                     _filteredExercises.isEmpty
                                 ? Container(
-                                    color: Colors.white,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
                                     height: ScreenUtil.verticalScale(
                                         (media.height - media.height / 3.2)),
                                   )
@@ -368,7 +369,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
       ),
       bottomSheet: Container(
         alignment: Alignment.center,
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         height: 65,
         child: Padding(
           padding:
@@ -407,7 +408,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
       child: Container(
         padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(8)),
           ),

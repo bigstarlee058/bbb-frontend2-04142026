@@ -140,9 +140,9 @@ class _TutorialPageState extends State<TutorialPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -161,7 +161,7 @@ class _TutorialPageState extends State<TutorialPage> {
                         horizontal: ScreenUtil.horizontalScale(6),
                         vertical: ScreenUtil.verticalScale(2)),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -209,7 +209,7 @@ class _TutorialPageState extends State<TutorialPage> {
       child: Container(
         padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(8)),
           ),

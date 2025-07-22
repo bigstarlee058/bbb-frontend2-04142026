@@ -390,7 +390,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ],
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -456,7 +456,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(2),
               height: 1.5,
-              color: Color(0xff6f6f6f),
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(3)),
@@ -466,7 +466,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(2),
               height: 1.5,
-              color: Color(0xff6f6f6f),
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(4)),
@@ -523,7 +523,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(2),
               height: 1.5,
-              color: Color(0xff6f6f6f),
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(3.5)),
@@ -588,7 +588,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(2),
               height: 1.5,
-              color: Color(0xff6f6f6f),
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(3.5)),
@@ -645,7 +645,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             style: TextStyle(
               fontSize: ScreenUtil.verticalScale(2),
               height: 1.5,
-              color: Color(0xff6f6f6f),
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(4)),
@@ -754,14 +754,14 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               horizontal: ScreenUtil.horizontalScale(1),
             ).copyWith(left: 20),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
+              color: Theme.of(context).cardColor,
               borderRadius: Utils.buttonRadius,
             ),
             child: Center(
               // Center the dropdown content
               child: DropdownButton<String>(
                 value: value,
-                dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                dropdownColor: Theme.of(context).cardColor,
                 elevation: 12,
                 hint: Text(hint),
                 isDense: true,
@@ -779,6 +779,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                         maxLines: 1,
                         textAlign: TextAlign.center,
                         style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontSize: ScreenUtil.verticalScale(1.95),
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -787,7 +788,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                   );
                 }).toList(),
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontSize: ScreenUtil.verticalScale(1.95),
                   fontWeight: FontWeight.normal,
                 ),
@@ -833,7 +834,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                   horizontal: ScreenUtil.horizontalScale(1),
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.052),
+                  color: Theme.of(context).cardColor,
                   borderRadius: Utils.buttonRadius,
                 ),
                 child: Center(
@@ -843,7 +844,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                     style: TextStyle(
                       color: value == 'Select Birthday'
                           ? Colors.grey.shade700
-                          : Colors.black,
+                          : Theme.of(context).textTheme.bodyLarge!.color!,
                       fontSize: ScreenUtil.verticalScale(1.95),
                       // fontWeight: (value == 'Select Birthday') ? FontWeight.normal : FontWeight.bold,
                       fontWeight: FontWeight.normal,
@@ -856,138 +857,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _numberPicker({
-    required BuildContext context,
-    required String label,
-    required TextEditingController controller,
-    required String suffix,
-    required FocusNode focusNode,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: ScreenUtil.verticalScale(0.6),
-      ),
-      height: ScreenUtil.verticalScale(6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: ScreenUtil.horizontalScale(32),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.95),
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            width: ScreenUtil.horizontalScale(50),
-            height: ScreenUtil.verticalScale(6),
-            padding:
-                EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.052),
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: KeyboardActions(
-              autoScroll: false,
-              config: _buildConfig(context, focusNode),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IntrinsicWidth(
-                    child: TextField(
-                      style: TextStyle(
-                        fontSize: ScreenUtil.verticalScale(1.95),
-                        color: Colors.black,
-                      ),
-                      controller: controller,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => FocusScope.of(context).unfocus(),
-                      textAlign: TextAlign.center,
-                      focusNode: focusNode,
-                      maxLength: 3,
-                      decoration: InputDecoration(
-                        counterText: "",
-                        hintText: "0",
-                        hintStyle: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: ScreenUtil.verticalScale(1.95),
-                        ),
-                        suffix: !focusNode.hasFocus && controller.text.isEmpty
-                            ? SizedBox()
-                            : Text(
-                                suffix,
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.verticalScale(1.95),
-                                  color: Colors.black,
-                                ),
-                              ),
-                        border: InputBorder.none,
-                        isCollapsed: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        TextInputFormatter.withFunction((oldValue, newValue) {
-                          String newText = newValue.text;
-                          if (newText.isNotEmpty) {
-                            newText = newText.replaceFirst(RegExp(r'^0+'), '');
-                          }
-                          return TextEditingValue(
-                            text: newText,
-                            selection:
-                                TextSelection.collapsed(offset: newText.length),
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  KeyboardActionsConfig _buildConfig(BuildContext context, FocusNode nodeText) {
-    return KeyboardActionsConfig(
-      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
-      keyboardBarColor: Colors.white,
-      nextFocus: true,
-      actions: [
-        KeyboardActionsItem(
-          focusNode: nodeText,
-          displayArrows: false,
-          toolbarButtons: [
-            (node) {
-              return GestureDetector(
-                onTap: () => node.unfocus(),
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: AppColors.primaryColor),
-                  child: Text(
-                    "Done",
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
-              );
-            }
-          ],
-        ),
-      ],
     );
   }
 
@@ -1019,7 +888,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               horizontal: ScreenUtil.horizontalScale(1),
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
+              color: Theme.of(context).cardColor,
               borderRadius: Utils.buttonRadius,
             ),
             child: Center(
@@ -1046,7 +915,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                   style: TextStyle(
                     color: value.text.isEmpty
                         ? Colors.grey.shade700
-                        : Colors.black,
+                        : Theme.of(context).textTheme.bodyLarge!.color!,
                     fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
                   ),
@@ -1064,7 +933,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       pickerTextStyle: TextStyle(
         fontSize: ScreenUtil.verticalScale(1.8),
         fontWeight: FontWeight.w400,
-        color: AppColors.blackColor,
+        color: Theme.of(context).textTheme.bodyLarge!.color!,
       ),
       dateOrder: DatePickerDateOrder.mdy,
       initialDateTime: DateTime(2000, 1, 1),
@@ -1074,10 +943,10 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
         selectedDate = dob;
         setState(() {});
       },
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       height: 320,
       displayCloseIcon: true,
-      closeIconColor: Colors.black,
+      closeIconColor: Theme.of(context).textTheme.bodyLarge!.color!,
       buttonWidth: ScreenUtil.horizontalScale(80),
       buttonContent: Center(
         child: Text(
@@ -1101,7 +970,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
         child: Text(
           "Select Date of Birth",
           style: TextStyle(
-            color: AppColors.blackColor,
+            color: Theme.of(context).textTheme.bodyLarge!.color!,
             fontWeight: FontWeight.w600,
             fontSize: ScreenUtil.verticalScale(2),
           ),

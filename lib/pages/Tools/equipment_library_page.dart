@@ -7,7 +7,6 @@ import 'package:bbb/components/filter_sort_shop.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
-import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -200,9 +199,9 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                           child: Container(
                             height: media.height / 11,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                            ),
+                            decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor),
                           ),
                         ),
                       ),
@@ -219,7 +218,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                     ),
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -228,8 +227,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                       children: [
                         Container(
                           width: media.width,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(55),
                             ),
@@ -291,7 +290,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
       ),
       bottomSheet: Container(
         alignment: Alignment.center,
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         height: 65,
         child: Padding(
           padding:
@@ -337,7 +336,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
       child: Container(
         padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(8)),
           ),

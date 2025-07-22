@@ -78,7 +78,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               child: Container(
                 width: media.width,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(8))),
                 ),
@@ -93,9 +93,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         child: Container(
                           height: media.height / 9.8,
                           width: media.width / 6,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor),
                         ),
                       ),
                     ),

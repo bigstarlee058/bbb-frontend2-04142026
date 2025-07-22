@@ -255,7 +255,7 @@ class _WatchTutorialState extends State<WatchTutorial>
 
   Size calculateVideoSize(
       {required BuildContext context, required double aspectRatio}) {
-    double maxWidth = ScreenUtil.horizontalScale(90);
+    double maxWidth = ScreenUtil.horizontalScale(86.5);
     double calculatedHeight = maxWidth / aspectRatio;
     return Size(maxWidth, calculatedHeight);
   }
@@ -304,7 +304,7 @@ class _WatchTutorialState extends State<WatchTutorial>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -717,7 +717,10 @@ class _WatchTutorialState extends State<WatchTutorial>
                                   style: TextStyle(
                                     fontSize: ScreenUtil.verticalScale(1.75),
                                     height: 1.5,
-                                    color: AppColors.appGreyColor,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color,
                                   ),
                                 ),
                               ),

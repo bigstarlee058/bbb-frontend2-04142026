@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-WarmUpModel warmUpModelFromJson(String str) => WarmUpModel.fromJson(json.decode(str));
+WarmUpModel warmUpModelFromJson(String str) =>
+    WarmUpModel.fromJson(json.decode(str));
 
 String warmUpModelToJson(WarmUpModel data) => json.encode(data.toJson());
 
@@ -15,6 +16,7 @@ class WarmUpModel {
   int? v;
   int? length;
   String? thumbnail;
+  String? videoThumbnail;
   List<FileElement>? files;
 
   WarmUpModel({
@@ -29,6 +31,7 @@ class WarmUpModel {
     this.length,
     this.thumbnail,
     this.files,
+    this.videoThumbnail,
   });
 
   factory WarmUpModel.fromJson(Map<String, dynamic> json) => WarmUpModel(
@@ -36,13 +39,23 @@ class WarmUpModel {
         title: json["title"],
         vimeoId: json["vimeoId"],
         description: json["description"],
-        equipments: json["equipments"] == null ? [] : List<String>.from(json["equipments"]!.map((x) => x)),
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        equipments: json["equipments"] == null
+            ? []
+            : List<String>.from(json["equipments"]!.map((x) => x)),
+        createdAt: json["createdAt"] == null
+            ? null
+            : DateTime.parse(json["createdAt"]),
+        updatedAt: json["updatedAt"] == null
+            ? null
+            : DateTime.parse(json["updatedAt"]),
         v: json["__v"],
         length: json["length"],
         thumbnail: json["thumbnail"],
-        files: json["files"] == null ? [] : List<FileElement>.from(json["files"]!.map((x) => FileElement.fromJson(x))),
+        videoThumbnail: json["videoThumbnail"] ?? json["videoThumbnails"],
+        files: json["files"] == null
+            ? []
+            : List<FileElement>.from(
+                json["files"]!.map((x) => FileElement.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,13 +63,18 @@ class WarmUpModel {
         "title": title,
         "vimeoId": vimeoId,
         "description": description,
-        "equipments": equipments == null ? [] : List<dynamic>.from(equipments!.map((x) => x)),
+        "equipments": equipments == null
+            ? []
+            : List<dynamic>.from(equipments!.map((x) => x)),
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
+        "videoThumbnail": videoThumbnail,
         "__v": v,
         "length": length,
         "thumbnail": thumbnail,
-        "files": files == null ? [] : List<dynamic>.from(files!.map((x) => x.toJson())),
+        "files": files == null
+            ? []
+            : List<dynamic>.from(files!.map((x) => x.toJson())),
       };
 }
 
@@ -96,7 +114,9 @@ class FileElement {
         width: json["width"],
         height: json["height"],
         link: json["link"],
-        createdTime: json["created_time"] == null ? null : DateTime.parse(json["created_time"]),
+        createdTime: json["created_time"] == null
+            ? null
+            : DateTime.parse(json["created_time"]),
         fps: json["fps"],
         size: json["size"],
         md5: json["md5"],

@@ -206,9 +206,9 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -227,7 +227,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                     ),
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -361,6 +361,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               // overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: ScreenUtil.verticalScale(1.6),
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.bold,
               ),
@@ -372,6 +373,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               textAlign: TextAlign.center,
               overflow: TextOverflow.visible,
               style: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color,
                 fontSize: ScreenUtil.verticalScale(1.4),
                 // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.w500,

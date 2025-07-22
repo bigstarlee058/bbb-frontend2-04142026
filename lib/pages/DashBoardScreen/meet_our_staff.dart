@@ -61,7 +61,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
     final staffData = ModalRoute.of(context)?.settings.arguments as Staffs?;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: ClampingScrollPhysics(),
         child: Column(
@@ -176,8 +176,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                           child: Container(
                             height: media.height / 11,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                         ),
@@ -195,7 +195,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                   ),
                   width: media.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
@@ -380,12 +380,18 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                     "body": Style(
                                       fontSize: FontSize(
                                           ScreenUtil.verticalScale(1.8)),
-                                      color: AppColors.appGreyColor,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                     "p": Style(
                                       fontSize: FontSize(
                                           ScreenUtil.verticalScale(1.8)),
-                                      color: AppColors.appGreyColor,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                   },
                                 );

@@ -35,6 +35,7 @@ import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
@@ -132,7 +133,6 @@ class _TodayPageState extends State<TodayPage>
                   .replaceAll(" Workout", "")) -
               1
           : 0;
-
       exerciseList = monthDataModel
               .weeks?[monthProvider!.overviewCurrentWeek - 1]
               .days?[nextWorkOutIndex]
@@ -148,7 +148,6 @@ class _TodayPageState extends State<TodayPage>
     await monthProvider?.fetchSingleDayHistoryLocalData();
     await monthProvider?.fetchDayStatusLocalData();
     await monthProvider?.fetchExerciseStatusLocalData();
-
     int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1]
             .toString()
             .contains("Workout")
@@ -195,11 +194,15 @@ class _TodayPageState extends State<TodayPage>
           isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status ==
                   Status.skipped ||
               (monthProvider?.dayHistoryDetails == null &&
-                  monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] ==
+                  monthProvider!.weekStatuses[
+                          (monthProvider!.overviewCurrentWeek) - 1] ==
                       WeekType.pastWeek) ||
               (monthProvider!.actualWeek! > 4 &&
+                  monthProvider?.dayHistoryDetails?.status == Status.started) ||
+              (monthProvider!.weekStatuses[
+                          (monthProvider!.overviewCurrentWeek) - 1] ==
+                      WeekType.pastWeek &&
                   monthProvider?.dayHistoryDetails?.status == Status.started);
-
           monthProvider?.fetchAllExercise();
         }
       },
@@ -302,7 +305,7 @@ class _TodayPageState extends State<TodayPage>
     monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
   }
 
-  fetchRemovedExerciseLocalData() async {
+  Future<void> fetchRemovedExerciseLocalData() async {
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()
@@ -394,11 +397,10 @@ class _TodayPageState extends State<TodayPage>
     super.didChangeDependencies();
   }
 
-  int getTextLineCount({
-    required String text,
-    required TextStyle style,
-    required double maxWidth,
-  }) {
+  int getTextLineCount(
+      {required String text,
+      required TextStyle style,
+      required double maxWidth}) {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       textDirection: TextDirection.ltr,
@@ -411,11 +413,7 @@ class _TodayPageState extends State<TodayPage>
     return lineCount;
   }
 
-  void toggleEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-    });
-  }
+  void toggleEditMode() => setState(() => isEditMode = !isEditMode);
 
   @override
   void dispose() {
@@ -428,7 +426,6 @@ class _TodayPageState extends State<TodayPage>
     });
     WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) => scrollProvider?.updateOffSet2(0.0));
-
     super.dispose();
   }
 
@@ -450,7 +447,7 @@ class _TodayPageState extends State<TodayPage>
       },
       child: isInit
           ? Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: const Center(
                 child: CircularProgressIndicator(color: AppColors.primaryColor),
               ),
@@ -569,8 +566,9 @@ class _TodayPageState extends State<TodayPage>
                                   MediaQuery.of(context).padding.top,
                             ),
                             decoration: BoxDecoration(
-                              color:
-                                  isEditMode ? Color(0xffe5f0f9) : Colors.white,
+                              color: isEditMode
+                                  ? Color(0xffe5f0f9)
+                                  : Theme.of(context).scaffoldBackgroundColor,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(
                                     ScreenUtil.verticalScale(7)),
@@ -606,7 +604,8 @@ class _TodayPageState extends State<TodayPage>
                                           width: media.width / 6,
                                           color: isEditMode
                                               ? Color(0xffe5f0f9)
-                                              : Colors.white,
+                                              : Theme.of(context)
+                                                  .scaffoldBackgroundColor,
                                         ),
                                       ),
                                     ),
@@ -983,7 +982,12 @@ class _TodayPageState extends State<TodayPage>
                                               "Future")
                                         SizedBox()
                                       else if (monthProvider!.isCurrentMonth ==
-                                          "Past")
+                                              "Past" ||
+                                          monthProvider!
+                                                  .weekStatuses[(monthProvider!
+                                                      .overviewCurrentWeek) -
+                                                  1] ==
+                                              WeekType.pastWeek)
                                         Column(
                                           children: [
                                             Container(
@@ -993,7 +997,8 @@ class _TodayPageState extends State<TodayPage>
                                                       .horizontalScale(6),
                                                   vertical: 20),
                                               width: media.width * 0.75,
-                                              color: Colors.black12,
+                                              color: Theme.of(context)
+                                                  .dividerColor,
                                             ),
                                             SizedBox(
                                                 height: media.height * 0.025),
@@ -1003,10 +1008,7 @@ class _TodayPageState extends State<TodayPage>
                                                       ScreenUtil.verticalScale(
                                                           5)),
                                               child: ButtonWidget(
-                                                text: monthProvider
-                                                            ?.dayHistoryDetails
-                                                            ?.status ==
-                                                        Status.completed
+                                                text: isCurrentDayCompleted
                                                     ? "Completed"
                                                     : "Skipped",
                                                 textColor: Colors.white,
@@ -1029,16 +1031,15 @@ class _TodayPageState extends State<TodayPage>
                                                     vertical:
                                                         media.height * 0.04),
                                                 width: media.width * 0.75,
-                                                color: Colors.black12,
+                                                color: Theme.of(context)
+                                                    .dividerColor,
                                               ),
                                         SizedBox(height: media.height * 0.025),
                                         Consumer<MonthProvider>(
                                             builder: (context, value, child) {
                                           return value.dayHistoryDetails !=
                                                       null &&
-                                                  value.dayHistoryDetails
-                                                          ?.status ==
-                                                      Status.skipped
+                                                  isCurrentDaySkipped
                                               ? Container(
                                                   margin: EdgeInsets.symmetric(
                                                       horizontal: ScreenUtil
@@ -1076,10 +1077,7 @@ class _TodayPageState extends State<TodayPage>
                                                           !value.isPastWeek
                                                       ? Column(
                                                           children: [
-                                                            value.dayHistoryDetails
-                                                                        ?.status ==
-                                                                    Status
-                                                                        .completed
+                                                            isCurrentDayCompleted
                                                                 ? Container(
                                                                     margin: EdgeInsets.symmetric(
                                                                             horizontal: ScreenUtil.verticalScale(
@@ -1103,10 +1101,7 @@ class _TodayPageState extends State<TodayPage>
                                                                     ),
                                                                   )
                                                                 : SizedBox(),
-                                                            value.dayHistoryDetails
-                                                                        ?.status ==
-                                                                    Status
-                                                                        .completed
+                                                            isCurrentDayCompleted
                                                                 ? TextButton(
                                                                     onPressed:
                                                                         () {
@@ -1162,14 +1157,8 @@ class _TodayPageState extends State<TodayPage>
                                                         )
                                                       : Column(
                                                           children: [
-                                                            value.dayHistoryDetails
-                                                                            ?.status !=
-                                                                        Status
-                                                                            .skipped &&
-                                                                    value.dayHistoryDetails
-                                                                            ?.status !=
-                                                                        Status
-                                                                            .completed
+                                                            !isCurrentDayCompleted &&
+                                                                    !isCurrentDaySkipped
                                                                 ? Padding(
                                                                     padding: EdgeInsets.symmetric(
                                                                         horizontal:
@@ -1240,17 +1229,16 @@ class _TodayPageState extends State<TodayPage>
                                                                             ScreenUtil.verticalScale(3.2)),
                                                                     child:
                                                                         ButtonWidget(
-                                                                      text: value.dayHistoryDetails?.status ==
-                                                                              Status.completed
+                                                                      text: isCurrentDayCompleted
                                                                           ? "Completed"
-                                                                          : value.dayHistoryDetails?.status == Status.skipped
+                                                                          : isCurrentDaySkipped
                                                                               ? "Skipped"
                                                                               : "Finish the workout",
                                                                       textColor:
                                                                           Colors
                                                                               .white,
-                                                                      onPress: value.dayHistoryDetails?.status == Status.completed ||
-                                                                              value.dayHistoryDetails?.status == Status.skipped
+                                                                      onPress: isCurrentDayCompleted ||
+                                                                              isCurrentDaySkipped
                                                                           ? null
                                                                           : () async {
                                                                               HapticFeedBack.buttonClick();
@@ -1269,14 +1257,8 @@ class _TodayPageState extends State<TodayPage>
                                                                   ),
                                                             const SizedBox(
                                                                 height: 14),
-                                                            value.dayHistoryDetails
-                                                                            ?.status !=
-                                                                        Status
-                                                                            .skipped &&
-                                                                    value.dayHistoryDetails
-                                                                            ?.status !=
-                                                                        Status
-                                                                            .completed
+                                                            !isCurrentDayCompleted &&
+                                                                    !isCurrentDaySkipped
                                                                 ? Container(
                                                                     margin: EdgeInsets.symmetric(
                                                                         horizontal:
@@ -1490,7 +1472,7 @@ class _TodayPageState extends State<TodayPage>
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: const Color(0xFFFFFFFF),
+                color: Theme.of(context).cardColor,
               ),
               child: Stack(
                 children: [
@@ -1503,7 +1485,7 @@ class _TodayPageState extends State<TodayPage>
                         Text(
                           "Skip workout",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                             fontSize: ScreenUtil.verticalScale(2.4),
                             fontWeight: FontWeight.bold,
                           ),
@@ -1516,7 +1498,8 @@ class _TodayPageState extends State<TodayPage>
                             "Are you sure you want to skip\n this workout?",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.black,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
                               fontSize: ScreenUtil.verticalScale(2),
                               fontWeight: FontWeight.normal,
                             ),
@@ -1672,7 +1655,7 @@ class _TodayPageState extends State<TodayPage>
           return StatefulBuilder(
             builder: (context, setState) {
               return Dialog(
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).cardColor,
                 insetPadding: const EdgeInsets.all(0),
                 child: Consumer<MonthProvider>(
                   builder: (context, value, child) {
@@ -1774,7 +1757,10 @@ class _TodayPageState extends State<TodayPage>
                                                             .title ??
                                                         "",
                                                     style: TextStyle(
-                                                      color: Colors.black,
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.color,
                                                       fontSize: ScreenUtil
                                                           .verticalScale(2),
                                                     ),
@@ -1798,7 +1784,7 @@ class _TodayPageState extends State<TodayPage>
                                                 color:
                                                     selectExerciseSwapIndex == i
                                                         ? AppColors.primaryColor
-                                                        : Colors.white,
+                                                        : Colors.transparent,
                                               ),
                                               child:
                                                   selectExerciseSwapIndex == i
@@ -1913,15 +1899,19 @@ class _TodayPageState extends State<TodayPage>
                                             ),
                                           ),
                                         ),
-                                        SearchEquipmentField(
-                                          onChanged: (query) {
-                                            setState(() {
-                                              searchQuery = query;
-                                              currentPageAll = 0;
-                                              monthProvider
-                                                  ?.fetchAllFilterEx(query);
-                                            });
-                                          },
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: SearchEquipmentField(
+                                            onChanged: (query) {
+                                              setState(() {
+                                                searchQuery = query;
+                                                currentPageAll = 0;
+                                                monthProvider
+                                                    ?.fetchAllFilterEx(query);
+                                              });
+                                            },
+                                          ),
                                         ),
                                         searchQuery.isEmpty
                                             ? SizedBox(
@@ -2243,7 +2233,7 @@ class _TodayPageState extends State<TodayPage>
           return StatefulBuilder(
             builder: (context, setState) {
               return Dialog(
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).cardColor,
                 insetPadding: EdgeInsets.zero,
                 child:
                     Consumer<MonthProvider>(builder: (context, value, child) {
@@ -2320,7 +2310,10 @@ class _TodayPageState extends State<TodayPage>
                                                   exercises[i - (0)].title ??
                                                       "",
                                                   style: TextStyle(
-                                                    color: Colors.black,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge
+                                                        ?.color,
                                                     fontSize: ScreenUtil
                                                         .verticalScale(2),
                                                   ),
@@ -2344,7 +2337,7 @@ class _TodayPageState extends State<TodayPage>
                                               color:
                                                   selectExerciseSwapIndex == i
                                                       ? AppColors.primaryColor
-                                                      : Colors.white,
+                                                      : Colors.transparent,
                                             ),
                                             child: selectExerciseSwapIndex == i
                                                 ? Icon(
@@ -2471,7 +2464,10 @@ class _TodayPageState extends State<TodayPage>
                                                     child: Text(
                                                   exercises[i].title ?? "",
                                                   style: TextStyle(
-                                                    color: Colors.black,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge
+                                                        ?.color,
                                                     fontSize: ScreenUtil
                                                         .verticalScale(2),
                                                   ),
@@ -2496,7 +2492,7 @@ class _TodayPageState extends State<TodayPage>
                                                   selectRelatedExerciseSwapIndex ==
                                                           i
                                                       ? AppColors.primaryColor
-                                                      : Colors.white,
+                                                      : Colors.transparent,
                                             ),
                                             child:
                                                 selectRelatedExerciseSwapIndex ==
@@ -2654,7 +2650,11 @@ class _TodayPageState extends State<TodayPage>
                                                           child: Text(
                                                         exercises[i].name ?? "",
                                                         style: TextStyle(
-                                                          color: Colors.black,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyLarge
+                                                                  ?.color,
                                                           fontSize: ScreenUtil
                                                               .verticalScale(2),
                                                         ),
@@ -2682,7 +2682,8 @@ class _TodayPageState extends State<TodayPage>
                                                                 i
                                                             ? AppColors
                                                                 .primaryColor
-                                                            : Colors.white,
+                                                            : Colors
+                                                                .transparent,
                                                   ),
                                                   child:
                                                       selectSwapOptionExerciseIndex ==
@@ -3003,7 +3004,7 @@ class _TodayPageState extends State<TodayPage>
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
-                                            vertical: 5),
+                                            vertical: 5, horizontal: 20),
                                         child: SearchEquipmentField(
                                           onChanged: (query) {
                                             setState(() {
@@ -3877,7 +3878,7 @@ class _TodayPageState extends State<TodayPage>
             horizontal: ScreenUtil.verticalScale(1),
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
             boxShadow: const [
               BoxShadow(
@@ -3980,6 +3981,11 @@ class _TodayPageState extends State<TodayPage>
     final warmUps = monthProvider!.isPumpDay
         ? monthProvider!.pumpDayModel!.warmups!
         : monthProvider!.dayDataModel!.warmups ?? [];
+
+    warmUps.removeWhere((element) =>
+        element.warmupId == null ||
+        !((element.formats ?? []).contains(monthProvider!.equipmentType)));
+
     return warmUps.isEmpty
         ? SizedBox(height: 15)
         : Column(
@@ -3988,10 +3994,19 @@ class _TodayPageState extends State<TodayPage>
                 height: ScreenUtil.verticalScale(1),
               ),
               Theme(
-                data: ThemeData().copyWith(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                ),
+                data: lightTheme.brightness == Brightness.light
+                    ? lightTheme.copyWith(
+                        dividerColor: Theme.of(context).dividerColor,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        cardColor: Theme.of(context).cardColor,
+                      )
+                    : darkTheme.copyWith(
+                        cardColor: Theme.of(context).cardColor,
+                        dividerColor: Theme.of(context).dividerColor,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                      ),
                 child: ClipRRect(
                   borderRadius:
                       BorderRadius.circular(ScreenUtil.verticalScale(0)),
@@ -4031,7 +4046,7 @@ class _TodayPageState extends State<TodayPage>
                   vertical: ScreenUtil.verticalScale(1.5),
                 ),
                 width: media.width * 0.75,
-                color: Colors.black12,
+                color: Theme.of(context).dividerColor,
               ),
               SizedBox(
                 height: ScreenUtil.verticalScale(1.5),
@@ -4077,7 +4092,7 @@ class _TodayPageState extends State<TodayPage>
                       top: BorderSide(
                           color: isEditMode
                               ? Colors.grey.shade700
-                              : Colors.grey.shade400,
+                              : Theme.of(context).dividerColor,
                           width: 1.5),
                     ),
                   ),
@@ -4150,7 +4165,7 @@ class _TodayPageState extends State<TodayPage>
                           },
                           style: ElevatedButton.styleFrom(
                             disabledBackgroundColor: const Color(0xFFF3F3F3),
-                            backgroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).cardColor,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(
@@ -4552,7 +4567,7 @@ class _TodayPageState extends State<TodayPage>
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: const Color(0xFFFFFFFF),
+                color: Theme.of(context).cardColor,
               ),
               child: Stack(
                 children: [
@@ -4565,7 +4580,7 @@ class _TodayPageState extends State<TodayPage>
                         Text(
                           "Are you sure?",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                             fontSize: ScreenUtil.verticalScale(2.4),
                             fontWeight: FontWeight.bold,
                           ),
@@ -4578,7 +4593,8 @@ class _TodayPageState extends State<TodayPage>
                             "This action will reset your progress for this day. Are you sure you want to proceed?",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.black,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
                               fontSize: ScreenUtil.verticalScale(2),
                               fontWeight: FontWeight.normal,
                             ),
@@ -4693,16 +4709,17 @@ class SearchEquipmentField extends StatelessWidget {
         vertical: ScreenUtil.horizontalScale(1),
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).canvasColor,
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
       ),
       child: TextField(
+        cursorColor: Theme.of(context).textTheme.bodyLarge?.color,
         onChanged: onChanged,
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           hintText: 'Search Exercises',
           hintStyle: TextStyle(
-            color: Colors.black45,
+            color: Colors.grey.shade400,
             fontSize: ScreenUtil.verticalScale(2),
           ),
           suffixIcon: Icon(

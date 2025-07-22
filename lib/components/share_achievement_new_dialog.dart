@@ -80,7 +80,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Screenshot(
                   controller: screenshotController,
                   child: Container(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     child: SizedBox(
                       width: ScreenUtil.verticalScale(38),
                       height: ScreenUtil.verticalScale(38),
@@ -145,7 +145,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: ScreenUtil.verticalScale(1.6),
-                                        color: AppColors.blackColor,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -160,7 +163,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: ScreenUtil.verticalScale(1.6),
-                                      color: Colors.grey.shade600,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -176,7 +182,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: const Color(0xFFFFFFFF),
+                    color: Theme.of(context).cardColor,
                   ),
                   child: Stack(
                     children: [
@@ -296,7 +302,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.6),
-                                                  color: AppColors.blackColor,
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge
+                                                      ?.color,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -313,7 +322,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                 fontSize:
                                                     ScreenUtil.verticalScale(
                                                         1.6),
-                                                color: Colors.grey.shade600,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),

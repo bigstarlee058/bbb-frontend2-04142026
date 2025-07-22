@@ -39,7 +39,7 @@ class _ToolsPageState extends State<ToolsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -154,8 +154,9 @@ class _ToolsPageState extends State<ToolsPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
                                 ),
                               ),
                             ),
@@ -178,7 +179,7 @@ class _ToolsPageState extends State<ToolsPage> {
                                 ? media.height / 8.5
                                 : media.height / 7))),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -187,8 +188,8 @@ class _ToolsPageState extends State<ToolsPage> {
                       children: [
                         Container(
                           width: media.width,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(55),
                             ),

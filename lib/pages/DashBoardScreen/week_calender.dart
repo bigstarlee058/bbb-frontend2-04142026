@@ -50,6 +50,12 @@ class _WeekCalenderState extends State<WeekCalender> {
             selectedDayPredicate: (day) {
               return isSameDay(_selectedDay, day);
             },
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(
+                  color: Theme.of(context).textTheme.bodySmall?.color),
+              weekendStyle: TextStyle(
+                  color: Theme.of(context).textTheme.bodySmall?.color),
+            ),
             headerStyle: HeaderStyle(
               headerPadding: const EdgeInsets.only(bottom: 2),
               formatButtonVisible: false,
@@ -319,13 +325,13 @@ class _WeekCalenderState extends State<WeekCalender> {
       margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(0.92)),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white,
+        color: Colors.transparent,
       ),
       child: Text(
         '${date.day}',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14.0,
-          color: Colors.black,
+          color: Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
     );

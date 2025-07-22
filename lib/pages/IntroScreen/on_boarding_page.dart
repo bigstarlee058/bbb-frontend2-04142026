@@ -226,7 +226,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 Container(
                   width: media.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
                     ),
@@ -242,8 +242,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                           child: Container(
                             height: media.height / 9.8,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                         ),
@@ -278,11 +278,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text(
+                                Text(
                                   "Don't have an account? ",
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: AppColors.appGreyColor,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color,
                                   ),
                                 ),
                                 TextButton(
@@ -415,7 +418,7 @@ class _TextSliderState extends State<TextSlider> {
                         style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(1.65),
                           height: 1.5,
-                          color: AppColors.appGreyColor,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
                         ),
                       ),
                     ),

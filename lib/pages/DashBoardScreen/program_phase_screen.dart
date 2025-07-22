@@ -40,7 +40,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Consumer<DataProvider>(builder: (context, value, c) {
         return SingleChildScrollView(
           controller: _scrollController,
@@ -53,7 +53,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                     height: ScreenUtil.verticalScale(65),
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Color(0xFFEEEEEE).withValues(alpha: 0.8),
+                      color: Theme.of(context).cardColor,
                     ),
                     child: Align(
                       alignment: Alignment.topCenter,
@@ -138,9 +138,8 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                         child: Container(
                           height: media.height / 11,
                           width: media.width / 6,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor),
                         ),
                       ),
                     ),
@@ -155,7 +154,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                 child: Container(
                   width: media.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
@@ -198,7 +197,10 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                                           "${value.programPhaseModel?.phasesmaininfo?.description}",
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: AppColors.appGreyColor,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color,
                                           ),
                                           textAlign: TextAlign.left,
                                         ),
@@ -343,10 +345,10 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
       collapsedBackgroundColor: const Color(0xFF0D0D0D),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-        color: AppColors.greyColor,
+        color: Theme.of(context).cardColor,
       ),
       iconColor: AppColors.primaryColor,
-      collapsedIconColor: Colors.white,
+      collapsedIconColor: Theme.of(context).cardColor,
       trailing: Padding(
         padding: EdgeInsets.only(
           bottom: _expandedStates[index] == true

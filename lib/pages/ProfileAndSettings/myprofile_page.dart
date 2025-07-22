@@ -279,7 +279,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -429,9 +429,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -446,7 +446,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       minHeight: media.height - (media.height / 3)),
                   margin: EdgeInsets.only(top: media.height / 3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
@@ -496,32 +496,34 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             //   },
                             // ),
                             Consumer<LocationProvider>(
-                              builder: (context, value, child) => Column(
-                                children: [
-                                  _buildDropdownField(
-                                    context: context,
-                                    label: 'Country',
-                                    value: value.selectedCountry,
-                                    options: value.country?.countries ?? [],
-                                    hint: 'Enter here',
-                                    onChanged: value.onCountrySelect,
-                                  ),
-                                  _buildDropdownField(
-                                    context: context,
-                                    label: 'State',
-                                    value: value.selectedState,
-                                    options: value.states?.states ?? [],
-                                    hint: 'Enter here',
-                                    onChanged: value.onStateSelect,
-                                  ),
-                                  _buildTextField(
-                                    context: context,
-                                    label: 'City',
-                                    value: value.selectedCityController,
-                                    hint: 'Enter here',
-                                  ),
-                                ],
-                              ),
+                              builder: (context, value, child) {
+                                return Column(
+                                  children: [
+                                    _buildDropdownField(
+                                      context: context,
+                                      label: 'Country',
+                                      value: value.selectedCountry,
+                                      options: value.country?.countries ?? [],
+                                      hint: 'Enter here',
+                                      onChanged: value.onCountrySelect,
+                                    ),
+                                    _buildDropdownField(
+                                      context: context,
+                                      label: 'State',
+                                      value: value.selectedState,
+                                      options: value.states?.states ?? [],
+                                      hint: 'Enter here',
+                                      onChanged: value.onStateSelect,
+                                    ),
+                                    _buildTextField(
+                                      context: context,
+                                      label: 'City',
+                                      value: value.selectedCityController,
+                                      hint: 'Enter here',
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                             _heightPicker(
                               context: context,
@@ -631,7 +633,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   horizontal: ScreenUtil.horizontalScale(1),
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.052),
+                  color: Theme.of(context).cardColor,
                   borderRadius: Utils.buttonRadius,
                 ),
                 child: Center(
@@ -641,7 +643,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     style: TextStyle(
                       color: value == 'Enter here'
                           ? Colors.grey.shade700
-                          : Colors.black,
+                          : Theme.of(context).textTheme.bodyLarge?.color,
                       fontSize: ScreenUtil.verticalScale(1.95),
                       fontWeight: FontWeight.normal,
                     ),
@@ -689,16 +691,26 @@ class _MyProfilePageState extends State<MyProfilePage> {
               horizontal: ScreenUtil.horizontalScale(1),
             ).copyWith(left: 20),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
+              color: Theme.of(context).cardColor,
               borderRadius: Utils.buttonRadius,
             ),
             child: Center(
               // Center the dropdown content
               child: DropdownButton<String>(
-                value: value,
-                dropdownColor: const Color.fromARGB(255, 252, 252, 252),
+                // value: value,
+
+                dropdownColor: Theme.of(context).cardColor,
                 elevation: 12,
-                hint: Text(hint),
+                hint: Text(
+                  (value != null && value.isNotEmpty) ? value : hint,
+                  style: TextStyle(
+                    color: (value != null && value.isNotEmpty)
+                        ? Theme.of(context).textTheme.bodyLarge?.color
+                        : Colors.grey.shade700,
+                    fontSize: ScreenUtil.verticalScale(1.95),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
                 isDense: true,
                 isExpanded: true,
                 alignment: Alignment.center,
@@ -714,6 +726,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         maxLines: 1,
                         textAlign: TextAlign.center,
                         style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontSize: ScreenUtil.verticalScale(1.95),
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -722,10 +735,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   );
                 }).toList(),
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontSize: ScreenUtil.verticalScale(1.95),
                   fontWeight: FontWeight.normal,
                 ),
+
                 onChanged: onChanged,
                 underline: Container(),
               ),
@@ -766,7 +780,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             padding:
                 EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.052),
+              color: Theme.of(context).cardColor,
               borderRadius: Utils.buttonRadius,
             ),
             child: Center(
@@ -850,7 +864,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 horizontal: ScreenUtil.horizontalScale(1),
               ),
               decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.052),
+                color: Theme.of(context).cardColor,
                 borderRadius: Utils.buttonRadius,
               ),
               child: Center(
@@ -858,8 +872,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   value.text.isEmpty ? 'Enter here' : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty
-                        ? Colors.grey.shade700
-                        : Colors.black,
+                        ? Colors.grey.shade400
+                        : Theme.of(context).textTheme.bodyLarge?.color,
                     fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
                   ),
@@ -887,7 +901,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         selectedDate = dob;
         setState(() {});
       },
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).canvasColor,
       height: 320,
       displayCloseIcon: true,
       closeIconColor: Colors.black,

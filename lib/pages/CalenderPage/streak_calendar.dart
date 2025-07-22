@@ -52,7 +52,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
     ScreenUtil.init(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           SizedBox(
@@ -220,7 +220,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                   child: Container(
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -236,8 +236,9 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                             child: Container(
                               height: media.height / 9.8,
                               width: media.width / 6,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                               ),
                             ),
                           ),
@@ -256,7 +257,10 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               child: Text(
                                 'Mark a day a complete every day to keep the perfect flame streak going.',
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.5),
                                 ),
                                 textAlign: TextAlign.center,
@@ -372,7 +376,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                 horizontal: ScreenUtil.verticalScale(1),
               ),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius:
                     BorderRadius.circular(ScreenUtil.verticalScale(5)),
                 boxShadow: const [

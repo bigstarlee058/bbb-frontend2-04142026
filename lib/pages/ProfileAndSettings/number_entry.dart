@@ -112,7 +112,7 @@ class _NumberEntryState extends State<NumberEntry> {
               horizontal: ScreenUtil.horizontalScale(1),
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.052),
+              color: Theme.of(context).cardColor,
               borderRadius: Utils.buttonRadius,
             ),
             child: Center(
@@ -130,7 +130,7 @@ class _NumberEntryState extends State<NumberEntry> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.95),
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
                 decoration: InputDecoration(
                   hintText: "Enter here",

@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
@@ -78,8 +81,9 @@ class AppTextFormField extends StatelessWidget {
         ),
         floatingLabelBehavior: FloatingLabelBehavior.never,
         filled: true,
-        fillColor: Colors.grey.withValues(alpha: 0.052),
-        contentPadding: EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(1.85), horizontal: 20.0),
+        fillColor: Theme.of(context).cardColor,
+        contentPadding: EdgeInsets.symmetric(
+            vertical: ScreenUtil.verticalScale(1.85), horizontal: 20.0),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: Utils.buttonRadius,
@@ -89,12 +93,13 @@ class AppTextFormField extends StatelessWidget {
           borderRadius: Utils.buttonRadius,
         ),
       ),
-      cursorColor: Colors.black,
+      cursorColor: Theme.of(context).textTheme.bodySmall?.color,
       cursorWidth: 0.5,
       onTapOutside: (event) => FocusScope.of(context).unfocus(),
       style: GoogleFonts.plusJakartaSans(
         fontWeight: FontWeight.w500,
-        color: Colors.black,
+        color: Theme.of(context).textTheme.bodyLarge?.color,
+        decoration: TextDecoration.none,
         fontSize: ScreenUtil.verticalScale(1.82),
       ),
     );

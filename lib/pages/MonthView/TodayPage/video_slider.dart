@@ -5,7 +5,6 @@ import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/pump_day_model.dart';
 import 'package:bbb/pages/MonthView/TodayPage/slider_video_page.dart';
-import 'package:bbb/routes/fade_page_route.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';

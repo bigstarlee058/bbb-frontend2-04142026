@@ -267,7 +267,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       //     _loadValue();
       //   },
       // ),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: SafeArea(
@@ -433,8 +433,9 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                         horizontalInterval:
                                             (maxWeight / 5).ceilToDouble(),
                                         getDrawingHorizontalLine: (value) {
-                                          return const FlLine(
-                                              color: Colors.grey,
+                                          return FlLine(
+                                              color:
+                                                  Theme.of(context).canvasColor,
                                               strokeWidth: 0.5,
                                               dashArray: [5, 5]);
                                         },
@@ -483,11 +484,14 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                         ),
                                       ),
                                       borderData: FlBorderData(
-                                        border: const Border(
+                                        border: Border(
                                           top: BorderSide.none,
                                           right: BorderSide.none,
                                           left: BorderSide.none,
-                                          bottom: BorderSide(width: .5),
+                                          bottom: BorderSide(
+                                            width: .5,
+                                            color: Theme.of(context).cardColor,
+                                          ),
                                         ),
                                       ),
                                       minY: 0,
@@ -595,7 +599,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
               Expanded(
                 child: Container(
                   padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.5)),
-                  color: Colors.grey.withValues(alpha: 0.05),
+                  color: Theme.of(context).cardColor,
                   child: ListView.separated(
                     separatorBuilder: (context, index) => SizedBox(height: 7),
                     itemCount: finalData.length,
@@ -995,7 +999,7 @@ class FilterButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor:
-              isSelected ? AppColors.primaryColor : AppColors.greyColor,
+              isSelected ? AppColors.primaryColor : Theme.of(context).cardColor,
           padding: const EdgeInsets.symmetric(horizontal: 1.0),
         ),
         onPressed: onPressed,

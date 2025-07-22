@@ -10,6 +10,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -77,8 +78,33 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                   } else if (descriptionController.text.isEmpty) {
                     showBottomAlert(context, "Please enter description");
                   } else {
-                    await value.addOwnSpotlight(titleController.text.trim(),
-                        descriptionController.text.trim(), image);
+                    bool val = await value.addOwnSpotlight(
+                      titleController.text.trim(),
+                      descriptionController.text.trim(),
+                      image,
+                    );
+                    if (val == true) {
+                      Fluttertoast.showToast(
+                        msg: "Spotlight added successfully",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.TOP_RIGHT,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: AppColors.primaryColor,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: "Failed to add spotlight, Please try again!",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.TOP_RIGHT,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: AppColors.primaryColor,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    }
                   }
                 },
                 isLoading: value.storyLoader,

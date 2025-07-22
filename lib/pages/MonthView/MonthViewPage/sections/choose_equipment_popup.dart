@@ -320,7 +320,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -744,11 +744,17 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                       "body": Style(
                                           fontSize: FontSize(
                                               ScreenUtil.verticalScale(1.7)),
-                                          color: AppColors.appGreyColor),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color),
                                       "p": Style(
                                           fontSize: FontSize(
                                               ScreenUtil.verticalScale(1.7)),
-                                          color: AppColors.appGreyColor),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color),
                                     },
                                   )
                                   // Text(

@@ -29,7 +29,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
   bool videoNotInitialized = false;
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  late Size videoSize;
+  Size? videoSize;
   Timer? _hideControlsTimer;
   bool isMute = true;
   DataProvider? dataProvider;
@@ -188,7 +188,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
               hideControls: hideControls,
               isZoom: isZoom,
               media: screenSize,
-              videoSize: videoSize,
+              videoSize: videoSize!,
               muteUnMute: muteUnMute,
               showControls: showControls,
               showControlsOnTap: showControlsOnTap,
@@ -288,15 +288,15 @@ class _SliderVideoPageState extends State<SliderVideoPage>
             borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                  maxHeight: loading
+                  maxHeight: loading || videoSize == null
                       ? MediaQuery.of(context).size.height * 0.825
-                      : videoSize.height +
+                      : videoSize!.height +
                           ScreenUtil.verticalScale(
-                              videoSize.height > 300 ? 12 : 10.5)),
+                              videoSize!.height > 300 ? 12 : 10.5)),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -337,13 +337,14 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                               ? Stack(
                                                   children: [
                                                     SizedBox(
-                                                      height: videoSize.height +
+                                                      height: videoSize!
+                                                              .height +
                                                           ScreenUtil.verticalScale(
-                                                              videoSize.height >
+                                                              videoSize!.height >
                                                                       300
                                                                   ? 2.5
                                                                   : .8),
-                                                      width: videoSize.width +
+                                                      width: videoSize!.width +
                                                           ScreenUtil
                                                               .verticalScale(
                                                                   1.5),
@@ -359,13 +360,14 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                       color: showControls
                                                           ? Colors.black38
                                                           : Colors.transparent,
-                                                      height: videoSize.height +
+                                                      height: videoSize!
+                                                              .height +
                                                           ScreenUtil.verticalScale(
-                                                              videoSize.height >
+                                                              videoSize!.height >
                                                                       300
                                                                   ? 2.5
                                                                   : .8),
-                                                      width: videoSize.width +
+                                                      width: videoSize!.width +
                                                           ScreenUtil
                                                               .verticalScale(
                                                                   1.5),
@@ -389,8 +391,8 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                     ),
                                   ),
                                   Positioned(
-                                    bottom: videoSize.height /
-                                        (videoSize.height > 300 ? 2 : 2.7),
+                                    bottom: videoSize!.height /
+                                        (videoSize!.height > 300 ? 2 : 2.7),
                                     left: 10,
                                     right: 10,
                                     child: AnimatedOpacity(
@@ -498,7 +500,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                   ),
                                   Positioned(
                                     bottom: ScreenUtil.verticalScale(
-                                        videoSize.height > 300 ? 1 : -1.5),
+                                        videoSize!.height > 300 ? 1 : -1.5),
                                     left: 10,
                                     right: 10,
                                     child: !videoNotInitialized &&
@@ -582,7 +584,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                     SizedBox(
                                                         height: ScreenUtil
                                                             .verticalScale(
-                                                                videoSize.height >
+                                                                videoSize!.height >
                                                                         300
                                                                     ? 1
                                                                     : 0.5)),

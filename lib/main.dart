@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -43,6 +44,7 @@ import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_routes.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -60,6 +62,7 @@ import 'localstorage/month_database.dart';
 import 'pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'pages/Tools/seeall_achievement_page_new.dart';
 import 'providers/month_provider.dart';
+import 'providers/theme_provider.dart';
 import 'providers/video_initiase_loader.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -76,7 +79,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await preferences.init();
   await _configureLocalTimeZone();
   const androidInitializationSetting =
       AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -164,6 +167,9 @@ class _MyAppState extends State<MyApp> {
       ChangeNotifierProvider<VideoInitialiseProvider>(
     create: (context) => VideoInitialiseProvider(),
   );
+  final themeProvider = ChangeNotifierProvider<ThemeProvider>(
+    create: (context) => ThemeProvider(),
+  );
 
   late AppLinks _appLinks;
 
@@ -176,7 +182,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   _initialisation() async {
-    await preferences.init();
+    // await preferences.init();
     await DatabaseHelper().initDatabase();
   }
 
@@ -230,78 +236,84 @@ class _MyAppState extends State<MyApp> {
           programInfoProvider,
           monthProvider,
           scrollProvider,
-          videoInitialiseProvider
+          videoInitialiseProvider,
+          themeProvider
         ],
-        child: MaterialApp(
-          navigatorObservers: <NavigatorObserver>[observer],
-          navigatorKey: navigatorKey,
-          locale: !kReleaseMode ? DevicePreview.locale(context) : null,
-          builder: !kReleaseMode ? DevicePreview.appBuilder : null,
-          title: 'Booty by Bret',
-          theme: ThemeData(
-            appBarTheme: AppBarTheme(
-                titleTextStyle: TextStyle(fontWeight: FontWeight.w400)),
-            primaryColor: AppColors.primaryColor,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.transparent),
-          ),
-          debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.splashScreen,
-          routes: {
-            AppRoutes.splashScreen: (context) => const SplashScreen(),
-            AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
-            AppRoutes.mainScreen: (context) =>
-                const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-            AppRoutes.loginScreen: (context) => const LoginPage(),
-            AppRoutes.registerScreen: (context) => const SignupPage(image: ''),
-            AppRoutes.nutritionCalculatorScreen: (context) =>
-                const NutritionCalculatorPage(),
-            AppRoutes.programPhaseScreen: (context) =>
-                const ProgramPhaseScreen(),
-            AppRoutes.graphAndReportsScreen: (context) =>
-                const GraphAndReportsPage(),
-            AppRoutes.exerciseHistory: (context) => const ExerciseHistoryPage(),
-            AppRoutes.exerciseLibraryDetailScreen: (context) =>
-                const ExerciseLibraryDetailPage(),
-            AppRoutes.exerciseLibraryScreen: (context) =>
-                const ExerciseLibraryPage(),
-            AppRoutes.equipmentLibraryScreen: (context) =>
-                const EquipmentLibraryPage(),
-            AppRoutes.bonusLibraryScreen: (context) => const BonusLibraryPage(),
-            AppRoutes.tutorialScreen: (context) => const TutorialPage(),
-            AppRoutes.passwordresetScreen: (context) =>
-                const ResetPasswordScreen(image: ''),
-            // AppRoutes.emailVerificationScreen: (context) =>
-            //     const EmailVerificationScreen(),
-            AppRoutes.dayOverviewScreen: (context) => const DayOverviewPage(),
-            AppRoutes.todayScreen: (context) => const TodayPage(),
-            AppRoutes.dayCompletedScreen: (context) =>
-                const DayCompletedPage(dayTitle: ""),
-            AppRoutes.exerciseScreen: (context) => const ExercisePage(),
-            AppRoutes.recalculateScreen: (context) => const RecalculatePage(),
-            // AppRoutes.streakScreen: (context) => const StreakPage(),
-            AppRoutes.calendarScreen: (context) => const CalendarPage(),
-            AppRoutes.myProfileScreen: (context) => const MyProfilePage(),
-            AppRoutes.languageScreen: (context) => const LanguagePage(),
-            AppRoutes.streakCalendarScreen: (context) =>
-                const StreakCalendarPage(),
-            AppRoutes.notificationsScreen: (context) =>
-                const NotificationsPage(),
-            AppRoutes.joinChallengeScreen: (context) =>
-                const JoinTheChallengePage(),
-            AppRoutes.meetOurStaff: (context) => const MeetOurStaff(),
-            AppRoutes.joinedChallengeScreen: (context) =>
-                const JoinedChallengePage(),
-            AppRoutes.collectionDetailScreen: (context) =>
-                const CollectionDetailPage(),
-            AppRoutes.settingPage: (context) => const SettingPage(),
-            AppRoutes.seeAllAchievementPage: (context) =>
-                const SeeAllAchievementPage(),
-            AppRoutes.faqsPage: (context) => const FAQsPage(),
-            AppRoutes.paywall: (context) => const SubscriptionPayWall(),
-          },
+        child: ChangeNotifierProvider(
+          create: (_) => ThemeProvider(),
+          child:
+              Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+            return MaterialApp(
+              navigatorObservers: <NavigatorObserver>[observer],
+              navigatorKey: navigatorKey,
+              locale: !kReleaseMode ? DevicePreview.locale(context) : null,
+              builder: !kReleaseMode ? DevicePreview.appBuilder : null,
+              title: 'Booty by Bret',
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: themeProvider.themeMode,
+              debugShowCheckedModeBanner: false,
+              initialRoute: AppRoutes.splashScreen,
+              routes: {
+                AppRoutes.splashScreen: (context) => const SplashScreen(),
+                AppRoutes.onBoardingScreen: (context) => const OnBoardingPage(),
+                AppRoutes.mainScreen: (context) =>
+                    const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+                AppRoutes.loginScreen: (context) => const LoginPage(),
+                AppRoutes.registerScreen: (context) =>
+                    const SignupPage(image: ''),
+                AppRoutes.nutritionCalculatorScreen: (context) =>
+                    const NutritionCalculatorPage(),
+                AppRoutes.programPhaseScreen: (context) =>
+                    const ProgramPhaseScreen(),
+                AppRoutes.graphAndReportsScreen: (context) =>
+                    const GraphAndReportsPage(),
+                AppRoutes.exerciseHistory: (context) =>
+                    const ExerciseHistoryPage(),
+                AppRoutes.exerciseLibraryDetailScreen: (context) =>
+                    const ExerciseLibraryDetailPage(),
+                AppRoutes.exerciseLibraryScreen: (context) =>
+                    const ExerciseLibraryPage(),
+                AppRoutes.equipmentLibraryScreen: (context) =>
+                    const EquipmentLibraryPage(),
+                AppRoutes.bonusLibraryScreen: (context) =>
+                    const BonusLibraryPage(),
+                AppRoutes.tutorialScreen: (context) => const TutorialPage(),
+                AppRoutes.passwordresetScreen: (context) =>
+                    const ResetPasswordScreen(image: ''),
+                // AppRoutes.emailVerificationScreen: (context) =>
+                //     const EmailVerificationScreen(),
+                AppRoutes.dayOverviewScreen: (context) =>
+                    const DayOverviewPage(),
+                AppRoutes.todayScreen: (context) => const TodayPage(),
+                AppRoutes.dayCompletedScreen: (context) =>
+                    const DayCompletedPage(dayTitle: ""),
+                AppRoutes.exerciseScreen: (context) => const ExercisePage(),
+                AppRoutes.recalculateScreen: (context) =>
+                    const RecalculatePage(),
+                // AppRoutes.streakScreen: (context) => const StreakPage(),
+                AppRoutes.calendarScreen: (context) => const CalendarPage(),
+                AppRoutes.myProfileScreen: (context) => const MyProfilePage(),
+                AppRoutes.languageScreen: (context) => const LanguagePage(),
+                AppRoutes.streakCalendarScreen: (context) =>
+                    const StreakCalendarPage(),
+                AppRoutes.notificationsScreen: (context) =>
+                    const NotificationsPage(),
+                AppRoutes.joinChallengeScreen: (context) =>
+                    const JoinTheChallengePage(),
+                AppRoutes.meetOurStaff: (context) => const MeetOurStaff(),
+                AppRoutes.joinedChallengeScreen: (context) =>
+                    const JoinedChallengePage(),
+                AppRoutes.collectionDetailScreen: (context) =>
+                    const CollectionDetailPage(),
+                AppRoutes.settingPage: (context) => const SettingPage(),
+                AppRoutes.seeAllAchievementPage: (context) =>
+                    const SeeAllAchievementPage(),
+                AppRoutes.faqsPage: (context) => const FAQsPage(),
+                AppRoutes.paywall: (context) => const SubscriptionPayWall(),
+              },
+            );
+          }),
         ),
       ),
     );

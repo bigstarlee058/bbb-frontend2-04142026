@@ -131,7 +131,7 @@ class _HeightPickerState extends State<HeightPicker> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +146,7 @@ class _HeightPickerState extends State<HeightPicker> {
                 onTap: () => Navigator.pop(context),
                 child: Icon(
                   Icons.close,
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge!.color!,
                   size: 22,
                 ),
               ),
@@ -297,7 +297,8 @@ Future<void> showCupertinoHeightPicker({
     barrierColor: barrierColor,
     builder: (context) {
       return Theme(
-        data: Theme.of(context).copyWith(primaryColor: Colors.white),
+        data: Theme.of(context)
+            .copyWith(primaryColor: Theme.of(context).cardColor),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(ScreenUtil.verticalScale(2.5)),
@@ -307,7 +308,7 @@ Future<void> showCupertinoHeightPicker({
             height: modalHeight,
             width: maxModalWidth ?? double.infinity,
             child: ColoredBox(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               child: HeightPicker(
                 key: key,
                 initialHeight: initialHeight,

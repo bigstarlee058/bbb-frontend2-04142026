@@ -172,7 +172,10 @@ class _SettingSectionState extends State<SettingSection> {
                                               'Choose workout frequency',
                                               textAlign: TextAlign.left,
                                               style: TextStyle(
-                                                color: const Color(0xBB888888),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                                 fontSize:
                                                     ScreenUtil.verticalScale(
                                                         1.7),
@@ -210,8 +213,10 @@ class _SettingSectionState extends State<SettingSection> {
                                                   size:
                                                       ScreenUtil.verticalScale(
                                                           2.3),
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                 ),
                                               ),
                                             )
@@ -257,7 +262,10 @@ class _SettingSectionState extends State<SettingSection> {
                                             Text(
                                               "3 days per week",
                                               style: TextStyle(
-                                                color: const Color(0xBB888888),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                                 fontSize:
                                                     ScreenUtil.verticalScale(
                                                         1.8),
@@ -333,7 +341,10 @@ class _SettingSectionState extends State<SettingSection> {
                                             Text(
                                               "4 days per week",
                                               style: TextStyle(
-                                                color: const Color(0xBB888888),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                                 fontSize:
                                                     ScreenUtil.verticalScale(
                                                         1.8),
@@ -409,7 +420,10 @@ class _SettingSectionState extends State<SettingSection> {
                                             Text(
                                               "5 days per week",
                                               style: TextStyle(
-                                                color: const Color(0xBB888888),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                                 fontSize:
                                                     ScreenUtil.verticalScale(
                                                         1.8),
@@ -535,7 +549,10 @@ class _SettingSectionState extends State<SettingSection> {
                                             'Choose equipment availability',
                                             textAlign: TextAlign.left,
                                             style: TextStyle(
-                                              color: const Color(0xBB888888),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color,
                                               fontSize:
                                                   ScreenUtil.verticalScale(1.7),
                                               fontWeight: FontWeight.w700,
@@ -571,7 +588,10 @@ class _SettingSectionState extends State<SettingSection> {
                                                 Icons.info,
                                                 size: ScreenUtil.verticalScale(
                                                     2.3),
-                                                color: const Color(0xBB888888),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                               ),
                                             ),
                                           )
@@ -616,7 +636,10 @@ class _SettingSectionState extends State<SettingSection> {
                                           Text(
                                             "Fully equipped gym",
                                             style: TextStyle(
-                                              color: const Color(0xBB888888),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color,
                                               fontSize:
                                                   ScreenUtil.verticalScale(1.8),
                                               fontWeight: FontWeight.w600,
@@ -691,7 +714,10 @@ class _SettingSectionState extends State<SettingSection> {
                                           Text(
                                             "Home gym",
                                             style: TextStyle(
-                                              color: const Color(0xBB888888),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color,
                                               fontSize:
                                                   ScreenUtil.verticalScale(1.8),
                                               fontWeight: FontWeight.w600,
@@ -766,7 +792,10 @@ class _SettingSectionState extends State<SettingSection> {
                                           Text(
                                             "Dumbbells and bands",
                                             style: TextStyle(
-                                              color: const Color(0xBB888888),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color,
                                               fontSize:
                                                   ScreenUtil.verticalScale(1.8),
                                               fontWeight: FontWeight.w600,
@@ -833,7 +862,7 @@ class _SettingSectionState extends State<SettingSection> {
                         'Choose workout frequency',
                         textAlign: TextAlign.left,
                         style: TextStyle(
-                          color: const Color(0xBB888888),
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                           fontSize: ScreenUtil.verticalScale(1.7),
                           fontWeight: FontWeight.w700,
                         ),
@@ -864,7 +893,8 @@ class _SettingSectionState extends State<SettingSection> {
                           child: Icon(
                             Icons.info,
                             size: ScreenUtil.verticalScale(2.3),
-                            color: const Color(0xBB888888),
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                         ),
                       )
@@ -881,15 +911,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -909,7 +939,10 @@ class _SettingSectionState extends State<SettingSection> {
                               Text(
                                 "3 days per week",
                                 style: TextStyle(
-                                  color: const Color(0xBB888888),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.8),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -932,7 +965,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: splitIndex == 0
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -946,15 +981,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -974,7 +1009,10 @@ class _SettingSectionState extends State<SettingSection> {
                               Text(
                                 "4 days per week",
                                 style: TextStyle(
-                                  color: const Color(0xBB888888),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.8),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -997,7 +1035,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: splitIndex == 1
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1011,15 +1051,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1039,7 +1079,10 @@ class _SettingSectionState extends State<SettingSection> {
                               Text(
                                 "5 days per week",
                                 style: TextStyle(
-                                  color: const Color(0xBB888888),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.8),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -1062,7 +1105,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: splitIndex == 2
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1096,7 +1141,7 @@ class _SettingSectionState extends State<SettingSection> {
                         'Choose equipment availability',
                         textAlign: TextAlign.left,
                         style: TextStyle(
-                          color: const Color(0xBB888888),
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                           fontSize: ScreenUtil.verticalScale(1.7),
                           fontWeight: FontWeight.w700,
                         ),
@@ -1127,7 +1172,8 @@ class _SettingSectionState extends State<SettingSection> {
                           child: Icon(
                             Icons.info,
                             size: ScreenUtil.verticalScale(2.3),
-                            color: const Color(0xBB888888),
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                         ),
                       )
@@ -1145,15 +1191,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1173,7 +1219,10 @@ class _SettingSectionState extends State<SettingSection> {
                               Text(
                                 "Fully equipped gym",
                                 style: TextStyle(
-                                  color: const Color(0xBB888888),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.8),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -1196,7 +1245,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: equipments == 0
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1210,15 +1261,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1238,7 +1289,10 @@ class _SettingSectionState extends State<SettingSection> {
                               Text(
                                 "Home gym",
                                 style: TextStyle(
-                                  color: const Color(0xBB888888),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.8),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -1261,7 +1315,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: equipments == 1
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),
@@ -1275,15 +1331,15 @@ class _SettingSectionState extends State<SettingSection> {
                           padding:
                               EdgeInsets.all(ScreenUtil.verticalScale(1.25)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(
                                 ScreenUtil.verticalScale(5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.greyColor,
-                                blurRadius: 10,
-                              ),
-                            ],
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Theme.of(context).cardColor,
+                            //     blurRadius: 10,
+                            //   ),
+                            // ],
                           ),
                           child: Row(
                             children: [
@@ -1303,7 +1359,10 @@ class _SettingSectionState extends State<SettingSection> {
                               Text(
                                 "Dumbbells and bands",
                                 style: TextStyle(
-                                  color: const Color(0xBB888888),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.8),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -1326,7 +1385,9 @@ class _SettingSectionState extends State<SettingSection> {
                                     child: Icon(
                                       Icons.done,
                                       size: ScreenUtil.verticalScale(2.5),
-                                      color: Colors.white,
+                                      color: equipments == 2
+                                          ? Colors.white
+                                          : Colors.transparent,
                                     ),
                                   ),
                                 ),

@@ -152,7 +152,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         controller: scrollController,
         physics: const ClampingScrollPhysics(),
@@ -177,7 +177,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
               child: Container(
                 width: media.width,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                   ),
@@ -283,7 +283,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                           Container(
                             height: ScreenUtil.verticalScale(4),
                             decoration: BoxDecoration(
-                              color: Colors.white,
                               borderRadius: BorderRadius.circular(
                                   ScreenUtil.verticalScale(2)),
                             ),
@@ -495,8 +494,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                   top: ScreenUtil.verticalScale(2),
                                   bottom: ScreenUtil.verticalScale(2),
                                 ),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(20),
                                   ),
@@ -517,7 +516,10 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       'Total Weight\nLifted',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                          color: Colors.black54,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color,
                                           fontSize:
                                               ScreenUtil.horizontalScale(3.6)),
                                     ),
@@ -551,8 +553,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                   top: ScreenUtil.verticalScale(2),
                                   bottom: ScreenUtil.verticalScale(2),
                                 ),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(20),
                                   ),
@@ -573,7 +575,10 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       'Total completed\nExercises',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        color: Colors.black54,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color,
                                         fontSize:
                                             ScreenUtil.horizontalScale(3.6),
                                       ),
@@ -762,8 +767,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                           child: Container(
                             height: media.height / 11,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                         ),
