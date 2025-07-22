@@ -257,7 +257,10 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                               child: Text(
                                 'Mark a day a complete every day to keep the perfect flame streak going.',
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
                                   fontSize: ScreenUtil.verticalScale(1.5),
                                 ),
                                 textAlign: TextAlign.center,
@@ -373,7 +376,7 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                 horizontal: ScreenUtil.verticalScale(1),
               ),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius:
                     BorderRadius.circular(ScreenUtil.verticalScale(5)),
                 boxShadow: const [

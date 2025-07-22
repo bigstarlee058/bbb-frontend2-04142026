@@ -8,8 +8,10 @@ import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/theme_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -26,13 +28,15 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   DataProvider? dataProvider;
   MonthProvider? monthProvider;
+  ThemeProvider? themeProvider;
   late UserDataProvider userData;
-
+  bool isDarkMode = false;
   @override
   void initState() {
     super.initState();
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
+    themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     // _handleLogout(context);
     WidgetsBinding.instance.addPostFrameCallback(
@@ -40,6 +44,20 @@ class _SplashScreenState extends State<SplashScreen> {
         if (Platform.isIOS) {
           getOffering();
         }
+      },
+    );
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
+
+        if (raw4 == null) {
+          isDarkMode = false;
+          await preferences.setBool(SharedPreference.isDarkMode, isDarkMode);
+        } else {
+          isDarkMode = raw4;
+        }
+        log('isDarkMode==========>>>>>${isDarkMode}');
+        themeProvider?.toggleTheme(isDarkMode);
       },
     );
     _checkLoginStatus();
@@ -476,7 +494,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

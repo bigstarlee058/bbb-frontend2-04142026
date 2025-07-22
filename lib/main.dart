@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -78,7 +79,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await preferences.init();
   await _configureLocalTimeZone();
   const androidInitializationSetting =
       AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -181,7 +182,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   _initialisation() async {
-    await preferences.init();
+    // await preferences.init();
     await DatabaseHelper().initDatabase();
   }
 

@@ -45,7 +45,6 @@ class _MainPageState extends State<MainPage> {
   late MainPageProvider mainPageProvider;
   late MonthProvider monthProvider;
 
-  late List<Widget> _pages;
   Timer? _timer;
 
   DateTime _currentDate = DateTime.now();
@@ -95,7 +94,12 @@ class _MainPageState extends State<MainPage> {
       ),
     );
 
-    _startPeriodicUpdate();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        _startPeriodicUpdate();
+      },
+    );
+
     // WidgetsBinding.instance.addPostFrameCallback(
     //   (timeStamp) async {
     //     String rawMonthId = preferences.getString(SharedPreference.monthId) ?? "";
@@ -116,13 +120,6 @@ class _MainPageState extends State<MainPage> {
     //     }
     //   },
     // );
-
-    _pages = [
-      const DashboardPage(),
-      const MonthView(),
-      const ToolsPage(),
-      const ProfileSettingsPage(),
-    ];
   }
 
   Future<void> _initializeData() async {
@@ -183,6 +180,7 @@ class _MainPageState extends State<MainPage> {
     _timer = Timer.periodic(
       const Duration(seconds: 10),
       (Timer timer) {
+        if (!mounted) return;
         _initializeData();
       },
     );
@@ -208,6 +206,12 @@ class _MainPageState extends State<MainPage> {
     //     arguments: {"buttontext": "Go to Dashboard"});
   }
 
+  final List<Widget> _pages = [
+    const DashboardPage(),
+    const MonthView(),
+    const ToolsPage(),
+    const ProfileSettingsPage(),
+  ];
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);

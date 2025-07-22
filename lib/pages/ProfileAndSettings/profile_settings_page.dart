@@ -725,7 +725,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         userData?.user["singuptype"] != "web"
                                             ? true
                                             : false;
-                                    if (isAppUser) {
+                                    if (isAppUser && Platform.isIOS) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -943,7 +943,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         Text(
                           "Are you sure?",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                             fontSize: ScreenUtil.verticalScale(2.4),
                             fontWeight: FontWeight.bold,
                           ),
@@ -956,7 +956,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             "This action will completely delete your account, all of your data and you will immediately lose access to the app. If you're experiencing an issue then please feel free to contact us and we'll be happy to help you.",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.black,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
                               fontSize: ScreenUtil.verticalScale(2),
                               fontWeight: FontWeight.normal,
                             ),
@@ -1096,7 +1097,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         Text(
                           "Delete Account",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                             fontSize: ScreenUtil.verticalScale(2.4),
                             fontWeight: FontWeight.bold,
                           ),
@@ -1109,7 +1110,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             "Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be lost.",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.black,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
                               fontSize: ScreenUtil.verticalScale(2),
                               fontWeight: FontWeight.normal,
                             ),

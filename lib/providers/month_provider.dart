@@ -1785,6 +1785,7 @@ class MonthProvider extends ChangeNotifier {
   DayHistoryModel? dayHistoryDetails;
 
   fetchSingleDayHistoryLocalData() async {
+    dayHistoryDetails = null;
     if (overviewCurrentDay == 0) {
       return null;
     }

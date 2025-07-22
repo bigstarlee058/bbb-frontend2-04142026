@@ -8,6 +8,7 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -235,7 +236,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     }
                   : null,
           style: ElevatedButton.styleFrom(
-            disabledBackgroundColor: const Color(0xFFF3F3F3),
+            disabledBackgroundColor: Theme.of(context).disabledColor,
             backgroundColor: Theme.of(context).cardColor,
             elevation: 0,
             shape: RoundedRectangleBorder(

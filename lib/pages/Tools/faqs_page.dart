@@ -320,7 +320,7 @@ class _FAQsPageState extends State<FAQsPage> {
                 item.answer ?? "",
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.7),
-                  color: AppColors.appGreyColor,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
             ),

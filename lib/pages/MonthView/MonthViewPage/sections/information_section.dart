@@ -248,11 +248,13 @@ class _InformationSectionState extends State<InformationSection> {
                           style: {
                             "body": Style(
                               fontSize: FontSize(ScreenUtil.verticalScale(1.7)),
-                              color: Colors.grey.shade700,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
                             ),
                             "p": Style(
                               fontSize: FontSize(ScreenUtil.verticalScale(1.7)),
-                              color: Colors.grey.shade700,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
                             ),
                           },
                         );

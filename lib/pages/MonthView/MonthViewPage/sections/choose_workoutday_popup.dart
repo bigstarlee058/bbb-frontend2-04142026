@@ -739,11 +739,17 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog>
                                       "body": Style(
                                           fontSize: FontSize(
                                               ScreenUtil.verticalScale(1.7)),
-                                          color: AppColors.appGreyColor),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color),
                                       "p": Style(
                                           fontSize: FontSize(
                                               ScreenUtil.verticalScale(1.7)),
-                                          color: AppColors.appGreyColor),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color),
                                     },
                                   )
                                   // Text(

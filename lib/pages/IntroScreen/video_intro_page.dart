@@ -232,20 +232,10 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
     isZoom = value;
   }
 
-  Size calculateVideoSize({
-    required BuildContext context,
-    required double aspectRatio,
-  }) {
-    double maxWidth = ScreenUtil.horizontalScale(100);
-    double maxHeight = ScreenUtil.verticalScale(70);
-
+  Size calculateVideoSize(
+      {required BuildContext context, required double aspectRatio}) {
+    double maxWidth = ScreenUtil.horizontalScale(86.5);
     double calculatedHeight = maxWidth / aspectRatio;
-
-    if (calculatedHeight > maxHeight) {
-      calculatedHeight = maxHeight;
-      maxWidth = maxHeight * aspectRatio;
-    }
-
     return Size(maxWidth, calculatedHeight);
   }
 
@@ -293,7 +283,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -319,12 +309,8 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                           ? Stack(
                                               children: [
                                                 SizedBox(
-                                                  height: videoSize.height +
-                                                      ScreenUtil.verticalScale(
-                                                          2.5),
-                                                  width: videoSize.width +
-                                                      ScreenUtil.verticalScale(
-                                                          1.5),
+                                                  height: videoSize.height,
+                                                  width: videoSize.width,
                                                   child: Chewie(
                                                     controller:
                                                         _chewieController!,
@@ -337,12 +323,8 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                                   color: showControls
                                                       ? Colors.black38
                                                       : Colors.transparent,
-                                                  height: videoSize.height +
-                                                      ScreenUtil.verticalScale(
-                                                          2.5),
-                                                  width: videoSize.width +
-                                                      ScreenUtil.verticalScale(
-                                                          1.5),
+                                                  height: videoSize.height,
+                                                  width: videoSize.width,
                                                 ),
                                               ],
                                             )
@@ -591,7 +573,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                           ),
                           Container(
                             margin: EdgeInsets.only(
-                              top: ScreenUtil.verticalScale(1.5),
+                              top: ScreenUtil.verticalScale(2.5),
                               bottom: ScreenUtil.verticalScale(1.5),
                               left: ScreenUtil.horizontalScale(3),
                               right: ScreenUtil.horizontalScale(3),

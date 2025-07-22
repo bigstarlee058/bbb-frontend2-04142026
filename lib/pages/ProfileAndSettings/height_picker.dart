@@ -146,7 +146,7 @@ class _HeightPickerState extends State<HeightPicker> {
                 onTap: () => Navigator.pop(context),
                 child: Icon(
                   Icons.close,
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge!.color!,
                   size: 22,
                 ),
               ),

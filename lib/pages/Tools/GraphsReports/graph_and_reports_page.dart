@@ -516,7 +516,10 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       'Total Weight\nLifted',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                          color: Colors.black54,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color,
                                           fontSize:
                                               ScreenUtil.horizontalScale(3.6)),
                                     ),
@@ -572,7 +575,10 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                       'Total completed\nExercises',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        color: Colors.black54,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color,
                                         fontSize:
                                             ScreenUtil.horizontalScale(3.6),
                                       ),

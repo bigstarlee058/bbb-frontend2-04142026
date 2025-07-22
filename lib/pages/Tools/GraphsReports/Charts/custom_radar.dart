@@ -50,6 +50,9 @@ class CustomRadarChart extends StatelessWidget {
           dataDates: dataDates,
           outlineColor: Colors.grey.shade400,
           axisColor: Colors.grey.shade400,
+          featuresTextStyle: TextStyle(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              fontSize: 11),
           graphColors: [
             Colors.pink.shade100,
             Colors.pink.shade800.withValues(alpha: 0.5),

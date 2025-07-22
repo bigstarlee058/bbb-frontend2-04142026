@@ -240,7 +240,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
 
   Size calculateVideoSize(
       {required BuildContext context, required double aspectRatio}) {
-    double maxWidth = ScreenUtil.horizontalScale(90);
+    double maxWidth = ScreenUtil.horizontalScale(86.5);
     double calculatedHeight = maxWidth / aspectRatio;
     return Size(maxWidth, calculatedHeight);
   }
@@ -290,7 +290,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -661,7 +661,10 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                 style: TextStyle(
                                   fontSize: ScreenUtil.verticalScale(1.75),
                                   height: 1.5,
-                                  color: AppColors.appGreyColor,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
                                 ),
                               ),
                             ),

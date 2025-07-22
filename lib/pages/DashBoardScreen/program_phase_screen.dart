@@ -197,7 +197,10 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                                           "${value.programPhaseModel?.phasesmaininfo?.description}",
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: AppColors.appGreyColor,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color,
                                           ),
                                           textAlign: TextAlign.left,
                                         ),

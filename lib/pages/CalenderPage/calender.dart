@@ -119,6 +119,12 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           selectedDayPredicate: (day) {
             return isSameDay(_selectedDay, day);
           },
+          daysOfWeekStyle: DaysOfWeekStyle(
+            weekdayStyle:
+                TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
+            weekendStyle:
+                TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
+          ),
           headerStyle: HeaderStyle(
               headerPadding: const EdgeInsets.only(bottom: 10, top: 5),
               formatButtonVisible: false,
@@ -414,7 +420,10 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                                                 1 ==
                                             data["innerIndex"]))
                                     ? Colors.white
-                                    : Colors.black),
+                                    : Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color),
                           ),
                         ),
                       ),
@@ -485,7 +494,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           '${date.day}',
           style: TextStyle(
             fontSize: 14.0,
-            color: isOutSide ? Colors.grey : Colors.black,
+            color: isOutSide
+                ? Colors.grey
+                : Theme.of(context).textTheme.bodyLarge?.color,
           ),
         ),
       ),

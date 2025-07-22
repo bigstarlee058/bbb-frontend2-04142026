@@ -351,15 +351,30 @@ class _ExercisePageState extends State<ExercisePage>
     monthProvider!.overviewCurrentWeek = payloadModel.weekIndex!;
     monthProvider!.selectedExIndex = payloadModel.exerciseIndex!;
 
+    // isCurrentDayCompleted =
+    //     monthProvider?.dayHistoryDetails?.status == Status.completed;
+    // isCurrentDaySkipped =
+    //     monthProvider?.dayHistoryDetails?.status == Status.skipped ||
+    //         (monthProvider?.dayHistoryDetails == null &&
+    //             monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] ==
+    //                 WeekType.pastWeek) ||
+    //         (monthProvider!.actualWeek! > 4 &&
+    //             monthProvider?.dayHistoryDetails?.status == Status.started);
+
     isCurrentDayCompleted =
         monthProvider?.dayHistoryDetails?.status == Status.completed;
-    isCurrentDaySkipped =
-        monthProvider?.dayHistoryDetails?.status == Status.skipped ||
-            (monthProvider?.dayHistoryDetails == null &&
-                monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] ==
-                    WeekType.pastWeek) ||
-            (monthProvider!.actualWeek! > 4 &&
-                monthProvider?.dayHistoryDetails?.status == Status.started);
+    isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status ==
+            Status.skipped ||
+        (monthProvider?.dayHistoryDetails == null &&
+            monthProvider!
+                    .weekStatuses[(monthProvider!.overviewCurrentWeek) - 1] ==
+                WeekType.pastWeek) ||
+        (monthProvider!.actualWeek! > 4 &&
+            monthProvider?.dayHistoryDetails?.status == Status.started) ||
+        (monthProvider!
+                    .weekStatuses[(monthProvider!.overviewCurrentWeek) - 1] ==
+                WeekType.pastWeek &&
+            monthProvider?.dayHistoryDetails?.status == Status.started);
     if (monthProvider!.isPumpDay) {
       await monthProvider?.fetchDayStatusLocalData();
 
@@ -490,19 +505,35 @@ class _ExercisePageState extends State<ExercisePage>
         await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
         log('121212==========>>>>>${DateTime.now()}');
 
+        // isCurrentDayCompleted =
+        //     monthProvider?.dayHistoryDetails?.status == Status.completed;
+        // isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status ==
+        //         Status.skipped ||
+        //     (monthProvider?.dayHistoryDetails == null &&
+        //         monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] ==
+        //             WeekType.pastWeek) ||
+        //     (monthProvider!.actualWeek! > 4 &&
+        //         monthProvider?.dayHistoryDetails?.status == Status.started);
+
         isCurrentDayCompleted =
             monthProvider?.dayHistoryDetails?.status == Status.completed;
         isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status ==
                 Status.skipped ||
             (monthProvider?.dayHistoryDetails == null &&
-                monthProvider!.weekStatuses[(monthProvider!.week ?? 1) - 1] ==
+                monthProvider!.weekStatuses[
+                        (monthProvider!.overviewCurrentWeek) - 1] ==
                     WeekType.pastWeek) ||
             (monthProvider!.actualWeek! > 4 &&
+                monthProvider?.dayHistoryDetails?.status == Status.started) ||
+            (monthProvider!.weekStatuses[
+                        (monthProvider!.overviewCurrentWeek) - 1] ==
+                    WeekType.pastWeek &&
                 monthProvider?.dayHistoryDetails?.status == Status.started);
         isCurrentExerciseCompleted =
             monthProvider?.exerciseHistoryDetails?.status == Status.completed;
         isCurrentExerciseSkipped =
             monthProvider?.exerciseHistoryDetails?.status == Status.skipped;
+
         isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);
         findIsAtLeastOnSet();
         log('131313==========>>>>>${DateTime.now()}');

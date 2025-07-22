@@ -260,16 +260,10 @@ class _AppTutorialState extends State<AppTutorial>
     isZoom = value;
   }
 
-  Size calculateVideoSize({
-    required BuildContext context,
-    required double aspectRatio, // Aspect ratio of the video (width/height)
-  }) {
-    // Maximum allowable width and height based on screen dimensions
-    double maxWidth = ScreenUtil.horizontalScale(90);
-
-    // Calculate height dynamically based on width and aspect ratio
+  Size calculateVideoSize(
+      {required BuildContext context, required double aspectRatio}) {
+    double maxWidth = ScreenUtil.horizontalScale(86.5);
     double calculatedHeight = maxWidth / aspectRatio;
-
     return Size(maxWidth, calculatedHeight);
   }
 
@@ -745,7 +739,10 @@ class _AppTutorialState extends State<AppTutorial>
                                     style: TextStyle(
                                       fontSize: ScreenUtil.verticalScale(1.75),
                                       height: 1.5,
-                                      color: AppColors.appGreyColor,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                   ),
                                 ),

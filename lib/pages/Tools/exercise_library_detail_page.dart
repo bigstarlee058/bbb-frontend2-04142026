@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/common_network_image.dart';
@@ -955,7 +956,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
               offset: Offset(0, 1),
             ),
           ],
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(7)),
           ),

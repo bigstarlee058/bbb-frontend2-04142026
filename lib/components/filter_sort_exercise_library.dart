@@ -88,8 +88,12 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                         ].map((String option) {
                           return RadioListTile<String>(
                             title: Text(option,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black)),
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color)),
                             value: option,
                             groupValue: _selectedSortBy,
                             onChanged: (String? value) {
@@ -113,8 +117,12 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                             return ListTile(
                               title: Text(
                                 equipment['title']!,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black),
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color),
                               ),
                               contentPadding: EdgeInsets.only(
                                 right: ScreenUtil.horizontalScale(5),
@@ -219,8 +227,12 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                           return ListTile(
                             title: Text(
                               category['title']!,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.black),
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color),
                             ),
                             contentPadding: EdgeInsets.only(
                               right: ScreenUtil.horizontalScale(5),

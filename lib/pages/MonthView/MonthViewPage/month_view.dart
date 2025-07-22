@@ -525,7 +525,10 @@ class _MonthViewState extends State<MonthView> {
                                                               controller
                                                                   .selectedSection
                                                           ? Colors.white
-                                                          : Colors.black,
+                                                          : Theme.of(context)
+                                                              .textTheme
+                                                              .bodyLarge
+                                                              ?.color,
                                                       fontSize: ScreenUtil
                                                           .verticalScale(1.75),
                                                       fontWeight:

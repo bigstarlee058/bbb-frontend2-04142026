@@ -103,7 +103,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     fontSize: ScreenUtil.verticalScale(1.75),
-                                    color: AppColors.blackColor,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color,
                                     fontWeight: FontWeight.normal),
                               ),
                             ),
@@ -124,7 +127,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                         'Choose workout frequency',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
-                                          color: const Color(0xBB888888),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.color,
                                           fontSize:
                                               ScreenUtil.verticalScale(1.5),
                                           fontWeight: FontWeight.w700,
@@ -158,7 +164,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           child: Icon(
                                             Icons.info,
                                             size: ScreenUtil.verticalScale(2.3),
-                                            color: const Color(0xBB888888),
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.color,
                                           ),
                                         ),
                                       )
@@ -208,8 +217,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "3 days per week",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -290,8 +301,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "4 days per week",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -372,8 +385,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "5 days per week",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -429,7 +444,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                         'Choose equipment availability',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
-                                          color: const Color(0xBB888888),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.color,
                                           fontSize:
                                               ScreenUtil.verticalScale(1.5),
                                           fontWeight: FontWeight.w700,
@@ -463,7 +481,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           child: Icon(
                                             Icons.info,
                                             size: ScreenUtil.verticalScale(2.3),
-                                            color: const Color(0xBB888888),
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.color,
                                           ),
                                         ),
                                       )
@@ -513,8 +534,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "Fully equipped gym",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -595,8 +618,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "Home gym",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -677,8 +702,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "Dumbbells and bands",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),

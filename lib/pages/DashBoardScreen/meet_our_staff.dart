@@ -380,12 +380,18 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                     "body": Style(
                                       fontSize: FontSize(
                                           ScreenUtil.verticalScale(1.8)),
-                                      color: AppColors.appGreyColor,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                     "p": Style(
                                       fontSize: FontSize(
                                           ScreenUtil.verticalScale(1.8)),
-                                      color: AppColors.appGreyColor,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                   },
                                 );

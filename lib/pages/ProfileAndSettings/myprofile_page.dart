@@ -497,7 +497,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             // ),
                             Consumer<LocationProvider>(
                               builder: (context, value, child) {
-                                log(' value.selectedState==========>>>>>${value.selectedState}');
                                 return Column(
                                   children: [
                                     _buildDropdownField(
@@ -644,7 +643,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     style: TextStyle(
                       color: value == 'Enter here'
                           ? Colors.grey.shade700
-                          : Colors.black,
+                          : Theme.of(context).textTheme.bodyLarge?.color,
                       fontSize: ScreenUtil.verticalScale(1.95),
                       fontWeight: FontWeight.normal,
                     ),
@@ -699,9 +698,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
               // Center the dropdown content
               child: DropdownButton<String>(
                 // value: value,
+
                 dropdownColor: Theme.of(context).cardColor,
                 elevation: 12,
-                hint: Text((value != null && value.isNotEmpty) ? value : hint),
+                hint: Text(
+                  (value != null && value.isNotEmpty) ? value : hint,
+                  style: TextStyle(
+                    color: (value != null && value.isNotEmpty)
+                        ? Theme.of(context).textTheme.bodyLarge?.color
+                        : Colors.grey.shade700,
+                    fontSize: ScreenUtil.verticalScale(1.95),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
                 isDense: true,
                 isExpanded: true,
                 alignment: Alignment.center,
@@ -717,6 +726,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         maxLines: 1,
                         textAlign: TextAlign.center,
                         style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontSize: ScreenUtil.verticalScale(1.95),
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -725,10 +735,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   );
                 }).toList(),
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontSize: ScreenUtil.verticalScale(1.95),
                   fontWeight: FontWeight.normal,
                 ),
+
                 onChanged: onChanged,
                 underline: Container(),
               ),
@@ -861,8 +872,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   value.text.isEmpty ? 'Enter here' : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty
-                        ? Colors.grey.shade700
-                        : Colors.black,
+                        ? Colors.grey.shade400
+                        : Theme.of(context).textTheme.bodyLarge?.color,
                     fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
                   ),

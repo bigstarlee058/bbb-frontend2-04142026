@@ -122,7 +122,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     ScreenUtil.init(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           captureScreenShot(media),
@@ -253,9 +253,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       child: Container(
                         height: media.height / 11,
                         width: media.width / 6,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                        ),
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor),
                       ),
                     ),
                   ),
@@ -263,7 +262,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                 Container(
                   width: media.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
@@ -311,7 +310,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       Text(
                         "Here's an overview of your today's workout.",
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                           fontSize: ScreenUtil.horizontalScale(3.6),
                           fontWeight: FontWeight.w500,
                         ),
@@ -319,7 +318,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                       Text(
                         "Now recover and get ready for tomorrow!",
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                           fontSize: ScreenUtil.horizontalScale(3.6),
                           fontWeight: FontWeight.w500,
                         ),
@@ -338,7 +337,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               horizontal: ScreenUtil.verticalScale(4.1),
                               vertical: ScreenUtil.verticalScale(2)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.all(
                               Radius.circular(ScreenUtil.verticalScale(3)),
                             ),
@@ -355,11 +354,15 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const Text(
+                                Text(
                                   'Exercises Completed',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: Colors.black54, fontSize: 16.5),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                      fontSize: 16.5),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
@@ -393,7 +396,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                   padding: EdgeInsets.symmetric(
                                       vertical: ScreenUtil.verticalScale(2)),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: Theme.of(context).cardColor,
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(
                                           ScreenUtil.verticalScale(3)),
@@ -411,10 +414,13 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'Weight Lifted',
                                         style: TextStyle(
-                                            color: Colors.black54,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color,
                                             fontSize: 16.5),
                                       ),
                                       const SizedBox(height: 10),
@@ -444,7 +450,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                   padding: EdgeInsets.symmetric(
                                       vertical: ScreenUtil.verticalScale(2)),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: Theme.of(context).cardColor,
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(
                                           ScreenUtil.verticalScale(3)),
@@ -462,10 +468,13 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'Streak Achieved',
                                         style: TextStyle(
-                                            color: Colors.black54,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color,
                                             fontSize: 16.5),
                                       ),
                                       const SizedBox(height: 10),
@@ -496,11 +505,19 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                           // textColor: const Color(0x40000000),
                           textColor: Colors.white,
                           onPress: () {
-                            HapticFeedBack.buttonClick();
-                            monthProvider?.checkForPumpDay();
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, '/home', (route) => false);
-                            mainPageProvider?.changeTab(0);
+                            log('monthProvider!.isPumpDay==========>>>>>${monthProvider!.isPumpDay}');
+                            if (monthProvider!.isPumpDay) {
+                              monthProvider?.checkForPumpDay();
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            } else {
+                              monthProvider?.checkForPumpDay();
+                              mainPageProvider?.changeTab(0);
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, '/home', (route) => false);
+                            }
+                            // HapticFeedBack.buttonClick();
+
                             // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                           },
                           // color: const Color(0xC0FFFFFF),
@@ -793,7 +810,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         Text(
                           "Here's an overview of your today's workout.",
                           style: TextStyle(
-                            color: Colors.black54,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color,
                             fontSize: ScreenUtil.horizontalScale(3.6),
                             fontWeight: FontWeight.w500,
                           ),
@@ -801,7 +819,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                         Text(
                           "Now recover and get ready for tomorrow!",
                           style: TextStyle(
-                            color: Colors.black54,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color,
                             fontSize: ScreenUtil.horizontalScale(3.6),
                             fontWeight: FontWeight.w500,
                           ),
@@ -815,7 +834,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                               horizontal: ScreenUtil.verticalScale(4.1),
                               vertical: ScreenUtil.verticalScale(2)),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.all(
                               Radius.circular(ScreenUtil.verticalScale(3)),
                             ),
@@ -832,11 +851,15 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const Text(
+                                Text(
                                   'Exercises Completed',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: Colors.black54, fontSize: 16.5),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                      fontSize: 16.5),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
@@ -869,7 +892,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                     padding: EdgeInsets.symmetric(
                                         vertical: ScreenUtil.verticalScale(2)),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Theme.of(context).cardColor,
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(
                                             ScreenUtil.verticalScale(3)),
@@ -887,10 +910,13 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Weight Lifted',
                                           style: TextStyle(
-                                              color: Colors.black54,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.color,
                                               fontSize: 16.5),
                                         ),
                                         const SizedBox(height: 10),
@@ -919,7 +945,7 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                     padding: EdgeInsets.symmetric(
                                         vertical: ScreenUtil.verticalScale(2)),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Theme.of(context).cardColor,
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(
                                             ScreenUtil.verticalScale(3)),
@@ -937,10 +963,13 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Streak Achieved',
                                           style: TextStyle(
-                                              color: Colors.black54,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.color,
                                               fontSize: 16.5),
                                         ),
                                         const SizedBox(height: 10),
@@ -1460,7 +1489,14 @@ class IconWithDot extends StatelessWidget {
           : BoxDecoration(),
       child: Column(
         children: [
-          Text(iconData.day ?? ""),
+          Text(
+            iconData.day ?? "",
+            style: TextStyle(
+              color: iconData.index == 6
+                  ? Colors.black
+                  : Theme.of(context).textTheme.bodyLarge?.color,
+            ),
+          ),
           Container(
             padding: EdgeInsets.all(ScreenUtil.horizontalScale(1)),
             margin: EdgeInsets.only(top: ScreenUtil.verticalScale(1)),

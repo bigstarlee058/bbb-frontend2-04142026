@@ -177,7 +177,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: widget.loading
                     ? const Center(
@@ -576,7 +576,10 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                 style: TextStyle(
                                   fontSize: ScreenUtil.verticalScale(1.75),
                                   height: 1.5,
-                                  color: Colors.grey.shade700,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
                                 ),
                               ),
                             ),
@@ -597,7 +600,10 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                     "Do not show again.",
                                     style: TextStyle(
                                       fontSize: ScreenUtil.verticalScale(1.8),
-                                      color: Colors.black,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                   )
                                 ],

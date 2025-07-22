@@ -278,11 +278,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text(
+                                Text(
                                   "Don't have an account? ",
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: AppColors.appGreyColor,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color,
                                   ),
                                 ),
                                 TextButton(
@@ -415,7 +418,7 @@ class _TextSliderState extends State<TextSlider> {
                         style: TextStyle(
                           fontSize: ScreenUtil.verticalScale(1.65),
                           height: 1.5,
-                          color: AppColors.appGreyColor,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
                         ),
                       ),
                     ),

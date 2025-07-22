@@ -130,7 +130,7 @@ class _NumberEntryState extends State<NumberEntry> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.95),
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
                 decoration: InputDecoration(
                   hintText: "Enter here",

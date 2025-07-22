@@ -361,6 +361,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               // overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: ScreenUtil.verticalScale(1.6),
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.bold,
               ),
@@ -372,6 +373,7 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
               textAlign: TextAlign.center,
               overflow: TextOverflow.visible,
               style: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color,
                 fontSize: ScreenUtil.verticalScale(1.4),
                 // color: item["isArchived"]! == true ? AppColors.primaryColor : Colors.black,
                 fontWeight: FontWeight.w500,
