@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/common_network_image.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
-import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/custom_prints.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -50,7 +49,6 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
   Size? videoSize;
-
   List values = [];
   Timer? _hideControlsTimer;
 
@@ -62,6 +60,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
         fetchExercise();
       },
     );
+
     super.initState();
   }
 
@@ -813,10 +812,27 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                           child: Html(
                             data: exerciseDesc,
                             style: {
-                              "p.fancy": Style(
-                                  padding: HtmlPaddings.zero,
-                                  color: Colors.black),
+                              "body": Style(
+                                padding: HtmlPaddings.zero,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
+                                    ?.color,
+                              ),
+                              "p": Style(
+                                padding: HtmlPaddings.zero,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
+                                    ?.color,
+                              ),
                             },
+                            // style: {
+                            //   "p.fancy": Style(
+                            //     padding: HtmlPaddings.zero,
+                            //     color: Colors.black,
+                            //   ),
+                            // },
                           ),
                         ),
                         Padding(
@@ -842,6 +858,19 @@ class EquipmentSection extends StatefulWidget {
 }
 
 class _EquipmentSectionState extends State<EquipmentSection> {
+  bool isDarkMode = false;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
+        isDarkMode = raw4 ?? false;
+      },
+    );
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
@@ -876,7 +905,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
                       Text(
                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: isDarkMode ? Colors.white : Colors.black54,
                         ),
                       )
                     ],
@@ -929,7 +958,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           disabledBackgroundColor: const Color(0xFFF3F3F3),
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).cardColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(

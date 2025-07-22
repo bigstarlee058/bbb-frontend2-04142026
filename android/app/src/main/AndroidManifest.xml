@@ -63,8 +63,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="https"
-                    android:host="bbbdev1.wpenginepowered.com"
+                    android:host="app.bootybybret.com"
                     android:pathPrefix="/my-account/bbbapp/" />
+                <!--android:host="bbbdev1.wpenginepowered.com"-->
             </intent-filter>
         </activity>
 

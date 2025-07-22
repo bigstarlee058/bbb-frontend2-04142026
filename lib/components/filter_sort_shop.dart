@@ -70,8 +70,12 @@ class _FilterSortDialogShopState extends State<FilterSortDialogShop>
                         ].map((String option) {
                           return RadioListTile<String>(
                             title: Text(option,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black)),
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color)),
                             value: option,
                             groupValue: _selectedSortBy,
                             onChanged: (String? value) {

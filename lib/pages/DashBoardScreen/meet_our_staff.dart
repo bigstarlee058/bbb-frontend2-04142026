@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/staffs.dart';
@@ -414,6 +416,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                     textColor: Colors.white,
                                     color: AppColors.primaryColor,
                                     onPress: () async {
+                                      log('staffData.link==========>>>>>${staffData.link}');
                                       _launchURL(staffData.link);
                                     },
                                     isLoading: false,

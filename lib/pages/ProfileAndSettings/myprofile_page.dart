@@ -872,7 +872,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   value.text.isEmpty ? 'Enter here' : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty
-                        ? Colors.grey.shade400
+                        ? Colors.grey.shade700
                         : Theme.of(context).textTheme.bodyLarge?.color,
                     fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,

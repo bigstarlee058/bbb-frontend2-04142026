@@ -43,12 +43,14 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
           for (var package in offeringItem.availablePackages) {
             if (package.storeProduct.identifier == "monthly_membership_1m_29") {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier == "yearly_membership_1y_289") {
+            } else if (package.storeProduct.identifier ==
+                "yearly_membership_1y_289") {
               yearPrice = package.storeProduct.priceString;
             }
           }
         }
-        selectedPackage = userDataProvider?.user["subscription"]["subscription_type"];
+        selectedPackage =
+            userDataProvider?.user["subscription"]["subscription_type"];
       });
     } catch (e) {
       log("Failed to fetch offerings: $e");
@@ -69,20 +71,30 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
             width: double.infinity,
             fit: BoxFit.fitWidth,
           ),
-          Utils.appImage(
-            MediaQuery.of(context).size,
-            imageKey: '',
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: SafeArea(
-                    child: BackArrowWidget(onPress: () {
-                      Navigator.pop(context);
-                    }),
-                  ),
-                ),
-              ],
+          // Utils.appImage(
+          //   isImage: true,
+          //   MediaQuery.of(context).size,
+          //   imageKey: '',
+          //   child: Column(
+          //     children: [
+          //       Align(
+          //         alignment: Alignment.topLeft,
+          //         child: SafeArea(
+          //           child: BackArrowWidget(onPress: () {
+          //             Navigator.pop(context);
+          //           }),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          Positioned(
+            child: SafeArea(
+              child: BackArrowWidget(
+                onPress: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
           ),
           Positioned(
@@ -95,8 +107,10 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.2),
-            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5)).copyWith(bottom: ScreenUtil.verticalScale(3.2)),
+            margin:
+                EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.2),
+            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5))
+                .copyWith(bottom: ScreenUtil.verticalScale(3.2)),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -109,6 +123,7 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
                       Text(
                         "Subscription Details for get the full Booty by Bret Monthly Programming",
                         style: TextStyle(
+                          color: Theme.of(context).textTheme.labelLarge?.color,
                           fontWeight: FontWeight.bold,
                           fontSize: ScreenUtil.verticalScale(2.4),
                         ),
@@ -124,14 +139,16 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
                             _planOption(
                               title: "Monthly",
                               price: monthPrice,
-                              selected: selectedPackage == "monthly_membership_1m_29",
+                              selected:
+                                  selectedPackage == "monthly_membership_1m_29",
                               onTap: () {},
                             ),
                             SizedBox(height: ScreenUtil.verticalScale(1.5)),
                             _planOption(
                               title: "Annual",
                               price: yearPrice,
-                              selected: selectedPackage == "yearly_membership_1y_289",
+                              selected:
+                                  selectedPackage == "yearly_membership_1y_289",
                               onTap: () {},
                               badge: "20% OFF",
                             ),
@@ -154,6 +171,7 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
           const SizedBox(width: 8),
           Text(text,
               style: TextStyle(
+                color: Theme.of(context).textTheme.labelLarge?.color,
                 fontSize: ScreenUtil.verticalScale(1.6),
               )),
         ],
@@ -192,21 +210,30 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
                     ? Container(
                         margin: EdgeInsets.only(right: 5),
                         decoration: BoxDecoration(
-                            border: Border.all(color: !selected ? Colors.grey.shade300 : AppColors.primaryColor),
+                            border: Border.all(
+                                color: !selected
+                                    ? Colors.grey.shade300
+                                    : AppColors.primaryColor),
                             shape: BoxShape.circle),
                         child: Center(
-                          child:
-                              Icon(Icons.check_circle, color: !selected ? Colors.white : Color(0xFF8B2D40), size: 18),
+                          child: Icon(Icons.check_circle,
+                              color:
+                                  !selected ? Colors.white : Color(0xFF8B2D40),
+                              size: 18),
                         ),
                       )
                     : SizedBox(),
                 Text(
                   title,
-                  style: TextStyle(fontSize: ScreenUtil.verticalScale(1.8), fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.labelLarge?.color,
+                      fontSize: ScreenUtil.verticalScale(1.8),
+                      fontWeight: FontWeight.bold),
                 ),
                 if (badge != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     margin: EdgeInsets.only(left: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFF8B2D40),
@@ -215,21 +242,30 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
                     child: Text(
                       badge,
                       style: TextStyle(
-                          color: Colors.white, fontSize: ScreenUtil.verticalScale(1.2), fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontSize: ScreenUtil.verticalScale(1.2),
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 Spacer(),
                 selected
                     ? Text(
                         "Active",
-                        style: TextStyle(fontSize: ScreenUtil.verticalScale(1.8), fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.labelLarge?.color,
+                            fontSize: ScreenUtil.verticalScale(1.8),
+                            fontWeight: FontWeight.w500),
                       )
                     : SizedBox()
               ],
             ),
             SizedBox(height: ScreenUtil.verticalScale(1)),
-            Text("Full access for just $price/${badge != null ? "year" : "month"}",
-                style: TextStyle(fontSize: ScreenUtil.verticalScale(1.5))),
+            Text(
+                "Full access for just $price/${badge != null ? "year" : "month"}",
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.labelLarge?.color,
+                    fontSize: ScreenUtil.verticalScale(1.5))),
           ],
         ),
       ),

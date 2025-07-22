@@ -210,7 +210,8 @@ class _MyAppState extends State<MyApp> {
   void _handleDeepLink(String? deepLink) {
     if (deepLink != null) {
       Uri uri = Uri.parse(deepLink);
-      if (uri.scheme == 'https' && uri.host == 'bbbdev1.wpenginepowered.com') {
+      // if (uri.scheme == 'https' && uri.host == 'bbbdev1.wpenginepowered.com') {
+      if (uri.scheme == 'https' && uri.host == 'app.bootybybret.com') {
         Navigator.of(context).pushNamed(AppRoutes.mainScreen);
       } else {
         debugPrint('Unsupported deep link: $deepLink');

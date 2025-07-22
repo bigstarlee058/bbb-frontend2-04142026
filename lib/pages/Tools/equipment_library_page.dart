@@ -12,6 +12,7 @@ import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -101,7 +102,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -176,7 +177,6 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                     FilterSortButton(
                                       selectedSortBy: _selectedSortBy,
                                       onApplyFilters: (String sortBy) {
-                                        log('sortBy==========>>>>>${sortBy}');
                                         setState(() {
                                           _selectedSortBy = sortBy;
                                         });
@@ -248,7 +248,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                             .adminEquipmentsData.isEmpty ||
                                         _filteredEquipments.isEmpty
                                     ? Container(
-                                        color: Colors.white,
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
                                         height: ScreenUtil.verticalScale(
                                             (media.height -
                                                 media.height / 3.2)),
@@ -424,17 +425,25 @@ class SearchEquipmentField extends StatelessWidget {
         vertical: ScreenUtil.horizontalScale(1),
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).canvasColor,
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
       ),
       child: TextField(
         onChanged: onChanged,
         textAlignVertical: TextAlignVertical.center,
+        style: GoogleFonts.plusJakartaSans(
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).textTheme.bodyLarge?.color,
+          decoration: TextDecoration.none,
+          fontSize: ScreenUtil.verticalScale(1.82),
+        ),
+        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
         decoration: InputDecoration(
           hintText: 'Search Equipment',
-          hintStyle: TextStyle(
-            color: Colors.black45,
-            fontSize: ScreenUtil.verticalScale(2),
+          hintStyle: GoogleFonts.plusJakartaSans(
+            color: Colors.grey.shade400,
+            fontWeight: FontWeight.w500,
+            fontSize: ScreenUtil.verticalScale(1.82),
           ),
           suffixIcon: Icon(
             Icons.search,

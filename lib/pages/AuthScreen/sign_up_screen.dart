@@ -71,8 +71,7 @@ class _SignupPageState extends State<SignupPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse(
-          'https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signup_user');
+      final url = Uri.parse('${AppConstants.serverUrl}/api/users/signup_user');
 
       final response = await http.post(
         url,
@@ -126,7 +125,8 @@ class _SignupPageState extends State<SignupPage> {
       });
 
       final url = Uri.parse(
-          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+          // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+          'https://app.bootybybret.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,

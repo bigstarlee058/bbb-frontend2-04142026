@@ -4621,7 +4621,7 @@ class _TodayPageState extends State<TodayPage>
                                     side: BorderSide(
                                         width: 2.0,
                                         color: AppColors.primaryColor),
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: Colors.transparent,
                                   ),
                                   child: Text(
                                     'No',

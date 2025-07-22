@@ -741,7 +741,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       String? token =
                                           prefs.getString('authToken');
                                       Uri url = Uri.parse(
-                                          'https://bbbdev1.wpenginepowered.com/?token=$token');
+                                          'https://app.bootybybret.com/?token=$token');
                                       if (await canLaunchUrl(url)) {
                                         await launchUrl(url);
                                       } else {

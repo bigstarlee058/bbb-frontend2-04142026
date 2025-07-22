@@ -71,11 +71,12 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                 ),
 
                 // Add a New Note text
-                const Center(
+                Center(
                   child: Text(
                     "Journal & Reminders",
                     style: TextStyle(
                       fontSize: 20,
+                      color: Theme.of(context).textTheme.labelLarge?.color,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -131,16 +132,25 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
   Widget _buildPreviouslyAddedNotes() {
     return Consumer<UserDataProvider>(
       builder: (context, userData, child) => dataList.isEmpty
-          ? const Padding(
+          ? Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
-              child: Text("No journal & reminders added yet."),
+              child: Text(
+                "No journal & reminders added yet.",
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.labelLarge?.color,
+                ),
+              ),
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Previously Added Entries:",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.labelLarge?.color,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(

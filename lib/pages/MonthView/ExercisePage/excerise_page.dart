@@ -227,7 +227,6 @@ class _ExercisePageState extends State<ExercisePage>
 
   @override
   void initState() {
-    log('1==========>>>>>${DateTime.now()}');
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider1 = Provider.of<DataProvider>(context, listen: false);
 
@@ -239,14 +238,10 @@ class _ExercisePageState extends State<ExercisePage>
           SharedPreference.inTheExerciseScreenOrNot, "YES");
       await preferences.clearValue(SharedPreference.fromNotification);
     });
-    log('2==========>>>>>${DateTime.now()}');
-
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       String isChecked =
           preferences.getString(SharedPreference.exerciseTutorial) ?? "";
       if (isChecked != "true") {
-        log('11==========>>>>>${DateTime.now()}');
-
         fetchTutorialData().then(
           (value) async {
             argument = ModalRoute.of(context)?.settings.arguments as String?;
@@ -260,10 +255,7 @@ class _ExercisePageState extends State<ExercisePage>
             }
           },
         );
-        log('22==========>>>>>${DateTime.now()}');
       } else {
-        log('33==========>>>>>${DateTime.now()}');
-
         argument = ModalRoute.of(context)?.settings.arguments as String?;
         setState(() => loading = true);
         if (argument != "Exercise") {
@@ -275,15 +267,10 @@ class _ExercisePageState extends State<ExercisePage>
             (value) => clearNotificationAndNavigateExercise(),
           );
         }
-        log('44==========>>>>>${DateTime.now()}');
       }
     });
-    log('3==========>>>>>${DateTime.now()}');
-
     WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) => monthProvider?.fetchExerciseHistroy());
-    log('5==========>>>>>${DateTime.now()}');
-
     super.initState();
   }
 
@@ -432,19 +419,11 @@ class _ExercisePageState extends State<ExercisePage>
       bool? isPumpDay,
       bool? isCircuit,
       String? circuitIndex}) async {
-    log('111==========>>>>>${DateTime.now()}');
-
     if (monthProvider?.isWarmup == false) {
-      log('222==========>>>>>${DateTime.now()}');
-
       await monthProvider?.fetchCurrentExercise(
           exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
-      log('333==========>>>>>${DateTime.now()}');
-
       isExercise = 1;
       this.exerciseIndex = exerciseIndex ?? monthProvider!.selectedExIndex;
-      log('444==========>>>>>${DateTime.now()}');
-
       // if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
       //   initializeVideo(monthProvider!.exerciseDetailModel!.files!.first.link!);
       // } else {
@@ -455,18 +434,13 @@ class _ExercisePageState extends State<ExercisePage>
         exerciseDesc = monthProvider!.exerciseDetailModel?.description ?? "";
         exerciseName = monthProvider!.exerciseDetailModel?.title ?? "";
       }
-      log('555==========>>>>>${DateTime.now()}');
     } else {
-      log('666==========>>>>>${DateTime.now()}');
-
       await monthProvider!.fetchWarmUp(monthProvider!.warmupId).then(
         (value) {
           exerciseDesc = monthProvider!.warmUpModel?.description ?? "";
           exerciseName = monthProvider!.warmUpModel?.title ?? "";
         },
       );
-      log('777==========>>>>>${DateTime.now()}');
-
       // if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
       //   initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
       // } else {
@@ -474,16 +448,10 @@ class _ExercisePageState extends State<ExercisePage>
       //   videoNotInitialized = false;
       // }
     }
-    log('888==========>>>>>${DateTime.now()}');
-
     monthProvider?.fetchExerciseHistoryLocalData();
     monthProvider?.fetchExerciseStatusLocalData();
-    log('999==========>>>>>${DateTime.now()}');
-
     if (monthProvider?.isWarmup == false &&
         monthProvider?.isCurrentMonth != "Future") {
-      log('101010==========>>>>>${DateTime.now()}');
-
       if (monthProvider?.exerciseDetailModel != null) {
         String exId = (isPumpDay ?? monthProvider!.isPumpDay) &&
                 (isCircuit ?? monthProvider!.isCircuit)
@@ -500,11 +468,7 @@ class _ExercisePageState extends State<ExercisePage>
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
 
         fetchExtraSetLocalData(dataId);
-        log('111111==========>>>>>${DateTime.now()}');
-
         await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
-        log('121212==========>>>>>${DateTime.now()}');
-
         // isCurrentDayCompleted =
         //     monthProvider?.dayHistoryDetails?.status == Status.completed;
         // isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status ==
@@ -536,14 +500,10 @@ class _ExercisePageState extends State<ExercisePage>
 
         isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);
         findIsAtLeastOnSet();
-        log('131313==========>>>>>${DateTime.now()}');
       }
     }
     setState(() => loading = false);
-    log('141414==========>>>>>${DateTime.now()}');
-
     videoInitialize();
-    log('151515==========>>>>>${DateTime.now()}');
   }
 
   bool videoNotAvailable = false;
@@ -1538,9 +1498,20 @@ class _ExercisePageState extends State<ExercisePage>
                             child: Html(
                               data: exerciseDesc,
                               style: {
-                                "p.fancy": Style(
-                                    padding: HtmlPaddings.zero,
-                                    color: Colors.black),
+                                "body": Style(
+                                  padding: HtmlPaddings.zero,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.color,
+                                ),
+                                "p": Style(
+                                  padding: HtmlPaddings.zero,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.color,
+                                ),
                               },
                             ),
                           ),
@@ -1757,7 +1728,10 @@ class _ExercisePageState extends State<ExercisePage>
           if (monthProvider!.isCurrentMonth == "Future") ...[
             SizedBox()
           ] else ...[
-            count != 0 && !isCurrentDaySkipped && !isCurrentDayCompleted
+            count != 0 &&
+                    !isCurrentDaySkipped &&
+                    !isCurrentDayCompleted &&
+                    !monthProvider!.isPumpDay
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 40),
                     child: TextButton(
@@ -1800,7 +1774,8 @@ class _ExercisePageState extends State<ExercisePage>
                 : SizedBox(),
             Container(
               height: 0.5,
-              margin: const EdgeInsets.symmetric(horizontal: 40),
+              margin: EdgeInsets.symmetric(
+                  horizontal: 40, vertical: !monthProvider!.isPumpDay ? 0 : 20),
               width: media.width,
               color: Theme.of(context).dividerColor,
             ),
@@ -1997,7 +1972,46 @@ class _ExercisePageState extends State<ExercisePage>
                             type: "Warmup",
                           );
 
-                          Navigator.pop(context);
+                          // ...//
+
+                          List<WarmupDataModel> warmUps =
+                              monthProvider!.isPumpDay
+                                  ? monthProvider!.pumpDayModel!.warmups!
+                                  : monthProvider!.dayDataModel!.warmups ?? [];
+
+                          List<WarmupDataModel> tempo = warmUps
+                              .where(
+                                (element) => ((element.formats ?? [])
+                                    .contains(monthProvider?.equipmentType)),
+                              )
+                              .toList();
+
+                          tempo.removeWhere(
+                            (element) {
+                              String dataId =
+                                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${element.warmupId}";
+
+                              return monthProvider!.exerciseHistoryModel.any(
+                                (element) =>
+                                    element.dataId == dataId &&
+                                    (element.status == Status.completed ||
+                                        element.status == Status.skipped),
+                              );
+                            },
+                          );
+
+                          if (tempo.isEmpty) {
+                            Navigator.pop(context);
+                          } else {
+                            monthProvider?.updateWarmUp(
+                                true, tempo[0].warmupId ?? '');
+                            monthProvider?.updateIsLastExercise(false);
+                            Navigator.pop(context);
+                            Navigator.pushNamed(context, '/exercise',
+                                arguments: "Exercise");
+                          }
+
+                          // Navigator.pop(context);
                         },
                         color: AppColors.primaryColor,
                         isLoading: false,
@@ -2271,8 +2285,9 @@ class _ExercisePageState extends State<ExercisePage>
                           padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                           child: Text(
                             "${monthProvider!.selectedExercise!.guide}",
-                            style: const TextStyle(
-                              color: Colors.black,
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodySmall!.color,
                             ),
                             textAlign: TextAlign.left,
                           ),
@@ -2283,8 +2298,9 @@ class _ExercisePageState extends State<ExercisePage>
                           padding: EdgeInsets.only(top: 5, bottom: 35),
                           child: Text(
                             monthProvider?.warmUpModel?.description ?? "",
-                            style: const TextStyle(
-                              color: Colors.black,
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodySmall!.color,
                             ),
                             textAlign: TextAlign.left,
                           ),

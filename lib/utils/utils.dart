@@ -23,34 +23,50 @@ class Utils {
       RoundedRectangleBorder(borderRadius: buttonRadius);
 
   static appImage(Size media,
-      {String? image, Widget? child, required String imageKey, bool? val}) {
+      {bool? isImage,
+      String? image,
+      Widget? child,
+      required String imageKey,
+      bool? val}) {
     String? url = image!.startsWith('https://storage.cloud.google.com/')
         ? image.replaceFirst('https://storage.cloud.google.com/',
             'https://storage.googleapis.com/')
         : image;
-    return val == true
-        ? Center(
-            child: Container(
-              height: media.height / 1,
-              width: media.width,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: CachedNetworkImageProvider(url),
-                  fit: BoxFit.cover,
-                ),
+    return isImage == true
+        ? Stack(
+            children: [
+              Image.asset(
+                'assets/img/back 1.png',
+                height: media.height / 1.8,
+                width: double.infinity,
+                fit: BoxFit.fitWidth,
               ),
-              child: child,
-            ),
+              child ?? SizedBox(),
+            ],
           )
-        : appShimmerImage(
-            color: Colors.transparent,
-            networkImageUrl: url,
-            fit: BoxFit.cover,
-            height: media.height,
-            width: media.width,
-            borderRadius: BorderRadius.circular(0),
-            child: child,
-          );
+        : val == true
+            ? Center(
+                child: Container(
+                  height: media.height / 1,
+                  width: media.width,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: CachedNetworkImageProvider(url),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: child,
+                ),
+              )
+            : appShimmerImage(
+                color: Colors.transparent,
+                networkImageUrl: url,
+                fit: BoxFit.cover,
+                height: media.height,
+                width: media.width,
+                borderRadius: BorderRadius.circular(0),
+                child: child,
+              );
   }
 
   static appFileImage(Size media,

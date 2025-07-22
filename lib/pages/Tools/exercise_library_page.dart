@@ -513,17 +513,26 @@ class SearchExerciseField extends StatelessWidget {
         vertical: ScreenUtil.horizontalScale(1),
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).canvasColor,
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
       ),
       child: TextField(
         onChanged: onChanged, // Notify the parent of text changes
         textAlignVertical: TextAlignVertical.center,
+        style: GoogleFonts.plusJakartaSans(
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).textTheme.bodyLarge?.color,
+          decoration: TextDecoration.none,
+          fontSize: ScreenUtil.verticalScale(1.82),
+        ),
+        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+
         decoration: InputDecoration(
           hintText: 'Search Exercises',
-          hintStyle: TextStyle(
-            color: Colors.black45,
-            fontSize: ScreenUtil.verticalScale(2),
+          hintStyle: GoogleFonts.plusJakartaSans(
+            color: Colors.grey.shade400,
+            fontWeight: FontWeight.w500,
+            fontSize: ScreenUtil.verticalScale(1.82),
           ),
           suffixIcon: Icon(
             Icons.search,

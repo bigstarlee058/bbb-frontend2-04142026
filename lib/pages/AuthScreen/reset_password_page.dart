@@ -52,7 +52,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         if (AppConstants.emailRegex.hasMatch(emailAddress)) {
           var response = await http.post(
             Uri.parse(
-                'https://bbbdev1.wpenginepowered.com/wp-json/custom/v1/send-password-reset'),
+                // 'https://bbbdev1.wpenginepowered.com/wp-json/custom/v1/send-password-reset'),
+                'https://app.bootybybret.com/wp-json/custom/v1/send-password-reset'),
             headers: <String, String>{
               'Content-Type': 'application/json',
             },

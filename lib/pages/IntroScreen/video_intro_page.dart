@@ -234,7 +234,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
 
   Size calculateVideoSize(
       {required BuildContext context, required double aspectRatio}) {
-    double maxWidth = ScreenUtil.horizontalScale(86.5);
+    double maxWidth = ScreenUtil.horizontalScale(86.4);
     double calculatedHeight = maxWidth / aspectRatio;
     return Size(maxWidth, calculatedHeight);
   }

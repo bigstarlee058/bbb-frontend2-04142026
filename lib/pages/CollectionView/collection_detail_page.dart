@@ -114,7 +114,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
           width: media.width,
           height: ScreenUtil.verticalScale(11),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             boxShadow: [
               BoxShadow(
                 spreadRadius: 1,
@@ -422,7 +422,12 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                       )
                                     : Text(
                                         "No Collection",
-                                        style: TextStyle(fontSize: 17),
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .labelLarge
+                                                ?.color),
                                       ),
                               ),
                             ),
@@ -442,7 +447,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
         return dataProvider.collectionData.equipments.isNotEmpty
             ? Container(
                 alignment: Alignment.center,
-                color: Colors.white,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 height: 65,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16)
