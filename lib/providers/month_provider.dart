@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:math' as math;
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -682,6 +681,7 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchWarmUp(String warmUpId) async {
     try {
+      log('warmUpId==========>>>>>${warmUpId}');
       Uri url =
           Uri.parse('${AppConstants.serverUrl}/api/warmups/get/$warmUpId');
       url = Uri.http(url.authority, url.path);
@@ -839,6 +839,7 @@ class MonthProvider extends ChangeNotifier {
   bool isWarmup = false;
 
   List<RelatedExercises> relatedExercises = [];
+  List<ExerciseDataModel> swapOptionExercises = [];
   List<UsedEquipments> usedEquipments = [];
 
   String allExercisesMainList = "";
@@ -875,9 +876,54 @@ class MonthProvider extends ChangeNotifier {
 
   ExerciseDetailModel? exerciseDetailModelData;
 
-  Future<void> fetchRelatedExercise(String exerciseId) async {
+  Future<void> fetchRelatedExercise(
+      String exerciseId,
+      List formates,
+      List<ExerciseDataModel> exercises,
+      int typeId,
+      String exerciseName) async {
+    final seen = <String>{};
+    swapOptionExercises = exercises.where((element) {
+      final isValid = !element.formats!.contains(equipmentType) &&
+          element.typeId == typeId &&
+          element.exerciseId != exerciseId &&
+          seen.add(element.exerciseId ?? '');
+      return isValid;
+    }).toList();
+
+    final monthId = preferences.getString(SharedPreference.monthId) ?? "";
+    final split = preferences.getString(SharedPreference.split) ?? "";
+    final rawTempData = preferences.getString("$split-$monthId");
+
+    if (rawTempData?.isNotEmpty == true) {
+      final monthDataModel = MonthDataModel.fromJson(jsonDecode(rawTempData!));
+
+      int nextWorkOutIndex = weekDataModel!.dayList![overviewCurrentDay - 1]
+              .toString()
+              .contains("Workout")
+          ? int.parse(weekDataModel!.dayList![overviewCurrentDay - 1]
+                  .toString()
+                  .replaceAll("Day ", "")
+                  .replaceAll(" Workout", "")) -
+              1
+          : 0;
+
+      final extraExercises = monthDataModel
+          .weeks?[overviewCurrentWeek - 1].days?[nextWorkOutIndex].exercises
+          ?.where((element) =>
+              element.typeId == typeId &&
+              element.exerciseId != exerciseId &&
+              seen.add(element.exerciseId ?? ''))
+          .toList();
+
+      if (extraExercises != null) {
+        swapOptionExercises.addAll(extraExercises);
+      }
+    }
+
     if (exerciseDetailModelData != null) {
       if (exerciseDetailModelData?.sId == exerciseId) {
+        notifyListeners();
         return;
       }
     }
@@ -985,40 +1031,27 @@ class MonthProvider extends ChangeNotifier {
     return authToken;
   }
 
-  Future fetchCurrentExercise(String id) async {
-    usedEquipments = [];
-    exerciseDetailModel = null;
-    notifyListeners();
+  Future<void> fetchCurrentExercise(String id) async {
     try {
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$id');
+      final userIdToken = await getAuthToken();
 
-      url = Uri.http(url.authority, url.path);
-      String? userIdToken = await getAuthToken();
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'AUTH_TOKEN': userIdToken ?? "",
-        },
-      );
+      final url = Uri.parse('${AppConstants.serverUrl}/api/exercises/get/$id');
+      final response =
+          await http.get(url, headers: {'AUTH_TOKEN': userIdToken ?? ""});
 
       if (response.statusCode == 200) {
-        getExerciseFromJson(jsonDecode(response.body));
-        notifyListeners();
+        final data = jsonDecode(response.body);
+        final model = ExerciseDetailModel.fromJson(data);
+        exerciseDetailModel = model;
+        usedEquipments = List.from(model.usedEquipments ?? []);
+
+        notifyListeners(); // Single rebuild
       } else {
         throw Exception('Failed to load exercise info');
       }
     } catch (e) {
-      log("fetchCurrentEx ERROR $e ");
+      log("fetchCurrentExercise ERROR: $e");
     }
-  }
-
-  void getExerciseFromJson(responseData) {
-    exerciseDetailModel = null;
-    if (responseData != null) {
-      exerciseDetailModel = ExerciseDetailModel.fromJson(responseData);
-      usedEquipments.addAll(exerciseDetailModel!.usedEquipments!);
-    }
-    notifyListeners();
   }
 
   updateWarmUp(bool val, String id) {
@@ -1126,7 +1159,6 @@ class MonthProvider extends ChangeNotifier {
         await pf.setString(SharedPreference.lastExitTime, "");
       }
     } else {
-      log("CLEAR VALUES");
       await clearValues();
       NotificationService.clearNotification(10);
     }
@@ -1694,23 +1726,21 @@ class MonthProvider extends ChangeNotifier {
               element.restDayList = ["Rest Day 1", "Rest Day 2"];
             }
           }
-
           if (lastSplit.isNotEmpty) {
-            final list = allSplitDayHistoryModel
-                .where((e1) =>
-                    e1.type!.contains("Pump Day") &&
-                    e1.weekId == element.id &&
-                    (isCurrentMonth == "Future"
-                            ? (splitType ?? "")
-                            : lastSplit[i]) ==
-                        e1.split)
-                .toList();
-
+            final list = allSplitDayHistoryModel.where((e1) {
+              return e1.type!.contains("Pump Day") &&
+                  e1.weekId == element.id &&
+                  (isCurrentMonth == "Future"
+                          ? (splitType ?? "")
+                          : lastSplit[i]) ==
+                      e1.split;
+            }).toList();
             if (list.isNotEmpty) {
               for (int j = 0; j < list.length; j++) {
                 var pump = list[j];
                 int pumpDayIndex =
                     int.parse(pump.dayId?.split(" ").last ?? "1");
+
                 int restDayIndex =
                     element.restDayList!.indexOf("Rest Day $pumpDayIndex");
                 if (restDayIndex != -1) {
@@ -1721,17 +1751,15 @@ class MonthProvider extends ChangeNotifier {
           }
         }
       }
-
-      for (var element in monthDataModel!.weeks!) {
+      for (var e in monthDataModel!.weeks!) {
         int restDayCount = 1;
-        for (int i = 0; i < element.restDayList!.length; i++) {
-          if (element.restDayList![i].startsWith('Rest Day')) {
-            element.restDayList![i] = 'Rest Day ${restDayCount++}';
+        for (int i = 0; i < e.restDayList!.length; i++) {
+          if (e.restDayList![i].startsWith('Rest Day')) {
+            e.restDayList![i] = 'Rest Day ${restDayCount++}';
           }
         }
       }
     }
-
     notifyListeners();
     // } catch (e) {
     //   debugPrint("Error fetching all day status local data: $e");
@@ -1757,6 +1785,7 @@ class MonthProvider extends ChangeNotifier {
   DayHistoryModel? dayHistoryDetails;
 
   fetchSingleDayHistoryLocalData() async {
+    dayHistoryDetails = null;
     if (overviewCurrentDay == 0) {
       return null;
     }
@@ -2112,7 +2141,6 @@ class MonthProvider extends ChangeNotifier {
               _BarData(AppColors.primaryColor, dataList[0], 0.0)
         };
       }).toList();
-
       return list;
     } catch (e) {
       debugPrint("Error processing exercise completed graph data: $e");
@@ -2164,7 +2192,8 @@ class MonthProvider extends ChangeNotifier {
       if (data.status != Status.completed) {
         return false;
       }
-      DateTime entryDate = data.endTime!;
+
+      DateTime entryDate = Utils.formattedDate(data.endTime!.toString());
       return entryDate.isAfter(startDate) && entryDate.isBefore(endDate);
     }).toList();
 

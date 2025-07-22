@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/pump_day_model.dart';
@@ -35,7 +38,8 @@ class _CircuitsViewState extends State<CircuitsView> {
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    pageController = List.generate(widget.circuit.length, (index) => PageController());
+    pageController =
+        List.generate(widget.circuit.length, (index) => PageController());
     initData();
     super.initState();
   }
@@ -61,14 +65,22 @@ class _CircuitsViewState extends State<CircuitsView> {
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemBuilder: (context, circuitsIndex) {
-              String exId = monthProvider.pumpDayModel?.circuits?[circuitsIndex].id ?? "";
-              String split =
-                  monthProvider.monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+              String exId =
+                  monthProvider.pumpDayModel?.circuits?[circuitsIndex].id ?? "";
+              String split = monthProvider
+                      .monthDataModel
+                      ?.weeks?[monthProvider.overviewCurrentWeek - 1]
+                      .idList
+                      ?.first
+                      .toString()
+                      .split(" ")[1] ??
+                  "";
 
               String dataId1 =
                   "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$exId";
 
-              int? indexW = monthProvider.circuitModel.indexWhere((element) => element.dataId == dataId1);
+              int? indexW = monthProvider.circuitModel
+                  .indexWhere((element) => element.dataId == dataId1);
 
               CircuitModel? data = CircuitModel();
               if (indexW != -1) {
@@ -77,17 +89,17 @@ class _CircuitsViewState extends State<CircuitsView> {
 
               String dayDtaId =
                   "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
-
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
+                    padding:
+                        EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Circuit ${circuitsIndex + 1}: ${widget.circuit[circuitsIndex].round} Rounds",
+                          "Circuit ${circuitsIndex + 1}: Round ${(widget.circuit[circuitsIndex].selectedDot! + 1)}/${widget.circuit[circuitsIndex].round}",
                           style: TextStyle(
                             fontSize: ScreenUtil.horizontalScale(3),
                             fontWeight: FontWeight.bold,
@@ -116,18 +128,26 @@ class _CircuitsViewState extends State<CircuitsView> {
                                   width: ScreenUtil.verticalScale(4),
                                   margin: const EdgeInsets.only(left: 10),
                                   decoration: BoxDecoration(
-                                    color: monthProvider.dayHistoryModel.any((element) =>
-                                                element.dataId == dayDtaId &&
-                                                (element.status == Status.completed || element.status == Status.skipped)) ||
+                                    color: monthProvider.dayHistoryModel.any(
+                                                (element) =>
+                                                    element.dataId ==
+                                                        dayDtaId &&
+                                                    (element.status ==
+                                                            Status.completed ||
+                                                        element.status ==
+                                                            Status.skipped)) ||
                                             monthProvider.isPastWeek
                                         ? AppColors.primaryColor
                                         : data == null
                                             ? Colors.transparent
-                                            : ((data.lastRound ?? 1) - 1) > index
+                                            : ((data.lastRound ?? 1) - 1) >
+                                                    index
                                                 ? AppColors.primaryColor
                                                 : Colors.transparent,
                                     border: Border.all(
-                                        color: widget.circuit[circuitsIndex].selectedDot != index
+                                        color: widget.circuit[circuitsIndex]
+                                                    .selectedDot !=
+                                                index
                                             ? Colors.transparent
                                             : AppColors.primaryColor),
                                     shape: BoxShape.circle,
@@ -137,25 +157,36 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         ? Text(
                                             "${index + 1}",
                                             style: TextStyle(
-                                              fontSize: ScreenUtil.horizontalScale(3),
+                                              fontSize:
+                                                  ScreenUtil.horizontalScale(3),
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.primaryColor,
                                             ),
                                           )
-                                        : (((data.lastRound ?? 1) - 1) > index) ||
-                                                monthProvider.dayHistoryModel.any((element) =>
-                                                    element.dataId == dayDtaId &&
-                                                    (element.status == Status.completed || element.status == Status.skipped)) ||
+                                        : (((data.lastRound ?? 1) - 1) >
+                                                    index) ||
+                                                monthProvider.dayHistoryModel
+                                                    .any((element) =>
+                                                        element.dataId ==
+                                                            dayDtaId &&
+                                                        (element.status ==
+                                                                Status
+                                                                    .completed ||
+                                                            element.status ==
+                                                                Status
+                                                                    .skipped)) ||
                                                 monthProvider.isPastWeek
                                             ? Icon(
                                                 Icons.check,
                                                 color: Colors.white,
-                                                size: ScreenUtil.verticalScale(2.5),
+                                                size: ScreenUtil.verticalScale(
+                                                    2.5),
                                               )
                                             : Text(
                                                 "${index + 1}",
                                                 style: TextStyle(
-                                                  fontSize: ScreenUtil.horizontalScale(3),
+                                                  fontSize: ScreenUtil
+                                                      .horizontalScale(3),
                                                   fontWeight: FontWeight.bold,
                                                   color: AppColors.primaryColor,
                                                 ),
@@ -179,7 +210,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                         spaceLength: 5,
                         strokeCap: StrokeCap.round,
                         dashLength: 1,
-                        top: BorderSide(color: AppColors.primaryColor, width: 1),
+                        top:
+                            BorderSide(color: AppColors.primaryColor, width: 1),
                       ),
                     ),
                   ),
@@ -189,7 +221,8 @@ class _CircuitsViewState extends State<CircuitsView> {
                         spaceLength: 5,
                         strokeCap: StrokeCap.round,
                         dashLength: 1.5,
-                        left: BorderSide(color: AppColors.primaryColor, width: 1),
+                        left:
+                            BorderSide(color: AppColors.primaryColor, width: 1),
                       ),
                     ),
                     child: Stack(
@@ -208,11 +241,13 @@ class _CircuitsViewState extends State<CircuitsView> {
                             widget.circuit[circuitsIndex].round!,
                             (roundIndex) {
                               return Container(
-                                margin: EdgeInsets.only(right: ScreenUtil.verticalScale(3)),
+                                margin: EdgeInsets.only(
+                                    right: ScreenUtil.verticalScale(3)),
 
                                 ///exercisesBuilder
                                 child: ListView.builder(
-                                  itemCount: widget.circuit[circuitsIndex].circuitExercises!.length,
+                                  itemCount: widget.circuit[circuitsIndex]
+                                      .circuitExercises!.length,
                                   physics: const NeverScrollableScrollPhysics(),
                                   padding: EdgeInsets.zero,
                                   shrinkWrap: true,
@@ -220,29 +255,51 @@ class _CircuitsViewState extends State<CircuitsView> {
                                     ///
                                     /// CIRCUIT ===>>> ROUND ===>> EXERCISE
 
-                                    ExerciseDataModel exercise = widget.circuit[circuitsIndex].circuitExercises![exerciseIndex];
+                                    ExerciseDataModel exercise = widget
+                                        .circuit[circuitsIndex]
+                                        .circuitExercises![exerciseIndex];
 
-                                    String tempIndex = "$circuitsIndex:$roundIndex:$exerciseIndex";
+                                    String tempIndex =
+                                        "$circuitsIndex:$roundIndex:$exerciseIndex";
 
                                     String dataId =
                                         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${exercise.exerciseId}-$tempIndex";
 
-                                    bool isExist = ((!monthProvider.exerciseHistoryModel.any((item) => item.dataId != dataId)) &&
+                                    bool isExist = ((!monthProvider
+                                                .exerciseHistoryModel
+                                                .any((item) =>
+                                                    item.dataId != dataId)) &&
                                             monthProvider.isPastWeek) ||
                                         ((!monthProvider.exerciseHistoryModel
-                                                .any((item) => item.dataId == dataId && item.status == Status.started)) &&
+                                                .any((item) =>
+                                                    item.dataId == dataId &&
+                                                    item.status ==
+                                                        Status.started)) &&
                                             monthProvider.isPastWeek);
                                     return Padding(
                                       padding: EdgeInsets.only(
                                           left: 20,
                                           top: media.height * 0.032,
-                                          bottom: exerciseIndex == (widget.circuit[circuitsIndex].circuitExercises!.length - 1)
+                                          bottom: exerciseIndex ==
+                                                  (widget
+                                                          .circuit[
+                                                              circuitsIndex]
+                                                          .circuitExercises!
+                                                          .length -
+                                                      1)
                                               ? media.height * 0.032
                                               : 0),
                                       child: Builder(builder: (context) {
-                                        String exId = monthProvider.pumpDayModel?.circuits?[circuitsIndex].id ?? "";
+                                        String exId = monthProvider.pumpDayModel
+                                                ?.circuits?[circuitsIndex].id ??
+                                            "";
                                         String split = monthProvider
-                                                .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                                .monthDataModel
+                                                ?.weeks?[monthProvider
+                                                        .overviewCurrentWeek -
+                                                    1]
+                                                .idList
+                                                ?.first
                                                 .toString()
                                                 .split(" ")[1] ??
                                             "";
@@ -250,78 +307,148 @@ class _CircuitsViewState extends State<CircuitsView> {
                                         String dataId1 =
                                             "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-$exId";
 
-                                        int indexW = monthProvider.circuitModel.indexWhere((element) => element.dataId == dataId1);
+                                        int indexW = monthProvider.circuitModel
+                                            .indexWhere((element) =>
+                                                element.dataId == dataId1);
 
                                         CircuitModel? data = CircuitModel();
                                         if (indexW != -1) {
-                                          data = monthProvider.circuitModel[indexW];
+                                          data = monthProvider
+                                              .circuitModel[indexW];
                                         }
                                         return WorkoutCard(
+                                          exerciseList: [],
                                           isEditMode: widget.isEditable,
-                                          image: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].thumbnail ?? "unknown",
+                                          image: widget
+                                                  .circuit[circuitsIndex]
+                                                  .circuitExercises![
+                                                      exerciseIndex]
+                                                  .thumbnail ??
+                                              "unknown",
                                           dataId: dataId,
                                           isDayCompleted: widget.isDayCompleted,
                                           isDaySkipped: widget.isDaySkipped,
-                                          exerciseId: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId!,
+                                          exerciseId: widget
+                                              .circuit[circuitsIndex]
+                                              .circuitExercises![exerciseIndex]
+                                              .exerciseId!,
                                           roundIndex: roundIndex,
                                           isCircuit: true,
-                                          isCompleted: monthProvider.exerciseHistoryModel
-                                              .any((element) => element.dataId == dataId && element.status == Status.completed),
-                                          isSkipped: monthProvider.exerciseHistoryModel
-                                                  .any((element) => element.dataId == dataId && element.status == Status.skipped) ||
+                                          isCompleted: monthProvider
+                                              .exerciseHistoryModel
+                                              .any((element) =>
+                                                  element.dataId == dataId &&
+                                                  element.status ==
+                                                      Status.completed),
+                                          isSkipped: monthProvider
+                                                  .exerciseHistoryModel
+                                                  .any((element) =>
+                                                      element.dataId ==
+                                                          dataId &&
+                                                      element.status ==
+                                                          Status.skipped) ||
                                               isExist,
                                           exerciseIndex: exerciseIndex,
                                           onPress: widget.isEditable
                                               ? (Function()? function) {}
                                               : indexW == -1
                                                   ? roundIndex == 0
-                                                      ? (Function()? function) async {
-                                                          monthProvider.updateIsCircuit(true);
-                                                          monthProvider.updateCircuit(
-                                                              "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
+                                                      ? (Function()?
+                                                          function) async {
+                                                          monthProvider
+                                                              .updateIsCircuit(
+                                                                  true);
+                                                          monthProvider
+                                                              .updateCircuit(
+                                                                  "$circuitsIndex:$roundIndex:$exerciseIndex",
+                                                                  circuitsIndex);
                                                           String dataId =
                                                               "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                           monthProvider.setSelectedExercise(
-                                                              widget.circuit[circuitsIndex].circuitExercises![exerciseIndex],
+                                                              widget
+                                                                      .circuit[
+                                                                          circuitsIndex]
+                                                                      .circuitExercises![
+                                                                  exerciseIndex],
                                                               exerciseIndex);
-                                                          monthProvider.updateWarmUp(false, "");
-                                                          monthProvider.updateIsLastExercise(false);
+                                                          monthProvider
+                                                              .updateWarmUp(
+                                                                  false, "");
+                                                          monthProvider
+                                                              .updateIsLastExercise(
+                                                                  false);
 
-                                                          await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
+                                                          await Navigator.pushNamed(
+                                                                  context,
+                                                                  '/exercise',
+                                                                  arguments:
+                                                                      "Exercise")
+                                                              .then(
                                                             (value) {
                                                               function!();
                                                             },
                                                           );
 
-                                                          monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
+                                                          monthProvider
+                                                              .fetchExerciseSingleExerciseLocalData(
+                                                                  dataId);
                                                         }
                                                       : null
-                                                  : ((data.lastRound ?? 1) - 1) >= widget.circuit[circuitsIndex].selectedDot!
-                                                      ? (Function()? function) async {
-                                                          monthProvider.updateIsCircuit(true);
-                                                          monthProvider.updateCircuit(
-                                                              "$circuitsIndex:$roundIndex:$exerciseIndex", circuitsIndex);
+                                                  : ((data.lastRound ?? 1) -
+                                                              1) >=
+                                                          widget
+                                                              .circuit[
+                                                                  circuitsIndex]
+                                                              .selectedDot!
+                                                      ? (Function()?
+                                                          function) async {
+                                                          monthProvider
+                                                              .updateIsCircuit(
+                                                                  true);
+                                                          monthProvider
+                                                              .updateCircuit(
+                                                                  "$circuitsIndex:$roundIndex:$exerciseIndex",
+                                                                  circuitsIndex);
                                                           String dataId =
                                                               "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${widget.circuit[circuitsIndex].circuitExercises![exerciseIndex].exerciseId}-${monthProvider.circuitIndex}";
                                                           monthProvider.setSelectedExercise(
-                                                              widget.circuit[circuitsIndex].circuitExercises![exerciseIndex],
+                                                              widget
+                                                                      .circuit[
+                                                                          circuitsIndex]
+                                                                      .circuitExercises![
+                                                                  exerciseIndex],
                                                               exerciseIndex);
-                                                          monthProvider.updateWarmUp(false, "");
-                                                          monthProvider.updateIsLastExercise(false);
+                                                          monthProvider
+                                                              .updateWarmUp(
+                                                                  false, "");
+                                                          monthProvider
+                                                              .updateIsLastExercise(
+                                                                  false);
 
-                                                          await Navigator.pushNamed(context, '/exercise', arguments: "Exercise").then(
+                                                          await Navigator.pushNamed(
+                                                                  context,
+                                                                  '/exercise',
+                                                                  arguments:
+                                                                      "Exercise")
+                                                              .then(
                                                             (value) {
                                                               function!();
                                                             },
                                                           );
 
-                                                          monthProvider.fetchExerciseSingleExerciseLocalData(dataId);
+                                                          monthProvider
+                                                              .fetchExerciseSingleExerciseLocalData(
+                                                                  dataId);
                                                         }
                                                       : null,
                                           openSwapModal: () {},
-                                          exercise: widget.circuit[circuitsIndex].circuitExercises![exerciseIndex],
-                                          exerciseData: exercise.exerciseId ?? "",
-                                          name: exercise.name ?? "Exercise ${exerciseIndex + 1}",
+                                          exercise: widget
+                                              .circuit[circuitsIndex]
+                                              .circuitExercises![exerciseIndex],
+                                          exerciseData:
+                                              exercise.exerciseId ?? "",
+                                          name: exercise.name ??
+                                              "Exercise ${exerciseIndex + 1}",
                                           onRemove: () {},
                                           enabled: true,
                                         );
@@ -347,7 +474,9 @@ class _CircuitsViewState extends State<CircuitsView> {
                                     spaceLength: 5,
                                     strokeCap: StrokeCap.round,
                                     dashLength: 1,
-                                    top: BorderSide(color: AppColors.primaryColor, width: 1),
+                                    top: BorderSide(
+                                        color: AppColors.primaryColor,
+                                        width: 1),
                                   ),
                                 ),
                               ),
@@ -359,10 +488,15 @@ class _CircuitsViewState extends State<CircuitsView> {
                                     width: 10,
                                     margin: const EdgeInsets.only(left: 10),
                                     decoration: BoxDecoration(
-                                      color:
-                                          widget.circuit[circuitsIndex].selectedDot != index ? Colors.transparent : AppColors.primaryColor,
+                                      color: widget.circuit[circuitsIndex]
+                                                  .selectedDot !=
+                                              index
+                                          ? Colors.transparent
+                                          : AppColors.primaryColor,
                                       border: Border.all(
-                                          color: widget.circuit[circuitsIndex].selectedDot == index
+                                          color: widget.circuit[circuitsIndex]
+                                                      .selectedDot ==
+                                                  index
                                               ? Colors.transparent
                                               : AppColors.primaryColor),
                                       shape: BoxShape.circle,
@@ -408,7 +542,8 @@ class ExpandablePageView extends StatefulWidget {
   State<ExpandablePageView> createState() => _ExpandablePageViewState();
 }
 
-class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProviderStateMixin {
+class _ExpandablePageViewState extends State<ExpandablePageView>
+    with TickerProviderStateMixin {
   late List<double> _heights;
   int _currentPage = 0;
   PageController? _pageController;
@@ -464,7 +599,8 @@ class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProv
             maxHeight: double.infinity,
             alignment: Alignment.topCenter,
             child: SizeReportingWidget(
-              onSizeChange: (size) => setState(() => _heights[index] = size.height),
+              onSizeChange: (size) =>
+                  setState(() => _heights[index] = size.height),
               child: Align(child: child),
             ),
           ),

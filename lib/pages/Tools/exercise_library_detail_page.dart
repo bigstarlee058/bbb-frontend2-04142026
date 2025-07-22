@@ -1,16 +1,17 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/custom_prints.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
@@ -50,15 +51,19 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
   ChewieController? _chewieController;
   Size? videoSize;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
-    fetchExercise();
-  }
-
   List values = [];
   Timer? _hideControlsTimer;
+
+  @override
+  void initState() {
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        fetchExercise();
+      },
+    );
+    super.initState();
+  }
 
   void fetchExercise() async {
     try {
@@ -115,7 +120,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
 
       if (_chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
-        // hideControls();
+        hideControls();
         videoSize = calculateVideoSize(
             aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
@@ -138,19 +143,6 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
 
         setState(() {});
       });
-      // _videoPlayerController.addListener(() async {
-      //   final bool isFinished =
-      //       _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
-      //   if (isFinished) {
-      //     showControlsOnTapOfPause();
-      //   }
-      //   if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
-      //     AudioManager.abandonAudioFocus();
-      //   } else {
-      //     AudioManager.requestAudioFocus();
-      //   }
-      //   setState(() {});
-      // });
 
       _controller = ProgressBarController(
         vsync: this,
@@ -196,18 +188,22 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
   }
 
   void hideControls() {
-    _hideControlsTimer?.cancel();
-    _hideControlsTimer = Timer(const Duration(seconds: 4), () {
-      if (mounted) {
-        setState(() => showControls = false);
-      }
-    });
+    if (_videoPlayerController.value.isPlaying) {
+      _hideControlsTimer?.cancel();
+      _hideControlsTimer = Timer(const Duration(seconds: 4), () {
+        if (mounted) {
+          setState(() => showControls = false);
+        }
+      });
+    }
   }
 
   void showControlsOnTap() {
-    setState(() => showControls = !showControls);
     if (_videoPlayerController.value.isPlaying) {
-      hideControls();
+      setState(() => showControls = !showControls);
+      if (_videoPlayerController.value.isPlaying) {
+        hideControls();
+      }
     }
   }
 
@@ -216,17 +212,55 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
     setState(() => showControls = true);
   }
 
-  void toggleFullscreen() {
+  // void toggleFullscreen() {
+  //   setState(() {
+  //     isFullscreen = !isFullscreen;
+  //   });
+  //   if (isFullscreen) {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+  //   } else {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  //   }
+  // }
+  Future<void> toggleFullscreen() async {
     setState(() {
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
-    } else {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      final screenSize = MediaQuery.of(context).size;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoFullScreenView(
+              makeRefresh: () {
+                setState(() {});
+              },
+              isFullscreen: isFullscreen,
+              toggleFullscreen: toggleFullscreen,
+              controller: _controller,
+              isMute: isMute,
+              changeZoom: changeZoom,
+              chewieController: _chewieController!,
+              hideControls: hideControls,
+              isZoom: isZoom,
+              media: screenSize,
+              videoSize: videoSize!,
+              muteUnMute: muteUnMute,
+              showControls: showControls,
+              showControlsOnTap: showControlsOnTap,
+              showControlsOnTapOfPause: showControlsOnTapOfPause,
+              videoNotInitialized: videoNotInitialized,
+              videoPlayerController: _videoPlayerController,
+              videoProgressValue: videoProgressValue,
+            ),
+          ));
     }
+  }
+
+  changeZoom(value) {
+    isZoom = value;
   }
 
   Size calculateVideoSize({
@@ -253,13 +287,15 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
 
   @override
   void dispose() {
-    if (_chewieController != null) {
-      _chewieController!.dispose();
-      _videoPlayerController.dispose();
-    }
-    AudioManager.abandonAudioFocus();
-    _controller.dispose();
-
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (_chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
+        _chewieController?.dispose();
+        _videoPlayerController.dispose();
+      }
+      AudioManager.abandonAudioFocus();
+      _controller.dispose();
+    });
     super.dispose();
   }
 
@@ -270,7 +306,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: loading
           ? const Center(
               child: CircularProgressIndicator(
@@ -323,16 +359,45 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                                                 ),
                                               ],
                                             )
-                                          : Container(
-                                              height: media.height * 0.4,
-                                              color: Colors.black12,
-                                              child: const Center(
-                                                  child: Text(
-                                                'No Video Available',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              )),
-                                            ),
+                                          : appShimmerImage(
+                                              width: media.width,
+                                              height: (dataProvider
+                                                              ?.currentExerciseObj
+                                                              .videoThumbnail ??
+                                                          "")
+                                                      .isNotEmpty
+                                                  ? media.height * 0.835
+                                                  : media.width,
+                                              networkImageUrl: (dataProvider
+                                                              ?.currentExerciseObj
+                                                              .videoThumbnail ??
+                                                          "")
+                                                      .isNotEmpty
+                                                  ? (dataProvider
+                                                          ?.currentExerciseObj
+                                                          .videoThumbnail ??
+                                                      "")
+                                                  : dataProvider
+                                                          ?.currentExerciseObj
+                                                          .thumbnail ??
+                                                      "",
+                                              fit: BoxFit.cover,
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(
+                                                    ScreenUtil.horizontalScale(
+                                                        1)),
+                                              ),
+                                            )
+                                      // Container(
+                                      //     height: media.height * 0.4,
+                                      //     color: Colors.black12,
+                                      //     child: const Center(
+                                      //         child: Text(
+                                      //       'No Video Available',
+                                      //       style: TextStyle(
+                                      //           color: Colors.white),
+                                      //     )),
+                                      //   ),
                                     ],
                                   ),
                                 ),
@@ -412,6 +477,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                                                         .value.position -
                                                     const Duration(seconds: 10),
                                               );
+                                              _controller.forward();
                                             }
                                           : null,
                                     ),
@@ -472,6 +538,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                                                         .value.position +
                                                     const Duration(seconds: 10),
                                               );
+                                              _controller.forward();
                                             }
                                           : null,
                                     ),
@@ -504,28 +571,53 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                                                   SizedBox(
                                                       height: ScreenUtil
                                                           .verticalScale(0.8)),
-                                                  Row(
-                                                    children: [
-                                                      Spacer(),
-                                                      GestureDetector(
-                                                        onTap: showControls
-                                                            ? () {
-                                                                muteUnMute();
-                                                              }
-                                                            : null,
-                                                        child: Icon(
-                                                          isMute
-                                                              ? Icons.volume_up
-                                                              : Icons
-                                                                  .volume_off,
-                                                          color: !showControls
-                                                              ? Colors
-                                                                  .transparent
-                                                              : Colors.white70,
-                                                          size: 28,
+                                                  AnimatedOpacity(
+                                                    opacity: showControls
+                                                        ? 1.0
+                                                        : 0.0,
+                                                    duration: const Duration(
+                                                        milliseconds: 800),
+                                                    curve: Curves.easeInOut,
+                                                    child: Row(
+                                                      children: [
+                                                        Spacer(),
+                                                        GestureDetector(
+                                                          onTap: showControls
+                                                              ? () {
+                                                                  toggleFullscreen();
+                                                                }
+                                                              : null,
+                                                          child: Icon(
+                                                            !isFullscreen
+                                                                ? Icons
+                                                                    .fullscreen
+                                                                : Icons
+                                                                    .fullscreen_exit,
+                                                            color:
+                                                                Colors.white70,
+                                                            size: 28,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                        SizedBox(width: 10),
+                                                        GestureDetector(
+                                                          onTap: showControls
+                                                              ? () {
+                                                                  muteUnMute();
+                                                                }
+                                                              : null,
+                                                          child: Icon(
+                                                            isMute
+                                                                ? Icons
+                                                                    .volume_up
+                                                                : Icons
+                                                                    .volume_off,
+                                                            color:
+                                                                Colors.white70,
+                                                            size: 28,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -599,9 +691,9 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -671,12 +763,18 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius:
                             BorderRadius.only(topLeft: Radius.circular(50))),
                     margin: EdgeInsets.only(
                         top: videoSize == null
-                            ? media.height * 0.4 - media.height * 0.12
+                            ? ((dataProvider?.currentExerciseObj
+                                                .videoThumbnail ??
+                                            "")
+                                        .isNotEmpty
+                                    ? media.height * 0.835
+                                    : media.width) -
+                                media.height * 0.12
                             : videoSize!.height - media.height * 0.12),
                     child: Column(
                       children: [
@@ -716,10 +814,8 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                             data: exerciseDesc,
                             style: {
                               "p.fancy": Style(
-                                color: Colors.black,
-                                fontSize: FontSize(14),
-                                textAlign: TextAlign.left,
-                              ),
+                                  padding: HtmlPaddings.zero,
+                                  color: Colors.black),
                             },
                           ),
                         ),
@@ -860,7 +956,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
               offset: Offset(0, 1),
             ),
           ],
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(7)),
           ),

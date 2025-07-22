@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -37,6 +38,8 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
   Timer? _hideControlsTimer;
   bool isMute = true;
   late final ProgressBarController _controller;
+  bool hasClosedPopup = false;
+
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -82,17 +85,19 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
   }
 
   Future<void> initializeVideo(String url) async {
+    if (hasClosedPopup) return;
     try {
       // Initialize the video player controller
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
-      await _videoPlayerController.initialize().then(
-        (value) {
-          AudioManager.requestAudioFocus();
-        },
-      );
+      await _videoPlayerController.initialize();
+      if (hasClosedPopup || !mounted) {
+        await _videoPlayerController.dispose();
+        return;
+      }
       await _videoPlayerController.setLooping(true);
+      AudioManager.requestAudioFocus();
 
       // Initialize the ChewieController with custom controls
       _chewieController = ChewieController(
@@ -106,7 +111,8 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null &&
+      if (!hasClosedPopup &&
+          _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
         videoSize = calculateVideoSize(
@@ -127,6 +133,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
       //   setState(() {});
       // });
       _videoPlayerController.addListener(() async {
+        if (hasClosedPopup || !mounted) return;
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
         final bool isFinished =
@@ -153,14 +160,18 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
         thumbAnimationDuration: const Duration(milliseconds: 200),
         waitingDuration: const Duration(milliseconds: 1800),
       );
-      setState(() {
-        loading = false;
-      });
+      if (!hasClosedPopup && mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        videoNotInitialized = true;
-        loading = false;
-      });
+      if (!hasClosedPopup) {
+        setState(() {
+          videoNotInitialized = true;
+          loading = false;
+        });
+      }
       debugPrint("VIDEO NOT INITIALIZED: $e");
     }
   }
@@ -186,9 +197,11 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
   }
 
   void showControlsOnTap() {
-    setState(() => showControls = !showControls);
     if (_videoPlayerController.value.isPlaying) {
-      hideControls();
+      setState(() => showControls = !showControls);
+      if (_videoPlayerController.value.isPlaying) {
+        hideControls();
+      }
     }
   }
 
@@ -197,17 +210,56 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
     setState(() => showControls = true);
   }
 
-  void toggleFullscreen() {
+  // void toggleFullscreen() {
+  //   setState(() {
+  //     isFullscreen = !isFullscreen;
+  //   });
+  //   if (isFullscreen) {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+  //   } else {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  //   }
+  // }
+
+  Future<void> toggleFullscreen() async {
     setState(() {
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
-    } else {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      final screenSize = MediaQuery.of(context).size;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoFullScreenView(
+              makeRefresh: () {
+                setState(() {});
+              },
+              isFullscreen: isFullscreen,
+              toggleFullscreen: toggleFullscreen,
+              controller: _controller,
+              isMute: isMute,
+              changeZoom: changeZoom,
+              chewieController: _chewieController!,
+              hideControls: hideControls,
+              isZoom: isZoom,
+              media: screenSize,
+              videoSize: videoSize,
+              muteUnMute: muteUnMute,
+              showControls: showControls,
+              showControlsOnTap: showControlsOnTap,
+              showControlsOnTapOfPause: showControlsOnTapOfPause,
+              videoNotInitialized: videoNotInitialized,
+              videoPlayerController: _videoPlayerController,
+              videoProgressValue: videoProgressValue,
+            ),
+          ));
     }
+  }
+
+  changeZoom(value) {
+    isZoom = value;
   }
 
   Size calculateVideoSize(
@@ -225,13 +277,25 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
 
   @override
   void dispose() {
-    if (_chewieController != null) {
-      _chewieController!.dispose();
+    hasClosedPopup = true;
+
+    try {
+      _videoPlayerController.pause();
       _videoPlayerController.dispose();
-      _controller.dispose();
-    }
+    } catch (_) {}
+
+    try {
+      _chewieController?.dispose();
+    } catch (_) {}
 
     AudioManager.abandonAudioFocus();
+    _hideControlsTimer?.cancel();
+
+    // if (_chewieController != null) {
+    //   _chewieController!.dispose();
+    //   _videoPlayerController.dispose();
+    //   AudioManager.abandonAudioFocus();
+    // }
 
     super.dispose();
   }
@@ -256,7 +320,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -324,19 +388,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                                 // ),
                                               ],
                                             )
-                                          : SizedBox() ??
-                                              Container(
-                                                height:
-                                                    ScreenUtil.verticalScale(
-                                                        40),
-                                                color: Colors.black12,
-                                                child: const Center(
-                                                    child: Text(
-                                                  'No Video Available',
-                                                  style: TextStyle(
-                                                      color: Colors.black),
-                                                )),
-                                              ),
+                                          : SizedBox(),
                                     ],
                                   ),
                                 ),
@@ -372,6 +424,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                                               const Duration(
                                                                   seconds: 10),
                                                         );
+                                                        _controller.forward();
                                                       }
                                                     : null,
                                               ),
@@ -443,6 +496,7 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                                               const Duration(
                                                                   seconds: 10),
                                                         );
+                                                        _controller.forward();
                                                       }
                                                     : null,
                                               ),
@@ -477,30 +531,57 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                                           height: ScreenUtil
                                                               .verticalScale(
                                                                   0.8)),
-                                                      Row(
-                                                        children: [
-                                                          Spacer(),
-                                                          GestureDetector(
-                                                            onTap: showControls
-                                                                ? () {
-                                                                    muteUnMute();
-                                                                  }
-                                                                : null,
-                                                            child: Icon(
-                                                              isMute
-                                                                  ? Icons
-                                                                      .volume_up
-                                                                  : Icons
-                                                                      .volume_off,
-                                                              color: !showControls
-                                                                  ? Colors
-                                                                      .transparent
-                                                                  : Colors
-                                                                      .white70,
-                                                              size: 28,
+                                                      AnimatedOpacity(
+                                                        opacity: showControls
+                                                            ? 1.0
+                                                            : 0.0,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    800),
+                                                        curve: Curves.easeInOut,
+                                                        child: Row(
+                                                          children: [
+                                                            Spacer(),
+                                                            GestureDetector(
+                                                              onTap:
+                                                                  showControls
+                                                                      ? () {
+                                                                          toggleFullscreen();
+                                                                        }
+                                                                      : null,
+                                                              child: Icon(
+                                                                !isFullscreen
+                                                                    ? Icons
+                                                                        .fullscreen
+                                                                    : Icons
+                                                                        .fullscreen_exit,
+                                                                color: Colors
+                                                                    .white70,
+                                                                size: 28,
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            SizedBox(width: 10),
+                                                            GestureDetector(
+                                                              onTap:
+                                                                  showControls
+                                                                      ? () {
+                                                                          muteUnMute();
+                                                                        }
+                                                                      : null,
+                                                              child: Icon(
+                                                                isMute
+                                                                    ? Icons
+                                                                        .volume_up
+                                                                    : Icons
+                                                                        .volume_off,
+                                                                color: Colors
+                                                                    .white70,
+                                                                size: 28,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -660,12 +741,20 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                                   Html(
                                     data: tutorialDesc,
                                     style: {
-                                      "p": Style(
-                                          padding: HtmlPaddings.zero,
-                                          color: Color(0xff6f6f6f),
-                                          textAlign: TextAlign.left,
+                                      "body": Style(
                                           fontSize: FontSize(
-                                              ScreenUtil.verticalScale(1.8))),
+                                              ScreenUtil.verticalScale(1.7)),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color),
+                                      "p": Style(
+                                          fontSize: FontSize(
+                                              ScreenUtil.verticalScale(1.7)),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color),
                                     },
                                   )
                                   // Text(
@@ -720,8 +809,21 @@ class _ChooseEquipmentDialogState extends State<ChooseEquipmentDialog>
                         color: Colors.white),
                   ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
+                onTap: () async {
+                  hasClosedPopup = true;
+
+                  try {
+                    await _videoPlayerController.pause();
+                    await _videoPlayerController.dispose();
+                  } catch (_) {}
+
+                  try {
+                    _chewieController?.dispose();
+                  } catch (_) {}
+
+                  if (mounted) Navigator.of(context).pop();
+
+                  AudioManager.abandonAudioFocus();
                 },
               ),
             ),

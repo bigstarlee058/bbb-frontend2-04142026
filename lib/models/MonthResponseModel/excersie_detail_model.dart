@@ -3,6 +3,7 @@ class ExerciseDetailModel {
   String? title;
   String? vimeoId;
   String? thumbnail;
+  String? videoThumbnail;
   String? description;
   String? guide;
   List<String>? categories;
@@ -18,6 +19,7 @@ class ExerciseDetailModel {
       this.title,
       this.vimeoId,
       this.thumbnail,
+      this.videoThumbnail,
       this.description,
       this.guide,
       this.categories,
@@ -33,6 +35,7 @@ class ExerciseDetailModel {
     title = json['title'];
     vimeoId = json['vimeoId'];
     thumbnail = json['thumbnail'];
+    videoThumbnail = json['videoThumbnail'];
     description = json['description'];
     guide = json['guide'];
     categories = json['categories'].cast<String>();
@@ -65,6 +68,7 @@ class ExerciseDetailModel {
     data['title'] = title;
     data['vimeoId'] = vimeoId;
     data['thumbnail'] = thumbnail;
+    data['videoThumbnail'] = videoThumbnail;
     data['description'] = description;
     data['guide'] = guide;
     data['categories'] = categories;
@@ -72,7 +76,8 @@ class ExerciseDetailModel {
       data['usedEquipments'] = usedEquipments!.map((v) => v.toJson()).toList();
     }
     if (relatedExercises != null) {
-      data['relatedExercises'] = relatedExercises!.map((v) => v.toJson()).toList();
+      data['relatedExercises'] =
+          relatedExercises!.map((v) => v.toJson()).toList();
     }
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
@@ -96,7 +101,15 @@ class UsedEquipments {
   int? iV;
 
   UsedEquipments(
-      {this.sId, this.title, this.thumbnail, this.description, this.link, this.collections, this.createdAt, this.updatedAt, this.iV});
+      {this.sId,
+      this.title,
+      this.thumbnail,
+      this.description,
+      this.link,
+      this.collections,
+      this.createdAt,
+      this.updatedAt,
+      this.iV});
 
   UsedEquipments.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];

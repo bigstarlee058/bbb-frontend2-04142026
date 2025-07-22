@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/pages/WatchTutorial/app_tutorial.dart';
@@ -74,16 +75,19 @@ class _WatchTutorialState extends State<WatchTutorial>
   }
 
   Future<void> initializeVideo(String url) async {
+    if (hasClosedPopup) return;
     try {
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
-      await _videoPlayerController.initialize().then(
-        (value) {
-          AudioManager.requestAudioFocus();
-        },
-      );
+      await _videoPlayerController.initialize();
+      if (hasClosedPopup || !mounted) {
+        await _videoPlayerController.dispose();
+        return;
+      }
+
       await _videoPlayerController.setLooping(true);
+      AudioManager.requestAudioFocus();
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -95,7 +99,8 @@ class _WatchTutorialState extends State<WatchTutorial>
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null &&
+      if (!hasClosedPopup &&
+          _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
         videoSize = calculateVideoSize(
@@ -116,6 +121,7 @@ class _WatchTutorialState extends State<WatchTutorial>
       //   setState(() {});
       // });
       _videoPlayerController.addListener(() async {
+        if (hasClosedPopup || !mounted) return;
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
         final bool isFinished =
@@ -143,18 +149,26 @@ class _WatchTutorialState extends State<WatchTutorial>
         waitingDuration: const Duration(milliseconds: 1800),
       );
 
-      setState(() => loading = false);
+      if (!hasClosedPopup && mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        videoNotInitialized = true;
-        loading = false;
-      });
+      if (!hasClosedPopup) {
+        setState(() {
+          videoNotInitialized = true;
+          loading = false;
+        });
+      }
+
       debugPrint("VIDEO NOT INITIALIZED: $e");
     }
   }
 
   bool showControls = true;
   bool isFullscreen = false;
+  bool hasClosedPopup = false;
 
   muteUnMute() async {
     isMute = !isMute;
@@ -174,9 +188,11 @@ class _WatchTutorialState extends State<WatchTutorial>
   }
 
   void showControlsOnTap() {
-    setState(() => showControls = !showControls);
     if (_videoPlayerController.value.isPlaying) {
-      hideControls();
+      setState(() => showControls = !showControls);
+      if (_videoPlayerController.value.isPlaying) {
+        hideControls();
+      }
     }
   }
 
@@ -185,35 +201,86 @@ class _WatchTutorialState extends State<WatchTutorial>
     setState(() => showControls = true);
   }
 
-  void toggleFullscreen() {
+  // void toggleFullscreen() {
+  //   setState(() {
+  //     isFullscreen = !isFullscreen;
+  //   });
+  //   if (isFullscreen) {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+  //   } else {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  //   }
+  // }
+
+  Future<void> toggleFullscreen() async {
     setState(() {
       isFullscreen = !isFullscreen;
     });
     if (isFullscreen) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
-    } else {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      final screenSize = MediaQuery.of(context).size;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoFullScreenView(
+              makeRefresh: () {
+                setState(() {});
+              },
+              isFullscreen: isFullscreen,
+              toggleFullscreen: toggleFullscreen,
+              controller: _controller,
+              isMute: isMute,
+              changeZoom: changeZoom,
+              chewieController: _chewieController!,
+              hideControls: hideControls,
+              isZoom: isZoom,
+              media: screenSize,
+              videoSize: videoSize,
+              muteUnMute: muteUnMute,
+              showControls: showControls,
+              showControlsOnTap: showControlsOnTap,
+              showControlsOnTapOfPause: showControlsOnTapOfPause,
+              videoNotInitialized: videoNotInitialized,
+              videoPlayerController: _videoPlayerController,
+              videoProgressValue: videoProgressValue,
+            ),
+          ));
     }
+  }
+
+  changeZoom(value) {
+    isZoom = value;
   }
 
   Size calculateVideoSize(
       {required BuildContext context, required double aspectRatio}) {
-    double maxWidth = ScreenUtil.horizontalScale(90);
+    double maxWidth = ScreenUtil.horizontalScale(86.5);
     double calculatedHeight = maxWidth / aspectRatio;
     return Size(maxWidth, calculatedHeight);
   }
 
   @override
   void dispose() {
-    if (_chewieController != null) {
-      _chewieController!.dispose();
+    hasClosedPopup = true;
+
+    try {
+      _videoPlayerController.pause();
       _videoPlayerController.dispose();
-    }
+    } catch (_) {}
+
+    try {
+      _chewieController?.dispose();
+    } catch (_) {}
 
     AudioManager.abandonAudioFocus();
-    _controller.dispose();
+    hideControlsTimer?.cancel();
+
+    // if (_chewieController != null) {
+    //   _chewieController!.dispose();
+    //   _videoPlayerController.dispose();
+    //   AudioManager.abandonAudioFocus();
+    // }
 
     super.dispose();
   }
@@ -237,7 +304,7 @@ class _WatchTutorialState extends State<WatchTutorial>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -351,6 +418,7 @@ class _WatchTutorialState extends State<WatchTutorial>
                                                               const Duration(
                                                                   seconds: 10),
                                                         );
+                                                        _controller.forward();
                                                       }
                                                     : null,
                                               ),
@@ -422,6 +490,7 @@ class _WatchTutorialState extends State<WatchTutorial>
                                                               const Duration(
                                                                   seconds: 10),
                                                         );
+                                                        _controller.forward();
                                                       }
                                                     : null,
                                               ),
@@ -475,30 +544,57 @@ class _WatchTutorialState extends State<WatchTutorial>
                                                           height: ScreenUtil
                                                               .verticalScale(
                                                                   0.8)),
-                                                      Row(
-                                                        children: [
-                                                          Spacer(),
-                                                          GestureDetector(
-                                                            onTap: showControls
-                                                                ? () {
-                                                                    muteUnMute();
-                                                                  }
-                                                                : null,
-                                                            child: Icon(
-                                                              isMute
-                                                                  ? Icons
-                                                                      .volume_up
-                                                                  : Icons
-                                                                      .volume_off,
-                                                              color: !showControls
-                                                                  ? Colors
-                                                                      .transparent
-                                                                  : Colors
-                                                                      .white70,
-                                                              size: 28,
+                                                      AnimatedOpacity(
+                                                        opacity: showControls
+                                                            ? 1.0
+                                                            : 0.0,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    800),
+                                                        curve: Curves.easeInOut,
+                                                        child: Row(
+                                                          children: [
+                                                            Spacer(),
+                                                            GestureDetector(
+                                                              onTap:
+                                                                  showControls
+                                                                      ? () {
+                                                                          toggleFullscreen();
+                                                                        }
+                                                                      : null,
+                                                              child: Icon(
+                                                                !isFullscreen
+                                                                    ? Icons
+                                                                        .fullscreen
+                                                                    : Icons
+                                                                        .fullscreen_exit,
+                                                                color: Colors
+                                                                    .white70,
+                                                                size: 28,
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            SizedBox(width: 10),
+                                                            GestureDetector(
+                                                              onTap:
+                                                                  showControls
+                                                                      ? () {
+                                                                          muteUnMute();
+                                                                        }
+                                                                      : null,
+                                                              child: Icon(
+                                                                isMute
+                                                                    ? Icons
+                                                                        .volume_up
+                                                                    : Icons
+                                                                        .volume_off,
+                                                                color: Colors
+                                                                    .white70,
+                                                                size: 28,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -621,7 +717,10 @@ class _WatchTutorialState extends State<WatchTutorial>
                                   style: TextStyle(
                                     fontSize: ScreenUtil.verticalScale(1.75),
                                     height: 1.5,
-                                    color: Colors.grey.shade700,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color,
                                   ),
                                 ),
                               ),
@@ -671,8 +770,21 @@ class _WatchTutorialState extends State<WatchTutorial>
                         color: Colors.white),
                   ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
+                onTap: () async {
+                  hasClosedPopup = true;
+
+                  try {
+                    await _videoPlayerController.pause();
+                    await _videoPlayerController.dispose();
+                  } catch (_) {}
+
+                  try {
+                    _chewieController?.dispose();
+                  } catch (_) {}
+
+                  if (mounted) Navigator.of(context).pop();
+
+                  AudioManager.abandonAudioFocus();
                 },
               ),
             ),

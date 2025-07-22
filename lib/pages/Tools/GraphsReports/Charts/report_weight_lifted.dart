@@ -65,10 +65,10 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                 show: true,
                 border: Border.symmetric(
                   horizontal: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Theme.of(context).cardColor,
                   ),
                   vertical: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Theme.of(context).cardColor,
                   ),
                 ),
               ),
@@ -103,11 +103,11 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                         : 1000,
                 show: true,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).cardColor,
                   strokeWidth: 1,
                 ),
                 getDrawingVerticalLine: (value) => FlLine(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).cardColor,
                   strokeWidth: 1,
                 ),
               ),
@@ -132,7 +132,10 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                 enabled: true,
                 handleBuiltInTouches: false,
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (group1) => Colors.transparent,
+                  tooltipPadding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  tooltipMargin: 8, // space between bar and tooltip
+                  getTooltipColor: (_) => Colors.black87,
                   getTooltipItem: (
                     BarChartGroupData group,
                     int groupIndex,
@@ -140,17 +143,12 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
                     int rodIndex,
                   ) {
                     return BarTooltipItem(
-                      rod.toY.toStringAsFixed(0),
-                      TextStyle(
+                      "${NumberFormat.decimalPattern('en_US').format(rod.toY.toInt())}lbs",
+                      // '${rod.toY.toInt()}',
+                      const TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        color: rod.color,
-                        fontSize: 14,
-                        shadows: const [
-                          Shadow(
-                            color: Colors.black26,
-                            blurRadius: 12,
-                          ),
-                        ],
+                        fontSize: 12,
                       ),
                     );
                   },
@@ -238,21 +236,39 @@ class _ReportWeightLiftedGraphState extends State<ReportWeightLiftedGraph> {
     );
   }
 
+  // Widget getLeftTitles(double value, TitleMeta meta) {
+  //   const style = TextStyle(
+  //     color: Colors.grey,
+  //     fontWeight: FontWeight.w500,
+  //     fontSize: 12,
+  //   );
+  //   String roundedValue = "";
+  //
+  //   if (value < 1000) {
+  //     roundedValue = value.toStringAsFixed(0);
+  //   } else {
+  //     int val = (value / 1000).round();
+  //     roundedValue = '${val.toString()}k';
+  //   }
+  //   return Text(roundedValue == "0k" ? "0" : roundedValue, style: style);
+  // }
   Widget getLeftTitles(double value, TitleMeta meta) {
     const style = TextStyle(
       color: Colors.grey,
       fontWeight: FontWeight.w500,
       fontSize: 12,
     );
-    String roundedValue = "";
 
+    String formattedValue;
     if (value < 1000) {
-      roundedValue = value.toStringAsFixed(0);
+      formattedValue = value.toStringAsFixed(0);
+    } else if (value < 1000000) {
+      formattedValue = '${(value / 1000).round()}k';
     } else {
-      int val = (value / 1000).round();
-      roundedValue = '${val.toString()}k';
+      formattedValue = '${(value / 1000000).round()}M';
     }
-    return Text(roundedValue == "0k" ? "0" : roundedValue, style: style);
+
+    return Text(formattedValue == "0k" ? "0" : formattedValue, style: style);
   }
 }
 

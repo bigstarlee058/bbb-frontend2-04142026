@@ -1,4 +1,5 @@
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/staffs.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -6,6 +7,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,15 +33,9 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
 
   @override
   void initState() {
-    dataProvider = Provider.of<DataProvider>(
-      context,
-      listen: false,
-    );
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
 
-    userData = Provider.of<UserDataProvider>(
-      context,
-      listen: false,
-    );
+    userData = Provider.of<UserDataProvider>(context, listen: false);
 
     super.initState();
   }
@@ -65,7 +61,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
     final staffData = ModalRoute.of(context)?.settings.arguments as Staffs?;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: ClampingScrollPhysics(),
         child: Column(
@@ -75,21 +71,32 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                 Stack(
                   children: [
                     Container(
-                      height: media.height / 1.7, // 2,//2.35,
+                      height: media.height / 1.7,
                       width: media.width,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: staffData != null
-                              ? NetworkImage(staffData.photo.startsWith(
-                                      'https://storage.cloud.google.com/')
-                                  ? staffData.photo.replaceFirst(
-                                      'https://storage.cloud.google.com/',
-                                      'https://storage.googleapis.com/')
-                                  : staffData.photo)
-                              : const AssetImage('assets/img/back.jpg'),
-                          fit: BoxFit.cover,
-                          opacity: 1,
-                        ),
+                      // decoration: BoxDecoration(
+                      //   image: DecorationImage(
+                      //     image: staffData != null
+                      //         ? NetworkImage(staffData.photo.startsWith(
+                      //                 'https://storage.cloud.google.com/')
+                      //             ? staffData.photo.replaceFirst(
+                      //                 'https://storage.cloud.google.com/',
+                      //                 'https://storage.googleapis.com/')
+                      //             : staffData.photo)
+                      //         : const AssetImage('assets/img/back.jpg'),
+                      //     fit: BoxFit.cover,
+                      //     opacity: 1,
+                      //   ),
+                      // ),
+                      child: appShimmerImage(
+                        borderRadius: BorderRadius.circular(0),
+                        fit: BoxFit.cover,
+                        color: Colors.transparent,
+                        networkImageUrl: (staffData?.photo ?? "")
+                                .startsWith('https://storage.cloud.google.com/')
+                            ? (staffData?.photo ?? "").replaceFirst(
+                                'https://storage.cloud.google.com/',
+                                'https://storage.googleapis.com/')
+                            : (staffData?.photo ?? ""),
                       ),
                     ),
                     SizedBox(
@@ -169,8 +176,8 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                           child: Container(
                             height: media.height / 11,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                         ),
@@ -188,7 +195,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                   ),
                   width: media.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
@@ -355,29 +362,53 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                             ],
                           ),
                           Container(
-                            margin: const EdgeInsets.only(top: 10.0),
-                            alignment: Alignment
-                                .centerLeft, // Center-align the header text
-                            child: Text(
-                              staffData != null
-                                  ? staffData.bio
-                                  : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. "
-                                      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+                              margin: const EdgeInsets.only(top: 10.0),
+                              alignment: Alignment.centerLeft,
+                              child: Builder(builder: (context) {
+                                String bioContent = staffData.bio ?? "";
 
-                              style: const TextStyle(
-                                fontSize:
-                                    16, // Customize font size for better readability
-                                color: Colors.grey,
+                                bool isPlainText = !bioContent
+                                    .trim()
+                                    .contains(RegExp(r"<[a-z][\s\S]*>"));
+
+                                if (isPlainText) {
+                                  bioContent = "<p>$bioContent</p>";
+                                }
+                                return Html(
+                                  data: bioContent,
+                                  style: {
+                                    "body": Style(
+                                      fontSize: FontSize(
+                                          ScreenUtil.verticalScale(1.8)),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                    "p": Style(
+                                      fontSize: FontSize(
+                                          ScreenUtil.verticalScale(1.8)),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                  },
+                                );
+                              })
+                              // Text(
+                              //   staffData.bio,
+                              //   style: const TextStyle(
+                              //       fontSize: 16, color: Colors.grey),
+                              //   textAlign: TextAlign.left,
+                              // ),
                               ),
-                              textAlign: TextAlign
-                                  .left, // Center align the description
-                            ),
-                          ),
                           staffData.link.isEmpty
                               ? SizedBox()
                               : Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: ScreenUtil.verticalScale(4)),
+                                  margin: EdgeInsets.only(
+                                      top: ScreenUtil.verticalScale(1.8),
+                                      bottom: ScreenUtil.verticalScale(3.2)),
                                   child: ButtonWidget(
                                     text: 'View Details',
                                     textColor: Colors.white,

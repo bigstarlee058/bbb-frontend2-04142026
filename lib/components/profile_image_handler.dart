@@ -47,7 +47,6 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    log('widget.name==========>>>>>${widget.name}');
     return Container(
       height: ScreenUtil.verticalScale(10.5),
       width: ScreenUtil.verticalScale(10.5),

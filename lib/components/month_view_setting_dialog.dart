@@ -69,7 +69,7 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: Stack(
                   children: [
@@ -103,7 +103,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     fontSize: ScreenUtil.verticalScale(1.75),
-                                    color: AppColors.blackColor,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color,
                                     fontWeight: FontWeight.normal),
                               ),
                             ),
@@ -124,7 +127,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                         'Choose workout frequency',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
-                                          color: const Color(0xBB888888),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.color,
                                           fontSize:
                                               ScreenUtil.verticalScale(1.5),
                                           fontWeight: FontWeight.w700,
@@ -158,7 +164,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           child: Icon(
                                             Icons.info,
                                             size: ScreenUtil.verticalScale(2.3),
-                                            color: const Color(0xBB888888),
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.color,
                                           ),
                                         ),
                                       )
@@ -176,15 +185,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -207,8 +217,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "3 days per week",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -240,7 +252,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: splitIndex == 0
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -255,15 +269,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -286,8 +301,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "4 days per week",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -319,7 +336,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: splitIndex == 1
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -334,15 +353,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -365,8 +385,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "5 days per week",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -398,7 +420,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: splitIndex == 2
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -420,7 +444,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                         'Choose equipment availability',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
-                                          color: const Color(0xBB888888),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.color,
                                           fontSize:
                                               ScreenUtil.verticalScale(1.5),
                                           fontWeight: FontWeight.w700,
@@ -454,7 +481,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           child: Icon(
                                             Icons.info,
                                             size: ScreenUtil.verticalScale(2.3),
-                                            color: const Color(0xBB888888),
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.color,
                                           ),
                                         ),
                                       )
@@ -472,15 +502,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -503,8 +534,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "Fully equipped gym",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -536,7 +569,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: equipments == 0
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -551,15 +586,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -582,8 +618,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "Home gym",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -615,7 +653,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: equipments == 1
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -630,15 +670,16 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                           padding: EdgeInsets.all(
                                               ScreenUtil.verticalScale(1.25)),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color:
+                                                Theme.of(context).canvasColor,
                                             borderRadius: BorderRadius.circular(
                                                 ScreenUtil.verticalScale(5)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.greyColor,
-                                                blurRadius: 10,
-                                              ),
-                                            ],
+                                            // boxShadow: [
+                                            //   BoxShadow(
+                                            //     color: AppColors.greyColor,
+                                            //     blurRadius: 10,
+                                            //   ),
+                                            // ],
                                           ),
                                           child: Row(
                                             children: [
@@ -661,8 +702,10 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                               Text(
                                                 "Dumbbells and bands",
                                                 style: TextStyle(
-                                                  color:
-                                                      const Color(0xBB888888),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.8),
@@ -694,7 +737,9 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                       Icons.done,
                                                       size: ScreenUtil
                                                           .verticalScale(2.5),
-                                                      color: Colors.white,
+                                                      color: equipments == 2
+                                                          ? Colors.white
+                                                          : Colors.transparent,
                                                     ),
                                                   ),
                                                 ),
@@ -800,23 +845,28 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
             top: -ScreenUtil.verticalScale(1.2),
             child: Align(
               alignment: Alignment.centerRight,
-              child: GestureDetector(
-                child: Container(
-                  decoration: const BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
-                  child: Padding(
-                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
-                    child: Icon(
-                        size: ScreenUtil.verticalScale(2.5),
-                        Icons.close,
-                        color: Colors.white),
+              child: Consumer<MonthProvider>(builder: (context, value, child) {
+                return GestureDetector(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.all(Radius.circular(100))),
+                    child: Padding(
+                      padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                      child: Icon(
+                          size: ScreenUtil.verticalScale(2.5),
+                          Icons.close,
+                          color: Colors.white),
+                    ),
                   ),
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await preferences.putString(
+                        SharedPreference.monthSettingDone,
+                        value.monthDataModel?.id ?? "");
+                  },
+                );
+              }),
             ),
           ),
         ],

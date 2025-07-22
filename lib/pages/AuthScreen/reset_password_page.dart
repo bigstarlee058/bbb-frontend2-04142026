@@ -10,6 +10,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -151,11 +152,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Utils.appImage(
-                  media,
-                  // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
-                  image: dataProvider!.cachedImageMap["imageForgot"],
-                  imageKey: "imageForgot",
+                AppImage.imageForgot(
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageForgot")
+                  //     .first["image"],
+                  // // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
+                  // // image: dataProvider!.cachedImageMap["imageForgot"],
+                  // imageKey: "imageForgot",
                   child: Column(
                     children: [
                       Align(
@@ -198,15 +202,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           child: Container(
                             height: media.height / 9.8,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                         ),
                         Container(
                           width: media.width,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.only(
                               topLeft:
                                   Radius.circular(ScreenUtil.verticalScale(7)),

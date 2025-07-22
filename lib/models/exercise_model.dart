@@ -4,6 +4,7 @@ class Exercise {
     required this.title,
     required this.vimeoId,
     required this.thumbnail,
+    required this.videoThumbnail,
     required this.description,
     required this.guide,
     required this.relatedExercises,
@@ -16,6 +17,7 @@ class Exercise {
   String title;
   String vimeoId;
   String thumbnail;
+  String videoThumbnail;
   String description;
   String guide;
   List<dynamic> relatedExercises = [];

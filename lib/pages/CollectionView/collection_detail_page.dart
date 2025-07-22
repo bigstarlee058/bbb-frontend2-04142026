@@ -34,12 +34,15 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
     userData = Provider.of<UserDataProvider>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final collection = ModalRoute.of(context)!.settings.arguments as Collections;
+      final collection =
+          ModalRoute.of(context)!.settings.arguments as Collections;
       await loadCollectionData(collection).then((_) {
         setState(() {
           if (dataProvider!.collectionData.equipments.isNotEmpty) {
-            final List<Equipment>? equipments =
-                dataProvider?.collectionData.equipments.map<Equipment>((e) => Equipment.fromJson(e)).toList();
+            final List<Equipment>? equipments = dataProvider
+                ?.collectionData.equipments
+                .map<Equipment>((e) => Equipment.fromJson(e))
+                .toList();
             _filteredEquipments = equipments!;
             _numPages = (_filteredEquipments.length / _itemsPerPage).ceil();
           } else {
@@ -79,11 +82,14 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
 
     return _filteredEquipments.sublist(
       startIndex,
-      endIndex > _filteredEquipments.length ? _filteredEquipments.length : endIndex,
+      endIndex > _filteredEquipments.length
+          ? _filteredEquipments.length
+          : endIndex,
     );
   }
 
-  Widget equipmentCard(String title, String imageurl, String description, String link) {
+  Widget equipmentCard(
+      String title, String imageurl, String description, String link) {
     var media = MediaQuery.of(context).size;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -129,9 +135,12 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
               appShimmerImage(
                 width: ScreenUtil.verticalScale(11),
                 height: ScreenUtil.verticalScale(11),
-                networkImageUrl: imageurl.startsWith('https://storage.cloud.google.com/')
-                    ? imageurl.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                    : imageurl,
+                networkImageUrl:
+                    imageurl.startsWith('https://storage.cloud.google.com/')
+                        ? imageurl.replaceFirst(
+                            'https://storage.cloud.google.com/',
+                            'https://storage.googleapis.com/')
+                        : imageurl,
                 fit: BoxFit.cover,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
@@ -218,7 +227,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                   child: SvgPicture.asset(
                     "assets/icons/shopping-bag.svg",
                     height: ScreenUtil.verticalScale(2.3),
-                    colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    colorFilter:
+                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   ),
                 ),
               ),
@@ -232,12 +242,13 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final collectionData = ModalRoute.of(context)!.settings.arguments as Collections?;
+    final collectionData =
+        ModalRoute.of(context)!.settings.arguments as Collections?;
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -248,23 +259,18 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                   children: [
                     Stack(
                       children: [
-                        Container(
+                        appShimmerImage(
                           height: media.height / 2.35,
                           width: media.width,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: collectionData!.photo.isNotEmpty
-                                  ? NetworkImage(
-                                      collectionData.photo.startsWith('https://storage.cloud.google.com/')
-                                          ? collectionData.photo.replaceFirst(
-                                              'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                          : collectionData.photo,
-                                    )
-                                  : const AssetImage('assets/img/back.jpg'),
-                              fit: BoxFit.cover,
-                              opacity: 1,
-                            ),
-                          ),
+                          networkImageUrl: (collectionData?.photo ?? "")
+                                  .startsWith(
+                                      'https://storage.cloud.google.com/')
+                              ? (collectionData?.photo ?? "").replaceFirst(
+                                  'https://storage.cloud.google.com/',
+                                  'https://storage.googleapis.com/')
+                              : (collectionData?.photo ?? ""),
+                          fit: BoxFit.cover,
+                          borderRadius: BorderRadius.circular(0),
                         ),
                         SizedBox(
                           height: media.height / 2,
@@ -273,7 +279,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   centerTitle: true,
                                   backgroundColor: Colors.transparent,
                                   leading: BackArrowWidget(
@@ -301,7 +308,8 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/collectionDetail'),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: '/collectionDetail'),
                                     )
                                   ],
                                 ),
@@ -309,15 +317,19 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                   child: Container(
                                     height: media.height / 5.6,
                                     margin: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil.horizontalScale(15),
+                                        horizontal:
+                                            ScreenUtil.horizontalScale(15),
                                         vertical: ScreenUtil.verticalScale(3)),
                                     child: Center(
                                       child: Text(
-                                        collectionData.title.isNotEmpty ? collectionData.title : 'Collection Title',
+                                        (collectionData?.title ?? "").isNotEmpty
+                                            ? collectionData?.title ?? ""
+                                            : 'Collection Title',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: ScreenUtil.horizontalScale(6.5),
+                                          fontSize:
+                                              ScreenUtil.horizontalScale(6.5),
                                           fontWeight: FontWeight.bold,
                                           height: 1.35,
                                         ),
@@ -339,9 +351,9 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
@@ -356,19 +368,23 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                         ? Container(
                             margin: EdgeInsets.only(top: media.height / 2.8),
                             width: media.width,
-                            padding: EdgeInsets.only(top: ScreenUtil.verticalScale(2)),
+                            padding: EdgeInsets.only(
+                                top: ScreenUtil.verticalScale(2)),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).scaffoldBackgroundColor,
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                                topLeft: Radius.circular(
+                                    ScreenUtil.horizontalScale(15)),
                               ),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(6)),
                               child: Consumer<DataProvider>(
                                 builder: (context, dataProvider, child) {
                                   return Column(
-                                    children: _getPaginatedEquipments().map((equipment) {
+                                    children: _getPaginatedEquipments()
+                                        .map((equipment) {
                                       return Column(
                                         children: [
                                           equipmentCard(
@@ -391,9 +407,11 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                               width: media.width,
                               height: media.height * 0.3,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(ScreenUtil.horizontalScale(15)),
+                                  topLeft: Radius.circular(
+                                      ScreenUtil.horizontalScale(15)),
                                 ),
                               ),
                               child: Align(
@@ -419,20 +437,23 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
           ],
         ),
       ),
-      bottomSheet: Consumer<DataProvider>(builder: (context, dataProvider, child) {
+      bottomSheet:
+          Consumer<DataProvider>(builder: (context, dataProvider, child) {
         return dataProvider.collectionData.equipments.isNotEmpty
             ? Container(
                 alignment: Alignment.center,
                 color: Colors.white,
                 height: 65,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 16)
+                      .copyWith(bottom: 10),
                   child: _numPages > 0
                       ? NumberPaginator(
                           numberPages: _numPages,
                           config: const NumberPaginatorUIConfig(
                             height: 48,
-                            buttonSelectedForegroundColor: AppColors.primaryColor,
+                            buttonSelectedForegroundColor:
+                                AppColors.primaryColor,
                             buttonUnselectedForegroundColor: Colors.grey,
                             buttonUnselectedBackgroundColor: Colors.transparent,
                             buttonSelectedBackgroundColor: Colors.transparent,

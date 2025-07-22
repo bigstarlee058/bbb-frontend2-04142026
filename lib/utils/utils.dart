@@ -1,19 +1,60 @@
+import 'dart:developer';
+
+import 'package:bbb/components/common_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Utils {
   static DateTime formattedDate(String date) {
-    String utcTimeString = date;
-    DateTime utcTime = DateFormat("yyyy-MM-dd HH:mm:ss").parseUtc(utcTimeString);
-    DateTime localTime = utcTime.toLocal();
-    return localTime;
+    try {
+      DateFormat format = DateFormat("yyyy-MM-dd HH:mm:ss");
+      DateTime utcTime = format.parseUtc(date);
+      return utcTime.toLocal();
+    } catch (e) {
+      debugPrint("⚠️ Error parsing date: $e");
+      return DateTime.now();
+    }
   }
 
   static BorderRadius buttonRadius = BorderRadius.circular(20);
 
-  static RoundedRectangleBorder buttonStyle = RoundedRectangleBorder(borderRadius: buttonRadius);
+  static RoundedRectangleBorder buttonStyle =
+      RoundedRectangleBorder(borderRadius: buttonRadius);
 
-  static appImage(Size media, {FileImage? image, Widget? child, required String imageKey}) {
+  static appImage(Size media,
+      {String? image, Widget? child, required String imageKey, bool? val}) {
+    String? url = image!.startsWith('https://storage.cloud.google.com/')
+        ? image.replaceFirst('https://storage.cloud.google.com/',
+            'https://storage.googleapis.com/')
+        : image;
+    return val == true
+        ? Center(
+            child: Container(
+              height: media.height / 1,
+              width: media.width,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: CachedNetworkImageProvider(url),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: child,
+            ),
+          )
+        : appShimmerImage(
+            color: Colors.transparent,
+            networkImageUrl: url,
+            fit: BoxFit.cover,
+            height: media.height,
+            width: media.width,
+            borderRadius: BorderRadius.circular(0),
+            child: child,
+          );
+  }
+
+  static appFileImage(Size media,
+      {FileImage? image, Widget? child, required String imageKey}) {
     return Center(
       child: Container(
         height: media.height / 1,

@@ -80,7 +80,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Screenshot(
                   controller: screenshotController,
                   child: Container(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     child: SizedBox(
                       width: ScreenUtil.verticalScale(38),
                       height: ScreenUtil.verticalScale(38),
@@ -145,7 +145,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: ScreenUtil.verticalScale(1.6),
-                                        color: AppColors.blackColor,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -160,7 +163,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: ScreenUtil.verticalScale(1.6),
-                                      color: Colors.grey.shade600,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -176,7 +182,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: const Color(0xFFFFFFFF),
+                    color: Theme.of(context).cardColor,
                   ),
                   child: Stack(
                     children: [
@@ -296,7 +302,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                   fontSize:
                                                       ScreenUtil.verticalScale(
                                                           1.6),
-                                                  color: AppColors.blackColor,
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge
+                                                      ?.color,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -313,7 +322,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                 fontSize:
                                                     ScreenUtil.verticalScale(
                                                         1.6),
-                                                color: Colors.grey.shade600,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -352,7 +364,8 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                     .writeAsBytes(image);
                                                 await Share.shareXFiles(
                                                     [XFile(imagePath.path)],
-                                                    text: 'Check this out!');
+                                                    text:
+                                                        'I just achieved ${widget.achievements[currentPage].achievementAchievementId?.title ?? ""} of Booty By Bret! Join me in the app at https://bootybybret.com');
                                               },
                                             );
                                           } catch (e) {
@@ -405,7 +418,6 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                             final progress = calculateStepProgress(
                                 currentValue: currentValue,
                                 thresholds: thresholds ?? []);
-
                             return Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(5)),
@@ -430,7 +442,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   setState(() => currentPage = index);
                                 },
                                 totalSteps: widget.achievements.length,
-                                progress: progress == 0 ? 0 : (progress + 1),
+                                progress: progress == 0 ? 0 : (progress),
                               ),
                             );
                           }),
@@ -445,9 +457,12 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
           Positioned(
             right: -ScreenUtil.verticalScale(1.2),
             top: -ScreenUtil.verticalScale(1.2),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Align(
+                alignment: Alignment.centerRight,
                 child: Container(
                   decoration: const BoxDecoration(
                       color: AppColors.primaryColor,
@@ -460,9 +475,6 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                         color: Colors.white),
                   ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
               ),
             ),
           ),
@@ -477,13 +489,17 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
   }) {
     for (int i = 0; i < thresholds.length; i++) {
       if (currentValue < thresholds[i]) {
-        if (i == 0) return (currentValue / thresholds[0]);
-        final prev = thresholds[i - 1];
-        final next = thresholds[i];
-        final partial = (currentValue - prev) / (next - prev);
-        return i - 1 + partial;
+        if (i == 0) {
+          return currentValue / thresholds[0];
+        } else {
+          final prev = thresholds[i - 1];
+          final range = thresholds[i] - prev;
+          final progressInStep = (currentValue - prev) / range;
+          return i + progressInStep;
+        }
       }
     }
+
     return thresholds.length.toDouble();
   }
 }

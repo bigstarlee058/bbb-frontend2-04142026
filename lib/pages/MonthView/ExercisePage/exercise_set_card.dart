@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/choice_clip.dart';
-import 'package:bbb/components/expansion_panel.dart';
+import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
@@ -17,8 +14,8 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/widgets.dart';
 
 import 'notes_slideout.dart';
 
@@ -49,6 +46,7 @@ class ExerciseSetCard extends StatefulWidget {
     required this.setCount,
     required this.extraSetLength,
     required this.totalRIRSet,
+    required this.scrollController,
   });
 
   final Color color;
@@ -75,6 +73,7 @@ class ExerciseSetCard extends StatefulWidget {
   final bool available;
   final bool completed;
   final bool isFromNotification;
+  final ScrollController scrollController;
 
   @override
   State<ExerciseSetCard> createState() => _ExerciseSetCardState();
@@ -106,6 +105,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
   late TextEditingController _repsController;
   List<String> effortValue = ["0", "1", "2", "3", "4+"];
   String dataId = "";
+  final GlobalKey _cardKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -471,6 +471,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
     return isLoad
         ? SizedBox()
         : Column(
+            key: _cardKey,
             children: [
               Theme(
                 data: ThemeData().copyWith(
@@ -493,7 +494,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                         setState(() {
                           _isExpanded = !_isExpanded;
                         });
-                        monthProvider?.setShowTimerIndex(-1, -1, -1);
+                        // monthProvider?.setShowTimerIndex(-1, -1, -1);
 
                         monthProvider?.updateExpandedItem(!_isExpanded
                             ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
@@ -534,8 +535,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                       widget.completed ||
                                       setCompleted) {
                                     _showTimer = false;
-                                    await monthProvider?.setShowTimerIndex(
-                                        -1, -1, -1);
+                                    // await monthProvider?.setShowTimerIndex(
+                                    //     -1, -1, -1);
                                     await monthProvider?.updateExpandedItem(
                                         !_isExpanded
                                             ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
@@ -699,16 +700,29 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                     children: [
                                                       TextField(
                                                         maxLines: 1,
+                                                        maxLength: 3,
                                                         controller:
                                                             _weightController,
-                                                        keyboardType: Platform
+                                                        onTapOutside: (event) {
+                                                          FocusScope.of(context)
+                                                              .unfocus();
+                                                          if (_weightController
+                                                              .text.isEmpty) {
+                                                            _weightController
+                                                                .text = "0";
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                        keyboardType: /*Platform
                                                                 .isAndroid
-                                                            ? TextInputType
-                                                                .number
+                                                            ?*/
+                                                            TextInputType
+                                                                .number /*
                                                             : const TextInputType
                                                                 .numberWithOptions(
                                                                 decimal: false,
-                                                                signed: true),
+                                                                signed: true)*/
+                                                        ,
                                                         onSubmitted: (value) {
                                                           FocusScope.of(context)
                                                               .unfocus();
@@ -727,24 +741,15 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                                 : true,
                                                         decoration:
                                                             const InputDecoration(
+                                                          counterText: '',
                                                           border:
                                                               InputBorder.none,
                                                         ),
-                                                        onTap: () {
-                                                          if (_weightController
-                                                                  .text ==
-                                                              "0") {
-                                                            _weightController
-                                                                .clear();
-                                                          }
+                                                        onTap: () async {
+                                                          await weightOnTap(
+                                                              context);
                                                         },
                                                         onEditingComplete: () {
-                                                          if (_weightController
-                                                                  .text ==
-                                                              "0") {
-                                                            _weightController
-                                                                .clear();
-                                                          }
                                                           if (_weightController
                                                               .text.isEmpty) {
                                                             _weightController
@@ -753,10 +758,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                           }
                                                         },
                                                         onChanged: (value) {
-                                                          if (value == "0") {
-                                                            _weightController
-                                                                .clear();
-                                                          }
                                                           if (value.isEmpty) {
                                                             _weightController
                                                                 .text = "0";
@@ -851,21 +852,25 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                   child: TextFormField(
                                                     controller: _repsController,
                                                     focusNode: _nodeText2,
+                                                    maxLength: 3,
                                                     cursorColor:
                                                         AppColors.primaryColor,
-                                                    keyboardType: Platform
+                                                    keyboardType: /*Platform
                                                             .isAndroid
-                                                        ? TextInputType.number
-                                                        : const TextInputType
+                                                        ?*/
+                                                        TextInputType.number
+                                                    /*: const TextInputType
                                                             .numberWithOptions(
                                                             decimal: false,
-                                                            signed: true),
+                                                            signed: true)*/
+                                                    ,
                                                     textInputAction:
                                                         TextInputAction.done,
                                                     textAlign: TextAlign.center,
                                                     readOnly: false,
                                                     decoration:
                                                         const InputDecoration(
+                                                      counterText: '',
                                                       border: InputBorder.none,
                                                     ),
                                                     onChanged: (value) {
@@ -874,6 +879,28 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                             "0";
                                                         setState(() {});
                                                       }
+                                                    },
+                                                    onFieldSubmitted: (value) {
+                                                      FocusScope.of(context)
+                                                          .unfocus();
+                                                      if (value.isEmpty) {
+                                                        _repsController.text =
+                                                            "0";
+                                                        setState(() {});
+                                                      }
+                                                    },
+                                                    onTapOutside: (event) {
+                                                      FocusScope.of(context)
+                                                          .unfocus();
+                                                      if (_repsController
+                                                          .text.isEmpty) {
+                                                        _repsController.text =
+                                                            "0";
+                                                        setState(() {});
+                                                      }
+                                                    },
+                                                    onTap: () async {
+                                                      await repsOnTap(context);
                                                     },
                                                     inputFormatters: [
                                                       FilteringTextInputFormatter
@@ -1051,5 +1078,37 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
               ],
             ],
           );
+  }
+
+  Future<void> repsOnTap(BuildContext context) async {
+    if (_repsController.text == "0") {
+      _repsController.clear();
+    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (_cardKey.currentContext != null) {
+      final box = _cardKey.currentContext!.findRenderObject() as RenderBox;
+      final position = box.localToGlobal(Offset.zero, ancestor: null);
+      final double safeAreaTop = MediaQuery.of(context).padding.top;
+      final double appBarHeight =
+          Scaffold.maybeOf(context)?.appBarMaxHeight ?? kToolbarHeight;
+      final double desiredTop = safeAreaTop + appBarHeight + 8;
+      final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+      final double offset = widget.scrollController.offset +
+          position.dy -
+          desiredTop +
+          keyboardHeight;
+      widget.scrollController.animateTo(
+        offset < 0 ? 0 : offset,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  Future<void> weightOnTap(BuildContext context) async {
+    if (_weightController.text == "0") {
+      _weightController.clear();
+    }
+    await repsOnTap(context);
   }
 }

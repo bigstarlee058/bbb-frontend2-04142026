@@ -38,6 +38,7 @@ class JoinChallengeWidget extends StatelessWidget {
                 ClipPath(
                   clipper: MiddleClipper(),
                   child: Container(
+                    padding: EdgeInsets.all(ScreenUtil.verticalScale(1)),
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: featureChallenge.photo.isNotEmpty

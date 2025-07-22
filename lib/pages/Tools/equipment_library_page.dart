@@ -1,12 +1,14 @@
+import 'dart:developer';
+
 import 'package:bbb/components/back_arrow_widget.dart';
-import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/filter_sort_shop.dart';
 import 'package:bbb/models/equipment.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
-import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -61,15 +63,19 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
 
     return _filteredEquipments.sublist(
       startIndex,
-      endIndex > _filteredEquipments.length ? _filteredEquipments.length : endIndex,
+      endIndex > _filteredEquipments.length
+          ? _filteredEquipments.length
+          : endIndex,
     );
   }
 
   void _applyFilters() {
     setState(() {
       // Filter equipments based on selected equipment, category, and search query
-      _filteredEquipments = dataProvider!.adminEquipmentsData.where((equipment) {
-        bool matchesSearch = _searchQuery.isEmpty || equipment.title.toLowerCase().contains(_searchQuery.toLowerCase());
+      _filteredEquipments =
+          dataProvider!.adminEquipmentsData.where((equipment) {
+        bool matchesSearch = _searchQuery.isEmpty ||
+            equipment.title.toLowerCase().contains(_searchQuery.toLowerCase());
 
         return matchesSearch;
       }).toList();
@@ -94,9 +100,6 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-
-    // Fetch the equipments for the current page
-    // List<Equipment> paginatedEquipments = _getPaginatedEquipments();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -107,24 +110,13 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
               children: [
                 Stack(
                   children: [
-                    // Container(
-                    //   height: media.height / 1,
-                    //   width: media.width,
-                    //   decoration: const BoxDecoration(
-                    //     image: DecorationImage(
-                    //       image: AssetImage('assets/img/back.jpg'),
-                    //       fit: BoxFit.cover,
-                    //       opacity: 1,
-                    //     ),
-                    //   ),
-                    // ),
-                    Utils.appImage(
-                      media,
-                      // dataProvider?.screenBackgroundResponse?.imageApparel ?? "",
-                      image: dataProvider!.cachedImageMap["imageApparel"],
-
-                      imageKey: "imageDashboard",
-                    ),
+                    AppImage.imageApparel(
+                        // media,
+                        // image: dataProvider!.allImageList
+                        //     .where((element) => element["key"] == "imageApparel")
+                        //     .first["image"],
+                        // imageKey: "imageApparel",
+                        ),
                     SizedBox(
                       height: media.height / 2.5,
                       width: media.width,
@@ -132,7 +124,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                         child: Column(
                           children: [
                             AppBar(
-                              toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                              toolbarHeight: ScreenUtil.verticalScale(5.1),
+                              surfaceTintColor: Colors.transparent,
                               centerTitle: true,
                               backgroundColor: Colors.transparent,
                               leading: BackArrowWidget(
@@ -140,18 +133,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                   Navigator.pop(context);
                                 },
                               ),
-
-                              /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                              // Positioned(
-                              //   left: 0,
-                              //   child: BackArrowWidget(
-                              //     onPress: () {
-                              //       Navigator.pop(context);
-                              //     },
-                              //   ),
-                              // leading: SizedBox(),
                               title: Text(
-                                'Apparel & Equipment',
+                                'Shop',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: ScreenUtil.horizontalScale(5),
@@ -160,7 +143,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                               actions: [
                                 Padding(
                                   padding: const EdgeInsets.only(right: 10),
-                                  child: const CommonStreakWithNotification(routeString: '/equipmentLibrary'),
+                                  child: const CommonStreakWithNotification(
+                                      routeString: '/equipmentLibrary'),
                                 )
                               ],
                             ),
@@ -179,7 +163,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                     SearchEquipmentField(
                                       onChanged: (query) {
                                         setState(() {
-                                          _searchQuery = query; // Update the search query
+                                          _searchQuery =
+                                              query; // Update the search query
                                           _currentPage = 0;
                                           _applyFilters(); // Reset pagination when searching
                                         });
@@ -191,6 +176,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                     FilterSortButton(
                                       selectedSortBy: _selectedSortBy,
                                       onApplyFilters: (String sortBy) {
+                                        log('sortBy==========>>>>>${sortBy}');
                                         setState(() {
                                           _selectedSortBy = sortBy;
                                         });
@@ -213,9 +199,9 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                           child: Container(
                             height: media.height / 11,
                             width: media.width / 6,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                            ),
+                            decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor),
                           ),
                         ),
                       ),
@@ -226,11 +212,13 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                   margin: EdgeInsets.only(top: media.height / 3.2),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: (media.height - (media.height / 4) - (media.height * 0.12)),
+                      minHeight: (media.height -
+                          (media.height / 4) -
+                          (media.height * 0.12)),
                     ),
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -239,8 +227,8 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                       children: [
                         Container(
                           width: media.width,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(55),
                             ),
@@ -256,21 +244,26 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                   height: ScreenUtil.verticalScale(2),
                                 ),
                                 dataProvider == null ||
-                                        dataProvider!.adminEquipmentsData.isEmpty ||
+                                        dataProvider!
+                                            .adminEquipmentsData.isEmpty ||
                                         _filteredEquipments.isEmpty
                                     ? Container(
                                         color: Colors.white,
-                                        height: ScreenUtil.verticalScale((media.height - media.height / 3.2)),
+                                        height: ScreenUtil.verticalScale(
+                                            (media.height -
+                                                media.height / 3.2)),
                                       )
                                     : Column(
-                                        children: _getPaginatedEquipments().map((equipment) {
+                                        children: _getPaginatedEquipments()
+                                            .map((equipment) {
                                           return Column(
                                             children: [
                                               equipmentCard(
                                                 equipment, // Dynamically display equipment
                                               ),
                                               SizedBox(
-                                                height: ScreenUtil.verticalScale(2),
+                                                height:
+                                                    ScreenUtil.verticalScale(2),
                                               ),
                                             ],
                                           );
@@ -297,10 +290,11 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
       ),
       bottomSheet: Container(
         alignment: Alignment.center,
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         height: 65,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
           child: _numPages > 0
               ? NumberPaginator(
                   numberPages: _numPages,
@@ -342,7 +336,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
       child: Container(
         padding: EdgeInsets.only(right: ScreenUtil.horizontalScale(5)),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(8)),
           ),
@@ -364,9 +358,11 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                 appShimmerImage(
                   height: media.width / 4,
                   width: media.width / 4,
-                  networkImageUrl: equipment.thumbnail.startsWith('https://storage.cloud.google.com/')
-                      ? equipment.thumbnail
-                          .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+                  networkImageUrl: equipment.thumbnail
+                          .startsWith('https://storage.cloud.google.com/')
+                      ? equipment.thumbnail.replaceFirst(
+                          'https://storage.cloud.google.com/',
+                          'https://storage.googleapis.com/')
                       : equipment.thumbnail,
                   fit: BoxFit.cover,
                   borderRadius: BorderRadius.only(
@@ -374,41 +370,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                     bottomLeft: Radius.circular(ScreenUtil.verticalScale(12)),
                   ),
                 ),
-                // Container(
-                //   height: media.width / 4,
-                //   width: media.width / 4,
-                //   decoration: BoxDecoration(
-                //     image: DecorationImage(
-                //       image: equipment.thumbnail.isNotEmpty
-                //           ? NetworkImage(equipment.thumbnail.startsWith('https://storage.cloud.google.com/')
-                //               ? equipment.thumbnail
-                //                   .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                //               : equipment.thumbnail)
-                //           : const AssetImage('assets/img/library_placeholder.png'),
-                //       fit: BoxFit.cover,
-                //       opacity: 1,
-                //     ),
-                //     borderRadius: BorderRadius.only(
-                //       topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(8)),
-                //     ),
-                //   ),
-                // ),
-                const SizedBox(
-                  width: 10,
-                ),
-
-                // SizedBox(
-                //   width: media.width / 2.5,
-                //   child: Text(
-                //     equipment.title,
-                //     style: TextStyle(
-                //       color: AppColors.primaryColor,
-                //       fontSize: ScreenUtil.horizontalScale(4),
-                //       fontWeight: FontWeight.bold,
-                //     ),
-                //   ),
-                // ),
+                const SizedBox(width: 10),
               ],
             ),
             Expanded(
@@ -423,19 +385,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                       fontSize: ScreenUtil.verticalScale(2),
                       fontWeight: FontWeight.bold,
                     ),
-                    // maxLines: 1,
-                    // overflow: TextOverflow.ellipsis,
                   ),
-                  // SizedBox(height: ScreenUtil.verticalScale(0.5)),
-                  // Text(
-                  //   equipment.description,
-                  //   style: TextStyle(
-                  //     color: Colors.grey[600],
-                  //     fontSize: ScreenUtil.verticalScale(1.7),
-                  //   ),
-                  //   maxLines: 2,
-                  //   overflow: TextOverflow.ellipsis,
-                  // ),
                 ],
               ),
             ),
@@ -463,8 +413,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
 }
 
 class SearchEquipmentField extends StatelessWidget {
-  final ValueChanged<String> onChanged; // Add a callback for text change
-
+  final ValueChanged<String> onChanged;
   const SearchEquipmentField({super.key, required this.onChanged});
 
   @override
@@ -479,7 +428,7 @@ class SearchEquipmentField extends StatelessWidget {
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
       ),
       child: TextField(
-        onChanged: onChanged, // Notify the parent of text changes
+        onChanged: onChanged,
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           hintText: 'Search Equipment',
@@ -517,9 +466,7 @@ class FilterSortButton extends StatefulWidget {
 }
 
 class _FilterSortButtonState extends State<FilterSortButton> {
-  String _selectedSortBy = 'A-Z'; // Default value for sort by
-  // List<String> _selectedEquipmentIds = []; // Store selected equipment IDs
-  // List<String> _selectedCategoryIds = []; // Store selected category IDs
+  String _selectedSortBy = 'A-Z';
   @override
   void initState() {
     super.initState();
@@ -534,7 +481,17 @@ class _FilterSortButtonState extends State<FilterSortButton> {
       width: media.width,
       child: ElevatedButton(
         onPressed: () {
-          _showFilterSortDialog(context, media.width);
+          showDialog(
+            context: context,
+            builder: (_) => FilterSortDialogShop(
+              selectedSortBy: _selectedSortBy,
+              onApplyFilters: (sort) {
+                widget.onApplyFilters(sort);
+                _selectedSortBy = sort;
+                setState(() {});
+              },
+            ),
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF9a354e),
@@ -570,154 +527,175 @@ class _FilterSortButtonState extends State<FilterSortButton> {
     );
   }
 
-  void _showFilterSortDialog(BuildContext context, double dialogWidth) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            List<bool> isExpanded = [true, false, false];
-            return Dialog(
-              insetPadding: const EdgeInsets.all(0),
-              backgroundColor: Colors.white, // Popup background color
-              child: SingleChildScrollView(
-                // Wrap the content in a SingleChildScrollView
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: ScreenUtil.horizontalScale(90), // Set the width of the popup to match the button
-                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Filter & Sort Options',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color(0xFF9a354e), // White text
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              // IconButton(
-                              //   icon: const Icon(Icons.close, color: Color(0xFF9a354e)),
-                              //   onPressed: () {
-                              //     Navigator.of(context).pop();
-                              //   },
-                              // ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-
-                          // "Sort by" ExpansionTile with Radio buttons
-                          ExpansionTile(
-                            title: const Text(
-                              'Sort by',
-                              style: TextStyle(fontSize: 14), // Small white text
-                            ),
-                            textColor: const Color(0xFF9a354e),
-                            collapsedTextColor: Colors.black,
-                            collapsedShape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(color: Color.fromARGB(255, 252, 252, 252), width: 1),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(color: Color(0xFF9a354e), width: 1),
-                            ),
-                            iconColor: Colors.black,
-                            collapsedIconColor: const Color(0xFF9a354e),
-                            initiallyExpanded: isExpanded[0], // Set initial expanded state
-                            onExpansionChanged: (isExpandedState) {
-                              setState(() {
-                                // Set the current index to true and others to false
-                                isExpanded = [isExpandedState, false, false];
-                              });
-                            },
-                            children: <String>['A-Z', 'Z-A', 'Newest added', 'Oldest added'].map((String option) {
-                              return RadioListTile<String>(
-                                title: Text(option, style: const TextStyle(fontSize: 14, color: Colors.black)),
-                                value: option,
-                                groupValue: _selectedSortBy,
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    _selectedSortBy = value!;
-                                  });
-                                },
-                                activeColor: const Color(0xFF9a354e), // Change the checked color here
-                                hoverColor: Colors.white,
-                              );
-                            }).toList(),
-                          ),
-
-                          const SizedBox(height: 20),
-                          // Apply now button
-
-                          ButtonWidget(
-                              text: "Apply now",
-                              textColor: Colors.white,
-                              color: AppColors.primaryColor,
-                              onPress: () {
-                                Navigator.of(context).pop();
-                                widget.onApplyFilters(
-                                  _selectedSortBy,
-                                );
-                              },
-                              isLoading: false),
-
-                          // SizedBox(
-                          //   width: double.infinity,
-                          //   height: ScreenUtil.verticalScale(7),
-                          //   child: ElevatedButton(
-                          //     style: ElevatedButton.styleFrom(
-                          //       backgroundColor: const Color(0xFF9a354e), // Apply now button color
-                          //       padding: const EdgeInsets.symmetric(vertical: 10),
-                          //     ),
-                          //     onPressed: () {
-                          //       Navigator.of(context).pop();
-                          //       widget.onApplyFilters(
-                          //         _selectedSortBy,
-                          //       );
-                          //     },
-                          //     child: const Text(
-                          //       'Apply now',
-                          //       style: TextStyle(color: Colors.white, fontSize: 16),
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      right: -ScreenUtil.verticalScale(1.2),
-                      top: -ScreenUtil.verticalScale(1.2),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: GestureDetector(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                color: AppColors.primaryColor, borderRadius: BorderRadius.all(Radius.circular(100))),
-                            child: Padding(
-                              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
-                              child: Icon(size: ScreenUtil.verticalScale(2.5), Icons.close, color: Colors.white),
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+// void _showFilterSortDialog(BuildContext context, double dialogWidth) {
+//   showDialog(
+//     context: context,
+//     builder: (BuildContext context) {
+//       return StatefulBuilder(
+//         builder: (BuildContext context, StateSetter setState) {
+//           List<bool> isExpanded = [true, false, false];
+//           return Dialog(
+//             insetPadding: const EdgeInsets.all(0),
+//             backgroundColor: Colors.white, // Popup background color
+//             child: SingleChildScrollView(
+//               // Wrap the content in a SingleChildScrollView
+//               child: Stack(
+//                 clipBehavior: Clip.none,
+//                 children: [
+//                   Container(
+//                     width: ScreenUtil.horizontalScale(
+//                         90), // Set the width of the popup to match the button
+//                     padding: const EdgeInsets.symmetric(
+//                         vertical: 20, horizontal: 20),
+//                     child: Column(
+//                       mainAxisSize: MainAxisSize.min,
+//                       children: [
+//                         Row(
+//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                           children: [
+//                             const Text(
+//                               'Filter & Sort Options',
+//                               style: TextStyle(
+//                                 fontSize: 18,
+//                                 color: Color(0xFF9a354e), // White text
+//                                 fontWeight: FontWeight.bold,
+//                               ),
+//                             ),
+//                             // IconButton(
+//                             //   icon: const Icon(Icons.close, color: Color(0xFF9a354e)),
+//                             //   onPressed: () {
+//                             //     Navigator.of(context).pop();
+//                             //   },
+//                             // ),
+//                           ],
+//                         ),
+//                         const SizedBox(height: 20),
+//
+//                         // "Sort by" ExpansionTile with Radio buttons
+//                         ExpansionTile(
+//                           title: const Text(
+//                             'Sort by',
+//                             style:
+//                                 TextStyle(fontSize: 14), // Small white text
+//                           ),
+//                           textColor: const Color(0xFF9a354e),
+//                           collapsedTextColor: Colors.black,
+//                           collapsedShape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(10),
+//                             side: const BorderSide(
+//                                 color: Color.fromARGB(255, 252, 252, 252),
+//                                 width: 1),
+//                           ),
+//                           shape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(10),
+//                             side: const BorderSide(
+//                                 color: Color(0xFF9a354e), width: 1),
+//                           ),
+//                           iconColor: Colors.black,
+//                           collapsedIconColor: const Color(0xFF9a354e),
+//                           initiallyExpanded:
+//                               isExpanded[0], // Set initial expanded state
+//                           onExpansionChanged: (isExpandedState) {
+//                             setState(() {
+//                               // Set the current index to true and others to false
+//                               isExpanded = [isExpandedState, false, false];
+//                             });
+//                           },
+//                           children: <String>[
+//                             'A-Z',
+//                             'Z-A',
+//                             'Newest added',
+//                             'Oldest added'
+//                           ].map((String option) {
+//                             return RadioListTile<String>(
+//                               title: Text(option,
+//                                   style: const TextStyle(
+//                                       fontSize: 14, color: Colors.black)),
+//                               value: option,
+//                               groupValue: _selectedSortBy,
+//                               onChanged: (String? value) {
+//                                 setState(() {
+//                                   _selectedSortBy = value!;
+//                                 });
+//                               },
+//                               activeColor: const Color(
+//                                   0xFF9a354e), // Change the checked color here
+//                               hoverColor: Colors.white,
+//                             );
+//                           }).toList(),
+//                         ),
+//
+//                         const SizedBox(height: 20),
+//                         // Apply now button
+//
+//                         ButtonWidget(
+//                             text: "Apply now",
+//                             textColor: Colors.white,
+//                             color: AppColors.primaryColor,
+//                             onPress: () {
+//                               Navigator.of(context).pop();
+//                               widget.onApplyFilters(
+//                                 _selectedSortBy,
+//                               );
+//                             },
+//                             isLoading: false),
+//
+//                         // SizedBox(
+//                         //   width: double.infinity,
+//                         //   height: ScreenUtil.verticalScale(7),
+//                         //   child: ElevatedButton(
+//                         //     style: ElevatedButton.styleFrom(
+//                         //       backgroundColor: const Color(0xFF9a354e), // Apply now button color
+//                         //       padding: const EdgeInsets.symmetric(vertical: 10),
+//                         //     ),
+//                         //     onPressed: () {
+//                         //       Navigator.of(context).pop();
+//                         //       widget.onApplyFilters(
+//                         //         _selectedSortBy,
+//                         //       );
+//                         //     },
+//                         //     child: const Text(
+//                         //       'Apply now',
+//                         //       style: TextStyle(color: Colors.white, fontSize: 16),
+//                         //     ),
+//                         //   ),
+//                         // ),
+//                       ],
+//                     ),
+//                   ),
+//                   Positioned(
+//                     right: -ScreenUtil.verticalScale(1.2),
+//                     top: -ScreenUtil.verticalScale(1.2),
+//                     child: Align(
+//                       alignment: Alignment.centerRight,
+//                       child: GestureDetector(
+//                         child: Container(
+//                           decoration: const BoxDecoration(
+//                               color: AppColors.primaryColor,
+//                               borderRadius:
+//                                   BorderRadius.all(Radius.circular(100))),
+//                           child: Padding(
+//                             padding:
+//                                 EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+//                             child: Icon(
+//                                 size: ScreenUtil.verticalScale(2.5),
+//                                 Icons.close,
+//                                 color: Colors.white),
+//                           ),
+//                         ),
+//                         onTap: () {
+//                           Navigator.of(context).pop();
+//                         },
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//       );
+//     },
+//   );
+// }
 }

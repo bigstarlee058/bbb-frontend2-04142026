@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -7,6 +8,7 @@ import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -33,6 +35,7 @@ class WorkoutCard extends StatefulWidget {
     required this.isDaySkipped,
     required this.dataId,
     required this.image,
+    this.exerciseList,
   });
 
   final bool isSkipped;
@@ -53,6 +56,7 @@ class WorkoutCard extends StatefulWidget {
   final bool isDaySkipped;
   final int? roundIndex;
   final String image;
+  final List<ExerciseDataModel>? exerciseList;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
@@ -217,21 +221,23 @@ class _WorkoutCardState extends State<WorkoutCard> {
           ],
         ),
         child: ElevatedButton(
-          onPressed: widget.enabled && widget.onPress != null
-              ? () async {
-                  await getTotalSets();
-                  final provider =
-                      Provider.of<MonthProvider>(context, listen: false);
-                  widget.onPress!(
-                    () async => await getTotalSets(),
-                  );
-                  provider.updateSetValue(
-                      warmUpSetTotal, backOffSetTotal, workingSetTotal);
-                }
-              : null,
+          onPressed: widget.isEditMode
+              ? () => widget.openSwapModal!()
+              : widget.enabled && widget.onPress != null
+                  ? () async {
+                      await getTotalSets();
+                      final provider =
+                          Provider.of<MonthProvider>(context, listen: false);
+                      widget.onPress!(
+                        () async => await getTotalSets(),
+                      );
+                      provider.updateSetValue(
+                          warmUpSetTotal, backOffSetTotal, workingSetTotal);
+                    }
+                  : null,
           style: ElevatedButton.styleFrom(
-            disabledBackgroundColor: const Color(0xFFF3F3F3),
-            backgroundColor: Colors.white,
+            disabledBackgroundColor: Theme.of(context).disabledColor,
+            backgroundColor: Theme.of(context).cardColor,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
@@ -328,18 +334,26 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          widget.name,
-                          style: TextStyle(
-                              color: (widget.exercise.isAddedUpdated ?? false)
-                                  ? AppColors.skipDayColor
-                                  : AppColors.primaryColor,
-                              fontSize: ScreenUtil.horizontalScale(3.8),
-                              fontWeight: FontWeight.bold,
-                              height: 1.2),
-                        ),
+                        Builder(builder: (context) {
+                          final data = widget.exerciseList!.where((element) =>
+                              element.exerciseId != widget.exerciseId);
+                          return Text(
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            widget.name,
+                            style: TextStyle(
+                                color: ((widget.exercise.isAddedUpdated ??
+                                                false) &&
+                                            data.isNotEmpty) ||
+                                        (widget.exercise.newAddedExercise ??
+                                            false)
+                                    ? AppColors.skipDayColor
+                                    : AppColors.primaryColor,
+                                fontSize: ScreenUtil.horizontalScale(3.8),
+                                fontWeight: FontWeight.bold,
+                                height: 1.2),
+                          );
+                        }),
                         widget.isCircuit
                             ? SizedBox()
                             : Padding(
@@ -372,36 +386,42 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     ),
                   ),
                   if (widget.enabled && !widget.isEditMode) ...[
-                    GestureDetector(
-                      onTap: widget.enabled
-                          ? () async {
-                              await getTotalSets();
-                              final provider = Provider.of<MonthProvider>(
-                                  context,
-                                  listen: false);
-                              widget.onPress!(
-                                () async => await getTotalSets(),
-                              );
-                              provider.updateSetValue(warmUpSetTotal,
-                                  backOffSetTotal, workingSetTotal);
-                            }
-                          : null,
-                      child: Container(
-                        padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5))
-                            .copyWith(right: 5),
-                        decoration: BoxDecoration(
-                          color: (widget.exercise.isAddedUpdated ?? false)
-                              ? AppColors.skipDayColor
-                              : AppColors.primaryColor,
-                          shape: BoxShape.circle,
+                    Builder(builder: (context) {
+                      final data = widget.exerciseList!.where(
+                          (element) => element.exerciseId != widget.exerciseId);
+                      return GestureDetector(
+                        onTap: widget.enabled
+                            ? () async {
+                                await getTotalSets();
+                                final provider = Provider.of<MonthProvider>(
+                                    context,
+                                    listen: false);
+                                widget.onPress!(
+                                  () async => await getTotalSets(),
+                                );
+                                provider.updateSetValue(warmUpSetTotal,
+                                    backOffSetTotal, workingSetTotal);
+                              }
+                            : null,
+                        child: Container(
+                          padding: EdgeInsets.all(ScreenUtil.verticalScale(0.5))
+                              .copyWith(right: 5),
+                          decoration: BoxDecoration(
+                            color: ((widget.exercise.isAddedUpdated ?? false) &&
+                                        data.isNotEmpty) ||
+                                    (widget.exercise.newAddedExercise ?? false)
+                                ? AppColors.skipDayColor
+                                : AppColors.primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.play_arrow,
+                            color: Colors.white,
+                            size: ScreenUtil.verticalScale(3),
+                          ),
                         ),
-                        child: Icon(
-                          Icons.play_arrow,
-                          color: Colors.white,
-                          size: ScreenUtil.verticalScale(3),
-                        ),
-                      ),
-                    ),
+                      );
+                    }),
                   ],
                   if (widget.isEditMode && !widget.isCircuit) ...[
                     Row(

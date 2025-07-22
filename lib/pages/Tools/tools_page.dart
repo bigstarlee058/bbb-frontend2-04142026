@@ -6,6 +6,7 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +39,7 @@ class _ToolsPageState extends State<ToolsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -49,12 +50,16 @@ class _ToolsPageState extends State<ToolsPage> {
                   children: [
                     Stack(
                       children: [
-                        Utils.appImage(
-                          media,
-                          // dataProvider?.screenBackgroundResponse?.imageTools ?? "",
-                          image: dataProvider!.cachedImageMap["imageTools"],
-                          imageKey: "imageTools",
-                        ),
+                        AppImage.imageTools(
+                            // media,
+                            // // dataProvider?.screenBackgroundResponse?.imageTools ?? "",
+                            // image: dataProvider!.allImageList
+                            //     .where(
+                            //         (element) => element["key"] == "imageTools")
+                            //     .first["image"],
+                            // // image: dataProvider!.cachedImageMap["imageTools"],
+                            // imageKey: "imageTools",
+                            ),
 
                         // Container(
                         //   height: media.height / 1,
@@ -74,7 +79,8 @@ class _ToolsPageState extends State<ToolsPage> {
                             child: Column(
                               children: [
                                 AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1), surfaceTintColor: Colors.transparent,
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
                                   backgroundColor: Colors.transparent,
                                   centerTitle: true,
                                   // leading: BackArrowWidget(
@@ -96,7 +102,8 @@ class _ToolsPageState extends State<ToolsPage> {
                                   actions: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(routeString: '/exerciseLibrary'),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: '/exerciseLibrary'),
                                     )
                                   ],
                                 ),
@@ -136,7 +143,9 @@ class _ToolsPageState extends State<ToolsPage> {
                           ),
                         ),
                         SizedBox(
-                          height: Platform.isAndroid ? media.height / 8.39 : media.height / 6.99,
+                          height: Platform.isAndroid
+                              ? media.height / 8.39
+                              : media.height / 6.99,
                           width: media.width,
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -145,8 +154,9 @@ class _ToolsPageState extends State<ToolsPage> {
                               child: Container(
                                 height: media.height / 11,
                                 width: media.width / 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
                                 ),
                               ),
                             ),
@@ -157,13 +167,19 @@ class _ToolsPageState extends State<ToolsPage> {
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: Platform.isAndroid ? media.height / 8.5 : media.height / 7),
+                  margin: EdgeInsets.only(
+                      top: Platform.isAndroid
+                          ? media.height / 8.5
+                          : media.height / 7),
                   child: Container(
                     width: media.width,
                     constraints: BoxConstraints(
-                        minHeight: (media.height - (Platform.isAndroid ? media.height / 8.5 : media.height / 7))),
+                        minHeight: (media.height -
+                            (Platform.isAndroid
+                                ? media.height / 8.5
+                                : media.height / 7))),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
@@ -172,8 +188,8 @@ class _ToolsPageState extends State<ToolsPage> {
                       children: [
                         Container(
                           width: media.width,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(55),
                             ),
@@ -217,16 +233,20 @@ class _ToolsPageState extends State<ToolsPage> {
                                 //   url: '/nutritionCalculator',
                                 // ),
                                 Builder(builder: (context) {
-                                  bool isAppUser = userData?.user["singuptype"] != "web" ? true : false;
+                                  bool isAppUser =
+                                      userData?.user["singuptype"] != "web"
+                                          ? true
+                                          : false;
                                   return isAppUser
                                       ? SizedBox()
                                       : Column(
                                           children: [
                                             SizedBox(
-                                              height: ScreenUtil.verticalScale(1.3),
+                                              height:
+                                                  ScreenUtil.verticalScale(1.3),
                                             ),
                                             const ToolsPageButton(
-                                              title: 'Apparel & Equipment',
+                                              title: 'Shop',
                                               icon: 'assets/icons/apparel.svg',
                                               url: '/equipmentLibrary',
                                             ),

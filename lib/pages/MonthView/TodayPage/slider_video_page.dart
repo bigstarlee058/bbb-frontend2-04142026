@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -28,7 +29,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
   bool videoNotInitialized = false;
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  late Size videoSize;
+  Size? videoSize;
   Timer? _hideControlsTimer;
   bool isMute = true;
   DataProvider? dataProvider;
@@ -45,14 +46,23 @@ class _SliderVideoPageState extends State<SliderVideoPage>
     setState(() {
       loading = true;
     });
-    await dataProvider?.getVideoUsingVimeo(widget.videoUrl);
-    if (dataProvider!.videoModel!.files!.isNotEmpty) {
-      initializeVideo(dataProvider!.videoModel!.files![0].link ?? "");
-    } else {
-      loading = false;
-      videoNotInitialized = true;
-      setState(() {});
-    }
+    await dataProvider?.getVideoUsingVimeo(widget.videoUrl).then(
+      (value) {
+        if (dataProvider!.videoModel == null) {
+          loading = false;
+          videoNotInitialized = true;
+          setState(() {});
+        } else {
+          if (dataProvider!.videoModel!.files!.isNotEmpty) {
+            initializeVideo(dataProvider!.videoModel!.files![0].link ?? "");
+          } else {
+            loading = false;
+            videoNotInitialized = true;
+            setState(() {});
+          }
+        }
+      },
+    );
   }
 
   final ValueNotifier<Duration> videoProgressValue =
@@ -72,16 +82,19 @@ class _SliderVideoPageState extends State<SliderVideoPage>
   }
 
   Future<void> initializeVideo(String url) async {
+    if (hasClosedPopup) return;
     try {
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
-      await _videoPlayerController.initialize().then(
-        (value) {
-          AudioManager.requestAudioFocus();
-        },
-      );
+      await _videoPlayerController.initialize();
+      if (hasClosedPopup || !mounted) {
+        await _videoPlayerController.dispose();
+        return;
+      }
+
       await _videoPlayerController.setLooping(true);
+      AudioManager.requestAudioFocus();
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -93,7 +106,8 @@ class _SliderVideoPageState extends State<SliderVideoPage>
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
       _videoPlayerController.setVolume(rawData ? 1 : 0);
       isMute = rawData;
-      if (_chewieController != null &&
+      if (!hasClosedPopup &&
+          _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
         videoSize =
@@ -102,6 +116,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
       }
 
       _videoPlayerController.addListener(() async {
+        if (hasClosedPopup || !mounted) return;
         final position = _videoPlayerController.value.position;
         final duration = _videoPlayerController.value.duration;
         final bool isFinished =
@@ -129,22 +144,66 @@ class _SliderVideoPageState extends State<SliderVideoPage>
         waitingDuration: const Duration(milliseconds: 1800),
       );
 
-      setState(() {
-        loading = false;
-      });
+      if (!hasClosedPopup && mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        videoNotInitialized = true;
-        loading = false;
-      });
+      if (!hasClosedPopup) {
+        setState(() {
+          videoNotInitialized = true;
+          loading = false;
+        });
+      }
       debugPrint("VIDEO NOT INITIALIZED: $e");
     }
   }
+
+  bool hasClosedPopup = false;
 
   bool isZoom = false;
 
   bool showControls = true;
   bool isFullscreen = false;
+  Future<void> toggleFullscreen() async {
+    setState(() {
+      isFullscreen = !isFullscreen;
+    });
+    if (isFullscreen) {
+      final screenSize = MediaQuery.of(context).size;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoFullScreenView(
+              makeRefresh: () {
+                setState(() {});
+              },
+              isFullscreen: isFullscreen,
+              toggleFullscreen: toggleFullscreen,
+              controller: _controller,
+              isMute: isMute,
+              changeZoom: changeZoom,
+              chewieController: _chewieController!,
+              hideControls: hideControls,
+              isZoom: isZoom,
+              media: screenSize,
+              videoSize: videoSize!,
+              muteUnMute: muteUnMute,
+              showControls: showControls,
+              showControlsOnTap: showControlsOnTap,
+              showControlsOnTapOfPause: showControlsOnTapOfPause,
+              videoNotInitialized: videoNotInitialized,
+              videoPlayerController: _videoPlayerController,
+              videoProgressValue: videoProgressValue,
+            ),
+          ));
+    }
+  }
+
+  changeZoom(value) {
+    isZoom = value;
+  }
 
   muteUnMute() async {
     isMute = !isMute;
@@ -164,9 +223,11 @@ class _SliderVideoPageState extends State<SliderVideoPage>
   }
 
   void showControlsOnTap() {
-    setState(() => showControls = !showControls);
     if (_videoPlayerController.value.isPlaying) {
-      hideControls();
+      setState(() => showControls = !showControls);
+      if (_videoPlayerController.value.isPlaying) {
+        hideControls();
+      }
     }
   }
 
@@ -176,7 +237,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
   }
 
   Size calculateVideoSize({required double aspectRatio}) {
-    double maxWidth = ScreenUtil.horizontalScale(100);
+    double maxWidth = ScreenUtil.horizontalScale(84);
     double maxHeight = ScreenUtil.verticalScale(70);
     double calculatedHeight = maxWidth / aspectRatio;
     if (calculatedHeight > maxHeight) {
@@ -189,12 +250,25 @@ class _SliderVideoPageState extends State<SliderVideoPage>
 
   @override
   void dispose() {
-    if (_chewieController != null) {
-      _chewieController!.dispose();
-    }
-    _videoPlayerController.dispose();
+    hasClosedPopup = true;
+
+    try {
+      _videoPlayerController.pause();
+      _videoPlayerController.dispose();
+    } catch (_) {}
+
+    try {
+      _chewieController?.dispose();
+    } catch (_) {}
+
     AudioManager.abandonAudioFocus();
-    _controller.dispose();
+    _hideControlsTimer?.cancel();
+
+    // if (_chewieController != null) {
+    //   _chewieController!.dispose();
+    //   _videoPlayerController.dispose();
+    //   AudioManager.abandonAudioFocus();
+    // }
 
     super.dispose();
   }
@@ -214,11 +288,15 @@ class _SliderVideoPageState extends State<SliderVideoPage>
             borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.825),
+                  maxHeight: loading || videoSize == null
+                      ? MediaQuery.of(context).size.height * 0.825
+                      : videoSize!.height +
+                          ScreenUtil.verticalScale(
+                              videoSize!.height > 300 ? 12 : 10.5)),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: loading
                     ? const Center(
@@ -241,6 +319,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                             ],
                           )
                         : Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Stack(
                                 children: [
@@ -258,11 +337,14 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                               ? Stack(
                                                   children: [
                                                     SizedBox(
-                                                      height: videoSize.height +
-                                                          ScreenUtil
-                                                              .verticalScale(
-                                                                  2.5),
-                                                      width: videoSize.width +
+                                                      height: videoSize!
+                                                              .height +
+                                                          ScreenUtil.verticalScale(
+                                                              videoSize!.height >
+                                                                      300
+                                                                  ? 2.5
+                                                                  : .8),
+                                                      width: videoSize!.width +
                                                           ScreenUtil
                                                               .verticalScale(
                                                                   1.5),
@@ -271,7 +353,6 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                             _chewieController!,
                                                       ),
                                                     ),
-
                                                     AnimatedContainer(
                                                       duration: Duration(
                                                           milliseconds: 1300),
@@ -279,20 +360,18 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                       color: showControls
                                                           ? Colors.black38
                                                           : Colors.transparent,
-                                                      height: videoSize.height +
-                                                          ScreenUtil
-                                                              .verticalScale(
-                                                                  2.5),
-                                                      width: videoSize.width +
+                                                      height: videoSize!
+                                                              .height +
+                                                          ScreenUtil.verticalScale(
+                                                              videoSize!.height >
+                                                                      300
+                                                                  ? 2.5
+                                                                  : .8),
+                                                      width: videoSize!.width +
                                                           ScreenUtil
                                                               .verticalScale(
                                                                   1.5),
                                                     ),
-                                                    // Container(
-                                                    //   color: showControls ? Colors.black38 : Colors.transparent,
-                                                    //   height: videoSize.height,
-                                                    //   width: videoSize.width,
-                                                    // ),
                                                   ],
                                                 )
                                               : Container(
@@ -312,7 +391,8 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                     ),
                                   ),
                                   Positioned(
-                                    bottom: videoSize.height / 2,
+                                    bottom: videoSize!.height /
+                                        (videoSize!.height > 300 ? 2 : 2.7),
                                     left: 10,
                                     right: 10,
                                     child: AnimatedOpacity(
@@ -340,6 +420,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                           const Duration(
                                                               seconds: 10),
                                                     );
+                                                    _controller.forward();
                                                   }
                                                 : null,
                                           ),
@@ -409,6 +490,7 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                           const Duration(
                                                               seconds: 10),
                                                     );
+                                                    _controller.forward();
                                                   }
                                                 : null,
                                           ),
@@ -417,7 +499,8 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                     ),
                                   ),
                                   Positioned(
-                                    bottom: ScreenUtil.verticalScale(1),
+                                    bottom: ScreenUtil.verticalScale(
+                                        videoSize!.height > 300 ? 1 : -1.5),
                                     left: 10,
                                     right: 10,
                                     child: !videoNotInitialized &&
@@ -442,37 +525,69 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                             height: ScreenUtil
                                                                 .verticalScale(
                                                                     0.8)),
-                                                        Row(
-                                                          children: [
-                                                            Spacer(),
-                                                            GestureDetector(
-                                                              onTap:
-                                                                  showControls
-                                                                      ? () {
-                                                                          muteUnMute();
-                                                                        }
-                                                                      : null,
-                                                              child: Icon(
-                                                                isMute
-                                                                    ? Icons
-                                                                        .volume_up
-                                                                    : Icons
-                                                                        .volume_off,
-                                                                color: !showControls
-                                                                    ? Colors
-                                                                        .transparent
-                                                                    : Colors
-                                                                        .white70,
-                                                                size: 28,
+                                                        AnimatedOpacity(
+                                                          opacity: showControls
+                                                              ? 1.0
+                                                              : 0.0,
+                                                          duration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      800),
+                                                          curve:
+                                                              Curves.easeInOut,
+                                                          child: Row(
+                                                            children: [
+                                                              Spacer(),
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    showControls
+                                                                        ? () {
+                                                                            toggleFullscreen();
+                                                                          }
+                                                                        : null,
+                                                                child: Icon(
+                                                                  !isFullscreen
+                                                                      ? Icons
+                                                                          .fullscreen
+                                                                      : Icons
+                                                                          .fullscreen_exit,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  size: 28,
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    showControls
+                                                                        ? () {
+                                                                            muteUnMute();
+                                                                          }
+                                                                        : null,
+                                                                child: Icon(
+                                                                  isMute
+                                                                      ? Icons
+                                                                          .volume_up
+                                                                      : Icons
+                                                                          .volume_off,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  size: 28,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
                                                     SizedBox(
                                                         height: ScreenUtil
-                                                            .verticalScale(1)),
+                                                            .verticalScale(
+                                                                videoSize!.height >
+                                                                        300
+                                                                    ? 1
+                                                                    : 0.5)),
                                                     ValueListenableBuilder<
                                                         Duration>(
                                                       valueListenable:
@@ -517,27 +632,6 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                         );
                                                       },
                                                     ),
-                                                    // ProgressBar(
-                                                    //   collapsedBufferedBarColor: Colors.white,
-                                                    //   expandedBufferedBarColor: Colors.white,
-                                                    //   buffered: Duration(
-                                                    //       seconds: _videoPlayerController.value.buffered.isEmpty
-                                                    //           ? 0
-                                                    //           : _videoPlayerController.value.buffered.first.end.inSeconds),
-                                                    //   controller: _controller,
-                                                    //   progress: Duration(seconds: _videoPlayerController.value.position.inSeconds),
-                                                    //   total: Duration(seconds: _videoPlayerController.value.duration.inSeconds),
-                                                    //   onChanged: (value) {
-                                                    //     _videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
-                                                    //   },
-                                                    //   onSeek: (Duration value) {},
-                                                    //   onChangeStart: (value) {
-                                                    //     setState(() => isZoom = true);
-                                                    //   },
-                                                    //   onChangeEnd: (value) {
-                                                    //     setState(() => isZoom = false);
-                                                    //   },
-                                                    // ),
                                                     SizedBox(
                                                         height: ScreenUtil
                                                             .verticalScale(
@@ -545,43 +639,13 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                   ],
                                                 ),
                                               ),
-                                              // Container(
-                                              //   margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(6), left: 20, right: 20),
-                                              //   child: Row(
-                                              //     children: [
-                                              //       Expanded(
-                                              //         child: SliderTheme(
-                                              //           data: SliderTheme.of(context).copyWith(
-                                              //             thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
-                                              //             trackHeight: isZoom ? 7 : 4,
-                                              //             trackShape: RectangularSliderTrackShape(),
-                                              //             overlayShape: SliderComponentShape.noOverlay,
-                                              //           ),
-                                              //           child: Slider(
-                                              //             activeColor: Colors.red,
-                                              //             value: _videoPlayerController.value.position.inSeconds.toDouble(),
-                                              //             max: _videoPlayerController.value.duration.inSeconds.toDouble(),
-                                              //             onChangeStart: (value) {
-                                              //               setState(() => isZoom = true);
-                                              //             },
-                                              //             onChangeEnd: (value) {
-                                              //               setState(() => isZoom = false);
-                                              //             },
-                                              //             onChanged: (value) {
-                                              //               _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
-                                              //             },
-                                              //           ),
-                                              //         ),
-                                              //       ),
-                                              //     ],
-                                              //   ),
-                                              // ),
                                             ],
                                           )
                                         : const SizedBox(),
                                   ),
                                 ],
                               ),
+                              Spacer(),
                               Container(
                                 margin: EdgeInsets.only(
                                   top: ScreenUtil.verticalScale(1.5),
@@ -589,14 +653,17 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                   left: ScreenUtil.horizontalScale(3),
                                   right: ScreenUtil.horizontalScale(3),
                                 ),
-                                child: ButtonWidget(
-                                  text: "Close",
-                                  textColor: Colors.white,
-                                  onPress: () {
-                                    Navigator.pop(context);
-                                  },
-                                  color: AppColors.primaryColor,
-                                  isLoading: false,
+                                child: SizedBox(
+                                  height: ScreenUtil.verticalScale(6.4),
+                                  child: ButtonWidget(
+                                    text: "Close",
+                                    textColor: Colors.white,
+                                    onPress: () {
+                                      Navigator.pop(context);
+                                    },
+                                    color: AppColors.primaryColor,
+                                    isLoading: false,
+                                  ),
                                 ),
                               ),
                             ],
@@ -622,8 +689,21 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                         color: Colors.white),
                   ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
+                onTap: () async {
+                  hasClosedPopup = true;
+
+                  try {
+                    await _videoPlayerController.pause();
+                    await _videoPlayerController.dispose();
+                  } catch (_) {}
+
+                  try {
+                    _chewieController?.dispose();
+                  } catch (_) {}
+
+                  if (mounted) Navigator.of(context).pop();
+
+                  AudioManager.abandonAudioFocus();
                 },
               ),
             ),

@@ -24,8 +24,15 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
+    _tileKeys.clear();
+    final phaseCount = dataProvider?.programPhaseModel?.phases?.length ?? 0;
+    for (int i = 0; i < phaseCount; i++) {
+      _tileKeys.add(GlobalKey());
+    }
     super.initState();
   }
+
+  final List<GlobalKey> _tileKeys = [];
 
   final ScrollController _scrollController = ScrollController();
   @override
@@ -33,7 +40,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Consumer<DataProvider>(builder: (context, value, c) {
         return SingleChildScrollView(
           controller: _scrollController,
@@ -46,24 +53,31 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                     height: ScreenUtil.verticalScale(65),
                     width: media.width,
                     decoration: BoxDecoration(
-                      color: Color(0xFFEEEEEE).withValues(alpha: 0.8),
+                      color: Theme.of(context).cardColor,
                     ),
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: SafeArea(
                         child: value.programPhaseModel != null
-                            ? value.programPhaseModel!.phasesmaininfo!.thumbnail!.isEmpty
+                            ? value.programPhaseModel!.phasesmaininfo!
+                                    .thumbnail!.isEmpty
                                 ? Image.asset(
                                     "assets/img/program-phase-1.png",
                                   )
                                 : appShimmerImage(
                                     color: Colors.transparent,
                                     height: ScreenUtil.verticalScale(46),
-                                    networkImageUrl:
-                                        value.programPhaseModel!.phasesmaininfo!.thumbnail!.startsWith('https://storage.cloud.google.com/')
-                                            ? value.programPhaseModel!.phasesmaininfo!.thumbnail!
-                                                .replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                                            : value.programPhaseModel!.phasesmaininfo!.thumbnail!,
+                                    networkImageUrl: value.programPhaseModel!
+                                            .phasesmaininfo!.thumbnail!
+                                            .startsWith(
+                                                'https://storage.cloud.google.com/')
+                                        ? value.programPhaseModel!
+                                            .phasesmaininfo!.thumbnail!
+                                            .replaceFirst(
+                                                'https://storage.cloud.google.com/',
+                                                'https://storage.googleapis.com/')
+                                        : value.programPhaseModel!
+                                            .phasesmaininfo!.thumbnail!,
                                   )
                             : Image.asset(
                                 "assets/img/program-phase-1.png",
@@ -85,7 +99,8 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                               Stack(
                                 children: [
                                   Container(
-                                    margin: EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
+                                    margin: EdgeInsets.only(
+                                        left: ScreenUtil.horizontalScale(4)),
                                     decoration: const BoxDecoration(
                                       color: Color(0XFFd18a9b),
                                       shape: BoxShape.circle,
@@ -95,7 +110,9 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                                       height: ScreenUtil.verticalScale(4.65),
                                       child: IconButton(
                                         padding: EdgeInsets.zero,
-                                        icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                                        icon: const Icon(
+                                            Icons.keyboard_arrow_left,
+                                            color: Colors.white),
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
@@ -121,9 +138,8 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                         child: Container(
                           height: media.height / 11,
                           width: media.width / 6,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor),
                         ),
                       ),
                     ),
@@ -138,7 +154,7 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                 child: Container(
                   width: media.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                     ),
@@ -150,17 +166,21 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(6)),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2)),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(2)),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      value.programPhaseModel?.phasesmaininfo?.contenttitle ?? "",
+                                      value.programPhaseModel?.phasesmaininfo
+                                              ?.contenttitle ??
+                                          "",
                                       style: TextStyle(
                                         fontSize: ScreenUtil.verticalScale(3),
                                         fontWeight: FontWeight.bold,
@@ -168,15 +188,19 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                                       ),
                                     ),
                                     Container(
-                                      margin: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                      margin: const EdgeInsets.only(
+                                          top: 10.0, bottom: 10.0),
                                       alignment: Alignment.centerLeft,
                                       child: Padding(
                                         padding: const EdgeInsets.all(0.0),
                                         child: Text(
                                           "${value.programPhaseModel?.phasesmaininfo?.description}",
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 16,
-                                            color: Colors.grey,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color,
                                           ),
                                           textAlign: TextAlign.left,
                                         ),
@@ -188,12 +212,20 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                               ListView.separated(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
-                                separatorBuilder: (context, index) => SizedBox(height: 15),
-                                padding: EdgeInsets.symmetric(vertical: 12).copyWith(bottom: ScreenUtil.verticalScale(3.2)),
-                                itemCount: value.programPhaseModel?.phases?.length ?? 0,
+                                separatorBuilder: (context, index) =>
+                                    SizedBox(height: 15),
+                                padding: EdgeInsets.symmetric(vertical: 12)
+                                    .copyWith(
+                                        bottom: ScreenUtil.verticalScale(3.2)),
+                                itemCount:
+                                    value.programPhaseModel?.phases?.length ??
+                                        0,
                                 itemBuilder: (context, index) {
                                   return buildExpansionTileItem(
-                                      index, value.programPhaseModel!.phases![index], value.programPhaseModel?.phases?.length ?? 0);
+                                      index,
+                                      value.programPhaseModel!.phases![index],
+                                      value.programPhaseModel?.phases?.length ??
+                                          0);
                                 },
                               ),
                             ],
@@ -211,8 +243,50 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
     );
   }
 
+  void _scrollToTile(int index) {
+    // final context = _tileKeys[index].currentContext;
+    // if (context != null) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     Future.delayed(const Duration(milliseconds: 200), () {
+    //       if (_scrollController.hasClients) {
+    //         Scrollable.ensureVisible(
+    //           context,
+    //           duration: const Duration(milliseconds: 200),
+    //           curve: Curves.easeInOut,
+    //           alignment: 0.1,
+    //         );
+    //       }
+    //     });
+    //   });
+    // }
+
+    final context = _tileKeys[index].currentContext;
+    if (context != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(Duration(milliseconds: 200), () {
+          final RenderBox renderBox = context.findRenderObject() as RenderBox;
+          final position = renderBox.localToGlobal(Offset.zero);
+          final tileHeight = renderBox.size.height;
+          final screenHeight = MediaQuery.of(context).size.height;
+          final desiredOffset = _scrollController.offset +
+              position.dy +
+              tileHeight -
+              screenHeight +
+              50;
+          final maxScroll = _scrollController.position.maxScrollExtent;
+          _scrollController.animateTo(
+            desiredOffset.clamp(0, maxScroll),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+          );
+        });
+      });
+    }
+  }
+
   ExpansionTileItem buildExpansionTileItem(int index, Phase item, int length) {
     return ExpansionTileItem(
+      key: _tileKeys[index],
       tilePadding: EdgeInsets.symmetric(
         horizontal: ScreenUtil.horizontalScale(5),
         vertical: ScreenUtil.verticalScale(0.5),
@@ -220,7 +294,9 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
       title: Padding(
         padding: EdgeInsets.only(
           top: ScreenUtil.verticalScale(1.5),
-          bottom: _expandedStates[index] == true ? 0 : ScreenUtil.verticalScale(1.5),
+          bottom: _expandedStates[index] == true
+              ? 0
+              : ScreenUtil.verticalScale(1.5),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,17 +321,23 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
           _expandedStates[index] = value;
         });
 
-        if (value == true && index == length - 1) {
+        // if (value == true && index == length - 1) {
+        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     Future.delayed(const Duration(milliseconds: 200), () {
+        //       if (_scrollController.hasClients) {
+        //         _scrollController.animateTo(
+        //           _scrollController.position.maxScrollExtent,
+        //           duration: const Duration(milliseconds: 100),
+        //           curve: Curves.easeOut,
+        //         );
+        //       }
+        //     });
+        //   });
+        // }
+
+        if (value) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Future.delayed(const Duration(milliseconds: 200), () {
-              if (_scrollController.hasClients) {
-                _scrollController.animateTo(
-                  _scrollController.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOut,
-                );
-              }
-            });
+            _scrollToTile(index);
           });
         }
       },
@@ -263,13 +345,15 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
       collapsedBackgroundColor: const Color(0xFF0D0D0D),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(3)),
-        color: AppColors.greyColor,
+        color: Theme.of(context).cardColor,
       ),
       iconColor: AppColors.primaryColor,
-      collapsedIconColor: Colors.white,
+      collapsedIconColor: Theme.of(context).cardColor,
       trailing: Padding(
         padding: EdgeInsets.only(
-          bottom: _expandedStates[index] == true ? 0 : ScreenUtil.verticalScale(1.5),
+          bottom: _expandedStates[index] == true
+              ? 0
+              : ScreenUtil.verticalScale(1.5),
           top: ScreenUtil.verticalScale(1.5),
           right: ScreenUtil.horizontalScale(5),
         ),
@@ -288,7 +372,9 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                   color: AppColors.primaryColor,
                 ),
                 child: Icon(
-                  _expandedStates[index] == true ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
+                  _expandedStates[index] == true
+                      ? Icons.keyboard_arrow_up_outlined
+                      : Icons.keyboard_arrow_down_outlined,
                   color: Colors.white,
                   size: ScreenUtil.verticalScale(3),
                 ),
@@ -297,13 +383,18 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
           ],
         ),
       ),
-      childrenPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(0.7)),
+      childrenPadding:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(0.7)),
       isDefaultVerticalPadding: false,
       children: [
+        // Text(item.description ?? "")
         NewspaperLayoutWidget(
           text: item.description ?? "",
-          imageUrl: (item.thumbnail ?? "").startsWith('https://storage.cloud.google.com/')
-              ? (item.thumbnail ?? "").replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
+          imageUrl: (item.thumbnail ?? "")
+                  .startsWith('https://storage.cloud.google.com/')
+              ? (item.thumbnail ?? "").replaceFirst(
+                  'https://storage.cloud.google.com/',
+                  'https://storage.googleapis.com/')
               : (item.thumbnail ?? ""),
         ),
       ],

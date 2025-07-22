@@ -4,6 +4,7 @@ import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -37,10 +38,13 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Utils.appImage(
-                media,
-                image: dataProvider!.cachedImageMap["imageEmailConfirm"],
-                imageKey: "imageEmailConfirm",
+              AppImage.imageEmailConfirm(
+                // media,
+                // image: dataProvider!.allImageList
+                //     .where((element) => element["key"] == "imageEmailConfirm")
+                //     .first["image"],
+                // // image: dataProvider!.cachedImageMap["imageEmailConfirm"],
+                // imageKey: "imageEmailConfirm",
                 child: Column(
                   children: [
                     Align(
@@ -62,7 +66,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               height: 120,
               width: media.width,
               decoration: const BoxDecoration(
-                image: DecorationImage(image: AssetImage('assets/img/bbb-logo.png'), fit: BoxFit.fitHeight, opacity: 1),
+                image: DecorationImage(
+                    image: AssetImage('assets/img/bbb-logo.png'),
+                    fit: BoxFit.fitHeight,
+                    opacity: 1),
               ),
             ),
           ),
@@ -71,8 +78,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               child: Container(
                 width: media.width,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(ScreenUtil.verticalScale(8))),
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(ScreenUtil.verticalScale(8))),
                 ),
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -85,20 +93,21 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         child: Container(
                           height: media.height / 9.8,
                           width: media.width / 6,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor),
                         ),
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(1)),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(1)),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.verticalScale(3)),
                             child: Stack(
                               clipBehavior: Clip.none,
                               children: [
@@ -112,19 +121,23 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                       Text(
                                         'CONFIRM YOUR EMAIL',
                                         style: TextStyle(
-                                          fontSize: ScreenUtil.verticalScale(3.32),
+                                          fontSize:
+                                              ScreenUtil.verticalScale(3.32),
                                           color: AppColors.primaryColor,
                                           height: 1.5,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(3)),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                ScreenUtil.verticalScale(3)),
                                         child: Text(
                                           'A verification email has been sent to your inbox. Please click the link in the email to confirm your account.',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            fontSize: ScreenUtil.verticalScale(1.7),
+                                            fontSize:
+                                                ScreenUtil.verticalScale(1.7),
                                             height: 1.5,
                                             color: Color(0xff6f6f6f),
                                           ),
@@ -140,7 +153,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             height: ScreenUtil.horizontalScale(23),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.verticalScale(4)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.verticalScale(4)),
                             child: ButtonWidget(
                               text: "Back to Login",
                               textColor: Colors.white,

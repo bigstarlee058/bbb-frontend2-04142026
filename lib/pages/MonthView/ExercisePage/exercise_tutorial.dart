@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -13,7 +14,7 @@ import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart
 import 'package:video_player/video_player.dart';
 
 class ExerciseTutorialScreen extends StatefulWidget {
-  const ExerciseTutorialScreen({
+  ExerciseTutorialScreen({
     super.key,
     required this.loading,
     required this.dataProvider,
@@ -23,6 +24,7 @@ class ExerciseTutorialScreen extends StatefulWidget {
     required this.videoSize,
     required this.controller,
     required this.videoProgressValue,
+    required this.hasClosedPopup,
   });
 
   final bool loading;
@@ -33,6 +35,7 @@ class ExerciseTutorialScreen extends StatefulWidget {
   final Size videoSize;
   final ProgressBarController controller;
   final ValueNotifier<Duration> videoProgressValue;
+  bool hasClosedPopup;
 
   @override
   State<ExerciseTutorialScreen> createState() => _ExerciseTutorialScreenState();
@@ -94,17 +97,56 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
     setState(() => showControls1 = true);
   }
 
-  void toggleFullscreen1() {
+  // void toggleFullscreen1() {
+  //   setState(() {
+  //     isFullscreen1 = !isFullscreen1;
+  //   });
+  //   if (isFullscreen1) {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+  //   } else {
+  //     SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  //   }
+  // }
+
+  Future<void> toggleFullscreen() async {
     setState(() {
       isFullscreen1 = !isFullscreen1;
     });
     if (isFullscreen1) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
-    } else {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      final screenSize = MediaQuery.of(context).size;
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoFullScreenView(
+              makeRefresh: () {
+                setState(() {});
+              },
+              isFullscreen: isFullscreen1,
+              toggleFullscreen: toggleFullscreen,
+              controller: widget.controller,
+              isMute: isMute1,
+              changeZoom: changeZoom,
+              chewieController: widget.chewieController,
+              hideControls: hideControls1,
+              isZoom: isZoom1,
+              media: screenSize,
+              videoSize: widget.videoSize,
+              muteUnMute: muteUnMute1,
+              showControls: showControls1,
+              showControlsOnTap: showControlsOnTap1,
+              showControlsOnTapOfPause: showControlsOnTapOfPause1,
+              videoNotInitialized: widget.videoNotInitialized,
+              videoPlayerController: widget.videoPlayerController,
+              videoProgressValue: widget.videoProgressValue,
+            ),
+          ));
     }
+  }
+
+  changeZoom(value) {
+    isZoom1 = value;
   }
 
   updateDonTShowAgain(value) async {
@@ -135,7 +177,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFFFFFFFF),
+                  color: Theme.of(context).cardColor,
                 ),
                 child: widget.loading
                     ? const Center(
@@ -230,6 +272,8 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                                               const Duration(
                                                                   seconds: 10),
                                                         );
+                                                        widget.controller
+                                                            .forward();
                                                       }
                                                     : null,
                                               ),
@@ -308,6 +352,8 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                                               const Duration(
                                                                   seconds: 10),
                                                         );
+                                                        widget.controller
+                                                            .forward();
                                                       }
                                                     : null,
                                               ),
@@ -343,30 +389,57 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                                           height: ScreenUtil
                                                               .verticalScale(
                                                                   0.8)),
-                                                      Row(
-                                                        children: [
-                                                          Spacer(),
-                                                          GestureDetector(
-                                                            onTap: showControls1
-                                                                ? () {
-                                                                    muteUnMute1();
-                                                                  }
-                                                                : null,
-                                                            child: Icon(
-                                                              isMute1
-                                                                  ? Icons
-                                                                      .volume_up
-                                                                  : Icons
-                                                                      .volume_off,
-                                                              color: !showControls1
-                                                                  ? Colors
-                                                                      .transparent
-                                                                  : Colors
-                                                                      .white70,
-                                                              size: 28,
+                                                      AnimatedOpacity(
+                                                        opacity: showControls1
+                                                            ? 1.0
+                                                            : 0.0,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    800),
+                                                        curve: Curves.easeInOut,
+                                                        child: Row(
+                                                          children: [
+                                                            Spacer(),
+                                                            GestureDetector(
+                                                              onTap:
+                                                                  showControls1
+                                                                      ? () {
+                                                                          toggleFullscreen();
+                                                                        }
+                                                                      : null,
+                                                              child: Icon(
+                                                                !isFullscreen1
+                                                                    ? Icons
+                                                                        .fullscreen
+                                                                    : Icons
+                                                                        .fullscreen_exit,
+                                                                color: Colors
+                                                                    .white70,
+                                                                size: 28,
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            SizedBox(width: 10),
+                                                            GestureDetector(
+                                                              onTap:
+                                                                  showControls1
+                                                                      ? () {
+                                                                          muteUnMute1();
+                                                                        }
+                                                                      : null,
+                                                              child: Icon(
+                                                                isMute1
+                                                                    ? Icons
+                                                                        .volume_up
+                                                                    : Icons
+                                                                        .volume_off,
+                                                                color: Colors
+                                                                    .white70,
+                                                                size: 28,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -377,14 +450,14 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                                   //   collapsedBufferedBarColor: Colors.white,
                                                   //   expandedBufferedBarColor: Colors.white,
                                                   //   buffered: Duration(
-                                                  //       seconds: widget.videoPlayerController.value.buffered.isEmpty
+                                                  //       seconds: value.videoPlayerController.value.buffered.isEmpty
                                                   //           ? 0
-                                                  //           : widget.videoPlayerController.value.buffered.first.end.inSeconds),
-                                                  //   controller: widget.controller,
-                                                  //   progress: Duration(seconds: widget.videoPlayerController.value.position.inSeconds),
-                                                  //   total: Duration(seconds: widget.videoPlayerController.value.duration.inSeconds),
+                                                  //           : value.videoPlayerController.value.buffered.first.end.inSeconds),
+                                                  //   controller: value.controller,
+                                                  //   progress: Duration(seconds: value.videoPlayerController.value.position.inSeconds),
+                                                  //   total: Duration(seconds: value.videoPlayerController.value.duration.inSeconds),
                                                   //   onChanged: (value) {
-                                                  //     widget.videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
+                                                  //     value.videoPlayerController.seekTo(Duration(seconds: value.inSeconds));
                                                   //   },
                                                   //   onSeek: (Duration value) {},
                                                   //   onChangeStart: (value) {
@@ -429,18 +502,18 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                                               .duration
                                                               .inSeconds,
                                                         ),
-                                                        onChanged: (value) {
+                                                        onChanged: (v) {
                                                           widget
                                                               .videoPlayerController
                                                               .seekTo(Duration(
-                                                                  seconds: value
+                                                                  seconds: v
                                                                       .inSeconds));
                                                         },
-                                                        onSeek: (value) {},
-                                                        onChangeStart: (value) {
+                                                        onSeek: (v) {},
+                                                        onChangeStart: (v) {
                                                           isZoom1 = true;
                                                         },
-                                                        onChangeEnd: (value) {
+                                                        onChangeEnd: (v) {
                                                           isZoom1 = false;
                                                         },
                                                       );
@@ -466,8 +539,8 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                             //           ),
                                             //           child: Slider(
                                             //             activeColor: Colors.red,
-                                            //             value: widget.videoPlayerController.value.position.inSeconds.toDouble(),
-                                            //             max: widget.videoPlayerController.value.duration.inSeconds.toDouble(),
+                                            //             value: value.videoPlayerController.value.position.inSeconds.toDouble(),
+                                            //             max: value.videoPlayerController.value.duration.inSeconds.toDouble(),
                                             //             onChangeStart: (value) {
                                             //               setState(() => isZoom1 = true);
                                             //             },
@@ -475,7 +548,7 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                             //               setState(() => isZoom1 = false);
                                             //             },
                                             //             onChanged: (value) {
-                                            //               widget.videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                                            //               value.videoPlayerController.seekTo(Duration(seconds: value.toInt()));
                                             //               setState(() {});
                                             //             },
                                             //           ),
@@ -503,7 +576,10 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                 style: TextStyle(
                                   fontSize: ScreenUtil.verticalScale(1.75),
                                   height: 1.5,
-                                  color: Colors.grey.shade700,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
                                 ),
                               ),
                             ),
@@ -516,15 +592,18 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                                   Checkbox(
                                     activeColor: AppColors.primaryColor,
                                     value: dontShowAgain1,
-                                    onChanged: (value) async {
-                                      await updateDonTShowAgain(value);
+                                    onChanged: (v) async {
+                                      await updateDonTShowAgain(v);
                                     },
                                   ),
                                   Text(
                                     "Do not show again.",
                                     style: TextStyle(
                                       fontSize: ScreenUtil.verticalScale(1.8),
-                                      color: Colors.black,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                   )
                                 ],
@@ -571,8 +650,21 @@ class _ExerciseTutorialScreenState extends State<ExerciseTutorialScreen>
                         color: Colors.white),
                   ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
+                onTap: () async {
+                  widget.hasClosedPopup = true;
+
+                  try {
+                    await widget.videoPlayerController.pause();
+                    await widget.videoPlayerController.dispose();
+                  } catch (_) {}
+
+                  try {
+                    widget.chewieController.dispose();
+                  } catch (_) {}
+
+                  if (mounted) Navigator.of(context).pop();
+
+                  AudioManager.abandonAudioFocus();
                 },
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/track_card.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,7 @@ class _ScheduleSectionState extends State<ScheduleSection> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         widget.monthProvider.updateWeekExpandedHeight(-1, -1);
+        widget.monthProvider.expandWeeks.clear();
       },
     );
     super.dispose();
@@ -50,7 +52,7 @@ class _ScheduleSectionState extends State<ScheduleSection> {
         return SizedBox(
           height: ScreenUtil.verticalScale(6) +
               ScreenUtil.verticalScale(
-                  (value.isCurrentMonth == "Current" ? 43 : 33) +
+                  (value.isCurrentMonth == "Current" ? 38 : 29) +
                       (value.weekExpandedHeight).toDouble()),
           child: PageView.builder(
             reverse: true,
@@ -98,6 +100,18 @@ class _ScheduleSectionState extends State<ScheduleSection> {
                               padding: EdgeInsets.zero,
                               physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
+                                DateTime endDate =
+                                    value.monthDataModel?.startDate ??
+                                        DateTime.now();
+
+                                DateTime start = (DateTime(
+                                        endDate.year,
+                                        endDate.month,
+                                        endDate
+                                            .day) /*)
+                                    .add(Duration(days: 27)*/
+                                    );
+
                                 return /*index != 1
                                     ? SizedBox()
                                     :*/
@@ -119,9 +133,8 @@ class _ScheduleSectionState extends State<ScheduleSection> {
                                       weekIndex: index,
                                       isOpened: false,
                                       isCompleted: false,
-                                      startDate:
-                                          (value.startTime ?? DateTime.now())
-                                              .add(Duration(days: index * 7)),
+                                      startDate: (start)
+                                          .add(Duration(days: index * 7)),
                                       cardData: value.weeksDataList[index],
                                       daySplit: split,
                                       expandedVal: (index + 1) == value.week
@@ -186,8 +199,6 @@ class _ScheduleSectionState extends State<ScheduleSection> {
                                           onPress: monthProvider
                                                   .todayTitleId.isEmpty
                                               ? () async {
-                                                  log('monthProvider.week==========>>>>>${monthProvider.week}');
-
                                                   if (monthProvider
                                                       .expandWeeks.isEmpty) {
                                                     int mainIndex =
@@ -197,21 +208,19 @@ class _ScheduleSectionState extends State<ScheduleSection> {
 
                                                     monthProvider
                                                         .updateWeekExpandedHeight(
-                                                            86, mainIndex);
+                                                            89, mainIndex);
                                                     monthProvider
                                                         .updateExpandWeeks(
                                                             mainIndex);
 
                                                     setState(() {});
 
-                                                    log('monthProvider.week==========>>>>>${monthProvider.week}');
                                                     await Future.delayed(
                                                             Duration(
                                                                 milliseconds:
                                                                     20))
                                                         .then(
                                                       (v) {
-                                                        log('widget==========>>>>>${widget.keys}');
                                                         Scrollable
                                                             .ensureVisible(
                                                           widget
