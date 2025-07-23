@@ -320,6 +320,7 @@ class _AppTutorialState extends State<AppTutorial>
                           ),
                         )
                       : SingleChildScrollView(
+                          physics: ClampingScrollPhysics(),
                           child: Column(
                             children: [
                               // SizedBox(height: ScreenUtil.verticalScale(5)),
@@ -749,22 +750,22 @@ class _AppTutorialState extends State<AppTutorial>
                               ),
                               SizedBox(height: ScreenUtil.verticalScale(1)),
                               // Button at the bottom
-                              Container(
-                                margin: EdgeInsets.only(
-                                  bottom: ScreenUtil.verticalScale(2.5),
-                                  left: ScreenUtil.horizontalScale(5),
-                                  right: ScreenUtil.horizontalScale(5),
-                                ),
-                                child: ButtonWidget(
-                                  text: "Close",
-                                  textColor: Colors.white,
-                                  onPress: () {
-                                    Navigator.pop(context);
-                                  },
-                                  color: AppColors.primaryColor,
-                                  isLoading: false,
-                                ),
-                              ),
+                              // Container(
+                              //   margin: EdgeInsets.only(
+                              //     bottom: ScreenUtil.verticalScale(2.5),
+                              //     left: ScreenUtil.horizontalScale(5),
+                              //     right: ScreenUtil.horizontalScale(5),
+                              //   ),
+                              //   child: ButtonWidget(
+                              //     text: "Close",
+                              //     textColor: Colors.white,
+                              //     onPress: () {
+                              //       Navigator.pop(context);
+                              //     },
+                              //     color: AppColors.primaryColor,
+                              //     isLoading: false,
+                              //   ),
+                              // ),
                             ],
                           ),
                         )),

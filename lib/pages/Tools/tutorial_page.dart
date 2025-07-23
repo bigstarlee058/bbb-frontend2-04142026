@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -168,17 +170,33 @@ class _TutorialPageState extends State<TutorialPage> {
                     ),
                     child: Consumer<DataProvider>(
                       builder: (context, value, child) {
-                        return ListView.separated(
-                          separatorBuilder: (context, index) =>
-                              SizedBox(height: ScreenUtil.verticalScale(2)),
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: value.tutorialList.length,
-                          padding: EdgeInsets.symmetric(
-                              vertical: ScreenUtil.verticalScale(2)),
-                          itemBuilder: (context, index) =>
-                              tutorialCard(value.tutorialList[index]),
-                        );
+                        return value.tutorialLoader
+                            ? Center(child: CircularProgressIndicator())
+                            : value.tutorialList.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      "Tutorials pending!\nPlease check back in later.",
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.color),
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    separatorBuilder: (context, index) =>
+                                        SizedBox(
+                                            height:
+                                                ScreenUtil.verticalScale(2)),
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: value.tutorialList.length,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: ScreenUtil.verticalScale(2)),
+                                    itemBuilder: (context, index) =>
+                                        tutorialCard(value.tutorialList[index]),
+                                  );
                       },
                     ),
                   ),

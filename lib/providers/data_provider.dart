@@ -344,10 +344,8 @@ class DataProvider extends ChangeNotifier {
     } catch (e) {
       throw Exception('Failed to get tutorialList');
     } finally {
-      if (tutorialList.isEmpty) {
-        tutorialLoader = false;
-        notifyListeners();
-      }
+      tutorialLoader = false;
+      notifyListeners();
     }
   }
 

@@ -80,7 +80,9 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Screenshot(
                   controller: screenshotController,
                   child: Container(
-                    color: Theme.of(context).cardColor,
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Theme.of(context).scaffoldBackgroundColor
+                        : Theme.of(context).cardColor,
                     child: SizedBox(
                       width: ScreenUtil.verticalScale(38),
                       height: ScreenUtil.verticalScale(38),
@@ -182,7 +184,9 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Theme.of(context).cardColor,
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Theme.of(context).scaffoldBackgroundColor
+                        : Theme.of(context).cardColor,
                   ),
                   child: Stack(
                     children: [
@@ -190,7 +194,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                         padding: EdgeInsets.all(ScreenUtil.horizontalScale(2))
                             .copyWith(top: ScreenUtil.verticalScale(5)),
                         child: SizedBox(
-                          height: ScreenUtil.verticalScale(46),
+                          height: ScreenUtil.verticalScale(
+                              widget.achievements[currentPage].achieved == false
+                                  ? 39
+                                  : 46),
                           child: Column(
                             children: [
                               SizedBox(
@@ -229,20 +236,31 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                   width:
                                                       ScreenUtil.verticalScale(
                                                           18),
-                                                  networkImageUrl: data
-                                                          .achievementAchievementId!
-                                                          .image!
-                                                          .startsWith(
-                                                              'https://storage.cloud.google.com/')
-                                                      ? data
-                                                          .achievementAchievementId!
-                                                          .image!
-                                                          .replaceFirst(
-                                                              'https://storage.cloud.google.com/',
-                                                              'https://storage.googleapis.com/')
-                                                      : data
-                                                          .achievementAchievementId!
-                                                          .image!,
+                                                  networkImageUrl: index == 0 &&
+                                                          data.achieved == false
+                                                      ? widget.item.thumbnail!
+                                                              .startsWith(
+                                                                  'https://storage.cloud.google.com/')
+                                                          ? widget
+                                                              .item.thumbnail!
+                                                              .replaceFirst(
+                                                                  'https://storage.cloud.google.com/',
+                                                                  'https://storage.googleapis.com/')
+                                                          : widget
+                                                              .item.thumbnail!
+                                                      : data.achievementAchievementId!
+                                                              .image!
+                                                              .startsWith(
+                                                                  'https://storage.cloud.google.com/')
+                                                          ? data
+                                                              .achievementAchievementId!
+                                                              .image!
+                                                              .replaceFirst(
+                                                                  'https://storage.cloud.google.com/',
+                                                                  'https://storage.googleapis.com/')
+                                                          : data
+                                                              .achievementAchievementId!
+                                                              .image!,
                                                   fit: BoxFit.cover,
                                                   borderRadius:
                                                       BorderRadius.all(
@@ -340,64 +358,69 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   },
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.all(
-                                    ScreenUtil.horizontalScale(2)),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          try {
-                                            await screenshotController
-                                                .capture(
-                                                    delay: Duration(
-                                                        milliseconds: 200))
-                                                .then(
-                                              (image) async {
-                                                if (image == null) return;
-                                                final directory =
-                                                    await getTemporaryDirectory();
-                                                final imagePath = File(
-                                                    '${directory.path}/screenshot.png');
-                                                await imagePath
-                                                    .writeAsBytes(image);
-                                                await Share.shareXFiles(
-                                                    [XFile(imagePath.path)],
-                                                    text:
-                                                        'I just achieved ${widget.achievements[currentPage].achievementAchievementId?.title ?? ""} of Booty By Bret! Join me in the app at https://bootybybret.com');
+                              widget.achievements[currentPage].achieved == false
+                                  ? SizedBox()
+                                  : Padding(
+                                      padding: EdgeInsets.all(
+                                          ScreenUtil.horizontalScale(2)),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                try {
+                                                  await screenshotController
+                                                      .capture(
+                                                          delay: Duration(
+                                                              milliseconds:
+                                                                  200))
+                                                      .then(
+                                                    (image) async {
+                                                      if (image == null) return;
+                                                      final directory =
+                                                          await getTemporaryDirectory();
+                                                      final imagePath = File(
+                                                          '${directory.path}/screenshot.png');
+                                                      await imagePath
+                                                          .writeAsBytes(image);
+                                                      await Share.shareXFiles([
+                                                        XFile(imagePath.path)
+                                                      ],
+                                                          text:
+                                                              'I just achieved ${widget.achievements[currentPage].achievementAchievementId?.title ?? ""} of Booty By Bret! Join me in the app at https://bootybybret.com');
+                                                    },
+                                                  );
+                                                } catch (e) {
+                                                  debugPrint(
+                                                      'Error capturing and sharing screenshot: $e');
+                                                }
                                               },
-                                            );
-                                          } catch (e) {
-                                            debugPrint(
-                                                'Error capturing and sharing screenshot: $e');
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.blueColor,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: ScreenUtil
+                                                        .verticalScale(1.7)),
+                                              ),
+                                              child: Text(
+                                                "Share",
+                                                style: TextStyle(
+                                                  fontSize:
+                                                      ScreenUtil.verticalScale(
+                                                          2),
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                          backgroundColor: AppColors.blueColor,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical:
-                                                  ScreenUtil.verticalScale(
-                                                      1.7)),
-                                        ),
-                                        child: Text(
-                                          "Share",
-                                          style: TextStyle(
-                                            fontSize:
-                                                ScreenUtil.verticalScale(2),
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
+                                    )
                             ],
                           ),
                         ),

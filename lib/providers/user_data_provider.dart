@@ -74,7 +74,7 @@ class UserDataProvider extends ChangeNotifier {
         'AUTH_TOKEN': userIdToken!,
         'Accept': 'application/json',
       });
-
+      log('request==========>>>>>${request.fields}');
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
@@ -117,11 +117,13 @@ class UserDataProvider extends ChangeNotifier {
         'AUTH_TOKEN': userIdToken!,
         'Accept': 'application/json',
       });
+      log('url==========>>>>>$url');
+      log('request==========>>>>>${request.fields}');
 
       http.StreamedResponse response = await request.send();
-
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
+        log('responseBody==========>>>>>${responseBody}');
         jsonDecode(responseBody);
         updateUserData();
       } else {

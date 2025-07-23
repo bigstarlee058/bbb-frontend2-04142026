@@ -47,86 +47,84 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: ScreenUtil.verticalScale(10.5),
-      width: ScreenUtil.verticalScale(10.5),
-      decoration: BoxDecoration(
-        // color: Colors.grey.withValues(alpha: .9),
-        borderRadius: BorderRadius.all(
-          Radius.circular(ScreenUtil.horizontalScale(12.5)),
+    return GestureDetector(
+      onTap: () => _pickAndUploadImage(),
+      child: Container(
+        height: ScreenUtil.verticalScale(10.5),
+        width: ScreenUtil.verticalScale(10.5),
+        decoration: BoxDecoration(
+          // color: Colors.grey.withValues(alpha: .9),
+          borderRadius: BorderRadius.all(
+            Radius.circular(ScreenUtil.horizontalScale(12.5)),
+          ),
         ),
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          Container(
-            height: ScreenUtil.horizontalScale(25),
-            width: ScreenUtil.horizontalScale(25),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(ScreenUtil.horizontalScale(12.5)),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Container(
+              height: ScreenUtil.horizontalScale(25),
+              width: ScreenUtil.horizontalScale(25),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(ScreenUtil.horizontalScale(12.5)),
+                ),
               ),
-            ),
-            child: ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
-                child: image != null
-                    ? Image.file(
-                        image!,
-                        fit: BoxFit.cover,
-                      )
-                    : widget.avatarUrl != ''
-                        ? appShimmerImage(
-                            height: ScreenUtil.horizontalScale(25),
-                            width: ScreenUtil.horizontalScale(25),
-                            networkImageUrl: widget.avatarUrl.startsWith(
-                                    'https://storage.cloud.google.com/')
-                                ? widget.avatarUrl.replaceFirst(
-                                    'https://storage.cloud.google.com/',
-                                    'https://storage.googleapis.com/')
-                                : widget.avatarUrl,
-                            fit: BoxFit.cover,
-                            borderRadius: BorderRadius.circular(
-                                ScreenUtil.horizontalScale(12.5)),
-                          )
-                        : Container(
-                            height: ScreenUtil.horizontalScale(25),
-                            width: ScreenUtil.horizontalScale(25),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.withValues(alpha: .9),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(
-                                    ScreenUtil.horizontalScale(12.5)),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                widget.name == null
-                                    ? ""
-                                    : widget.name!.isNotEmpty
-                                        ? widget.name![0].capitalizeFirst()
-                                        : "", // First character of the name
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.horizontalScale(12),
-                                  color: Colors.white, // Adjust size as needed
-                                  fontWeight: FontWeight.bold,
+              child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(ScreenUtil.horizontalScale(12.5)),
+                  child: image != null
+                      ? Image.file(
+                          image!,
+                          fit: BoxFit.cover,
+                        )
+                      : widget.avatarUrl != ''
+                          ? appShimmerImage(
+                              height: ScreenUtil.horizontalScale(25),
+                              width: ScreenUtil.horizontalScale(25),
+                              networkImageUrl: widget.avatarUrl.startsWith(
+                                      'https://storage.cloud.google.com/')
+                                  ? widget.avatarUrl.replaceFirst(
+                                      'https://storage.cloud.google.com/',
+                                      'https://storage.googleapis.com/')
+                                  : widget.avatarUrl,
+                              fit: BoxFit.cover,
+                              borderRadius: BorderRadius.circular(
+                                  ScreenUtil.horizontalScale(12.5)),
+                            )
+                          : Container(
+                              height: ScreenUtil.horizontalScale(25),
+                              width: ScreenUtil.horizontalScale(25),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withValues(alpha: .9),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                      ScreenUtil.horizontalScale(12.5)),
                                 ),
                               ),
-                            ),
-                          )),
-          ),
-          Positioned(
-            right: 0,
-            bottom: -(ScreenUtil.horizontalScale(3.5)),
-            left: 0,
-            child: Visibility(
-              visible: widget.showPickImageButton,
-              child: GestureDetector(
-                onTap: () {
-                  _pickAndUploadImage();
-                  // Handle camera icon action here
-                },
+                              child: Center(
+                                child: Text(
+                                  widget.name == null
+                                      ? ""
+                                      : widget.name!.isNotEmpty
+                                          ? widget.name![0].capitalizeFirst()
+                                          : "", // First character of the name
+                                  style: TextStyle(
+                                    fontSize: ScreenUtil.horizontalScale(12),
+                                    color:
+                                        Colors.white, // Adjust size as needed
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            )),
+            ),
+            Positioned(
+              right: 0,
+              bottom: -(ScreenUtil.horizontalScale(3.5)),
+              left: 0,
+              child: Visibility(
+                visible: widget.showPickImageButton,
                 child: CircleAvatar(
                   radius:
                       ScreenUtil.horizontalScale(3.5), // Adjust size as needed
@@ -142,8 +140,8 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

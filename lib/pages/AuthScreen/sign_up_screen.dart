@@ -77,7 +77,7 @@ class _SignupPageState extends State<SignupPage> {
         url,
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
-          'username': userName,
+          'firstname': userName,
           'lastname': lastName,
           'email': emailAddress,
           'password': password,

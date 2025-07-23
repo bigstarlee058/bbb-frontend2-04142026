@@ -31,6 +31,7 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -215,7 +216,7 @@ class _ExercisePageState extends State<ExercisePage>
       {required BuildContext context, required double aspectRatio}) {
     double maxWidth =
         ScreenUtil.horizontalScale(100) - ScreenUtil.horizontalScale(13.4);
-    double maxHeight = MediaQuery.of(context).size.height * 0.825;
+    double maxHeight = MediaQuery.of(context).size.height * 0.83;
     double calculatedHeight = maxWidth / aspectRatio;
     if (calculatedHeight > maxHeight) {
       calculatedHeight = maxHeight;
@@ -239,35 +240,35 @@ class _ExercisePageState extends State<ExercisePage>
       await preferences.clearValue(SharedPreference.fromNotification);
     });
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      String isChecked =
-          preferences.getString(SharedPreference.exerciseTutorial) ?? "";
-      if (isChecked != "true") {
-        fetchTutorialData().then(
-          (value) async {
-            argument = ModalRoute.of(context)?.settings.arguments as String?;
-            setState(() => loading = true);
-            if (argument != "Exercise") {
-              await fromNotification()
-                  .then((value) => clearNotificationAndNavigateExercise());
-            } else {
-              await fetchExercise()
-                  .then((value) => clearNotificationAndNavigateExercise());
-            }
-          },
+      // String isChecked =
+      //     preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+      // if (isChecked != "true") {
+      //   fetchTutorialData().then(
+      //     (value) async {
+      //       argument = ModalRoute.of(context)?.settings.arguments as String?;
+      //       setState(() => loading = true);
+      //       if (argument != "Exercise") {
+      //         await fromNotification()
+      //             .then((value) => clearNotificationAndNavigateExercise());
+      //       } else {
+      //         await fetchExercise()
+      //             .then((value) => clearNotificationAndNavigateExercise());
+      //       }
+      //     },
+      //   );
+      // } else {
+      argument = ModalRoute.of(context)?.settings.arguments as String?;
+      setState(() => loading = true);
+      if (argument != "Exercise") {
+        await fromNotification().then(
+          (value) => clearNotificationAndNavigateExercise(),
         );
       } else {
-        argument = ModalRoute.of(context)?.settings.arguments as String?;
-        setState(() => loading = true);
-        if (argument != "Exercise") {
-          await fromNotification().then(
-            (value) => clearNotificationAndNavigateExercise(),
-          );
-        } else {
-          await fetchExercise().then(
-            (value) => clearNotificationAndNavigateExercise(),
-          );
-        }
+        await fetchExercise().then(
+          (value) => clearNotificationAndNavigateExercise(),
+        );
       }
+      // }
     });
     WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) => monthProvider?.fetchExerciseHistroy());
@@ -275,24 +276,25 @@ class _ExercisePageState extends State<ExercisePage>
   }
 
   clearNotificationAndNavigateExercise() async {
-    String isChecked =
-        preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+    // String isChecked =
+    //     preferences.getString(SharedPreference.exerciseTutorial) ?? "";
 
-    await Future.delayed(Duration(milliseconds: 800)).then(
-      (value) async => await NotificationService.clearNotification(10).then(
-        (value) async {
-          if (isChecked != "true") {
-            if (_chewieController1 != null && !loading1) {
-              await Future.delayed(Duration(milliseconds: 100)).then(
-                (value) {
-                  tutorialVideo(context);
-                },
-              );
-            }
-          }
-        },
-      ),
-    );
+    await Future.delayed(Duration(milliseconds: 1))
+        .then((value) async => await NotificationService.clearNotification(10)
+            // .then(
+            //   (value) async {
+            //     if (isChecked != "true") {
+            //       if (_chewieController1 != null && !loading1) {
+            //         await Future.delayed(Duration(milliseconds: 100)).then(
+            //           (value) {
+            //             tutorialVideo(context);
+            //           },
+            //         );
+            //       }
+            //     }
+            //   },
+            // ),
+            );
   }
 
   Future<void> fromNotification() async {
@@ -887,8 +889,8 @@ class _ExercisePageState extends State<ExercisePage>
                                                 .isEmpty
                                             ? media.width +
                                                 media.height * 0.0605
-                                            : media.height * 0.835
-                                        : media.height * 0.835) -
+                                            : media.height * 0.83
+                                        : media.height * 0.83) -
                                 media.height * 0.121),
                         child: Stack(
                           clipBehavior: Clip.none,
@@ -1201,7 +1203,7 @@ class _ExercisePageState extends State<ExercisePage>
                                   "")
                           .isEmpty)
                   ? media.width
-                  : media.height * 0.835,
+                  : media.height * 0.83,
               width: media.width,
               color: Colors.black12,
               child: videoNotAvailable
@@ -1216,7 +1218,7 @@ class _ExercisePageState extends State<ExercisePage>
                                           ?.warmUpModel?.videoThumbnail ??
                                       "")
                               .isNotEmpty
-                          ? media.height * 0.835
+                          ? media.height * 0.83
                           : media.width,
                       networkImageUrl: isExercise == 1
                           ? ((monthProvider?.exerciseDetailModel
@@ -1249,7 +1251,7 @@ class _ExercisePageState extends State<ExercisePage>
                         appShimmerImage(
                           width: media.width,
                           color: Colors.transparent,
-                          height: media.height * 0.835,
+                          height: media.height * 0.83,
                           networkImageUrl: isExercise == 1
                               ? ((monthProvider?.exerciseDetailModel
                                               ?.videoThumbnail ??
@@ -1306,7 +1308,7 @@ class _ExercisePageState extends State<ExercisePage>
   }
 
   Widget mainContent(Size media) => Padding(
-        padding: const EdgeInsets.only(bottom: 50),
+        padding: EdgeInsets.only(bottom: ScreenUtil.verticalScale(3.2)),
         child: Container(
           decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
@@ -1414,10 +1416,7 @@ class _ExercisePageState extends State<ExercisePage>
                   )
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 15),
-                child: guideLineText(),
-              ),
+              guideLineText(),
               if (isExercise == 1)
                 exerciseSection(media)
               else
@@ -1946,77 +1945,72 @@ class _ExercisePageState extends State<ExercisePage>
     return isExercise == 1
         ? const SizedBox(height: 0, width: 0)
         : loading || monthProvider?.warmUpModel == null
-            ? const SizedBox(
-                height: 0,
-                width: 0,
-              )
-            : Padding(
-                padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1)),
-                child: monthProvider!.exerciseHistoryModel.any((element) =>
-                        element.dataId == dataId &&
-                        element.status == Status.completed)
-                    ? ButtonWidget(
-                        text: "Completed",
-                        textColor: Colors.white,
-                        onPress: null,
-                        color: AppColors.primaryColor,
-                        isLoading: false,
-                      )
-                    : ButtonWidget(
-                        text: "Mark Complete",
-                        textColor: Colors.white,
-                        onPress: () async {
-                          await _saveExerciseData(
-                            status: Status.completed,
-                            id: monthProvider!.warmUpModel!.id.toString(),
-                            type: "Warmup",
-                          );
+            ? const SizedBox(height: 0, width: 0)
+            : monthProvider!.exerciseHistoryModel.any((element) =>
+                    element.dataId == dataId &&
+                    element.status == Status.completed)
+                ? ButtonWidget(
+                    text: "Completed",
+                    textColor: Colors.white,
+                    onPress: null,
+                    color: AppColors.primaryColor,
+                    isLoading: false,
+                  )
+                : Consumer<MonthProvider>(builder: (context, value, c) {
+                    return ButtonWidget(
+                      text: "Mark Complete",
+                      textColor: Colors.white,
+                      onPress: () async {
+                        await _saveExerciseData(
+                          status: Status.completed,
+                          id: value.warmUpModel!.id.toString(),
+                          type: "Warmup",
+                        );
 
-                          // ...//
+                        // ...//
 
-                          List<WarmupDataModel> warmUps =
-                              monthProvider!.isPumpDay
-                                  ? monthProvider!.pumpDayModel!.warmups!
-                                  : monthProvider!.dayDataModel!.warmups ?? [];
+                        List<WarmupDataModel> warmUps = value.isPumpDay
+                            ? value.pumpDayModel!.warmups!
+                            : value.dayDataModel!.warmups ?? [];
 
-                          List<WarmupDataModel> tempo = warmUps
-                              .where(
-                                (element) => ((element.formats ?? [])
-                                    .contains(monthProvider?.equipmentType)),
-                              )
-                              .toList();
+                        List<WarmupDataModel> tempo = warmUps
+                            .where(
+                              (element) => ((element.formats ?? [])
+                                  .contains(monthProvider?.equipmentType)),
+                            )
+                            .toList();
 
-                          tempo.removeWhere(
-                            (element) {
-                              String dataId =
-                                  "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${element.warmupId}";
+                        tempo.removeWhere(
+                          (element) {
+                            String dataId =
+                                "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${element.warmupId}";
 
-                              return monthProvider!.exerciseHistoryModel.any(
-                                (element) =>
-                                    element.dataId == dataId &&
-                                    (element.status == Status.completed ||
-                                        element.status == Status.skipped),
-                              );
-                            },
-                          );
+                            return monthProvider!.exerciseHistoryModel.any(
+                              (element) =>
+                                  element.dataId == dataId &&
+                                  (element.status == Status.completed ||
+                                      element.status == Status.skipped),
+                            );
+                          },
+                        );
 
-                          if (tempo.isEmpty) {
-                            Navigator.pop(context);
-                          } else {
-                            monthProvider?.updateWarmUp(
-                                true, tempo[0].warmupId ?? '');
-                            monthProvider?.updateIsLastExercise(false);
-                            Navigator.pop(context);
-                            Navigator.pushNamed(context, '/exercise',
-                                arguments: "Exercise");
-                          }
+                        if (tempo.isEmpty) {
+                          Navigator.pop(context);
+                        } else {
+                          value.updateWarmUp(true, tempo[0].warmupId ?? '');
+                          value.updateIsLastExercise(false);
 
-                          // Navigator.pop(context);
-                        },
-                        color: AppColors.primaryColor,
-                        isLoading: false,
-                      ),
-              );
+                          Navigator.pop(context);
+                          Navigator.pushNamed(context, '/exercise',
+                              arguments: "Exercise");
+                        }
+
+                        // Navigator.pop(context);
+                      },
+                      color: AppColors.primaryColor,
+                      isLoading: false,
+                    );
+                  });
   }
 
   Future<void> finishAndNextButton(
@@ -2276,26 +2270,33 @@ class _ExercisePageState extends State<ExercisePage>
                   ? (monthProvider!.selectedExercise!.guide == "" ||
                           monthProvider!.selectedExercise!.guide == null)
                       ? SizedBox()
-                      : Container(
-                          margin: EdgeInsets.only(top: 5, bottom: 15),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(254, 233, 232, 1.0),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                          child: Text(
-                            "${monthProvider!.selectedExercise!.guide}",
-                            style: TextStyle(
-                              color:
-                                  Theme.of(context).textTheme.bodySmall!.color,
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 15),
+                          child: Container(
+                            margin: EdgeInsets.only(top: 5, bottom: 15),
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(254, 233, 232, 1.0),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            textAlign: TextAlign.left,
+                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                            child: Text(
+                              "${monthProvider!.selectedExercise!.guide}",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .color,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
                           ),
                         )
                   : (monthProvider?.warmUpModel?.description ?? "") == ""
                       ? SizedBox()
                       : Padding(
-                          padding: EdgeInsets.only(top: 5, bottom: 35),
+                          padding: EdgeInsets.only(
+                              top: ScreenUtil.verticalScale(.8),
+                              bottom: ScreenUtil.verticalScale(2.5)),
                           child: Text(
                             monthProvider?.warmUpModel?.description ?? "",
                             style: TextStyle(

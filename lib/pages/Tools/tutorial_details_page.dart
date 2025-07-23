@@ -298,6 +298,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                             color: AppColors.primaryColor),
                       )
                     : SingleChildScrollView(
+                        physics: ClampingScrollPhysics(),
                         child: Column(
                           children: [
                             Stack(
@@ -668,26 +669,28 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                 ),
                               ),
                             ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                bottom: ScreenUtil.verticalScale(2),
-                                top: ScreenUtil.verticalScale(1),
-                                left: ScreenUtil.horizontalScale(10),
-                                right: ScreenUtil.horizontalScale(10),
-                              ),
-                              child: Column(
-                                children: [
-                                  TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text(
-                                        "Back",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            color: AppColors.primaryColor),
-                                      ))
-                                ],
-                              ),
-                            ),
+                            SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                            // Container(
+                            //   margin: EdgeInsets.only(
+                            //     bottom: ScreenUtil.verticalScale(2),
+                            //     top: ScreenUtil.verticalScale(1),
+                            //     left: ScreenUtil.horizontalScale(10),
+                            //     right: ScreenUtil.horizontalScale(10),
+                            //   ),
+                            //   child: Column(
+                            //     children: [
+                            //       TextButton(
+                            //         onPressed: () => Navigator.pop(context),
+                            //         child: Text(
+                            //           "Back",
+                            //           style: TextStyle(
+                            //               fontSize: 18,
+                            //               color: AppColors.primaryColor),
+                            //         ),
+                            //       )
+                            //     ],
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),

@@ -272,7 +272,7 @@ class MonthProvider extends ChangeNotifier {
 
   clearWarmupModel() {
     warmUpModel = null;
-    isWarmup = false;
+    // isWarmup = false;
   }
 
   updateLocalData() async {

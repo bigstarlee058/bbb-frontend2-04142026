@@ -56,7 +56,6 @@ class _SplashScreenState extends State<SplashScreen> {
         } else {
           isDarkMode = raw4;
         }
-        log('isDarkMode==========>>>>>${isDarkMode}');
         themeProvider?.toggleTheme(isDarkMode);
       },
     );
@@ -126,7 +125,9 @@ class _SplashScreenState extends State<SplashScreen> {
                       (value) async {
                         bool isFirstTime = userData.user["createdAt"] ==
                                 userData.user["updatedAt"] ||
-                            userData.user["detail"] == null;
+                            (userData.user["detail"] == null ||
+                                !userData.user["detail"]
+                                    .containsKey('bodyfat'));
 
                         await preferences.setBool(
                             SharedPreference.isFirstTime, isFirstTime);

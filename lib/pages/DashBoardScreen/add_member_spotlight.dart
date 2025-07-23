@@ -85,7 +85,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                     );
                     if (val == true) {
                       Fluttertoast.showToast(
-                        msg: "Spotlight added successfully",
+                        msg: "Story submitted successfully!",
                         toastLength: Toast.LENGTH_LONG,
                         gravity: ToastGravity.TOP_RIGHT,
                         timeInSecForIosWeb: 1,
@@ -250,7 +250,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: AppTextFormField(
-                  maxLines: 4,
+                  maxLines: 7,
                   hintText: 'Write your story here',
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,

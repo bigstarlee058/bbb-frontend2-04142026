@@ -137,7 +137,7 @@ class _VideoSliderState extends State<VideoSlider> {
               SizedBox(
                 height: ScreenUtil.horizontalScale(2),
               ),
-              videoData.isEmpty
+              videoData.isEmpty || videoData.length == 1
                   ? SizedBox()
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -292,7 +292,7 @@ class _PumpVideoSliderState extends State<PumpVideoSlider> {
               SizedBox(
                 height: ScreenUtil.horizontalScale(2),
               ),
-              videoData.isEmpty
+              videoData.isEmpty || videoData.length == 1
                   ? SizedBox()
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,

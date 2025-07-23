@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -11,7 +9,6 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -33,7 +30,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
   DataProvider? dataProvider;
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  late Size videoSize;
+  Size? videoSize;
   Timer? _hideControlsTimer;
   bool isMute = true;
   late final ProgressBarController _controller;
@@ -215,7 +212,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
               hideControls: hideControls,
               isZoom: isZoom,
               media: screenSize,
-              videoSize: videoSize,
+              videoSize: videoSize!,
               muteUnMute: muteUnMute,
               showControls: showControls,
               showControlsOnTap: showControlsOnTap,
@@ -279,7 +276,9 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
             borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.825),
+                  maxHeight: loading || videoSize == null
+                      ? MediaQuery.of(context).size.height * 0.725
+                      : videoSize!.height),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -309,8 +308,8 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                           ? Stack(
                                               children: [
                                                 SizedBox(
-                                                  height: videoSize.height,
-                                                  width: videoSize.width,
+                                                  height: videoSize!.height,
+                                                  width: videoSize!.width,
                                                   child: Chewie(
                                                     controller:
                                                         _chewieController!,
@@ -323,8 +322,8 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                                   color: showControls
                                                       ? Colors.black38
                                                       : Colors.transparent,
-                                                  height: videoSize.height,
-                                                  width: videoSize.width,
+                                                  height: videoSize!.height,
+                                                  width: videoSize!.width,
                                                 ),
                                               ],
                                             )
@@ -344,7 +343,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                                 ),
                               ),
                               Positioned(
-                                bottom: videoSize.height / 2,
+                                bottom: videoSize!.height / 2,
                                 left: 10,
                                 right: 10,
                                 child: AnimatedOpacity(
@@ -571,23 +570,22 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                               ),
                             ],
                           ),
-                          Container(
-                            margin: EdgeInsets.only(
-                              top: ScreenUtil.verticalScale(2.5),
-                              bottom: ScreenUtil.verticalScale(1.5),
-                              left: ScreenUtil.horizontalScale(3),
-                              right: ScreenUtil.horizontalScale(3),
-                            ),
-                            child: ButtonWidget(
-                              text: "Continue Working Out",
-                              textColor: Colors.white,
-                              onPress: () {
-                                Navigator.pop(context);
-                              },
-                              color: AppColors.primaryColor,
-                              isLoading: false,
-                            ),
-                          ),
+                          // Container(
+                          //   margin: EdgeInsets.only(
+                          //     top: ScreenUtil.verticalScale(2),
+                          //     left: ScreenUtil.horizontalScale(3),
+                          //     right: ScreenUtil.horizontalScale(3),
+                          //   ),
+                          //   child: ButtonWidget(
+                          //     text: "Continue Working Out",
+                          //     textColor: Colors.white,
+                          //     onPress: () {
+                          //       Navigator.pop(context);
+                          //     },
+                          //     color: AppColors.primaryColor,
+                          //     isLoading: false,
+                          //   ),
+                          // ),
                         ],
                       ),
               ),

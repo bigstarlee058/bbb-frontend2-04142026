@@ -289,10 +289,10 @@ class _SliderVideoPageState extends State<SliderVideoPage>
             child: ConstrainedBox(
               constraints: BoxConstraints(
                   maxHeight: loading || videoSize == null
-                      ? MediaQuery.of(context).size.height * 0.825
+                      ? MediaQuery.of(context).size.height * 0.725
                       : videoSize!.height +
                           ScreenUtil.verticalScale(
-                              videoSize!.height > 300 ? 12 : 10.5)),
+                              videoSize!.height > 300 ? 2.5 : .8)),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -645,27 +645,27 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                   ),
                                 ],
                               ),
-                              Spacer(),
-                              Container(
-                                margin: EdgeInsets.only(
-                                  top: ScreenUtil.verticalScale(1.5),
-                                  bottom: ScreenUtil.verticalScale(1.5),
-                                  left: ScreenUtil.horizontalScale(3),
-                                  right: ScreenUtil.horizontalScale(3),
-                                ),
-                                child: SizedBox(
-                                  height: ScreenUtil.verticalScale(6.4),
-                                  child: ButtonWidget(
-                                    text: "Close",
-                                    textColor: Colors.white,
-                                    onPress: () {
-                                      Navigator.pop(context);
-                                    },
-                                    color: AppColors.primaryColor,
-                                    isLoading: false,
-                                  ),
-                                ),
-                              ),
+                              // Spacer(),
+                              // Container(
+                              //   margin: EdgeInsets.only(
+                              //     top: ScreenUtil.verticalScale(1.5),
+                              //     bottom: ScreenUtil.verticalScale(1.5),
+                              //     left: ScreenUtil.horizontalScale(3),
+                              //     right: ScreenUtil.horizontalScale(3),
+                              //   ),
+                              //   child: SizedBox(
+                              //     height: ScreenUtil.verticalScale(6.4),
+                              //     child: ButtonWidget(
+                              //       text: "Close",
+                              //       textColor: Colors.white,
+                              //       onPress: () {
+                              //         Navigator.pop(context);
+                              //       },
+                              //       color: AppColors.primaryColor,
+                              //       isLoading: false,
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
               ),

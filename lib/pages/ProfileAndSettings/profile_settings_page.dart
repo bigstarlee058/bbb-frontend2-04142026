@@ -255,114 +255,110 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(1),
                                       ),
-                                      GestureDetector(
-                                        onTap: _pickAndUploadImage,
-                                        child: Consumer<UserDataProvider>(
-                                          builder: (context, userData, child) {
-                                            return userData.userData[
-                                                            'detail'] !=
-                                                        null &&
-                                                    userData.userData['detail']
-                                                            ['avatarUrl'] !=
-                                                        null &&
-                                                    userData.userData['detail']
-                                                            ['avatarUrl'] !=
-                                                        ""
-                                                ? ClipRRect(
-                                                    borderRadius: BorderRadius
-                                                        .circular(ScreenUtil
-                                                            .horizontalScale(
-                                                                12.5)),
-                                                    child: appShimmerImage(
-                                                      height: ScreenUtil
-                                                          .verticalScale(10.5),
-                                                      width: ScreenUtil
-                                                          .verticalScale(10.5),
-                                                      networkImageUrl: userData
-                                                                      .userData[
-                                                                  'detail'] !=
-                                                              null
-                                                          ? userData.userData['detail'][
-                                                                      'avatarUrl']
-                                                                  .startsWith(
-                                                                      'https://storage.cloud.google.com/')
-                                                              ? userData
-                                                                  .userData[
-                                                                      'detail'][
-                                                                      'avatarUrl']
-                                                                  .replaceFirst(
-                                                                      'https://storage.cloud.google.com/',
-                                                                      'https://storage.googleapis.com/')
-                                                              : userData.userData[
-                                                                      'detail']
-                                                                  ['avatarUrl']
-                                                          : "",
-                                                      fit: BoxFit.cover,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(
-                                                            ScreenUtil
-                                                                .horizontalScale(
-                                                                    12.5)),
-                                                      ),
-                                                    )
-                                                    // Image.network(
-                                                    //   userData.userData['detail'] != null
-                                                    //       ? userData.userData['detail']['avatarUrl']
-                                                    //               .startsWith('https://storage.cloud.google.com/')
-                                                    //           ? userData.userData['detail']['avatarUrl'].replaceFirst(
-                                                    //               'https://storage.cloud.google.com/',
-                                                    //               'https://storage.googleapis.com/')
-                                                    //           : userData.userData['detail']['avatarUrl']
-                                                    //       : "",
-                                                    //   fit: BoxFit.cover,
-                                                    // ),
-                                                    )
-                                                : Container(
+                                      Consumer<UserDataProvider>(
+                                        builder: (context, userData, child) {
+                                          return userData.userData['detail'] !=
+                                                      null &&
+                                                  userData.userData['detail']
+                                                          ['avatarUrl'] !=
+                                                      null &&
+                                                  userData.userData['detail']
+                                                          ['avatarUrl'] !=
+                                                      ""
+                                              ? ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          ScreenUtil
+                                                              .horizontalScale(
+                                                                  12.5)),
+                                                  child: appShimmerImage(
                                                     height: ScreenUtil
                                                         .verticalScale(10.5),
                                                     width: ScreenUtil
                                                         .verticalScale(10.5),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.grey
-                                                          .withValues(
-                                                              alpha: .9),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(
-                                                            ScreenUtil
-                                                                .horizontalScale(
-                                                                    12.5)),
-                                                      ),
+                                                    networkImageUrl: userData
+                                                                    .userData[
+                                                                'detail'] !=
+                                                            null
+                                                        ? userData
+                                                                .userData['detail'][
+                                                                    'avatarUrl']
+                                                                .startsWith(
+                                                                    'https://storage.cloud.google.com/')
+                                                            ? userData
+                                                                .userData['detail']
+                                                                    [
+                                                                    'avatarUrl']
+                                                                .replaceFirst(
+                                                                    'https://storage.cloud.google.com/',
+                                                                    'https://storage.googleapis.com/')
+                                                            : userData.userData[
+                                                                    'detail']
+                                                                ['avatarUrl']
+                                                        : "",
+                                                    fit: BoxFit.cover,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(ScreenUtil
+                                                          .horizontalScale(
+                                                              12.5)),
                                                     ),
-                                                    child: Center(
-                                                      child: userData.user[
-                                                                  "name"] !=
-                                                              ""
-                                                          ? Text(
-                                                              userData
-                                                                  .user["name"]
-                                                                  .toString()
-                                                                  .replaceAll(
-                                                                      " ",
-                                                                      "")[0]
-                                                                  .capitalizeFirst(), // First character of the name
-                                                              style: TextStyle(
-                                                                fontSize: ScreenUtil
-                                                                    .horizontalScale(
-                                                                        12),
-                                                                color: Colors
-                                                                    .white, // Adjust size as needed
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )
-                                                          : const SizedBox(),
+                                                  )
+                                                  // Image.network(
+                                                  //   userData.userData['detail'] != null
+                                                  //       ? userData.userData['detail']['avatarUrl']
+                                                  //               .startsWith('https://storage.cloud.google.com/')
+                                                  //           ? userData.userData['detail']['avatarUrl'].replaceFirst(
+                                                  //               'https://storage.cloud.google.com/',
+                                                  //               'https://storage.googleapis.com/')
+                                                  //           : userData.userData['detail']['avatarUrl']
+                                                  //       : "",
+                                                  //   fit: BoxFit.cover,
+                                                  // ),
+                                                  )
+                                              : Container(
+                                                  height:
+                                                      ScreenUtil.verticalScale(
+                                                          10.5),
+                                                  width:
+                                                      ScreenUtil.verticalScale(
+                                                          10.5),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey
+                                                        .withValues(alpha: .9),
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(ScreenUtil
+                                                          .horizontalScale(
+                                                              12.5)),
                                                     ),
-                                                  );
-                                          },
-                                        ),
+                                                  ),
+                                                  child: Center(
+                                                    child: userData
+                                                                .user["name"] !=
+                                                            ""
+                                                        ? Text(
+                                                            userData
+                                                                .user["name"]
+                                                                .toString()
+                                                                .replaceAll(
+                                                                    " ", "")[0]
+                                                                .capitalizeFirst(), // First character of the name
+                                                            style: TextStyle(
+                                                              fontSize: ScreenUtil
+                                                                  .horizontalScale(
+                                                                      12),
+                                                              color: Colors
+                                                                  .white, // Adjust size as needed
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          )
+                                                        : const SizedBox(),
+                                                  ),
+                                                );
+                                        },
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(0.8),

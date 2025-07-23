@@ -121,8 +121,9 @@ class _LoginPageState extends State<LoginPage> {
           (timeStamp) async => await _initializeFetchData().then(
             (value) async {
               bool isFirstTime =
-                  userData.user["createdAt"] == userData.user["updatedAt"] ||
-                      userData.user["detail"] == null;
+                  (userData.user["createdAt"] == userData.user["updatedAt"]) ||
+                      (userData.user["detail"] == null) ||
+                      !userData.user["detail"].containsKey('bodyfat');
               await preferences.setBool(
                   SharedPreference.isFirstTime, isFirstTime);
 

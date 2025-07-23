@@ -71,6 +71,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   num totalSets = 0;
+  num totalReps = 0;
   int warmUpSetTotal = 0;
   int workingSetTotal = 0;
   int backOffSetTotal = 0;
@@ -78,6 +79,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   Future<void> getTotalSets() async {
     await fetchExtraSetLocalData();
     totalSets = 0;
+    totalReps = 0;
     warmUpSetTotal = 0;
     workingSetTotal = 0;
     backOffSetTotal = 0;
@@ -92,6 +94,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
       for (var element in widget.exercise.extra!) {
         if (element.type != 1) {
           totalSets += int.parse(element.sets.toString());
+          totalReps += int.parse(element.reps.toString());
         }
         if (element.type == 1) {
           warmUpSetTotal += int.parse(element.sets.toString());
@@ -107,6 +110,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     for (var element in extraSetModel) {
       if (element.type != 1) {
         totalSets += int.parse(element.sets.toString());
+        totalReps += int.parse(element.reps.toString());
       }
       if (element.type == 1) {
         warmUpSetTotal += int.parse(element.sets.toString());
@@ -370,7 +374,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 width: 5,
                               ),
                               Text(
-                                "$totalSets Working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
+                                value.isPumpDay
+                                    ? "$totalReps Rep${(totalReps > 1 || totalReps == 0) ? "s" : ""}"
+                                    : "$totalSets Working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: ScreenUtil.verticalScale(1.45),

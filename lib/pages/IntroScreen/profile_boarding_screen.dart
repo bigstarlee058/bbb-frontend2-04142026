@@ -105,8 +105,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
     });
 
     final userDetails = {
-      'lastName': '',
-      'firstName': nameController.text.trim().toString().isEmpty
+      'lastname': '',
+      'firstname': nameController.text.trim().toString().isEmpty
           ? userData.user["name"] ?? ""
           : nameController.text.toString(),
       'sex': selectedGender != null
@@ -649,74 +649,77 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             ),
           ),
           SizedBox(height: ScreenUtil.verticalScale(4)),
-          Center(
-            child: Container(
-              height: ScreenUtil.horizontalScale(32),
-              width: ScreenUtil.horizontalScale(32),
-              decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: .9),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(ScreenUtil.horizontalScale(32)),
+          GestureDetector(
+            onTap: () => _pickAndUploadImage(),
+            child: Center(
+              child: Container(
+                height: ScreenUtil.horizontalScale(32),
+                width: ScreenUtil.horizontalScale(32),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: .9),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(ScreenUtil.horizontalScale(32)),
+                  ),
                 ),
-              ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: ScreenUtil.horizontalScale(32),
-                    width: ScreenUtil.horizontalScale(32),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(ScreenUtil.horizontalScale(32)),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      height: ScreenUtil.horizontalScale(32),
+                      width: ScreenUtil.horizontalScale(32),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(ScreenUtil.horizontalScale(32)),
+                        ),
                       ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(ScreenUtil.horizontalScale(32)),
-                      child: image != null
-                          ? Image.file(
-                              image!,
-                              fit: BoxFit.cover,
-                            )
-                          : Center(
-                              child: Text(
-                                "B",
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.horizontalScale(12),
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            ScreenUtil.horizontalScale(32)),
+                        child: image != null
+                            ? Image.file(
+                                image!,
+                                fit: BoxFit.cover,
+                              )
+                            : Center(
+                                child: Text(
+                                  "B",
+                                  style: TextStyle(
+                                    fontSize: ScreenUtil.horizontalScale(12),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: -(ScreenUtil.horizontalScale(3.35)),
-                    left: 0,
-                    child: GestureDetector(
-                      onTap: () {
-                        _pickAndUploadImage();
-                        // Handle camera icon action here
-                      },
-                      child: CircleAvatar(
-                        radius: ScreenUtil.horizontalScale(
-                            4), // Adjust size as needed
-                        backgroundColor: Colors.black.withValues(alpha: .7),
-                        child: Center(
-                          child: Icon(
-                            Icons.edit,
-                            size: ScreenUtil.horizontalScale(
-                                4), // Adjust size as needed
-                            color: Colors.white,
+                    Positioned(
+                      right: 0,
+                      bottom: -(ScreenUtil.horizontalScale(3.35)),
+                      left: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          _pickAndUploadImage();
+                          // Handle camera icon action here
+                        },
+                        child: CircleAvatar(
+                          radius: ScreenUtil.horizontalScale(
+                              4), // Adjust size as needed
+                          backgroundColor: Colors.black.withValues(alpha: .7),
+                          child: Center(
+                            child: Icon(
+                              Icons.edit,
+                              size: ScreenUtil.horizontalScale(
+                                  4), // Adjust size as needed
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
