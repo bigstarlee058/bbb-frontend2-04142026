@@ -63,6 +63,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
 
   @override
   Widget build(BuildContext context) {
+    log('currentPage==========>>>>>${currentPage}');
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -90,7 +91,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                         controller: pageController1,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: widget.achievements.length,
-                        onPageChanged: (index) {},
+                        onPageChanged: (index) {
+                          currentPage = index;
+                          setState(() {});
+                        },
                         itemBuilder: (context, index) {
                           var data = widget.achievements[currentPage];
                           return Padding(
@@ -142,7 +146,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                       data.achievementAchievementId!
                                               .description ??
                                           "",
-                                      maxLines: 1,
+                                      maxLines: 3,
                                       textAlign: TextAlign.center,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
@@ -158,7 +162,8 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   Text(
                                     data.achievedDate!.isEmpty &&
                                             data.achieved == false
-                                        ? "Not achieved yet"
+                                        // ? "Not achieved yet"
+                                        ? "${widget.item.currentValue}/${data.achievementAchievementId!.value} Achieved"
                                         : "Date Achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
@@ -206,6 +211,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   // physics: NeverScrollableScrollPhysics(),
                                   itemCount: widget.achievements.length,
                                   controller: pageController,
+                                  onPageChanged: (index) {
+                                    currentPage = index;
+                                    setState(() {});
+                                  },
                                   itemBuilder: (context, index) {
                                     var data = widget.achievements[index];
 
@@ -225,7 +234,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
-                                                        3.5)),
+                                                        4)),
                                             Stack(
                                               children: [
                                                 appShimmerImage(
@@ -290,7 +299,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
-                                                        3)),
+                                                        2)),
                                             Text(
                                               data.achievementAchievementId!
                                                       .title ??
@@ -311,9 +320,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                       vertical: 5),
                                               child: Text(
                                                 data.achievementAchievementId!
-                                                        .description ??
+                                                        .description
+                                                        ?.trim() ??
                                                     "",
-                                                maxLines: 1,
+                                                maxLines: 3,
                                                 textAlign: TextAlign.center,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
@@ -331,7 +341,8 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             Text(
                                               data.achievedDate!.isEmpty &&
                                                       data.achieved == false
-                                                  ? "Not achieved yet"
+                                                  // ? "Not achieved yet"
+                                                  ? "${widget.item.currentValue}/${data.achievementAchievementId!.value} Achieved"
                                                   : "Date Achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
                                               maxLines: 1,
                                               textAlign: TextAlign.center,
@@ -350,7 +361,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
-                                                        3.5)),
+                                                        2.5)),
                                           ],
                                         ),
                                       ),
@@ -441,10 +452,12 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                             final progress = calculateStepProgress(
                                 currentValue: currentValue,
                                 thresholds: thresholds ?? []);
+
                             return Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(5)),
                               child: StepProgressBar(
+                                progress1: (currentPage + 1).toDouble(),
                                 stepHeight: ScreenUtil.verticalScale(1.5),
                                 onStepTap: (int index) {
                                   if (pageController.hasClients) {

@@ -1434,7 +1434,7 @@ class _ExercisePageState extends State<ExercisePage>
           exerciseDesc.trim() == '<p><br></p>' || exerciseDesc.trim().isEmpty
               ? const SizedBox.shrink()
               : Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.only(bottom: 20, top: 15),
                   child: Theme(
                     data: Theme.of(context)
                         .copyWith(dividerColor: Colors.transparent),

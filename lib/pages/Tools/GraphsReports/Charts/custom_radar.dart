@@ -1,8 +1,12 @@
+import 'dart:developer';
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 class CustomRadarChart extends StatelessWidget {
+  final List<double> valueList;
+  final List<String> dateOld;
+  final List<String> dateHighest;
+
   final List<String> features = [
     "Back Squat",
     "Barbell\nBench Press",
@@ -12,47 +16,35 @@ class CustomRadarChart extends StatelessWidget {
     "Chinup"
   ];
 
-  final List<List<double>> data = [
-    [140, 172, 135, 136, 174, 170],
-    [100, 100, 100, 100, 100, 100],
-  ];
-
-  final List<List<String>> dataDates = [
-    [
-      "05/01/2025",
-      "05/02/2025",
-      "05/03/2025",
-      "05/04/2025",
-      "05/05/2025",
-      "05/06/2025"
-    ],
-    [
-      "06/01/2025",
-      "06/02/2025",
-      "06/03/2025",
-      "06/04/2025",
-      "06/05/2025",
-      "06/06/2025"
-    ],
-  ];
-
-  CustomRadarChart({super.key});
+  CustomRadarChart(
+      {super.key,
+      required this.valueList,
+      required this.dateOld,
+      required this.dateHighest});
 
   @override
   Widget build(BuildContext context) {
+    final List<List<String>> dataDates = [dateHighest, dateOld];
+
+    final List<List<double>> data = [
+      valueList,
+      List.generate(6, (index) => 100)
+    ];
+
     return Center(
       child: AspectRatio(
         aspectRatio: 1,
         child: RadarChart(
-          ticks: List.generate(10, (index) => 20 * (index + 1)),
+          ticks: List.generate(10, (index) => 20 * (index + 1)), // up to 200
           features: features,
           data: data,
           dataDates: dataDates,
           outlineColor: Colors.grey.shade400,
           axisColor: Colors.grey.shade400,
           featuresTextStyle: TextStyle(
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-              fontSize: 11),
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+            fontSize: 11,
+          ),
           graphColors: [
             Colors.pink.shade100,
             Colors.pink.shade800.withValues(alpha: 0.5),
@@ -166,10 +158,10 @@ class _RadarChartState extends State<RadarChart>
 
               for (int i = 0; i < widget.data.length; i++) {
                 for (int j = 0; j < widget.data[i].length; j++) {
-                  final scaled = radius *
-                      widget.data[i][j] *
-                      fraction /
-                      widget.ticks.last.toDouble();
+                  final value = widget.data[i][j];
+                  final displayValue = value > 200 ? 200 : value; // clamp
+                  final scaled =
+                      radius * displayValue * fraction / widget.ticks.last;
                   final angle = angleIncrement * j - math.pi / 2;
                   final x = centerX + scaled * math.cos(angle);
                   final y = centerY + scaled * math.sin(angle);
@@ -179,7 +171,7 @@ class _RadarChartState extends State<RadarChart>
                     closestDistance = distance;
                     closestPoint = Offset(x, y);
                     closestTooltipText =
-                        "${widget.data[i][j]}%\n${widget.dataDates[i][j]}";
+                        "${value.toStringAsFixed(0)}%${widget.dataDates[i][j].isEmpty ? "" : "\n${widget.dataDates[i][j]}"}";
                   }
                 }
               }
@@ -348,7 +340,8 @@ class RadarChartPainter extends CustomPainter {
 
       for (int i = 0; i < graph.length; i++) {
         final value = graph[i] * fraction;
-        final scaled = value * radius / ticks.last.toDouble();
+        final displayValue = value > 200 ? 200 : value;
+        final scaled = displayValue * radius / ticks.last.toDouble();
         final x = center.dx + scaled * math.cos(angle * i - math.pi / 2);
         final y = center.dy + scaled * math.sin(angle * i - math.pi / 2);
         if (i == 0) {
@@ -372,7 +365,8 @@ class RadarChartPainter extends CustomPainter {
 
       for (int i = 0; i < graph.length; i++) {
         final value = graph[i] * fraction;
-        final scaled = value * radius / ticks.last.toDouble();
+        final displayValue = value > 200 ? 200 : value;
+        final scaled = displayValue * radius / ticks.last.toDouble();
         final x = center.dx + scaled * math.cos(angle * i - math.pi / 2);
         final y = center.dy + scaled * math.sin(angle * i - math.pi / 2);
         canvas.drawCircle(

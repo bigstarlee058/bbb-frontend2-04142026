@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -77,8 +78,8 @@ class _SignupPageState extends State<SignupPage> {
         url,
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
-          'firstname': userName,
-          'lastname': lastName,
+          'firstName': userName,
+          'lastName': lastName,
           'email': emailAddress,
           'password': password,
         },

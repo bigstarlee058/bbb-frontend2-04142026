@@ -114,7 +114,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     }
 
     final data1 = highestByDate.values.toList();
-
     for (var data in data1) {
       double weight = double.tryParse(data.weight.toString()) ?? 0.0;
       int reps = int.tryParse(data.reps.toString()) ?? 0;
@@ -131,9 +130,9 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       //     groupedData[formattedDate]!['totalRIR']! + (repsInReverse == 100 ? 0 : repsInReverse.toDouble());
 
       // double oneRmSession = weight * (1 + (reps + rir) / 30);
-      double oneRmSession =
-          weight * (0.025 * (reps + rir)) + 1 /*+ (reps + rir) / 30)*/;
 
+      double oneRmSession =
+          weight * ((0.025 * (reps + rir)) + 1) /*+ (reps + rir) / 30)*/;
       groupedData[formattedDate]!['oneRmSession'] =
           groupedData[formattedDate]!['oneRmSession']! + oneRmSession;
       groupedData.removeWhere((key, value) =>
@@ -262,11 +261,11 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     _loadValue();
-      //   },
-      // ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _loadValue();
+        },
+      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -335,8 +334,9 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
               child: Text(
                 monthProvider?.selectedExercise?.name ?? "",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
+                  color: Theme.of(context).textTheme.labelLarge?.color,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -370,9 +370,12 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       '1-Rep Max History',
-                      style: TextStyle(fontSize: 14),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).textTheme.labelLarge?.color,
+                      ),
                     ),
                     Row(
                       children: [
@@ -432,13 +435,29 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                         drawVerticalLine: false,
                                         horizontalInterval:
                                             (maxWeight / 5).ceilToDouble(),
-                                        getDrawingHorizontalLine: (value) {
-                                          return FlLine(
-                                              color:
-                                                  Theme.of(context).canvasColor,
-                                              strokeWidth: 0.5,
-                                              dashArray: [5, 5]);
-                                        },
+                                        getDrawingHorizontalLine: (value) =>
+                                            FlLine(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .displayLarge
+                                                    ?.color,
+                                                strokeWidth: 1,
+                                                dashArray: [5, 5]),
+                                        getDrawingVerticalLine: (value) =>
+                                            FlLine(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .displayLarge
+                                                    ?.color,
+                                                strokeWidth: 1,
+                                                dashArray: [5, 5]),
+                                        // getDrawingHorizontalLine: (value) {
+                                        //   return FlLine(
+                                        //       color:
+                                        //           Theme.of(context).canvasColor,
+                                        //       strokeWidth: 0.5,
+                                        //       dashArray: [5, 5]);
+                                        // },
                                       ),
                                       titlesData: FlTitlesData(
                                         leftTitles: AxisTitles(
@@ -449,8 +468,13 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                             getTitlesWidget: (value, meta) {
                                               return Text(
                                                 value.toStringAsFixed(0),
-                                                style: const TextStyle(
-                                                    fontSize: 10),
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .labelLarge
+                                                      ?.color,
+                                                ),
                                               );
                                             },
                                           ),
@@ -466,8 +490,13 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                   index < dateLabels.length) {
                                                 return Text(
                                                   dateLabels[index],
-                                                  style: const TextStyle(
-                                                      fontSize: 10),
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .labelLarge
+                                                        ?.color,
+                                                  ),
                                                 );
                                               }
                                               return const Text('');
@@ -484,13 +513,19 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                         ),
                                       ),
                                       borderData: FlBorderData(
-                                        border: Border(
-                                          top: BorderSide.none,
-                                          right: BorderSide.none,
-                                          left: BorderSide.none,
-                                          bottom: BorderSide(
-                                            width: .5,
-                                            color: Theme.of(context).cardColor,
+                                        show: true,
+                                        border: Border.symmetric(
+                                          horizontal: BorderSide(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge!
+                                                .color!,
+                                          ),
+                                          vertical: BorderSide(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge!
+                                                .color!,
                                           ),
                                         ),
                                       ),
@@ -554,8 +589,12 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                           children: [
                             Text(
                               '$totalWeight lbs',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
+                                    ?.color,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -574,8 +613,12 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                           children: [
                             Text(
                               '$maxWeight lbs',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
+                                    ?.color,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -705,7 +748,10 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                   style: TextStyle(
                                     fontSize: ScreenUtil.horizontalScale(3.5),
                                     fontWeight: FontWeight.normal,
-                                    color: Colors.black,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.color,
                                   ),
                                 ),
                               ),
@@ -736,16 +782,23 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                         fontSize: ScreenUtil
                                                             .horizontalScale(
                                                                 3.5),
-                                                        color: Colors.black,
+                                                        color: Theme.of(context)
+                                                            .textTheme
+                                                            .labelLarge
+                                                            ?.color,
                                                         fontWeight:
                                                             FontWeight.normal),
                                                   ),
                                                   TextSpan(
                                                     text: ' × ',
                                                     style: TextStyle(
-                                                        fontSize: ScreenUtil
-                                                            .horizontalScale(3),
-                                                        color: Colors.black),
+                                                      fontSize: ScreenUtil
+                                                          .horizontalScale(3),
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .labelLarge
+                                                          ?.color,
+                                                    ),
                                                   ),
                                                   TextSpan(
                                                     text: '${data.weight}lbs',
@@ -753,7 +806,10 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                         fontSize: ScreenUtil
                                                             .horizontalScale(
                                                                 3.5),
-                                                        color: Colors.black,
+                                                        color: Theme.of(context)
+                                                            .textTheme
+                                                            .labelLarge
+                                                            ?.color,
                                                         fontWeight:
                                                             FontWeight.bold),
                                                   ),
@@ -761,19 +817,25 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                     text:
                                                         '($result) @ ${data.load}% load',
                                                     style: TextStyle(
-                                                        fontSize: ScreenUtil
-                                                            .horizontalScale(
-                                                                3.5),
-                                                        color: Colors.black),
+                                                      fontSize: ScreenUtil
+                                                          .horizontalScale(3.5),
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .labelLarge
+                                                          ?.color,
+                                                    ),
                                                   ),
                                                   TextSpan(
                                                     text:
                                                         ' | RIR ${data.effort == "100" ? "0" : data.effort}',
                                                     style: TextStyle(
-                                                        fontSize: ScreenUtil
-                                                            .horizontalScale(
-                                                                3.5),
-                                                        color: Colors.black),
+                                                      fontSize: ScreenUtil
+                                                          .horizontalScale(3.5),
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .labelLarge
+                                                          ?.color,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -1005,7 +1067,11 @@ class FilterButton extends StatelessWidget {
         onPressed: onPressed,
         child: Text(
           label,
-          style: TextStyle(color: isSelected ? Colors.white : Colors.black),
+          style: TextStyle(
+            color: isSelected
+                ? Colors.white
+                : Theme.of(context).textTheme.labelLarge?.color,
+          ),
         ),
       ),
     );

@@ -105,8 +105,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
     });
 
     final userDetails = {
-      'lastname': '',
-      'firstname': nameController.text.trim().toString().isEmpty
+      'lastName': '',
+      'firstName': nameController.text.trim().toString().isEmpty
           ? userData.user["name"] ?? ""
           : nameController.text.toString(),
       'sex': selectedGender != null

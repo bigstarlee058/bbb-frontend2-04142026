@@ -175,7 +175,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     // });
 
     final userDetails = {
-      'firstname': 'Nick',
+      // 'firstName': 'Nick',
       // 'lastName': 'Vlacic',
       'sex':
           selectedGender != null ? genderOptions.indexOf(selectedGender!) : "",

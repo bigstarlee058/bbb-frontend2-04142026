@@ -1,16 +1,10 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:math' as math;
+
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
-import 'package:bbb/components/haptic_feedback%20.dart';
-import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
-import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
-import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
-import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/custom_radar.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -42,7 +36,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   bool isDropdownOpen = false;
 
   MonthProvider? monthProvider;
-
+  bool loader = false;
   @override
   void initState() {
     super.initState();
@@ -50,7 +44,9 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) => filterRadarChartData(),
+    );
     // dataProvider?.fetchAdminData().then((_) {
     //   setState(() {
     //     _filteredExercises = dataProvider!.adminExercises;
@@ -61,16 +57,85 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     // });
   }
 
+  // Future<void> filterRadarChartData() async {
+  //   final exerciseMap = {
+  //     "Back Squat": "67941affde5cb7e685b6250d",
+  //     "Barbell Bench Press": "67658618b4bdd7fee53c62a0",
+  //     "Conventional Deadlift": "67f6092ec86cd04c9a31a21e",
+  //     "Weighted Chin-Up": "67fbebb2be021a74cbd96ba7",
+  //     "Barbell Hip Thrust": "67658533b4bdd7fee53c5566",
+  //   };
+  //
+  //   Map<String, int> maxOneRMMap = {};
+  //
+  //   final allDataFutures = exerciseMap.entries.map((entry) async {
+  //     final name = entry.key;
+  //     final id = entry.value;
+  //
+  //     List<ExerciseHistoryDataModel> history =
+  //         await ApiRepo.fetchExerciseForTheExercise(id);
+  //
+  //     final Map<String, ExerciseHistoryDataModel> highestByDate = {};
+  //
+  //     for (final item in history) {
+  //       final dateStr = item.date;
+  //       final date = DateTime.tryParse(dateStr ?? '') ?? DateTime.now();
+  //       final dayKey = DateFormat('yyyy-MM-dd').format(date);
+  //
+  //       final reps = int.tryParse(item.reps ?? "0") ?? 0;
+  //       final weight = double.tryParse(item.weight ?? "0") ?? 0;
+  //       final load = reps * weight;
+  //
+  //       final existing = highestByDate[dayKey];
+  //       final existingLoad = (int.tryParse(existing?.reps ?? "0") ?? 0) *
+  //           (double.tryParse(existing?.weight ?? "0") ?? 0);
+  //
+  //       if (!highestByDate.containsKey(dayKey) || load > existingLoad) {
+  //         highestByDate[dayKey] = item;
+  //       }
+  //     }
+  //
+  //     double maxOneRM = 0.0;
+  //
+  //     for (final data in highestByDate.values) {
+  //       final weight = double.tryParse(data.weight ?? "0") ?? 0;
+  //       final reps = int.tryParse(data.reps ?? "0") ?? 0;
+  //       final effort = int.tryParse(data.effort ?? "0") ?? 100;
+  //
+  //       if (weight == 0 || reps == 0) continue;
+  //
+  //       final rir = (effort == 100) ? 0.0 : effort.toDouble();
+  //       final oneRM = weight * (0.025 * (reps + rir)) + 1;
+  //
+  //       if (oneRM > maxOneRM) maxOneRM = oneRM;
+  //     }
+  //
+  //     maxOneRMMap[name] = (maxOneRM.toInt());
+  //   });
+  //   await Future.wait(allDataFutures);
+  // }
+
   Future<void> filterRadarChartData() async {
+    loader = true;
+    setState(() {});
+    valueList = [];
     final exerciseMap = {
       "Back Squat": "67941affde5cb7e685b6250d",
       "Barbell Bench Press": "67658618b4bdd7fee53c62a0",
       "Conventional Deadlift": "67f6092ec86cd04c9a31a21e",
       "Weighted Chin-Up": "67fbebb2be021a74cbd96ba7",
-      "Barbell Hip Thrust": "67658533b4bdd7fee53c5566",
+      "Barbell Hip Thrust": "67658533b4bdd7fee53c5566"
     };
+    final List<String> features = [
+      "Back Squat",
+      "Barbell\nBench Press",
+      "Conventional\nDeadlift",
+      "Weighted\nChin-Up",
+      "Barbell\nHip Thrust",
+      "Chinup"
+    ];
 
-    Map<String, int> maxOneRMMap = {};
+    Map<String, Map<String, dynamic>> percentageMap = {};
 
     final allDataFutures = exerciseMap.entries.map((entry) async {
       final name = entry.key;
@@ -79,45 +144,103 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
       List<ExerciseHistoryDataModel> history =
           await ApiRepo.fetchExerciseForTheExercise(id);
 
+      history.sort((a, b) {
+        final da = DateTime.tryParse(a.date ?? '') ?? DateTime(1970);
+        final db = DateTime.tryParse(b.date ?? '') ?? DateTime(1970);
+        return da.compareTo(db);
+      });
+
+      double? baseOneRM;
+      String? baseDate;
+      double? latestOneRM;
+      String? latestDate;
+
       final Map<String, ExerciseHistoryDataModel> highestByDate = {};
 
       for (final item in history) {
         final dateStr = item.date;
-        final date = DateTime.tryParse(dateStr ?? '') ?? DateTime.now();
-        final dayKey = DateFormat('yyyy-MM-dd').format(date);
+        final date = DateTime.parse("${dateStr ?? DateTime.now()}");
+        final dayKey = DateFormat('MM-dd-yyyy').format(date);
 
         final reps = int.tryParse(item.reps ?? "0") ?? 0;
         final weight = double.tryParse(item.weight ?? "0") ?? 0;
         final load = reps * weight;
 
-        final existing = highestByDate[dayKey];
-        final existingLoad = (int.tryParse(existing?.reps ?? "0") ?? 0) *
-            (double.tryParse(existing?.weight ?? "0") ?? 0);
-
-        if (!highestByDate.containsKey(dayKey) || load > existingLoad) {
+        if (!highestByDate.containsKey(dayKey) ||
+            (load) >
+                (int.tryParse(highestByDate[dayKey]!.reps ?? "0") ?? 0) *
+                    (double.tryParse(highestByDate[dayKey]!.weight ?? "0") ??
+                        0)) {
           highestByDate[dayKey] = item;
         }
       }
+      final data1 = highestByDate.values.toList();
 
-      double maxOneRM = 0.0;
-
-      for (final data in highestByDate.values) {
-        final weight = double.tryParse(data.weight ?? "0") ?? 0;
-        final reps = int.tryParse(data.reps ?? "0") ?? 0;
-        final effort = int.tryParse(data.effort ?? "0") ?? 100;
+      for (final item in data1) {
+        final weight = double.tryParse(item.weight ?? "0") ?? 0;
+        final reps = int.tryParse(item.reps ?? "0") ?? 0;
+        final effort = int.tryParse(item.effort ?? "0") ?? 100;
 
         if (weight == 0 || reps == 0) continue;
 
         final rir = (effort == 100) ? 0.0 : effort.toDouble();
-        final oneRM = weight * (0.025 * (reps + rir)) + 1;
+        final oneRM = weight * ((0.025 * (reps + rir)) + 1);
 
-        if (oneRM > maxOneRM) maxOneRM = oneRM;
+        if (oneRM <= 1) continue;
+
+        if (baseOneRM == null) {
+          baseOneRM = oneRM;
+          baseDate = item.date;
+        }
+        latestOneRM = oneRM;
+        latestDate = item.date;
       }
 
-      maxOneRMMap[name] = (maxOneRM.toInt());
+      double percentage = 0;
+      if (baseOneRM != null && latestOneRM != null && baseOneRM > 0) {
+        percentage = (latestOneRM / baseOneRM) * 100;
+      }
+
+      percentageMap[name] = {
+        "oldest_1RM": baseOneRM ?? 0,
+        "oldest_date": baseDate ?? "",
+        "latest_1RM": latestOneRM ?? 0,
+        "latest_date": latestDate ?? "",
+        "percentage": percentage
+      };
     });
 
     await Future.wait(allDataFutures);
+
+    final data = features.map((feature) {
+      final key = feature.replaceAll("\n", " ");
+      return (percentageMap[key] ??
+          {
+            "oldest_1RM": 0.0,
+            "oldest_date": "",
+            "latest_1RM": 0.0,
+            "latest_date": "",
+            "percentage": 0.0
+          });
+    }).toList();
+
+    for (var element in data) {
+      valueList.add(
+          double.parse("${element["percentage"].toStringAsFixed(0) ?? 0}"));
+      dateHighest.add(element["latest_date"] == null ||
+              element["latest_date"].toString().isEmpty
+          ? ""
+          : DateFormat("MM/dd/yyyy")
+              .format(DateTime.parse(element["latest_date"])));
+      dateOld.add(element["oldest_date"] == null ||
+              element["oldest_date"].toString().isEmpty
+          ? ""
+          : DateFormat("MM/dd/yyyy")
+              .format(DateTime.parse(element["oldest_date"])));
+    }
+    setState(() {
+      loader = false;
+    });
   }
 
   void scrollToMiddle() {
@@ -138,6 +261,10 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     }
   }
 
+  List<double> valueList = [];
+  List<String> dateOld = [];
+  List<String> dateHighest = [];
+
   @override
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -152,6 +279,11 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          filterRadarChartData();
+        },
+      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         controller: scrollController,
@@ -159,16 +291,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            AppImage.imageGraphs(
-                // media,
-                // image: dataProvider!.allImageList
-                //     .where((element) => element["key"] == "imageGraphs")
-                //     .first["image"],
-                // // dataProvider?.screenBackgroundResponse?.imageGraphs ?? "",
-                // // image: dataProvider!.cachedImageMap["imageGraphs"],
-                //
-                // imageKey: "imageGraphs",
-                ),
+            AppImage.imageGraphs(),
             Container(
               margin: EdgeInsets.only(
                   top: Platform.isAndroid
@@ -182,435 +305,462 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                     topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                   ),
                 ),
-                child: Column(
-                  children: [
-                    /// EXERCISE COMPLETED
-
-                    // SizedBox(height: ScreenUtil.horizontalScale(7)),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(
-                    //     vertical: ScreenUtil.verticalScale(1.5),
-                    //     horizontal: ScreenUtil.horizontalScale(8),
-                    //   ),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       Text(
-                    //         "Exercises Completed",
-                    //         style: TextStyle(
-                    //           color: AppColors.primaryColor,
-                    //           fontSize: ScreenUtil.verticalScale(2.3),
-                    //           fontWeight: FontWeight.w700,
-                    //         ),
-                    //       ),
-                    //       Container(
-                    //         height: ScreenUtil.verticalScale(4),
-                    //         decoration: BoxDecoration(
-                    //           color: Colors.white,
-                    //           borderRadius: BorderRadius.circular(
-                    //             ScreenUtil.verticalScale(2),
-                    //           ),
-                    //         ),
-                    //         child: Consumer<MonthProvider>(
-                    //           builder: (context, monthProvider, child) {
-                    //             return DropdownButtonHideUnderline(
-                    //               child: DropdownButton(
-                    //                 value: monthProvider
-                    //                     .reportExerciseCompletedWeek,
-                    //                 items: [
-                    //                   "Week 1",
-                    //                   "Week 2",
-                    //                   "Week 3",
-                    //                   "Week 4"
-                    //                 ]
-                    //                     .map(
-                    //                       (name) => DropdownMenuItem(
-                    //                         value: name,
-                    //                         child: Text(
-                    //                           name,
-                    //                           style: TextStyle(
-                    //                             color: const Color(0xA09F9F9F),
-                    //                             fontSize:
-                    //                                 ScreenUtil.horizontalScale(
-                    //                               3,
-                    //                             ),
-                    //                           ),
-                    //                         ),
-                    //                       ),
-                    //                     )
-                    //                     .toList(),
-                    //                 onChanged: monthProvider
-                    //                     .changeWeekExerciseCompleted,
-                    //                 icon: Icon(
-                    //                   Icons.expand_more,
-                    //                   color: const Color(0xA09F9F9F),
-                    //                   size: ScreenUtil.verticalScale(3),
-                    //                 ),
-                    //               ),
-                    //             );
-                    //           },
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // SizedBox(height: ScreenUtil.horizontalScale(2)),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(
-                    //     horizontal: ScreenUtil.horizontalScale(8),
-                    //   ),
-                    // child: const ReportExerciseCompletedGraph(),
-                    // ),
-
-                    /// WEIGHT LIFTED
-
-                    SizedBox(height: ScreenUtil.horizontalScale(4)),
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                          vertical: ScreenUtil.verticalScale(1.5),
-                          horizontal: ScreenUtil.horizontalScale(8)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: loader
+                    ? SizedBox(
+                        height: media.height -
+                            (Platform.isAndroid
+                                ? media.height / 8.5
+                                : media.height / 7),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                      )
+                    : Column(
                         children: [
-                          Text(
-                            "Weight Lifted",
-                            style: TextStyle(
-                              color: AppColors.primaryColor,
-                              fontSize: ScreenUtil.verticalScale(2.3),
-                              fontWeight: FontWeight.w700,
+                          /// EXERCISE COMPLETED
+
+                          // SizedBox(height: ScreenUtil.horizontalScale(7)),
+                          // Container(
+                          //   margin: EdgeInsets.symmetric(
+                          //     vertical: ScreenUtil.verticalScale(1.5),
+                          //     horizontal: ScreenUtil.horizontalScale(8),
+                          //   ),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       Text(
+                          //         "Exercises Completed",
+                          //         style: TextStyle(
+                          //           color: AppColors.primaryColor,
+                          //           fontSize: ScreenUtil.verticalScale(2.3),
+                          //           fontWeight: FontWeight.w700,
+                          //         ),
+                          //       ),
+                          //       Container(
+                          //         height: ScreenUtil.verticalScale(4),
+                          //         decoration: BoxDecoration(
+                          //           color: Colors.white,
+                          //           borderRadius: BorderRadius.circular(
+                          //             ScreenUtil.verticalScale(2),
+                          //           ),
+                          //         ),
+                          //         child: Consumer<MonthProvider>(
+                          //           builder: (context, monthProvider, child) {
+                          //             return DropdownButtonHideUnderline(
+                          //               child: DropdownButton(
+                          //                 value: monthProvider
+                          //                     .reportExerciseCompletedWeek,
+                          //                 items: [
+                          //                   "Week 1",
+                          //                   "Week 2",
+                          //                   "Week 3",
+                          //                   "Week 4"
+                          //                 ]
+                          //                     .map(
+                          //                       (name) => DropdownMenuItem(
+                          //                         value: name,
+                          //                         child: Text(
+                          //                           name,
+                          //                           style: TextStyle(
+                          //                             color: const Color(0xA09F9F9F),
+                          //                             fontSize:
+                          //                                 ScreenUtil.horizontalScale(
+                          //                               3,
+                          //                             ),
+                          //                           ),
+                          //                         ),
+                          //                       ),
+                          //                     )
+                          //                     .toList(),
+                          //                 onChanged: monthProvider
+                          //                     .changeWeekExerciseCompleted,
+                          //                 icon: Icon(
+                          //                   Icons.expand_more,
+                          //                   color: const Color(0xA09F9F9F),
+                          //                   size: ScreenUtil.verticalScale(3),
+                          //                 ),
+                          //               ),
+                          //             );
+                          //           },
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          // SizedBox(height: ScreenUtil.horizontalScale(2)),
+                          // Container(
+                          //   margin: EdgeInsets.symmetric(
+                          //     horizontal: ScreenUtil.horizontalScale(8),
+                          //   ),
+                          // child: const ReportExerciseCompletedGraph(),
+                          // ),
+
+                          /// WEIGHT LIFTED
+
+                          SizedBox(height: ScreenUtil.horizontalScale(4)),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: ScreenUtil.verticalScale(1.5),
+                                horizontal: ScreenUtil.horizontalScale(8)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Weight Lifted",
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor,
+                                    fontSize: ScreenUtil.verticalScale(2.3),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Container(
+                                  height: ScreenUtil.verticalScale(4),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        ScreenUtil.verticalScale(2)),
+                                  ),
+                                  child: Consumer<MonthProvider>(
+                                    builder: (context, monthProvider, child) {
+                                      return DropdownButtonHideUnderline(
+                                        child: DropdownButton(
+                                          value:
+                                              monthProvider.reportWeightLifted,
+                                          items: [
+                                            "Week 1",
+                                            "Week 2",
+                                            "Week 3",
+                                            "Week 4"
+                                          ]
+                                              .map(
+                                                (name) => DropdownMenuItem(
+                                                  value: name,
+                                                  child: Text(
+                                                    name,
+                                                    style: TextStyle(
+                                                      color: const Color(
+                                                          0xA09F9F9F),
+                                                      fontSize: ScreenUtil
+                                                          .verticalScale(1.5),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                          onChanged: monthProvider
+                                              .changeWeekWeightLifted,
+                                          icon: const Icon(
+                                            Icons.expand_more,
+                                            color: Color(0xA09F9F9F),
+                                            size: 25,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                          SizedBox(height: ScreenUtil.horizontalScale(2)),
                           Container(
-                            height: ScreenUtil.verticalScale(4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                  ScreenUtil.verticalScale(2)),
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(8)),
+                              child: const ReportWeightLiftedGraph()),
+
+                          /// AVERAGE RIR
+
+                          // SizedBox(height: ScreenUtil.horizontalScale(4)),
+                          // Container(
+                          //   margin: EdgeInsets.symmetric(
+                          //       vertical: ScreenUtil.verticalScale(1.5),
+                          //       horizontal: ScreenUtil.horizontalScale(8)),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       Text(
+                          //         "Average RIR",
+                          //         style: TextStyle(
+                          //           color: AppColors.primaryColor,
+                          //           fontSize: ScreenUtil.verticalScale(2.3),
+                          //           fontWeight: FontWeight.w700,
+                          //         ),
+                          //       ),
+                          //       Container(
+                          //         height: ScreenUtil.verticalScale(4),
+                          //         decoration: BoxDecoration(
+                          //           color: Colors.white,
+                          //           borderRadius: BorderRadius.circular(
+                          //               ScreenUtil.verticalScale(2)),
+                          //         ),
+                          //         child: Consumer<MonthProvider>(
+                          //           builder: (context, monthProvider, child) {
+                          //             return DropdownButtonHideUnderline(
+                          //               child: DropdownButton(
+                          //                 value: monthProvider.reportAverageRIRWeek,
+                          //                 items: [
+                          //                   "Week 1",
+                          //                   "Week 2",
+                          //                   "Week 3",
+                          //                   "Week 4"
+                          //                 ]
+                          //                     .map(
+                          //                       (name) => DropdownMenuItem(
+                          //                         value: name,
+                          //                         child: Text(
+                          //                           name,
+                          //                           style: TextStyle(
+                          //                             color: const Color(0xA09F9F9F),
+                          //                             fontSize:
+                          //                                 ScreenUtil.verticalScale(
+                          //                                     1.5),
+                          //                           ),
+                          //                         ),
+                          //                       ),
+                          //                     )
+                          //                     .toList(),
+                          //                 onChanged:
+                          //                     monthProvider.changeWeekWeightLifted,
+                          //                 icon: const Icon(
+                          //                   Icons.expand_more,
+                          //                   color: Color(0xA09F9F9F),
+                          //                   size: 25,
+                          //                 ),
+                          //               ),
+                          //             );
+                          //           },
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          // SizedBox(height: ScreenUtil.horizontalScale(2)),
+                          // Container(
+                          //     margin: EdgeInsets.symmetric(
+                          //         horizontal: ScreenUtil.horizontalScale(8)),
+                          //     child: const ReportAverageRIRGraph()),
+
+                          /// TIME SPENT
+
+                          // SizedBox(height: ScreenUtil.horizontalScale(4)),
+                          // Container(
+                          //   margin: EdgeInsets.symmetric(
+                          //     vertical: ScreenUtil.verticalScale(1.5),
+                          //     horizontal: ScreenUtil.horizontalScale(8),
+                          //   ),
+                          //   width: media.width,
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       Text(
+                          //         'Time Spent',
+                          //         style: TextStyle(
+                          //           color: AppColors.primaryColor,
+                          //           fontSize: ScreenUtil.horizontalScale(5),
+                          //           fontWeight: FontWeight.bold,
+                          //         ),
+                          //       ),
+                          //       Container(
+                          //         height: ScreenUtil.verticalScale(4),
+                          //         decoration: BoxDecoration(
+                          //           color: Colors.white,
+                          //           borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
+                          //         ),
+                          //         child: Consumer<MonthProvider>(
+                          //           builder: (context, monthProvider, child) {
+                          //             return DropdownButtonHideUnderline(
+                          //               child: DropdownButton(
+                          //                 value: monthProvider.reportTimeSpent,
+                          //                 items: ["Week 1", "Week 2", "Week 3", "Week 4"]
+                          //                     .map((name) => DropdownMenuItem(
+                          //                           value: name,
+                          //                           child: Text(
+                          //                             name,
+                          //                             style: TextStyle(
+                          //                               color: const Color(0xA09F9F9F),
+                          //                               fontSize: ScreenUtil.verticalScale(1.5),
+                          //                             ),
+                          //                           ),
+                          //                         ))
+                          //                     .toList(),
+                          //                 onChanged: monthProvider.changeWeekTimeSpent,
+                          //                 icon: const Icon(
+                          //                   Icons.expand_more,
+                          //                   color: Color(0xA09F9F9F),
+                          //                   size: 25,
+                          //                 ),
+                          //               ),
+                          //             );
+                          //           },
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          // SizedBox(height: ScreenUtil.horizontalScale(2)),
+                          // Container(
+                          //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
+                          //   child: const ReportTimeSpentGraph()
+                          // ),
+
+                          SizedBox(height: ScreenUtil.horizontalScale(2)),
+                          Container(
+                            margin: EdgeInsets.only(
+                              left: ScreenUtil.horizontalScale(2),
+                              right: ScreenUtil.horizontalScale(5),
                             ),
-                            child: Consumer<MonthProvider>(
-                              builder: (context, monthProvider, child) {
-                                return DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                    value: monthProvider.reportWeightLifted,
-                                    items: [
-                                      "Week 1",
-                                      "Week 2",
-                                      "Week 3",
-                                      "Week 4"
-                                    ]
-                                        .map(
-                                          (name) => DropdownMenuItem(
-                                            value: name,
-                                            child: Text(
-                                              name,
-                                              style: TextStyle(
-                                                color: const Color(0xA09F9F9F),
-                                                fontSize:
-                                                    ScreenUtil.verticalScale(
-                                                        1.5),
-                                              ),
-                                            ),
+                            // height: 400,
+                            child: CustomRadarChart(
+                                valueList: valueList,
+                                dateHighest: dateHighest,
+                                dateOld: dateOld),
+                          ),
+
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(8),
+                                vertical: 35),
+                            child: IntrinsicHeight(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: ScreenUtil.horizontalScale(3),
+                                        right: ScreenUtil.horizontalScale(5),
+                                        top: ScreenUtil.verticalScale(2),
+                                        bottom: ScreenUtil.verticalScale(2),
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            spreadRadius: 2,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 1),
                                           ),
-                                        )
-                                        .toList(),
-                                    onChanged:
-                                        monthProvider.changeWeekWeightLifted,
-                                    icon: const Icon(
-                                      Icons.expand_more,
-                                      color: Color(0xA09F9F9F),
-                                      size: 25,
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Total Weight\nLifted',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.color,
+                                                fontSize:
+                                                    ScreenUtil.horizontalScale(
+                                                        3.6)),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Consumer<MonthProvider>(
+                                            builder: (context, monthProvider,
+                                                child) {
+                                              return Text(
+                                                "${NumberFormat.decimalPattern('en_US').format(monthProvider.totalWeightLiftedInAWeek.toInt())}lbs",
+
+                                                // '${monthProvider.totalWeightLiftedInAWeek.toStringAsFixed(0)} lbs',
+                                                style: TextStyle(
+                                                  color:
+                                                      const Color(0xFFDD1166),
+                                                  fontSize: ScreenUtil
+                                                      .horizontalScale(4),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                );
-                              },
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: ScreenUtil.horizontalScale(3),
+                                        right: ScreenUtil.horizontalScale(5),
+                                        top: ScreenUtil.verticalScale(2),
+                                        bottom: ScreenUtil.verticalScale(2),
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            spreadRadius: 2,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Total completed\nExercises',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.color,
+                                              fontSize:
+                                                  ScreenUtil.horizontalScale(
+                                                      3.6),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Consumer<MonthProvider>(
+                                            builder: (context, monthProvider,
+                                                child) {
+                                              return Text(
+                                                monthProvider
+                                                    .totalExerciseCompletedInAWeek
+                                                    .toStringAsFixed(0),
+                                                style: TextStyle(
+                                                  color:
+                                                      const Color(0xFFDD1166),
+                                                  fontSize: ScreenUtil
+                                                      .horizontalScale(4),
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                          ),
+                          SizedBox(
+                            height: media.height * 0.02,
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: ScreenUtil.horizontalScale(2)),
-                    Container(
-                        margin: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.horizontalScale(8)),
-                        child: const ReportWeightLiftedGraph()),
-
-                    /// AVERAGE RIR
-
-                    // SizedBox(height: ScreenUtil.horizontalScale(4)),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(
-                    //       vertical: ScreenUtil.verticalScale(1.5),
-                    //       horizontal: ScreenUtil.horizontalScale(8)),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       Text(
-                    //         "Average RIR",
-                    //         style: TextStyle(
-                    //           color: AppColors.primaryColor,
-                    //           fontSize: ScreenUtil.verticalScale(2.3),
-                    //           fontWeight: FontWeight.w700,
-                    //         ),
-                    //       ),
-                    //       Container(
-                    //         height: ScreenUtil.verticalScale(4),
-                    //         decoration: BoxDecoration(
-                    //           color: Colors.white,
-                    //           borderRadius: BorderRadius.circular(
-                    //               ScreenUtil.verticalScale(2)),
-                    //         ),
-                    //         child: Consumer<MonthProvider>(
-                    //           builder: (context, monthProvider, child) {
-                    //             return DropdownButtonHideUnderline(
-                    //               child: DropdownButton(
-                    //                 value: monthProvider.reportAverageRIRWeek,
-                    //                 items: [
-                    //                   "Week 1",
-                    //                   "Week 2",
-                    //                   "Week 3",
-                    //                   "Week 4"
-                    //                 ]
-                    //                     .map(
-                    //                       (name) => DropdownMenuItem(
-                    //                         value: name,
-                    //                         child: Text(
-                    //                           name,
-                    //                           style: TextStyle(
-                    //                             color: const Color(0xA09F9F9F),
-                    //                             fontSize:
-                    //                                 ScreenUtil.verticalScale(
-                    //                                     1.5),
-                    //                           ),
-                    //                         ),
-                    //                       ),
-                    //                     )
-                    //                     .toList(),
-                    //                 onChanged:
-                    //                     monthProvider.changeWeekWeightLifted,
-                    //                 icon: const Icon(
-                    //                   Icons.expand_more,
-                    //                   color: Color(0xA09F9F9F),
-                    //                   size: 25,
-                    //                 ),
-                    //               ),
-                    //             );
-                    //           },
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // SizedBox(height: ScreenUtil.horizontalScale(2)),
-                    // Container(
-                    //     margin: EdgeInsets.symmetric(
-                    //         horizontal: ScreenUtil.horizontalScale(8)),
-                    //     child: const ReportAverageRIRGraph()),
-
-                    /// TIME SPENT
-
-                    // SizedBox(height: ScreenUtil.horizontalScale(4)),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(
-                    //     vertical: ScreenUtil.verticalScale(1.5),
-                    //     horizontal: ScreenUtil.horizontalScale(8),
-                    //   ),
-                    //   width: media.width,
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       Text(
-                    //         'Time Spent',
-                    //         style: TextStyle(
-                    //           color: AppColors.primaryColor,
-                    //           fontSize: ScreenUtil.horizontalScale(5),
-                    //           fontWeight: FontWeight.bold,
-                    //         ),
-                    //       ),
-                    //       Container(
-                    //         height: ScreenUtil.verticalScale(4),
-                    //         decoration: BoxDecoration(
-                    //           color: Colors.white,
-                    //           borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(2)),
-                    //         ),
-                    //         child: Consumer<MonthProvider>(
-                    //           builder: (context, monthProvider, child) {
-                    //             return DropdownButtonHideUnderline(
-                    //               child: DropdownButton(
-                    //                 value: monthProvider.reportTimeSpent,
-                    //                 items: ["Week 1", "Week 2", "Week 3", "Week 4"]
-                    //                     .map((name) => DropdownMenuItem(
-                    //                           value: name,
-                    //                           child: Text(
-                    //                             name,
-                    //                             style: TextStyle(
-                    //                               color: const Color(0xA09F9F9F),
-                    //                               fontSize: ScreenUtil.verticalScale(1.5),
-                    //                             ),
-                    //                           ),
-                    //                         ))
-                    //                     .toList(),
-                    //                 onChanged: monthProvider.changeWeekTimeSpent,
-                    //                 icon: const Icon(
-                    //                   Icons.expand_more,
-                    //                   color: Color(0xA09F9F9F),
-                    //                   size: 25,
-                    //                 ),
-                    //               ),
-                    //             );
-                    //           },
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // SizedBox(height: ScreenUtil.horizontalScale(2)),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(8)),
-                    //   child: const ReportTimeSpentGraph()
-                    // ),
-
-                    SizedBox(height: ScreenUtil.horizontalScale(2)),
-                    Container(
-                      margin: EdgeInsets.only(
-                        left: ScreenUtil.horizontalScale(2),
-                        right: ScreenUtil.horizontalScale(5),
-                      ),
-                      // height: 400,
-                      child: CustomRadarChart(),
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.horizontalScale(8),
-                          vertical: 35),
-                      child: IntrinsicHeight(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                  left: ScreenUtil.horizontalScale(3),
-                                  right: ScreenUtil.horizontalScale(5),
-                                  top: ScreenUtil.verticalScale(2),
-                                  bottom: ScreenUtil.verticalScale(2),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      spreadRadius: 2,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Total Weight\nLifted',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.color,
-                                          fontSize:
-                                              ScreenUtil.horizontalScale(3.6)),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Consumer<MonthProvider>(
-                                      builder: (context, monthProvider, child) {
-                                        return Text(
-                                          "${NumberFormat.decimalPattern('en_US').format(monthProvider.totalWeightLiftedInAWeek.toInt())}lbs",
-
-                                          // '${monthProvider.totalWeightLiftedInAWeek.toStringAsFixed(0)} lbs',
-                                          style: TextStyle(
-                                            color: const Color(0xFFDD1166),
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(4),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                  left: ScreenUtil.horizontalScale(3),
-                                  right: ScreenUtil.horizontalScale(5),
-                                  top: ScreenUtil.verticalScale(2),
-                                  bottom: ScreenUtil.verticalScale(2),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      spreadRadius: 2,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Total completed\nExercises',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.color,
-                                        fontSize:
-                                            ScreenUtil.horizontalScale(3.6),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Consumer<MonthProvider>(
-                                      builder: (context, monthProvider, child) {
-                                        return Text(
-                                          monthProvider
-                                              .totalExerciseCompletedInAWeek
-                                              .toStringAsFixed(0),
-                                          style: TextStyle(
-                                            color: const Color(0xFFDD1166),
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(4),
-                                          ),
-                                        );
-                                      },
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: media.height * 0.02,
-                    ),
-                  ],
-                ),
               ),
             ),
             Column(
@@ -783,393 +933,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
       ),
     );
   }
-
-  Future<void> continueWorkoutOnTap(
-      MonthProvider monthProvider, BuildContext context) async {
-    HapticFeedBack.buttonClick();
-    int? index = monthProvider
-        .monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList
-        ?.indexWhere((element) => element == monthProvider.todayTitleId);
-
-    String split = monthProvider
-            .monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].idList?.first
-            .toString()
-            .split(" ")[1] ??
-        "";
-
-    String dataId =
-        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
-
-    final dayIndex = int.parse((monthProvider.monthDataModel
-                ?.weeks![(monthProvider.week ?? 1) - 1].dayList?[index ?? 0]
-                .toString()
-                .replaceAll("Workout", "")
-                .replaceAll("Rest", "")
-                .replaceAll("Day", "")
-                .replaceAll(" ", "") ??
-            "0")) -
-        1;
-
-    bool isRestDay =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-            .toString()
-            .contains("Rest Day");
-
-    bool isPumpDay = (isRestDay &&
-            monthProvider.allDayHistoryModel.any((element) =>
-                element.dataId == dataId &&
-                element.type.toString().contains("Pump Day"))) ||
-        (isRestDay &&
-            (monthProvider.isPumpDayAvailable &&
-                (monthProvider.allDayHistoryModel.any((element) =>
-                    element.dataId == dataId &&
-                    element.type != "Rest Day")))) ||
-        (isRestDay &&
-            monthProvider.isPumpDayAvailable &&
-            (monthProvider.allDayHistoryModel.any((element) =>
-                element.dataId == dataId &&
-                element.type == "Rest Day" &&
-                element.status == ""))) ||
-        (isRestDay &&
-            monthProvider.isPumpDayAvailable &&
-            (!monthProvider.allDayHistoryModel
-                .map((e) => e.dataId)
-                .toList()
-                .contains(dataId)));
-
-    monthProvider.changeIsPumpDay(isPumpDay);
-    if (isPumpDay) {
-      final dataList = monthProvider.dayHistoryModel
-          .where((element) =>
-              element.type?.contains("Pump Day") == true &&
-              element.status != Status.empty)
-          .toList();
-
-      if (dataList.isNotEmpty) {
-        int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any(
-            (e1) => (e1.dayId == monthProvider.todayTitleId &&
-                e1.type.toString().replaceAll("Pump Day - ", "") == el1.id)));
-        if (index1 != -1) {
-          monthProvider.updatePumpDayData(monthProvider.pumpDays[index1]);
-        } else {
-          int index1 = monthProvider.pumpDays.indexWhere((el1) => dataList.any(
-              (e1) =>
-                  e1.type.toString().replaceAll("Pump Day - ", "") == el1.id));
-          monthProvider.updatePumpDayData(monthProvider.pumpDays[index == -1
-              ? 0
-              : index1 == 0
-                  ? 1
-                  : 0]);
-        }
-      } else {
-        monthProvider.updatePumpDayData(monthProvider.pumpDays[0]);
-      }
-
-      // monthProvider.updatePumpDayData(monthProvider.pumpDays[
-      //     int.parse(monthProvider.monthDataModel!.weeks![monthProvider.week! - 1].dayList![index ?? 0].toString().split(" ").last) - 1]);
-    }
-
-    DayDataModel dayData =
-        "${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].dayList![index ?? 0] ?? ""}"
-                .toString()
-                .contains("Workout")
-            ? monthProvider.monthDataModel!
-                .weeks![(monthProvider.week ?? 1) - 1].days![dayIndex]
-            : DayDataModel();
-
-    monthProvider.overviewCurrentWeek = monthProvider.week ?? 1;
-    monthProvider.overviewCurrentDay = ((index ?? 1) + 1);
-    monthProvider.dayDataModel = dayData;
-    // monthProvider.alternateEquipmentType = monthProvider.equipmentType;
-    monthProvider.weekDataModel =
-        monthProvider.monthDataModel!.weeks![(monthProvider.week ?? 1) - 1];
-    monthProvider.updateIsPastWeek(
-        monthProvider.weekStatuses[(monthProvider.week ?? 1) - 1] ==
-            WeekType.pastWeek);
-    Navigator.pop(context);
-
-    final dayIndex1 = monthProvider.overviewCurrentDay;
-
-    int nextWorkOutIndex = monthProvider.weekDataModel!.dayList![dayIndex1 - 1]
-            .toString()
-            .contains("Workout")
-        ? int.parse(monthProvider.weekDataModel!.dayList![dayIndex1 - 1]
-                .toString()
-                .replaceAll("Day ", "")
-                .replaceAll(" Workout", "")) -
-            1
-        : 0;
-    String currentDayTitle = monthProvider
-            .weekDataModel!.dayList![dayIndex1 - 1]
-            .toString()
-            .contains("Workout")
-        ? monthProvider.weekDataModel!.days![nextWorkOutIndex].title ?? ""
-        : monthProvider.weekDataModel!.dayList![dayIndex1 - 1];
-    // if (currentDayTitle.contains("Rest Day") && (!monthProvider.isPumpDay)) {
-    //   Navigator.pushNamed(context, '/dayOverview');
-    // }
-
-    final isCompletedOrSkipped = (monthProvider.allSplitDayHistoryModel.any(
-        (element) =>
-            (element.status == Status.completed ||
-                element.status == Status.skipped) &&
-            element.dataId == dataId));
-
-    if (currentDayTitle.contains("Rest Day") &&
-        (!monthProvider.isPumpDay) &&
-        isCompletedOrSkipped) {
-      return;
-    } else if (currentDayTitle.contains("Rest Day") &&
-        (!monthProvider.isPumpDay) &&
-        !isCompletedOrSkipped) {
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-      context.read<MainPageProvider>().changeTab(1);
-      monthProvider.updateIsOnMonthPage(false);
-      monthProvider.updateScrollToRestDay(true);
-
-      // showDialog(
-      //   barrierDismissible: false,
-      //   context: context,
-      //   builder: (c1) {
-      //     return skipWorkoutDialog(context, c1);
-      //   },
-      // );
-    } else {
-      if (monthProvider.isPumpDay) {
-        if ((monthProvider.allSplitDayHistoryModel.any((element) =>
-                (element.status == Status.completed ||
-                    element.status == Status.skipped) &&
-                element.dataId == dataId)) ==
-            false) {
-          _saveDayData(
-              type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
-              status: Status.started,
-              title: monthProvider.pumpDayModel?.title);
-          if (!context.mounted) return;
-          await Navigator.pushNamed(context, '/today').then(
-            (value) {
-              WidgetsBinding.instance.addPostFrameCallback(
-                  (timeStamp) async => await monthProvider.checkForPumpDay());
-            },
-          );
-        } else {
-          if (!context.mounted) return;
-          await Navigator.pushNamed(context, '/today');
-        }
-      } else {
-        if ((monthProvider.dayHistoryModel
-                .any((element) => element.dataId == dataId)) ==
-            false) {
-          _saveDayData(status: Status.started, type: 'Workout Day');
-        }
-        if (!context.mounted) return;
-        await Navigator.pushNamed(context, '/today');
-      }
-    }
-    // Navigator.pushNamed(context, '/dayOverview');
-  }
-
-  Future<void> _saveDayData(
-      {required String status, required String type, String? title}) async {
-    String split = monthProvider?.monthDataModel
-            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-            .toString()
-            .split(" ")[1] ??
-        "";
-
-    String dataId =
-        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
-
-    final data = {
-      "title": title ?? "",
-      "dataId": dataId,
-      "monthId": monthProvider?.monthDataModel?.id,
-      "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider
-          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "split": split,
-      "date": "${DateTime.now().toUtc()}",
-      "status": status,
-      "type": type,
-      "startTime": "${DateTime.now().toUtc()}",
-      "endTime": "",
-    };
-
-    DayHistoryModel? matchingElement =
-        monthProvider?.dayHistoryModel.firstWhere(
-      (element) => element.dataId == dataId,
-      orElse: () => DayHistoryModel(),
-    );
-
-    final data1 = {
-      "title": title ?? "",
-      "status": status,
-      "type": type,
-      "startTime": status == Status.empty
-          ? ""
-          : matchingElement?.startTime == null
-              ? "${DateTime.now().toUtc()}"
-              : matchingElement?.startTime.toString(),
-      "endTime":
-          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
-    };
-
-    final apiBody = {
-      "title": title ?? "",
-      "status": status,
-      "type": type,
-      "startTime": status == Status.empty
-          ? ""
-          : matchingElement?.startTime == null
-              ? "${DateTime.now().toUtc()}"
-              : matchingElement?.startTime.toString(),
-      "endTime":
-          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
-      "dataId": dataId
-    };
-
-    if (matchingElement?.id != null) {
-      ApiRepo.updateDayStatus(body: apiBody);
-      await DatabaseHelper().updateData(
-          tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
-    } else {
-      ApiRepo.addDayStatus(body: data);
-      await DatabaseHelper()
-          .insertData(data: data, tableName: DatabaseHelper.dayStatus);
-    }
-
-    await monthProvider?.fetchAllDayStatusLocalData();
-    monthProvider?.findWeekStatuses();
-    monthProvider?.fetchToday();
-    monthProvider?.manageStreak();
-    monthProvider?.getLiftedWeightGraphData();
-  }
-
-  // Widget skipWorkoutDialog(BuildContext context, BuildContext c1) {
-  //   return Dialog(
-  //     shape: RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.circular(20),
-  //     ),
-  //     insetPadding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-  //     child: ClipRRect(
-  //       borderRadius: BorderRadius.circular(20),
-  //       child: Container(
-  //         decoration: BoxDecoration(
-  //           borderRadius: BorderRadius.circular(20),
-  //           color: const Color(0xFFFFFFFF),
-  //         ),
-  //         child: Stack(
-  //           children: [
-  //             Padding(
-  //               padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)).copyWith(top: ScreenUtil.verticalScale(2.5)),
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   SizedBox(height: ScreenUtil.verticalScale(2)),
-  //                   Text(
-  //                     "Rest Day",
-  //                     style: TextStyle(
-  //                       color: Colors.black,
-  //                       fontSize: ScreenUtil.verticalScale(2.4),
-  //                       fontWeight: FontWeight.bold,
-  //                     ),
-  //                   ),
-  //                   Padding(
-  //                     padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(2), vertical: ScreenUtil.verticalScale(1)),
-  //                     child: Text(
-  //                       "Would you like to mark the rest day complete or skip?",
-  //                       textAlign: TextAlign.center,
-  //                       style: TextStyle(
-  //                         color: Colors.black,
-  //                         fontSize: ScreenUtil.verticalScale(2),
-  //                         fontWeight: FontWeight.normal,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                   Padding(
-  //                     padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
-  //                     child: Row(
-  //                       children: [
-  //                         Expanded(
-  //                           child: ElevatedButton(
-  //                             onPressed: () async {
-  //                               await _saveDayData(status: Status.skipped, type: 'Rest Day');
-  //                               if (!c1.mounted) return;
-  //                               Navigator.of(c1).pop();
-  //                             },
-  //                             style: ElevatedButton.styleFrom(
-  //                               shape: RoundedRectangleBorder(
-  //                                 borderRadius: BorderRadius.circular(15),
-  //                               ),
-  //                               backgroundColor: AppColors.skipDayColor,
-  //                               padding: EdgeInsets.symmetric(
-  //                                 vertical: ScreenUtil.verticalScale(1.7),
-  //                               ),
-  //                             ),
-  //                             child: Text(
-  //                               "Skip day",
-  //                               style: TextStyle(
-  //                                 fontSize: ScreenUtil.verticalScale(2),
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: Colors.white,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                         SizedBox(width: ScreenUtil.horizontalScale(3)),
-  //                         Expanded(
-  //                           child: ElevatedButton(
-  //                             onPressed: () async {
-  //                               await _saveDayData(status: Status.completed, type: 'Rest Day');
-  //                               if (!c1.mounted) return;
-  //                               Navigator.of(c1).pop();
-  //                             },
-  //                             style: ElevatedButton.styleFrom(
-  //                               shape: RoundedRectangleBorder(
-  //                                 borderRadius: BorderRadius.circular(15),
-  //                               ),
-  //                               backgroundColor: AppColors.primaryColor,
-  //                               padding: EdgeInsets.symmetric(
-  //                                 vertical: ScreenUtil.verticalScale(1.7),
-  //                               ),
-  //                             ),
-  //                             child: Text(
-  //                               "Mark complete",
-  //                               style: TextStyle(
-  //                                 fontSize: ScreenUtil.verticalScale(2),
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: Colors.white,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   )
-  //                 ],
-  //               ),
-  //             ),
-  //             Padding(
-  //               padding: EdgeInsets.only(top: ScreenUtil.verticalScale(0.7)),
-  //               child: Row(
-  //                 mainAxisAlignment: MainAxisAlignment.end,
-  //                 children: [
-  //                   IconButton(
-  //                     icon: const Icon(Icons.close),
-  //                     onPressed: () {
-  //                       Navigator.of(c1).pop();
-  //                     },
-  //                   ),
-  //                   SizedBox(width: ScreenUtil.horizontalScale(2)),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }
 
 class SearchExerciseField extends StatelessWidget {

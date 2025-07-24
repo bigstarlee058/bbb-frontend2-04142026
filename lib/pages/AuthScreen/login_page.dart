@@ -38,10 +38,12 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordController1 = TextEditingController();
+  StringBuffer realPassword = StringBuffer();
 
   DataProvider? dataProvider;
   MonthProvider? monthProvider;
-  bool isObscure = true;
+  bool isObscure = false;
   bool isLoading = false;
   ImageProvider? imageProvider;
   late UserDataProvider userData;
@@ -459,6 +461,8 @@ class _LoginPageState extends State<LoginPage> {
     return prefs.getString('authToken');
   }
 
+  String previousMasked = "";
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -580,12 +584,62 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.visiblePassword,
                               textInputAction: TextInputAction.done,
                               controller: passwordController,
-                              obscureText: isObscure,
+                              obscureText: false,
+                              onChanged: (value) {
+                                if (isObscure) {
+                                  if (value.length < previousMasked.length) {
+                                    if (realPassword.isNotEmpty) {
+                                      realPassword = StringBuffer(
+                                        realPassword.toString().substring(
+                                            0, realPassword.length - 1),
+                                      );
+                                    }
+                                  } else if (value.length >
+                                      previousMasked.length) {
+                                    final newChar = value[value.length - 1];
+                                    realPassword.write(newChar);
+                                  }
+
+                                  final masked = List.generate(
+                                      realPassword.length, (_) => "•").join();
+                                  previousMasked = masked;
+
+                                  passwordController.value = TextEditingValue(
+                                    text: masked,
+                                    selection: TextSelection.collapsed(
+                                        offset: masked.length),
+                                  );
+                                } else {
+                                  realPassword
+                                    ..clear()
+                                    ..write(value);
+                                  previousMasked = value;
+                                }
+                              },
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.only(right: 15),
                                 child: IconButton(
                                   onPressed: () {
-                                    setState(() => isObscure = !isObscure);
+                                    isObscure = !isObscure;
+                                    if (isObscure) {
+                                      final masked = List.generate(
+                                              realPassword.length, (_) => "•")
+                                          .join();
+                                      passwordController.value =
+                                          TextEditingValue(
+                                        text: masked,
+                                        selection: TextSelection.collapsed(
+                                            offset: masked.length),
+                                      );
+                                    } else {
+                                      passwordController.value =
+                                          TextEditingValue(
+                                        text: realPassword.toString(),
+                                        selection: TextSelection.collapsed(
+                                            offset: realPassword.length),
+                                      );
+                                    }
+                                    setState(() {});
                                   },
                                   style: ButtonStyle(
                                       minimumSize: WidgetStateProperty.all(
@@ -635,10 +689,11 @@ class _LoginPageState extends State<LoginPage> {
                             textColor: Colors.white,
                             color: AppColors.primaryColor,
                             onPress: () {
+                              previousMasked = passwordController.text;
                               if (_formKey.currentState?.validate() == true) {
                                 signInUser(
                                   emailController.text,
-                                  passwordController.text,
+                                  realPassword.toString(),
                                 );
                               }
                             },
