@@ -1,6 +1,8 @@
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/components/radar_chart_info.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/pages/MonthView/MonthViewPage/sections/choose_workoutday_popup.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -9,7 +11,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../pages/MonthView/MonthViewPage/sections/choose_equipment_popup.dart';
-import '../pages/MonthView/MonthViewPage/sections/choose_workoutday_popup.dart';
 
 class MonthSettingDialog extends StatefulWidget {
   const MonthSettingDialog({super.key, required this.monthProvider});

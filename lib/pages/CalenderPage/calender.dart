@@ -114,7 +114,8 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           rowHeight: ScreenUtil.verticalScale(5),
           daysOfWeekHeight: ScreenUtil.verticalScale(3),
           firstDay: DateTime.utc(2020, 1, 1),
-          lastDay: DateTime.utc(2100, 12, 31),
+          lastDay: DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day),
           focusedDay: _focusedDay,
           selectedDayPredicate: (day) {
             return isSameDay(_selectedDay, day);
@@ -247,75 +248,57 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
     final now = DateTime.now();
     String accountCreatedDate = widget.userDataProvider?.userData["createdAt"];
     DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
-
-    if (targetDate.subtract(Duration(days: 1)).isBefore(date)) {
-      if (monthProvider!.monthLocalDataModel.isNotEmpty) {
-        DateTime oldestStartDate = monthProvider!.monthLocalDataModel.map(
-          (e) {
-            return DateFormat("dd-MM-yyyy").parse(
-              DateFormat("dd-MM-yyyy").format(
-                Utils.formattedDate(e.monthStartDate!),
-              ),
-            );
-          },
-        ).reduce((a, b) => a.isBefore(b) ? a : b);
-        List<DayHistoryModel> data = monthProvider!.decodedDataAll();
-        final data11 = groupCompletedByConsecutiveDates(data);
-        bool isCurrentDay = date.year == now.year &&
-            date.month == now.month &&
-            date.day == now.day;
-        if (data11.isEmpty) {
-          if (isCurrentDay) {
-            return _buildCurrentWorkoutDay(date);
-          } else if (oldestStartDate.isBefore(date) && now.isAfter(date)) {
-            return _buildCustomDayCircle(date, Colors.blue);
+    DateTime futureDay =
+        DateTime(now.year, now.month, now.day).add(Duration(days: 1));
+    DateTime today = DateTime(date.year, date.month, date.day);
+    if (today.isBefore(futureDay)) {
+      if (targetDate.subtract(Duration(days: 1)).isBefore(date)) {
+        if (monthProvider!.monthLocalDataModel.isNotEmpty) {
+          DateTime oldestStartDate = monthProvider!.monthLocalDataModel.map(
+            (e) {
+              return DateFormat("dd-MM-yyyy").parse(
+                DateFormat("dd-MM-yyyy").format(
+                  Utils.formattedDate(e.monthStartDate!),
+                ),
+              );
+            },
+          ).reduce((a, b) => a.isBefore(b) ? a : b);
+          List<DayHistoryModel> data = monthProvider!.decodedDataAll();
+          final data11 = groupCompletedByConsecutiveDates(data);
+          bool isCurrentDay = date.year == now.year &&
+              date.month == now.month &&
+              date.day == now.day;
+          if (data11.isEmpty) {
+            if (isCurrentDay) {
+              return _buildCurrentWorkoutDay(date);
+            } else if (oldestStartDate.isBefore(date) && now.isAfter(date)) {
+              return _buildCustomDayCircle(date, Colors.blue);
+            }
           }
-        }
-        DateTime futureDay =
-            DateTime(now.year, now.month, now.day).add(Duration(days: 1));
-        if (date.isBefore(futureDay)) {
-          for (var day in data) {
-            final workoutDate = day.endTime!;
-            DateTime localTime = Utils.formattedDate("$workoutDate");
-            if ((localTime.day == date.day &&
-                localTime.month == date.month &&
-                localTime.year == date.year)) {
-              final isRange = data11
-                  .any((d) => d.any((element) => _isSameDate(localTime, date)));
-              final isCircleP = !isRange
-                  ? data.any((d) =>
-                      d.status == Status.completed &&
-                      _isSameDate(localTime, date))
-                  : false;
+          DateTime futureDay =
+              DateTime(now.year, now.month, now.day).add(Duration(days: 1));
+          if (date.isBefore(futureDay)) {
+            for (var day in data) {
+              final workoutDate = day.endTime!;
+              DateTime localTime = Utils.formattedDate("$workoutDate");
+              if ((localTime.day == date.day &&
+                  localTime.month == date.month &&
+                  localTime.year == date.year)) {
+                final isRange = data11.any(
+                    (d) => d.any((element) => _isSameDate(localTime, date)));
+                final isCircleP = !isRange
+                    ? data.any((d) =>
+                        d.status == Status.completed &&
+                        _isSameDate(localTime, date))
+                    : false;
 
-              final isCircleB = !isRange
-                  ? data.any((d) =>
-                      d.status == Status.skipped &&
-                      _isSameDate(localTime, date))
-                  : false;
+                final isCircleB = !isRange
+                    ? data.any((d) =>
+                        d.status == Status.skipped &&
+                        _isSameDate(localTime, date))
+                    : false;
 
-              if ((isCircleP || isCircleB) && !isRange) {
-                return Center(
-                  child: Container(
-                    width: ScreenUtil.verticalScale(3.2),
-                    height: ScreenUtil.verticalScale(3.2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isCircleP ? AppColors.primaryColor : Colors.blue,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${date.day}',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  ),
-                );
-              } else if (isRange) {
-                final size = MediaQuery.of(context).size.width;
-
-                final data = findDateIndex(date, data11);
-
-                if (data == null) {
+                if ((isCircleP || isCircleB) && !isRange) {
                   return Center(
                     child: Container(
                       width: ScreenUtil.verticalScale(3.2),
@@ -331,150 +314,174 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
                       ),
                     ),
                   );
-                }
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    if (data11[data["outerIndex"]!].length > 1 &&
-                        data["innerIndex"] == 0)
-                      Positioned(
-                        top: ScreenUtil.verticalScale(0.7),
-                        left:
-                            ScreenUtil.horizontalScale(size > 600 ? 4.5 : 3.5),
-                        right: 0,
-                        child: Container(
-                          height: ScreenUtil.verticalScale(3.2),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.horizontal(
-                              right: (data11[data["outerIndex"]!].length - 1 ==
-                                      data["innerIndex"])
-                                  ? Radius.circular(20)
-                                  : Radius.circular(0),
-                              left: (data["innerIndex"] == 0)
-                                  ? Radius.circular(20)
-                                  : Radius.circular(0),
-                            ),
-                            color: AppColors.backOffSetColor,
-                          ),
-                        ),
-                      ),
-                    if (data11[data["outerIndex"]!].length > 1 &&
-                        data11[data["outerIndex"]!].length - 1 ==
-                            data["innerIndex"])
-                      Positioned(
-                        top: ScreenUtil.verticalScale(0.7),
-                        right:
-                            ScreenUtil.horizontalScale(size > 600 ? 4.5 : 3.5),
-                        left: 0,
-                        child: Container(
-                          height: ScreenUtil.verticalScale(3.2),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.horizontal(
-                              right: (data11[data["outerIndex"]!].length - 1 ==
-                                      data["innerIndex"])
-                                  ? Radius.circular(20)
-                                  : Radius.circular(0),
-                              left: (data["innerIndex"] == 0)
-                                  ? Radius.circular(20)
-                                  : Radius.circular(0),
-                            ),
-                            color: AppColors.backOffSetColor,
-                          ),
-                        ),
-                      ),
-                    Container(
-                      height: ScreenUtil.verticalScale(3.2),
-                      margin: EdgeInsets.symmetric(
-                          vertical: ScreenUtil.verticalScale(0.7)),
-                      decoration: BoxDecoration(
-                        color: ((data["innerIndex"] == 0) ||
-                                (data11[data["outerIndex"]!].length - 1 ==
-                                    data["innerIndex"]))
-                            ? Colors.transparent
-                            : AppColors.backOffSetColor,
-                        borderRadius: BorderRadius.horizontal(
-                          right: (data11[data["outerIndex"]!].length - 1 ==
-                                  data["innerIndex"])
-                              ? Radius.circular(20)
-                              : Radius.circular(0),
-                          left: (data["innerIndex"] == 0)
-                              ? Radius.circular(20)
-                              : Radius.circular(0),
-                        ),
-                      ),
-                      alignment: Alignment.center,
+                } else if (isRange) {
+                  final size = MediaQuery.of(context).size.width;
+
+                  final data = findDateIndex(date, data11);
+
+                  if (data == null) {
+                    return Center(
                       child: Container(
+                        width: ScreenUtil.verticalScale(3.2),
+                        height: ScreenUtil.verticalScale(3.2),
                         decoration: BoxDecoration(
-                            color: ((data["innerIndex"] == 0) ||
+                          shape: BoxShape.circle,
+                          color:
+                              isCircleP ? AppColors.primaryColor : Colors.blue,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${date.day}',
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                      ),
+                    );
+                  }
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      if (data11[data["outerIndex"]!].length > 1 &&
+                          data["innerIndex"] == 0)
+                        Positioned(
+                          top: ScreenUtil.verticalScale(0.7),
+                          left: ScreenUtil.horizontalScale(
+                              size > 600 ? 4.5 : 3.5),
+                          right: 0,
+                          child: Container(
+                            height: ScreenUtil.verticalScale(3.2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.horizontal(
+                                right:
                                     (data11[data["outerIndex"]!].length - 1 ==
-                                        data["innerIndex"]))
-                                ? AppColors.primaryColor
-                                : Colors.transparent,
-                            shape: BoxShape.circle),
-                        child: Center(
-                          child: Text(
-                            '${date.day}',
-                            style: TextStyle(
-                                color: ((data["innerIndex"] == 0) ||
-                                        (data11[data["outerIndex"]!].length -
-                                                1 ==
-                                            data["innerIndex"]))
-                                    ? Colors.white
-                                    : Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.color),
+                                            data["innerIndex"])
+                                        ? Radius.circular(20)
+                                        : Radius.circular(0),
+                                left: (data["innerIndex"] == 0)
+                                    ? Radius.circular(20)
+                                    : Radius.circular(0),
+                              ),
+                              color: AppColors.backOffSetColor,
+                            ),
+                          ),
+                        ),
+                      if (data11[data["outerIndex"]!].length > 1 &&
+                          data11[data["outerIndex"]!].length - 1 ==
+                              data["innerIndex"])
+                        Positioned(
+                          top: ScreenUtil.verticalScale(0.7),
+                          right: ScreenUtil.horizontalScale(
+                              size > 600 ? 4.5 : 3.5),
+                          left: 0,
+                          child: Container(
+                            height: ScreenUtil.verticalScale(3.2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.horizontal(
+                                right:
+                                    (data11[data["outerIndex"]!].length - 1 ==
+                                            data["innerIndex"])
+                                        ? Radius.circular(20)
+                                        : Radius.circular(0),
+                                left: (data["innerIndex"] == 0)
+                                    ? Radius.circular(20)
+                                    : Radius.circular(0),
+                              ),
+                              color: AppColors.backOffSetColor,
+                            ),
+                          ),
+                        ),
+                      Container(
+                        height: ScreenUtil.verticalScale(3.2),
+                        margin: EdgeInsets.symmetric(
+                            vertical: ScreenUtil.verticalScale(0.7)),
+                        decoration: BoxDecoration(
+                          color: ((data["innerIndex"] == 0) ||
+                                  (data11[data["outerIndex"]!].length - 1 ==
+                                      data["innerIndex"]))
+                              ? Colors.transparent
+                              : AppColors.backOffSetColor,
+                          borderRadius: BorderRadius.horizontal(
+                            right: (data11[data["outerIndex"]!].length - 1 ==
+                                    data["innerIndex"])
+                                ? Radius.circular(20)
+                                : Radius.circular(0),
+                            left: (data["innerIndex"] == 0)
+                                ? Radius.circular(20)
+                                : Radius.circular(0),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: ((data["innerIndex"] == 0) ||
+                                      (data11[data["outerIndex"]!].length - 1 ==
+                                          data["innerIndex"]))
+                                  ? AppColors.primaryColor
+                                  : Colors.transparent,
+                              shape: BoxShape.circle),
+                          child: Center(
+                            child: Text(
+                              '${date.day}',
+                              style: TextStyle(
+                                  color: ((data["innerIndex"] == 0) ||
+                                          (data11[data["outerIndex"]!].length -
+                                                  1 ==
+                                              data["innerIndex"]))
+                                      ? Colors.white
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              } else {
-                return _buildNormalDay(date);
+                    ],
+                  );
+                } else {
+                  return _buildNormalDay(date);
+                }
               }
             }
           }
-        }
 
-        if (isCurrentDay) {
-          for (var day in data) {
-            final workoutDate = day.endTime!;
-            DateTime localTime = Utils.formattedDate("$workoutDate");
-            if ((localTime.day == date.day &&
-                localTime.month == date.month &&
-                localTime.year == date.year)) {
-              if (day.status == Status.completed) {
-                return _buildCustomDayCircle(date, AppColors.primaryColor);
-              } else if (day.status == Status.skipped) {
-                return _buildCustomDayCircle(date, Colors.blue);
-              } else {
-                return _buildNormalDay(date);
+          if (isCurrentDay) {
+            for (var day in data) {
+              final workoutDate = day.endTime!;
+              DateTime localTime = Utils.formattedDate("$workoutDate");
+              if ((localTime.day == date.day &&
+                  localTime.month == date.month &&
+                  localTime.year == date.year)) {
+                if (day.status == Status.completed) {
+                  return _buildCustomDayCircle(date, AppColors.primaryColor);
+                } else if (day.status == Status.skipped) {
+                  return _buildCustomDayCircle(date, Colors.blue);
+                } else {
+                  return _buildNormalDay(date);
+                }
               }
+              return _buildCurrentWorkoutDay(date);
             }
-            return _buildCurrentWorkoutDay(date);
           }
-        }
 
-        if (oldestStartDate.isBefore(date) && now.isAfter(date)) {
-          if (DateTime(futureDay.year, futureDay.month, futureDay.day) !=
-              DateTime(date.year, date.month, date.day)) {
-            return _buildCustomDayCircle(date, Colors.blue);
+          if (oldestStartDate.isBefore(date) && now.isAfter(date)) {
+            if (DateTime(futureDay.year, futureDay.month, futureDay.day) !=
+                DateTime(date.year, date.month, date.day)) {
+              return _buildCustomDayCircle(date, Colors.blue);
+            }
           }
-        }
-      } else {
-        final nowUtc = DateTime.now();
-        bool isCurrentDay = date.year == nowUtc.year &&
-            date.month == nowUtc.month &&
-            date.day == nowUtc.day;
-        if (isCurrentDay) {
-          return _buildCurrentWorkoutDay(date);
         } else {
-          return _buildNormalDay(date);
+          final nowUtc = DateTime.now();
+          bool isCurrentDay = date.year == nowUtc.year &&
+              date.month == nowUtc.month &&
+              date.day == nowUtc.day;
+          if (isCurrentDay) {
+            return _buildCurrentWorkoutDay(date);
+          } else {
+            return _buildNormalDay(date);
+          }
         }
       }
     }
-
     return _buildNormalDay(date, isOutSide: isOutSide);
   }
 

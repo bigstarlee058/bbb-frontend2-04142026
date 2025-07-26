@@ -60,7 +60,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'localstorage/month_database.dart';
 import 'pages/SubscriptionPage/subscription_pay_wall.dart';
-import 'pages/Tools/seeall_achievement_page_new.dart';
+import 'pages/Tools/seeall_achievement_page.dart';
 import 'providers/month_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/video_initiase_loader.dart';

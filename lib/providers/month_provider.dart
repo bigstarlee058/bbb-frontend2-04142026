@@ -231,6 +231,7 @@ class MonthProvider extends ChangeNotifier {
           i++) {
         var value = await fetchPumpDay(
             monthDataModel!.weeks![week! - 1].pumpDayIds![i]);
+        log('value==========>>>>>$value');
         if (value != null) {
           pumpDays.add(value);
         }
@@ -681,7 +682,7 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchWarmUp(String warmUpId) async {
     try {
-      log('warmUpId==========>>>>>${warmUpId}');
+      log('warmUpId==========>>>>>$warmUpId');
       Uri url =
           Uri.parse('${AppConstants.serverUrl}/api/warmups/get/$warmUpId');
       url = Uri.http(url.authority, url.path);
@@ -771,19 +772,19 @@ class MonthProvider extends ChangeNotifier {
   }
 
   getRestDayData() {
-    String monthId = preferences.getString(SharedPreference.monthId) ?? "";
-
-    try {
-      final rawTempData1 = preferences.getString("REST-$monthId");
-      if (rawTempData1 != null && rawTempData1.isNotEmpty) {
-        restDayModel = List<RestDayModel>.from(
-            json.decode(rawTempData1).map((x) => RestDayModel.fromJson(x)));
-      }
-    } catch (e, stackTrace) {
-      debugPrint("Error in getRestDayData: $e");
-      debugPrint("StackTrace: $stackTrace");
-    }
-    notifyListeners();
+    // String monthId = preferences.getString(SharedPreference.monthId) ?? "";
+    //
+    // try {
+    //   final rawTempData1 = preferences.getString("REST-$monthId");
+    //   if (rawTempData1 != null && rawTempData1.isNotEmpty) {
+    //     restDayModel = List<RestDayModel>.from(
+    //         json.decode(rawTempData1).map((x) => RestDayModel.fromJson(x)));
+    //   }
+    // } catch (e, stackTrace) {
+    //   debugPrint("Error in getRestDayData: $e");
+    //   debugPrint("StackTrace: $stackTrace");
+    // }
+    // notifyListeners();
   }
 
   Future<void> changeDaySplit(String value) async {
@@ -1187,6 +1188,14 @@ class MonthProvider extends ChangeNotifier {
       String dataId,
       String index,
       String subIndex) async {
+    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
+    await preferences.putString(
+        SharedPreference.lastExitTime, DateTime.now().toString());
+    final pf = await SharedPreferences.getInstance();
+    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
+    await pf.setString(
+        SharedPreference.lastExitTime, DateTime.now().toString());
+
     if (timerAddress != '') {
       timePassed = timePassed1;
       int newTime = totalTime - int.parse(timePassed);
@@ -1212,13 +1221,6 @@ class MonthProvider extends ChangeNotifier {
             newTime, selectedExIndex, payLoad);
       }
     }
-    await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
-    await preferences.putString(
-        SharedPreference.lastExitTime, DateTime.now().toString());
-    final pf = await SharedPreferences.getInstance();
-    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
-    await pf.setString(
-        SharedPreference.lastExitTime, DateTime.now().toString());
     notifyListeners();
   }
 
@@ -1996,6 +1998,95 @@ class MonthProvider extends ChangeNotifier {
   double reportMaximumValueOfTotalEx = 0;
   List<Map<String, dynamic>> reportExerciseCompletedEachDay = [];
   double totalExerciseCompletedInAWeek = 0;
+  int totalCompletedExercise = 0;
+  int totalDayCompleted = 0;
+
+  calculateDayAndExercise() {
+    totalCompletedExercise = 0;
+    totalDayCompleted = 0;
+
+    List<DayHistoryModel> filteredData = allSplitDayHistoryModel.where((data) {
+      return data.status == Status.completed;
+    }).toList();
+
+    final data = keepLatestPerDay(filteredData);
+
+    if (data.isNotEmpty) {
+      for (var element in data) {
+        totalCompletedExercise += int.parse(
+            element.completedExercise!.isNotEmpty
+                ? element.completedExercise ?? "0"
+                : "0");
+      }
+      totalDayCompleted = data.length;
+    }
+  }
+
+  List<DayHistoryModel> keepLatestPerDay(List<DayHistoryModel> raw) {
+    final Map<String, DayHistoryModel> byDay = {};
+
+    DateTime? tryParse(String? s) {
+      try {
+        if (s == null || s.isEmpty) return null;
+        return DateTime.parse(s);
+      } catch (e, stack) {
+        debugPrint('Date parsing failed for "$s": $e\n$stack');
+        return null;
+      }
+    }
+
+    DateTime pickBestTime(DayHistoryModel item) {
+      try {
+        final end = tryParse(item.endTime?.toString());
+        final start = tryParse(item.startTime?.toString());
+        final date = tryParse(item.date?.toString());
+        return end ?? start ?? date ?? DateTime.fromMillisecondsSinceEpoch(0);
+      } catch (e, stack) {
+        debugPrint('pickBestTime failed: $e\n$stack');
+        return DateTime.fromMillisecondsSinceEpoch(0);
+      }
+    }
+
+    String dayKey(DateTime dt) {
+      try {
+        return DateFormat('yyyy-MM-dd').format(dt.toUtc());
+      } catch (e, stack) {
+        debugPrint('dayKey format failed: $e\n$stack');
+        return 'unknown';
+      }
+    }
+
+    try {
+      for (final item in raw) {
+        final bestTime = pickBestTime(item);
+        final key = dayKey(bestTime);
+
+        if (!byDay.containsKey(key)) {
+          byDay[key] = item;
+        } else {
+          final existingBestTime = pickBestTime(byDay[key]!);
+          if (bestTime.isAfter(existingBestTime)) {
+            byDay[key] = item;
+          }
+        }
+      }
+    } catch (e, stack) {
+      debugPrint('Error while processing list: $e\n$stack');
+    }
+
+    try {
+      final result = byDay.values.toList()
+        ..sort((a, b) {
+          final ta = pickBestTime(a);
+          final tb = pickBestTime(b);
+          return tb.compareTo(ta);
+        });
+      return result;
+    } catch (e, stack) {
+      debugPrint('Sorting failed: $e\n$stack');
+      return byDay.values.toList();
+    }
+  }
 
   changeWeekExerciseCompleted(value) {
     String newValue =

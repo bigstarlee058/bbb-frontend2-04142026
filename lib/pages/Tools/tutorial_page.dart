@@ -114,9 +114,10 @@ class _TutorialPageState extends State<TutorialPage> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        width: ScreenUtil.horizontalScale(50),
+                                        width: ScreenUtil.horizontalScale(70),
                                         child: Text(
-                                          "Here’s a quick tutorial\njust for you",
+                                          // "Here’s a quick tutorial\njust for you",
+                                          "Browse our tutorial library (new ones added regularly).",
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize:

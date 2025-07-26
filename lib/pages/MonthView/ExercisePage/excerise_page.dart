@@ -571,68 +571,65 @@ class _ExercisePageState extends State<ExercisePage>
 
   Future<void> initializeVideo(String url) async {
     try {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) async {
-          _videoPlayerController = VideoPlayerController.networkUrl(
-              Uri.parse(url),
-              videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
-          await _videoPlayerController.initialize().then(
-            (value) {
-              AudioManager.requestAudioFocus();
-            },
-          );
+      await _videoPlayerController.initialize();
+      AudioManager.requestAudioFocus();
 
-          await _videoPlayerController.setLooping(true);
+      // We will loop manually to avoid the iOS freeze/mute issue
+      await _videoPlayerController.setLooping(false);
 
-          _chewieController = ChewieController(
-            videoPlayerController: _videoPlayerController,
-            autoPlay: false,
-            looping: true,
-            showControls: false,
-            aspectRatio: _videoPlayerController.value.aspectRatio,
-          );
-          bool rawData =
-              await preferences.getBool(SharedPreference.isMute) ?? true;
-          _videoPlayerController.setVolume(rawData ? 1 : 0);
-          isMute = rawData;
-          if (_chewieController != null &&
-              _chewieController!.videoPlayerController.value.isInitialized) {
-            videoSize = calculateVideoSize(
-                aspectRatio: _chewieController!.aspectRatio!, context: context);
-            setState(() {});
-          }
-          _videoPlayerController.addListener(() {
-            final position = _videoPlayerController.value.position;
-            final duration = _videoPlayerController.value.duration;
+      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      isMute = rawData;
+      await _videoPlayerController.setVolume(rawData ? 1 : 0);
 
-            if (duration != null && position >= duration) {
-              AudioManager.abandonAudioFocus();
-              if (Platform.isIOS) {
-                _videoPlayerController.seekTo(Duration.zero);
-                _videoPlayerController.play();
-              }
-            } else {
-              AudioManager.requestAudioFocus();
-            }
-
-            videoProgressValue.value = position;
-            setState(() {});
-          });
-
-          _controller = ProgressBarController(
-            vsync: this,
-            barAnimationDuration: const Duration(milliseconds: 300),
-            thumbAnimationDuration: const Duration(milliseconds: 200),
-            waitingDuration: const Duration(milliseconds: 1800),
-          );
-
-          setState(() {
-            videoLoader = false;
-            loading = false;
-          });
-        },
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        autoPlay: false,
+        looping: false,
+        showControls: false,
+        aspectRatio: _videoPlayerController.value.aspectRatio,
       );
+
+      if (_chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
+        videoSize = calculateVideoSize(
+            aspectRatio: _chewieController!.aspectRatio!, context: context);
+        setState(() {});
+      }
+
+      _videoPlayerController.addListener(_onVideoTick);
+
+      // _videoPlayerController.addListener(() {
+      //   final position = _videoPlayerController.value.position;
+      //   final duration = _videoPlayerController.value.duration;
+      //
+      //   if (duration != null && position >= duration) {
+      //     AudioManager.abandonAudioFocus();
+      //     if (Platform.isIOS) {
+      //       _videoPlayerController.seekTo(Duration.zero);
+      //       _videoPlayerController.play();
+      //     }
+      //   } else {
+      //     AudioManager.requestAudioFocus();
+      //   }
+      //
+      //   videoProgressValue.value = position;
+      //   setState(() {});
+      // });
+
+      _controller = ProgressBarController(
+        vsync: this,
+        barAnimationDuration: const Duration(milliseconds: 300),
+        thumbAnimationDuration: const Duration(milliseconds: 200),
+        waitingDuration: const Duration(milliseconds: 1800),
+      );
+
+      setState(() {
+        videoLoader = false;
+        loading = false;
+      });
     } catch (e) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -645,6 +642,34 @@ class _ExercisePageState extends State<ExercisePage>
         }
       });
       debugPrint("VIDEO NOT INITIALIZED: $e");
+    }
+  }
+
+  bool _restarting = false;
+
+  void _onVideoTick() async {
+    final v = _videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null || _restarting) return;
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      _restarting = true;
+
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await _videoPlayerController.pause();
+      await _videoPlayerController.seekTo(Duration.zero);
+      await _videoPlayerController.setVolume(isMute ? 1 : 0);
+      await _videoPlayerController.play();
+      _restarting = false;
     }
   }
 

@@ -27,6 +27,7 @@ import 'package:bbb/models/equipmenttitle.dart';
 import 'package:bbb/models/exerciselibrary.dart';
 import 'package:bbb/models/faqs_model.dart';
 import 'package:bbb/models/get_all_achivements.dart';
+import 'package:bbb/models/new_version_model.dart';
 import 'package:bbb/models/program_phase_model.dart';
 import 'package:bbb/models/screen_bg_model.dart';
 import 'package:bbb/models/staffs.dart';
@@ -102,6 +103,36 @@ class DataProvider extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('authToken');
     return authToken;
+  }
+
+  NewVersionModel? newVersionModel;
+
+  Future<void> fetchAppVersion() async {
+    Uri url = Uri.parse('${AppConstants.serverUrl}/api/version/get_version');
+    String? userIdToken = await getAuthToken();
+    log('userIdToken==========>>>>>$userIdToken');
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? ""
+        },
+      );
+      log('response==========>>>>>$response');
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+
+        if (data != null) {
+          newVersionModel = NewVersionModel.fromJson(data);
+        }
+        notifyListeners();
+      } else {
+        throw Exception('Failed to get app version');
+      }
+    } catch (e) {
+      throw Exception('Failed to get app version');
+    }
   }
 
   List<Map<String, dynamic>> allImageList = [];
@@ -221,6 +252,7 @@ class DataProvider extends ChangeNotifier {
     List<AchievementsDataModel> achievementsData =
         await ApiRepo.fetchAchievementsList();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/achievements-group/get');
+    log('achievementsData==========>>>>>$achievementsData');
     String? userIdToken = await getAuthToken();
 
     // try {
@@ -489,7 +521,6 @@ class DataProvider extends ChangeNotifier {
             .where((item) => item['type'] == 2)
             .map((item) => Staffs.fromJson(item))
             .toList();
-
         athletesData.add(
           Staffs(
             id: '',
@@ -506,7 +537,6 @@ class DataProvider extends ChangeNotifier {
             instagram: '',
           ),
         );
-
         notifyListeners();
       } else {
         throw Exception('Failed to load staff data');
@@ -531,6 +561,7 @@ class DataProvider extends ChangeNotifier {
           'AUTH_TOKEN': userIdToken ?? "",
         },
       );
+      log('response==========>>>>>$response');
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
@@ -964,13 +995,13 @@ class DataProvider extends ChangeNotifier {
             jsonEncode(monthDataModelSplit5));
         final dataList = [];
 
-        for (var element in monthDataModelSplit3.weeks ?? []) {
-          final data =
-              await monthProvider?.fetchRestDay(element.restdayId ?? "");
-          dataList.add(data);
-          await preferences.putString(
-              "REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
-        }
+        // for (var element in monthDataModelSplit3.weeks ?? []) {
+        //   final data =
+        //       await monthProvider?.fetchRestDay(element.restdayId ?? "");
+        //   dataList.add(data);
+        //   await preferences.putString(
+        //       "REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
+        // }
 
         final value = await DatabaseHelper().areAllTablesEmpty();
 
@@ -1636,7 +1667,6 @@ class DataProvider extends ChangeNotifier {
           },
         ),
       );
-
       if (response.statusCode == 200) {
         var data = response.data;
         var responseData = data[0];

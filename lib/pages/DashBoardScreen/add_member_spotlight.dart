@@ -47,7 +47,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
         title: Text(
           'Submit Your Story',
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
             fontSize: ScreenUtil.verticalScale(2.3),
           ),
         ),
@@ -113,7 +113,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
           ],
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding:
             EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
@@ -172,8 +172,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                                     height: ScreenUtil.horizontalScale(50),
                                     width: ScreenUtil.horizontalScale(50),
                                     decoration: BoxDecoration(
-                                      color:
-                                          Colors.grey.withValues(alpha: 0.052),
+                                      color: Theme.of(context).cardColor,
                                       // border:
                                       //     Border.all(color: AppColors.appGreyColor),
                                       borderRadius: BorderRadius.all(

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
+import 'package:bbb/pages/IntroScreen/version_update_screen.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -14,6 +15,7 @@ import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,6 +96,11 @@ class _SplashScreenState extends State<SplashScreen> {
   //   Navigator.pushNamed(context, AppRoutes.loginScreen);
   // }
 
+  Future<PackageInfo> getCurrentAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo;
+  }
+
   Future<void> _checkLoginStatus() async {
     // await dataProvider?.getAppBGs().then(
     //   (value) async {
@@ -109,9 +116,15 @@ class _SplashScreenState extends State<SplashScreen> {
     //   );
     // }
     // return;
+    await dataProvider?.fetchAppVersion();
+
+    PackageInfo version = await getCurrentAppVersion();
+    log('version==========>>>>>$version');
+
+    // if (version.version ==
+    //     (dataProvider?.newVersionModel?.latestVersion ?? "")) {
     if (isLoggedIn) {
       dataProvider?.getAppBGs();
-
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) async => await _initializeFetchData().then(
           (value) async {
@@ -217,53 +230,31 @@ class _SplashScreenState extends State<SplashScreen> {
                                 if (isFirstTime) {
                                   if (mounted) {
                                     await Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProfileBoardingScreen(
-                                            welcomeDescription: '',
-                                            welcomeImageUrl: '',
-                                          ),
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProfileBoardingScreen(
+                                          welcomeDescription: '',
+                                          welcomeImageUrl: '',
                                         ),
-                                        (route) => false).then(
-                                      (value) async {
-                                        await preferences.setBool(
-                                            SharedPreference.isFirstTime,
-                                            false);
-                                      },
-                                    );
+                                      ),
+                                      (route) => false,
+                                    ).then((value) async {
+                                      await preferences.setBool(
+                                          SharedPreference.isFirstTime, false);
+                                    });
                                   }
                                 } else {
-                                  if (isFirstTime) {
-                                    if (mounted) {
-                                      await Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ProfileBoardingScreen(
-                                              welcomeDescription: '',
-                                              welcomeImageUrl: '',
-                                            ),
-                                          ),
-                                          (route) => false).then(
-                                        (value) async {
-                                          await preferences.setBool(
-                                              SharedPreference.isFirstTime,
-                                              false);
-                                        },
-                                      );
-                                    }
-                                  } else {
-                                    if (mounted) {
-                                      await Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const MainPage(
-                                              welcomeDescription: '',
-                                              welcomeImageUrl: ''),
+                                  if (mounted) {
+                                    await Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const MainPage(
+                                          welcomeDescription: '',
+                                          welcomeImageUrl: '',
                                         ),
-                                      );
-                                    }
+                                      ),
+                                    );
                                   }
                                   await isFromNotification();
                                 }
@@ -413,6 +404,17 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.pushReplacementNamed(context, '/onboarding');
       }
     }
+    // } else {
+    //   if (mounted) {
+    //     Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(
+    //         builder: (context) => VersionUpdateScreen(),
+    //       ),
+    //     );
+    //   }
+    // }
+
     //   },
     // );
   }

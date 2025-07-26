@@ -2000,106 +2000,105 @@ class _TodayPageState extends State<TodayPage>
                                                           newDayExercise =
                                                           ExerciseDataModel();
 
-                                                      if (exercises
-                                                          .isNotEmpty) {
-                                                        newDayExercise =
-                                                            ExerciseDataModel(
-                                                          newAddedExercise:
-                                                              true,
-                                                          id: "",
-                                                          exerciseId: monthProvider
-                                                                  ?.allFilterExercises[
-                                                                      selectExerciseSwapIndex!]
-                                                                  .id ??
-                                                              "",
-                                                          typeId: (monthProvider
-                                                                      ?.allFilterExercises
-                                                                      .length ??
-                                                                  0) +
-                                                              1,
-                                                          name: monthProvider
-                                                                  ?.allFilterExercises[
-                                                                      selectExerciseSwapIndex!]
-                                                                  .title ??
-                                                              "Exercise ${exercises.length + 1}",
-                                                          guide: exercises[0]
-                                                                  .guide ??
-                                                              "",
-                                                          sets: exercises[0]
-                                                                  .sets ??
-                                                              0,
-                                                          reps: exercises[0]
-                                                                  .reps ??
-                                                              0,
-                                                          rest: exercises[0]
-                                                                  .rest ??
-                                                              0,
-                                                          weight: exercises[0]
-                                                                  .weight ??
-                                                              0,
-                                                          formats: [
-                                                            monthProvider
-                                                                    ?.equipmentType ??
-                                                                "A"
-                                                          ],
-                                                          thumbnail: monthProvider
-                                                                  ?.allFilterExercises[
-                                                                      selectExerciseSwapIndex!]
-                                                                  .thumbnail ??
-                                                              "unknown",
-                                                          extra: exercises[0]
-                                                                  .extra ??
-                                                              [],
-                                                        );
-                                                      } else {
-                                                        newDayExercise =
-                                                            ExerciseDataModel(
-                                                          newAddedExercise:
-                                                              true,
-                                                          id: "",
-                                                          exerciseId: monthProvider
-                                                                  ?.allFilterExercises[
-                                                                      selectExerciseSwapIndex!]
-                                                                  .id ??
-                                                              "",
-                                                          typeId: (monthProvider
-                                                                      ?.allFilterExercises
-                                                                      .length ??
-                                                                  0) +
-                                                              1,
-                                                          name: monthProvider
-                                                                  ?.allFilterExercises[
-                                                                      selectExerciseSwapIndex!]
-                                                                  .title ??
-                                                              "Exercise ${exercises.length + 1}",
-                                                          thumbnail: monthProvider
-                                                                  ?.allFilterExercises[
-                                                                      selectExerciseSwapIndex!]
-                                                                  .thumbnail ??
-                                                              "unknown",
-                                                          guide: "",
-                                                          sets: 5,
-                                                          reps: 10,
-                                                          rest: 3,
-                                                          weight: 30,
-                                                          formats: [
-                                                            monthProvider
-                                                                    ?.equipmentType ??
-                                                                "A"
-                                                          ],
-                                                          extra: [
-                                                            ExtraDataModel(
-                                                              weight: 0,
-                                                              rest: 120,
-                                                              load: 0,
-                                                              reps: 0,
-                                                              sets: 3,
-                                                              type: 3,
-                                                              id: "extraaddedexercisesetsdefaultvalueid",
-                                                            )
-                                                          ],
-                                                        );
-                                                      }
+                                                      // if (exercises
+                                                      //     .isNotEmpty) {
+                                                      //   newDayExercise =
+                                                      //       ExerciseDataModel(
+                                                      //     newAddedExercise:
+                                                      //         true,
+                                                      //     id: "",
+                                                      //     exerciseId: monthProvider
+                                                      //             ?.allFilterExercises[
+                                                      //                 selectExerciseSwapIndex!]
+                                                      //             .id ??
+                                                      //         "",
+                                                      //     typeId: (monthProvider
+                                                      //                 ?.allFilterExercises
+                                                      //                 .length ??
+                                                      //             0) +
+                                                      //         1,
+                                                      //     name: monthProvider
+                                                      //             ?.allFilterExercises[
+                                                      //                 selectExerciseSwapIndex!]
+                                                      //             .title ??
+                                                      //         "Exercise ${exercises.length + 1}",
+                                                      //     guide: exercises[0]
+                                                      //             .guide ??
+                                                      //         "",
+                                                      //     sets: exercises[0]
+                                                      //             .sets ??
+                                                      //         0,
+                                                      //     reps: exercises[0]
+                                                      //             .reps ??
+                                                      //         0,
+                                                      //     rest: exercises[0]
+                                                      //             .rest ??
+                                                      //         0,
+                                                      //     weight: exercises[0]
+                                                      //             .weight ??
+                                                      //         0,
+                                                      //     formats: [
+                                                      //       monthProvider
+                                                      //               ?.equipmentType ??
+                                                      //           "A"
+                                                      //     ],
+                                                      //     thumbnail: monthProvider
+                                                      //             ?.allFilterExercises[
+                                                      //                 selectExerciseSwapIndex!]
+                                                      //             .thumbnail ??
+                                                      //         "unknown",
+                                                      //     extra: exercises[0]
+                                                      //             .extra ??
+                                                      //         [],
+                                                      //   );
+                                                      // } else {
+                                                      newDayExercise =
+                                                          ExerciseDataModel(
+                                                        newAddedExercise: true,
+                                                        id: "",
+                                                        exerciseId: monthProvider
+                                                                ?.allFilterExercises[
+                                                                    selectExerciseSwapIndex!]
+                                                                .id ??
+                                                            "",
+                                                        typeId: (monthProvider
+                                                                    ?.allFilterExercises
+                                                                    .length ??
+                                                                0) +
+                                                            1,
+                                                        name: monthProvider
+                                                                ?.allFilterExercises[
+                                                                    selectExerciseSwapIndex!]
+                                                                .title ??
+                                                            "Exercise ${exercises.length + 1}",
+                                                        thumbnail: monthProvider
+                                                                ?.allFilterExercises[
+                                                                    selectExerciseSwapIndex!]
+                                                                .thumbnail ??
+                                                            "unknown",
+                                                        guide: "",
+                                                        sets: 3,
+                                                        reps: 8,
+                                                        rest: 180,
+                                                        weight: 0,
+                                                        formats: [
+                                                          monthProvider
+                                                                  ?.equipmentType ??
+                                                              "A"
+                                                        ],
+                                                        extra: [
+                                                          ExtraDataModel(
+                                                            weight: 0,
+                                                            rest: 180,
+                                                            load: 0,
+                                                            reps: 8,
+                                                            sets: 3,
+                                                            type: 3,
+                                                            id: "extraaddedexercisesetsdefaultvalueid",
+                                                          )
+                                                        ],
+                                                      );
+                                                      // }
 
                                                       String split = monthProvider
                                                               ?.monthDataModel

@@ -218,8 +218,9 @@ class _ToolsPageState extends State<ToolsPage> {
                                   height: ScreenUtil.verticalScale(1.3),
                                 ),
                                 const ToolsPageButton(
+                                  isNotSVG: true,
                                   title: 'Achievements',
-                                  icon: 'assets/img/verified (1).svg',
+                                  icon: 'assets/img/achievements.png',
                                   url: '/seeAllAchievementPage',
                                 ),
 

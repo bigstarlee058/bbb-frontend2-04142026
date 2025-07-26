@@ -261,11 +261,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _loadValue();
-        },
-      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -355,11 +350,13 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: ScreenUtil.horizontalScale(8)),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       textAlign: TextAlign.center,
                       "No data available. Once you finish & save your first exercise, this page will show your history.",
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).textTheme.labelLarge?.color),
                     ),
                   ),
                 ),

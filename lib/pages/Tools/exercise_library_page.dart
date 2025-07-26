@@ -1,12 +1,8 @@
-import 'dart:developer';
-
 import 'package:bbb/components/back_arrow_widget.dart';
-import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/filter_sort_exercise_library.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
-import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
@@ -33,30 +29,40 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
   int _numPages = 0;
   String _searchQuery = "";
   String _selectedSortBy = 'A-Z'; // Default sorting
-  List<String> _selectedEquipmentIds = [];
-  List<String> _selectedCategoryIds = [];
+  // List<String> _selectedEquipmentIds = [];
+  // List<String> _selectedCategoryIds = [];
+  String _selectedEquipmentIds = "";
+  String _selectedCategoryIds = "";
   late MainPageProvider mainPageProvider;
 
   List<ExerciseLibrary> _filteredExercises = [];
+
+  bool loader = false;
 
   @override
   void initState() {
     super.initState();
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.fetchAdminData().then((_) {
-      setState(() {
-        // Calculate the number of pages based on the fetched exercises
-        if (dataProvider!.adminExercises.isNotEmpty) {
-          _filteredExercises = dataProvider!.adminExercises;
-          _numPages = (_filteredExercises.length / _itemsPerPage).ceil();
-        } else {
-          _numPages = 1; // Handle the case when no exercises are available
-        }
-      });
+    getData();
+  }
+
+  getData() async {
+    loader = true;
+    setState(() {});
+    await dataProvider?.fetchAdminData().then((_) {
+      if (dataProvider!.adminExercises.isNotEmpty) {
+        _filteredExercises = dataProvider!.adminExercises;
+        _numPages = (_filteredExercises.length / _itemsPerPage).ceil();
+      } else {
+        _numPages = 1;
+      }
     }).catchError((error) {
       debugPrint('Error fetching admin exercises: $error');
     });
+
+    loader = false;
+    setState(() {});
   }
 
   List<ExerciseLibrary> _getPaginatedExercises() {
@@ -247,8 +253,8 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                                               {'id': c.id, 'title': c.title})
                                           .toList(),
                                       onApplyFilters:
-                                          (List<String> selectedEquipments,
-                                              List<String> selectedCategories,
+                                          (String selectedEquipments,
+                                              String selectedCategories,
                                               String sortBy) {
                                         setState(() {
                                           _selectedEquipmentIds =
@@ -290,7 +296,7 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                   child: Container(
                     constraints: BoxConstraints(
                       minHeight: (media.height -
-                          (media.height / 4) -
+                          (media.height / 3.2) -
                           (media.height * 0.12)),
                     ),
                     width: media.width,
@@ -315,44 +321,67 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                               horizontal: ScreenUtil.horizontalScale(6),
                               vertical: ScreenUtil.verticalScale(2),
                             ),
-                            child: dataProvider == null ||
-                                    dataProvider!.adminExercises.isEmpty ||
-                                    _filteredExercises.isEmpty
+                            child: loader
                                 ? Container(
                                     color: Theme.of(context)
                                         .scaffoldBackgroundColor,
-                                    height: ScreenUtil.verticalScale(
-                                        (media.height - media.height / 3.2)),
+                                    height: media.height - media.height / 2.4,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
                                   )
-                                : Column(
-                                    children: [
-                                      SizedBox(
-                                        height: ScreenUtil.verticalScale(2),
+                                : dataProvider!.adminExercises.isEmpty ||
+                                        _filteredExercises.isEmpty ||
+                                        loader
+                                    ? Container(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        height:
+                                            media.height - media.height / 2.4,
+                                        child: Center(
+                                          child: Text(
+                                            textAlign: TextAlign.center,
+                                            "No Exercises found matching your filters.\nPlease try again.",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge
+                                                    ?.color),
+                                          ),
+                                        ),
+                                      )
+                                    : Column(
+                                        children: [
+                                          SizedBox(
+                                            height: ScreenUtil.verticalScale(2),
+                                          ),
+                                          Column(
+                                            children: _getPaginatedExercises()
+                                                .map((exercise) {
+                                              return Column(
+                                                children: [
+                                                  exerciseCard(
+                                                    exercise.id,
+                                                    exercise.title,
+                                                    exercise
+                                                        .thumbnail, // Dynamically display exercise titles
+                                                  ),
+                                                  SizedBox(
+                                                    height: ScreenUtil
+                                                        .verticalScale(2),
+                                                  ),
+                                                ],
+                                              );
+                                            }).toList(),
+                                          ),
+                                          SizedBox(
+                                            height: ScreenUtil.verticalScale(2),
+                                          ),
+                                        ],
                                       ),
-                                      Column(
-                                        children: _getPaginatedExercises()
-                                            .map((exercise) {
-                                          return Column(
-                                            children: [
-                                              exerciseCard(
-                                                exercise.id,
-                                                exercise.title,
-                                                exercise
-                                                    .thumbnail, // Dynamically display exercise titles
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    ScreenUtil.verticalScale(2),
-                                              ),
-                                            ],
-                                          );
-                                        }).toList(),
-                                      ),
-                                      SizedBox(
-                                        height: ScreenUtil.verticalScale(2),
-                                      ),
-                                    ],
-                                  ),
                           ),
                         ),
                         const SizedBox(
@@ -550,14 +579,20 @@ class SearchExerciseField extends StatelessWidget {
 }
 
 class FilterSortButton extends StatefulWidget {
-  final List<String> selectedEquipmentIds;
-  final List<String> selectedCategoryIds;
-  final String selectedSortBy;
-  final Function(List<String> selectedEquipmentIds,
-      List<String> selectedCategoryIds, String selectedSortBy) onApplyFilters;
+  // final List<String> selectedEquipmentIds;
+  // final List<String> selectedCategoryIds;
+  // final String selectedSortBy;
+  // final Function(List<String> selectedEquipmentIds,
+  //     List<String> selectedCategoryIds, String selectedSortBy) onApplyFilters;
 
-  final List<Map<String, String>> equipments; // Add dynamic equipment data
-  final List<Map<String, String>> categories; // Add dynamic category data
+  final String selectedEquipmentIds;
+  final String selectedCategoryIds;
+  final String selectedSortBy;
+  final Function(String selectedEquipmentIds, String selectedCategoryIds,
+      String selectedSortBy) onApplyFilters;
+
+  final List<Map<String, String>> equipments;
+  final List<Map<String, String>> categories;
 
   const FilterSortButton({
     super.key,
@@ -575,8 +610,11 @@ class FilterSortButton extends StatefulWidget {
 
 class _FilterSortButtonState extends State<FilterSortButton> {
   String _selectedSortBy = 'A-Z'; // Default value for sort by
-  List<String> _selectedEquipmentIds = []; // Store selected equipment IDs
-  List<String> _selectedCategoryIds = []; // Store selected category IDs
+  // List<String> _selectedEquipmentIds = [];
+  // List<String> _selectedCategoryIds = [];
+  String _selectedEquipmentIds = "";
+  String _selectedCategoryIds = "";
+
   @override
   void initState() {
     super.initState();

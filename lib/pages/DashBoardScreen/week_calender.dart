@@ -45,7 +45,8 @@ class _WeekCalenderState extends State<WeekCalender> {
             rowHeight: ScreenUtil.verticalScale(4.55),
             daysOfWeekHeight: ScreenUtil.verticalScale(4.55),
             firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2100, 12, 31),
+            lastDay: DateTime(
+                DateTime.now().year, DateTime.now().month, DateTime.now().day),
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) {
               return isSameDay(_selectedDay, day);
@@ -96,99 +97,104 @@ class _WeekCalenderState extends State<WeekCalender> {
     final nowUtc = DateTime.now();
     String accountCreatedDate = widget.userData.userData["createdAt"];
     DateTime targetDate = DateTime.parse(accountCreatedDate).toLocal();
+    DateTime futureDay =
+        DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
+    DateTime today = DateTime(date.year, date.month, date.day);
 
-    if (targetDate.subtract(Duration(days: 1)).isBefore(date)) {
-      if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
-        DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
-            .map(
-              (e) => DateFormat("dd-MM-yyyy").parse(
-                DateFormat("dd-MM-yyyy").format(
-                  Utils.formattedDate(e.monthStartDate!),
+    if (today.isBefore(futureDay)) {
+      if (targetDate.subtract(Duration(days: 1)).isBefore(date)) {
+        if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {
+          DateTime oldestStartDate = widget.monthProvider.monthLocalDataModel
+              .map(
+                (e) => DateFormat("dd-MM-yyyy").parse(
+                  DateFormat("dd-MM-yyyy").format(
+                    Utils.formattedDate(e.monthStartDate!),
+                  ),
                 ),
-              ),
-            )
-            .reduce((a, b) => a.isBefore(b) ? a : b);
-        List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
-        bool isCurrentDay = date.year == nowUtc.year &&
-            date.month == nowUtc.month &&
-            date.day == nowUtc.day;
+              )
+              .reduce((a, b) => a.isBefore(b) ? a : b);
+          List<DayHistoryModel> data = widget.monthProvider.decodedDataAll();
+          bool isCurrentDay = date.year == nowUtc.year &&
+              date.month == nowUtc.month &&
+              date.day == nowUtc.day;
 
-        if (data.isEmpty) {
+          if (data.isEmpty) {
+            if (isCurrentDay) {
+              return _buildCurrentWorkoutDay(date);
+            } else if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
+              return _buildCustomDayCircle(date, Colors.blue);
+            }
+          }
+
+          DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day)
+              .add(Duration(days: 1));
+
+          if (date.isBefore(futureDay)) {
+            // if (widget.monthProvider.dayStatusList.isNotEmpty) {
+            //   for (var day in data) {
+            //     final workoutDate = day.date;
+            //     DateTime localTime = Utils.formattedDate("$workoutDate");
+            //     if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
+            //       if (day.status == Status.completed) {
+            //         return _buildCustomDayCircle(date, AppColors.primaryColor);
+            //       } else if (day.status == Status.skipped) {
+            //         return _buildCustomDayCircle(date, Colors.blue);
+            //       }
+            //     }
+            //   }
+            // }
+
+            for (var day in data) {
+              final workoutDate = day.endTime!;
+
+              DateTime localTime = Utils.formattedDate("$workoutDate");
+
+              if ((localTime.day == date.day &&
+                  localTime.month == date.month &&
+                  localTime.year == date.year)) {
+                if (day.status == Status.completed) {
+                  return _buildCustomDayCircle(date, AppColors.primaryColor);
+                } else if (day.status == Status.skipped) {
+                  return _buildCustomDayCircle(date, Colors.blue);
+                }
+              }
+            }
+          }
+
+          if (isCurrentDay) {
+            for (var day in data) {
+              final workoutDate = day.endTime!;
+              DateTime localTime = Utils.formattedDate("$workoutDate");
+              if ((localTime.day == date.day &&
+                  localTime.month == date.month &&
+                  localTime.year == date.year)) {
+                if (day.status == Status.completed) {
+                  return _buildCustomDayCircle(date, AppColors.primaryColor);
+                } else if (day.status == Status.skipped) {
+                  return _buildCustomDayCircle(date, Colors.blue);
+                }
+              }
+              return _buildCurrentWorkoutDay(date);
+            }
+          }
+          if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
+            if (DateTime(futureDay.year, futureDay.month, futureDay.day) !=
+                DateTime(date.year, date.month, date.day)) {
+              return _buildCustomDayCircle(date, Colors.blue);
+            }
+          } else {
+            return _buildNormalDay(date);
+          }
+        } else {
+          final nowUtc = DateTime.now();
+          bool isCurrentDay = date.year == nowUtc.year &&
+              date.month == nowUtc.month &&
+              date.day == nowUtc.day;
           if (isCurrentDay) {
             return _buildCurrentWorkoutDay(date);
-          } else if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
-            return _buildCustomDayCircle(date, Colors.blue);
+          } else {
+            return _buildNormalDay(date);
           }
-        }
-
-        DateTime futureDay = DateTime(nowUtc.year, nowUtc.month, nowUtc.day)
-            .add(Duration(days: 1));
-
-        if (date.isBefore(futureDay)) {
-          // if (widget.monthProvider.dayStatusList.isNotEmpty) {
-          //   for (var day in data) {
-          //     final workoutDate = day.date;
-          //     DateTime localTime = Utils.formattedDate("$workoutDate");
-          //     if ((localTime.day == date.day && localTime.month == date.month && localTime.year == date.year)) {
-          //       if (day.status == Status.completed) {
-          //         return _buildCustomDayCircle(date, AppColors.primaryColor);
-          //       } else if (day.status == Status.skipped) {
-          //         return _buildCustomDayCircle(date, Colors.blue);
-          //       }
-          //     }
-          //   }
-          // }
-
-          for (var day in data) {
-            final workoutDate = day.endTime!;
-
-            DateTime localTime = Utils.formattedDate("$workoutDate");
-
-            if ((localTime.day == date.day &&
-                localTime.month == date.month &&
-                localTime.year == date.year)) {
-              if (day.status == Status.completed) {
-                return _buildCustomDayCircle(date, AppColors.primaryColor);
-              } else if (day.status == Status.skipped) {
-                return _buildCustomDayCircle(date, Colors.blue);
-              }
-            }
-          }
-        }
-
-        if (isCurrentDay) {
-          for (var day in data) {
-            final workoutDate = day.endTime!;
-            DateTime localTime = Utils.formattedDate("$workoutDate");
-            if ((localTime.day == date.day &&
-                localTime.month == date.month &&
-                localTime.year == date.year)) {
-              if (day.status == Status.completed) {
-                return _buildCustomDayCircle(date, AppColors.primaryColor);
-              } else if (day.status == Status.skipped) {
-                return _buildCustomDayCircle(date, Colors.blue);
-              }
-            }
-            return _buildCurrentWorkoutDay(date);
-          }
-        }
-        if (oldestStartDate.isBefore(date) && nowUtc.isAfter(date)) {
-          if (DateTime(futureDay.year, futureDay.month, futureDay.day) !=
-              DateTime(date.year, date.month, date.day)) {
-            return _buildCustomDayCircle(date, Colors.blue);
-          }
-        } else {
-          return _buildNormalDay(date);
-        }
-      } else {
-        final nowUtc = DateTime.now();
-        bool isCurrentDay = date.year == nowUtc.year &&
-            date.month == nowUtc.month &&
-            date.day == nowUtc.day;
-        if (isCurrentDay) {
-          return _buildCurrentWorkoutDay(date);
-        } else {
-          return _buildNormalDay(date);
         }
       }
     }

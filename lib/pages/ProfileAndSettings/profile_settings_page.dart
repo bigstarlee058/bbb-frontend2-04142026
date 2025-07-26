@@ -8,6 +8,7 @@ import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/get_all_achivements.dart';
 import 'package:bbb/pages/ProfileAndSettings/payment_detail_screen.dart';
+import 'package:bbb/pages/ProfileAndSettings/report_a_bug.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -752,6 +753,21 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
+                                  settingsImageButton(
+                                    'Beta',
+                                    Icons.bug_report,
+                                    () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ReportABugScreen(),
+                                      ),
+                                    ),
+                                    context,
+                                  ),
+
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
                                   settingsButton('Support', Icons.handshake,
                                       () => toSupportPage(), context),
                                   // SizedBox(
@@ -1249,6 +1265,60 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   icon,
                   color: AppColors.primaryColor,
                   size: ScreenUtil.verticalScale(3.8),
+                ),
+                SizedBox(
+                  width: ScreenUtil.verticalScale(3),
+                ),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontSize: ScreenUtil.horizontalScale(4.5),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.keyboard_arrow_right,
+                color: Colors.white,
+                size: ScreenUtil.verticalScale(3),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget settingsImageButton(
+      String title, IconData icon, VoidCallback onPressed, context) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+        ),
+        padding: EdgeInsets.all(
+          ScreenUtil.verticalScale(1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Image.asset(
+                  "assets/img/bug.png",
+                  color: AppColors.primaryColor,
+                  width: ScreenUtil.verticalScale(3.8),
+                  height: ScreenUtil.verticalScale(3.2),
                 ),
                 SizedBox(
                   width: ScreenUtil.verticalScale(3),

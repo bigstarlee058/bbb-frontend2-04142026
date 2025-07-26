@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ToolsPageButton extends StatelessWidget {
-  const ToolsPageButton({super.key, required this.title, required this.icon, required this.url});
+  const ToolsPageButton(
+      {super.key,
+      required this.title,
+      required this.icon,
+      required this.url,
+      this.isNotSVG});
 
   final String title;
   final String url;
   final String icon;
+  final bool? isNotSVG;
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +30,14 @@ class ToolsPageButton extends StatelessWidget {
         onTap: onPress,
         child: Container(
           padding: EdgeInsets.only(
-            top: ScreenUtil.horizontalScale(12),
+            top: isNotSVG ?? false
+                ? ScreenUtil.horizontalScale(12) - 5
+                : ScreenUtil.horizontalScale(12),
             left: ScreenUtil.horizontalScale(8),
             right: ScreenUtil.horizontalScale(8),
-            bottom: ScreenUtil.horizontalScale(13),
+            bottom: isNotSVG ?? false
+                ? ScreenUtil.horizontalScale(13) - 5
+                : ScreenUtil.horizontalScale(13),
           ),
           decoration: BoxDecoration(
             color: AppColors.primaryColor,
@@ -40,12 +50,19 @@ class ToolsPageButton extends StatelessWidget {
               const SizedBox(
                 width: 10,
               ),
-              SvgPicture.asset(
-                icon, // Path to your SVG file
-                width: 30,
-                height: 30,
-                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-              ), // Spacing between icon and text
+              isNotSVG ?? false
+                  ? Image.asset(
+                      icon,
+                      width: 40,
+                      height: 40,
+                    )
+                  : SvgPicture.asset(
+                      icon, // Path to your SVG file
+                      width: 30,
+                      height: 30,
+                      colorFilter:
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    ), // Spacing between icon and text
               const SizedBox(
                 width: 30,
               ),

@@ -63,7 +63,6 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
 
   @override
   Widget build(BuildContext context) {
-    log('currentPage==========>>>>>${currentPage}');
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -163,8 +162,8 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                     data.achievedDate!.isEmpty &&
                                             data.achieved == false
                                         // ? "Not achieved yet"
-                                        ? "${widget.item.currentValue}/${data.achievementAchievementId!.value} Achieved"
-                                        : "Date Achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
+                                        ? "${widget.item.currentValue}/${data.achievementAchievementId!.value} achieved."
+                                        : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
@@ -201,7 +200,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                         child: SizedBox(
                           height: ScreenUtil.verticalScale(
                               widget.achievements[currentPage].achieved == false
-                                  ? 39
+                                  ? 39.5
                                   : 46),
                           child: Column(
                             children: [
@@ -234,7 +233,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
-                                                        4)),
+                                                        3.9)),
                                             Stack(
                                               children: [
                                                 appShimmerImage(
@@ -342,8 +341,8 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                               data.achievedDate!.isEmpty &&
                                                       data.achieved == false
                                                   // ? "Not achieved yet"
-                                                  ? "${widget.item.currentValue}/${data.achievementAchievementId!.value} Achieved"
-                                                  : "Date Achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
+                                                  ? "${formatNumber(widget.item.currentValue ?? 0)}/${formatNumber(data.achievementAchievementId!.value ?? 0)} achieved."
+                                                  : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
                                               maxLines: 1,
                                               textAlign: TextAlign.center,
                                               overflow: TextOverflow.ellipsis,
@@ -517,6 +516,23 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
         ],
       ),
     );
+  }
+
+  String formatNumber(int number) {
+    try {
+      if (number >= 1000000) {
+        double result = number / 1000000;
+        return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}M';
+      } else if (number >= 1000) {
+        double result = number / 1000;
+        return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}k';
+      } else {
+        return number.toString();
+      }
+    } catch (e, stack) {
+      debugPrint('Error in formatNumber: $e\n$stack');
+      return number.toString();
+    }
   }
 
   double calculateStepProgress({

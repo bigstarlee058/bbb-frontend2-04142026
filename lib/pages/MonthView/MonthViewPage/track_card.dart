@@ -446,117 +446,117 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       BuildContext context,
       int nextWorkOutIndex,
       int? exerciseCount) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-      child: Container(
-        margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.1)),
-        decoration: BoxDecoration(
-          border: Border.all(
-              color: Colors.black.withValues(alpha: 0.1), width: 0.3),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 10,
-              spreadRadius: 2,
-              offset: Offset(0, 2),
+    return GestureDetector(
+      onTap: monthProvider.weekStatuses[mainIndex!] == WeekType.futureWeek &&
+              monthProvider.isCurrentMonth != "Future"
+          ? null
+          : () => continueWorkoutOnTap(
+              isRestDay,
+              dataId,
+              index,
+              dayData,
+              context,
+              mainIndex!,
+              widget.monthProvider!.weeksDataList[mainIndex!].idList![index]),
+      child: Padding(
+        padding:
+            EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+        child: Container(
+          margin: EdgeInsets.only(bottom: ScreenUtil.verticalScale(1.1)),
+          decoration: BoxDecoration(
+            border: Border.all(
+                color: Colors.black.withValues(alpha: 0.1), width: 0.3),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.07),
+                blurRadius: 10,
+                spreadRadius: 2,
+                offset: Offset(0, 2),
+              ),
+            ],
+            color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
+                Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(
+              ScreenUtil.verticalScale(2),
             ),
-          ],
-          color: /*monthProvider.weekStatuses[mainIndex!] == WeekType.pastWeek ? AppColors.primaryColor :*/
-              Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(
-            ScreenUtil.verticalScale(2),
           ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              height: ScreenUtil.verticalScale(8.8),
-              width: ScreenUtil.verticalScale(8.8),
-              // margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
-              decoration: BoxDecoration(
-                color: monthProvider.weekStatuses[mainIndex!] ==
-                        WeekType.futureWeek
-                    ? Theme.of(context).brightness == Brightness.light
-                        ? AppColors.greyColor1
-                        : Theme.of(context).canvasColor
-                    : (monthProvider.weekStatuses[mainIndex!] ==
-                                    WeekType.pastWeek &&
-                                monthProvider
-                                    .allSplitDayHistoryModel.isEmpty) ||
-                            monthProvider.allSplitDayHistoryModel.any((e) =>
-                                e.status == Status.skipped &&
-                                e.dataId == dataId)
-                        ? AppColors.skipDayColor
-                        : monthProvider.allSplitDayHistoryModel.any((e) =>
-                                e.status == Status.completed &&
-                                e.dataId == dataId)
-                            ? Colors.green
-                            : monthProvider.weekStatuses[mainIndex!] ==
-                                    WeekType.currentWeek
-                                ? Theme.of(context).brightness ==
-                                        Brightness.light
-                                    ? AppColors.greyColor1
-                                    : Theme.of(context).canvasColor
-                                : AppColors.skipDayColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
-                  bottomLeft: Radius.circular(ScreenUtil.verticalScale(2)),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
-                child: Center(
-                  child: monthProvider.weekStatuses[mainIndex!] ==
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: ScreenUtil.verticalScale(8.8),
+                width: ScreenUtil.verticalScale(8.8),
+                // margin: EdgeInsets.all(ScreenUtil.verticalScale(1)),
+                decoration: BoxDecoration(
+                  color: monthProvider.weekStatuses[mainIndex!] ==
                           WeekType.futureWeek
-                      ? Icon(Icons.hourglass_top, color: Colors.black, size: 25)
-                      : monthProvider.allSplitDayHistoryModel.any((e) =>
-                              (e.status == Status.completed) &&
-                              e.dataId == dataId)
-                          ? Icon(
-                              Icons.check,
-                              size: 25,
-                              color: Colors.white,
-                            )
+                      ? Theme.of(context).brightness == Brightness.light
+                          ? AppColors.greyColor1
+                          : Theme.of(context).canvasColor
+                      : (monthProvider.weekStatuses[mainIndex!] ==
+                                      WeekType.pastWeek &&
+                                  monthProvider
+                                      .allSplitDayHistoryModel.isEmpty) ||
+                              monthProvider.allSplitDayHistoryModel.any((e) =>
+                                  e.status == Status.skipped &&
+                                  e.dataId == dataId)
+                          ? AppColors.skipDayColor
                           : monthProvider.allSplitDayHistoryModel.any((e) =>
-                                      (e.status == Status.skipped) &&
-                                      e.dataId == dataId) ||
-                                  monthProvider.weekStatuses[mainIndex!] ==
-                                      WeekType.pastWeek
-                              ? Icon(
-                                  Icons.close,
-                                  size: 25,
-                                  color: Colors.white,
-                                )
-                              : Image.asset(
-                                  "assets/img/workout1.png",
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.color,
-                                  height: ScreenUtil.verticalScale(3.8),
-                                ),
+                                  e.status == Status.completed &&
+                                  e.dataId == dataId)
+                              ? Colors.green
+                              : monthProvider.weekStatuses[mainIndex!] ==
+                                      WeekType.currentWeek
+                                  ? Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? AppColors.greyColor1
+                                      : Theme.of(context).canvasColor
+                                  : AppColors.skipDayColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+                    bottomLeft: Radius.circular(ScreenUtil.verticalScale(2)),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
+                  child: Center(
+                    child: monthProvider.weekStatuses[mainIndex!] ==
+                            WeekType.futureWeek
+                        ? Icon(Icons.hourglass_top,
+                            color: Colors.black, size: 25)
+                        : monthProvider.allSplitDayHistoryModel.any((e) =>
+                                (e.status == Status.completed) &&
+                                e.dataId == dataId)
+                            ? Icon(
+                                Icons.check,
+                                size: 25,
+                                color: Colors.white,
+                              )
+                            : monthProvider.allSplitDayHistoryModel.any((e) =>
+                                        (e.status == Status.skipped) &&
+                                        e.dataId == dataId) ||
+                                    monthProvider.weekStatuses[mainIndex!] ==
+                                        WeekType.pastWeek
+                                ? Icon(
+                                    Icons.close,
+                                    size: 25,
+                                    color: Colors.white,
+                                  )
+                                : Image.asset(
+                                    "assets/img/workout1.png",
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color,
+                                    height: ScreenUtil.verticalScale(3.8),
+                                  ),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: 3 + ScreenUtil.verticalScale(1)),
-            Expanded(
-              child: SizedBox(
-                height: 60,
-                child: InkWell(
-                  onTap: monthProvider.weekStatuses[mainIndex!] ==
-                              WeekType.futureWeek &&
-                          monthProvider.isCurrentMonth != "Future"
-                      ? null
-                      : () => continueWorkoutOnTap(
-                          isRestDay,
-                          dataId,
-                          index,
-                          dayData,
-                          context,
-                          mainIndex!,
-                          widget.monthProvider!.weeksDataList[mainIndex!]
-                              .idList![index]),
+              SizedBox(width: 3 + ScreenUtil.verticalScale(1)),
+              Expanded(
+                child: SizedBox(
+                  height: 60,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -684,8 +684,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

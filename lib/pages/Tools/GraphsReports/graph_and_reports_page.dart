@@ -1,10 +1,12 @@
-import 'dart:developer';
 import 'dart:io';
 
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
+import 'package:bbb/components/radar_chart_info.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
+import 'package:bbb/models/radar_chart_history.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/custom_radar.dart';
 import 'package:bbb/pages/Tools/GraphsReports/Charts/report_weight_lifted.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -47,14 +49,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) => filterRadarChartData(),
     );
-    // dataProvider?.fetchAdminData().then((_) {
-    //   setState(() {
-    //     _filteredExercises = dataProvider!.adminExercises;
-    //     items = _filteredExercises.map((exercise) => exercise.title).toList();
-    //   });
-    // }).catchError((error) {
-    //   debugPrint('Error fetching admin exercises: $error');
-    // });
   }
 
   // Future<void> filterRadarChartData() async {
@@ -115,17 +109,141 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
   //   await Future.wait(allDataFutures);
   // }
 
+  // Future<void> filterRadarChartData() async {
+  //   loader = true;
+  //   setState(() {});
+  //   monthProvider?.calculateDayAndExercise();
+  //   valueList = [];
+  //   final exerciseMap = {
+  //     "Back Squat": "67941affde5cb7e685b6250d",
+  //     "Barbell Bench Press": "67658618b4bdd7fee53c62a0",
+  //     "Conventional Deadlift": "67f6092ec86cd04c9a31a21e",
+  //     "Weighted Chin-Up": "67fbebb2be021a74cbd96ba7",
+  //     "Barbell Hip Thrust": "67658533b4bdd7fee53c5566"
+  //   };
+  //   final List<String> features = [
+  //     "Back Squat",
+  //     "Barbell\nBench Press",
+  //     "Conventional\nDeadlift",
+  //     "Weighted\nChin-Up",
+  //     "Barbell\nHip Thrust",
+  //     "Chinup"
+  //   ];
+  //
+  //   Map<String, Map<String, dynamic>> percentageMap = {};
+  //
+  //   final allDataFutures = exerciseMap.entries.map((entry) async {
+  //     final name = entry.key;
+  //     final id = entry.value;
+  //
+  //     List<ExerciseHistoryDataModel> history =
+  //         await ApiRepo.fetchExerciseForTheExercise(id);
+  //
+  //     history.sort((a, b) {
+  //       final da = DateTime.tryParse(a.date ?? '') ?? DateTime(1970);
+  //       final db = DateTime.tryParse(b.date ?? '') ?? DateTime(1970);
+  //       return da.compareTo(db);
+  //     });
+  //
+  //     double? baseOneRM;
+  //     String? baseDate;
+  //     double? latestOneRM;
+  //     String? latestDate;
+  //
+  //     final Map<String, ExerciseHistoryDataModel> highestByDate = {};
+  //
+  //     for (final item in history) {
+  //       final dateStr = item.date;
+  //       final date = DateTime.parse("${dateStr ?? DateTime.now()}");
+  //       final dayKey = DateFormat('MM-dd-yyyy').format(date);
+  //
+  //       final reps = int.tryParse(item.reps ?? "0") ?? 0;
+  //       final weight = double.tryParse(item.weight ?? "0") ?? 0;
+  //       final load = reps * weight;
+  //
+  //       if (!highestByDate.containsKey(dayKey) ||
+  //           (load) >
+  //               (int.tryParse(highestByDate[dayKey]!.reps ?? "0") ?? 0) *
+  //                   (double.tryParse(highestByDate[dayKey]!.weight ?? "0") ??
+  //                       0)) {
+  //         highestByDate[dayKey] = item;
+  //       }
+  //     }
+  //     final data1 = highestByDate.values.toList();
+  //
+  //     for (final item in data1) {
+  //       final weight = double.tryParse(item.weight ?? "0") ?? 0;
+  //       final reps = int.tryParse(item.reps ?? "0") ?? 0;
+  //       final effort = int.tryParse(item.effort ?? "0") ?? 100;
+  //
+  //       if (weight == 0 || reps == 0) continue;
+  //
+  //       final rir = (effort == 100) ? 0.0 : effort.toDouble();
+  //       final oneRM = weight * ((0.025 * (reps + rir)) + 1);
+  //
+  //       if (oneRM <= 1) continue;
+  //
+  //       if (baseOneRM == null) {
+  //         baseOneRM = oneRM;
+  //         baseDate = item.date;
+  //       }
+  //       latestOneRM = oneRM;
+  //       latestDate = item.date;
+  //     }
+  //
+  //     double percentage = 0;
+  //     if (baseOneRM != null && latestOneRM != null && baseOneRM > 0) {
+  //       percentage = (latestOneRM / baseOneRM) * 100;
+  //     }
+  //
+  //     percentageMap[name] = {
+  //       "oldest_1RM": baseOneRM ?? 0,
+  //       "oldest_date": baseDate ?? "",
+  //       "latest_1RM": latestOneRM ?? 0,
+  //       "latest_date": latestDate ?? "",
+  //       "percentage": percentage
+  //     };
+  //   });
+  //
+  //   await Future.wait(allDataFutures);
+  //
+  //   final data = features.map((feature) {
+  //     final key = feature.replaceAll("\n", " ");
+  //     return (percentageMap[key] ??
+  //         {
+  //           "oldest_1RM": 0.0,
+  //           "oldest_date": "",
+  //           "latest_1RM": 0.0,
+  //           "latest_date": "",
+  //           "percentage": 0.0
+  //         });
+  //   }).toList();
+  //
+  //   for (var element in data) {
+  //     valueList.add(
+  //         double.parse("${element["percentage"].toStringAsFixed(0) ?? 0}"));
+  //     dateHighest.add(element["latest_date"] == null ||
+  //             element["latest_date"].toString().isEmpty
+  //         ? ""
+  //         : DateFormat("MM/dd/yyyy")
+  //             .format(DateTime.parse(element["latest_date"])));
+  //     dateOld.add(element["oldest_date"] == null ||
+  //             element["oldest_date"].toString().isEmpty
+  //         ? ""
+  //         : DateFormat("MM/dd/yyyy")
+  //             .format(DateTime.parse(element["oldest_date"])));
+  //   }
+  //   setState(() {
+  //     loader = false;
+  //   });
+  // }
+
   Future<void> filterRadarChartData() async {
     loader = true;
     setState(() {});
+    monthProvider?.calculateDayAndExercise();
     valueList = [];
-    final exerciseMap = {
-      "Back Squat": "67941affde5cb7e685b6250d",
-      "Barbell Bench Press": "67658618b4bdd7fee53c62a0",
-      "Conventional Deadlift": "67f6092ec86cd04c9a31a21e",
-      "Weighted Chin-Up": "67fbebb2be021a74cbd96ba7",
-      "Barbell Hip Thrust": "67658533b4bdd7fee53c5566"
-    };
+
     final List<String> features = [
       "Back Squat",
       "Barbell\nBench Press",
@@ -137,16 +255,13 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
     Map<String, Map<String, dynamic>> percentageMap = {};
 
-    final allDataFutures = exerciseMap.entries.map((entry) async {
-      final name = entry.key;
-      final id = entry.value;
+    List<RadarChartHistoryModel> history =
+        await ApiRepo.fetchRadarChartExerciseHistory();
 
-      List<ExerciseHistoryDataModel> history =
-          await ApiRepo.fetchExerciseForTheExercise(id);
-
-      history.sort((a, b) {
-        final da = DateTime.tryParse(a.date ?? '') ?? DateTime(1970);
-        final db = DateTime.tryParse(b.date ?? '') ?? DateTime(1970);
+    history.forEach((entry) async {
+      entry.exerciseHistoryData?.sort((a, b) {
+        final da = DateTime.tryParse(a.date ?? '') ?? DateTime.now();
+        final db = DateTime.tryParse(b.date ?? '') ?? DateTime.now();
         return da.compareTo(db);
       });
 
@@ -157,23 +272,26 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
       final Map<String, ExerciseHistoryDataModel> highestByDate = {};
 
-      for (final item in history) {
-        final dateStr = item.date;
-        final date = DateTime.parse("${dateStr ?? DateTime.now()}");
-        final dayKey = DateFormat('MM-dd-yyyy').format(date);
+      if (entry.exerciseHistoryData != null) {
+        for (final item in entry.exerciseHistoryData!) {
+          final dateStr = item.date;
+          final date = DateTime.parse("${dateStr ?? DateTime.now()}");
+          final dayKey = DateFormat('MM-dd-yyyy').format(date);
 
-        final reps = int.tryParse(item.reps ?? "0") ?? 0;
-        final weight = double.tryParse(item.weight ?? "0") ?? 0;
-        final load = reps * weight;
+          final reps = int.tryParse(item.reps ?? "0") ?? 0;
+          final weight = double.tryParse(item.weight ?? "0") ?? 0;
+          final load = reps * weight;
 
-        if (!highestByDate.containsKey(dayKey) ||
-            (load) >
-                (int.tryParse(highestByDate[dayKey]!.reps ?? "0") ?? 0) *
-                    (double.tryParse(highestByDate[dayKey]!.weight ?? "0") ??
-                        0)) {
-          highestByDate[dayKey] = item;
+          if (!highestByDate.containsKey(dayKey) ||
+              (load) >
+                  (int.tryParse(highestByDate[dayKey]!.reps ?? "0") ?? 0) *
+                      (double.tryParse(highestByDate[dayKey]!.weight ?? "0") ??
+                          0)) {
+            highestByDate[dayKey] = item;
+          }
         }
       }
+
       final data1 = highestByDate.values.toList();
 
       for (final item in data1) {
@@ -201,7 +319,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
         percentage = (latestOneRM / baseOneRM) * 100;
       }
 
-      percentageMap[name] = {
+      percentageMap[entry.exerciseName ?? ""] = {
         "oldest_1RM": baseOneRM ?? 0,
         "oldest_date": baseDate ?? "",
         "latest_1RM": latestOneRM ?? 0,
@@ -209,8 +327,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
         "percentage": percentage
       };
     });
-
-    await Future.wait(allDataFutures);
 
     final data = features.map((feature) {
       final key = feature.replaceAll("\n", " ");
@@ -242,6 +358,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
       loader = false;
     });
   }
+
+  ///
 
   void scrollToMiddle() {
     if (monthProvider?.graphType == "Weight" ||
@@ -279,11 +397,6 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          filterRadarChartData();
-        },
-      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         controller: scrollController,
@@ -399,75 +512,56 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
 
                           /// WEIGHT LIFTED
 
-                          SizedBox(height: ScreenUtil.horizontalScale(4)),
+                          SizedBox(height: ScreenUtil.horizontalScale(7)),
+
                           Container(
                             margin: EdgeInsets.symmetric(
-                                vertical: ScreenUtil.verticalScale(1.5),
                                 horizontal: ScreenUtil.horizontalScale(8)),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Weight Lifted",
+                                  "6 Big Lifts Progress",
                                   style: TextStyle(
                                     color: AppColors.primaryColor,
                                     fontSize: ScreenUtil.verticalScale(2.3),
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                Container(
-                                  height: ScreenUtil.verticalScale(4),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        ScreenUtil.verticalScale(2)),
+                                SizedBox(width: 5),
+                                GestureDetector(
+                                  onTap: () {
+                                    AnimatedDialog.showAnimatedDialog(
+                                      context: context,
+                                      pageBuilder: (c1, anim1, anim2) =>
+                                          RadarChartInfoDialog(),
+                                    );
+                                  },
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.info,
+                                      size: ScreenUtil.verticalScale(2.3),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color,
+                                    ),
                                   ),
-                                  child: Consumer<MonthProvider>(
-                                    builder: (context, monthProvider, child) {
-                                      return DropdownButtonHideUnderline(
-                                        child: DropdownButton(
-                                          value:
-                                              monthProvider.reportWeightLifted,
-                                          items: [
-                                            "Week 1",
-                                            "Week 2",
-                                            "Week 3",
-                                            "Week 4"
-                                          ]
-                                              .map(
-                                                (name) => DropdownMenuItem(
-                                                  value: name,
-                                                  child: Text(
-                                                    name,
-                                                    style: TextStyle(
-                                                      color: const Color(
-                                                          0xA09F9F9F),
-                                                      fontSize: ScreenUtil
-                                                          .verticalScale(1.5),
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                              .toList(),
-                                          onChanged: monthProvider
-                                              .changeWeekWeightLifted,
-                                          icon: const Icon(
-                                            Icons.expand_more,
-                                            color: Color(0xA09F9F9F),
-                                            size: 25,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                )
                               ],
                             ),
                           ),
-                          SizedBox(height: ScreenUtil.horizontalScale(2)),
+
                           Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(8)),
-                              child: const ReportWeightLiftedGraph()),
+                            margin: EdgeInsets.only(
+                              left: ScreenUtil.horizontalScale(2),
+                              right: ScreenUtil.horizontalScale(5),
+                            ),
+                            // height: 400,
+                            child: CustomRadarChart(
+                                valueList: valueList,
+                                dateHighest: dateHighest,
+                                dateOld: dateOld),
+                          ),
 
                           /// AVERAGE RIR
 
@@ -605,17 +699,75 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                           // ),
 
                           SizedBox(height: ScreenUtil.horizontalScale(2)),
+
                           Container(
-                            margin: EdgeInsets.only(
-                              left: ScreenUtil.horizontalScale(2),
-                              right: ScreenUtil.horizontalScale(5),
+                            margin: EdgeInsets.symmetric(
+                                vertical: ScreenUtil.verticalScale(1.5),
+                                horizontal: ScreenUtil.horizontalScale(8)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Total Weight Lifted",
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor,
+                                    fontSize: ScreenUtil.verticalScale(2.3),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Container(
+                                  height: ScreenUtil.verticalScale(4),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        ScreenUtil.verticalScale(2)),
+                                  ),
+                                  child: Consumer<MonthProvider>(
+                                    builder: (context, monthProvider, child) {
+                                      return DropdownButtonHideUnderline(
+                                        child: DropdownButton(
+                                          value:
+                                              monthProvider.reportWeightLifted,
+                                          items: [
+                                            "Week 1",
+                                            "Week 2",
+                                            "Week 3",
+                                            "Week 4"
+                                          ]
+                                              .map(
+                                                (name) => DropdownMenuItem(
+                                                  value: name,
+                                                  child: Text(
+                                                    name,
+                                                    style: TextStyle(
+                                                      color: const Color(
+                                                          0xA09F9F9F),
+                                                      fontSize: ScreenUtil
+                                                          .verticalScale(1.5),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                          onChanged: monthProvider
+                                              .changeWeekWeightLifted,
+                                          icon: const Icon(
+                                            Icons.expand_more,
+                                            color: Color(0xA09F9F9F),
+                                            size: 25,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                            // height: 400,
-                            child: CustomRadarChart(
-                                valueList: valueList,
-                                dateHighest: dateHighest,
-                                dateOld: dateOld),
                           ),
+                          SizedBox(height: ScreenUtil.horizontalScale(2)),
+                          Container(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(8)),
+                              child: const ReportWeightLiftedGraph()),
 
                           Container(
                             margin: EdgeInsets.symmetric(
@@ -655,7 +807,7 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'Total Weight\nLifted',
+                                            'Program Days\nCompleted',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                                 color: Theme.of(context)
@@ -671,8 +823,8 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                             builder: (context, monthProvider,
                                                 child) {
                                               return Text(
-                                                "${NumberFormat.decimalPattern('en_US').format(monthProvider.totalWeightLiftedInAWeek.toInt())}lbs",
-
+                                                // "${NumberFormat.decimalPattern('en_US').format(monthProvider.totalWeightLiftedInAWeek.toInt())}lbs",
+                                                "${monthProvider.totalDayCompleted}",
                                                 // '${monthProvider.totalWeightLiftedInAWeek.toStringAsFixed(0)} lbs',
                                                 style: TextStyle(
                                                   color:
@@ -736,8 +888,11 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
                                             builder: (context, monthProvider,
                                                 child) {
                                               return Text(
+                                                // monthProvider
+                                                //     .totalExerciseCompletedInAWeek
+                                                //     .toStringAsFixed(0),
                                                 monthProvider
-                                                    .totalExerciseCompletedInAWeek
+                                                    .totalCompletedExercise
                                                     .toStringAsFixed(0),
                                                 style: TextStyle(
                                                   color:

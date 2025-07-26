@@ -1,4 +1,5 @@
 abstract class BaseService<T> {
+  static const radarChartHistory = "/api/exercise-history/radar-chart";
   static const fetchExerciseHistory = "/api/exercise-history/fetch";
   static const addExerciseHistory = "/api/exercise-history/add";
   static const updateExerciseHistory = "/api/exercise-history/update";

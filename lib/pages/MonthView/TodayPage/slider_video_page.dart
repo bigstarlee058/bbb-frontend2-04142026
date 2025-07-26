@@ -312,7 +312,12 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                 child: Center(
                                   child: Text(
                                     "Video not available!",
-                                    style: TextStyle(fontSize: 18),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color),
                                   ),
                                 ),
                               ),

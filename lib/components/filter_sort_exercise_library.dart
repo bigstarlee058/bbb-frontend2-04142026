@@ -9,10 +9,12 @@ import 'package:google_fonts/google_fonts.dart';
 class FilterSortDialog extends StatefulWidget {
   final List<Map<String, String>> equipments;
   final List<Map<String, String>> categories;
-  final Function(List<String>, List<String>, String) onApplyFilters;
+  final Function(String, String, String) onApplyFilters;
   final String selectedSortBy;
-  final List<String> selectedEquipmentIds;
-  final List<String> selectedCategoryIds;
+  // final List<String> selectedEquipmentIds;
+  // final List<String> selectedCategoryIds;
+  final String selectedEquipmentIds;
+  final String selectedCategoryIds;
 
   const FilterSortDialog({
     super.key,
@@ -32,8 +34,10 @@ class _FilterSortDialogState extends State<FilterSortDialog>
     with TickerProviderStateMixin {
   int? _expandedIndex = 0;
   String _selectedSortBy = '';
-  List<String> _selectedEquipmentIds = [];
-  List<String> _selectedCategoryIds = [];
+  // List<String> _selectedEquipmentIds = [];
+  // List<String> _selectedCategoryIds = [];
+  String _selectedEquipmentIds = "";
+  String _selectedCategoryIds = "";
 
   @override
   void initState() {
@@ -112,8 +116,10 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                         title: "Filter by Equipment",
                         child: Column(
                           children: widget.equipments.map((equipment) {
+                            // final isChecked =
+                            //     _selectedEquipmentIds.contains(equipment['id']);
                             final isChecked =
-                                _selectedEquipmentIds.contains(equipment['id']);
+                                _selectedEquipmentIds == equipment['id'];
                             return ListTile(
                               title: Text(
                                 equipment['title']!,
@@ -132,13 +138,21 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                                 onTap: () {
                                   setState(() {
                                     if (isChecked) {
-                                      _selectedEquipmentIds
-                                          .remove(equipment['id']);
+                                      _selectedEquipmentIds = "";
                                     } else {
-                                      _selectedEquipmentIds
-                                          .add(equipment['id']!);
+                                      _selectedEquipmentIds =
+                                          equipment['id'] ?? "";
                                     }
                                   });
+                                  // setState(() {
+                                  //   if (isChecked) {
+                                  //     _selectedEquipmentIds
+                                  //         .remove(equipment['id']);
+                                  //   } else {
+                                  //     _selectedEquipmentIds
+                                  //         .add(equipment['id']!);
+                                  //   }
+                                  // });
                                 },
                                 child: Container(
                                   width: 22,
@@ -179,12 +193,20 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                               ),
                               onTap: () {
                                 setState(() {
-                                  if (isChecked) {
-                                    _selectedEquipmentIds
-                                        .remove(equipment['id']);
-                                  } else {
-                                    _selectedEquipmentIds.add(equipment['id']!);
-                                  }
+                                  setState(() {
+                                    if (isChecked) {
+                                      _selectedEquipmentIds = "";
+                                    } else {
+                                      _selectedEquipmentIds =
+                                          equipment['id'] ?? "";
+                                    }
+                                  });
+                                  // if (isChecked) {
+                                  //   _selectedEquipmentIds
+                                  //       .remove(equipment['id']);
+                                  // } else {
+                                  //   _selectedEquipmentIds.add(equipment['id']!);
+                                  // }
                                 });
                               },
                             );
@@ -223,7 +245,7 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                       child: Column(
                         children: widget.categories.map((category) {
                           final isChecked =
-                              _selectedCategoryIds.contains(category['id']);
+                              _selectedCategoryIds == category['id'];
                           return ListTile(
                             title: Text(
                               category['title']!,
@@ -242,11 +264,19 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                               onTap: () {
                                 setState(() {
                                   if (isChecked) {
-                                    _selectedCategoryIds.remove(category['id']);
+                                    _selectedCategoryIds = "";
                                   } else {
-                                    _selectedCategoryIds.add(category['id']!);
+                                    _selectedCategoryIds = category['id'] ?? "";
                                   }
                                 });
+
+                                // setState(() {
+                                //   if (isChecked) {
+                                //     _selectedCategoryIds.remove(category['id']);
+                                //   } else {
+                                //     _selectedCategoryIds.add(category['id']!);
+                                //   }
+                                // });
                               },
                               child: Container(
                                 width: 22,
@@ -288,11 +318,18 @@ class _FilterSortDialogState extends State<FilterSortDialog>
                             onTap: () {
                               setState(() {
                                 if (isChecked) {
-                                  _selectedCategoryIds.remove(category['id']);
+                                  _selectedCategoryIds = "";
                                 } else {
-                                  _selectedCategoryIds.add(category['id']!);
+                                  _selectedCategoryIds = category['id'] ?? "";
                                 }
                               });
+                              // setState(() {
+                              //   if (isChecked) {
+                              //     _selectedCategoryIds.remove(category['id']);
+                              //   } else {
+                              //     _selectedCategoryIds.add(category['id']!);
+                              //   }
+                              // });
                             },
                           );
                         }).toList(),
