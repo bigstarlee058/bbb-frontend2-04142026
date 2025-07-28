@@ -228,7 +228,7 @@ class DataProvider extends ChangeNotifier {
         }
 
         await preloadAndCacheImages();
-        allImages = allImageList;
+        // allImages = allImageList;
       } else {
         throw Exception('Failed to get screen bg data');
       }
@@ -845,6 +845,7 @@ class DataProvider extends ChangeNotifier {
 
   Future fetchMonthWorkouts(int month) async {
     try {
+      log('==========>>>>>${DateTime.now().toUtc()}');
       final Map<String, String> queryParams = {
         'month': month.toString(),
         'equipment': '0',

@@ -68,7 +68,7 @@ import 'providers/video_initiase_loader.dart';
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-List<Map<String, dynamic>> allImages = [];
+// List<Map<String, dynamic>> allImages = [];
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {}
 

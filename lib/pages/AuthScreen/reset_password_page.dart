@@ -153,27 +153,30 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                AppImage.imageForgot(
-                  // media,
-                  // image: dataProvider!.allImageList
-                  //     .where((element) => element["key"] == "imageForgot")
-                  //     .first["image"],
-                  // // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
-                  // // image: dataProvider!.cachedImageMap["imageForgot"],
-                  // imageKey: "imageForgot",
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: SafeArea(
-                          child: BackArrowWidget(onPress: () {
-                            Navigator.pop(context);
-                          }),
+                Consumer<DataProvider>(builder: (context, value, c) {
+                  return AppImage.imageForgot(
+                    value,
+                    // media,
+                    // image: dataProvider!.allImageList
+                    //     .where((element) => element["key"] == "imageForgot")
+                    //     .first["image"],
+                    // // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
+                    // // image: dataProvider!.cachedImageMap["imageForgot"],
+                    // imageKey: "imageForgot",
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: SafeArea(
+                            child: BackArrowWidget(onPress: () {
+                              Navigator.pop(context);
+                            }),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                )
+                      ],
+                    ),
+                  );
+                })
               ],
             ),
             Positioned(

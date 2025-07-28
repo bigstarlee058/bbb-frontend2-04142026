@@ -456,14 +456,17 @@ class _TodayPageState extends State<TodayPage>
               backgroundColor: Colors.white,
               body: Stack(
                 children: [
-                  AppImage.imageToday(
+                  Consumer<DataProvider>(builder: (context, value, c) {
+                    return AppImage.imageToday(
+                      value,
                       // media,
                       // image: dataProvider!.allImageList
                       //     .where((element) => element["key"] == "imageToday")
                       //     .first["image"],
                       // // image: dataProvider!.cachedImageMap["imageToday"],
                       // imageKey: "imageToday",
-                      ),
+                    );
+                  }),
                   SizedBox(
                     height: media.height,
                     child: SingleChildScrollView(

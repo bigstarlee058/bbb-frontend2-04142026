@@ -196,27 +196,30 @@ class _SignupPageState extends State<SignupPage> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              AppImage.imageSignup(
-                // media,
-                // image: dataProvider!.allImageList
-                //     .where((element) => element["key"] == "imageSignup")
-                //     .first["image"],
-                // // dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
-                // // image: dataProvider!.cachedImageMap["imageSignup"],
-                // imageKey: "imageSignup",
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: SafeArea(
-                        child: BackArrowWidget(onPress: () {
-                          Navigator.pop(context);
-                        }),
+              Consumer<DataProvider>(builder: (context, value, c) {
+                return AppImage.imageSignup(
+                  value,
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageSignup")
+                  //     .first["image"],
+                  // // dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
+                  // // image: dataProvider!.cachedImageMap["imageSignup"],
+                  // imageKey: "imageSignup",
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: SafeArea(
+                          child: BackArrowWidget(onPress: () {
+                            Navigator.pop(context);
+                          }),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              )
+                    ],
+                  ),
+                );
+              })
             ],
           ),
           Positioned(

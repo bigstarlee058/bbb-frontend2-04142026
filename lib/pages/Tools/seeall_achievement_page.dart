@@ -114,17 +114,19 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageAchievement(
-                            // media,
-                            // // dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
-                            // image: dataProvider!.allImageList
-                            //     .where((element) =>
-                            //         element["key"] == "imageAchievement")
-                            //     .first["image"],
-                            // // image:
-                            // //     dataProvider!.cachedImageMap["imageAchievement"],
-                            // imageKey: "imageAchievement",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageAchievement(value
+                              // media,
+                              // // dataProvider?.screenBackgroundResponse?.imageAchievement ?? "",
+                              // image: dataProvider!.allImageList
+                              //     .where((element) =>
+                              //         element["key"] == "imageAchievement")
+                              //     .first["image"],
+                              // // image:
+                              // //     dataProvider!.cachedImageMap["imageAchievement"],
+                              // imageKey: "imageAchievement",
+                              );
+                        }),
                         // Container(
                         //   height: media.height / 1,
                         //   width: media.width,

@@ -290,7 +290,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageMyProfle(
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageMyProfle(
+                            value,
                             // media,
                             // image: dataProvider!.allImageList
                             //     .where((element) =>
@@ -298,7 +300,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             //     .first["image"],
                             // // image: dataProvider!.cachedImageMap["imageMyProfle"],
                             // imageKey: "imageMyProfle",
-                            ),
+                          );
+                        }),
                         SizedBox(
                           height: media.height / 1.5,
                           width: media.width,

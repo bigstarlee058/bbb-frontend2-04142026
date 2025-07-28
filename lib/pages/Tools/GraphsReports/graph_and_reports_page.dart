@@ -404,7 +404,9 @@ class _GraphAndReportsPageState extends State<GraphAndReportsPage> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            AppImage.imageGraphs(),
+            Consumer<DataProvider>(builder: (context, value, c) {
+              return AppImage.imageGraphs(value);
+            }),
             Container(
               margin: EdgeInsets.only(
                   top: Platform.isAndroid

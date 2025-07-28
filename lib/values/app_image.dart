@@ -1,151 +1,69 @@
-import 'package:bbb/main.dart';
+import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/utils.dart';
 
 class AppImage {
-  static Widget imageLogin({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[1]["image"],
-      imageKey: allImages[1]["key"],
-    );
+  static Widget _safeImage(DataProvider value, int index, {Widget? child}) {
+    return (value.allImageList.length > index)
+        ? Utils.appImage(
+            child: child,
+            Size(
+              ScreenUtil.horizontalScale(100),
+              ScreenUtil.verticalScale(100),
+            ),
+            image: value.allImageList[index]["image"],
+            imageKey: value.allImageList[index]["key"],
+          )
+        : const SizedBox();
   }
 
-  static Widget imageSignup({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[2]["image"],
-      imageKey: allImages[2]["key"],
-    );
-  }
+  static Widget imageLogin(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 1, child: child);
 
-  static Widget imageEmailConfirm({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[3]["image"],
-      imageKey: allImages[3]["key"],
-    );
-  }
+  static Widget imageSignup(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 2, child: child);
 
-  static Widget imageAchievement({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[4]["image"],
-      imageKey: allImages[4]["key"],
-    );
-  }
+  static Widget imageEmailConfirm(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 3, child: child);
 
-  static Widget imageApparel({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[5]["image"],
-      imageKey: allImages[5]["key"],
-    );
-  }
+  static Widget imageAchievement(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 4, child: child);
 
-  static Widget imageExerciseLibrary({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[6]["image"],
-      imageKey: allImages[6]["key"],
-    );
-  }
+  static Widget imageApparel(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 5, child: child);
 
-  static Widget imageFaQs({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[7]["image"],
-      imageKey: allImages[7]["key"],
-    );
-  }
+  static Widget imageExerciseLibrary(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 6, child: child);
 
-  static Widget imageForgot({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[8]["image"],
-      imageKey: allImages[8]["key"],
-    );
-  }
+  static Widget imageFaQs(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 7, child: child);
 
-  static Widget imageGraphs({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[9]["image"],
-      imageKey: allImages[9]["key"],
-    );
-  }
+  static Widget imageForgot(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 8, child: child);
 
-  static Widget imageMonthView({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[10]["image"],
-      imageKey: allImages[10]["key"],
-    );
-  }
+  static Widget imageGraphs(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 9, child: child);
 
-  static Widget imageMyProfle({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[11]["image"],
-      imageKey: allImages[11]["key"],
-    );
-  }
+  static Widget imageMonthView(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 10, child: child);
 
-  static Widget imageProfile({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[12]["image"],
-      imageKey: allImages[12]["key"],
-    );
-  }
+  static Widget imageMyProfle(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 11, child: child);
 
-  static Widget imageSetting({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[13]["image"],
-      imageKey: allImages[13]["key"],
-    );
-  }
+  static Widget imageProfile(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 12, child: child);
 
-  static Widget imageStreakCalendar({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[14]["image"],
-      imageKey: allImages[14]["key"],
-    );
-  }
+  static Widget imageSetting(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 13, child: child);
 
-  static Widget imageToday({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[15]["image"],
-      imageKey: allImages[15]["key"],
-    );
-  }
+  static Widget imageStreakCalendar(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 14, child: child);
 
-  static Widget imageTools({Widget? child}) {
-    return Utils.appImage(
-      child: child,
-      Size(ScreenUtil.horizontalScale(100), ScreenUtil.verticalScale(100)),
-      image: allImages[16]["image"],
-      imageKey: allImages[16]["key"],
-    );
-  }
+  static Widget imageToday(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 15, child: child);
+
+  static Widget imageTools(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 16, child: child);
 }

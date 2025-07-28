@@ -185,13 +185,16 @@ class _MonthViewState extends State<MonthView> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            AppImage.imageMonthView(
+            Consumer<DataProvider>(builder: (context, value, c) {
+              return AppImage.imageMonthView(
+                value,
                 // media,
                 // image: dataProvider!.allImageList
                 //     .where((element) => element["key"] == "imageMonthView")
                 //     .first["image"],
                 // imageKey: "imageMonthView",
-                ),
+              );
+            }),
             RefreshIndicator(
               color: AppColors.primaryColor,
               onRefresh: () async {

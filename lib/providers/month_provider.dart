@@ -231,7 +231,6 @@ class MonthProvider extends ChangeNotifier {
           i++) {
         var value = await fetchPumpDay(
             monthDataModel!.weeks![week! - 1].pumpDayIds![i]);
-        log('value==========>>>>>$value');
         if (value != null) {
           pumpDays.add(value);
         }
@@ -592,8 +591,8 @@ class MonthProvider extends ChangeNotifier {
       if (isEnabled) {
         loader = true;
       }
-
-      notifyListeners();
+      WidgetsBinding.instance
+          .addPostFrameCallback((timeStamp) => notifyListeners());
       String split = (preferences.getString(SharedPreference.split) ?? "")
           .replaceAll("split", "");
 
@@ -637,7 +636,8 @@ class MonthProvider extends ChangeNotifier {
     } finally {
       loader = false;
       loader1 = false;
-      notifyListeners();
+      WidgetsBinding.instance
+          .addPostFrameCallback((timeStamp) => notifyListeners());
     }
   }
 
@@ -2013,10 +2013,10 @@ class MonthProvider extends ChangeNotifier {
 
     if (data.isNotEmpty) {
       for (var element in data) {
-        totalCompletedExercise += int.parse(
-            element.completedExercise!.isNotEmpty
-                ? element.completedExercise ?? "0"
-                : "0");
+        totalCompletedExercise += int.parse(element.completedExercise != null &&
+                element.completedExercise!.isNotEmpty
+            ? element.completedExercise ?? "0"
+            : "0");
       }
       totalDayCompleted = data.length;
     }

@@ -167,15 +167,17 @@ class _SettingPageState extends State<SettingPage> {
               children: [
                 Stack(
                   children: [
-                    AppImage.imageSetting(
-                        // media,
-                        // image: dataProvider!.allImageList
-                        //     .where(
-                        //         (element) => element["key"] == "imageSetting")
-                        //     .first["image"],
-                        // // image: dataProvider!.cachedImageMap["imageSetting"],
-                        // imageKey: "imageSetting",
-                        ),
+                    Consumer<DataProvider>(builder: (context, value, c) {
+                      return AppImage.imageSetting(value
+                          // media,
+                          // image: dataProvider!.allImageList
+                          //     .where(
+                          //         (element) => element["key"] == "imageSetting")
+                          //     .first["image"],
+                          // // image: dataProvider!.cachedImageMap["imageSetting"],
+                          // imageKey: "imageSetting",
+                          );
+                    }),
                     SizedBox(
                       height: media.height / 1.5,
                       width: media.width,

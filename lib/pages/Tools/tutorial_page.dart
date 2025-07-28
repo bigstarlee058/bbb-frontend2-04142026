@@ -53,15 +53,17 @@ class _TutorialPageState extends State<TutorialPage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageApparel(
-                            // media,
-                            // image: dataProvider!.allImageList
-                            //     .where(
-                            //         (element) => element["key"] == "imageApparel")
-                            //     .first["image"],
-                            // // image: dataProvider!.cachedImageMap["imageApparel"],
-                            // imageKey: "imageApparel",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageApparel(value
+                              // media,
+                              // image: dataProvider!.allImageList
+                              //     .where(
+                              //         (element) => element["key"] == "imageApparel")
+                              //     .first["image"],
+                              // // image: dataProvider!.cachedImageMap["imageApparel"],
+                              // imageKey: "imageApparel",
+                              );
+                        }),
                         SizedBox(
                           height: media.height / 2.5,
                           width: media.width,

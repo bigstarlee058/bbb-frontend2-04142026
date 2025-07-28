@@ -475,27 +475,30 @@ class _LoginPageState extends State<LoginPage> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              AppImage.imageLogin(
-                // media,
-                // image: dataProvider!.allImageList
-                //     .where((element) => element["key"] == "imageLogin")
-                //     .first["image"],
-                // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                // // image: dataProvider!.cachedImageMap["imageLogin"],
-                // imageKey: "imageLogin",
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: SafeArea(
-                        child: BackArrowWidget(onPress: () {
-                          Navigator.pop(context);
-                        }),
+              Consumer<DataProvider>(builder: (context, value, c) {
+                return AppImage.imageLogin(
+                  value,
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageLogin")
+                  //     .first["image"],
+                  // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                  // // image: dataProvider!.cachedImageMap["imageLogin"],
+                  // imageKey: "imageLogin",
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: SafeArea(
+                          child: BackArrowWidget(onPress: () {
+                            Navigator.pop(context);
+                          }),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                );
+              }),
             ],
           ),
           Positioned(

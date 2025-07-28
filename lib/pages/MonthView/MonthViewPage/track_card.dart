@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -92,8 +94,8 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
           },
         );
       } else {
-        bool isFuture =
-            monthProvider?.weekStatuses[mainIndex ?? 0] == WeekType.futureWeek;
+        // bool isFuture =
+        //     monthProvider?.weekStatuses[mainIndex ?? 0] == WeekType.futureWeek;
 
         if ((mainIndex! + 1) == 1 ? true : false) {
           monthProvider!.updateWeekExpandedHeight(89, mainIndex ?? 0);

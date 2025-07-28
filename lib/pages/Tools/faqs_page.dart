@@ -60,14 +60,16 @@ class _FAQsPageState extends State<FAQsPage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageFaQs(
-                            // media,
-                            // image: dataProvider!.allImageList
-                            //     .where((element) => element["key"] == "imageFaQs")
-                            //     .first["image"],
-                            // // image: dataProvider!.cachedImageMap["imageFaQs"],
-                            // imageKey: "imageFaQs",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageFaQs(value
+                              // media,
+                              // image: dataProvider!.allImageList
+                              //     .where((element) => element["key"] == "imageFaQs")
+                              //     .first["image"],
+                              // // image: dataProvider!.cachedImageMap["imageFaQs"],
+                              // imageKey: "imageFaQs",
+                              );
+                        }),
                         SizedBox(
                           height: media.height / 2.5,
                           width: media.width,

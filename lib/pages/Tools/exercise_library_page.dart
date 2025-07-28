@@ -140,17 +140,19 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
                     //     ),
                     //   ),
                     // ),
-                    AppImage.imageExerciseLibrary(
-                        // media,
-                        // image: dataProvider!.allImageList
-                        //     .where((element) =>
-                        //         element["key"] == "imageExerciseLibrary")
-                        //     .first["image"],
-                        // // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
-                        // // image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
-                        //
-                        // imageKey: "imageExerciseLibrary",
-                        ),
+                    Consumer<DataProvider>(builder: (context, value, c) {
+                      return AppImage.imageExerciseLibrary(value
+                          // media,
+                          // image: dataProvider!.allImageList
+                          //     .where((element) =>
+                          //         element["key"] == "imageExerciseLibrary")
+                          //     .first["image"],
+                          // // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
+                          // // image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
+                          //
+                          // imageKey: "imageExerciseLibrary",
+                          );
+                    }),
                     SizedBox(
                       height: media.height / 2.5,
                       width: media.width,

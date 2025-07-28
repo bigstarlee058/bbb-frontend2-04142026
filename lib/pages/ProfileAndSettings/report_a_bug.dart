@@ -135,90 +135,92 @@ class _ReportABugScreenState extends State<ReportABugScreen> {
     }
   }
 
-  Widget form() => SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(height: ScreenUtil.verticalScale(3)),
-            Text(
-              "Welcome to the Booty by Bret app beta! We'd love to get your feedback as we work through our first release and some initial bugs. If you notice anything off or not working (or if you have any feedback or suggestions whatsoever), feel free to message us.",
-              style: TextStyle(
-                fontSize: ScreenUtil.verticalScale(1.8),
-                color: Theme.of(context).textTheme.bodySmall?.color,
+  Widget form() => Center(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: ScreenUtil.verticalScale(3)),
+              Text(
+                "Welcome to the Booty by Bret app beta! We'd love to get your feedback as we work through our first release and some initial bugs. If you notice anything off or not working (or if you have any feedback or suggestions whatsoever), feel free to message us.",
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.8),
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
               ),
-            ),
-            SizedBox(height: ScreenUtil.verticalScale(3)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: AppTextFormField(
-                maxLines: 8,
-                hintText: 'Enter details here...',
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                onChanged: (value) {
-                  if (descriptionController.text.toString().trim().isEmpty) {
-                    descriptionController.clear();
-                    setState(() {});
-                  }
-                },
-                controller: descriptionController,
+              SizedBox(height: ScreenUtil.verticalScale(3)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: AppTextFormField(
+                  maxLines: 8,
+                  hintText: 'Enter details here...',
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  onChanged: (value) {
+                    if (descriptionController.text.toString().trim().isEmpty) {
+                      descriptionController.clear();
+                      setState(() {});
+                    }
+                  },
+                  controller: descriptionController,
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            if (image == null)
-              TextButton(
-                  onPressed: _pickAndUploadImage,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                        size: ScreenUtil.verticalScale(2.5),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        "Attachment (Optional)",
-                        style: TextStyle(
-                          fontSize: ScreenUtil.verticalScale(1.8),
+              SizedBox(height: 20),
+              if (image == null)
+                TextButton(
+                    onPressed: _pickAndUploadImage,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.add,
                           color: Theme.of(context).textTheme.bodySmall?.color,
+                          size: ScreenUtil.verticalScale(2.5),
                         ),
-                      ),
-                    ],
-                  ))
-            else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Attachment",
-                    style: TextStyle(
-                      fontSize: ScreenUtil.verticalScale(1.8),
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  ClipRRect(
-                    borderRadius:
-                        BorderRadius.circular(ScreenUtil.horizontalScale(5)),
-                    child: Container(
-                      height: ScreenUtil.verticalScale(14),
-                      width: ScreenUtil.verticalScale(14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(ScreenUtil.horizontalScale(5)),
+                        SizedBox(width: 5),
+                        Text(
+                          "Attachment (Optional)",
+                          style: TextStyle(
+                            fontSize: ScreenUtil.verticalScale(1.8),
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
                         ),
-                      ),
-                      child: Image.file(
-                        image!,
-                        fit: BoxFit.cover,
+                      ],
+                    ))
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Attachment",
+                      style: TextStyle(
+                        fontSize: ScreenUtil.verticalScale(1.8),
+                        color: Theme.of(context).textTheme.bodySmall?.color,
                       ),
                     ),
-                  )
-                ],
-              ),
-            SizedBox(height: ScreenUtil.verticalScale(3)),
-          ],
+                    SizedBox(height: 15),
+                    ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(ScreenUtil.horizontalScale(5)),
+                      child: Container(
+                        height: ScreenUtil.verticalScale(14),
+                        width: ScreenUtil.verticalScale(14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(ScreenUtil.horizontalScale(5)),
+                          ),
+                        ),
+                        child: Image.file(
+                          image!,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              SizedBox(height: ScreenUtil.verticalScale(3)),
+            ],
+          ),
         ),
       );
 

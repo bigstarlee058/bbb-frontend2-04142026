@@ -209,14 +209,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageProfile(
-                            // media,
-                            // image: dataProvider!.allImageList
-                            //     .where(
-                            //         (element) => element["key"] == "imageProfile")
-                            //     .first["image"],
-                            // imageKey: "imageProfile",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageProfile(value
+                              // media,
+                              // image: dataProvider!.allImageList
+                              //     .where(
+                              //         (element) => element["key"] == "imageProfile")
+                              //     .first["image"],
+                              // imageKey: "imageProfile",
+                              );
+                        }),
                         SizedBox(
                           height: media.height / 1.5,
                           width: media.width,
@@ -754,7 +756,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsImageButton(
-                                    'Beta',
+                                    'Beta: Report a Bug',
                                     Icons.bug_report,
                                     () => Navigator.push(
                                       context,

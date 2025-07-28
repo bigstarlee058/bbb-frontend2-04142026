@@ -282,7 +282,7 @@ class RadarChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(center.dx, center.dy) * 0.8;
+    final radius = math.min(center.dx, center.dy) * 0.75;
     final tickRadius = radius / ticks.length;
 
     final axisPaint = Paint()
@@ -329,9 +329,34 @@ class RadarChartPainter extends CustomPainter {
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
       )..layout();
-      final dx = x < center.dx ? x - tp.width : x;
-      final dy = y < center.dy ? y - tp.height : y;
+
+      double dx = x < center.dx ? x - tp.width : x;
+      double dy = y < center.dy ? y - tp.height : y;
+      double angleAtIndex = angle * i;
+      const double labelPadding = 5;
+
+      dx = x < center.dx ? x - tp.width - labelPadding : x + labelPadding;
+      dy = y < center.dy ? y - tp.height - labelPadding : y + labelPadding;
+
+      if (math.cos(angleAtIndex).abs() > 0.9) {
+        dy -= tp.height / 2;
+      }
+
+      if (math.sin(angleAtIndex).abs() > 0.9) {
+        dx -= tp.width / 2;
+      }
+      if ((angle * i) % (2 * math.pi) == math.pi) {
+        dy += 15;
+      }
+
       tp.paint(canvas, Offset(dx, dy));
+
+      // double dx = x < center.dx ? x - tp.width : x;
+      // double dy = y < center.dy ? y - tp.height : y;
+      // const double labelPadding = 5;
+      // dx = x < center.dx ? x - tp.width - labelPadding : x + labelPadding;
+      // dy = y < center.dy ? y - tp.height - labelPadding : y + labelPadding;
+      // tp.paint(canvas, Offset(dx, dy));
     }
 
     for (int d = 0; d < data.length; d++) {
