@@ -252,7 +252,6 @@ class DataProvider extends ChangeNotifier {
     List<AchievementsDataModel> achievementsData =
         await ApiRepo.fetchAchievementsList();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/achievements-group/get');
-    log('achievementsData==========>>>>>$achievementsData');
     String? userIdToken = await getAuthToken();
 
     // try {
@@ -274,7 +273,7 @@ class DataProvider extends ChangeNotifier {
         if (element.achievements!.isNotEmpty) {
           for (var ele in element.achievements!) {
             if (achievementsData.isEmpty) {
-              if ((ele.achievementAchievementId?.value ?? 0) <
+              if ((ele.achievementAchievementId?.value ?? 0) <=
                   (element.currentValue ?? 0)) {
                 await ApiRepo.addAchievementsList(
                     body: UpdateAchievementsRequest(
@@ -292,7 +291,7 @@ class DataProvider extends ChangeNotifier {
                         z.achievementsTitle ==
                         ele.achievementAchievementId?.achievementIdId) ==
                     false)) {
-              if ((ele.achievementAchievementId!.value)! <
+              if ((ele.achievementAchievementId!.value)! <=
                   (element.currentValue!)) {
                 final data = UpdateAchievementsRequest(
                   achievementsDate: DateTime.now().toUtc().toString(),

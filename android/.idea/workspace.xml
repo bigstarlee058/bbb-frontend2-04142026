@@ -4,20 +4,76 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fda79f2a-562b-4806-9ddf-4d3b91527bdd" name="Changes" comment="">
+    <list default="true" id="3730fcef-d41e-4c2f-8f65-5d1e86226c12" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/appInsightsSettings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/appInsightsSettings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/kotlinc.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/components/common_streak_with_notification.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/components/common_streak_with_notification.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/CollectionView/collection_detail_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/CollectionView/collection_detail_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738268811498.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738268811519.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738268811529.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738268811554.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738268811586.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738268811617.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738276213895.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738280220747.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738280220771.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738280220781.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738280221077.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738280221139.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738280221200.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738280221239.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738330224620.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738330224773.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738330224791.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738330224870.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738330224905.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738330224960.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738330225030.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738346307870.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738346307890.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738346307910.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738346308037.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738346308069.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738346308130.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738346308196.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738347219663.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738347219708.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738347219829.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738347219856.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738347219917.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738347219965.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738416166924.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738416166961.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738416166998.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738416167160.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738416167197.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738416167297.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.kotlin/errors/errors-1738416167362.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/google-services.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/google-services.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/proguard-rules.pro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/AuthScreen/splash_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/AuthScreen/splash_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/dashboard_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/dashboard_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/MonthView/MonthViewPage/track_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/MonthView/MonthViewPage/track_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/height_picker.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/height_picker.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/myprofile_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/myprofile_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/featured_collection.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/featured_collection.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/week_calender.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/DashBoardScreen/week_calender.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/IntroScreen/version_update_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/IntroScreen/version_update_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/IntroScreen/video_intro_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/IntroScreen/video_intro_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/profile_settings_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/ProfileAndSettings/profile_settings_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/Tools/exercise_history.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Tools/exercise_history.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/Tools/seeall_achievement_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Tools/seeall_achievement_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/Tools/tutorial_details_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Tools/tutorial_details_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/pages/Tools/tutorial_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/pages/Tools/tutorial_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/providers/data_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/providers/data_provider.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,31 +83,35 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=Default, isTemplate=false, identifier=serial=192.168.29.184:5555;connection=149bd36e)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=10BEAK0DMC00429)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
   </component>
-  <component name="ExternalProjectsManager">
-    <system id="GRADLE">
-      <state>
-        <projects_view />
-      </state>
-    </system>
-  </component>
   <component name="GenerateSignedApkSettings">
-    <option name="KEY_STORE_PATH" value="$PROJECT_DIR$/../../../JKS/keystore.jks" />
-    <option name="KEY_ALIAS" value="URestaurant" />
-    <option name="REMEMBER_PASSWORDS" value="true" />
+    <option name="KEY_STORE_PATH" value="$PROJECT_DIR$/keystore" />
+    <option name="KEY_ALIAS" value="Booty By Bret" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 0
-}</component>
-  <component name="ProjectId" id="2sLLt5vgCDQWEpCoFr6MZYEYiXI" />
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Nevilrv"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/perceptively-nick/bbb-frontend2.git",
+    "accountId": "64d86e00-44e1-4945-84e0-f318bd050b4e"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="30Xfu7vZNMany4nBZYDYFlKzpCy" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -59,9 +119,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "BundleExportedModule": "android.app",
-    "ExportBundle.BundlePathForandroid.app": "/Users/user/Desktop/bbb/bbb-frontend/android/app",
+    "ExportBundle.BundlePathForandroid.app": "/Users/dreamworld/Desktop/bbb-frontend2/android/app",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
@@ -69,21 +130,19 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "nevil",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/user/Desktop/bbb/bbb-frontend2/android",
+    "last_opened_file_path": "/Users/dreamworld/Desktop/bbb-frontend2/android",
     "show.migrate.to.gradle.popup": "false"
   },
   "keyToStringList": {
     "ExportApk.BuildVariants": [
       "release"
-    ],
-    "kotlin-gradle-user-dirs": [
-      "/Users/user/.gradle"
     ]
   }
 }]]></component>
   <component name="RunManager">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
-      <module name="android.app.main" />
+      <module name="android.app" />
+      <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
       <option name="DEPLOY" value="true" />
       <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
       <option name="DEPLOY_AS_INSTANT" value="false" />
@@ -91,10 +150,14 @@
       <option name="PM_INSTALL_OPTIONS" value="" />
       <option name="ALL_USERS" value="false" />
       <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="ALLOW_ASSUME_VERIFIED" value="false" />
       <option name="CLEAR_APP_STORAGE" value="false" />
       <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
       <option name="ACTIVITY_EXTRA_FLAGS" value="" />
       <option name="MODE" value="default_activity" />
+      <option name="RESTORE_ENABLED" value="false" />
+      <option name="RESTORE_FILE" value="" />
+      <option name="RESTORE_FRESH_INSTALL_ONLY" value="false" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
       <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
@@ -141,6 +204,7 @@
         <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
       </Profilers>
       <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY" value="" />
       <option name="ACTIVITY_CLASS" value="" />
       <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
       <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
@@ -150,18 +214,25 @@
     </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="SwiftWorkspaceSettings">
-    <option name="detectedToolchain" value="true" />
-    <option name="toolchainPathValue" value="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain" />
-  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="fda79f2a-562b-4806-9ddf-4d3b91527bdd" name="Changes" comment="" />
-      <created>1738230119911</created>
+      <changelist id="3730fcef-d41e-4c2f-8f65-5d1e86226c12" name="Changes" comment="" />
+      <created>1753779057659</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1738230119911</updated>
+      <updated>1753779057659</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

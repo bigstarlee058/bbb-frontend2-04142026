@@ -967,7 +967,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               horizontal: ScreenUtil.horizontalScale(2),
                               vertical: ScreenUtil.verticalScale(1)),
                           child: Text(
-                            "This action will completely delete your account, all of your data and you will immediately lose access to the app. If you're experiencing an issue then please feel free to contact us and we'll be happy to help you.",
+                            "This action will completely delete your account & all of your data. You will immediately lose access to the app. If you're experiencing an issue then please feel free to contact us and we'll be happy to help you.",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color:

@@ -95,7 +95,7 @@ class FeaturedCollectionWidget extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Text(
-                      "Meet out team",
+                      "Meet Our Team",
                       maxLines: 2,
                       textAlign: TextAlign.left,
                       style: TextStyle(

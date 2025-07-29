@@ -91,6 +91,7 @@ class _DashboardPageState extends State<DashboardPage> {
     loadFeaturedCollectionData();
     loadProgramPhaseData();
     requestNotificationPermission();
+    loadAchievementsData(false);
   }
 
   Future<void> requestNotificationPermission() async {
@@ -1474,7 +1475,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   child: Center(
                     child: Text(
-                      "Meet our team",
+                      "Meet Our Team",
                       style: TextStyle(
                         color: AppColors.primaryColor,
                         fontSize: ScreenUtil.horizontalScale(5),

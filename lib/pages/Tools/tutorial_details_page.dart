@@ -31,7 +31,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
   DataProvider? dataProvider;
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  late Size videoSize;
+  Size? videoSize;
   Timer? hideControlsTimer;
   late final ProgressBarController _controller;
   bool isMute = true;
@@ -221,7 +221,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
               hideControls: hideControls,
               isZoom: isZoom,
               media: screenSize,
-              videoSize: videoSize,
+              videoSize: videoSize!,
               muteUnMute: muteUnMute,
               showControls: showControls,
               showControlsOnTap: showControlsOnTap,
@@ -277,7 +277,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
       insetPadding:
           EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6.7)),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(27),
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -286,10 +286,13 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
             borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.825),
+                  maxHeight: MediaQuery.of(context).size.height * 0.8,
+                  maxWidth: videoSize == null
+                      ? ScreenUtil.horizontalScale(86.5)
+                      : videoSize?.width ?? 0),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(25),
                   color: Theme.of(context).cardColor,
                 ),
                 child: loading
@@ -317,8 +320,8 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                             ? Stack(
                                                 children: [
                                                   SizedBox(
-                                                    height: videoSize.height,
-                                                    width: videoSize.width,
+                                                    height: videoSize?.height,
+                                                    width: videoSize?.width,
                                                     child: Chewie(
                                                       controller:
                                                           _chewieController!,
@@ -329,8 +332,8 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                                     duration: Duration(
                                                         milliseconds: 1300),
                                                     curve: Curves.easeInOut,
-                                                    height: videoSize.height,
-                                                    width: videoSize.width,
+                                                    height: videoSize?.height,
+                                                    width: videoSize?.width,
                                                     color: showControls
                                                         ? Colors.black38
                                                         : Colors.transparent,
@@ -362,7 +365,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                 videoNotInitialized
                                     ? const SizedBox()
                                     : Positioned(
-                                        bottom: videoSize.height / 2,
+                                        bottom: videoSize!.height / 2,
                                         left: 10,
                                         right: 10,
                                         child: AnimatedOpacity(
@@ -649,48 +652,28 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                 ),
                               ],
                             ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                left: ScreenUtil.horizontalScale(5),
-                                right: ScreenUtil.horizontalScale(5),
-                                top: 15.0,
-                              ),
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                tutorialDesc,
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.verticalScale(1.75),
-                                  height: 1.5,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: ScreenUtil.verticalScale(2.5)),
-                            // Container(
-                            //   margin: EdgeInsets.only(
-                            //     bottom: ScreenUtil.verticalScale(2),
-                            //     top: ScreenUtil.verticalScale(1),
-                            //     left: ScreenUtil.horizontalScale(10),
-                            //     right: ScreenUtil.horizontalScale(10),
-                            //   ),
-                            //   child: Column(
-                            //     children: [
-                            //       TextButton(
-                            //         onPressed: () => Navigator.pop(context),
-                            //         child: Text(
-                            //           "Back",
-                            //           style: TextStyle(
-                            //               fontSize: 18,
-                            //               color: AppColors.primaryColor),
-                            //         ),
-                            //       )
-                            //     ],
-                            //   ),
-                            // ),
+                            tutorialDesc.isNotEmpty
+                                ? Container(
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(5),
+                                      vertical: 18,
+                                    ),
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      tutorialDesc,
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                        fontSize:
+                                            ScreenUtil.verticalScale(1.75),
+                                        height: 1.5,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(),
                           ],
                         ),
                       ),

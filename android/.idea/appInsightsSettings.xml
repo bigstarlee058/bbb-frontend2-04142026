@@ -3,27 +3,13 @@
   <component name="AppInsightsSettings">
     <option name="tabSettings">
       <map>
-        <entry key="Android Vitals">
-          <value>
-            <InsightsFilterSettings>
-              <option name="connection">
-                <ConnectionSetting>
-                  <option name="appId" value="com.app.hegaload" />
-                </ConnectionSetting>
-              </option>
-              <option name="signal" value="SIGNAL_UNSPECIFIED" />
-              <option name="timeIntervalDays" value="SEVEN_DAYS" />
-              <option name="visibilityType" value="ALL" />
-            </InsightsFilterSettings>
-          </value>
-        </entry>
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.bbb" />
-                  <option name="mobileSdkAppId" value="1:648656113534:android:074e334a3b7f82a38a6d2f" />
+                  <option name="appId" value="com.bootybybret.app" />
+                  <option name="mobileSdkAppId" value="1:648656113534:android:4028cd6afef677c08a6d2f" />
                   <option name="projectId" value="bootybybret" />
                   <option name="projectNumber" value="648656113534" />
                 </ConnectionSetting>

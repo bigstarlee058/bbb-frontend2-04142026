@@ -283,8 +283,8 @@ class _TutorialPageState extends State<TutorialPage> {
                 //     ),
                 //   ),
                 // ),
-                const SizedBox(
-                  width: 10,
+                SizedBox(
+                  width: ScreenUtil.horizontalScale(2.5),
                 ),
               ],
             ),
@@ -303,6 +303,9 @@ class _TutorialPageState extends State<TutorialPage> {
                   ),
                 ],
               ),
+            ),
+            SizedBox(
+              width: ScreenUtil.horizontalScale(2),
             ),
             Container(
               padding: EdgeInsets.symmetric(

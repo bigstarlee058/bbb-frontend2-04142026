@@ -42,25 +42,6 @@
           "other_platform_oauth_client": []
         }
       }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:648656113534:android:565046b83c69d6388a6d2f",
-        "android_client_info": {
-          "package_name": "com.example1.bbb"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAg2zOiwcJhPzJiUEx2TkqpS9r38bv3FjI"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
     }
   ],
   "configuration_version": "1"

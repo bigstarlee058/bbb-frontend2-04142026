@@ -85,9 +85,9 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     for (final item in historyDataModel) {
       final weight = double.tryParse(item.weight ?? '0') ?? 0;
       final reps = int.tryParse(item.reps ?? '0') ?? 0;
-      final effort = int.tryParse(item.effort ?? '0') ?? 0;
+      // final effort = int.tryParse(item.effort ?? '0') ?? 0;
 
-      final multiplier = reps + (effort == 100 ? 0 : effort);
+      final multiplier = reps /*+ (effort == 100 ? 0 : effort)*/;
       final setTotal = weight * multiplier;
 
       totalWeight += (setTotal.toInt());

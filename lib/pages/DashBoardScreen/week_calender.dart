@@ -79,6 +79,9 @@ class _WeekCalenderState extends State<WeekCalender> {
               outsideTextStyle: TextStyle(fontSize: 14.0),
             ),
             calendarBuilders: CalendarBuilders(
+              disabledBuilder: (context, day, focusedDay) {
+                return _buildNormalDay(day);
+              },
               todayBuilder: (context, day, focusedDay) => _buildDayState(day),
               outsideBuilder: (context, date, _) {
                 return _buildDayState(date);

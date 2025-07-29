@@ -75,23 +75,7 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
             'assets/img/back.jpg',
             height: MediaQuery.of(context).size.height,
             width: double.infinity,
-            fit: BoxFit.fitWidth,
-          ),
-          Utils.appImage(
-            MediaQuery.of(context).size,
-            imageKey: '',
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: SafeArea(
-                    child: BackArrowWidget(onPress: () {
-                      _handleLogout(context);
-                    }),
-                  ),
-                ),
-              ],
-            ),
+            fit: BoxFit.cover,
           ),
           Positioned(
             left: 0,
@@ -123,6 +107,7 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
                         fontSize: ScreenUtil.verticalScale(2.4),
                       ),
                     ),
@@ -174,6 +159,7 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
             child: Text(text,
                 textAlign: TextAlign.center,
                 style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontSize: ScreenUtil.verticalScale(1.7),
                 )),
           ),

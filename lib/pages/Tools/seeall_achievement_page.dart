@@ -36,6 +36,8 @@ class _SeeAllAchievementPageState extends State<SeeAllAchievementPage> {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
 
+    dataProvider?.getAllAchievement(false);
+
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         if (dataProvider!.openDaySinceJoin) {
