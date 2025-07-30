@@ -39,6 +39,7 @@ class _SettingPageState extends State<SettingPage> {
   bool isSplit = false;
   bool isEquipment = false;
   bool isScreenAwake = false;
+  bool isKg = false;
   bool isDarkMode = false;
   int curExpandedIdx = 0;
 
@@ -121,6 +122,7 @@ class _SettingPageState extends State<SettingPage> {
     final raw2 = await preferences.getBool(SharedPreference.isHapticFeedbackOn);
     final raw3 = await preferences.getBool(SharedPreference.isScreenAwake);
     final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
+    final raw5 = await preferences.getBool(SharedPreference.isKG);
     bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
     if (raw1 != null) {
       isSwitchOn = raw1;
@@ -139,6 +141,12 @@ class _SettingPageState extends State<SettingPage> {
       isDarkMode = raw4;
     } else {
       await preferences.setBool(SharedPreference.isDarkMode, isDarkMode);
+    }
+
+    if (raw5 != null) {
+      isKg = raw5;
+    } else {
+      await preferences.setBool(SharedPreference.isKG, isKg);
     }
 
     if (raw2 != null) {
@@ -460,6 +468,55 @@ class _SettingPageState extends State<SettingPage> {
                                           await preferences.setBool(
                                               SharedPreference.isScreenAwake,
                                               isScreenAwake);
+                                        },
+                                        activeColor: AppColors.primaryColor,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                  ScreenUtil.horizontalScale(7),
+                                  0,
+                                  ScreenUtil.horizontalScale(7),
+                                  0),
+                              child: Divider(
+                                thickness: 0.3,
+                                height: 0,
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: ScreenUtil.horizontalScale(6),
+                                right: ScreenUtil.horizontalScale(6),
+                              ),
+                              height: ScreenUtil.verticalScale(8),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Use weight in Kg?",
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: ScreenUtil.verticalScale(2.2),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Consumer<MonthProvider>(
+                                    builder: (context, monthDataModel, child) {
+                                      return Switch(
+                                        value: isKg, // Boolean value
+
+                                        onChanged: (bool value) async {
+                                          setState(() {
+                                            isKg = value;
+                                          });
+
+                                          await preferences.setBool(
+                                              SharedPreference.isKG, isKg);
                                         },
                                         activeColor: AppColors.primaryColor,
                                       );

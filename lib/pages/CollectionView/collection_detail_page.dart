@@ -192,7 +192,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      title,
+                      title, maxLines: 3,
                       style: TextStyle(
                         color: AppColors.primaryColor,
                         fontSize: ScreenUtil.verticalScale(2),
@@ -299,7 +299,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                   //   ),
                                   // leading: SizedBox(),
                                   title: Text(
-                                    'Collection',
+                                    '',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: ScreenUtil.horizontalScale(5.5),

@@ -1081,8 +1081,10 @@ class MonthProvider extends ChangeNotifier {
   getPassedTime() {
     String time =
         preferences.getString(SharedPreference.lastTimerPassed) ?? "0";
+    log('time==========>>>>>${time}');
     String lastTime =
         preferences.getString(SharedPreference.lastExitTime) ?? "";
+    log('lastTime==========>>>>>${lastTime}');
     String pause = preferences.getString(SharedPreference.isPause) ?? "false";
 
     timePassed = time;
@@ -1191,10 +1193,11 @@ class MonthProvider extends ChangeNotifier {
     await preferences.putString(SharedPreference.lastTimerPassed, timePassed1);
     await preferences.putString(
         SharedPreference.lastExitTime, DateTime.now().toString());
-    final pf = await SharedPreferences.getInstance();
-    await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
-    await pf.setString(
-        SharedPreference.lastExitTime, DateTime.now().toString());
+
+    // final pf = await SharedPreferences.getInstance();
+    // await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
+    // await pf.setString(
+    //     SharedPreference.lastExitTime, DateTime.now().toString());
 
     if (timerAddress != '') {
       timePassed = timePassed1;

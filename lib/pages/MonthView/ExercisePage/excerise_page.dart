@@ -788,8 +788,7 @@ class _ExercisePageState extends State<ExercisePage>
     if (monthProvider?.selectedExercise?.extra?.isNotEmpty ?? false) {
       for (var element in monthProvider!.selectedExercise!.extra!) {
         final extraItem = element;
-        count = int.parse(extraItem.sets.toString()) +
-            (extraItem.type == 3 ? (extraSetModel.length) : 0);
+        count1 = (extraItem.type == 3 ? (extraSetModel.length) : 0);
 
         allSetCount += int.parse((extraItem.sets).toString());
       }
@@ -800,7 +799,7 @@ class _ExercisePageState extends State<ExercisePage>
     allSetCount += extraSetModel.length;
   }
 
-  int count = 0;
+  int count1 = 0;
   int allSetCount = 0;
   int warmUpIndex = 0;
   int backOffIndex = 0;
@@ -1572,8 +1571,17 @@ class _ExercisePageState extends State<ExercisePage>
                 itemBuilder: (context, index) {
                   final extraItem =
                       monthProvider?.selectedExercise!.extra![index];
-                  setCount = int.parse(extraItem!.sets.toString()) +
-                      (extraItem.type == 3 ? (extraSetModel.length) : 0);
+                  final data = monthProvider?.selectedExercise!.extra
+                      ?.where((element) => extraItem?.type == 3)
+                      .toList();
+
+                  if (data!.isNotEmpty && index == (data.length - 1)) {
+                    setCount = int.parse(extraItem!.sets.toString()) +
+                        (extraItem.type == 3 ? (extraSetModel.length) : 0);
+                  } else {
+                    setCount = int.parse(extraItem!.sets.toString());
+                  }
+
                   return ListView.builder(
                     itemCount: setCount,
                     shrinkWrap: true,
@@ -1748,11 +1756,13 @@ class _ExercisePageState extends State<ExercisePage>
               );
             },
           ),
-          SizedBox(height: 20),
+          Builder(builder: (context) {
+            return SizedBox(height: 20);
+          }),
           if (monthProvider!.isCurrentMonth == "Future") ...[
             SizedBox()
           ] else ...[
-            count != 0 &&
+            count1 != 0 &&
                     !isCurrentDaySkipped &&
                     !isCurrentDayCompleted &&
                     !monthProvider!.isPumpDay
@@ -2374,6 +2384,7 @@ class _ExercisePageState extends State<ExercisePage>
       "date": "${DateTime.now().toUtc()}",
       "dataId": "EXTRA-ADDED$dataId",
     };
+    log('data==========>>>>>$data');
     ApiRepo.addExtraSet(body: apiReqBody);
     await DatabaseHelper()
         .insertData(data: data, tableName: DatabaseHelper.extraSetHistory);

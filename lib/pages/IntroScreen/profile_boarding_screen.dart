@@ -50,19 +50,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   TextEditingController selectedMidThigh = TextEditingController();
   TextEditingController selectedWaist = TextEditingController();
   TextEditingController selectedHip = TextEditingController();
-  final List<String> heightOptions = [
-    '5\'0"',
-    '5\'5"',
-    '6\'0"',
-    '6\'5"'
-  ]; // Example heights
-  final List<String> weightOptions = [
-    '100 lbs',
-    '110 lbs',
-    '121 lbs',
-    '130 lbs',
-    '140 lbs'
-  ];
+
   final List<String> genderOptions = ['Female', 'Male', 'Other'];
   double heightInCm = 183;
   HeightUnit selectedHeightUnit = HeightUnit.cm;

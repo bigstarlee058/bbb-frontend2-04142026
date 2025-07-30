@@ -18,6 +18,7 @@ import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -788,10 +789,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
             child: Center(
               child: TextField(
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.95),
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  decoration: TextDecoration.none,
+                  fontSize: ScreenUtil.verticalScale(1.82),
                 ),
                 controller: value,
                 keyboardType: TextInputType.text,

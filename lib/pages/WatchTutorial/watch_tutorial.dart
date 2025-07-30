@@ -683,7 +683,7 @@ class _WatchTutorialState extends State<WatchTutorial>
                                   horizontal: ScreenUtil.horizontalScale(5),
                                   vertical: ScreenUtil.horizontalScale(1.5)),
                               child: ButtonWidget(
-                                text: "Watch the App Tutorial",
+                                text: "Browse App Tutorials",
                                 textColor: Colors.white,
                                 onPress: () async {
                                   if (_videoPlayerController.value.isPlaying) {
@@ -692,11 +692,14 @@ class _WatchTutorialState extends State<WatchTutorial>
                                   }
                                   Navigator.pop(context);
 
-                                  AnimatedDialog.showAnimatedDialog(
-                                    context: context,
-                                    pageBuilder: (c1, anim1, anim2) =>
-                                        AppTutorial(),
-                                  );
+                                  Navigator.pushNamed(
+                                      context, "/tutorialScreen");
+
+                                  // AnimatedDialog.showAnimatedDialog(
+                                  //   context: context,
+                                  //   pageBuilder: (c1, anim1, anim2) =>
+                                  //       AppTutorial(),
+                                  // );
                                   // await Navigator.pushNamed(
                                   //     context, '/appTutorialScreen');
                                 },

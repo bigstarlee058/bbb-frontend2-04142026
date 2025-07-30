@@ -63,7 +63,7 @@ class FeaturedCollectionWidget extends StatelessWidget {
                                 ),
                               ),
                               CarouselSlider.builder(
-                                itemCount: dataProvider.staffsData.length,
+                                itemCount: dataProvider.collectionsData.length,
                                 options: CarouselOptions(
                                   height: ScreenUtil.verticalScale(38),
                                   viewportFraction: 0.65,

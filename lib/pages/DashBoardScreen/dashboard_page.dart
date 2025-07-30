@@ -194,7 +194,6 @@ class _DashboardPageState extends State<DashboardPage> {
             Consumer<DataProvider>(
               builder: (context, value, child) {
                 return Utils.appImage(
-                  val: true,
                   media,
                   image: value.allImageList.isEmpty
                       ? ""
@@ -1405,7 +1404,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
         bool isAppUser = userData?.user["singuptype"] != "web" ? true : false;
-
         return isAppUser
             ? SizedBox(height: ScreenUtil.verticalScale(2.5))
             : (dataProvider.collectionsData.isNotEmpty)
@@ -1435,7 +1433,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         //   ),
                         // ),
                         CarouselSlider.builder(
-                          itemCount: dataProvider.staffsData.length,
+                          itemCount: dataProvider.collectionsData.length,
                           options: CarouselOptions(
                             height: ScreenUtil.verticalScale(38),
                             viewportFraction: 0.65,

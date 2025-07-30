@@ -232,11 +232,11 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       await getTotalSets();
                       final provider =
                           Provider.of<MonthProvider>(context, listen: false);
+                      provider.updateSetValue(
+                          warmUpSetTotal, backOffSetTotal, workingSetTotal);
                       widget.onPress!(
                         () async => await getTotalSets(),
                       );
-                      provider.updateSetValue(
-                          warmUpSetTotal, backOffSetTotal, workingSetTotal);
                     }
                   : null,
           style: ElevatedButton.styleFrom(
