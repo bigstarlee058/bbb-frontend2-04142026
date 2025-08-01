@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -51,15 +53,17 @@ class _TutorialPageState extends State<TutorialPage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageApparel(
-                            // media,
-                            // image: dataProvider!.allImageList
-                            //     .where(
-                            //         (element) => element["key"] == "imageApparel")
-                            //     .first["image"],
-                            // // image: dataProvider!.cachedImageMap["imageApparel"],
-                            // imageKey: "imageApparel",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageApparel(value
+                              // media,
+                              // image: dataProvider!.allImageList
+                              //     .where(
+                              //         (element) => element["key"] == "imageApparel")
+                              //     .first["image"],
+                              // // image: dataProvider!.cachedImageMap["imageApparel"],
+                              // imageKey: "imageApparel",
+                              );
+                        }),
                         SizedBox(
                           height: media.height / 2.5,
                           width: media.width,
@@ -112,9 +116,10 @@ class _TutorialPageState extends State<TutorialPage> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        width: ScreenUtil.horizontalScale(50),
+                                        width: ScreenUtil.horizontalScale(70),
                                         child: Text(
-                                          "Here’s a quick tutorial\njust for you",
+                                          // "Here’s a quick tutorial\njust for you",
+                                          "Browse our tutorial library (new ones added regularly).",
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize:
@@ -168,17 +173,33 @@ class _TutorialPageState extends State<TutorialPage> {
                     ),
                     child: Consumer<DataProvider>(
                       builder: (context, value, child) {
-                        return ListView.separated(
-                          separatorBuilder: (context, index) =>
-                              SizedBox(height: ScreenUtil.verticalScale(2)),
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: value.tutorialList.length,
-                          padding: EdgeInsets.symmetric(
-                              vertical: ScreenUtil.verticalScale(2)),
-                          itemBuilder: (context, index) =>
-                              tutorialCard(value.tutorialList[index]),
-                        );
+                        return value.tutorialLoader
+                            ? Center(child: CircularProgressIndicator())
+                            : value.tutorialList.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      "Tutorials pending!\nPlease check back in later.",
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.color),
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    separatorBuilder: (context, index) =>
+                                        SizedBox(
+                                            height:
+                                                ScreenUtil.verticalScale(2)),
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: value.tutorialList.length,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: ScreenUtil.verticalScale(2)),
+                                    itemBuilder: (context, index) =>
+                                        tutorialCard(value.tutorialList[index]),
+                                  );
                       },
                     ),
                   ),
@@ -262,8 +283,8 @@ class _TutorialPageState extends State<TutorialPage> {
                 //     ),
                 //   ),
                 // ),
-                const SizedBox(
-                  width: 10,
+                SizedBox(
+                  width: ScreenUtil.horizontalScale(2.5),
                 ),
               ],
             ),
@@ -282,6 +303,9 @@ class _TutorialPageState extends State<TutorialPage> {
                   ),
                 ],
               ),
+            ),
+            SizedBox(
+              width: ScreenUtil.horizontalScale(2),
             ),
             Container(
               padding: EdgeInsets.symmetric(

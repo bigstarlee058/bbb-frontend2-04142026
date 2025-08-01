@@ -3,7 +3,7 @@ description: "Booty by Bret"
 
 publish_to: "none"
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -28,6 +28,7 @@ dependencies:
   flutter_svg: ^2.0.17
   path: any
 
+
   provider: any
   http: any
   fl_chart: ^0.70.2
@@ -45,6 +46,7 @@ dependencies:
   cached_network_image: ^3.4.1
   carousel_slider: ^5.0.0
   dio: ^5.8.0+1
+  package_info_plus: ^8.3.0
   better_player_plus: ^1.0.8
   mobkit_dashed_border: ^0.0.7
   flutter_local_notifications: ^18.0.1

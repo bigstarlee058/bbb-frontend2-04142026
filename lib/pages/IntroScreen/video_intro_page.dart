@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/audio_manager.dart';
@@ -11,7 +9,6 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -33,7 +30,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
   DataProvider? dataProvider;
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  late Size videoSize;
+  Size? videoSize;
   Timer? _hideControlsTimer;
   bool isMute = true;
   late final ProgressBarController _controller;
@@ -49,16 +46,23 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
     setState(() {
       loading = true;
     });
-    await dataProvider?.fetchTutorialData();
-    if (dataProvider!.tutorialData.files.isNotEmpty) {
-      initializeVideo(dataProvider?.tutorialData.files[0]['link']);
-    } else {
-      loading = false;
-      videoNotInitialized = true;
-      setState(() {});
-    }
-
-    tutorialDesc = dataProvider?.tutorialData.description ?? "";
+    await dataProvider?.getVideoUsingVimeo(widget.vimeoId).then(
+      (value) {
+        if (dataProvider!.videoModel == null) {
+          loading = false;
+          videoNotInitialized = true;
+          setState(() {});
+        } else {
+          if (dataProvider!.videoModel!.files!.isNotEmpty) {
+            initializeVideo(dataProvider!.videoModel!.files![0].link ?? "");
+          } else {
+            loading = false;
+            videoNotInitialized = true;
+            setState(() {});
+          }
+        }
+      },
+    );
   }
 
   final ValueNotifier<Duration> videoProgressValue =
@@ -88,20 +92,37 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
         return;
       }
 
-      await _videoPlayerController.setLooping(true);
-      AudioManager.requestAudioFocus();
+      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      isMute = rawData;
+      await _videoPlayerController.setVolume(rawData ? 1 : 0);
+
+      final isPlaying = _videoPlayerController.value.isPlaying;
+
+      if (isPlaying && isMute == false) {
+        await AudioManager.requestAudioFocus();
+      } else {
+        await AudioManager.abandonAudioFocus();
+      }
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
-        looping: true,
+        looping: false,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
-      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
-      _videoPlayerController.setVolume(rawData ? 1 : 0);
-      isMute = rawData;
-      if (!hasClosedPopup &&
+
+      await _videoPlayerController.setLooping(false);
+
+      if (_videoPlayerController.value.volume == 0) {
+        await AudioManager.abandonAudioFocus().then((value) async {
+          await Future.delayed(Duration(milliseconds: 20));
+          return _videoPlayerController.play();
+        });
+      }
+
+      if (mounted &&
+          !hasClosedPopup &&
           _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
@@ -111,33 +132,46 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
       }
 
       _videoPlayerController.addListener(() async {
-        if (hasClosedPopup || !mounted) return;
-        final position = _videoPlayerController.value.position;
-        final duration = _videoPlayerController.value.duration;
-        final bool isFinished =
-            position >= duration && !_videoPlayerController.value.isPlaying;
-        if (isFinished) {
-          showControlsOnTapOfPause();
-        }
-        if (duration != null && position >= duration) {
-          AudioManager.abandonAudioFocus();
-          if (Platform.isIOS) {
-            _videoPlayerController.seekTo(Duration.zero);
-            _videoPlayerController.play();
-          }
-        } else {
-          AudioManager.requestAudioFocus();
+        if (!mounted) return;
+
+        final isPlaying = _videoPlayerController.value.isPlaying;
+        if (isPlaying && isMute == true) {
+          await AudioManager.requestAudioFocus();
         }
 
-        videoProgressValue.value = position;
+        _onVideoTick();
         setState(() {});
       });
+
+      // _videoPlayerController.addListener(() async {
+      //   if (hasClosedPopup || !mounted) return;
+      //   final position = _videoPlayerController.value.position;
+      //   final duration = _videoPlayerController.value.duration;
+      //   final bool isFinished =
+      //       position >= duration && !_videoPlayerController.value.isPlaying;
+      //   if (isFinished) {
+      //     showControlsOnTapOfPause();
+      //   }
+      //   if (duration != null && position >= duration) {
+      //     AudioManager.abandonAudioFocus();
+      //     if (Platform.isIOS) {
+      //       _videoPlayerController.seekTo(Duration.zero);
+      //       _videoPlayerController.play();
+      //     }
+      //   } else {
+      //     AudioManager.requestAudioFocus();
+      //   }
+      //
+      //   videoProgressValue.value = position;
+      //   setState(() {});
+      // });
       _controller = ProgressBarController(
         vsync: this,
         barAnimationDuration: const Duration(milliseconds: 300),
         thumbAnimationDuration: const Duration(milliseconds: 200),
         waitingDuration: const Duration(milliseconds: 1800),
       );
+
       if (!hasClosedPopup && mounted) {
         setState(() {
           loading = false;
@@ -155,6 +189,35 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
     }
   }
 
+  bool _restarting = false;
+
+  void _onVideoTick() async {
+    final v = _videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null || _restarting) return;
+
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      _restarting = true;
+
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await _videoPlayerController.pause();
+      await _videoPlayerController.seekTo(Duration.zero);
+      await _videoPlayerController.setVolume(isMute ? 1 : 0);
+      await _videoPlayerController.play();
+      _restarting = false;
+    }
+  }
+
   bool hasClosedPopup = false;
 
   bool isZoom = false;
@@ -166,6 +229,19 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
     isMute = !isMute;
 
     _videoPlayerController.setVolume(isMute ? 1 : 0);
+    setState(() {});
+
+    if (_videoPlayerController.value.volume == 0) {
+      final videoPlay = _videoPlayerController.value.isPlaying;
+
+      await AudioManager.abandonAudioFocus().then((value) async {
+        await Future.delayed(Duration(milliseconds: 20));
+        if (videoPlay) {
+          return _videoPlayerController.play();
+        }
+      });
+    }
+
     setState(() {});
     await preferences.setBool(SharedPreference.isMute, isMute);
   }
@@ -215,7 +291,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
               hideControls: hideControls,
               isZoom: isZoom,
               media: screenSize,
-              videoSize: videoSize,
+              videoSize: videoSize!,
               muteUnMute: muteUnMute,
               showControls: showControls,
               showControlsOnTap: showControlsOnTap,
@@ -234,7 +310,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
 
   Size calculateVideoSize(
       {required BuildContext context, required double aspectRatio}) {
-    double maxWidth = ScreenUtil.horizontalScale(86.5);
+    double maxWidth = ScreenUtil.horizontalScale(86.4);
     double calculatedHeight = maxWidth / aspectRatio;
     return Size(maxWidth, calculatedHeight);
   }
@@ -279,7 +355,9 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
             borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.825),
+                  maxHeight: loading || videoSize == null
+                      ? MediaQuery.of(context).size.height * 0.725
+                      : videoSize!.height),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -291,305 +369,323 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
                           color: AppColors.primaryColor,
                         ),
                       )
-                    : Column(
-                        children: [
-                          Stack(
+                    : widget.vimeoId.isEmpty ||
+                            dataProvider!.videoModel!.files!.isEmpty
+                        ? Column(
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  showControlsOnTap();
-                                },
-                                child: Container(
-                                  color: Colors.black,
-                                  child: Column(
-                                    children: [
-                                      dataProvider!.tutorialData.files
-                                                  .isNotEmpty &&
-                                              !videoNotInitialized
-                                          ? Stack(
-                                              children: [
-                                                SizedBox(
-                                                  height: videoSize.height,
-                                                  width: videoSize.width,
-                                                  child: Chewie(
-                                                    controller:
-                                                        _chewieController!,
-                                                  ),
-                                                ),
-                                                AnimatedContainer(
-                                                  duration: Duration(
-                                                      milliseconds: 1300),
-                                                  curve: Curves.easeInOut,
-                                                  color: showControls
-                                                      ? Colors.black38
-                                                      : Colors.transparent,
-                                                  height: videoSize.height,
-                                                  width: videoSize.width,
-                                                ),
-                                              ],
-                                            )
-                                          : Container(
-                                              height:
-                                                  ScreenUtil.verticalScale(40),
-                                              color: Colors.black12,
-                                              child: const Center(
-                                                  child: Text(
-                                                'No Video Available',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              )),
-                                            ),
-                                    ],
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    "Video not available!",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color),
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                bottom: videoSize.height / 2,
-                                left: 10,
-                                right: 10,
-                                child: AnimatedOpacity(
-                                  opacity: showControls ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 800),
-                                  curve: Curves.easeInOut,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      // Skip backward button
-                                      IconButton(
-                                        iconSize: 40,
-                                        icon: const Icon(
-                                          Icons.replay_10,
-                                          color: Colors.white70,
-                                        ),
-                                        onPressed: showControls
-                                            ? () {
-                                                _videoPlayerController.seekTo(
-                                                  _videoPlayerController
-                                                          .value.position -
-                                                      const Duration(
-                                                          seconds: 10),
-                                                );
-                                                _controller.forward();
-                                              }
-                                            : null,
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      showControlsOnTap();
+                                    },
+                                    child: Container(
+                                      color: Colors.black,
+                                      child: Column(
+                                        children: [
+                                          dataProvider!.videoModel!.files!
+                                                      .isNotEmpty &&
+                                                  !videoNotInitialized
+                                              ? Stack(
+                                                  children: [
+                                                    SizedBox(
+                                                      height: videoSize!.height,
+                                                      width: videoSize!.width,
+                                                      child: Chewie(
+                                                        controller:
+                                                            _chewieController!,
+                                                      ),
+                                                    ),
+                                                    AnimatedContainer(
+                                                      duration: Duration(
+                                                          milliseconds: 1300),
+                                                      curve: Curves.easeInOut,
+                                                      color: showControls
+                                                          ? Colors.black38
+                                                          : Colors.transparent,
+                                                      height: videoSize!.height,
+                                                      width: videoSize!.width,
+                                                    ),
+                                                  ],
+                                                )
+                                              : Container(
+                                                  height:
+                                                      ScreenUtil.verticalScale(
+                                                          40),
+                                                  color: Colors.black12,
+                                                  child: const Center(
+                                                      child: Text(
+                                                    'No Video Available',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  )),
+                                                ),
+                                        ],
                                       ),
-                                      IconButton(
-                                        iconSize: 60,
-                                        icon: Icon(
-                                          _videoPlayerController.value.isPlaying
-                                              ? Icons.pause_circle_filled
-                                              : Icons.play_circle_filled,
-                                          color: Colors.white70,
-                                        ),
-                                        onPressed: showControls
-                                            ? () async {
-                                                if (_videoPlayerController
-                                                    .value.isPlaying) {
-                                                  _videoPlayerController
-                                                      .pause();
-                                                  setState(() {});
-                                                  showControlsOnTapOfPause();
-                                                  await Future.delayed(Duration(
-                                                          milliseconds: 100))
-                                                      .then(
-                                                    (value) {
-                                                      AudioManager
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: videoSize!.height / 2,
+                                    left: 10,
+                                    right: 10,
+                                    child: AnimatedOpacity(
+                                      opacity: showControls ? 1.0 : 0.0,
+                                      duration:
+                                          const Duration(milliseconds: 800),
+                                      curve: Curves.easeInOut,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          // Skip backward button
+                                          IconButton(
+                                            iconSize: 40,
+                                            icon: const Icon(
+                                              Icons.replay_10,
+                                              color: Colors.white70,
+                                            ),
+                                            onPressed: showControls
+                                                ? () {
+                                                    _videoPlayerController
+                                                        .seekTo(
+                                                      _videoPlayerController
+                                                              .value.position -
+                                                          const Duration(
+                                                              seconds: 10),
+                                                    );
+                                                    _controller.forward();
+                                                  }
+                                                : null,
+                                          ),
+                                          IconButton(
+                                            iconSize: 60,
+                                            icon: Icon(
+                                              _videoPlayerController
+                                                      .value.isPlaying
+                                                  ? Icons.pause_circle_filled
+                                                  : Icons.play_circle_filled,
+                                              color: Colors.white70,
+                                            ),
+                                            onPressed: showControls
+                                                ? () async {
+                                                    if (_videoPlayerController
+                                                        .value.isPlaying) {
+                                                      _videoPlayerController
+                                                          .pause();
+                                                      setState(() {});
+                                                      showControlsOnTapOfPause();
+                                                      await Future.delayed(
+                                                          const Duration(
+                                                              milliseconds:
+                                                                  100));
+                                                      await AudioManager
                                                           .abandonAudioFocus();
                                                       setState(() {});
-                                                    },
-                                                  );
-                                                } else {
-                                                  _videoPlayerController.play();
-                                                  setState(() {});
-                                                  hideControls();
-
-                                                  await Future.delayed(Duration(
-                                                          milliseconds: 100))
-                                                      .then(
-                                                    (value) {
-                                                      AudioManager
-                                                          .requestAudioFocus();
+                                                    } else {
+                                                      _videoPlayerController
+                                                          .play();
                                                       setState(() {});
-                                                    },
-                                                  );
-                                                }
-                                              }
-                                            : null,
+                                                      hideControls();
+
+                                                      await Future.delayed(
+                                                          const Duration(
+                                                              milliseconds:
+                                                                  100));
+
+                                                      if (_videoPlayerController
+                                                              .value.volume >
+                                                          0) {
+                                                        await AudioManager
+                                                            .requestAudioFocus();
+                                                      }
+                                                      setState(() {});
+                                                    }
+                                                  }
+                                                : null,
+                                          ),
+                                          // Skip forward button
+                                          IconButton(
+                                            iconSize: 40,
+                                            icon: const Icon(
+                                              Icons.forward_10,
+                                              color: Colors.white70,
+                                            ),
+                                            onPressed: showControls
+                                                ? () {
+                                                    _videoPlayerController
+                                                        .seekTo(
+                                                      _videoPlayerController
+                                                              .value.position +
+                                                          const Duration(
+                                                              seconds: 10),
+                                                    );
+                                                    _controller.forward();
+                                                  }
+                                                : null,
+                                          ),
+                                        ],
                                       ),
-                                      // Skip forward button
-                                      IconButton(
-                                        iconSize: 40,
-                                        icon: const Icon(
-                                          Icons.forward_10,
-                                          color: Colors.white70,
-                                        ),
-                                        onPressed: showControls
-                                            ? () {
-                                                _videoPlayerController.seekTo(
-                                                  _videoPlayerController
-                                                          .value.position +
-                                                      const Duration(
-                                                          seconds: 10),
-                                                );
-                                                _controller.forward();
-                                              }
-                                            : null,
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: ScreenUtil.verticalScale(1),
-                                left: 10,
-                                right: 10,
-                                child: !videoNotInitialized &&
-                                        _chewieController!.videoPlayerController
-                                                .value.isInitialized ==
-                                            true
-                                    ? Column(
-                                        children: [
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                                bottom:
-                                                    ScreenUtil.verticalScale(
-                                                        1.3),
-                                                left: 20,
-                                                right: 20),
-                                            child: Column(
-                                              children: [
-                                                Column(
+                                  Positioned(
+                                    bottom: ScreenUtil.verticalScale(1),
+                                    left: 10,
+                                    right: 10,
+                                    child: !videoNotInitialized &&
+                                            _chewieController!
+                                                    .videoPlayerController
+                                                    .value
+                                                    .isInitialized ==
+                                                true
+                                        ? Column(
+                                            children: [
+                                              Container(
+                                                margin: EdgeInsets.only(
+                                                    bottom: ScreenUtil
+                                                        .verticalScale(1.3),
+                                                    left: 20,
+                                                    right: 20),
+                                                child: Column(
                                                   children: [
+                                                    Column(
+                                                      children: [
+                                                        SizedBox(
+                                                            height: ScreenUtil
+                                                                .verticalScale(
+                                                                    0.8)),
+                                                        AnimatedOpacity(
+                                                          opacity: showControls
+                                                              ? 1.0
+                                                              : 0.0,
+                                                          duration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      800),
+                                                          child: Row(
+                                                            children: [
+                                                              Spacer(),
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    showControls
+                                                                        ? () {
+                                                                            toggleFullscreen();
+                                                                          }
+                                                                        : null,
+                                                                child: Icon(
+                                                                  !isFullscreen
+                                                                      ? Icons
+                                                                          .fullscreen
+                                                                      : Icons
+                                                                          .fullscreen_exit,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  size: 28,
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    showControls
+                                                                        ? () {
+                                                                            muteUnMute();
+                                                                          }
+                                                                        : null,
+                                                                child: Icon(
+                                                                  isMute
+                                                                      ? Icons
+                                                                          .volume_up
+                                                                      : Icons
+                                                                          .volume_off,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  size: 28,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                        height: ScreenUtil
+                                                            .verticalScale(1)),
+                                                    ValueListenableBuilder<
+                                                        Duration>(
+                                                      valueListenable:
+                                                          videoProgressValue,
+                                                      builder: (context,
+                                                          progress, _) {
+                                                        return ProgressBar(
+                                                          collapsedBufferedBarColor:
+                                                              Colors.white,
+                                                          expandedBufferedBarColor:
+                                                              Colors.white,
+                                                          buffered:
+                                                              getBufferedPosition(),
+                                                          controller:
+                                                              _controller,
+                                                          progress: progress,
+                                                          total: Duration(
+                                                            seconds:
+                                                                _videoPlayerController
+                                                                    .value
+                                                                    .duration
+                                                                    .inSeconds,
+                                                          ),
+                                                          onChanged: (value) {
+                                                            _videoPlayerController
+                                                                .seekTo(Duration(
+                                                                    seconds: value
+                                                                        .inSeconds));
+                                                          },
+                                                          onSeek: (value) {},
+                                                          onChangeStart:
+                                                              (value) {
+                                                            _videoPlayerController
+                                                                .pause();
+                                                            isZoom = true;
+                                                          },
+                                                          onChangeEnd: (value) {
+                                                            _videoPlayerController
+                                                                .play();
+                                                            isZoom = false;
+                                                          },
+                                                        );
+                                                      },
+                                                    ),
                                                     SizedBox(
                                                         height: ScreenUtil
                                                             .verticalScale(
-                                                                0.8)),
-                                                    AnimatedOpacity(
-                                                      opacity: showControls
-                                                          ? 1.0
-                                                          : 0.0,
-                                                      duration: const Duration(
-                                                          milliseconds: 800),
-                                                      child: Row(
-                                                        children: [
-                                                          Spacer(),
-                                                          GestureDetector(
-                                                            onTap: showControls
-                                                                ? () {
-                                                                    toggleFullscreen();
-                                                                  }
-                                                                : null,
-                                                            child: Icon(
-                                                              !isFullscreen
-                                                                  ? Icons
-                                                                      .fullscreen
-                                                                  : Icons
-                                                                      .fullscreen_exit,
-                                                              color: Colors
-                                                                  .white70,
-                                                              size: 28,
-                                                            ),
-                                                          ),
-                                                          SizedBox(width: 10),
-                                                          GestureDetector(
-                                                            onTap: showControls
-                                                                ? () {
-                                                                    muteUnMute();
-                                                                  }
-                                                                : null,
-                                                            child: Icon(
-                                                              isMute
-                                                                  ? Icons
-                                                                      .volume_up
-                                                                  : Icons
-                                                                      .volume_off,
-                                                              color: Colors
-                                                                  .white70,
-                                                              size: 28,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
+                                                                2.2)),
                                                   ],
                                                 ),
-                                                SizedBox(
-                                                    height: ScreenUtil
-                                                        .verticalScale(1)),
-                                                ValueListenableBuilder<
-                                                    Duration>(
-                                                  valueListenable:
-                                                      videoProgressValue,
-                                                  builder:
-                                                      (context, progress, _) {
-                                                    return ProgressBar(
-                                                      collapsedBufferedBarColor:
-                                                          Colors.white,
-                                                      expandedBufferedBarColor:
-                                                          Colors.white,
-                                                      buffered:
-                                                          getBufferedPosition(),
-                                                      controller: _controller,
-                                                      progress: progress,
-                                                      total: Duration(
-                                                        seconds:
-                                                            _videoPlayerController
-                                                                .value
-                                                                .duration
-                                                                .inSeconds,
-                                                      ),
-                                                      onChanged: (value) {
-                                                        _videoPlayerController
-                                                            .seekTo(Duration(
-                                                                seconds: value
-                                                                    .inSeconds));
-                                                      },
-                                                      onSeek: (value) {},
-                                                      onChangeStart: (value) {
-                                                        _videoPlayerController
-                                                            .pause();
-                                                        isZoom = true;
-                                                      },
-                                                      onChangeEnd: (value) {
-                                                        _videoPlayerController
-                                                            .play();
-                                                        isZoom = false;
-                                                      },
-                                                    );
-                                                  },
-                                                ),
-                                                SizedBox(
-                                                    height: ScreenUtil
-                                                        .verticalScale(2.2)),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : const SizedBox(),
+                                              ),
+                                            ],
+                                          )
+                                        : const SizedBox(),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          Container(
-                            margin: EdgeInsets.only(
-                              top: ScreenUtil.verticalScale(2.5),
-                              bottom: ScreenUtil.verticalScale(1.5),
-                              left: ScreenUtil.horizontalScale(3),
-                              right: ScreenUtil.horizontalScale(3),
-                            ),
-                            child: ButtonWidget(
-                              text: "Continue Working Out",
-                              textColor: Colors.white,
-                              onPress: () {
-                                Navigator.pop(context);
-                              },
-                              color: AppColors.primaryColor,
-                              isLoading: false,
-                            ),
-                          ),
-                        ],
-                      ),
               ),
             ),
           ),

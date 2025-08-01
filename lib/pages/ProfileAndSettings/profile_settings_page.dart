@@ -8,6 +8,7 @@ import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/models/get_all_achivements.dart';
 import 'package:bbb/pages/ProfileAndSettings/payment_detail_screen.dart';
+import 'package:bbb/pages/ProfileAndSettings/report_a_bug.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -208,14 +209,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageProfile(
-                            // media,
-                            // image: dataProvider!.allImageList
-                            //     .where(
-                            //         (element) => element["key"] == "imageProfile")
-                            //     .first["image"],
-                            // imageKey: "imageProfile",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageProfile(value
+                              // media,
+                              // image: dataProvider!.allImageList
+                              //     .where(
+                              //         (element) => element["key"] == "imageProfile")
+                              //     .first["image"],
+                              // imageKey: "imageProfile",
+                              );
+                        }),
                         SizedBox(
                           height: media.height / 1.5,
                           width: media.width,
@@ -255,114 +258,110 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(1),
                                       ),
-                                      GestureDetector(
-                                        onTap: _pickAndUploadImage,
-                                        child: Consumer<UserDataProvider>(
-                                          builder: (context, userData, child) {
-                                            return userData.userData[
-                                                            'detail'] !=
-                                                        null &&
-                                                    userData.userData['detail']
-                                                            ['avatarUrl'] !=
-                                                        null &&
-                                                    userData.userData['detail']
-                                                            ['avatarUrl'] !=
-                                                        ""
-                                                ? ClipRRect(
-                                                    borderRadius: BorderRadius
-                                                        .circular(ScreenUtil
-                                                            .horizontalScale(
-                                                                12.5)),
-                                                    child: appShimmerImage(
-                                                      height: ScreenUtil
-                                                          .verticalScale(10.5),
-                                                      width: ScreenUtil
-                                                          .verticalScale(10.5),
-                                                      networkImageUrl: userData
-                                                                      .userData[
-                                                                  'detail'] !=
-                                                              null
-                                                          ? userData.userData['detail'][
-                                                                      'avatarUrl']
-                                                                  .startsWith(
-                                                                      'https://storage.cloud.google.com/')
-                                                              ? userData
-                                                                  .userData[
-                                                                      'detail'][
-                                                                      'avatarUrl']
-                                                                  .replaceFirst(
-                                                                      'https://storage.cloud.google.com/',
-                                                                      'https://storage.googleapis.com/')
-                                                              : userData.userData[
-                                                                      'detail']
-                                                                  ['avatarUrl']
-                                                          : "",
-                                                      fit: BoxFit.cover,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(
-                                                            ScreenUtil
-                                                                .horizontalScale(
-                                                                    12.5)),
-                                                      ),
-                                                    )
-                                                    // Image.network(
-                                                    //   userData.userData['detail'] != null
-                                                    //       ? userData.userData['detail']['avatarUrl']
-                                                    //               .startsWith('https://storage.cloud.google.com/')
-                                                    //           ? userData.userData['detail']['avatarUrl'].replaceFirst(
-                                                    //               'https://storage.cloud.google.com/',
-                                                    //               'https://storage.googleapis.com/')
-                                                    //           : userData.userData['detail']['avatarUrl']
-                                                    //       : "",
-                                                    //   fit: BoxFit.cover,
-                                                    // ),
-                                                    )
-                                                : Container(
+                                      Consumer<UserDataProvider>(
+                                        builder: (context, userData, child) {
+                                          return userData.userData['detail'] !=
+                                                      null &&
+                                                  userData.userData['detail']
+                                                          ['avatarUrl'] !=
+                                                      null &&
+                                                  userData.userData['detail']
+                                                          ['avatarUrl'] !=
+                                                      ""
+                                              ? ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          ScreenUtil
+                                                              .horizontalScale(
+                                                                  12.5)),
+                                                  child: appShimmerImage(
                                                     height: ScreenUtil
                                                         .verticalScale(10.5),
                                                     width: ScreenUtil
                                                         .verticalScale(10.5),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.grey
-                                                          .withValues(
-                                                              alpha: .9),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(
-                                                            ScreenUtil
-                                                                .horizontalScale(
-                                                                    12.5)),
-                                                      ),
+                                                    networkImageUrl: userData
+                                                                    .userData[
+                                                                'detail'] !=
+                                                            null
+                                                        ? userData
+                                                                .userData['detail'][
+                                                                    'avatarUrl']
+                                                                .startsWith(
+                                                                    'https://storage.cloud.google.com/')
+                                                            ? userData
+                                                                .userData['detail']
+                                                                    [
+                                                                    'avatarUrl']
+                                                                .replaceFirst(
+                                                                    'https://storage.cloud.google.com/',
+                                                                    'https://storage.googleapis.com/')
+                                                            : userData.userData[
+                                                                    'detail']
+                                                                ['avatarUrl']
+                                                        : "",
+                                                    fit: BoxFit.cover,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(ScreenUtil
+                                                          .horizontalScale(
+                                                              12.5)),
                                                     ),
-                                                    child: Center(
-                                                      child: userData.user[
-                                                                  "name"] !=
-                                                              ""
-                                                          ? Text(
-                                                              userData
-                                                                  .user["name"]
-                                                                  .toString()
-                                                                  .replaceAll(
-                                                                      " ",
-                                                                      "")[0]
-                                                                  .capitalizeFirst(), // First character of the name
-                                                              style: TextStyle(
-                                                                fontSize: ScreenUtil
-                                                                    .horizontalScale(
-                                                                        12),
-                                                                color: Colors
-                                                                    .white, // Adjust size as needed
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )
-                                                          : const SizedBox(),
+                                                  )
+                                                  // Image.network(
+                                                  //   userData.userData['detail'] != null
+                                                  //       ? userData.userData['detail']['avatarUrl']
+                                                  //               .startsWith('https://storage.cloud.google.com/')
+                                                  //           ? userData.userData['detail']['avatarUrl'].replaceFirst(
+                                                  //               'https://storage.cloud.google.com/',
+                                                  //               'https://storage.googleapis.com/')
+                                                  //           : userData.userData['detail']['avatarUrl']
+                                                  //       : "",
+                                                  //   fit: BoxFit.cover,
+                                                  // ),
+                                                  )
+                                              : Container(
+                                                  height:
+                                                      ScreenUtil.verticalScale(
+                                                          10.5),
+                                                  width:
+                                                      ScreenUtil.verticalScale(
+                                                          10.5),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey
+                                                        .withValues(alpha: .9),
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(ScreenUtil
+                                                          .horizontalScale(
+                                                              12.5)),
                                                     ),
-                                                  );
-                                          },
-                                        ),
+                                                  ),
+                                                  child: Center(
+                                                    child: userData
+                                                                .user["name"] !=
+                                                            ""
+                                                        ? Text(
+                                                            userData
+                                                                .user["name"]
+                                                                .toString()
+                                                                .replaceAll(
+                                                                    " ", "")[0]
+                                                                .capitalizeFirst(), // First character of the name
+                                                            style: TextStyle(
+                                                              fontSize: ScreenUtil
+                                                                  .horizontalScale(
+                                                                      12),
+                                                              color: Colors
+                                                                  .white, // Adjust size as needed
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          )
+                                                        : const SizedBox(),
+                                                  ),
+                                                );
+                                        },
                                       ),
                                       SizedBox(
                                         height: ScreenUtil.verticalScale(0.8),
@@ -607,12 +606,20 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                                   UserDataProvider>()
                                                               .userData["createdAt"]
                                                           : "";
-                                                      DateTime targetDate =
+
+                                                      DateTime createDate =
                                                           DateTime.parse(
-                                                                  accountCreatedDate)
-                                                              .toLocal();
+                                                              accountCreatedDate);
+
+                                                      DateTime targetDate =
+                                                          DateTime(
+                                                              createDate.year,
+                                                              createDate.month,
+                                                              createDate.day);
+
                                                       DateTime today =
                                                           DateTime.now();
+
                                                       int dayDifference = today
                                                           .difference(
                                                               targetDate)
@@ -741,7 +748,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       String? token =
                                           prefs.getString('authToken');
                                       Uri url = Uri.parse(
-                                          'https://bbbdev1.wpenginepowered.com/?token=$token');
+                                          'https://app.bootybybret.com/?token=$token');
                                       if (await canLaunchUrl(url)) {
                                         await launchUrl(url);
                                       } else {
@@ -754,6 +761,21 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
                                   // SizedBox(height: ScreenUtil.horizontalScale(4.5)),
                                   // settingsButton('Language', Icons.chat_bubble_outline, () => Navigator.pushNamed(context, '/languageScreen')),
+                                  SizedBox(height: ScreenUtil.verticalScale(2)),
+
+                                  settingsImageButton(
+                                    'Beta: Report a Bug',
+                                    Icons.bug_report,
+                                    () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ReportABugScreen(),
+                                      ),
+                                    ),
+                                    context,
+                                  ),
+
                                   SizedBox(height: ScreenUtil.verticalScale(2)),
 
                                   settingsButton('Support', Icons.handshake,
@@ -953,7 +975,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               horizontal: ScreenUtil.horizontalScale(2),
                               vertical: ScreenUtil.verticalScale(1)),
                           child: Text(
-                            "This action will completely delete your account, all of your data and you will immediately lose access to the app. If you're experiencing an issue then please feel free to contact us and we'll be happy to help you.",
+                            "This action will completely delete your account & all of your data. You will immediately lose access to the app. If you're experiencing an issue then please feel free to contact us and we'll be happy to help you.",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color:
@@ -1253,6 +1275,60 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   icon,
                   color: AppColors.primaryColor,
                   size: ScreenUtil.verticalScale(3.8),
+                ),
+                SizedBox(
+                  width: ScreenUtil.verticalScale(3),
+                ),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontSize: ScreenUtil.horizontalScale(4.5),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              padding: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.keyboard_arrow_right,
+                color: Colors.white,
+                size: ScreenUtil.verticalScale(3),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget settingsImageButton(
+      String title, IconData icon, VoidCallback onPressed, context) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(4)),
+        ),
+        padding: EdgeInsets.all(
+          ScreenUtil.verticalScale(1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Image.asset(
+                  "assets/img/bug.png",
+                  color: AppColors.primaryColor,
+                  width: ScreenUtil.verticalScale(3.8),
+                  height: ScreenUtil.verticalScale(3.2),
                 ),
                 SizedBox(
                   width: ScreenUtil.verticalScale(3),

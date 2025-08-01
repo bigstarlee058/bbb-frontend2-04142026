@@ -765,22 +765,22 @@ class _ChooseWorkoutDayDialogState extends State<ChooseWorkoutDayDialog>
                               ),
                             ),
                             // SizedBox(height: ScreenUtil.verticalScale(1.2)),
-                            Container(
-                              margin: EdgeInsets.only(
-                                bottom: ScreenUtil.verticalScale(3),
-                                left: ScreenUtil.horizontalScale(5),
-                                right: ScreenUtil.horizontalScale(5),
-                              ),
-                              child: ButtonWidget(
-                                text: "Close",
-                                textColor: Colors.white,
-                                onPress: () {
-                                  Navigator.pop(context);
-                                },
-                                color: AppColors.primaryColor,
-                                isLoading: false,
-                              ),
-                            ),
+                            // Container(
+                            //   margin: EdgeInsets.only(
+                            //     bottom: ScreenUtil.verticalScale(3),
+                            //     left: ScreenUtil.horizontalScale(5),
+                            //     right: ScreenUtil.horizontalScale(5),
+                            //   ),
+                            //   child: ButtonWidget(
+                            //     text: "Close",
+                            //     textColor: Colors.white,
+                            //     onPress: () {
+                            //       Navigator.pop(context);
+                            //     },
+                            //     color: AppColors.primaryColor,
+                            //     isLoading: false,
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),

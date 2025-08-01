@@ -63,154 +63,160 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
                 Positioned(
                   top: 0,
                   child: FittedBox(
-                    child: AppImage.imageStreakCalendar(
-                      // media,
-                      // image: dataProvider!.allImageList
-                      //     .where((element) =>
-                      //         element["key"] == "imageStreakCalendar")
-                      //     .first["image"],
-                      // // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
-                      // // image:
-                      // //     dataProvider!.cachedImageMap["imageStreakCalendar"],
-                      // imageKey: "imageStreakCalendar",
-                      child: SafeArea(
-                        child: SizedBox(
-                          height: media.height / 1.8,
-                          width: media.width,
-                          child: Column(
-                            children: [
-                              AppBar(
-                                toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                surfaceTintColor: Colors.transparent,
-                                backgroundColor: Colors.transparent,
-                                centerTitle: true,
-                                leading: BackArrowWidget(
-                                  onPress: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                title: Text(
-                                  'Streaks',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: ScreenUtil.horizontalScale(5.5),
+                    child: Consumer<DataProvider>(builder: (context, value, c) {
+                      return AppImage.imageStreakCalendar(
+                        value,
+                        // media,
+                        // image: dataProvider!.allImageList
+                        //     .where((element) =>
+                        //         element["key"] == "imageStreakCalendar")
+                        //     .first["image"],
+                        // // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
+                        // // image:
+                        // //     dataProvider!.cachedImageMap["imageStreakCalendar"],
+                        // imageKey: "imageStreakCalendar",
+                        child: SafeArea(
+                          child: SizedBox(
+                            height: media.height / 1.8,
+                            width: media.width,
+                            child: Column(
+                              children: [
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
+                                  backgroundColor: Colors.transparent,
+                                  centerTitle: true,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  title: Text(
+                                    'Streaks',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              //   children: [
-                              //     Container(
-                              //       margin: EdgeInsets.only(
-                              //         left: ScreenUtil.horizontalScale(4),
-                              //       ),
-                              //       decoration: const BoxDecoration(
-                              //         color: Color(0XFFd18a9b),
-                              //         shape: BoxShape.circle,
-                              //       ),
-                              //       child: SizedBox(
-                              //         width: ScreenUtil.horizontalScale(10), // Size of the circle
-                              //         height: ScreenUtil.horizontalScale(10),
-                              //         child: IconButton(
-                              //           padding: EdgeInsets.zero, // Removes the default padding
-                              //           icon: const Icon(
-                              //             Icons.keyboard_arrow_left,
-                              //             color: Colors.white,
-                              //           ),
-                              //           onPressed: () {
-                              //             // HapticFeedBack.buttonClick();
-                              //             Navigator.pop(context);
-                              //           },
-                              //           iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     Expanded(
-                              //       child: Center(
-                              //         child: Text(
-                              //           "Streaks",
-                              //           style: TextStyle(
-                              //             color: Colors.white,
-                              //             fontSize: ScreenUtil.verticalScale(3),
-                              //             fontWeight: FontWeight.bold,
-                              //             height: 1,
-                              //           ),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     Container(
-                              //       margin: EdgeInsets.only(
-                              //         right: ScreenUtil.horizontalScale(4),
-                              //       ),
-                              //       child: SizedBox(
-                              //         width: ScreenUtil.horizontalScale(10),
-                              //         height: ScreenUtil.horizontalScale(10),
-                              //       ),
-                              //     ),
-                              //   ],
-                              // ),
-                              SizedBox(
-                                height: media.height / 4.9,
-                                width: media.width,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            bottom:
-                                                ScreenUtil.verticalScale(1.5)),
-                                        child: Text(
-                                          'Your Current Streak',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize:
-                                                ScreenUtil.verticalScale(2.5),
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: Colors.white, width: 1.7),
-                                        ),
-                                        padding: EdgeInsets.all(
-                                            ("${context.watch<MonthProvider>().streak}")
-                                                        .length >
-                                                    3
-                                                ? 19
-                                                : ("${context.watch<MonthProvider>().streak}")
-                                                            .length >
-                                                        2
-                                                    ? 10
-                                                    : ("${context.watch<MonthProvider>().streak}")
-                                                                .length >
-                                                            1
-                                                        ? 5
-                                                        : 2),
-                                        child: Center(
+                                // Row(
+                                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //   children: [
+                                //     Container(
+                                //       margin: EdgeInsets.only(
+                                //         left: ScreenUtil.horizontalScale(4),
+                                //       ),
+                                //       decoration: const BoxDecoration(
+                                //         color: Color(0XFFd18a9b),
+                                //         shape: BoxShape.circle,
+                                //       ),
+                                //       child: SizedBox(
+                                //         width: ScreenUtil.horizontalScale(10), // Size of the circle
+                                //         height: ScreenUtil.horizontalScale(10),
+                                //         child: IconButton(
+                                //           padding: EdgeInsets.zero, // Removes the default padding
+                                //           icon: const Icon(
+                                //             Icons.keyboard_arrow_left,
+                                //             color: Colors.white,
+                                //           ),
+                                //           onPressed: () {
+                                //             // HapticFeedBack.buttonClick();
+                                //             Navigator.pop(context);
+                                //           },
+                                //           iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
+                                //         ),
+                                //       ),
+                                //     ),
+                                //     Expanded(
+                                //       child: Center(
+                                //         child: Text(
+                                //           "Streaks",
+                                //           style: TextStyle(
+                                //             color: Colors.white,
+                                //             fontSize: ScreenUtil.verticalScale(3),
+                                //             fontWeight: FontWeight.bold,
+                                //             height: 1,
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ),
+                                //     Container(
+                                //       margin: EdgeInsets.only(
+                                //         right: ScreenUtil.horizontalScale(4),
+                                //       ),
+                                //       child: SizedBox(
+                                //         width: ScreenUtil.horizontalScale(10),
+                                //         height: ScreenUtil.horizontalScale(10),
+                                //       ),
+                                //     ),
+                                //   ],
+                                // ),
+                                SizedBox(
+                                  height: media.height / 4.9,
+                                  width: media.width,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: ScreenUtil.verticalScale(
+                                                  1.5)),
                                           child: Text(
-                                            '${context.watch<MonthProvider>().streak}',
+                                            'Your Current Streak',
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize:
-                                                  ScreenUtil.verticalScale(2.6),
-                                              fontWeight: FontWeight.bold,
+                                                  ScreenUtil.verticalScale(2.5),
+                                              fontWeight: FontWeight.normal,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                                color: Colors.white,
+                                                width: 1.7),
+                                          ),
+                                          padding: EdgeInsets.all(
+                                              ("${context.watch<MonthProvider>().streak}")
+                                                          .length >
+                                                      3
+                                                  ? 19
+                                                  : ("${context.watch<MonthProvider>().streak}")
+                                                              .length >
+                                                          2
+                                                      ? 10
+                                                      : ("${context.watch<MonthProvider>().streak}")
+                                                                  .length >
+                                                              1
+                                                          ? 5
+                                                          : 2),
+                                          child: Center(
+                                            child: Text(
+                                              '${context.watch<MonthProvider>().streak}',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        2.6),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                   ),
                 ),
                 Positioned(

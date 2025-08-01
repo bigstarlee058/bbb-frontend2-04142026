@@ -14,7 +14,8 @@ class CollectionGrid extends StatelessWidget {
     ScreenUtil.init(context);
     return GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, '/collectionDetail', arguments: collection);
+          Navigator.pushNamed(context, '/collectionDetail',
+              arguments: collection);
         },
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -22,9 +23,12 @@ class CollectionGrid extends StatelessWidget {
           ),
           child: appShimmerImage(
             height: media.height / 4,
-            networkImageUrl: collection.photo.startsWith('https://storage.cloud.google.com/')
-                ? collection.photo.replaceFirst('https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-                : collection.photo,
+            networkImageUrl:
+                collection.photo.startsWith('https://storage.cloud.google.com/')
+                    ? collection.photo.replaceFirst(
+                        'https://storage.cloud.google.com/',
+                        'https://storage.googleapis.com/')
+                    : collection.photo,
             fit: BoxFit.cover,
             borderRadius: BorderRadius.all(
               Radius.circular(ScreenUtil.verticalScale(5)),
@@ -34,7 +38,8 @@ class CollectionGrid extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5)),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil.horizontalScale(5)),
                   child: Column(
                     children: [
                       Text(

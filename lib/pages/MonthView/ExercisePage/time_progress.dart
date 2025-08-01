@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -38,7 +39,8 @@ class TimerWithProgressBar extends StatefulWidget {
   State<TimerWithProgressBar> createState() => _TimerWithProgressBarState();
 }
 
-class _TimerWithProgressBarState extends State<TimerWithProgressBar> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _TimerWithProgressBarState extends State<TimerWithProgressBar>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late MonthProvider monthProvider;
 
   @override
@@ -67,19 +69,26 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
 
     previousData = monthProvider.currentExpandedItem;
 
-    controller = AnimationController(vsync: this, duration: Duration(seconds: totalTime));
+    controller = AnimationController(
+        vsync: this, duration: Duration(seconds: totalTime));
 
     controller.addStatusListener(
       (status) async {
         if (status == AnimationStatus.completed) {
           animationCompleted = true;
           widget.onComplete();
-          ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
+          ApiRepo.updateExerciseHistory(
+              body: {"dataId": widget.dataId, "status": "Completed"});
           await DatabaseHelper()
               .updateSingleValue(
-                  tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
+                  tableName: DatabaseHelper.exerciseHistory,
+                  id: widget.dataId,
+                  columnName: 'status',
+                  newValue: Status.completed)
               .then(
-                (value) async => await monthProvider.fetchExerciseHistoryLocalData().then((value) => widget.makeRefresh()),
+                (value) async => await monthProvider
+                    .fetchExerciseHistoryLocalData()
+                    .then((value) => widget.makeRefresh()),
               );
         }
       },
@@ -117,14 +126,21 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         }
       });
     } else {
-      ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
+      ApiRepo.updateExerciseHistory(
+          body: {"dataId": widget.dataId, "status": "Completed"});
       await DatabaseHelper()
-          .updateSingleValue(tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
+          .updateSingleValue(
+              tableName: DatabaseHelper.exerciseHistory,
+              id: widget.dataId,
+              columnName: 'status',
+              newValue: Status.completed)
           .then(
-            (value) async => await monthProvider.fetchExerciseHistoryLocalData(),
+            (value) async =>
+                await monthProvider.fetchExerciseHistoryLocalData(),
           );
 
-      formattedTime = _formatTime(widget.initialDuration - widget.initialDuration);
+      formattedTime =
+          _formatTime(widget.initialDuration - widget.initialDuration);
       isPaused = true;
       controller.stop();
       widget.makeRefresh();
@@ -168,35 +184,72 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
           currentTime = int.parse(monthProvider.timePassed);
 
           if (int.parse(monthProvider.timePassed) > totalTime) {
-            ApiRepo.updateExerciseHistory(body: {"dataId": widget.dataId, "status": "Completed"});
+            ApiRepo.updateExerciseHistory(
+                body: {"dataId": widget.dataId, "status": "Completed"});
             await DatabaseHelper()
                 .updateSingleValue(
-                    tableName: DatabaseHelper.exerciseHistory, id: widget.dataId, columnName: 'status', newValue: Status.completed)
+                    tableName: DatabaseHelper.exerciseHistory,
+                    id: widget.dataId,
+                    columnName: 'status',
+                    newValue: Status.completed)
                 .then(
-                  (value) async => await monthProvider.fetchExerciseHistoryLocalData().then(
-                        (value) => widget.makeRefresh(),
-                      ),
+                  (value) async =>
+                      await monthProvider.fetchExerciseHistoryLocalData().then(
+                            (value) => widget.makeRefresh(),
+                          ),
                 );
           }
         }
         setState(() {});
+        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.resumed");
         break;
       case AppLifecycleState.inactive:
-        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context, widget.dataId, widget.index, widget.subIndex);
+        await monthProvider.savePassedTime(
+            currentTime.toString(),
+            widget.initialDuration,
+            context,
+            widget.dataId,
+            widget.index,
+            widget.subIndex);
+        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.inactive");
         break;
       case AppLifecycleState.paused:
-        monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context, widget.dataId, widget.index, widget.subIndex);
+        await monthProvider.savePassedTime(
+            currentTime.toString(),
+            widget.initialDuration,
+            context,
+            widget.dataId,
+            widget.index,
+            widget.subIndex);
+        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.paused");
         break;
       case AppLifecycleState.detached:
+        await monthProvider.savePassedTime(
+            currentTime.toString(),
+            widget.initialDuration,
+            context,
+            widget.dataId,
+            widget.index,
+            widget.subIndex);
+        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.detached");
         break;
       case AppLifecycleState.hidden:
+        await monthProvider.savePassedTime(
+            currentTime.toString(),
+            widget.initialDuration,
+            context,
+            widget.dataId,
+            widget.index,
+            widget.subIndex);
+        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.hidden");
         break;
     }
   }
 
   @override
   void dispose() {
-    monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration, context, widget.dataId, widget.index, widget.subIndex);
+    monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration,
+        context, widget.dataId, widget.index, widget.subIndex);
     controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     timerTimer?.cancel();
@@ -214,7 +267,9 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar> with Single
         //   bottomRight: Radius.circular(30),
         // ),
         borderRadius: const BorderRadius.all(Radius.circular(30)),
-        color: currentTime >= totalTime * 0.9 ? const Color(0xff008000) : AppColors.primaryColor,
+        color: currentTime >= totalTime * 0.9
+            ? const Color(0xff008000)
+            : AppColors.primaryColor,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

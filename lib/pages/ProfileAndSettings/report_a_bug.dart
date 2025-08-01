@@ -16,16 +16,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
-class AddMemberSpotlight extends StatefulWidget {
-  const AddMemberSpotlight({super.key});
+class ReportABugScreen extends StatefulWidget {
+  const ReportABugScreen({super.key});
 
   @override
-  State<AddMemberSpotlight> createState() => _AddMemberSpotlightState();
+  State<ReportABugScreen> createState() => _ReportABugScreenState();
 }
 
-class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
+class _ReportABugScreenState extends State<ReportABugScreen> {
   File? image;
-  final titleController = TextEditingController();
+  final titleController = TextEditingController(text: "Report a Bug");
   final descriptionController = TextEditingController();
   DataProvider? dataProvider;
 
@@ -45,7 +45,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'Submit Your Story',
+          'Report a Bug',
           style: TextStyle(
             color: Theme.of(context).textTheme.bodyLarge?.color,
             fontSize: ScreenUtil.verticalScale(2.3),
@@ -67,12 +67,9 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                 textColor: Colors.white,
                 color: AppColors.primaryColor,
                 onPress: () async {
-                  if (image == null &&
-                      titleController.text.isEmpty &&
+                  if (titleController.text.isEmpty &&
                       descriptionController.text.isEmpty) {
                     showBottomAlert(context, "Please enter details");
-                  } else if (image == null) {
-                    showBottomAlert(context, "Please select image");
                   } else if (titleController.text.isEmpty) {
                     showBottomAlert(context, "Please enter title");
                   } else if (descriptionController.text.isEmpty) {
@@ -85,7 +82,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                     );
                     if (val == true) {
                       Fluttertoast.showToast(
-                        msg: "Story submitted successfully!",
+                        msg: "Feedback submitted successfully!",
                         toastLength: Toast.LENGTH_LONG,
                         gravity: ToastGravity.TOP_RIGHT,
                         timeInSecForIosWeb: 1,
@@ -96,7 +93,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                       Navigator.pop(context);
                     } else {
                       Fluttertoast.showToast(
-                        msg: "Failed to add spotlight, Please try again!",
+                        msg: "Failed to submit feedback, Please try again!",
                         toastLength: Toast.LENGTH_LONG,
                         gravity: ToastGravity.TOP_RIGHT,
                         timeInSecForIosWeb: 1,
@@ -141,116 +138,23 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
   Widget form() => Center(
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: ScreenUtil.verticalScale(3)),
-              GestureDetector(
-                onTap: _pickAndUploadImage,
-                child: Consumer<UserDataProvider>(
-                  builder: (context, userData, child) {
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          height: ScreenUtil.horizontalScale(50),
-                          width: ScreenUtil.horizontalScale(50),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(ScreenUtil.horizontalScale(5)),
-                            ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                ScreenUtil.horizontalScale(5)),
-                            child: image != null
-                                ? Image.file(
-                                    image!,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Container(
-                                    height: ScreenUtil.horizontalScale(50),
-                                    width: ScreenUtil.horizontalScale(50),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      // border:
-                                      //     Border.all(color: AppColors.appGreyColor),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(
-                                            ScreenUtil.horizontalScale(5)),
-                                      ),
-                                    ),
-                                    child: Builder(builder: (context) {
-                                      return Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(
-                                                  ScreenUtil.verticalScale(
-                                                      1.1)),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.grey.shade100,
-                                                  shape: BoxShape.circle),
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Colors.grey.shade400,
-                                                size:
-                                                    ScreenUtil.verticalScale(3),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height:
-                                                  ScreenUtil.verticalScale(1.3),
-                                            ),
-                                            Text(
-                                              "Upload your photo",
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                color: Colors.grey.shade400,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize:
-                                                    ScreenUtil.verticalScale(
-                                                        1.7),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                                  ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+              Text(
+                "Welcome to the Booty by Bret app beta! We'd love to get your feedback as we work through our first release and some initial bugs. If you notice anything off or not working (or if you have any feedback or suggestions whatsoever), feel free to message us.",
+                style: TextStyle(
+                  fontSize: ScreenUtil.verticalScale(1.8),
+                  color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
               ),
-              SizedBox(height: ScreenUtil.verticalScale(5)),
+              SizedBox(height: ScreenUtil.verticalScale(3)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: AppTextFormField(
-                  hintText: 'Your Name',
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  onChanged: (value) {
-                    if (titleController.text.toString().trim().isEmpty) {
-                      titleController.clear();
-                      setState(() {});
-                    }
-                  },
-                  controller: titleController,
-                ),
-              ),
-              SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: AppTextFormField(
-                  maxLines: 7,
-                  hintText: 'Write your story here',
+                  maxLines: 8,
+                  hintText: 'Enter details here...',
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   onChanged: (value) {
@@ -262,6 +166,58 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                   controller: descriptionController,
                 ),
               ),
+              SizedBox(height: 20),
+              if (image == null)
+                TextButton(
+                    onPressed: _pickAndUploadImage,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          size: ScreenUtil.verticalScale(2.5),
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          "Attachment (Optional)",
+                          style: TextStyle(
+                            fontSize: ScreenUtil.verticalScale(1.8),
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        ),
+                      ],
+                    ))
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Attachment",
+                      style: TextStyle(
+                        fontSize: ScreenUtil.verticalScale(1.8),
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                    ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(ScreenUtil.horizontalScale(5)),
+                      child: Container(
+                        height: ScreenUtil.verticalScale(14),
+                        width: ScreenUtil.verticalScale(14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(ScreenUtil.horizontalScale(5)),
+                          ),
+                        ),
+                        child: Image.file(
+                          image!,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               SizedBox(height: ScreenUtil.verticalScale(3)),
             ],
           ),

@@ -1,6 +1,5 @@
-import 'dart:developer';
+import 'dart:async';
 import 'dart:io';
-
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/profile_image_handler.dart';
@@ -18,10 +17,28 @@ import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'number_entry.dart';
+
+class Debouncer {
+  final Duration delay;
+  VoidCallback? action;
+  Timer? _timer;
+
+  Debouncer({this.delay = const Duration(milliseconds: 600)});
+
+  run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
+  }
+
+  dispose() {
+    _timer?.cancel();
+  }
+}
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -52,6 +69,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   bool canConvertUnit = true;
   bool showSeparationText = true;
+  final Debouncer _debouncer = Debouncer();
 
   final List<String> genderOptions = ['Female', 'Male', 'Other'];
   final List<String> goalsOptions = [
@@ -68,6 +86,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     locationProvider = Provider.of<LocationProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
+    locationProvider.clearAlLData();
     _fetchUserData();
     super.initState();
   }
@@ -134,14 +153,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
         selectedLocation = detail?['location'] ?? "";
         _imageUrl = detail?['avatarUrl'] ?? "";
 
-        final genderIndex = detail == null
-            ? 0
-            : detail['sex'] == null
-                ? 1
-                : detail['sex'] == true
-                    ? 1
-                    : 0;
-        selectedGender = genderOptions[genderIndex];
+        // final genderIndex = detail == null
+        //     ? 0
+        //     : detail['sex'] == null
+        //         ? 1
+        //         : detail['sex'] == true
+        //             ? 1
+        //             : 0;
+
+        selectedGender = detail['mygoal'] ?? "";
+        // genderOptions[genderIndex];
 
         selectedGoal = detail?['mygoal'] ?? "";
 
@@ -175,10 +196,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
     // });
 
     final userDetails = {
-      // 'firstName': 'Nick',
-      // 'lastName': 'Vlacic',
-      'sex':
-          selectedGender != null ? genderOptions.indexOf(selectedGender!) : "",
+      // 'sex':
+      //     selectedGender != null ? genderOptions.indexOf(selectedGender!) : "",
       'dob': selectedDate != null ? selectedDate!.toIso8601String() : "",
       'weight': selectedWeight.text.replaceAll('lbs', "").isNotEmpty
           ? int.parse(selectedWeight.text.replaceAll('lbs', ""))
@@ -191,7 +210,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               selectedHeight.text.replaceAll('\'', '').replaceAll("\"", ""))
           : "",
       'location': selectedLocation,
-      'mygoal': selectedGoal,
+      'mygoal': selectedGender ?? "",
       'avatarUrl': _imageUrl ?? '',
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
@@ -222,8 +241,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
     if (_id != null) {
       await userData!.updateUserInfo(_id!, userDetails, image);
 
-      ///
-
       // Fluttertoast.showToast(
       //   msg: "Profile updated!",
       //   toastLength: Toast.LENGTH_LONG,
@@ -233,7 +250,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
       //   textColor: Colors.white,
       //   fontSize: 16.0,
       // );
-
       // setState(() {
       //   isLoading = false;
       // });
@@ -241,6 +257,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       if (kDebugMode) {
         print("Error: User ID is null");
       }
+
       // setState(() {
       //   isLoading = false;
       // });
@@ -253,24 +270,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
   @override
   void dispose() {
     _saveUserData();
-    _imageUrl = null;
-    selectedName = "";
-    selectedDate = null;
-    selectedWeight.clear();
-    selectedBodyFat.clear();
-    selectedGender = null;
-    selectedHeight.clear();
-    selectedMidThigh.clear();
-    selectedWaist.clear();
-    selectedHip.clear();
-    selectedLocation = null;
-    selectedGoal = null;
-    heightInCm = 183;
-
-    selectedHeightUnit = HeightUnit.cm;
-
-    canConvertUnit = true;
-    showSeparationText = true;
     super.dispose();
   }
 
@@ -290,15 +289,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageMyProfle(
-                            // media,
-                            // image: dataProvider!.allImageList
-                            //     .where((element) =>
-                            //         element["key"] == "imageMyProfle")
-                            //     .first["image"],
-                            // // image: dataProvider!.cachedImageMap["imageMyProfle"],
-                            // imageKey: "imageMyProfle",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageMyProfle(value);
+                        }),
                         SizedBox(
                           height: media.height / 1.5,
                           width: media.width,
@@ -481,6 +474,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 setState(() {
                                   selectedGender = newValue!;
                                 });
+                                _saveUserData();
                               },
                             ),
                             // _buildDropdownField(
@@ -505,7 +499,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       value: value.selectedCountry,
                                       options: value.country?.countries ?? [],
                                       hint: 'Enter here',
-                                      onChanged: value.onCountrySelect,
+                                      onChanged: (v) {
+                                        value.onCountrySelect(v);
+                                        _saveUserData();
+                                      },
                                     ),
                                     _buildDropdownField(
                                       context: context,
@@ -513,7 +510,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       value: value.selectedState,
                                       options: value.states?.states ?? [],
                                       hint: 'Enter here',
-                                      onChanged: value.onStateSelect,
+                                      onChanged: (v) {
+                                        value.onStateSelect(v);
+                                        _saveUserData();
+                                      },
                                     ),
                                     _buildTextField(
                                       context: context,
@@ -532,6 +532,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               hint: '6\'0"',
                             ),
                             NumberEntry(
+                              onchange: () {
+                                _debouncer.run(() {
+                                  _saveUserData();
+                                });
+                              },
                               label: 'Weight',
                               controller: selectedWeight,
                               focusNode: _nodeText1,
@@ -539,12 +544,22 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             ),
 
                             NumberEntry(
+                              onchange: () {
+                                _debouncer.run(() {
+                                  _saveUserData();
+                                });
+                              },
                               label: 'Waist',
                               controller: selectedWaist,
                               focusNode: _nodeText2,
                               suffix: '"',
                             ),
                             NumberEntry(
+                              onchange: () {
+                                _debouncer.run(() {
+                                  _saveUserData();
+                                });
+                              },
                               label: 'Hip',
                               controller: selectedHip,
                               focusNode: _nodeText3,
@@ -552,6 +567,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             ),
 
                             NumberEntry(
+                              onchange: () {
+                                _debouncer.run(() {
+                                  _saveUserData();
+                                });
+                              },
                               label: 'Mid-Thigh',
                               controller: selectedMidThigh,
                               focusNode: _nodeText4,
@@ -559,6 +579,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             ),
 
                             NumberEntry(
+                              onchange: () {
+                                _debouncer.run(() {
+                                  _saveUserData();
+                                });
+                              },
                               label: 'Body-Fat',
                               controller: selectedBodyFat,
                               focusNode: _nodeText5,
@@ -701,16 +726,18 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
                 dropdownColor: Theme.of(context).cardColor,
                 elevation: 12,
-                hint: Text(
-                  (value != null && value.isNotEmpty) ? value : hint,
-                  style: TextStyle(
-                    color: (value != null && value.isNotEmpty)
-                        ? Theme.of(context).textTheme.bodyLarge?.color
-                        : Colors.grey.shade700,
-                    fontSize: ScreenUtil.verticalScale(1.95),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
+                hint: Builder(builder: (context) {
+                  return Text(
+                    (value != null && value.isNotEmpty) ? value : hint,
+                    style: TextStyle(
+                      color: (value != null && value.isNotEmpty)
+                          ? Theme.of(context).textTheme.bodyLarge?.color
+                          : Colors.grey.shade700,
+                      fontSize: ScreenUtil.verticalScale(1.95),
+                      fontWeight: FontWeight.normal,
+                    ),
+                  );
+                }),
                 isDense: true,
                 isExpanded: true,
                 alignment: Alignment.center,
@@ -785,11 +812,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
             child: Center(
               child: TextField(
-                style: TextStyle(
-                  fontSize: ScreenUtil.verticalScale(1.95),
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  decoration: TextDecoration.none,
+                  fontSize: ScreenUtil.verticalScale(1.82),
                 ),
+                onChanged: (value) {
+                  _debouncer.run(() {
+                    _saveUserData();
+                  });
+                },
                 controller: value,
                 keyboardType: TextInputType.text,
                 onSubmitted: (value) {
@@ -855,6 +888,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     int inches = ((heightInCm / 2.54) % 12).floor();
                     value.text = '$feet\'$inches"';
                   });
+                  _saveUserData();
                 },
               );
             },
@@ -872,7 +906,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   value.text.isEmpty ? 'Enter here' : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty
-                        ? Colors.grey.shade400
+                        ? Colors.grey.shade700
                         : Theme.of(context).textTheme.bodyLarge?.color,
                     fontSize: ScreenUtil.verticalScale(1.95),
                     fontWeight: FontWeight.normal,
@@ -900,6 +934,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       onSubmit: (dob) {
         selectedDate = dob;
         setState(() {});
+        _saveUserData();
       },
       backgroundColor: Theme.of(context).canvasColor,
       height: 320,

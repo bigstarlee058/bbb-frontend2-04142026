@@ -51,7 +51,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
                       Text(
                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: Theme.of(context).textTheme.labelLarge?.color,
                         ),
                       )
                     ],
@@ -87,7 +87,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           disabledBackgroundColor: const Color(0xFFF3F3F3),
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).cardColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
@@ -115,7 +115,7 @@ class _EquipmentSectionState extends State<EquipmentSection> {
               offset: Offset(0, 1),
             ),
           ],
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.all(
             Radius.circular(ScreenUtil.verticalScale(7)),
           ),

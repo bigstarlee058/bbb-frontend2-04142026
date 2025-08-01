@@ -130,9 +130,9 @@ class _HeightPickerState extends State<HeightPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
-      body: Column(
+    return Container(
+      color: Theme.of(context).cardColor,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -190,9 +190,17 @@ class _HeightPickerState extends State<HeightPicker> {
                                 capEndEdge: false,
                               ),
                               Center(
-                                child: Text(
-                                  "Feet",
-                                  style: TextStyle(fontSize: 18),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: Text(
+                                    "Feet",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color),
+                                  ),
                                 ),
                               ),
                             ],
@@ -263,9 +271,12 @@ class _HeightPickerState extends State<HeightPicker> {
                   ),
                 ),
                 child: Center(
-                  child: Text(
-                    "Select",
-                    style: TextStyle(color: Colors.white),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(
+                      "Select",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
                 ),
               ),

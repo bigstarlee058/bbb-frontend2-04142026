@@ -74,6 +74,98 @@ class _WatchTutorialState extends State<WatchTutorial>
     return buffered.isNotEmpty ? buffered.last.end : Duration.zero;
   }
 
+  // Future<void> initializeVideo(String url) async {
+  //   if (hasClosedPopup) return;
+  //   try {
+  //     _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+  //         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+  //
+  //     await _videoPlayerController.initialize();
+  //     if (hasClosedPopup || !mounted) {
+  //       await _videoPlayerController.dispose();
+  //       return;
+  //     }
+  //
+  //     await _videoPlayerController.setLooping(true);
+  //     AudioManager.requestAudioFocus();
+  //
+  //     _chewieController = ChewieController(
+  //       videoPlayerController: _videoPlayerController,
+  //       autoPlay: true,
+  //       looping: true,
+  //       showControls: false,
+  //       aspectRatio: _videoPlayerController.value.aspectRatio,
+  //     );
+  //     bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+  //     _videoPlayerController.setVolume(rawData ? 1 : 0);
+  //     isMute = rawData;
+  //     if (!hasClosedPopup &&
+  //         _chewieController != null &&
+  //         _chewieController!.videoPlayerController.value.isInitialized) {
+  //       hideControls();
+  //       videoSize = calculateVideoSize(
+  //           aspectRatio: _chewieController!.aspectRatio!, context: context);
+  //       setState(() {});
+  //     }
+  //     // _videoPlayerController.addListener(() async {
+  //     //   final bool isFinished =
+  //     //       _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
+  //     //   if (isFinished) {
+  //     //     showControlsOnTapOfPause();
+  //     //   }
+  //     //   if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+  //     //     AudioManager.abandonAudioFocus();
+  //     //   } else {
+  //     //     AudioManager.requestAudioFocus();
+  //     //   }
+  //     //   setState(() {});
+  //     // });
+  //     _videoPlayerController.addListener(() async {
+  //       if (hasClosedPopup || !mounted) return;
+  //       final position = _videoPlayerController.value.position;
+  //       final duration = _videoPlayerController.value.duration;
+  //       final bool isFinished =
+  //           position >= duration && !_videoPlayerController.value.isPlaying;
+  //       if (isFinished) {
+  //         showControlsOnTapOfPause();
+  //       }
+  //       if (duration != null && position >= duration) {
+  //         AudioManager.abandonAudioFocus();
+  //         if (Platform.isIOS) {
+  //           _videoPlayerController.seekTo(Duration.zero);
+  //           _videoPlayerController.play();
+  //         }
+  //       } else {
+  //         AudioManager.requestAudioFocus();
+  //       }
+  //
+  //       videoProgressValue.value = position;
+  //       setState(() {});
+  //     });
+  //     _controller = ProgressBarController(
+  //       vsync: this,
+  //       barAnimationDuration: const Duration(milliseconds: 300),
+  //       thumbAnimationDuration: const Duration(milliseconds: 200),
+  //       waitingDuration: const Duration(milliseconds: 1800),
+  //     );
+  //
+  //     if (!hasClosedPopup && mounted) {
+  //       setState(() {
+  //         loading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     if (!hasClosedPopup) {
+  //       setState(() {
+  //         videoNotInitialized = true;
+  //         loading = false;
+  //       });
+  //     }
+  //
+  //     debugPrint("VIDEO NOT INITIALIZED: $e");
+  //   }
+  // }
+
   Future<void> initializeVideo(String url) async {
     if (hasClosedPopup) return;
     try {
@@ -86,20 +178,37 @@ class _WatchTutorialState extends State<WatchTutorial>
         return;
       }
 
-      await _videoPlayerController.setLooping(true);
-      AudioManager.requestAudioFocus();
+      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      isMute = rawData;
+      await _videoPlayerController.setVolume(rawData ? 1 : 0);
+
+      final isPlaying = _videoPlayerController.value.isPlaying;
+
+      if (isPlaying && isMute == false) {
+        await AudioManager.requestAudioFocus();
+      } else {
+        await AudioManager.abandonAudioFocus();
+      }
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
-        looping: true,
+        looping: false,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
-      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
-      _videoPlayerController.setVolume(rawData ? 1 : 0);
-      isMute = rawData;
-      if (!hasClosedPopup &&
+
+      await _videoPlayerController.setLooping(false);
+
+      if (_videoPlayerController.value.volume == 0) {
+        await AudioManager.abandonAudioFocus().then((value) async {
+          await Future.delayed(Duration(milliseconds: 20));
+          return _videoPlayerController.play();
+        });
+      }
+
+      if (mounted &&
+          !hasClosedPopup &&
           _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
@@ -107,41 +216,41 @@ class _WatchTutorialState extends State<WatchTutorial>
             aspectRatio: _chewieController!.aspectRatio!, context: context);
         setState(() {});
       }
+
+      _videoPlayerController.addListener(() async {
+        if (!mounted) return;
+
+        final isPlaying = _videoPlayerController.value.isPlaying;
+        if (isPlaying && isMute == true) {
+          await AudioManager.requestAudioFocus();
+        }
+
+        _onVideoTick();
+        setState(() {});
+      });
+
       // _videoPlayerController.addListener(() async {
+      //   if (hasClosedPopup || !mounted) return;
+      //   final position = _videoPlayerController.value.position;
+      //   final duration = _videoPlayerController.value.duration;
       //   final bool isFinished =
-      //       _videoPlayerController.value.position >= _videoPlayerController.value.duration && !_videoPlayerController.value.isPlaying;
+      //       position >= duration && !_videoPlayerController.value.isPlaying;
       //   if (isFinished) {
       //     showControlsOnTapOfPause();
       //   }
-      //   if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+      //   if (duration != null && position >= duration) {
       //     AudioManager.abandonAudioFocus();
+      //     if (Platform.isIOS) {
+      //       _videoPlayerController.seekTo(Duration.zero);
+      //       _videoPlayerController.play();
+      //     }
       //   } else {
       //     AudioManager.requestAudioFocus();
       //   }
+      //
+      //   videoProgressValue.value = position;
       //   setState(() {});
       // });
-      _videoPlayerController.addListener(() async {
-        if (hasClosedPopup || !mounted) return;
-        final position = _videoPlayerController.value.position;
-        final duration = _videoPlayerController.value.duration;
-        final bool isFinished =
-            position >= duration && !_videoPlayerController.value.isPlaying;
-        if (isFinished) {
-          showControlsOnTapOfPause();
-        }
-        if (duration != null && position >= duration) {
-          AudioManager.abandonAudioFocus();
-          if (Platform.isIOS) {
-            _videoPlayerController.seekTo(Duration.zero);
-            _videoPlayerController.play();
-          }
-        } else {
-          AudioManager.requestAudioFocus();
-        }
-
-        videoProgressValue.value = position;
-        setState(() {});
-      });
       _controller = ProgressBarController(
         vsync: this,
         barAnimationDuration: const Duration(milliseconds: 300),
@@ -166,6 +275,35 @@ class _WatchTutorialState extends State<WatchTutorial>
     }
   }
 
+  bool _restarting = false;
+
+  void _onVideoTick() async {
+    final v = _videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null || _restarting) return;
+
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      _restarting = true;
+
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await _videoPlayerController.pause();
+      await _videoPlayerController.seekTo(Duration.zero);
+      await _videoPlayerController.setVolume(isMute ? 1 : 0);
+      await _videoPlayerController.play();
+      _restarting = false;
+    }
+  }
+
   bool showControls = true;
   bool isFullscreen = false;
   bool hasClosedPopup = false;
@@ -174,6 +312,19 @@ class _WatchTutorialState extends State<WatchTutorial>
     isMute = !isMute;
 
     _videoPlayerController.setVolume(isMute ? 1 : 0);
+    setState(() {});
+
+    if (_videoPlayerController.value.volume == 0) {
+      final videoPlay = _videoPlayerController.value.isPlaying;
+
+      await AudioManager.abandonAudioFocus().then((value) async {
+        await Future.delayed(Duration(milliseconds: 20));
+        if (videoPlay) {
+          return _videoPlayerController.play();
+        }
+      });
+    }
+
     setState(() {});
     await preferences.setBool(SharedPreference.isMute, isMute);
   }
@@ -255,7 +406,7 @@ class _WatchTutorialState extends State<WatchTutorial>
 
   Size calculateVideoSize(
       {required BuildContext context, required double aspectRatio}) {
-    double maxWidth = ScreenUtil.horizontalScale(86.5);
+    double maxWidth = ScreenUtil.horizontalScale(86.6);
     double calculatedHeight = maxWidth / aspectRatio;
     return Size(maxWidth, calculatedHeight);
   }
@@ -312,6 +463,7 @@ class _WatchTutorialState extends State<WatchTutorial>
                             color: AppColors.primaryColor),
                       )
                     : SingleChildScrollView(
+                        physics: ClampingScrollPhysics(),
                         child: Column(
                           children: [
                             // SizedBox(height: ScreenUtil.verticalScale(5)),
@@ -443,32 +595,30 @@ class _WatchTutorialState extends State<WatchTutorial>
                                                           showControlsOnTapOfPause();
 
                                                           await Future.delayed(
-                                                                  Duration(
-                                                                      milliseconds:
-                                                                          100))
-                                                              .then(
-                                                            (value) {
-                                                              AudioManager
-                                                                  .abandonAudioFocus();
-                                                              setState(() {});
-                                                            },
-                                                          );
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      100));
+                                                          await AudioManager
+                                                              .abandonAudioFocus();
+                                                          setState(() {});
                                                         } else {
                                                           _videoPlayerController
                                                               .play();
                                                           setState(() {});
                                                           hideControls();
                                                           await Future.delayed(
-                                                                  Duration(
-                                                                      milliseconds:
-                                                                          100))
-                                                              .then(
-                                                            (value) {
-                                                              AudioManager
-                                                                  .requestAudioFocus();
-                                                              setState(() {});
-                                                            },
-                                                          );
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      100));
+
+                                                          if (_videoPlayerController
+                                                                  .value
+                                                                  .volume >
+                                                              0) {
+                                                            await AudioManager
+                                                                .requestAudioFocus();
+                                                          }
+                                                          setState(() {});
                                                         }
                                                       }
                                                     : null,
@@ -682,7 +832,7 @@ class _WatchTutorialState extends State<WatchTutorial>
                                   horizontal: ScreenUtil.horizontalScale(5),
                                   vertical: ScreenUtil.horizontalScale(1.5)),
                               child: ButtonWidget(
-                                text: "Watch the App Tutorial",
+                                text: "Browse App Tutorials",
                                 textColor: Colors.white,
                                 onPress: () async {
                                   if (_videoPlayerController.value.isPlaying) {
@@ -691,11 +841,14 @@ class _WatchTutorialState extends State<WatchTutorial>
                                   }
                                   Navigator.pop(context);
 
-                                  AnimatedDialog.showAnimatedDialog(
-                                    context: context,
-                                    pageBuilder: (c1, anim1, anim2) =>
-                                        AppTutorial(),
-                                  );
+                                  Navigator.pushNamed(
+                                      context, "/tutorialScreen");
+
+                                  // AnimatedDialog.showAnimatedDialog(
+                                  //   context: context,
+                                  //   pageBuilder: (c1, anim1, anim2) =>
+                                  //       AppTutorial(),
+                                  // );
                                   // await Navigator.pushNamed(
                                   //     context, '/appTutorialScreen');
                                 },
@@ -725,27 +878,27 @@ class _WatchTutorialState extends State<WatchTutorial>
                                 ),
                               ),
                             ),
-                            SizedBox(height: ScreenUtil.verticalScale(1)),
-                            Container(
-                              margin: EdgeInsets.only(
-                                bottom: ScreenUtil.verticalScale(2),
-                                left: ScreenUtil.horizontalScale(10),
-                                right: ScreenUtil.horizontalScale(10),
-                              ),
-                              child: Column(
-                                children: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text(
-                                      "Back",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: AppColors.primaryColor),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
+                            SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                            // Container(
+                            //   margin: EdgeInsets.only(
+                            //     bottom: ScreenUtil.verticalScale(2),
+                            //     left: ScreenUtil.horizontalScale(10),
+                            //     right: ScreenUtil.horizontalScale(10),
+                            //   ),
+                            //   child: Column(
+                            //     children: [
+                            //       TextButton(
+                            //         onPressed: () => Navigator.pop(context),
+                            //         child: Text(
+                            //           "Back",
+                            //           style: TextStyle(
+                            //               fontSize: 18,
+                            //               color: AppColors.primaryColor),
+                            //         ),
+                            //       )
+                            //     ],
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),

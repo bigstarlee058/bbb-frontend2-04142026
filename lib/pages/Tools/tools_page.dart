@@ -50,16 +50,18 @@ class _ToolsPageState extends State<ToolsPage> {
                   children: [
                     Stack(
                       children: [
-                        AppImage.imageTools(
-                            // media,
-                            // // dataProvider?.screenBackgroundResponse?.imageTools ?? "",
-                            // image: dataProvider!.allImageList
-                            //     .where(
-                            //         (element) => element["key"] == "imageTools")
-                            //     .first["image"],
-                            // // image: dataProvider!.cachedImageMap["imageTools"],
-                            // imageKey: "imageTools",
-                            ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageTools(value
+                              // media,
+                              // // dataProvider?.screenBackgroundResponse?.imageTools ?? "",
+                              // image: dataProvider!.allImageList
+                              //     .where(
+                              //         (element) => element["key"] == "imageTools")
+                              //     .first["image"],
+                              // // image: dataProvider!.cachedImageMap["imageTools"],
+                              // imageKey: "imageTools",
+                              );
+                        }),
 
                         // Container(
                         //   height: media.height / 1,
@@ -206,20 +208,21 @@ class _ToolsPageState extends State<ToolsPage> {
                                   icon: 'assets/icons/exercise_library.svg',
                                   url: '/exerciseLibrary',
                                 ),
+                                // SizedBox(
+                                //   height: ScreenUtil.verticalScale(1.3),
+                                // ),
+                                // const ToolsPageButton(
+                                //   title: 'Graphs & Reports',
+                                //   icon: 'assets/icons/graphs.svg',
+                                //   url: '/graphAndReports',
+                                // ),
                                 SizedBox(
                                   height: ScreenUtil.verticalScale(1.3),
                                 ),
                                 const ToolsPageButton(
-                                  title: 'Graphs & Reports',
-                                  icon: 'assets/icons/graphs.svg',
-                                  url: '/graphAndReports',
-                                ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(1.3),
-                                ),
-                                const ToolsPageButton(
+                                  isNotSVG: true,
                                   title: 'Achievements',
-                                  icon: 'assets/img/verified (1).svg',
+                                  icon: 'assets/img/achievements.png',
                                   url: '/seeAllAchievementPage',
                                 ),
 

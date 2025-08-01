@@ -38,26 +38,29 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              AppImage.imageEmailConfirm(
-                // media,
-                // image: dataProvider!.allImageList
-                //     .where((element) => element["key"] == "imageEmailConfirm")
-                //     .first["image"],
-                // // image: dataProvider!.cachedImageMap["imageEmailConfirm"],
-                // imageKey: "imageEmailConfirm",
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: SafeArea(
-                        child: BackArrowWidget(onPress: () {
-                          Navigator.pop(context);
-                        }),
+              Consumer<DataProvider>(builder: (context, value, c) {
+                return AppImage.imageEmailConfirm(
+                  value,
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageEmailConfirm")
+                  //     .first["image"],
+                  // // image: dataProvider!.cachedImageMap["imageEmailConfirm"],
+                  // imageKey: "imageEmailConfirm",
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: SafeArea(
+                          child: BackArrowWidget(onPress: () {
+                            Navigator.pop(context);
+                          }),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              )
+                    ],
+                  ),
+                );
+              })
             ],
           ),
           Positioned(

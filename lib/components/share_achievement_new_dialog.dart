@@ -80,7 +80,9 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Screenshot(
                   controller: screenshotController,
                   child: Container(
-                    color: Theme.of(context).cardColor,
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Theme.of(context).scaffoldBackgroundColor
+                        : Theme.of(context).cardColor,
                     child: SizedBox(
                       width: ScreenUtil.verticalScale(38),
                       height: ScreenUtil.verticalScale(38),
@@ -88,7 +90,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                         controller: pageController1,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: widget.achievements.length,
-                        onPageChanged: (index) {},
+                        onPageChanged: (index) {
+                          currentPage = index;
+                          setState(() {});
+                        },
                         itemBuilder: (context, index) {
                           var data = widget.achievements[currentPage];
                           return Padding(
@@ -140,7 +145,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                       data.achievementAchievementId!
                                               .description ??
                                           "",
-                                      maxLines: 1,
+                                      maxLines: 3,
                                       textAlign: TextAlign.center,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
@@ -156,8 +161,9 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   Text(
                                     data.achievedDate!.isEmpty &&
                                             data.achieved == false
-                                        ? "Not achieved yet"
-                                        : "Date Achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
+                                        // ? "Not achieved yet"
+                                        ? "${widget.item.currentValue}/${data.achievementAchievementId!.value} achieved."
+                                        : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
@@ -182,7 +188,9 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Theme.of(context).cardColor,
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Theme.of(context).scaffoldBackgroundColor
+                        : Theme.of(context).cardColor,
                   ),
                   child: Stack(
                     children: [
@@ -190,7 +198,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                         padding: EdgeInsets.all(ScreenUtil.horizontalScale(2))
                             .copyWith(top: ScreenUtil.verticalScale(5)),
                         child: SizedBox(
-                          height: ScreenUtil.verticalScale(46),
+                          height: ScreenUtil.verticalScale(
+                              widget.achievements[currentPage].achieved == false
+                                  ? 39.5
+                                  : 46),
                           child: Column(
                             children: [
                               SizedBox(
@@ -199,6 +210,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   // physics: NeverScrollableScrollPhysics(),
                                   itemCount: widget.achievements.length,
                                   controller: pageController,
+                                  onPageChanged: (index) {
+                                    currentPage = index;
+                                    setState(() {});
+                                  },
                                   itemBuilder: (context, index) {
                                     var data = widget.achievements[index];
 
@@ -218,7 +233,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
-                                                        3.5)),
+                                                        3.9)),
                                             Stack(
                                               children: [
                                                 appShimmerImage(
@@ -229,20 +244,31 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                   width:
                                                       ScreenUtil.verticalScale(
                                                           18),
-                                                  networkImageUrl: data
-                                                          .achievementAchievementId!
-                                                          .image!
-                                                          .startsWith(
-                                                              'https://storage.cloud.google.com/')
-                                                      ? data
-                                                          .achievementAchievementId!
-                                                          .image!
-                                                          .replaceFirst(
-                                                              'https://storage.cloud.google.com/',
-                                                              'https://storage.googleapis.com/')
-                                                      : data
-                                                          .achievementAchievementId!
-                                                          .image!,
+                                                  networkImageUrl: index == 0 &&
+                                                          data.achieved == false
+                                                      ? widget.item.thumbnail!
+                                                              .startsWith(
+                                                                  'https://storage.cloud.google.com/')
+                                                          ? widget
+                                                              .item.thumbnail!
+                                                              .replaceFirst(
+                                                                  'https://storage.cloud.google.com/',
+                                                                  'https://storage.googleapis.com/')
+                                                          : widget
+                                                              .item.thumbnail!
+                                                      : data.achievementAchievementId!
+                                                              .image!
+                                                              .startsWith(
+                                                                  'https://storage.cloud.google.com/')
+                                                          ? data
+                                                              .achievementAchievementId!
+                                                              .image!
+                                                              .replaceFirst(
+                                                                  'https://storage.cloud.google.com/',
+                                                                  'https://storage.googleapis.com/')
+                                                          : data
+                                                              .achievementAchievementId!
+                                                              .image!,
                                                   fit: BoxFit.cover,
                                                   borderRadius:
                                                       BorderRadius.all(
@@ -272,7 +298,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
-                                                        3)),
+                                                        2)),
                                             Text(
                                               data.achievementAchievementId!
                                                       .title ??
@@ -293,9 +319,10 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                       vertical: 5),
                                               child: Text(
                                                 data.achievementAchievementId!
-                                                        .description ??
+                                                        .description
+                                                        ?.trim() ??
                                                     "",
-                                                maxLines: 1,
+                                                maxLines: 3,
                                                 textAlign: TextAlign.center,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
@@ -313,8 +340,9 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             Text(
                                               data.achievedDate!.isEmpty &&
                                                       data.achieved == false
-                                                  ? "Not achieved yet"
-                                                  : "Date Achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
+                                                  // ? "Not achieved yet"
+                                                  ? "${formatNumber(widget.item.currentValue ?? 0)}/${formatNumber(data.achievementAchievementId!.value ?? 0)} achieved."
+                                                  : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
                                               maxLines: 1,
                                               textAlign: TextAlign.center,
                                               overflow: TextOverflow.ellipsis,
@@ -332,7 +360,7 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
-                                                        3.5)),
+                                                        2.5)),
                                           ],
                                         ),
                                       ),
@@ -340,64 +368,69 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                   },
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.all(
-                                    ScreenUtil.horizontalScale(2)),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          try {
-                                            await screenshotController
-                                                .capture(
-                                                    delay: Duration(
-                                                        milliseconds: 200))
-                                                .then(
-                                              (image) async {
-                                                if (image == null) return;
-                                                final directory =
-                                                    await getTemporaryDirectory();
-                                                final imagePath = File(
-                                                    '${directory.path}/screenshot.png');
-                                                await imagePath
-                                                    .writeAsBytes(image);
-                                                await Share.shareXFiles(
-                                                    [XFile(imagePath.path)],
-                                                    text:
-                                                        'I just achieved ${widget.achievements[currentPage].achievementAchievementId?.title ?? ""} of Booty By Bret! Join me in the app at https://bootybybret.com');
+                              widget.achievements[currentPage].achieved == false
+                                  ? SizedBox()
+                                  : Padding(
+                                      padding: EdgeInsets.all(
+                                          ScreenUtil.horizontalScale(2)),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                try {
+                                                  await screenshotController
+                                                      .capture(
+                                                          delay: Duration(
+                                                              milliseconds:
+                                                                  200))
+                                                      .then(
+                                                    (image) async {
+                                                      if (image == null) return;
+                                                      final directory =
+                                                          await getTemporaryDirectory();
+                                                      final imagePath = File(
+                                                          '${directory.path}/screenshot.png');
+                                                      await imagePath
+                                                          .writeAsBytes(image);
+                                                      await Share.shareXFiles([
+                                                        XFile(imagePath.path)
+                                                      ],
+                                                          text:
+                                                              'I just achieved ${widget.achievements[currentPage].achievementAchievementId?.title ?? ""} of Booty By Bret! Join me in the app at https://bootybybret.com');
+                                                    },
+                                                  );
+                                                } catch (e) {
+                                                  debugPrint(
+                                                      'Error capturing and sharing screenshot: $e');
+                                                }
                                               },
-                                            );
-                                          } catch (e) {
-                                            debugPrint(
-                                                'Error capturing and sharing screenshot: $e');
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.blueColor,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: ScreenUtil
+                                                        .verticalScale(1.7)),
+                                              ),
+                                              child: Text(
+                                                "Share",
+                                                style: TextStyle(
+                                                  fontSize:
+                                                      ScreenUtil.verticalScale(
+                                                          2),
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                          backgroundColor: AppColors.blueColor,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical:
-                                                  ScreenUtil.verticalScale(
-                                                      1.7)),
-                                        ),
-                                        child: Text(
-                                          "Share",
-                                          style: TextStyle(
-                                            fontSize:
-                                                ScreenUtil.verticalScale(2),
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
+                                    )
                             ],
                           ),
                         ),
@@ -418,10 +451,12 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                             final progress = calculateStepProgress(
                                 currentValue: currentValue,
                                 thresholds: thresholds ?? []);
+
                             return Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(5)),
                               child: StepProgressBar(
+                                progress1: (currentPage + 1).toDouble(),
                                 stepHeight: ScreenUtil.verticalScale(1.5),
                                 onStepTap: (int index) {
                                   if (pageController.hasClients) {
@@ -481,6 +516,23 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
         ],
       ),
     );
+  }
+
+  String formatNumber(int number) {
+    try {
+      if (number >= 1000000) {
+        double result = number / 1000000;
+        return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}M';
+      } else if (number >= 1000) {
+        double result = number / 1000;
+        return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}k';
+      } else {
+        return number.toString();
+      }
+    } catch (e, stack) {
+      debugPrint('Error in formatNumber: $e\n$stack');
+      return number.toString();
+    }
   }
 
   double calculateStepProgress({

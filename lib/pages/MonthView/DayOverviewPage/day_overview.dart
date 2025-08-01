@@ -38,7 +38,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async => await initData());
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) async => await initData());
     super.initState();
   }
 
@@ -52,11 +53,19 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
 
     // monthProvider?.setInitialPumpDayValues();
 
-    int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
-        ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().replaceAll("Day ", "").replaceAll(" Workout", "")) - 1
+    int nextWorkOutIndex = monthProvider!.weekDataModel!.dayList![dayIndex - 1]
+            .toString()
+            .contains("Workout")
+        ? int.parse(monthProvider!.weekDataModel!.dayList![dayIndex - 1]
+                .toString()
+                .replaceAll("Day ", "")
+                .replaceAll(" Workout", "")) -
+            1
         : 0;
 
-    currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex - 1].toString().contains("Workout")
+    currentDayTitle = monthProvider!.weekDataModel!.dayList![dayIndex - 1]
+            .toString()
+            .contains("Workout")
         ? monthProvider!.weekDataModel!.days![nextWorkOutIndex].title ?? ""
         : monthProvider!.weekDataModel!.dayList![dayIndex - 1];
 
@@ -99,10 +108,12 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                  Consumer<MonthProvider>(
+                      builder: (context, monthProvider, child) {
                     return Stack(
                       children: [
-                        monthProvider.dayHistoryDetails?.status == Status.completed
+                        monthProvider.dayHistoryDetails?.status ==
+                                Status.completed
                             ? Container(
                                 height: media.height / 2,
                                 width: media.width,
@@ -121,7 +132,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                   child: Container(
                                     decoration: const BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage('assets/img/back.jpg'),
+                                        image:
+                                            AssetImage('assets/img/back.jpg'),
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -139,7 +151,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                   ),
                                 ),
                               ),
-                        monthProvider.dayHistoryDetails?.status == Status.completed
+                        monthProvider.dayHistoryDetails?.status ==
+                                Status.completed
                             ? Container(
                                 height: media.height / 2,
                                 width: media.width,
@@ -157,90 +170,124 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                   child: Column(
                                     children: [
                                       Container(
-                                        margin: const EdgeInsets.only(right: 10),
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Stack(
                                               children: [
                                                 Container(
                                                   margin: EdgeInsets.only(
-                                                    left: ScreenUtil.horizontalScale(4),
+                                                    left: ScreenUtil
+                                                        .horizontalScale(4),
                                                   ),
-                                                  decoration: const BoxDecoration(
+                                                  decoration:
+                                                      const BoxDecoration(
                                                     color: Color(0XFFd18a9b),
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: SizedBox(
-                                                    width: ScreenUtil.verticalScale(4.65),
-                                                    height: ScreenUtil.verticalScale(4.65),
+                                                    width: ScreenUtil
+                                                        .verticalScale(4.65),
+                                                    height: ScreenUtil
+                                                        .verticalScale(4.65),
                                                     child: IconButton(
                                                       padding: EdgeInsets.zero,
                                                       icon: const Icon(
-                                                        Icons.keyboard_arrow_left,
+                                                        Icons
+                                                            .keyboard_arrow_left,
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
                                                         // HapticFeedBack.buttonClick();
                                                         Navigator.pop(context);
                                                       },
-                                                      iconSize: ScreenUtil.verticalScale(4),
+                                                      iconSize: ScreenUtil
+                                                          .verticalScale(4),
                                                     ),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            const CommonStreakWithNotification(routeString: '/dayOverview')
+                                            const CommonStreakWithNotification(
+                                                routeString: '/dayOverview')
                                           ],
                                         ),
                                       ),
 
                                       Container(
                                         margin: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(8),
-                                          vertical: ScreenUtil.verticalScale(1.9),
+                                          horizontal:
+                                              ScreenUtil.horizontalScale(8),
+                                          vertical:
+                                              ScreenUtil.verticalScale(1.9),
                                         ),
                                         height: media.height * 0.22,
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             SizedBox(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
                                                   Text(
-                                                    DateFormat('MMM, yyyy').format(DateTime.now()),
+                                                    DateFormat('MMM, yyyy')
+                                                        .format(DateTime.now()),
                                                     style: TextStyle(
                                                       color: Colors.white,
-                                                      fontSize: ScreenUtil.verticalScale(2),
+                                                      fontSize: ScreenUtil
+                                                          .verticalScale(2),
                                                     ),
                                                   ),
                                                   SizedBox(height: 4),
                                                   monthProvider.currentWeek != 0
                                                       ? Padding(
-                                                          padding: const EdgeInsets.only(bottom: 5),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  bottom: 5),
                                                           child: Text(
                                                             "Week ${monthProvider.overviewCurrentWeek}, Day ${monthProvider.overviewCurrentDay}",
                                                             style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2),
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: ScreenUtil
+                                                                  .verticalScale(
+                                                                      2),
                                                             ),
                                                           ),
                                                         )
                                                       : const SizedBox(),
-                                                  Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                                  Consumer<MonthProvider>(
+                                                      builder: (context,
+                                                          monthProvider,
+                                                          child) {
                                                     return Padding(
-                                                      padding: const EdgeInsets.only(bottom: 5),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 5),
                                                       child: Text(
                                                         monthProvider.isPumpDay
-                                                            ? monthProvider.pumpDayModel?.title ?? "Pump Day"
+                                                            ? monthProvider
+                                                                    .pumpDayModel
+                                                                    ?.title ??
+                                                                "Pump Day"
                                                             : currentDayTitle,
-                                                        textAlign: TextAlign.center,
+                                                        textAlign:
+                                                            TextAlign.center,
                                                         style: TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: ScreenUtil.horizontalScale(6),
-                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: ScreenUtil
+                                                              .horizontalScale(
+                                                                  6),
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                         ),
                                                       ),
                                                     );
@@ -250,9 +297,12 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                             ),
                                             Container(
                                               margin: EdgeInsets.symmetric(
-                                                horizontal: ScreenUtil.horizontalScale(9),
+                                                horizontal:
+                                                    ScreenUtil.horizontalScale(
+                                                        9),
                                               ),
-                                              child: Builder(builder: (context) {
+                                              child:
+                                                  Builder(builder: (context) {
                                                 // String split = monthProvider
                                                 //         .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
                                                 //         .toString()
@@ -266,13 +316,18 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                   //     ? "Watch Video"
                                                   //     : "Watch Video Intro",
                                                   text: "Watch Video",
-                                                  color: const Color(0xEEFFFFFF),
+                                                  color:
+                                                      const Color(0xEEFFFFFF),
                                                   onPress: () {
                                                     Navigator.of(context).push(
-                                                      FadePageRoute(page: const VideoIntroWidget(vimeoId: '953289606')),
+                                                      FadePageRoute(
+                                                          page: const VideoIntroWidget(
+                                                              vimeoId:
+                                                                  '953289606')),
                                                     );
                                                   },
-                                                  textColor: AppColors.primaryColor,
+                                                  textColor:
+                                                      AppColors.primaryColor,
                                                   isLoading: false,
                                                 );
                                               }),
@@ -357,90 +412,124 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                   child: Column(
                                     children: [
                                       Container(
-                                        margin: const EdgeInsets.only(right: 10),
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Stack(
                                               children: [
                                                 Container(
                                                   margin: EdgeInsets.only(
-                                                    left: ScreenUtil.horizontalScale(4),
+                                                    left: ScreenUtil
+                                                        .horizontalScale(4),
                                                   ),
-                                                  decoration: const BoxDecoration(
+                                                  decoration:
+                                                      const BoxDecoration(
                                                     color: Color(0XFFd18a9b),
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: SizedBox(
-                                                    width: ScreenUtil.verticalScale(4.65),
-                                                    height: ScreenUtil.verticalScale(4.65),
+                                                    width: ScreenUtil
+                                                        .verticalScale(4.65),
+                                                    height: ScreenUtil
+                                                        .verticalScale(4.65),
                                                     child: IconButton(
                                                       padding: EdgeInsets.zero,
                                                       icon: const Icon(
-                                                        Icons.keyboard_arrow_left,
+                                                        Icons
+                                                            .keyboard_arrow_left,
                                                         color: Colors.white,
                                                       ),
                                                       onPressed: () {
                                                         // HapticFeedBack.buttonClick();
                                                         Navigator.pop(context);
                                                       },
-                                                      iconSize: ScreenUtil.verticalScale(4),
+                                                      iconSize: ScreenUtil
+                                                          .verticalScale(4),
                                                     ),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            const CommonStreakWithNotification(routeString: '/dayOverview')
+                                            const CommonStreakWithNotification(
+                                                routeString: '/dayOverview')
                                           ],
                                         ),
                                       ),
 
                                       Container(
                                         margin: EdgeInsets.symmetric(
-                                          horizontal: ScreenUtil.horizontalScale(8),
-                                          vertical: ScreenUtil.verticalScale(1.9),
+                                          horizontal:
+                                              ScreenUtil.horizontalScale(8),
+                                          vertical:
+                                              ScreenUtil.verticalScale(1.9),
                                         ),
                                         height: media.height * 0.22,
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             SizedBox(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
                                                   Text(
-                                                    DateFormat('MMM, yyyy').format(DateTime.now()),
+                                                    DateFormat('MMM, yyyy')
+                                                        .format(DateTime.now()),
                                                     style: TextStyle(
                                                       color: Colors.white,
-                                                      fontSize: ScreenUtil.verticalScale(2),
+                                                      fontSize: ScreenUtil
+                                                          .verticalScale(2),
                                                     ),
                                                   ),
                                                   SizedBox(height: 4),
                                                   monthProvider.currentWeek != 0
                                                       ? Padding(
-                                                          padding: const EdgeInsets.only(bottom: 5),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  bottom: 5),
                                                           child: Text(
                                                             "Week ${monthProvider.overviewCurrentWeek}, Day ${monthProvider.overviewCurrentDay}",
                                                             style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: ScreenUtil.verticalScale(2),
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: ScreenUtil
+                                                                  .verticalScale(
+                                                                      2),
                                                             ),
                                                           ),
                                                         )
                                                       : const SizedBox(),
-                                                  Consumer<MonthProvider>(builder: (context, monthProvider, child) {
+                                                  Consumer<MonthProvider>(
+                                                      builder: (context,
+                                                          monthProvider,
+                                                          child) {
                                                     return Padding(
-                                                      padding: const EdgeInsets.only(bottom: 5),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 5),
                                                       child: Text(
                                                         monthProvider.isPumpDay
-                                                            ? monthProvider.pumpDayModel?.title ?? "Pump Day"
+                                                            ? monthProvider
+                                                                    .pumpDayModel
+                                                                    ?.title ??
+                                                                "Pump Day"
                                                             : currentDayTitle,
-                                                        textAlign: TextAlign.center,
+                                                        textAlign:
+                                                            TextAlign.center,
                                                         style: TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: ScreenUtil.horizontalScale(6),
-                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: ScreenUtil
+                                                              .horizontalScale(
+                                                                  6),
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                         ),
                                                       ),
                                                     );
@@ -450,9 +539,12 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                             ),
                                             Container(
                                               margin: EdgeInsets.symmetric(
-                                                horizontal: ScreenUtil.horizontalScale(9),
+                                                horizontal:
+                                                    ScreenUtil.horizontalScale(
+                                                        9),
                                               ),
-                                              child: Builder(builder: (context) {
+                                              child:
+                                                  Builder(builder: (context) {
                                                 // String split = monthProvider
                                                 //         .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
                                                 //         .toString()
@@ -466,13 +558,18 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                                   //     ? "Watch Video"
                                                   //     : "Watch Video Intro",
                                                   text: "Watch Video",
-                                                  color: const Color(0xEEFFFFFF),
+                                                  color:
+                                                      const Color(0xEEFFFFFF),
                                                   onPress: () {
                                                     Navigator.of(context).push(
-                                                      FadePageRoute(page: const VideoIntroWidget(vimeoId: '953289606')),
+                                                      FadePageRoute(
+                                                          page: const VideoIntroWidget(
+                                                              vimeoId:
+                                                                  '953289606')),
                                                     );
                                                   },
-                                                  textColor: AppColors.primaryColor,
+                                                  textColor:
+                                                      AppColors.primaryColor,
                                                   isLoading: false,
                                                 );
                                               }),
@@ -590,7 +687,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(10)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -605,21 +703,50 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                                   Consumer<MonthProvider>(
                                     builder: (context, monthProvider, child) {
                                       String split = monthProvider
-                                              .monthDataModel?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                                              .monthDataModel
+                                              ?.weeks?[monthProvider
+                                                      .overviewCurrentWeek -
+                                                  1]
+                                              .idList
+                                              ?.first
                                               .toString()
                                               .split(" ")[1] ??
                                           "";
-                                      return monthProvider.dayDataModel!.formats != null &&
-                                              monthProvider.dayDataModel!.formats!.contains(split.toString().replaceAll("split", "")) &&
+                                      return monthProvider
+                                                      .dayDataModel!.formats !=
+                                                  null &&
+                                              monthProvider
+                                                  .dayDataModel!.formats!
+                                                  .contains(split
+                                                      .toString()
+                                                      .replaceAll(
+                                                          "split", "")) &&
                                               !monthProvider.isPumpDay
-                                          ? BulletPoint(text: monthProvider.dayDataModel!.description!)
+                                          ? BulletPoint(
+                                              text: monthProvider
+                                                  .dayDataModel!.description!)
                                           : monthProvider.isPumpDay
                                               ? BulletPoint(
-                                                  text: (context.watch<MonthProvider>().pumpDayModel?.description ?? ""),
+                                                  text: (context
+                                                          .watch<
+                                                              MonthProvider>()
+                                                          .pumpDayModel
+                                                          ?.description ??
+                                                      ""),
                                                 )
-                                              : monthProvider.restDayModel[monthProvider.overviewCurrentWeek - 1].description!.isNotEmpty
+                                              : monthProvider
+                                                      .restDayModel[monthProvider
+                                                              .overviewCurrentWeek -
+                                                          1]
+                                                      .description!
+                                                      .isNotEmpty
                                                   ? BulletPoint(
-                                                      text: monthProvider.restDayModel[monthProvider.overviewCurrentWeek - 1].description!,
+                                                      text: monthProvider
+                                                          .restDayModel[
+                                                              monthProvider
+                                                                      .overviewCurrentWeek -
+                                                                  1]
+                                                          .description!,
                                                     )
                                                   : const SizedBox();
                                     },
@@ -649,7 +776,11 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                     vertical: ScreenUtil.verticalScale(2),
                   ),
                   child: Builder(builder: (context) {
-                    String split = monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+                    String split = monthProvider
+                            ?.monthDataModel
+                            ?.weeks?[monthProvider!.overviewCurrentWeek - 1]
+                            .idList
+                            ?.first
                             .toString()
                             .split(" ")[1] ??
                         "";
@@ -657,13 +788,17 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (monthProvider?.dayDataModel!.formats != null &&
-                            monthProvider!.dayDataModel!.formats!.contains(split.toString().replaceAll("split", ""))) ...[
+                            monthProvider!.dayDataModel!.formats!.contains(
+                                split.toString().replaceAll("split", ""))) ...[
                           Container(
-                            margin: EdgeInsets.only(left: ScreenUtil.verticalScale(2)),
+                            margin: EdgeInsets.only(
+                                left: ScreenUtil.verticalScale(2)),
                             child: Text(
                               'Choose equipment availability',
                               textAlign: TextAlign.left,
-                              style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.verticalScale(1.5)),
+                              style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: ScreenUtil.verticalScale(1.5)),
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -686,7 +821,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                     VoidCallback? onPress;
                     Color buttonColor = AppColors.primaryColor;
 
-                    if (currentDayTitle.contains("Rest Day") && monthProvider.isPastWeek) {
+                    if (currentDayTitle.contains("Rest Day") &&
+                        monthProvider.isPastWeek) {
                       if (monthProvider.isPumpDay) {
                         buttonText = "View the workout";
                         onPress = () {
@@ -694,12 +830,16 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                           Navigator.pushNamed(context, '/today');
                         };
                       } else {
-                        buttonText = monthProvider.dayHistoryDetails?.status == Status.completed ? "Completed" : "Skipped";
+                        buttonText = monthProvider.dayHistoryDetails?.status ==
+                                Status.completed
+                            ? "Completed"
+                            : "Skipped";
                         onPress = null;
                       }
                     } else if (monthProvider.isPumpDay &&
                         !monthProvider.isPastWeek &&
-                        monthProvider.dayHistoryDetails?.status == Status.skipped) {
+                        monthProvider.dayHistoryDetails?.status ==
+                            Status.skipped) {
                       buttonText = "Skipped. View here";
                       onPress = () {
                         // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
@@ -710,8 +850,10 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       };
                     } else if (monthProvider.isPastWeek ||
                         (monthProvider.isPumpDay &&
-                            (monthProvider.dayHistoryDetails?.status == Status.completed ||
-                                monthProvider.dayHistoryDetails?.status == Status.skipped))) {
+                            (monthProvider.dayHistoryDetails?.status ==
+                                    Status.completed ||
+                                monthProvider.dayHistoryDetails?.status ==
+                                    Status.skipped))) {
                       buttonText = "View the workout";
                       onPress = () {
                         // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
@@ -720,30 +862,40 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                         HapticFeedBack.buttonClick();
                         Navigator.pushNamed(context, '/today');
                       };
-                    } else if (currentDayTitle.contains("Rest Day") && (monthProvider.isPumpDay)) {
-                      if (monthProvider.dayHistoryDetails?.status == Status.skipped ||
-                          monthProvider.dayHistoryDetails?.status == Status.completed) {
+                    } else if (currentDayTitle.contains("Rest Day") &&
+                        (monthProvider.isPumpDay)) {
+                      if (monthProvider.dayHistoryDetails?.status ==
+                              Status.skipped ||
+                          monthProvider.dayHistoryDetails?.status ==
+                              Status.completed) {
                         return const SizedBox();
                       } else {
                         buttonText = !monthProvider.isPumpDay
                             ? "Mark Complete"
-                            : monthProvider.dayHistoryDetails?.status == Status.started ||
-                                    monthProvider.dayHistoryDetails?.status == Status.completed
+                            : monthProvider.dayHistoryDetails?.status ==
+                                        Status.started ||
+                                    monthProvider.dayHistoryDetails?.status ==
+                                        Status.completed
                                 ? "View the workout"
-                                : monthProvider.dayHistoryDetails?.status == Status.skipped
+                                : monthProvider.dayHistoryDetails?.status ==
+                                        Status.skipped
                                     ? "Skipped. View here"
                                     : "Start the workout";
 
                         onPress = () async {
                           HapticFeedBack.buttonClick();
                           if (!monthProvider.isPumpDay) {
-                            monthProvider
-                                .updateCurrentDayTitleId(monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]);
-                            await _saveDayData(status: Status.completed, type: 'Rest Day');
-                            Navigator.pushNamed(context, '/dayCompleted');
-                          } else if (buttonText == "Start the workout" || buttonText == "View the workout") {
+                            monthProvider.updateCurrentDayTitleId(
+                                monthProvider.weekDataModel?.idList![
+                                    monthProvider.overviewCurrentDay - 1]);
                             await _saveDayData(
-                              type: "Pump Day - ${monthProvider.pumpDayModel?.id}",
+                                status: Status.completed, type: 'Rest Day');
+                            Navigator.pushNamed(context, '/dayCompleted');
+                          } else if (buttonText == "Start the workout" ||
+                              buttonText == "View the workout") {
+                            await _saveDayData(
+                              type:
+                                  "Pump Day - ${monthProvider.pumpDayModel?.id}",
                               status: Status.started,
                               title: monthProvider.pumpDayModel?.title,
                             );
@@ -761,7 +913,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                         };
 
                         return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(10)),
                           child: ButtonWidget(
                             text: buttonText,
                             textColor: Colors.white,
@@ -897,30 +1050,41 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       }
                     } else {
                       if (currentDayTitle.contains("Rest Day") &&
-                          (monthProvider.dayHistoryDetails?.status == Status.skipped ||
-                              monthProvider.dayHistoryDetails?.status == Status.completed)) {
+                          (monthProvider.dayHistoryDetails?.status ==
+                                  Status.skipped ||
+                              monthProvider.dayHistoryDetails?.status ==
+                                  Status.completed)) {
                         return const SizedBox();
                       }
                       buttonText = currentDayTitle.contains("Rest Day")
                           ? "Mark Complete"
-                          : monthProvider.dayHistoryDetails?.status == Status.started ||
-                                  monthProvider.dayHistoryDetails?.status == Status.completed
+                          : monthProvider.dayHistoryDetails?.status ==
+                                      Status.started ||
+                                  monthProvider.dayHistoryDetails?.status ==
+                                      Status.completed
                               ? "View the workout"
-                              : monthProvider.dayHistoryDetails?.status == Status.skipped
+                              : monthProvider.dayHistoryDetails?.status ==
+                                      Status.skipped
                                   ? "Skipped. View here"
                                   : "Start the workout";
 
                       onPress = () async {
                         HapticFeedBack.buttonClick();
                         if (currentDayTitle.contains("Rest Day")) {
-                          monthProvider.updateCurrentDayTitleId(monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]);
-                          await _saveDayData(status: Status.completed, type: 'Rest Day');
+                          monthProvider.updateCurrentDayTitleId(monthProvider
+                              .weekDataModel
+                              ?.idList![monthProvider.overviewCurrentDay - 1]);
+                          await _saveDayData(
+                              status: Status.completed, type: 'Rest Day');
                           Navigator.pushNamed(context, '/dayCompleted');
                         } else {
-                          if (monthProvider.dayHistoryDetails?.status != Status.skipped &&
-                              monthProvider.dayHistoryDetails?.status != Status.completed) {
+                          if (monthProvider.dayHistoryDetails?.status !=
+                                  Status.skipped &&
+                              monthProvider.dayHistoryDetails?.status !=
+                                  Status.completed) {
                             monthProvider.changeIsPumpDay(false);
-                            await _saveDayData(status: Status.started, type: 'Workout Day');
+                            await _saveDayData(
+                                status: Status.started, type: 'Workout Day');
                           }
                           if (!context.mounted) return;
                           // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
@@ -933,7 +1097,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
 
                     return buttonText.isNotEmpty
                         ? Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(10)),
                             child: ButtonWidget(
                               text: buttonText,
                               textColor: Colors.white,
@@ -953,11 +1118,13 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                     }
 
                     if (currentDayTitle.contains("Rest Day") &&
-                        monthProvider.dayHistoryDetails?.status == Status.completed &&
+                        monthProvider.dayHistoryDetails?.status ==
+                            Status.completed &&
                         !monthProvider.isPumpDay) {
                       return Container(
                         color: Colors.white,
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.horizontalScale(10)),
                         child: const ButtonWidget(
                           text: "Completed",
                           textColor: Colors.white,
@@ -968,11 +1135,18 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       );
                     }
 
-                    if (monthProvider.dayHistoryDetails?.status != Status.completed) {
-                      String buttonText = monthProvider.dayHistoryDetails?.status == Status.skipped ? "Unskip?" : "Skip Day";
+                    if (monthProvider.dayHistoryDetails?.status !=
+                        Status.completed) {
+                      String buttonText =
+                          monthProvider.dayHistoryDetails?.status ==
+                                  Status.skipped
+                              ? "Unskip?"
+                              : "Skip Day";
                       onPress() async {
                         HapticFeedBack.buttonClick();
-                        bool isSkipped = monthProvider.dayHistoryDetails?.status == Status.skipped;
+                        bool isSkipped =
+                            monthProvider.dayHistoryDetails?.status ==
+                                Status.skipped;
                         String newStatus = isSkipped ? '' : Status.skipped;
 
                         String type = monthProvider.isPumpDay
@@ -996,7 +1170,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
                       }
 
                       return Container(
-                        margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10)),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.horizontalScale(10)),
                         child: ButtonWidget(
                           text: buttonText,
                           textColor: Colors.white,
@@ -1016,9 +1191,15 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
           );
   }
 
-  Future<void> _skipExerciseData({required String status, required String id, required String type}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  Future<void> _skipExerciseData(
+      {required String status,
+      required String id,
+      required String type}) async {
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
 
@@ -1027,7 +1208,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
       "exerciseId": id.toString(),
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
@@ -1047,34 +1229,48 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
     };
 
     if (monthProvider!.exerciseHistoryModel.isNotEmpty) {
-      if (monthProvider!.exerciseHistoryModel.any((element) => element.dataId == dataId)) {
+      if (monthProvider!.exerciseHistoryModel
+          .any((element) => element.dataId == dataId)) {
         ApiRepo.updateExerciseStatus(body: apiReqBody);
-        await DatabaseHelper().updateData(data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
+        await DatabaseHelper().updateData(
+            data: data1, tableName: DatabaseHelper.exerciseStatus, id: dataId);
       } else {
         ApiRepo.addExerciseStatus(body: data);
-        await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+        await DatabaseHelper()
+            .insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
       }
     } else {
       ApiRepo.addExerciseStatus(body: data);
-      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
+      await DatabaseHelper()
+          .insertData(data: data, tableName: DatabaseHelper.exerciseStatus);
     }
   }
 
-  Future<void> _unskipExerciseData({required String status, required String id, required String type}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  Future<void> _unskipExerciseData(
+      {required String status,
+      required String id,
+      required String type}) async {
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
     final data = {"status": status, "type": type};
     final apiReqBody = {"status": status, "type": type, "dataId": dataId};
     ApiRepo.updateExerciseStatus(body: apiReqBody);
-    await DatabaseHelper().updateData(tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
+    await DatabaseHelper().updateData(
+        tableName: DatabaseHelper.exerciseStatus, id: dataId, data: data);
   }
 
   Future<void> unSkipped(String status) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     if (monthProvider!.isPumpDay) {
       if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
@@ -1086,45 +1282,63 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
               var elementZ = elementI.circuitExercises?[z];
               String dataId =
                   "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j:$z";
-              bool? val =
-                  monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
+              bool? val = monthProvider?.exerciseHistoryModel.any((element) =>
+                  element.dataId == dataId && element.status == Status.skipped);
               if (val == true) {
-                await _unskipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
+                await _unskipExerciseData(
+                    status: status,
+                    id: "${elementZ?.exerciseId}-$i:$j:$z",
+                    type: 'Circuit - $i:$j:$z');
               }
             }
           }
         }
       }
     }
-    if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises != null : monthProvider!.dayDataModel!.exercises != null) {
-      final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.exercises : monthProvider!.dayDataModel!.exercises;
+    if (monthProvider!.isPumpDay
+        ? monthProvider!.pumpDayModel!.exercises != null
+        : monthProvider!.dayDataModel!.exercises != null) {
+      final data = monthProvider!.isPumpDay
+          ? monthProvider!.pumpDayModel!.exercises
+          : monthProvider!.dayDataModel!.exercises;
       for (int i = 0; i < data!.length; i++) {
         var elementI = data[i];
         String dataId =
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) =>
+            element.dataId == dataId && element.status == Status.skipped);
         if (val == true) {
-          await _unskipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
+          await _unskipExerciseData(
+              status: status, id: elementI.exerciseId!, type: 'Exercise');
         }
       }
     }
-    if (monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups != null : monthProvider!.dayDataModel!.warmups != null) {
-      final data = monthProvider!.isPumpDay ? monthProvider!.pumpDayModel!.warmups : monthProvider!.dayDataModel!.warmups;
+    if (monthProvider!.isPumpDay
+        ? monthProvider!.pumpDayModel!.warmups != null
+        : monthProvider!.dayDataModel!.warmups != null) {
+      final data = monthProvider!.isPumpDay
+          ? monthProvider!.pumpDayModel!.warmups
+          : monthProvider!.dayDataModel!.warmups;
       for (int i = 0; i < data!.length; i++) {
         var elementI = data[i];
         String dataId =
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
-        bool? val = monthProvider?.exerciseHistoryModel.any((element) => element.dataId == dataId && element.status == Status.skipped);
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) =>
+            element.dataId == dataId && element.status == Status.skipped);
         if (val == true) {
-          await _unskipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
+          await _unskipExerciseData(
+              status: status, id: elementI.warmupId!, type: 'Warmup');
         }
       }
     }
   }
 
   Future<void> skipped(String status) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     if (monthProvider!.isPumpDay) {
       if (monthProvider!.pumpDayModel!.circuits!.isNotEmpty) {
@@ -1136,10 +1350,15 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
               var elementZ = elementI.circuitExercises?[z];
               String dataId =
                   "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementZ?.exerciseId}-$i:$j";
-              bool? val = monthProvider?.exerciseHistoryModel
-                  .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
+              bool? val = monthProvider?.exerciseHistoryModel.any((element) =>
+                  element.dataId == dataId &&
+                  (element.status == Status.completed ||
+                      element.status == Status.skipped));
               if (val == false) {
-                await _skipExerciseData(status: status, id: "${elementZ?.exerciseId}-$i:$j:$z", type: 'Circuit - $i:$j:$z');
+                await _skipExerciseData(
+                    status: status,
+                    id: "${elementZ?.exerciseId}-$i:$j:$z",
+                    type: 'Circuit - $i:$j:$z');
               }
             }
           }
@@ -1152,10 +1371,13 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
         var elementI = data[i];
         String dataId =
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-        bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) =>
+            element.dataId == dataId &&
+            (element.status == Status.completed ||
+                element.status == Status.skipped));
         if (val == false) {
-          await _skipExerciseData(status: status, id: elementI.exerciseId!, type: 'Exercise');
+          await _skipExerciseData(
+              status: status, id: elementI.exerciseId!, type: 'Exercise');
         }
       }
     }
@@ -1165,18 +1387,25 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
         var elementI = data[i];
         String dataId =
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${elementI.warmupId}";
-        bool? val = monthProvider?.exerciseHistoryModel
-            .any((element) => element.dataId == dataId && (element.status == Status.completed || element.status == Status.skipped));
+        bool? val = monthProvider?.exerciseHistoryModel.any((element) =>
+            element.dataId == dataId &&
+            (element.status == Status.completed ||
+                element.status == Status.skipped));
         if (val == false) {
-          await _skipExerciseData(status: status, id: elementI.warmupId!, type: 'Warmup');
+          await _skipExerciseData(
+              status: status, id: elementI.warmupId!, type: 'Warmup');
         }
       }
     }
   }
 
-  Future<void> _skipUnskipDayData({required String status, required String type, String? title}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  Future<void> _skipUnskipDayData(
+      {required String status, required String type, String? title}) async {
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     if (type != "Rest Day" || monthProvider!.isPumpDay) {
       if (status == Status.skipped) {
@@ -1194,7 +1423,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
       "dataId": dataId,
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
@@ -1203,7 +1433,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
       "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
     };
 
-    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+    DayHistoryModel? matchingElement =
+        monthProvider?.dayHistoryModel.firstWhere(
       (element) => element.dataId == dataId,
       orElse: () => DayHistoryModel(),
     );
@@ -1234,10 +1465,12 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
 
     if (matchingElement?.id != null) {
       ApiRepo.updateDayStatus(body: apiBody);
-      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+      await DatabaseHelper().updateData(
+          tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
       ApiRepo.addDayStatus(body: data);
-      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+      await DatabaseHelper()
+          .insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
     await monthProvider?.fetchExerciseHistoryLocalData();
@@ -1251,9 +1484,13 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
     monthProvider?.getLiftedWeightGraphData();
   }
 
-  Future<void> _saveDayData({required String status, required String type, String? title}) async {
-    String split =
-        monthProvider?.monthDataModel?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first.toString().split(" ")[1] ?? "";
+  Future<void> _saveDayData(
+      {required String status, required String type, String? title}) async {
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
@@ -1263,16 +1500,21 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
       "dataId": dataId,
       "monthId": monthProvider?.monthDataModel?.id,
       "weekId": monthProvider?.weekDataModel?.id,
-      "dayId": monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
+      "dayId": monthProvider
+          ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
       "date": "${DateTime.now().toUtc()}",
       "status": status,
       "type": type,
-      "startTime": (status == Status.started || status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "startTime": (status == Status.started || status == Status.completed)
+          ? "${DateTime.now().toUtc()}"
+          : "",
+      "endTime":
+          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
     };
 
-    DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel.firstWhere(
+    DayHistoryModel? matchingElement =
+        monthProvider?.dayHistoryModel.firstWhere(
       (element) => element.dataId == dataId,
       orElse: () => DayHistoryModel(),
     );
@@ -1286,7 +1528,8 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime":
+          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
     };
     final apiBody = {
       "title": title ?? "",
@@ -1297,16 +1540,19 @@ class _DayOverviewPageState extends State<DayOverviewPage> {
           : matchingElement?.startTime == null
               ? "${DateTime.now().toUtc()}"
               : matchingElement?.startTime.toString(),
-      "endTime": (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime":
+          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
       "dataId": dataId,
     };
 
     if (matchingElement?.id != null) {
       ApiRepo.updateDayStatus(body: apiBody);
-      await DatabaseHelper().updateData(tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
+      await DatabaseHelper().updateData(
+          tableName: DatabaseHelper.dayStatus, id: dataId, data: data1);
     } else {
       ApiRepo.addDayStatus(body: data);
-      await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.dayStatus);
+      await DatabaseHelper()
+          .insertData(data: data, tableName: DatabaseHelper.dayStatus);
     }
 
     await monthProvider?.fetchDayStatusLocalData();
@@ -1333,7 +1579,9 @@ class BulletPoint extends StatelessWidget {
           text != ""
               ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   SizedBox(height: ScreenUtil.verticalScale(1.3)),
-                  Icon(Icons.circle, size: ScreenUtil.verticalScale(0.6), color: Colors.black54),
+                  Icon(Icons.circle,
+                      size: ScreenUtil.verticalScale(0.6),
+                      color: Colors.black54),
                 ])
               : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   SizedBox(height: ScreenUtil.verticalScale(1.3)),

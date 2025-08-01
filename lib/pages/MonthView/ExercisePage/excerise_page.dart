@@ -31,6 +31,7 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -83,14 +84,6 @@ class _ExercisePageState extends State<ExercisePage>
   late VideoPlayerController _videoPlayerController1;
   ChewieController? _chewieController1;
   late Size videoSize1;
-
-  muteUnMute() async {
-    isMute = !isMute;
-
-    _videoPlayerController.setVolume(isMute ? 1 : 0);
-    setState(() {});
-    await preferences.setBool(SharedPreference.isMute, isMute);
-  }
 
   Future<void> fetchTutorialData() async {
     setState(() {
@@ -215,7 +208,7 @@ class _ExercisePageState extends State<ExercisePage>
       {required BuildContext context, required double aspectRatio}) {
     double maxWidth =
         ScreenUtil.horizontalScale(100) - ScreenUtil.horizontalScale(13.4);
-    double maxHeight = MediaQuery.of(context).size.height * 0.825;
+    double maxHeight = MediaQuery.of(context).size.height * 0.83;
     double calculatedHeight = maxWidth / aspectRatio;
     if (calculatedHeight > maxHeight) {
       calculatedHeight = maxHeight;
@@ -227,7 +220,6 @@ class _ExercisePageState extends State<ExercisePage>
 
   @override
   void initState() {
-    log('1==========>>>>>${DateTime.now()}');
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider1 = Provider.of<DataProvider>(context, listen: false);
 
@@ -239,73 +231,62 @@ class _ExercisePageState extends State<ExercisePage>
           SharedPreference.inTheExerciseScreenOrNot, "YES");
       await preferences.clearValue(SharedPreference.fromNotification);
     });
-    log('2==========>>>>>${DateTime.now()}');
-
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      String isChecked =
-          preferences.getString(SharedPreference.exerciseTutorial) ?? "";
-      if (isChecked != "true") {
-        log('11==========>>>>>${DateTime.now()}');
-
-        fetchTutorialData().then(
-          (value) async {
-            argument = ModalRoute.of(context)?.settings.arguments as String?;
-            setState(() => loading = true);
-            if (argument != "Exercise") {
-              await fromNotification()
-                  .then((value) => clearNotificationAndNavigateExercise());
-            } else {
-              await fetchExercise()
-                  .then((value) => clearNotificationAndNavigateExercise());
-            }
-          },
+      // String isChecked =
+      //     preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+      // if (isChecked != "true") {
+      //   fetchTutorialData().then(
+      //     (value) async {
+      //       argument = ModalRoute.of(context)?.settings.arguments as String?;
+      //       setState(() => loading = true);
+      //       if (argument != "Exercise") {
+      //         await fromNotification()
+      //             .then((value) => clearNotificationAndNavigateExercise());
+      //       } else {
+      //         await fetchExercise()
+      //             .then((value) => clearNotificationAndNavigateExercise());
+      //       }
+      //     },
+      //   );
+      // } else {
+      argument = ModalRoute.of(context)?.settings.arguments as String?;
+      setState(() => loading = true);
+      if (argument != "Exercise") {
+        await fromNotification().then(
+          (value) => clearNotificationAndNavigateExercise(),
         );
-        log('22==========>>>>>${DateTime.now()}');
       } else {
-        log('33==========>>>>>${DateTime.now()}');
-
-        argument = ModalRoute.of(context)?.settings.arguments as String?;
-        setState(() => loading = true);
-        if (argument != "Exercise") {
-          await fromNotification().then(
-            (value) => clearNotificationAndNavigateExercise(),
-          );
-        } else {
-          await fetchExercise().then(
-            (value) => clearNotificationAndNavigateExercise(),
-          );
-        }
-        log('44==========>>>>>${DateTime.now()}');
+        await fetchExercise().then(
+          (value) => clearNotificationAndNavigateExercise(),
+        );
       }
+      // }
     });
-    log('3==========>>>>>${DateTime.now()}');
-
     WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) => monthProvider?.fetchExerciseHistroy());
-    log('5==========>>>>>${DateTime.now()}');
-
     super.initState();
   }
 
   clearNotificationAndNavigateExercise() async {
-    String isChecked =
-        preferences.getString(SharedPreference.exerciseTutorial) ?? "";
+    // String isChecked =
+    //     preferences.getString(SharedPreference.exerciseTutorial) ?? "";
 
-    await Future.delayed(Duration(milliseconds: 800)).then(
-      (value) async => await NotificationService.clearNotification(10).then(
-        (value) async {
-          if (isChecked != "true") {
-            if (_chewieController1 != null && !loading1) {
-              await Future.delayed(Duration(milliseconds: 100)).then(
-                (value) {
-                  tutorialVideo(context);
-                },
-              );
-            }
-          }
-        },
-      ),
-    );
+    await Future.delayed(Duration(milliseconds: 1))
+        .then((value) async => await NotificationService.clearNotification(10)
+            // .then(
+            //   (value) async {
+            //     if (isChecked != "true") {
+            //       if (_chewieController1 != null && !loading1) {
+            //         await Future.delayed(Duration(milliseconds: 100)).then(
+            //           (value) {
+            //             tutorialVideo(context);
+            //           },
+            //         );
+            //       }
+            //     }
+            //   },
+            // ),
+            );
   }
 
   Future<void> fromNotification() async {
@@ -432,19 +413,11 @@ class _ExercisePageState extends State<ExercisePage>
       bool? isPumpDay,
       bool? isCircuit,
       String? circuitIndex}) async {
-    log('111==========>>>>>${DateTime.now()}');
-
     if (monthProvider?.isWarmup == false) {
-      log('222==========>>>>>${DateTime.now()}');
-
       await monthProvider?.fetchCurrentExercise(
           exerciseId ?? monthProvider!.selectedExercise!.exerciseId.toString());
-      log('333==========>>>>>${DateTime.now()}');
-
       isExercise = 1;
       this.exerciseIndex = exerciseIndex ?? monthProvider!.selectedExIndex;
-      log('444==========>>>>>${DateTime.now()}');
-
       // if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
       //   initializeVideo(monthProvider!.exerciseDetailModel!.files!.first.link!);
       // } else {
@@ -455,18 +428,13 @@ class _ExercisePageState extends State<ExercisePage>
         exerciseDesc = monthProvider!.exerciseDetailModel?.description ?? "";
         exerciseName = monthProvider!.exerciseDetailModel?.title ?? "";
       }
-      log('555==========>>>>>${DateTime.now()}');
     } else {
-      log('666==========>>>>>${DateTime.now()}');
-
       await monthProvider!.fetchWarmUp(monthProvider!.warmupId).then(
         (value) {
           exerciseDesc = monthProvider!.warmUpModel?.description ?? "";
           exerciseName = monthProvider!.warmUpModel?.title ?? "";
         },
       );
-      log('777==========>>>>>${DateTime.now()}');
-
       // if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
       //   initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
       // } else {
@@ -474,16 +442,10 @@ class _ExercisePageState extends State<ExercisePage>
       //   videoNotInitialized = false;
       // }
     }
-    log('888==========>>>>>${DateTime.now()}');
-
     monthProvider?.fetchExerciseHistoryLocalData();
     monthProvider?.fetchExerciseStatusLocalData();
-    log('999==========>>>>>${DateTime.now()}');
-
     if (monthProvider?.isWarmup == false &&
         monthProvider?.isCurrentMonth != "Future") {
-      log('101010==========>>>>>${DateTime.now()}');
-
       if (monthProvider?.exerciseDetailModel != null) {
         String exId = (isPumpDay ?? monthProvider!.isPumpDay) &&
                 (isCircuit ?? monthProvider!.isCircuit)
@@ -500,11 +462,7 @@ class _ExercisePageState extends State<ExercisePage>
             "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
 
         fetchExtraSetLocalData(dataId);
-        log('111111==========>>>>>${DateTime.now()}');
-
         await monthProvider?.fetchExerciseSingleExerciseLocalData(dataId);
-        log('121212==========>>>>>${DateTime.now()}');
-
         // isCurrentDayCompleted =
         //     monthProvider?.dayHistoryDetails?.status == Status.completed;
         // isCurrentDaySkipped = monthProvider?.dayHistoryDetails?.status ==
@@ -536,14 +494,10 @@ class _ExercisePageState extends State<ExercisePage>
 
         isEditable = !(isCurrentDayCompleted || isCurrentDaySkipped);
         findIsAtLeastOnSet();
-        log('131313==========>>>>>${DateTime.now()}');
       }
     }
     setState(() => loading = false);
-    log('141414==========>>>>>${DateTime.now()}');
-
     videoInitialize();
-    log('151515==========>>>>>${DateTime.now()}');
   }
 
   bool videoNotAvailable = false;
@@ -607,70 +561,109 @@ class _ExercisePageState extends State<ExercisePage>
     setState(() {});
   }
 
+  muteUnMute() async {
+    isMute = !isMute;
+
+    _videoPlayerController.setVolume(isMute ? 1 : 0);
+    setState(() {});
+
+    if (_videoPlayerController.value.volume == 0) {
+      final videoPlay = _videoPlayerController.value.isPlaying;
+
+      await AudioManager.abandonAudioFocus().then((value) async {
+        await Future.delayed(Duration(milliseconds: 20));
+        if (videoPlay) {
+          return _videoPlayerController.play();
+        }
+      });
+    }
+
+    setState(() {});
+    await preferences.setBool(SharedPreference.isMute, isMute);
+  }
+
   Future<void> initializeVideo(String url) async {
     try {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) async {
-          _videoPlayerController = VideoPlayerController.networkUrl(
-              Uri.parse(url),
-              videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
-
-          await _videoPlayerController.initialize().then(
-            (value) {
-              AudioManager.requestAudioFocus();
-            },
-          );
-
-          await _videoPlayerController.setLooping(true);
-
-          _chewieController = ChewieController(
-            videoPlayerController: _videoPlayerController,
-            autoPlay: false,
-            looping: true,
-            showControls: false,
-            aspectRatio: _videoPlayerController.value.aspectRatio,
-          );
-          bool rawData =
-              await preferences.getBool(SharedPreference.isMute) ?? true;
-          _videoPlayerController.setVolume(rawData ? 1 : 0);
-          isMute = rawData;
-          if (_chewieController != null &&
-              _chewieController!.videoPlayerController.value.isInitialized) {
-            videoSize = calculateVideoSize(
-                aspectRatio: _chewieController!.aspectRatio!, context: context);
-            setState(() {});
-          }
-          _videoPlayerController.addListener(() {
-            final position = _videoPlayerController.value.position;
-            final duration = _videoPlayerController.value.duration;
-
-            if (duration != null && position >= duration) {
-              AudioManager.abandonAudioFocus();
-              if (Platform.isIOS) {
-                _videoPlayerController.seekTo(Duration.zero);
-                _videoPlayerController.play();
-              }
-            } else {
-              AudioManager.requestAudioFocus();
-            }
-
-            videoProgressValue.value = position;
-            setState(() {});
-          });
-
-          _controller = ProgressBarController(
-            vsync: this,
-            barAnimationDuration: const Duration(milliseconds: 300),
-            thumbAnimationDuration: const Duration(milliseconds: 200),
-            waitingDuration: const Duration(milliseconds: 1800),
-          );
-
-          setState(() {
-            videoLoader = false;
-            loading = false;
-          });
-        },
+      _videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
       );
+
+      await _videoPlayerController.initialize();
+
+      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      isMute = rawData;
+      await _videoPlayerController.setVolume(rawData ? 1 : 0);
+
+      final isPlaying = _videoPlayerController.value.isPlaying;
+
+      if (isPlaying && isMute == false) {
+        await AudioManager.requestAudioFocus();
+      } else {
+        await AudioManager.abandonAudioFocus();
+      }
+
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        autoPlay: false,
+        looping: false,
+        showControls: false,
+        aspectRatio: _videoPlayerController.value.aspectRatio,
+      );
+
+      await _videoPlayerController.setLooping(false);
+
+      if (mounted &&
+          _chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized) {
+        videoSize = calculateVideoSize(
+            aspectRatio: _chewieController!.aspectRatio!, context: context);
+        setState(() {});
+      }
+
+      _videoPlayerController.addListener(() async {
+        if (!mounted) return;
+
+        final isPlaying = _videoPlayerController.value.isPlaying;
+        if (isPlaying && isMute == true) {
+          await AudioManager.requestAudioFocus();
+        }
+
+        _onVideoTick();
+        setState(() {});
+      });
+
+      // _videoPlayerController.addListener(() {
+      //   final position = _videoPlayerController.value.position;
+      //   final duration = _videoPlayerController.value.duration;
+      //
+      //   if (duration != null && position >= duration) {
+      //     AudioManager.abandonAudioFocus();
+      //     if (Platform.isIOS) {
+      //       _videoPlayerController.seekTo(Duration.zero);
+      //       _videoPlayerController.play();
+      //     }
+      //   } else {
+      //     AudioManager.requestAudioFocus();
+      //   }
+      //
+      //   videoProgressValue.value = position;
+      //   setState(() {});
+      // });
+
+      _controller = ProgressBarController(
+        vsync: this,
+        barAnimationDuration: const Duration(milliseconds: 300),
+        thumbAnimationDuration: const Duration(milliseconds: 200),
+        waitingDuration: const Duration(milliseconds: 1800),
+      );
+
+      if (mounted) {
+        setState(() {
+          videoLoader = false;
+          loading = false;
+        });
+      }
     } catch (e) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -683,6 +676,35 @@ class _ExercisePageState extends State<ExercisePage>
         }
       });
       debugPrint("VIDEO NOT INITIALIZED: $e");
+    }
+  }
+
+  bool _restarting = false;
+
+  void _onVideoTick() async {
+    final v = _videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null || _restarting) return;
+
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      _restarting = true;
+
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await _videoPlayerController.pause();
+      await _videoPlayerController.seekTo(Duration.zero);
+      await _videoPlayerController.setVolume(isMute ? 1 : 0);
+      await _videoPlayerController.play();
+      _restarting = false;
     }
   }
 
@@ -801,8 +823,10 @@ class _ExercisePageState extends State<ExercisePage>
     if (monthProvider?.selectedExercise?.extra?.isNotEmpty ?? false) {
       for (var element in monthProvider!.selectedExercise!.extra!) {
         final extraItem = element;
-        count = int.parse(extraItem.sets.toString()) +
-            (extraItem.type == 3 ? (extraSetModel.length) : 0);
+
+        count1 = (extraItem.type == 3
+            ? int.parse((extraItem.sets).toString()) + (extraSetModel.length)
+            : 0);
 
         allSetCount += int.parse((extraItem.sets).toString());
       }
@@ -813,7 +837,7 @@ class _ExercisePageState extends State<ExercisePage>
     allSetCount += extraSetModel.length;
   }
 
-  int count = 0;
+  int count1 = 0;
   int allSetCount = 0;
   int warmUpIndex = 0;
   int backOffIndex = 0;
@@ -823,7 +847,7 @@ class _ExercisePageState extends State<ExercisePage>
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-
+    log('count1==========>>>>>$count1');
     warmUpIndex = 0;
     backOffIndex = 0;
     workingIndex = 0;
@@ -927,8 +951,8 @@ class _ExercisePageState extends State<ExercisePage>
                                                 .isEmpty
                                             ? media.width +
                                                 media.height * 0.0605
-                                            : media.height * 0.835
-                                        : media.height * 0.835) -
+                                            : media.height * 0.83
+                                        : media.height * 0.83) -
                                 media.height * 0.121),
                         child: Stack(
                           clipBehavior: Clip.none,
@@ -1150,26 +1174,51 @@ class _ExercisePageState extends State<ExercisePage>
                             setState(() {});
                             showControlsOnTapOfPause();
 
-                            await Future.delayed(Duration(milliseconds: 100))
-                                .then(
-                              (value) {
-                                AudioManager.abandonAudioFocus();
-                                setState(() {});
-                              },
-                            );
+                            await Future.delayed(
+                                const Duration(milliseconds: 100));
+                            await AudioManager.abandonAudioFocus();
+                            setState(() {});
                           } else {
                             videoStartPlay = true;
                             _videoPlayerController.play();
                             setState(() {});
                             hideControls();
-                            await Future.delayed(Duration(milliseconds: 100))
-                                .then(
-                              (value) {
-                                AudioManager.requestAudioFocus();
-                                setState(() {});
-                              },
-                            );
+
+                            await Future.delayed(
+                                const Duration(milliseconds: 100));
+
+                            if (_videoPlayerController.value.volume > 0) {
+                              await AudioManager.requestAudioFocus();
+                            }
+                            setState(() {});
                           }
+
+                          // if (_videoPlayerController.value.isPlaying) {
+                          //   _videoPlayerController.pause();
+                          //   videoStartPlay = true;
+                          //   setState(() {});
+                          //   showControlsOnTapOfPause();
+                          //
+                          //   await Future.delayed(Duration(milliseconds: 100))
+                          //       .then(
+                          //     (value) {
+                          //       AudioManager.abandonAudioFocus();
+                          //       setState(() {});
+                          //     },
+                          //   );
+                          // } else {
+                          //   videoStartPlay = true;
+                          //   _videoPlayerController.play();
+                          //   setState(() {});
+                          //   hideControls();
+                          //   await Future.delayed(Duration(milliseconds: 100))
+                          //       .then(
+                          //     (value) {
+                          //       AudioManager.requestAudioFocus();
+                          //       setState(() {});
+                          //     },
+                          //   );
+                          // }
                         }
                       : null,
                 ),
@@ -1241,7 +1290,7 @@ class _ExercisePageState extends State<ExercisePage>
                                   "")
                           .isEmpty)
                   ? media.width
-                  : media.height * 0.835,
+                  : media.height * 0.83,
               width: media.width,
               color: Colors.black12,
               child: videoNotAvailable
@@ -1256,7 +1305,7 @@ class _ExercisePageState extends State<ExercisePage>
                                           ?.warmUpModel?.videoThumbnail ??
                                       "")
                               .isNotEmpty
-                          ? media.height * 0.835
+                          ? media.height * 0.83
                           : media.width,
                       networkImageUrl: isExercise == 1
                           ? ((monthProvider?.exerciseDetailModel
@@ -1289,7 +1338,7 @@ class _ExercisePageState extends State<ExercisePage>
                         appShimmerImage(
                           width: media.width,
                           color: Colors.transparent,
-                          height: media.height * 0.835,
+                          height: media.height * 0.83,
                           networkImageUrl: isExercise == 1
                               ? ((monthProvider?.exerciseDetailModel
                                               ?.videoThumbnail ??
@@ -1346,7 +1395,7 @@ class _ExercisePageState extends State<ExercisePage>
   }
 
   Widget mainContent(Size media) => Padding(
-        padding: const EdgeInsets.only(bottom: 50),
+        padding: EdgeInsets.only(bottom: ScreenUtil.verticalScale(3.2)),
         child: Container(
           decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
@@ -1454,10 +1503,7 @@ class _ExercisePageState extends State<ExercisePage>
                   )
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 15),
-                child: guideLineText(),
-              ),
+              guideLineText(),
               if (isExercise == 1)
                 exerciseSection(media)
               else
@@ -1475,7 +1521,7 @@ class _ExercisePageState extends State<ExercisePage>
           exerciseDesc.trim() == '<p><br></p>' || exerciseDesc.trim().isEmpty
               ? const SizedBox.shrink()
               : Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.only(bottom: 20, top: 15),
                   child: Theme(
                     data: Theme.of(context)
                         .copyWith(dividerColor: Colors.transparent),
@@ -1538,9 +1584,20 @@ class _ExercisePageState extends State<ExercisePage>
                             child: Html(
                               data: exerciseDesc,
                               style: {
-                                "p.fancy": Style(
-                                    padding: HtmlPaddings.zero,
-                                    color: Colors.black),
+                                "body": Style(
+                                  padding: HtmlPaddings.zero,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.color,
+                                ),
+                                "p": Style(
+                                  padding: HtmlPaddings.zero,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.color,
+                                ),
                               },
                             ),
                           ),
@@ -1577,8 +1634,17 @@ class _ExercisePageState extends State<ExercisePage>
                 itemBuilder: (context, index) {
                   final extraItem =
                       monthProvider?.selectedExercise!.extra![index];
-                  setCount = int.parse(extraItem!.sets.toString()) +
-                      (extraItem.type == 3 ? (extraSetModel.length) : 0);
+                  final data = monthProvider?.selectedExercise!.extra
+                      ?.where((element) => extraItem?.type == 3)
+                      .toList();
+
+                  if (data!.isNotEmpty && index == (data.length - 1)) {
+                    setCount = int.parse(extraItem!.sets.toString()) +
+                        (extraItem.type == 3 ? (extraSetModel.length) : 0);
+                  } else {
+                    setCount = int.parse(extraItem!.sets.toString());
+                  }
+
                   return ListView.builder(
                     itemCount: setCount,
                     shrinkWrap: true,
@@ -1753,11 +1819,16 @@ class _ExercisePageState extends State<ExercisePage>
               );
             },
           ),
-          SizedBox(height: 20),
+          Builder(builder: (context) {
+            return SizedBox(height: 20);
+          }),
           if (monthProvider!.isCurrentMonth == "Future") ...[
             SizedBox()
           ] else ...[
-            count != 0 && !isCurrentDaySkipped && !isCurrentDayCompleted
+            count1 != 0 &&
+                    !isCurrentDaySkipped &&
+                    !isCurrentDayCompleted &&
+                    !monthProvider!.isPumpDay
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 40),
                     child: TextButton(
@@ -1800,7 +1871,8 @@ class _ExercisePageState extends State<ExercisePage>
                 : SizedBox(),
             Container(
               height: 0.5,
-              margin: const EdgeInsets.symmetric(horizontal: 40),
+              margin: EdgeInsets.symmetric(
+                  horizontal: 40, vertical: !monthProvider!.isPumpDay ? 0 : 20),
               width: media.width,
               color: Theme.of(context).dividerColor,
             ),
@@ -1971,38 +2043,72 @@ class _ExercisePageState extends State<ExercisePage>
     return isExercise == 1
         ? const SizedBox(height: 0, width: 0)
         : loading || monthProvider?.warmUpModel == null
-            ? const SizedBox(
-                height: 0,
-                width: 0,
-              )
-            : Padding(
-                padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1)),
-                child: monthProvider!.exerciseHistoryModel.any((element) =>
-                        element.dataId == dataId &&
-                        element.status == Status.completed)
-                    ? ButtonWidget(
-                        text: "Completed",
-                        textColor: Colors.white,
-                        onPress: null,
-                        color: AppColors.primaryColor,
-                        isLoading: false,
-                      )
-                    : ButtonWidget(
-                        text: "Mark Complete",
-                        textColor: Colors.white,
-                        onPress: () async {
-                          await _saveExerciseData(
-                            status: Status.completed,
-                            id: monthProvider!.warmUpModel!.id.toString(),
-                            type: "Warmup",
-                          );
+            ? const SizedBox(height: 0, width: 0)
+            : monthProvider!.exerciseHistoryModel.any((element) =>
+                    element.dataId == dataId &&
+                    element.status == Status.completed)
+                ? ButtonWidget(
+                    text: "Completed",
+                    textColor: Colors.white,
+                    onPress: null,
+                    color: AppColors.primaryColor,
+                    isLoading: false,
+                  )
+                : Consumer<MonthProvider>(builder: (context, value, c) {
+                    return ButtonWidget(
+                      text: "Mark Complete",
+                      textColor: Colors.white,
+                      onPress: () async {
+                        await _saveExerciseData(
+                          status: Status.completed,
+                          id: value.warmUpModel!.id.toString(),
+                          type: "Warmup",
+                        );
+
+                        // ...//
+
+                        List<WarmupDataModel> warmUps = value.isPumpDay
+                            ? value.pumpDayModel!.warmups!
+                            : value.dayDataModel!.warmups ?? [];
+
+                        List<WarmupDataModel> tempo = warmUps
+                            .where(
+                              (element) => ((element.formats ?? [])
+                                  .contains(monthProvider?.equipmentType)),
+                            )
+                            .toList();
+
+                        tempo.removeWhere(
+                          (element) {
+                            String dataId =
+                                "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${element.warmupId}";
+
+                            return monthProvider!.exerciseHistoryModel.any(
+                              (element) =>
+                                  element.dataId == dataId &&
+                                  (element.status == Status.completed ||
+                                      element.status == Status.skipped),
+                            );
+                          },
+                        );
+
+                        if (tempo.isEmpty) {
+                          Navigator.pop(context);
+                        } else {
+                          value.updateWarmUp(true, tempo[0].warmupId ?? '');
+                          value.updateIsLastExercise(false);
 
                           Navigator.pop(context);
-                        },
-                        color: AppColors.primaryColor,
-                        isLoading: false,
-                      ),
-              );
+                          Navigator.pushNamed(context, '/exercise',
+                              arguments: "Exercise");
+                        }
+
+                        // Navigator.pop(context);
+                      },
+                      color: AppColors.primaryColor,
+                      isLoading: false,
+                    );
+                  });
   }
 
   Future<void> finishAndNextButton(
@@ -2262,29 +2368,38 @@ class _ExercisePageState extends State<ExercisePage>
                   ? (monthProvider!.selectedExercise!.guide == "" ||
                           monthProvider!.selectedExercise!.guide == null)
                       ? SizedBox()
-                      : Container(
-                          margin: EdgeInsets.only(top: 5, bottom: 15),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(254, 233, 232, 1.0),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                          child: Text(
-                            "${monthProvider!.selectedExercise!.guide}",
-                            style: const TextStyle(
-                              color: Colors.black,
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 15),
+                          child: Container(
+                            margin: EdgeInsets.only(top: 5, bottom: 15),
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(254, 233, 232, 1.0),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            textAlign: TextAlign.left,
+                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                            child: Text(
+                              "${monthProvider!.selectedExercise!.guide}",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .color,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
                           ),
                         )
                   : (monthProvider?.warmUpModel?.description ?? "") == ""
                       ? SizedBox()
                       : Padding(
-                          padding: EdgeInsets.only(top: 5, bottom: 35),
+                          padding: EdgeInsets.only(
+                              top: ScreenUtil.verticalScale(.8),
+                              bottom: ScreenUtil.verticalScale(2.5)),
                           child: Text(
                             monthProvider?.warmUpModel?.description ?? "",
-                            style: const TextStyle(
-                              color: Colors.black,
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodySmall!.color,
                             ),
                             textAlign: TextAlign.left,
                           ),
@@ -2332,6 +2447,7 @@ class _ExercisePageState extends State<ExercisePage>
       "date": "${DateTime.now().toUtc()}",
       "dataId": "EXTRA-ADDED$dataId",
     };
+    log('data==========>>>>>$data');
     ApiRepo.addExtraSet(body: apiReqBody);
     await DatabaseHelper()
         .insertData(data: data, tableName: DatabaseHelper.extraSetHistory);

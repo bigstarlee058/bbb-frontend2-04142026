@@ -12,9 +12,23 @@ import 'package:bbb/models/SyncDataResponseModel/month_enrollment_data_model.dar
 import 'package:bbb/models/SyncDataResponseModel/removed_exercise_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/streak_data_model.dart';
 import 'package:bbb/models/SyncDataResponseModel/swap_exercise_data_model.dart';
+import 'package:bbb/models/radar_chart_history.dart';
 import 'package:flutter/material.dart';
 
 class ApiRepo extends BaseService {
+  static Future<List<RadarChartHistoryModel>>
+      fetchRadarChartExerciseHistory() async {
+    var response = await ApiService()
+        .getResponse(apiType: APIType.aGet, url: BaseService.radarChartHistory);
+    if (response is List) {
+      return response
+          .map((json) => RadarChartHistoryModel.fromJson(json))
+          .toList();
+    } else {
+      throw Exception("Unexpected response format: $response");
+    }
+  }
+
   /// ExerciseHistory ========================================================================
 
   static Future<List<ExerciseHistoryDataModel>> fetchExerciseForTheExercise(

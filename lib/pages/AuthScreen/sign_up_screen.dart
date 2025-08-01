@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -71,15 +72,14 @@ class _SignupPageState extends State<SignupPage> {
         isLoading = true;
       });
 
-      final url = Uri.parse(
-          'https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signup_user');
+      final url = Uri.parse('${AppConstants.serverUrl}/api/users/signup_user');
 
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
-          'username': userName,
-          'lastname': lastName,
+          'firstName': userName,
+          'lastName': lastName,
           'email': emailAddress,
           'password': password,
         },
@@ -126,7 +126,8 @@ class _SignupPageState extends State<SignupPage> {
       });
 
       final url = Uri.parse(
-          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+          // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+          'https://app.bootybybret.com/wp-json/jwt-auth/v1/token');
 
       final response = await http.post(
         url,
@@ -136,7 +137,7 @@ class _SignupPageState extends State<SignupPage> {
           'password': password,
         },
       );
-
+      log('response.statusCode==========>>>>>${response.statusCode}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         await _saveLoginState(true);
@@ -172,7 +173,44 @@ class _SignupPageState extends State<SignupPage> {
           debugPrint('this is login page ${descriptionResponse.statusCode}');
         }
       } else {
-        showBottomAlert(context, 'Login failed');
+        print("object >>> calling second api");
+        final url = Uri.parse(
+            // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+            'https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signin_mobile');
+
+        final response = await http.post(
+          url,
+          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+          body: {
+            'email': emailAddress,
+            'password': password,
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          await _saveLoginState(true);
+          String token = data['token'];
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('authToken', token);
+
+          bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+
+          await Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainPage(
+                showWelcomeModal: !hasSeenWelcome,
+                welcomeDescription: "",
+                welcomeImageUrl: "",
+              ),
+            ),
+            (route) => false,
+          );
+        } else {
+          showBottomAlert(context, 'Login failed');
+        }
       }
     } catch (e) {
       showBottomAlert(context, 'An error occurred');
@@ -195,27 +233,30 @@ class _SignupPageState extends State<SignupPage> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              AppImage.imageSignup(
-                // media,
-                // image: dataProvider!.allImageList
-                //     .where((element) => element["key"] == "imageSignup")
-                //     .first["image"],
-                // // dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
-                // // image: dataProvider!.cachedImageMap["imageSignup"],
-                // imageKey: "imageSignup",
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: SafeArea(
-                        child: BackArrowWidget(onPress: () {
-                          Navigator.pop(context);
-                        }),
+              Consumer<DataProvider>(builder: (context, value, c) {
+                return AppImage.imageSignup(
+                  value,
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageSignup")
+                  //     .first["image"],
+                  // // dataProvider?.screenBackgroundResponse?.imageSignup ?? "",
+                  // // image: dataProvider!.cachedImageMap["imageSignup"],
+                  // imageKey: "imageSignup",
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: SafeArea(
+                          child: BackArrowWidget(onPress: () {
+                            Navigator.pop(context);
+                          }),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              )
+                    ],
+                  ),
+                );
+              })
             ],
           ),
           Positioned(

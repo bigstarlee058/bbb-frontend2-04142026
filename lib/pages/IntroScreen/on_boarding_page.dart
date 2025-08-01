@@ -162,164 +162,167 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: Column(
-              children: dataProvider!.allImageList.map((entry) {
-                return Visibility(
-                  visible: true,
-                  child: Utils.appImage(
-                    media,
-                    image: entry["image"],
-                    imageKey: entry["key"],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          SizedBox(
-            height: media.height / 1,
-            child: _isVideoInitialized
-                ? Align(
-                    alignment: Alignment.topCenter,
-                    child: SizedBox(
-                        height: media.height / 1.37,
-                        child: VideoPlayer(_videoController)),
-                  )
-                : Image.asset(
-                    width: double.infinity,
-                    "assets/img/back.jpg",
-                    fit: BoxFit.cover,
-                  ), /*Utils.appImage(
-                    media,
-                    // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                    dataProvider!.cachedImageMap["imageLogin"],
-
-                    imageKey: "imageLogin",
-                  )*/
-          ),
-          Positioned(
-            top: ScreenUtil.horizontalScale(50),
-            child: Container(
-              // height: 120,
-              height: 150,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/img/bbb-logo.png'),
-                    fit: BoxFit.fitHeight,
-                    opacity: 1),
+      body: Consumer<DataProvider>(builder: (context, dataProvider, c) {
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                children: dataProvider.allImageList.map((entry) {
+                  return Visibility(
+                    visible: true,
+                    child: Utils.appImage(
+                      media,
+                      image: entry["image"],
+                      imageKey: entry["key"],
+                    ),
+                  );
+                }).toList(),
               ),
             ),
-          ),
-          Positioned(
-            bottom: -1,
-            left: 0,
-            right: 0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: media.width,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+            SizedBox(
+              height: media.height / 1,
+              child: _isVideoInitialized
+                  ? Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                          height: media.height / 1.37,
+                          child: VideoPlayer(_videoController)),
+                    )
+                  : Image.asset(
+                      width: double.infinity,
+                      "assets/img/back.jpg",
+                      fit: BoxFit.cover,
+                    ), /*Utils.appImage(
+                        media,
+                        // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                        dataProvider!.cachedImageMap["imageLogin"],
+
+                        imageKey: "imageLogin",
+                      )*/
+            ),
+            Positioned(
+              top: ScreenUtil.horizontalScale(50),
+              child: Container(
+                // height: 120,
+                height: 150,
+                width: media.width,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/img/bbb-logo.png'),
+                      fit: BoxFit.fitHeight,
+                      opacity: 1),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -1,
+              left: 0,
+              right: 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(8)),
+                      ),
                     ),
-                  ),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        right: 0,
-                        top: -(media.height / 9.8) + 0.3,
-                        child: ClipPath(
-                          clipper: DiagonalClipper(),
-                          child: Container(
-                            height: media.height / 9.8,
-                            width: media.width / 6,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          right: 0,
+                          top: -(media.height / 9.8) + 0.3,
+                          child: ClipPath(
+                            clipper: DiagonalClipper(),
+                            child: Container(
+                              height: media.height / 9.8,
+                              width: media.width / 6,
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil.verticalScale(4.4)),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: ScreenUtil.horizontalScale(2),
-                            ),
-                            isLoading
-                                ? SizedBox(
-                                    height: media.height * .28,
-                                  )
-                                : TextSlider(
-                                    slide: dataProvider!
-                                            .screenBackgroundModel?.slides ??
-                                        [],
-                                  ),
-                            ButtonWidget(
-                              text: 'Sign in',
-                              textColor: Colors.white,
-                              color: AppColors.primaryColor,
-                              onPress: onPressLogin,
-                              isLoading: false,
-                            ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Don't have an account? ",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.color,
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: onPressCreateAccount,
-                                  style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: const Size(65, 30),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      alignment: Alignment.center),
-                                  child: const Text(
-                                    'Sign up',
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.verticalScale(4.4)),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: ScreenUtil.horizontalScale(2),
+                              ),
+                              isLoading
+                                  ? SizedBox(
+                                      height: media.height * .28,
+                                    )
+                                  : TextSlider(
+                                      slide: dataProvider
+                                              .screenBackgroundModel?.slides ??
+                                          [],
+                                    ),
+                              ButtonWidget(
+                                text: 'Sign in',
+                                textColor: Colors.white,
+                                color: AppColors.primaryColor,
+                                onPress: onPressLogin,
+                                isLoading: false,
+                              ),
+                              const SizedBox(
+                                height: 6,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Don't have an account? ",
                                     style: TextStyle(
-                                      color: AppColors.primaryColor,
-                                      fontSize: 14,
+                                      fontSize: 15,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                     ),
                                   ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: ScreenUtil.horizontalScale(7.2),
-                            ),
-                          ],
+                                  TextButton(
+                                    onPressed: onPressCreateAccount,
+                                    style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        minimumSize: const Size(65, 30),
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        alignment: Alignment.center),
+                                    child: const Text(
+                                      'Sign up',
+                                      style: TextStyle(
+                                        color: AppColors.primaryColor,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: ScreenUtil.horizontalScale(7.2),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 

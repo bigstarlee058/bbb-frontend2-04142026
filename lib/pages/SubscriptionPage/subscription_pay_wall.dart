@@ -159,9 +159,10 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
         );
       } else {
         debugPrint('Entitlement not act ive or expiration date missing.');
-        if (mounted)
+        if (mounted) {
           showBottomAlert(
               context, "Subscription not activated. Please try again.");
+        }
       }
     } on PurchasesError catch (e) {
       if (e.code == PurchasesErrorCode.purchaseCancelledError) {
@@ -173,8 +174,9 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       }
     } catch (e) {
       debugPrint("Unexpected error: $e");
-      if (mounted)
+      if (mounted) {
         showBottomAlert(context, "Purchase failed: Please try again.");
+      }
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -216,6 +218,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
           ),
           Utils.appImage(
             image: '',
+            isImage: true,
             MediaQuery.of(context).size,
             imageKey: '',
             child: Column(
@@ -258,6 +261,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                         "Subscribe now to access the full Booty by Bret Monthly Programming",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.labelLarge?.color,
                           fontSize: ScreenUtil.verticalScale(2.4),
                         ),
                       ),
@@ -333,6 +337,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
           const SizedBox(width: 8),
           Text(text,
               style: TextStyle(
+                color: Theme.of(context).textTheme.labelLarge?.color,
                 fontSize: ScreenUtil.verticalScale(1.6),
               )),
         ],
@@ -384,6 +389,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                 Text(
                   title,
                   style: TextStyle(
+                      color: Theme.of(context).textTheme.labelLarge?.color,
                       fontSize: ScreenUtil.verticalScale(1.8),
                       fontWeight: FontWeight.bold),
                 ),
@@ -409,7 +415,9 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             SizedBox(height: ScreenUtil.verticalScale(0.5)),
             Text(
                 "Full access for just $price/${badge != null ? "year" : "month"}",
-                style: TextStyle(fontSize: ScreenUtil.verticalScale(1.5))),
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.labelLarge?.color,
+                    fontSize: ScreenUtil.verticalScale(1.5))),
           ],
         ),
       ),

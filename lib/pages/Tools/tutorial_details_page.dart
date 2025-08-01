@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -10,7 +9,6 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -31,7 +29,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
   DataProvider? dataProvider;
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  late Size videoSize;
+  Size? videoSize;
   Timer? hideControlsTimer;
   late final ProgressBarController _controller;
   bool isMute = true;
@@ -72,6 +70,86 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
     return buffered.isNotEmpty ? buffered.last.end : Duration.zero;
   }
 
+  // Future<void> initializeVideo(String url) async {
+  //   if (hasClosedPopup) return;
+  //   try {
+  //     _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+  //         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+  //
+  //     await _videoPlayerController.initialize();
+  //     if (hasClosedPopup || !mounted) {
+  //       await _videoPlayerController.dispose();
+  //       return;
+  //     }
+  //
+  //     await _videoPlayerController.setLooping(true);
+  //     AudioManager.requestAudioFocus();
+  //
+  //     _chewieController = ChewieController(
+  //       videoPlayerController: _videoPlayerController,
+  //       autoPlay: true,
+  //       looping: true,
+  //       showControls: false,
+  //       aspectRatio: _videoPlayerController.value.aspectRatio,
+  //     );
+  //     bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+  //     _videoPlayerController.setVolume(rawData ? 1 : 0);
+  //     isMute = rawData;
+  //     if (!hasClosedPopup &&
+  //         _chewieController != null &&
+  //         _chewieController!.videoPlayerController.value.isInitialized) {
+  //       hideControls();
+  //       videoSize = calculateVideoSize(
+  //           aspectRatio: _chewieController!.aspectRatio!, context: context);
+  //       setState(() {});
+  //     }
+  //
+  //     _videoPlayerController.addListener(() async {
+  //       if (hasClosedPopup || !mounted) return;
+  //       final position = _videoPlayerController.value.position;
+  //       final duration = _videoPlayerController.value.duration;
+  //       final bool isFinished =
+  //           position >= duration && !_videoPlayerController.value.isPlaying;
+  //       if (isFinished) {
+  //         showControlsOnTapOfPause();
+  //       }
+  //       if (duration != null && position >= duration) {
+  //         AudioManager.abandonAudioFocus();
+  //         if (Platform.isIOS) {
+  //           _videoPlayerController.seekTo(Duration.zero);
+  //           _videoPlayerController.play();
+  //         }
+  //       } else {
+  //         AudioManager.requestAudioFocus();
+  //       }
+  //
+  //       videoProgressValue.value = position;
+  //       setState(() {});
+  //     });
+  //     _controller = ProgressBarController(
+  //       vsync: this,
+  //       barAnimationDuration: const Duration(milliseconds: 300),
+  //       thumbAnimationDuration: const Duration(milliseconds: 200),
+  //       waitingDuration: const Duration(milliseconds: 1800),
+  //     );
+  //
+  //     if (!hasClosedPopup && mounted) {
+  //       setState(() {
+  //         loading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     if (!hasClosedPopup) {
+  //       setState(() {
+  //         videoNotInitialized = true;
+  //         loading = false;
+  //       });
+  //     }
+  //
+  //     debugPrint("VIDEO NOT INITIALIZED: $e");
+  //   }
+  // }
+
   Future<void> initializeVideo(String url) async {
     if (hasClosedPopup) return;
     try {
@@ -84,20 +162,37 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
         return;
       }
 
-      await _videoPlayerController.setLooping(true);
-      AudioManager.requestAudioFocus();
+      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      isMute = rawData;
+      await _videoPlayerController.setVolume(rawData ? 1 : 0);
+
+      final isPlaying = _videoPlayerController.value.isPlaying;
+
+      if (isPlaying && isMute == false) {
+        await AudioManager.requestAudioFocus();
+      } else {
+        await AudioManager.abandonAudioFocus();
+      }
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
-        looping: true,
+        looping: false,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
-      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
-      _videoPlayerController.setVolume(rawData ? 1 : 0);
-      isMute = rawData;
-      if (!hasClosedPopup &&
+
+      await _videoPlayerController.setLooping(false);
+
+      if (_videoPlayerController.value.volume == 0) {
+        await AudioManager.abandonAudioFocus().then((value) async {
+          await Future.delayed(Duration(milliseconds: 20));
+          return _videoPlayerController.play();
+        });
+      }
+
+      if (mounted &&
+          !hasClosedPopup &&
           _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
@@ -107,27 +202,39 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
       }
 
       _videoPlayerController.addListener(() async {
-        if (hasClosedPopup || !mounted) return;
-        final position = _videoPlayerController.value.position;
-        final duration = _videoPlayerController.value.duration;
-        final bool isFinished =
-            position >= duration && !_videoPlayerController.value.isPlaying;
-        if (isFinished) {
-          showControlsOnTapOfPause();
-        }
-        if (duration != null && position >= duration) {
-          AudioManager.abandonAudioFocus();
-          if (Platform.isIOS) {
-            _videoPlayerController.seekTo(Duration.zero);
-            _videoPlayerController.play();
-          }
-        } else {
-          AudioManager.requestAudioFocus();
+        if (!mounted) return;
+
+        final isPlaying = _videoPlayerController.value.isPlaying;
+        if (isPlaying && isMute == true) {
+          await AudioManager.requestAudioFocus();
         }
 
-        videoProgressValue.value = position;
+        _onVideoTick();
         setState(() {});
       });
+
+      // _videoPlayerController.addListener(() async {
+      //   if (hasClosedPopup || !mounted) return;
+      //   final position = _videoPlayerController.value.position;
+      //   final duration = _videoPlayerController.value.duration;
+      //   final bool isFinished =
+      //       position >= duration && !_videoPlayerController.value.isPlaying;
+      //   if (isFinished) {
+      //     showControlsOnTapOfPause();
+      //   }
+      //   if (duration != null && position >= duration) {
+      //     AudioManager.abandonAudioFocus();
+      //     if (Platform.isIOS) {
+      //       _videoPlayerController.seekTo(Duration.zero);
+      //       _videoPlayerController.play();
+      //     }
+      //   } else {
+      //     AudioManager.requestAudioFocus();
+      //   }
+      //
+      //   videoProgressValue.value = position;
+      //   setState(() {});
+      // });
       _controller = ProgressBarController(
         vsync: this,
         barAnimationDuration: const Duration(milliseconds: 300),
@@ -152,13 +259,63 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
     }
   }
 
+  bool _restarting = false;
+
+  void _onVideoTick() async {
+    final v = _videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null || _restarting) return;
+
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      _restarting = true;
+
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await _videoPlayerController.pause();
+      await _videoPlayerController.seekTo(Duration.zero);
+      await _videoPlayerController.setVolume(isMute ? 1 : 0);
+      await _videoPlayerController.play();
+      _restarting = false;
+    }
+  }
+
   bool showControls = true;
   bool isFullscreen = false;
+
+  // muteUnMute() async {
+  //   isMute = !isMute;
+  //
+  //   _videoPlayerController.setVolume(isMute ? 1 : 0);
+  //   setState(() {});
+  //   await preferences.setBool(SharedPreference.isMute, isMute);
+  // }
 
   muteUnMute() async {
     isMute = !isMute;
 
     _videoPlayerController.setVolume(isMute ? 1 : 0);
+    setState(() {});
+
+    if (_videoPlayerController.value.volume == 0) {
+      final videoPlay = _videoPlayerController.value.isPlaying;
+
+      await AudioManager.abandonAudioFocus().then((value) async {
+        await Future.delayed(Duration(milliseconds: 20));
+        if (videoPlay) {
+          return _videoPlayerController.play();
+        }
+      });
+    }
+
     setState(() {});
     await preferences.setBool(SharedPreference.isMute, isMute);
   }
@@ -221,7 +378,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
               hideControls: hideControls,
               isZoom: isZoom,
               media: screenSize,
-              videoSize: videoSize,
+              videoSize: videoSize!,
               muteUnMute: muteUnMute,
               showControls: showControls,
               showControlsOnTap: showControlsOnTap,
@@ -277,7 +434,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
       insetPadding:
           EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6.7)),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(27),
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -286,10 +443,13 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
             borderRadius: BorderRadius.circular(25),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.825),
+                  maxHeight: MediaQuery.of(context).size.height * 0.8,
+                  maxWidth: videoSize == null
+                      ? ScreenUtil.horizontalScale(86.5)
+                      : videoSize?.width ?? 0),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(25),
                   color: Theme.of(context).cardColor,
                 ),
                 child: loading
@@ -298,6 +458,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                             color: AppColors.primaryColor),
                       )
                     : SingleChildScrollView(
+                        physics: ClampingScrollPhysics(),
                         child: Column(
                           children: [
                             Stack(
@@ -316,8 +477,8 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                             ? Stack(
                                                 children: [
                                                   SizedBox(
-                                                    height: videoSize.height,
-                                                    width: videoSize.width,
+                                                    height: videoSize?.height,
+                                                    width: videoSize?.width,
                                                     child: Chewie(
                                                       controller:
                                                           _chewieController!,
@@ -328,8 +489,8 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                                     duration: Duration(
                                                         milliseconds: 1300),
                                                     curve: Curves.easeInOut,
-                                                    height: videoSize.height,
-                                                    width: videoSize.width,
+                                                    height: videoSize?.height,
+                                                    width: videoSize?.width,
                                                     color: showControls
                                                         ? Colors.black38
                                                         : Colors.transparent,
@@ -361,7 +522,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                 videoNotInitialized
                                     ? const SizedBox()
                                     : Positioned(
-                                        bottom: videoSize.height / 2,
+                                        bottom: videoSize!.height / 2,
                                         left: 10,
                                         right: 10,
                                         child: AnimatedOpacity(
@@ -415,32 +576,30 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                                           showControlsOnTapOfPause();
 
                                                           await Future.delayed(
-                                                                  Duration(
-                                                                      milliseconds:
-                                                                          100))
-                                                              .then(
-                                                            (value) {
-                                                              AudioManager
-                                                                  .abandonAudioFocus();
-                                                              setState(() {});
-                                                            },
-                                                          );
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      100));
+                                                          await AudioManager
+                                                              .abandonAudioFocus();
+                                                          setState(() {});
                                                         } else {
                                                           _videoPlayerController
                                                               .play();
                                                           setState(() {});
                                                           hideControls();
                                                           await Future.delayed(
-                                                                  Duration(
-                                                                      milliseconds:
-                                                                          100))
-                                                              .then(
-                                                            (value) {
-                                                              AudioManager
-                                                                  .requestAudioFocus();
-                                                              setState(() {});
-                                                            },
-                                                          );
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      100));
+
+                                                          if (_videoPlayerController
+                                                                  .value
+                                                                  .volume >
+                                                              0) {
+                                                            await AudioManager
+                                                                .requestAudioFocus();
+                                                          }
+                                                          setState(() {});
                                                         }
                                                       }
                                                     : null,
@@ -648,46 +807,28 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
                                 ),
                               ],
                             ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                left: ScreenUtil.horizontalScale(5),
-                                right: ScreenUtil.horizontalScale(5),
-                                top: 15.0,
-                              ),
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                tutorialDesc,
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.verticalScale(1.75),
-                                  height: 1.5,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                bottom: ScreenUtil.verticalScale(2),
-                                top: ScreenUtil.verticalScale(1),
-                                left: ScreenUtil.horizontalScale(10),
-                                right: ScreenUtil.horizontalScale(10),
-                              ),
-                              child: Column(
-                                children: [
-                                  TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text(
-                                        "Back",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            color: AppColors.primaryColor),
-                                      ))
-                                ],
-                              ),
-                            ),
+                            tutorialDesc.isNotEmpty
+                                ? Container(
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(5),
+                                      vertical: 18,
+                                    ),
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      tutorialDesc,
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                        fontSize:
+                                            ScreenUtil.verticalScale(1.75),
+                                        height: 1.5,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(),
                           ],
                         ),
                       ),

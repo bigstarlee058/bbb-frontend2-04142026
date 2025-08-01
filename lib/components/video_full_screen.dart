@@ -6,6 +6,7 @@ import 'package:bbb/middleware/audio_manager.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:video_player/video_player.dart';
 
@@ -63,24 +64,37 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
   bool showControls = false;
   Timer? _hideControlsTimer;
   ProgressBarController? _controller;
+  void rotateScreen() {
+    if (widget.videoSize.height < 300) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+  }
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
-        widget.videoPlayerController.addListener(() {
-          final position = widget.videoPlayerController.value.position;
-          final duration = widget.videoPlayerController.value.duration;
-          if (duration != null && position >= duration) {
-            AudioManager.abandonAudioFocus();
-            if (Platform.isIOS) {
-              widget.videoPlayerController.seekTo(Duration.zero);
-              widget.videoPlayerController.play();
-            }
-          } else {
-            AudioManager.requestAudioFocus();
+        rotateScreen();
+
+        widget.videoPlayerController.addListener(() async {
+          if (!mounted) return;
+
+          final isPlaying = widget.videoPlayerController.value.isPlaying;
+          if (isPlaying && isMute == true) {
+            await AudioManager.requestAudioFocus();
           }
-          videoProgressValue.value = position;
+          _onVideoTick();
+          setState(() {});
         });
         _controller = ProgressBarController(
           vsync: this,
@@ -97,10 +111,51 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
     super.initState();
   }
 
+  void _onVideoTick() async {
+    // final position = widget.videoPlayerController.value.position;
+    // final duration = widget.videoPlayerController.value.duration;
+    // if (duration != null && position >= duration) {
+    //   AudioManager.abandonAudioFocus();
+    //   if (Platform.isIOS) {
+    //     widget.videoPlayerController.seekTo(Duration.zero);
+    //     widget.videoPlayerController.play();
+    //   }
+    // } else {
+    //   AudioManager.requestAudioFocus();
+    // }
+    // videoProgressValue.value = position;
+    //
+    final v = widget.videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null) return;
+
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await widget.videoPlayerController.pause();
+      await widget.videoPlayerController.seekTo(Duration.zero);
+      await widget.videoPlayerController.setVolume(isMute ? 1 : 0);
+      await widget.videoPlayerController.play();
+    }
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
         _controller?.dispose();
         widget.toggleFullscreen();
       },
@@ -109,6 +164,7 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
     super.dispose();
   }
 
+  bool _disableAnimation = false;
   Duration getBufferedPosition() {
     final position = widget.videoPlayerController.value.position;
     final buffered = widget.videoPlayerController.value.buffered;
@@ -164,73 +220,95 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
     setState(() => showControls = true);
   }
 
+  Orientation? _lastOrientation;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentOrientation = MediaQuery.of(context).orientation;
+
+    if (_lastOrientation != currentOrientation) {
+      _lastOrientation = currentOrientation;
+
+      setState(() {
+        _disableAnimation = true;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _disableAnimation = false;
+          });
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      fit: StackFit.loose,
-      children: [
-        Column(
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        final isLandscape = orientation == Orientation.landscape;
+        return Stack(
+          clipBehavior: Clip.none,
+          fit: StackFit.loose,
           children: [
-            GestureDetector(
-              onTap: () {
-                widget.showControlsOnTap();
-                showControlsOnTap();
-              },
-              child: Stack(
-                children: [
-                  /// VIDEO SECTION
-
-                  videoSection(widget.media),
-
-                  /// BACK BUTTON
-
-                  backButton(widget.media, context),
-                ],
-              ),
+            Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    widget.showControlsOnTap();
+                    showControlsOnTap();
+                  },
+                  child: Stack(
+                    children: [
+                      videoSection(widget.media, isLandscape),
+                      backButton(widget.media, context, isLandscape),
+                    ],
+                  ),
+                ),
+              ],
             ),
+            playPauseControl(isLandscape),
+            videoProgress(widget.media, context, isLandscape),
           ],
-        ),
-
-        /// PLAY PAUSE REWIND CONTROL
-
-        playPauseControl(),
-
-        /// VIDEO PROGRESS
-
-        videoProgress(widget.media, context),
-      ],
+        );
+      },
     );
   }
 
-  Widget videoSection(Size media) => Container(
-        color: Colors.black,
-        child: Stack(
-          children: [
-            SizedBox(
-              height: media.height,
-              width: media.width,
-              child: Chewie(
-                controller: widget.chewieController,
-              ),
+  Widget videoSection(Size media, bool isLandscape) {
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        children: [
+          SizedBox(
+            height: isLandscape ? media.width : media.height,
+            width: isLandscape ? media.height : media.width,
+            child: Chewie(
+              controller: widget.chewieController,
             ),
-            AnimatedContainer(
-              duration: Duration(milliseconds: 1200),
-              curve: Curves.easeInOut,
-              height: media.height,
-              width: media.width,
-              color: showControls ? Colors.black38 : Colors.transparent,
-            ),
-          ],
-        ),
-      );
+          ),
+          AnimatedContainer(
+            duration: _disableAnimation
+                ? Duration.zero
+                : Duration(milliseconds: 1200),
+            curve: Curves.easeInOut,
+            height: isLandscape ? media.width : media.height,
+            width: isLandscape ? media.height : media.width,
+            color: showControls ? Colors.black38 : Colors.transparent,
+          ),
+        ],
+      ),
+    );
+  }
 
-  Widget backButton(Size media, BuildContext context) => Container(
+  Widget backButton(Size media, BuildContext context, bool isLandscape) =>
+      Container(
         width: media.width,
         decoration: const BoxDecoration(),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.only(right: 10, top: 8),
             child: Row(
               children: [
                 Container(
@@ -242,8 +320,8 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
                     shape: BoxShape.circle,
                   ),
                   child: SizedBox(
-                    width: ScreenUtil.verticalScale(4.65),
-                    height: ScreenUtil.verticalScale(4.65),
+                    width: ScreenUtil.verticalScale(isLandscape ? 10 : 4.65),
+                    height: ScreenUtil.verticalScale(isLandscape ? 10 : 4.65),
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       icon: const Icon(
@@ -251,9 +329,13 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
                         color: Colors.white,
                       ),
                       onPressed: () {
+                        SystemChrome.setPreferredOrientations([
+                          DeviceOrientation.portraitUp,
+                          DeviceOrientation.portraitDown,
+                        ]);
                         Navigator.pop(context);
                       },
-                      iconSize: ScreenUtil.verticalScale(4),
+                      iconSize: ScreenUtil.verticalScale(isLandscape ? 7 : 4),
                     ),
                   ),
                 ),
@@ -263,8 +345,10 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
         ),
       );
 
-  Widget playPauseControl() => Positioned(
-        bottom: ScreenUtil.verticalScale(48),
+  Widget playPauseControl(bool isLandscape) => Positioned(
+        bottom: widget.videoSize.height < 300
+            ? ScreenUtil.verticalScale(45)
+            : ScreenUtil.verticalScale(48),
         left: 10,
         right: 10,
         child: AnimatedOpacity(
@@ -307,24 +391,21 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
                           setState(() {});
                           widget.showControlsOnTapOfPause();
                           showControlsOnTapOfPause();
-                          await Future.delayed(Duration(milliseconds: 100))
-                              .then(
-                            (value) {
-                              AudioManager.abandonAudioFocus();
-                              setState(() {});
-                            },
-                          );
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
+                          await AudioManager.abandonAudioFocus();
+                          setState(() {});
                         } else {
                           widget.videoPlayerController.play();
+                          setState(() {});
                           widget.hideControls();
                           hideControls();
-                          await Future.delayed(Duration(milliseconds: 100))
-                              .then(
-                            (value) {
-                              AudioManager.requestAudioFocus();
-                              setState(() {});
-                            },
-                          );
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
+                          if (widget.videoPlayerController.value.volume > 0) {
+                            await AudioManager.requestAudioFocus();
+                          }
+                          setState(() {});
                         }
                       }
                     : null,
@@ -352,10 +433,17 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
         ),
       );
 
-  Widget videoProgress(Size media, BuildContext context) => Positioned(
-        bottom: ScreenUtil.verticalScale(7),
-        left: ScreenUtil.horizontalScale(3),
-        right: ScreenUtil.horizontalScale(3),
+  Widget videoProgress(Size media, BuildContext context, bool isLandscape) =>
+      Positioned(
+        bottom: isLandscape
+            ? ScreenUtil.verticalScale(4)
+            : ScreenUtil.verticalScale(7),
+        left: isLandscape
+            ? ScreenUtil.horizontalScale(10)
+            : ScreenUtil.horizontalScale(3),
+        right: isLandscape
+            ? ScreenUtil.horizontalScale(10)
+            : ScreenUtil.horizontalScale(3),
         child: !widget.videoNotInitialized &&
                 widget.chewieController.videoPlayerController.value
                         .isInitialized ==

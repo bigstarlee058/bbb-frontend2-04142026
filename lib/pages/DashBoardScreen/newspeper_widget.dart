@@ -62,73 +62,71 @@ class NewspaperLayoutWidget extends StatelessWidget {
     );
     final remainingText = text.substring(textNextToImage.length).trim();
 
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: imageWidth,
-                height: imageHeight,
-                margin: EdgeInsets.only(right: spacing),
-                child: ClipRRect(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: imageWidth,
+              height: imageHeight,
+              margin: EdgeInsets.only(right: spacing),
+              child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(ScreenUtil.verticalScale(500)),
+                  child: appShimmerImage(
+                    color: Colors.transparent,
+                    height: imageHeight,
+                    width: imageWidth,
+                    networkImageUrl: imageUrl,
+                    fit: BoxFit.cover,
                     borderRadius:
                         BorderRadius.circular(ScreenUtil.verticalScale(500)),
-                    child: appShimmerImage(
-                      color: Colors.transparent,
-                      height: imageHeight,
-                      width: imageWidth,
-                      networkImageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      borderRadius:
-                          BorderRadius.circular(ScreenUtil.verticalScale(500)),
-                    )
-                    // Image.network(
-                    //   imageUrl,
-                    //   width: imageWidth,
-                    //   height: imageHeight,
-                    //   fit: BoxFit.cover,
-                    //   errorBuilder: (context, error, stackTrace) {
-                    //     return Container(
-                    //       color: Colors.grey[300],
-                    //       child: const Icon(
-                    //         Icons.image_not_supported,
-                    //         color: Colors.grey,
-                    //         size: 40,
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
-                    ),
-              ),
-              Expanded(
-                child: SizedBox(
-                  height: imageHeight,
-                  child: Text(
-                    textNextToImage,
-                    style: defaultTextStyle.copyWith(
-                        color: Theme.of(context).textTheme.bodySmall?.color),
-                    // textAlign: TextAlign.justify,
-                    overflow: TextOverflow.visible,
+                  )
+                  // Image.network(
+                  //   imageUrl,
+                  //   width: imageWidth,
+                  //   height: imageHeight,
+                  //   fit: BoxFit.cover,
+                  //   errorBuilder: (context, error, stackTrace) {
+                  //     return Container(
+                  //       color: Colors.grey[300],
+                  //       child: const Icon(
+                  //         Icons.image_not_supported,
+                  //         color: Colors.grey,
+                  //         size: 40,
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   ),
+            ),
+            Expanded(
+              child: SizedBox(
+                height: imageHeight,
+                child: Text(
+                  textNextToImage,
+                  style: defaultTextStyle.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall?.color),
+                  // textAlign: TextAlign.justify,
+                  overflow: TextOverflow.visible,
                 ),
               ),
-            ],
-          ),
-          if (remainingText.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 1),
-              child: Text(
-                remainingText,
-                style: defaultTextStyle.copyWith(
-                    color: Theme.of(context).textTheme.bodySmall?.color),
-                // textAlign: TextAlign.justify,
-              ),
             ),
-        ],
-      ),
+          ],
+        ),
+        if (remainingText.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Text(
+              remainingText,
+              style: defaultTextStyle.copyWith(
+                  color: Theme.of(context).textTheme.bodySmall?.color),
+              // textAlign: TextAlign.justify,
+            ),
+          ),
+      ],
     );
   }
 

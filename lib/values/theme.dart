@@ -16,10 +16,11 @@ final ThemeData lightTheme = ThemeData(
     seedColor: Color(0xff9A354E),
     brightness: Brightness.light,
   ),
-  textTheme: const TextTheme(
+  textTheme: TextTheme(
     bodyLarge: TextStyle(color: Colors.black),
     bodyMedium: TextStyle(color: Color(0xBB888888)),
     bodySmall: TextStyle(color: AppColors.appGreyColor),
+    displayLarge: TextStyle(color: AppColors.greyColor1),
   ),
   checkboxTheme: CheckboxThemeData(
     side: BorderSide(
@@ -47,6 +48,7 @@ final ThemeData darkTheme = ThemeData(
     bodyLarge: TextStyle(color: Colors.white),
     bodyMedium: TextStyle(color: Colors.grey.shade400),
     bodySmall: TextStyle(color: Colors.grey.shade300),
+    displayLarge: TextStyle(color: Colors.grey[800]),
   ),
   checkboxTheme: CheckboxThemeData(
     side: BorderSide(

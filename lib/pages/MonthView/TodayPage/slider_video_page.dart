@@ -81,6 +81,85 @@ class _SliderVideoPageState extends State<SliderVideoPage>
     return buffered.isNotEmpty ? buffered.last.end : Duration.zero;
   }
 
+  // Future<void> initializeVideo(String url) async {
+  //   if (hasClosedPopup) return;
+  //   try {
+  //     _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
+  //         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+  //
+  //     await _videoPlayerController.initialize();
+  //     if (hasClosedPopup || !mounted) {
+  //       await _videoPlayerController.dispose();
+  //       return;
+  //     }
+  //
+  //     await _videoPlayerController.setLooping(true);
+  //     AudioManager.requestAudioFocus();
+  //
+  //     _chewieController = ChewieController(
+  //       videoPlayerController: _videoPlayerController,
+  //       autoPlay: true,
+  //       looping: true,
+  //       showControls: false,
+  //       aspectRatio: _videoPlayerController.value.aspectRatio,
+  //     );
+  //     bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+  //     _videoPlayerController.setVolume(rawData ? 1 : 0);
+  //     isMute = rawData;
+  //     if (!hasClosedPopup &&
+  //         _chewieController != null &&
+  //         _chewieController!.videoPlayerController.value.isInitialized) {
+  //       hideControls();
+  //       videoSize =
+  //           calculateVideoSize(aspectRatio: _chewieController!.aspectRatio!);
+  //       setState(() {});
+  //     }
+  //
+  //     _videoPlayerController.addListener(() async {
+  //       if (hasClosedPopup || !mounted) return;
+  //       final position = _videoPlayerController.value.position;
+  //       final duration = _videoPlayerController.value.duration;
+  //       final bool isFinished =
+  //           position >= duration && !_videoPlayerController.value.isPlaying;
+  //       if (isFinished) {
+  //         showControlsOnTapOfPause();
+  //       }
+  //       if (duration != null && position >= duration) {
+  //         AudioManager.abandonAudioFocus();
+  //         if (Platform.isIOS) {
+  //           _videoPlayerController.seekTo(Duration.zero);
+  //           _videoPlayerController.play();
+  //         }
+  //       } else {
+  //         AudioManager.requestAudioFocus();
+  //       }
+  //
+  //       videoProgressValue.value = position;
+  //       setState(() {});
+  //     });
+  //     _controller = ProgressBarController(
+  //       vsync: this,
+  //       barAnimationDuration: const Duration(milliseconds: 300),
+  //       thumbAnimationDuration: const Duration(milliseconds: 200),
+  //       waitingDuration: const Duration(milliseconds: 1800),
+  //     );
+  //
+  //     if (!hasClosedPopup && mounted) {
+  //       setState(() {
+  //         loading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     if (!hasClosedPopup) {
+  //       setState(() {
+  //         videoNotInitialized = true;
+  //         loading = false;
+  //       });
+  //     }
+  //     debugPrint("VIDEO NOT INITIALIZED: $e");
+  //   }
+  // }
+
   Future<void> initializeVideo(String url) async {
     if (hasClosedPopup) return;
     try {
@@ -93,20 +172,37 @@ class _SliderVideoPageState extends State<SliderVideoPage>
         return;
       }
 
-      await _videoPlayerController.setLooping(true);
-      AudioManager.requestAudioFocus();
+      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
+      isMute = rawData;
+      await _videoPlayerController.setVolume(rawData ? 1 : 0);
+
+      final isPlaying = _videoPlayerController.value.isPlaying;
+
+      if (isPlaying && isMute == false) {
+        await AudioManager.requestAudioFocus();
+      } else {
+        await AudioManager.abandonAudioFocus();
+      }
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
-        looping: true,
+        looping: false,
         showControls: false,
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
-      bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
-      _videoPlayerController.setVolume(rawData ? 1 : 0);
-      isMute = rawData;
-      if (!hasClosedPopup &&
+
+      await _videoPlayerController.setLooping(false);
+
+      if (_videoPlayerController.value.volume == 0) {
+        await AudioManager.abandonAudioFocus().then((value) async {
+          await Future.delayed(Duration(milliseconds: 20));
+          return _videoPlayerController.play();
+        });
+      }
+
+      if (mounted &&
+          !hasClosedPopup &&
           _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
@@ -116,27 +212,39 @@ class _SliderVideoPageState extends State<SliderVideoPage>
       }
 
       _videoPlayerController.addListener(() async {
-        if (hasClosedPopup || !mounted) return;
-        final position = _videoPlayerController.value.position;
-        final duration = _videoPlayerController.value.duration;
-        final bool isFinished =
-            position >= duration && !_videoPlayerController.value.isPlaying;
-        if (isFinished) {
-          showControlsOnTapOfPause();
-        }
-        if (duration != null && position >= duration) {
-          AudioManager.abandonAudioFocus();
-          if (Platform.isIOS) {
-            _videoPlayerController.seekTo(Duration.zero);
-            _videoPlayerController.play();
-          }
-        } else {
-          AudioManager.requestAudioFocus();
+        if (!mounted) return;
+
+        final isPlaying = _videoPlayerController.value.isPlaying;
+        if (isPlaying && isMute == true) {
+          await AudioManager.requestAudioFocus();
         }
 
-        videoProgressValue.value = position;
+        _onVideoTick();
         setState(() {});
       });
+
+      // _videoPlayerController.addListener(() async {
+      //   if (hasClosedPopup || !mounted) return;
+      //   final position = _videoPlayerController.value.position;
+      //   final duration = _videoPlayerController.value.duration;
+      //   final bool isFinished =
+      //       position >= duration && !_videoPlayerController.value.isPlaying;
+      //   if (isFinished) {
+      //     showControlsOnTapOfPause();
+      //   }
+      //   if (duration != null && position >= duration) {
+      //     AudioManager.abandonAudioFocus();
+      //     if (Platform.isIOS) {
+      //       _videoPlayerController.seekTo(Duration.zero);
+      //       _videoPlayerController.play();
+      //     }
+      //   } else {
+      //     AudioManager.requestAudioFocus();
+      //   }
+      //
+      //   videoProgressValue.value = position;
+      //   setState(() {});
+      // });
       _controller = ProgressBarController(
         vsync: this,
         barAnimationDuration: const Duration(milliseconds: 300),
@@ -156,7 +264,37 @@ class _SliderVideoPageState extends State<SliderVideoPage>
           loading = false;
         });
       }
+
       debugPrint("VIDEO NOT INITIALIZED: $e");
+    }
+  }
+
+  bool _restarting = false;
+
+  void _onVideoTick() async {
+    final v = _videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null || _restarting) return;
+
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      _restarting = true;
+
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await _videoPlayerController.pause();
+      await _videoPlayerController.seekTo(Duration.zero);
+      await _videoPlayerController.setVolume(isMute ? 1 : 0);
+      await _videoPlayerController.play();
+      _restarting = false;
     }
   }
 
@@ -205,10 +343,31 @@ class _SliderVideoPageState extends State<SliderVideoPage>
     isZoom = value;
   }
 
+  // muteUnMute() async {
+  //   isMute = !isMute;
+  //
+  //   _videoPlayerController.setVolume(isMute ? 1 : 0);
+  //   setState(() {});
+  //   await preferences.setBool(SharedPreference.isMute, isMute);
+  // }
+
   muteUnMute() async {
     isMute = !isMute;
 
     _videoPlayerController.setVolume(isMute ? 1 : 0);
+    setState(() {});
+
+    if (_videoPlayerController.value.volume == 0) {
+      final videoPlay = _videoPlayerController.value.isPlaying;
+
+      await AudioManager.abandonAudioFocus().then((value) async {
+        await Future.delayed(Duration(milliseconds: 20));
+        if (videoPlay) {
+          return _videoPlayerController.play();
+        }
+      });
+    }
+
     setState(() {});
     await preferences.setBool(SharedPreference.isMute, isMute);
   }
@@ -289,10 +448,10 @@ class _SliderVideoPageState extends State<SliderVideoPage>
             child: ConstrainedBox(
               constraints: BoxConstraints(
                   maxHeight: loading || videoSize == null
-                      ? MediaQuery.of(context).size.height * 0.825
+                      ? MediaQuery.of(context).size.height * 0.725
                       : videoSize!.height +
                           ScreenUtil.verticalScale(
-                              videoSize!.height > 300 ? 12 : 10.5)),
+                              videoSize!.height > 300 ? 2.5 : .8)),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -312,7 +471,12 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                 child: Center(
                                   child: Text(
                                     "Video not available!",
-                                    style: TextStyle(fontSize: 18),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color),
                                   ),
                                 ),
                               ),
@@ -443,16 +607,12 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                       showControlsOnTapOfPause();
 
                                                       await Future.delayed(
-                                                              Duration(
-                                                                  milliseconds:
-                                                                      100))
-                                                          .then(
-                                                        (value) {
-                                                          AudioManager
-                                                              .abandonAudioFocus();
-                                                          setState(() {});
-                                                        },
-                                                      );
+                                                          const Duration(
+                                                              milliseconds:
+                                                                  100));
+                                                      await AudioManager
+                                                          .abandonAudioFocus();
+                                                      setState(() {});
                                                     } else {
                                                       _videoPlayerController
                                                           .play();
@@ -460,16 +620,17 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                                       hideControls();
 
                                                       await Future.delayed(
-                                                              Duration(
-                                                                  milliseconds:
-                                                                      100))
-                                                          .then(
-                                                        (value) {
-                                                          AudioManager
-                                                              .requestAudioFocus();
-                                                          setState(() {});
-                                                        },
-                                                      );
+                                                          const Duration(
+                                                              milliseconds:
+                                                                  100));
+
+                                                      if (_videoPlayerController
+                                                              .value.volume >
+                                                          0) {
+                                                        await AudioManager
+                                                            .requestAudioFocus();
+                                                      }
+                                                      setState(() {});
                                                     }
                                                   }
                                                 : null,
@@ -645,27 +806,27 @@ class _SliderVideoPageState extends State<SliderVideoPage>
                                   ),
                                 ],
                               ),
-                              Spacer(),
-                              Container(
-                                margin: EdgeInsets.only(
-                                  top: ScreenUtil.verticalScale(1.5),
-                                  bottom: ScreenUtil.verticalScale(1.5),
-                                  left: ScreenUtil.horizontalScale(3),
-                                  right: ScreenUtil.horizontalScale(3),
-                                ),
-                                child: SizedBox(
-                                  height: ScreenUtil.verticalScale(6.4),
-                                  child: ButtonWidget(
-                                    text: "Close",
-                                    textColor: Colors.white,
-                                    onPress: () {
-                                      Navigator.pop(context);
-                                    },
-                                    color: AppColors.primaryColor,
-                                    isLoading: false,
-                                  ),
-                                ),
-                              ),
+                              // Spacer(),
+                              // Container(
+                              //   margin: EdgeInsets.only(
+                              //     top: ScreenUtil.verticalScale(1.5),
+                              //     bottom: ScreenUtil.verticalScale(1.5),
+                              //     left: ScreenUtil.horizontalScale(3),
+                              //     right: ScreenUtil.horizontalScale(3),
+                              //   ),
+                              //   child: SizedBox(
+                              //     height: ScreenUtil.verticalScale(6.4),
+                              //     child: ButtonWidget(
+                              //       text: "Close",
+                              //       textColor: Colors.white,
+                              //       onPress: () {
+                              //         Navigator.pop(context);
+                              //       },
+                              //       color: AppColors.primaryColor,
+                              //       isLoading: false,
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
               ),

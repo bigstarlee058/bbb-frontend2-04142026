@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/staffs.dart';
@@ -201,7 +203,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                     ),
                   ),
                   child: Container(
-                    margin: EdgeInsets.only(top: ScreenUtil.verticalScale(3)),
+                    margin: EdgeInsets.only(top: ScreenUtil.verticalScale(2.5)),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: ScreenUtil.horizontalScale(9)),
@@ -211,7 +213,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                           Text(
                             staffData != null ? staffData.title : 'Name',
                             style: TextStyle(
-                              fontSize: ScreenUtil.verticalScale(3.5),
+                              fontSize: ScreenUtil.verticalScale(3.2),
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryColor,
                             ),
@@ -222,7 +224,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                   ? SizedBox()
                                   : Padding(
                                       padding: const EdgeInsets.only(
-                                          right: 6, bottom: 10, top: 10),
+                                          right: 6, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(
@@ -251,7 +253,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                   ? SizedBox()
                                   : Padding(
                                       padding: const EdgeInsets.only(
-                                          right: 6, bottom: 10, top: 10),
+                                          right: 6, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.facebook);
@@ -279,7 +281,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                   ? SizedBox()
                                   : Padding(
                                       padding: const EdgeInsets.only(
-                                          right: 6, bottom: 10, top: 10),
+                                          right: 6, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.twitter);
@@ -307,7 +309,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                   ? SizedBox()
                                   : Padding(
                                       padding: const EdgeInsets.only(
-                                          right: 6, bottom: 10, top: 10),
+                                          right: 6, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.tiktok);
@@ -335,7 +337,7 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                                   ? SizedBox()
                                   : Padding(
                                       padding: const EdgeInsets.only(
-                                          right: 6, bottom: 10, top: 10),
+                                          right: 6, top: 10),
                                       child: GestureDetector(
                                         onTap: () async {
                                           await launchUrls(staffData.linkedin);
@@ -362,7 +364,6 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
                             ],
                           ),
                           Container(
-                              margin: const EdgeInsets.only(top: 10.0),
                               alignment: Alignment.centerLeft,
                               child: Builder(builder: (context) {
                                 String bioContent = staffData.bio ?? "";

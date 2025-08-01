@@ -60,7 +60,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'localstorage/month_database.dart';
 import 'pages/SubscriptionPage/subscription_pay_wall.dart';
-import 'pages/Tools/seeall_achievement_page_new.dart';
+import 'pages/Tools/seeall_achievement_page.dart';
 import 'providers/month_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/video_initiase_loader.dart';
@@ -68,7 +68,7 @@ import 'providers/video_initiase_loader.dart';
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-List<Map<String, dynamic>> allImages = [];
+// List<Map<String, dynamic>> allImages = [];
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {}
 
@@ -210,7 +210,8 @@ class _MyAppState extends State<MyApp> {
   void _handleDeepLink(String? deepLink) {
     if (deepLink != null) {
       Uri uri = Uri.parse(deepLink);
-      if (uri.scheme == 'https' && uri.host == 'bbbdev1.wpenginepowered.com') {
+      // if (uri.scheme == 'https' && uri.host == 'bbbdev1.wpenginepowered.com') {
+      if (uri.scheme == 'https' && uri.host == 'app.bootybybret.com') {
         Navigator.of(context).pushNamed(AppRoutes.mainScreen);
       } else {
         debugPrint('Unsupported deep link: $deepLink');

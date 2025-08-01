@@ -71,6 +71,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   num totalSets = 0;
+  num totalReps = 0;
   int warmUpSetTotal = 0;
   int workingSetTotal = 0;
   int backOffSetTotal = 0;
@@ -78,6 +79,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   Future<void> getTotalSets() async {
     await fetchExtraSetLocalData();
     totalSets = 0;
+    totalReps = 0;
     warmUpSetTotal = 0;
     workingSetTotal = 0;
     backOffSetTotal = 0;
@@ -92,6 +94,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
       for (var element in widget.exercise.extra!) {
         if (element.type != 1) {
           totalSets += int.parse(element.sets.toString());
+          totalReps += int.parse(element.reps.toString());
         }
         if (element.type == 1) {
           warmUpSetTotal += int.parse(element.sets.toString());
@@ -107,6 +110,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     for (var element in extraSetModel) {
       if (element.type != 1) {
         totalSets += int.parse(element.sets.toString());
+        totalReps += int.parse(element.reps.toString());
       }
       if (element.type == 1) {
         warmUpSetTotal += int.parse(element.sets.toString());
@@ -228,11 +232,11 @@ class _WorkoutCardState extends State<WorkoutCard> {
                       await getTotalSets();
                       final provider =
                           Provider.of<MonthProvider>(context, listen: false);
+                      provider.updateSetValue(
+                          warmUpSetTotal, backOffSetTotal, workingSetTotal);
                       widget.onPress!(
                         () async => await getTotalSets(),
                       );
-                      provider.updateSetValue(
-                          warmUpSetTotal, backOffSetTotal, workingSetTotal);
                     }
                   : null,
           style: ElevatedButton.styleFrom(
@@ -354,34 +358,33 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 height: 1.2),
                           );
                         }),
-                        widget.isCircuit
+                        /*widget.isCircuit
                             ? SizedBox()
-                            : Padding(
-                                padding: EdgeInsets.only(
-                                    top: ScreenUtil.verticalScale(1.5)),
-                                child: Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                      "assets/icons/trend.svg",
-                                      colorFilter: const ColorFilter.mode(
-                                          Colors.grey, BlendMode.srcIn),
-                                      width: 20,
-                                    ),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    Text(
-                                      "$totalSets Working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: widget.isCircuit
-                                            ? ScreenUtil.verticalScale(1.3)
-                                            : ScreenUtil.verticalScale(1.5),
-                                      ),
-                                    ),
-                                  ],
+                            : */
+                        Padding(
+                          padding:
+                              EdgeInsets.only(top: ScreenUtil.verticalScale(1)),
+                          child: Row(
+                            children: [
+                              SvgPicture.asset("assets/icons/trend.svg",
+                                  colorFilter: const ColorFilter.mode(
+                                      Colors.grey, BlendMode.srcIn),
+                                  width: ScreenUtil.verticalScale(1.8)),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                value.isPumpDay
+                                    ? "$totalReps Rep${(totalReps > 1 || totalReps == 0) ? "s" : ""}"
+                                    : "$totalSets Working set${(totalSets > 1 || totalSets == 0) ? "s" : ""}",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: ScreenUtil.verticalScale(1.45),
                                 ),
-                              )
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
                   ),

@@ -38,10 +38,12 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordController1 = TextEditingController();
+  StringBuffer realPassword = StringBuffer();
 
   DataProvider? dataProvider;
   MonthProvider? monthProvider;
-  bool isObscure = true;
+  bool isObscure = false;
   bool isLoading = false;
   ImageProvider? imageProvider;
   late UserDataProvider userData;
@@ -94,7 +96,9 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       final url = Uri.parse(
-          'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+          // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v  1/token');
+          'https://app.bootybybret.com/wp-json/jwt-auth/v1/token');
+      // '${AppConstants.serverUrl}api/users/signin_mobile');
 
       final response = await http.post(
         url,
@@ -105,283 +109,286 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        await _saveLoginState(true);
-        String token = data['token'];
-
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('authToken', token);
-
-        context.read<MainPageProvider>().changeTab(0);
-        bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-        await userData.fetchUserInfo();
-        bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
-        WidgetsBinding.instance.addPostFrameCallback(
-          (timeStamp) async => await _initializeFetchData().then(
-            (value) async {
-              bool isFirstTime =
-                  userData.user["createdAt"] == userData.user["updatedAt"] ||
-                      userData.user["detail"] == null;
-              await preferences.setBool(
-                  SharedPreference.isFirstTime, isFirstTime);
-
-              dataProvider?.getAllAchievement(true);
-              if (monthProvider?.monthDataModel == null) {
-                if (mounted) {
-                  await monthProvider?.onInit(context: context).then(
-                    (value) async {
-                      if (Platform.isIOS && isAppUser) {
-                        try {
-                          Map<String, dynamic> subscriptionData =
-                              userData.user["subscription"];
-                          DateTime now = DateTime.now().toUtc();
-                          DateTime? endDate = (subscriptionData["end_date"] ??
-                                      "")
-                                  .toString()
-                                  .isEmpty
-                              ? null
-                              : DateTime.parse(subscriptionData["end_date"]);
-                          if (endDate == null || (now.isAfter(endDate))) {
-                            await _updateSubscriptionData(
-                              type: "",
-                              endDate: "",
-                              startDate: "",
-                              status: "free_user",
-                            );
-                          }
-                        } catch (e) {
-                          debugPrint("Error fetching subscription: $e");
-                        }
-                      }
-
-                      // if (Platform.isIOS && isAppUser) {
-                      //   try {
-                      //     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-                      //     if (customerInfo.entitlements.active.isNotEmpty) {
-                      //       customerInfo.entitlements.active.forEach((key, entitlement) async {
-                      //         final latestPurchaseDate = customerInfo.allPurchaseDates;
-                      //         final identifier = entitlement.productIdentifier;
-                      //
-                      //         await _updateSubscriptionData(
-                      //           type: identifier,
-                      //           endDate: entitlement.expirationDate ?? "",
-                      //           startDate: latestPurchaseDate[identifier] ?? "",
-                      //           status: "subscribed_user",
-                      //         );
-                      //       });
-                      //     } else {
-                      //       await _updateSubscriptionData(
-                      //         type: "",
-                      //         endDate: "",
-                      //         startDate: "",
-                      //         status: "free_user",
-                      //       );
-                      //     }
-                      //   } catch (e) {
-                      //     debugPrint("Error fetching subscription: $e");
-                      //   }
-                      // }
-
-                      if (Platform.isIOS && isAppUser) {
-                        await userData.fetchUserInfo().then(
-                          (value) async {
-                            Map<String, dynamic> subscriptionData =
-                                userData.user["subscription"];
-
-                            if (subscriptionData["user_subscription_status"] ==
-                                "free_user") {
-                              if (mounted) {
-                                await Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          SubscriptionPayWall()),
-                                );
-                              }
-                            } else {
-                              if (isFirstTime) {
-                                if (mounted) {
-                                  await Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ProfileBoardingScreen(
-                                          welcomeDescription: '',
-                                          welcomeImageUrl: '',
-                                        ),
-                                      ),
-                                      (route) => false).then(
-                                    (value) async {
-                                      await preferences.setBool(
-                                          SharedPreference.isFirstTime, false);
-                                    },
-                                  );
-                                }
-                              } else {
-                                if (mounted) {
-                                  await Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => MainPage(
-                                                showWelcomeModal:
-                                                    !hasSeenWelcome,
-                                                welcomeDescription: "",
-                                                welcomeImageUrl: dataProvider
-                                                        ?.screenBackgroundModel
-                                                        ?.vimeoId ??
-                                                    "",
-                                              )),
-                                      (route) => false);
-                                }
-                              }
-                            }
-                          },
-                        );
-                      } else if (Platform.isIOS && !isAppUser) {
-                        // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
-                        //     ? null
-                        //     : DateTime.parse(subscriptionData["end_date"] ?? "");
-                        //
-                        // DateTime now = await NTP.now();
-                        //
-                        // if (subscriptionData["user_subscription_status"] == "free_user" ||
-                        //     (endDate != null && now.isAfter(endDate))) {
-                        //   if (mounted) {
-                        //     Navigator.pushReplacement(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) => const WooSubscriptionPayWall(),
-                        //       ),
-                        //     );
-                        //   }
-                        // } else {
-                        //   if (mounted) {
-                        //     await Navigator.pushAndRemoveUntil(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //             builder: (context) => MainPage(
-                        //                 showWelcomeModal: !hasSeenWelcome,
-                        //                 welcomeDescription:
-                        //                     descriptionData['description'] ?? "",
-                        //                 welcomeImageUrl: descriptionData['vimeoId'])),
-                        //         (route) => false);
-                        //   }
-                        // }
-                        WidgetsBinding.instance.addPostFrameCallback(
-                          (timeStamp) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          },
-                        );
-
-                        if (isFirstTime) {
-                          if (mounted) {
-                            await Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProfileBoardingScreen(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: '',
-                                  ),
-                                ),
-                                (route) => false).then(
-                              (value) async {
-                                await preferences.setBool(
-                                    SharedPreference.isFirstTime, false);
-                              },
-                            );
-                          }
-                        } else {
-                          if (mounted) {
-                            await Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MainPage(
-                                          showWelcomeModal: !hasSeenWelcome,
-                                          welcomeDescription: "",
-                                          welcomeImageUrl: dataProvider
-                                                  ?.screenBackgroundModel
-                                                  ?.vimeoId ??
-                                              "",
-                                        )),
-                                (route) => false);
-                          }
-                        }
-                      } else {
-                        if (isFirstTime) {
-                          if (mounted) {
-                            await Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProfileBoardingScreen(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: '',
-                                  ),
-                                ),
-                                (route) => false).then(
-                              (value) async {
-                                await preferences.setBool(
-                                    SharedPreference.isFirstTime, false);
-                              },
-                            );
-                          }
-                        } else {
-                          if (mounted) {
-                            await Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MainPage(
-                                    showWelcomeModal: !hasSeenWelcome,
-                                    welcomeDescription: "",
-                                    welcomeImageUrl: dataProvider
-                                            ?.screenBackgroundModel?.vimeoId ??
-                                        "",
-                                  ),
-                                ),
-                                (route) => false);
-                          }
-                        }
-
-                        WidgetsBinding.instance.addPostFrameCallback(
-                          (timeStamp) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          },
-                        );
-                      }
-                    },
-                  );
-                }
-              }
-            },
-          ),
-        );
+        await successResponse(response);
       } else {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (timeStamp) {
-            setState(() {
-              isLoading = false;
-            });
+        final url = Uri.parse(
+            // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+            'https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signin_mobile');
+
+        final response1 = await http.post(
+          url,
+          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+          body: {
+            'email': emailAddress,
+            'password': password,
           },
         );
-        if (mounted) {
-          showBottomAlert(context, 'Login failed');
+        log('response1==========>>>>>${response1.body}');
+        if (response1.statusCode == 200) {
+          await successResponse(response1);
+        } else {
+          setState1();
+          if (mounted) {
+            showBottomAlert(context, 'Login failed');
+          }
         }
       }
     } catch (e) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) {
-          setState(() {
-            isLoading = false;
-          });
-        },
-      );
+      setState1();
       if (mounted) {
         showBottomAlert(context, 'User not found!');
       }
     }
+  }
+
+  void setState1() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        setState(() {
+          isLoading = false;
+        });
+      },
+    );
+  }
+
+  Future<void> successResponse(http.Response response) async {
+    final data = json.decode(response.body);
+    await _saveLoginState(true);
+    String token = data['token'];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('authToken', token);
+
+    context.read<MainPageProvider>().changeTab(0);
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+    await userData.fetchUserInfo();
+    bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async => await _initializeFetchData().then(
+        (value) async {
+          bool isFirstTime =
+              (userData.user["createdAt"] == userData.user["updatedAt"]) ||
+                  (userData.user["detail"] == null) ||
+                  !userData.user["detail"].containsKey('bodyfat');
+          await preferences.setBool(SharedPreference.isFirstTime, isFirstTime);
+
+          dataProvider?.getAllAchievement(true);
+          if (monthProvider?.monthDataModel == null) {
+            if (mounted) {
+              await monthProvider?.onInit(context: context).then(
+                (value) async {
+                  if (Platform.isIOS && isAppUser) {
+                    try {
+                      Map<String, dynamic> subscriptionData =
+                          userData.user["subscription"];
+                      DateTime now = DateTime.now().toUtc();
+                      DateTime? endDate = (subscriptionData["end_date"] ?? "")
+                              .toString()
+                              .isEmpty
+                          ? null
+                          : DateTime.parse(subscriptionData["end_date"]);
+                      if (endDate == null || (now.isAfter(endDate))) {
+                        await _updateSubscriptionData(
+                          type: "",
+                          endDate: "",
+                          startDate: "",
+                          status: "free_user",
+                        );
+                      }
+                    } catch (e) {
+                      debugPrint("Error fetching subscription: $e");
+                    }
+                  }
+
+                  // if (Platform.isIOS && isAppUser) {
+                  //   try {
+                  //     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+                  //     if (customerInfo.entitlements.active.isNotEmpty) {
+                  //       customerInfo.entitlements.active.forEach((key, entitlement) async {
+                  //         final latestPurchaseDate = customerInfo.allPurchaseDates;
+                  //         final identifier = entitlement.productIdentifier;
+                  //
+                  //         await _updateSubscriptionData(
+                  //           type: identifier,
+                  //           endDate: entitlement.expirationDate ?? "",
+                  //           startDate: latestPurchaseDate[identifier] ?? "",
+                  //           status: "subscribed_user",
+                  //         );
+                  //       });
+                  //     } else {
+                  //       await _updateSubscriptionData(
+                  //         type: "",
+                  //         endDate: "",
+                  //         startDate: "",
+                  //         status: "free_user",
+                  //       );
+                  //     }
+                  //   } catch (e) {
+                  //     debugPrint("Error fetching subscription: $e");
+                  //   }
+                  // }
+
+                  if (Platform.isIOS && isAppUser) {
+                    await userData.fetchUserInfo().then(
+                      (value) async {
+                        Map<String, dynamic> subscriptionData =
+                            userData.user["subscription"];
+
+                        if (subscriptionData["user_subscription_status"] ==
+                            "free_user") {
+                          if (mounted) {
+                            await Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SubscriptionPayWall()),
+                            );
+                          }
+                        } else {
+                          if (isFirstTime) {
+                            if (mounted) {
+                              await Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfileBoardingScreen(
+                                      welcomeDescription: '',
+                                      welcomeImageUrl: '',
+                                    ),
+                                  ),
+                                  (route) => false).then(
+                                (value) async {
+                                  await preferences.setBool(
+                                      SharedPreference.isFirstTime, false);
+                                },
+                              );
+                            }
+                          } else {
+                            if (mounted) {
+                              await Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MainPage(
+                                            showWelcomeModal: !hasSeenWelcome,
+                                            welcomeDescription: "",
+                                            welcomeImageUrl: dataProvider
+                                                    ?.screenBackgroundModel
+                                                    ?.vimeoId ??
+                                                "",
+                                          )),
+                                  (route) => false);
+                            }
+                          }
+                        }
+                      },
+                    );
+                  } else if (Platform.isIOS && !isAppUser) {
+                    // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
+                    //     ? null
+                    //     : DateTime.parse(subscriptionData["end_date"] ?? "");
+                    //
+                    // DateTime now = await NTP.now();
+                    //
+                    // if (subscriptionData["user_subscription_status"] == "free_user" ||
+                    //     (endDate != null && now.isAfter(endDate))) {
+                    //   if (mounted) {
+                    //     Navigator.pushReplacement(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => const WooSubscriptionPayWall(),
+                    //       ),
+                    //     );
+                    //   }
+                    // } else {
+                    //   if (mounted) {
+                    //     await Navigator.pushAndRemoveUntil(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //             builder: (context) => MainPage(
+                    //                 showWelcomeModal: !hasSeenWelcome,
+                    //                 welcomeDescription:
+                    //                     descriptionData['description'] ?? "",
+                    //                 welcomeImageUrl: descriptionData['vimeoId'])),
+                    //         (route) => false);
+                    //   }
+                    // }
+                    setState1();
+
+                    if (isFirstTime) {
+                      if (mounted) {
+                        await Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileBoardingScreen(
+                                welcomeDescription: '',
+                                welcomeImageUrl: '',
+                              ),
+                            ),
+                            (route) => false).then(
+                          (value) async {
+                            await preferences.setBool(
+                                SharedPreference.isFirstTime, false);
+                          },
+                        );
+                      }
+                    } else {
+                      if (mounted) {
+                        await Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MainPage(
+                                      showWelcomeModal: !hasSeenWelcome,
+                                      welcomeDescription: "",
+                                      welcomeImageUrl: dataProvider
+                                              ?.screenBackgroundModel
+                                              ?.vimeoId ??
+                                          "",
+                                    )),
+                            (route) => false);
+                      }
+                    }
+                  } else {
+                    if (isFirstTime) {
+                      if (mounted) {
+                        await Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileBoardingScreen(
+                                welcomeDescription: '',
+                                welcomeImageUrl: '',
+                              ),
+                            ),
+                            (route) => false).then(
+                          (value) async {
+                            await preferences.setBool(
+                                SharedPreference.isFirstTime, false);
+                          },
+                        );
+                      }
+                    } else {
+                      if (mounted) {
+                        await Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainPage(
+                                showWelcomeModal: !hasSeenWelcome,
+                                welcomeDescription: "",
+                                welcomeImageUrl: dataProvider
+                                        ?.screenBackgroundModel?.vimeoId ??
+                                    "",
+                              ),
+                            ),
+                            (route) => false);
+                      }
+                    }
+
+                    setState1();
+                  }
+                },
+              );
+            }
+          }
+        },
+      ),
+    );
   }
 
   void onPressCreateAccount() async {
@@ -457,6 +464,8 @@ class _LoginPageState extends State<LoginPage> {
     return prefs.getString('authToken');
   }
 
+  String previousMasked = "";
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -468,27 +477,30 @@ class _LoginPageState extends State<LoginPage> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              AppImage.imageLogin(
-                // media,
-                // image: dataProvider!.allImageList
-                //     .where((element) => element["key"] == "imageLogin")
-                //     .first["image"],
-                // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                // // image: dataProvider!.cachedImageMap["imageLogin"],
-                // imageKey: "imageLogin",
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: SafeArea(
-                        child: BackArrowWidget(onPress: () {
-                          Navigator.pop(context);
-                        }),
+              Consumer<DataProvider>(builder: (context, value, c) {
+                return AppImage.imageLogin(
+                  value,
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageLogin")
+                  //     .first["image"],
+                  // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                  // // image: dataProvider!.cachedImageMap["imageLogin"],
+                  // imageKey: "imageLogin",
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: SafeArea(
+                          child: BackArrowWidget(onPress: () {
+                            Navigator.pop(context);
+                          }),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                );
+              }),
             ],
           ),
           Positioned(
@@ -578,12 +590,62 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.visiblePassword,
                               textInputAction: TextInputAction.done,
                               controller: passwordController,
-                              obscureText: isObscure,
+                              obscureText: false,
+                              onChanged: (value) {
+                                if (isObscure) {
+                                  if (value.length < previousMasked.length) {
+                                    if (realPassword.isNotEmpty) {
+                                      realPassword = StringBuffer(
+                                        realPassword.toString().substring(
+                                            0, realPassword.length - 1),
+                                      );
+                                    }
+                                  } else if (value.length >
+                                      previousMasked.length) {
+                                    final newChar = value[value.length - 1];
+                                    realPassword.write(newChar);
+                                  }
+
+                                  final masked = List.generate(
+                                      realPassword.length, (_) => "•").join();
+                                  previousMasked = masked;
+
+                                  passwordController.value = TextEditingValue(
+                                    text: masked,
+                                    selection: TextSelection.collapsed(
+                                        offset: masked.length),
+                                  );
+                                } else {
+                                  realPassword
+                                    ..clear()
+                                    ..write(value);
+                                  previousMasked = value;
+                                }
+                              },
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.only(right: 15),
                                 child: IconButton(
                                   onPressed: () {
-                                    setState(() => isObscure = !isObscure);
+                                    isObscure = !isObscure;
+                                    if (isObscure) {
+                                      final masked = List.generate(
+                                              realPassword.length, (_) => "•")
+                                          .join();
+                                      passwordController.value =
+                                          TextEditingValue(
+                                        text: masked,
+                                        selection: TextSelection.collapsed(
+                                            offset: masked.length),
+                                      );
+                                    } else {
+                                      passwordController.value =
+                                          TextEditingValue(
+                                        text: realPassword.toString(),
+                                        selection: TextSelection.collapsed(
+                                            offset: realPassword.length),
+                                      );
+                                    }
+                                    setState(() {});
                                   },
                                   style: ButtonStyle(
                                       minimumSize: WidgetStateProperty.all(
@@ -633,10 +695,11 @@ class _LoginPageState extends State<LoginPage> {
                             textColor: Colors.white,
                             color: AppColors.primaryColor,
                             onPress: () {
+                              previousMasked = passwordController.text;
                               if (_formKey.currentState?.validate() == true) {
                                 signInUser(
                                   emailController.text,
-                                  passwordController.text,
+                                  realPassword.toString(),
                                 );
                               }
                             },

@@ -63,7 +63,7 @@ class FeaturedCollectionWidget extends StatelessWidget {
                                 ),
                               ),
                               CarouselSlider.builder(
-                                itemCount: dataProvider.staffsData.length,
+                                itemCount: dataProvider.collectionsData.length,
                                 options: CarouselOptions(
                                   height: ScreenUtil.verticalScale(38),
                                   viewportFraction: 0.65,
@@ -95,7 +95,7 @@ class FeaturedCollectionWidget extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Text(
-                      "Meet out team",
+                      "Meet Our Team",
                       maxLines: 2,
                       textAlign: TextAlign.left,
                       style: TextStyle(

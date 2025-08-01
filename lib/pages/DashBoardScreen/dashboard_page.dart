@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/athletes_list_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -12,7 +13,6 @@ import 'package:bbb/components/program_phases_widget.dart';
 import 'package:bbb/components/share_achievement_new_dialog.dart';
 import 'package:bbb/components/staff_list_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
-import 'package:bbb/main.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -77,6 +77,7 @@ class _DashboardPageState extends State<DashboardPage> {
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
+    monthProvider.onInit(context: context, isEnabled: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollProvider.updateOffSet(0.0);
     });
@@ -90,6 +91,7 @@ class _DashboardPageState extends State<DashboardPage> {
     loadFeaturedCollectionData();
     loadProgramPhaseData();
     requestNotificationPermission();
+    loadAchievementsData(false);
   }
 
   Future<void> requestNotificationPermission() async {
@@ -162,39 +164,36 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            imageLoad(media),
-            if (allImages.isNotEmpty) ...[
-              AppImage.imageMonthView(),
-              AppImage.imageStreakCalendar(),
-              AppImage.imageTools(),
-              AppImage.imageProfile(),
-              AppImage.imageMyProfle(),
-              AppImage.imageToday(),
-              AppImage.imageExerciseLibrary(),
-              AppImage.imageGraphs(),
-              AppImage.imageAchievement(),
-              AppImage.imageFaQs(),
-              AppImage.imageLogin(),
-              AppImage.imageSignup(),
-              AppImage.imageEmailConfirm(),
-              AppImage.imageForgot(),
-              AppImage.imageSetting(),
-              AppImage.imageApparel(),
-            ],
             Consumer<DataProvider>(
-              builder: (context, value, child) {
-                return Utils.appImage(
-                  val: true,
-                  media,
-                  image: value.allImageList.isEmpty
-                      ? ""
-                      : value.allImageList
-                          .where(
-                              (element) => element["key"] == "imageDashboard")
-                          .first["image"],
-                  imageKey: "imageDashboard",
-                );
+              builder: (context, value, c) {
+                return value.allImageList.isNotEmpty
+                    ? Column(
+                        children: [
+                          AppImage.imageDashboard(value),
+                          AppImage.imageMonthView(value),
+                          AppImage.imageStreakCalendar(value),
+                          AppImage.imageTools(value),
+                          AppImage.imageProfile(value),
+                          AppImage.imageMyProfle(value),
+                          AppImage.imageToday(value),
+                          AppImage.imageExerciseLibrary(value),
+                          AppImage.imageGraphs(value),
+                          AppImage.imageAchievement(value),
+                          AppImage.imageFaQs(value),
+                          AppImage.imageLogin(value),
+                          AppImage.imageSignup(value),
+                          AppImage.imageEmailConfirm(value),
+                          AppImage.imageForgot(value),
+                          AppImage.imageSetting(value),
+                          AppImage.imageApparel(value),
+                        ],
+                      )
+                    : SizedBox();
               },
+            ),
+            Consumer<DataProvider>(
+              builder: (context, value, child) =>
+                  AppImage.imageDashboard(value),
             ),
             mainContent(context, media),
             Consumer<ScrollProvider>(
@@ -281,29 +280,6 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
     );
-  }
-
-  Widget imageLoad(Size media) {
-    return Visibility(
-      visible: true,
-      child: Utils.appImage(
-        media,
-        image: dataProvider!.allImageList[0]["image"],
-        imageKey: dataProvider!.allImageList[0]["key"],
-      ),
-    );
-    // return Column(
-    //   children: dataProvider!.allImageList.map((entry) {
-    //     return Visibility(
-    //       visible: true,
-    //       child: Utils.appImage(
-    //         media,
-    //         image: entry["image"],
-    //         imageKey: entry["key"],
-    //       ),
-    //     );
-    //   }).toList(),
-    // );
   }
 
   Widget mainContent(BuildContext context, Size media) {
@@ -717,7 +693,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
                   /// WEEK ACTIVITY
 
-                  graphs(),
+                  // graphs(),
 
                   /// ACHIEVEMENT PART
 
@@ -1405,7 +1381,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
         bool isAppUser = userData?.user["singuptype"] != "web" ? true : false;
-
         return isAppUser
             ? SizedBox(height: ScreenUtil.verticalScale(2.5))
             : (dataProvider.collectionsData.isNotEmpty)
@@ -1435,7 +1410,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         //   ),
                         // ),
                         CarouselSlider.builder(
-                          itemCount: dataProvider.staffsData.length,
+                          itemCount: dataProvider.collectionsData.length,
                           options: CarouselOptions(
                             height: ScreenUtil.verticalScale(38),
                             viewportFraction: 0.65,
@@ -1475,7 +1450,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   child: Center(
                     child: Text(
-                      "Meet our team",
+                      "Meet Our Team",
                       style: TextStyle(
                         color: AppColors.primaryColor,
                         fontSize: ScreenUtil.horizontalScale(5),
@@ -1572,7 +1547,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 .contains(dataId)));
 
     monthData.changeIsPumpDay(isPumpDay);
-
     if (isPumpDay) {
       final dataList = monthProvider.dayHistoryModel
           .where((element) =>
@@ -1645,33 +1619,26 @@ class _DashboardPageState extends State<DashboardPage> {
     } else if (currentDayTitle.contains("Rest Day") &&
         (!monthProvider.isPumpDay) &&
         !isCompletedOrSkipped) {
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 
-      await Future.delayed(Duration(milliseconds: 20)).then(
+      await Future.delayed(Duration(milliseconds: 300)).then(
         (value) {
+          mainPageProvider.changeTab(1);
           monthProvider.updateIsOnMonthPage(false);
           monthProvider.updateScrollToRestDay(true);
-          mainPageProvider.changeTab(1);
         },
       );
-
+      //
       _completeRestDay(
               status: Status.completed, type: 'Rest Day', endDate: true)
           .then(
-        (value) {
+        (value) async {
           if (context.mounted) {
-            monthProvider.onInit(context: context, isEnabled: false);
+            await monthProvider.onInit(context: context, isEnabled: false);
           }
         },
       );
       await monthProvider.checkForPumpDay();
-      // showDialog(
-      //   barrierDismissible: false,
-      //   context: context,
-      //   builder: (c1) {
-      //     return skipWorkoutDialog(context, c1);`
-      //   },
-      // );
     } else {
       if (monthProvider.isPumpDay) {
         if ((monthProvider.allSplitDayHistoryModel.any((element) =>
