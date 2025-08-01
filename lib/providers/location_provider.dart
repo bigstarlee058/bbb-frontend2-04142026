@@ -85,4 +85,14 @@ class LocationProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  clearAlLData() {
+    selectedCountry = null;
+    selectedState = null;
+    selectedCity = null;
+    selectedCityController.clear();
+    country = null;
+    states = null;
+    cities = null;
+  }
 }

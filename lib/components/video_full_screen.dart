@@ -85,19 +85,16 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         rotateScreen();
-        widget.videoPlayerController.addListener(() {
-          final position = widget.videoPlayerController.value.position;
-          final duration = widget.videoPlayerController.value.duration;
-          if (duration != null && position >= duration) {
-            AudioManager.abandonAudioFocus();
-            if (Platform.isIOS) {
-              widget.videoPlayerController.seekTo(Duration.zero);
-              widget.videoPlayerController.play();
-            }
-          } else {
-            AudioManager.requestAudioFocus();
+
+        widget.videoPlayerController.addListener(() async {
+          if (!mounted) return;
+
+          final isPlaying = widget.videoPlayerController.value.isPlaying;
+          if (isPlaying && isMute == true) {
+            await AudioManager.requestAudioFocus();
           }
-          videoProgressValue.value = position;
+          _onVideoTick();
+          setState(() {});
         });
         _controller = ProgressBarController(
           vsync: this,
@@ -112,6 +109,43 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
       },
     );
     super.initState();
+  }
+
+  void _onVideoTick() async {
+    // final position = widget.videoPlayerController.value.position;
+    // final duration = widget.videoPlayerController.value.duration;
+    // if (duration != null && position >= duration) {
+    //   AudioManager.abandonAudioFocus();
+    //   if (Platform.isIOS) {
+    //     widget.videoPlayerController.seekTo(Duration.zero);
+    //     widget.videoPlayerController.play();
+    //   }
+    // } else {
+    //   AudioManager.requestAudioFocus();
+    // }
+    // videoProgressValue.value = position;
+    //
+    final v = widget.videoPlayerController.value;
+    if (!v.isInitialized) return;
+
+    final pos = v.position;
+    final dur = v.duration;
+
+    videoProgressValue.value = pos;
+
+    if (dur == null) return;
+
+    const epsilon = Duration(milliseconds: 120);
+    if (pos >= dur - epsilon) {
+      if (isMute == true) {
+        AudioManager.requestAudioFocus();
+      }
+
+      await widget.videoPlayerController.pause();
+      await widget.videoPlayerController.seekTo(Duration.zero);
+      await widget.videoPlayerController.setVolume(isMute ? 1 : 0);
+      await widget.videoPlayerController.play();
+    }
   }
 
   @override
@@ -357,24 +391,21 @@ class _VideoFullScreenViewState extends State<VideoFullScreenView>
                           setState(() {});
                           widget.showControlsOnTapOfPause();
                           showControlsOnTapOfPause();
-                          await Future.delayed(Duration(milliseconds: 100))
-                              .then(
-                            (value) {
-                              AudioManager.abandonAudioFocus();
-                              setState(() {});
-                            },
-                          );
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
+                          await AudioManager.abandonAudioFocus();
+                          setState(() {});
                         } else {
                           widget.videoPlayerController.play();
+                          setState(() {});
                           widget.hideControls();
                           hideControls();
-                          await Future.delayed(Duration(milliseconds: 100))
-                              .then(
-                            (value) {
-                              AudioManager.requestAudioFocus();
-                              setState(() {});
-                            },
-                          );
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
+                          if (widget.videoPlayerController.value.volume > 0) {
+                            await AudioManager.requestAudioFocus();
+                          }
+                          setState(() {});
                         }
                       }
                     : null,

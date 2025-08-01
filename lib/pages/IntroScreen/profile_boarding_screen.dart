@@ -97,9 +97,9 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       'firstName': nameController.text.trim().toString().isEmpty
           ? userData.user["name"] ?? ""
           : nameController.text.toString(),
-      'sex': selectedGender != null
-          ? genderOptions.indexOf(selectedGender!)
-          : false,
+      // 'sex': selectedGender != null
+      //     ? genderOptions.indexOf(selectedGender!)
+      //     : false,
       'dob': selectedDate != null ? selectedDate!.toIso8601String() : "",
       'weight': selectedWeight.text.replaceAll('lbs', "").isNotEmpty
           ? int.parse(selectedWeight.text.replaceAll('lbs', ""))
@@ -111,6 +111,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ? int.parse(
               selectedHeight.text.replaceAll('\'', '').replaceAll("\"", ""))
           : "",
+      'mygoal': selectedGender ?? "",
       'waist': selectedWaist.text
               .replaceAll('\'', '')
               .replaceAll("\"", "")
@@ -133,6 +134,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
           : "",
     };
+    log('userDetails==========>>>>>${userDetails}');
     if (kDebugMode) {
       print('HERE IS USER DETAIL##, $userDetails');
     }
@@ -522,6 +524,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             options: genderOptions,
             hint: 'Male',
             onChanged: (String? newValue) {
+              log('newValue==========>>>>>$newValue');
               setState(() {
                 selectedGender = newValue!;
               });

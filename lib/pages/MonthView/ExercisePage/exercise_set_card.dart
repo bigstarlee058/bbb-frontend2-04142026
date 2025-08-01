@@ -764,33 +764,33 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                             setState(() {});
                                                           }
                                                         },
-                                                        inputFormatters: [
-                                                          FilteringTextInputFormatter
-                                                              .digitsOnly,
-                                                          TextInputFormatter
-                                                              .withFunction(
-                                                            (oldValue,
-                                                                newValue) {
-                                                              String newText =
-                                                                  newValue.text;
-                                                              if (newText
-                                                                  .isNotEmpty) {
-                                                                newText = newText
-                                                                    .replaceFirst(
-                                                                        RegExp(
-                                                                            r'^0+'),
-                                                                        '');
-                                                              }
-                                                              return TextEditingValue(
-                                                                text: newText,
-                                                                selection: TextSelection
-                                                                    .collapsed(
-                                                                        offset:
-                                                                            newText.length),
-                                                              );
-                                                            },
-                                                          ),
-                                                        ],
+                                                        // inputFormatters: [
+                                                        //   FilteringTextInputFormatter
+                                                        //       .digitsOnly,
+                                                        //   TextInputFormatter
+                                                        //       .withFunction(
+                                                        //     (oldValue,
+                                                        //         newValue) {
+                                                        //       String newText =
+                                                        //           newValue.text;
+                                                        //       if (newText
+                                                        //           .isNotEmpty) {
+                                                        //         newText = newText
+                                                        //             .replaceFirst(
+                                                        //                 RegExp(
+                                                        //                     r'^0+'),
+                                                        //                 '');
+                                                        //       }
+                                                        //       return TextEditingValue(
+                                                        //         text: newText,
+                                                        //         selection: TextSelection
+                                                        //             .collapsed(
+                                                        //                 offset:
+                                                        //                     newText.length),
+                                                        //       );
+                                                        //     },
+                                                        //   ),
+                                                        // ],
                                                       ),
                                                     ],
                                                   ),
@@ -902,32 +902,32 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                     onTap: () async {
                                                       await repsOnTap(context);
                                                     },
-                                                    inputFormatters: [
-                                                      FilteringTextInputFormatter
-                                                          .digitsOnly,
-                                                      TextInputFormatter
-                                                          .withFunction(
-                                                        (oldValue, newValue) {
-                                                          String newText =
-                                                              newValue.text;
-                                                          if (newText
-                                                              .isNotEmpty) {
-                                                            newText = newText
-                                                                .replaceFirst(
-                                                                    RegExp(
-                                                                        r'^0+'),
-                                                                    '');
-                                                          }
-                                                          return TextEditingValue(
-                                                            text: newText,
-                                                            selection: TextSelection
-                                                                .collapsed(
-                                                                    offset: newText
-                                                                        .length),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ],
+                                                    // inputFormatters: [
+                                                    //   FilteringTextInputFormatter
+                                                    //       .digitsOnly,
+                                                    //   TextInputFormatter
+                                                    //       .withFunction(
+                                                    //     (oldValue, newValue) {
+                                                    //       String newText =
+                                                    //           newValue.text;
+                                                    //       if (newText
+                                                    //           .isNotEmpty) {
+                                                    //         newText = newText
+                                                    //             .replaceFirst(
+                                                    //                 RegExp(
+                                                    //                     r'^0+'),
+                                                    //                 '');
+                                                    //       }
+                                                    //       return TextEditingValue(
+                                                    //         text: newText,
+                                                    //         selection: TextSelection
+                                                    //             .collapsed(
+                                                    //                 offset: newText
+                                                    //                     .length),
+                                                    //       );
+                                                    //     },
+                                                    //   ),
+                                                    // ],
                                                   ),
                                                 ),
                                                 SizedBox(

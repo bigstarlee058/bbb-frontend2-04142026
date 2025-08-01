@@ -28,6 +28,7 @@ class UserDataProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> fetchUserInfo() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/get_user');
     String? token = await getAuthToken();
+    log('token==========>>>>>$token');
     final response = await http.get(
       url,
       headers: {
@@ -52,10 +53,12 @@ class UserDataProvider extends ChangeNotifier {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
-
+    log('userIdToken==========>>>>>$userIdToken');
     try {
       http.MultipartRequest request = http.MultipartRequest("PUT", url);
       request.fields['detail'] = jsonEncode(userDetails);
+      request.fields['detail'] = jsonEncode(userDetails);
+      request.fields['firstName'] = userDetails["firstName"];
 
       if (imageFile != null) {
         final stream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
@@ -74,12 +77,13 @@ class UserDataProvider extends ChangeNotifier {
         'AUTH_TOKEN': userIdToken!,
         'Accept': 'application/json',
       });
-      log('request==========>>>>>${request.fields}');
+      log('REQUEST BODY==========>>>>>${request.fields}');
       http.StreamedResponse response = await request.send();
+      log('RESPONSE STATUS CODE==========>>>>>${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        log('responseBody==========>>>>>$responseBody');
+        log('RESPONSE BODY==========>>>>>$responseBody');
         updateUserData();
       } else {
         debugPrint(

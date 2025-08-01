@@ -14,6 +14,7 @@ class NumberEntry extends StatefulWidget {
     required this.controller,
     required this.suffix,
     required this.focusNode,
+    this.onchange,
     this.zeroPadding,
   });
 
@@ -22,6 +23,7 @@ class NumberEntry extends StatefulWidget {
   final String suffix;
   final FocusNode focusNode;
   final bool? zeroPadding;
+  final Function()? onchange;
 
   @override
   State<NumberEntry> createState() => _NumberEntryState();
@@ -147,6 +149,12 @@ class _NumberEntryState extends State<NumberEntry> {
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                   _suffixFormatter,
                 ],
+                onChanged: (value) {
+                  log('widget.onchange==========>>>>>${widget.onchange}');
+                  if (widget.onchange != null) {
+                    widget.onchange!();
+                  }
+                },
                 onTap: () {
                   if (!widget.controller.text.endsWith(widget.suffix)) {
                     widget.controller.text = widget.suffix;

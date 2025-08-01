@@ -169,7 +169,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 return value.allImageList.isNotEmpty
                     ? Column(
                         children: [
-                          imageLoad(media, value),
+                          AppImage.imageDashboard(value),
                           AppImage.imageMonthView(value),
                           AppImage.imageStreakCalendar(value),
                           AppImage.imageTools(value),
@@ -192,18 +192,8 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             Consumer<DataProvider>(
-              builder: (context, value, child) {
-                return Utils.appImage(
-                  media,
-                  image: value.allImageList.isEmpty
-                      ? ""
-                      : value.allImageList
-                          .where(
-                              (element) => element["key"] == "imageDashboard")
-                          .first["image"],
-                  imageKey: "imageDashboard",
-                );
-              },
+              builder: (context, value, child) =>
+                  AppImage.imageDashboard(value),
             ),
             mainContent(context, media),
             Consumer<ScrollProvider>(
@@ -290,19 +280,6 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
     );
-  }
-
-  Widget imageLoad(Size media, DataProvider value) {
-    return value.allImageList.length > 1
-        ? Visibility(
-            visible: true,
-            child: Utils.appImage(
-              media,
-              image: value.allImageList[0]["image"],
-              imageKey: value.allImageList[0]["key"],
-            ),
-          )
-        : SizedBox();
   }
 
   Widget mainContent(BuildContext context, Size media) {

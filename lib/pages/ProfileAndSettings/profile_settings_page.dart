@@ -606,12 +606,20 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                                   UserDataProvider>()
                                                               .userData["createdAt"]
                                                           : "";
-                                                      DateTime targetDate =
+
+                                                      DateTime createDate =
                                                           DateTime.parse(
-                                                                  accountCreatedDate)
-                                                              .toLocal();
+                                                              accountCreatedDate);
+
+                                                      DateTime targetDate =
+                                                          DateTime(
+                                                              createDate.year,
+                                                              createDate.month,
+                                                              createDate.day);
+
                                                       DateTime today =
                                                           DateTime.now();
+
                                                       int dayDifference = today
                                                           .difference(
                                                               targetDate)

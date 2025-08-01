@@ -137,7 +137,7 @@ class _SignupPageState extends State<SignupPage> {
           'password': password,
         },
       );
-
+      log('response.statusCode==========>>>>>${response.statusCode}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         await _saveLoginState(true);
@@ -173,7 +173,44 @@ class _SignupPageState extends State<SignupPage> {
           debugPrint('this is login page ${descriptionResponse.statusCode}');
         }
       } else {
-        showBottomAlert(context, 'Login failed');
+        print("object >>> calling second api");
+        final url = Uri.parse(
+            // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+            'https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signin_mobile');
+
+        final response = await http.post(
+          url,
+          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+          body: {
+            'email': emailAddress,
+            'password': password,
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          await _saveLoginState(true);
+          String token = data['token'];
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('authToken', token);
+
+          bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+
+          await Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainPage(
+                showWelcomeModal: !hasSeenWelcome,
+                welcomeDescription: "",
+                welcomeImageUrl: "",
+              ),
+            ),
+            (route) => false,
+          );
+        } else {
+          showBottomAlert(context, 'Login failed');
+        }
       }
     } catch (e) {
       showBottomAlert(context, 'An error occurred');

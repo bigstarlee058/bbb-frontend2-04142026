@@ -49,7 +49,6 @@ class _SplashScreenState extends State<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
-
         if (raw4 == null) {
           isDarkMode = false;
           await preferences.setBool(SharedPreference.isDarkMode, isDarkMode);
@@ -129,8 +128,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> loginStatus(bool isLoggedIn) async {
+    dataProvider?.getAppBGs();
     if (isLoggedIn) {
-      dataProvider?.getAppBGs();
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) async => await _initializeFetchData().then(
           (value) async {
@@ -138,171 +137,64 @@ class _SplashScreenState extends State<SplashScreen> {
             dataProvider?.fetchFeaturedChalleng();
             if (monthProvider?.monthDataModel == null) {
               if (mounted) {
-                await monthProvider?.onInit(context: context).then(
-                  (value) async {
+                await monthProvider?.onInit(context: context);
+                await userData.fetchUserInfo().then((value) async {
+                  bool isFirstTime = userData.user["createdAt"] ==
+                          userData.user["updatedAt"] ||
+                      (userData.user["detail"] == null ||
+                          !userData.user["detail"].containsKey('bodyfat'));
+
+                  await preferences.setBool(
+                      SharedPreference.isFirstTime, isFirstTime);
+
+                  bool isAppUser =
+                      userData.user["singuptype"] != "web" ? true : false;
+                  if (Platform.isIOS && isAppUser) {
+                    try {
+                      Map<String, dynamic> subscriptionData =
+                          userData.user["subscription"];
+                      DateTime now = DateTime.now().toUtc();
+                      DateTime? endDate = (subscriptionData["end_date"] ?? "")
+                              .toString()
+                              .isEmpty
+                          ? null
+                          : DateTime.parse(subscriptionData["end_date"]);
+
+                      if (endDate == null || (now.isAfter(endDate))) {
+                        await _updateSubscriptionData(
+                          type: "",
+                          endDate: "",
+                          startDate: "",
+                          status: "free_user",
+                        );
+                      }
+                    } catch (e) {
+                      debugPrint("Error fetching subscription: $e");
+                    }
+                  }
+                  if (Platform.isIOS && isAppUser) {
                     await userData.fetchUserInfo().then(
                       (value) async {
-                        bool isFirstTime = userData.user["createdAt"] ==
-                                userData.user["updatedAt"] ||
-                            (userData.user["detail"] == null ||
-                                !userData.user["detail"]
-                                    .containsKey('bodyfat'));
+                        Map<String, dynamic> subscriptionData =
+                            userData.user["subscription"];
 
-                        await preferences.setBool(
-                            SharedPreference.isFirstTime, isFirstTime);
-
-                        bool isAppUser =
-                            userData.user["singuptype"] != "web" ? true : false;
-                        log('isAppUser==========>>>>>${isAppUser}');
-                        if (Platform.isIOS && isAppUser) {
-                          try {
-                            Map<String, dynamic> subscriptionData =
-                                userData.user["subscription"];
-                            DateTime now = DateTime.now().toUtc();
-                            DateTime? endDate = (subscriptionData["end_date"] ??
-                                        "")
-                                    .toString()
-                                    .isEmpty
-                                ? null
-                                : DateTime.parse(subscriptionData["end_date"]);
-
-                            if (endDate == null || (now.isAfter(endDate))) {
-                              await _updateSubscriptionData(
-                                type: "",
-                                endDate: "",
-                                startDate: "",
-                                status: "free_user",
-                              );
-                            }
-                          } catch (e) {
-                            debugPrint("Error fetching subscription: $e");
-                          }
-                        }
-
-                        if (Platform.isIOS && isAppUser) {
-                          await userData.fetchUserInfo().then(
-                            (value) async {
-                              Map<String, dynamic> subscriptionData =
-                                  userData.user["subscription"];
-
-                              if (subscriptionData[
-                                      "user_subscription_status"] !=
-                                  "free_user") {
-                                if (isFirstTime) {
-                                  if (mounted) {
-                                    await Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ProfileBoardingScreen(
-                                          welcomeDescription: '',
-                                          welcomeImageUrl: '',
-                                        ),
-                                      ),
-                                      (route) => false,
-                                    ).then((value) async {
-                                      await preferences.setBool(
-                                          SharedPreference.isFirstTime, false);
-                                    });
-                                  }
-                                } else {
-                                  if (mounted) {
-                                    await Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MainPage(
-                                          welcomeDescription: '',
-                                          welcomeImageUrl: '',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  await isFromNotification();
-                                }
-                              } else {
-                                if (isFirstTime) {
-                                  if (mounted) {
-                                    await Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProfileBoardingScreen(
-                                            welcomeDescription: '',
-                                            welcomeImageUrl: '',
-                                          ),
-                                        ),
-                                        (route) => false).then(
-                                      (value) async {
-                                        await preferences.setBool(
-                                            SharedPreference.isFirstTime,
-                                            false);
-                                      },
-                                    );
-                                  }
-                                } else {
-                                  if (mounted) {
-                                    await Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SubscriptionPayWall(),
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                            },
-                          );
-                        } else if (Platform.isIOS && !isAppUser) {
-                          // Map<String, dynamic> subscriptionData =
-                          //     userData.user["subscription"];
-                          //
-                          // DateTime? endDate =
-                          //     subscriptionData["end_date"].toString().isEmpty
-                          //         ? null
-                          //         : DateTime.parse(subscriptionData["end_date"] ?? "");
-                          //
-                          // DateTime now = await NTP.now();
-                          //
-                          // if (subscriptionData["user_subscription_status"] ==
-                          //         "free_user" ||
-                          //     (endDate != null && now.isAfter(endDate))) {
-                          //   if (mounted) {
-                          //     Navigator.pushReplacement(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //         builder: (context) => const WooSubscriptionPayWall(),
-                          //       ),
-                          //     );
-                          //   }
-                          // } else {
-                          //   if (mounted) {
-                          //     await Navigator.pushReplacement(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //         builder: (context) => const MainPage(
-                          //             welcomeDescription: '', welcomeImageUrl: ''),
-                          //       ),
-                          //     );
-                          //   }
-                          //   await isFromNotification();
-                          // }
+                        if (subscriptionData["user_subscription_status"] !=
+                            "free_user") {
                           if (isFirstTime) {
                             if (mounted) {
                               await Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileBoardingScreen(
-                                      welcomeDescription: '',
-                                      welcomeImageUrl: '',
-                                    ),
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProfileBoardingScreen(
+                                    welcomeDescription: '',
+                                    welcomeImageUrl: '',
                                   ),
-                                  (route) => false).then(
-                                (value) async {
-                                  await preferences.setBool(
-                                      SharedPreference.isFirstTime, false);
-                                },
-                              );
+                                ),
+                                (route) => false,
+                              ).then((value) async {
+                                await preferences.setBool(
+                                    SharedPreference.isFirstTime, false);
+                              });
                             }
                           } else {
                             if (mounted) {
@@ -310,12 +202,13 @@ class _SplashScreenState extends State<SplashScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const MainPage(
-                                      welcomeDescription: '',
-                                      welcomeImageUrl: ''),
+                                    welcomeDescription: '',
+                                    welcomeImageUrl: '',
+                                  ),
                                 ),
                               );
-                              await isFromNotification();
                             }
+                            await isFromNotification();
                           }
                         } else {
                           if (isFirstTime) {
@@ -340,26 +233,84 @@ class _SplashScreenState extends State<SplashScreen> {
                               await Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const MainPage(
-                                      welcomeDescription: '',
-                                      welcomeImageUrl: ''),
+                                  builder: (context) =>
+                                      const SubscriptionPayWall(),
                                 ),
                               );
-                              await isFromNotification();
                             }
                           }
                         }
                       },
                     );
-                  },
-                );
+                  } else if (Platform.isIOS && !isAppUser) {
+                    if (isFirstTime) {
+                      if (mounted) {
+                        await Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileBoardingScreen(
+                                welcomeDescription: '',
+                                welcomeImageUrl: '',
+                              ),
+                            ),
+                            (route) => false).then(
+                          (value) async {
+                            await preferences.setBool(
+                                SharedPreference.isFirstTime, false);
+                          },
+                        );
+                      }
+                    } else {
+                      if (mounted) {
+                        await Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainPage(
+                                welcomeDescription: '', welcomeImageUrl: ''),
+                          ),
+                        );
+                        await isFromNotification();
+                      }
+                    }
+                  } else {
+                    if (isFirstTime) {
+                      if (mounted) {
+                        await Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileBoardingScreen(
+                                welcomeDescription: '',
+                                welcomeImageUrl: '',
+                              ),
+                            ),
+                            (route) => false).then(
+                          (value) async {
+                            await preferences.setBool(
+                                SharedPreference.isFirstTime, false);
+                          },
+                        );
+                      }
+                    } else {
+                      if (mounted) {
+                        await Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainPage(
+                                welcomeDescription: '', welcomeImageUrl: ''),
+                          ),
+                        );
+                        await isFromNotification();
+                      }
+                    }
+                  }
+                });
               }
             }
           },
         ),
       );
     } else {
-      await dataProvider?.getAppBGs();
+      await Future.delayed(Duration(milliseconds: 2500));
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/onboarding');
       }

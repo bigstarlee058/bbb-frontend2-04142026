@@ -158,6 +158,8 @@ class MonthProvider extends ChangeNotifier {
 
   fetchExerciseHistroy() async {
     try {
+      log(' selectedExercise!.exerciseId==========>>>>>${selectedExercise!.exerciseId}');
+
       exerciseHistroy = await ApiRepo.fetchExerciseForTheExercise(
           selectedExercise!.exerciseId ?? "");
       notifyListeners();

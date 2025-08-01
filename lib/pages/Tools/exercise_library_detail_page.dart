@@ -92,18 +92,24 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
       ValueNotifier(Duration.zero);
   Future<void> initializeVideo(String url) async {
     try {
-      // Initialize the video player controller
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
-          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
 
       await _videoPlayerController.initialize();
-      AudioManager.requestAudioFocus();
-      // We will loop manually to avoid the iOS freeze/mute issue
-      await _videoPlayerController.setLooping(false);
 
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
       isMute = rawData;
       await _videoPlayerController.setVolume(rawData ? 1 : 0);
+
+      final isPlaying = _videoPlayerController.value.isPlaying;
+
+      if (isPlaying && isMute == false) {
+        await AudioManager.requestAudioFocus();
+      } else {
+        await AudioManager.abandonAudioFocus();
+      }
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -113,7 +119,10 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
         aspectRatio: _videoPlayerController.value.aspectRatio,
       );
 
-      if (_chewieController != null &&
+      await _videoPlayerController.setLooping(false);
+
+      if (mounted &&
+          _chewieController != null &&
           _chewieController!.videoPlayerController.value.isInitialized) {
         hideControls();
         videoSize = calculateVideoSize(
@@ -121,7 +130,17 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
         setState(() {});
       }
 
-      _videoPlayerController.addListener(_onVideoTick);
+      _videoPlayerController.addListener(() async {
+        if (!mounted) return;
+
+        final isPlaying = _videoPlayerController.value.isPlaying;
+        if (isPlaying && isMute == true) {
+          await AudioManager.requestAudioFocus();
+        }
+
+        _onVideoTick();
+        setState(() {});
+      });
 
       // _videoPlayerController.addListener(() {
       //   final position = _videoPlayerController.value.position;
@@ -173,6 +192,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
     videoProgressValue.value = pos;
 
     if (dur == null || _restarting) return;
+
     const epsilon = Duration(milliseconds: 120);
     if (pos >= dur - epsilon) {
       _restarting = true;
@@ -209,6 +229,19 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
     isMute = !isMute;
 
     _videoPlayerController.setVolume(isMute ? 1 : 0);
+    setState(() {});
+
+    if (_videoPlayerController.value.volume == 0) {
+      final videoPlay = _videoPlayerController.value.isPlaying;
+
+      await AudioManager.abandonAudioFocus().then((value) async {
+        await Future.delayed(Duration(milliseconds: 20));
+        if (videoPlay) {
+          return _videoPlayerController.play();
+        }
+      });
+    }
+
     setState(() {});
     await preferences.setBool(SharedPreference.isMute, isMute);
   }
@@ -523,29 +556,28 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
                                                 setState(() {});
                                                 showControlsOnTapOfPause();
 
-                                                await Future.delayed(Duration(
-                                                        milliseconds: 100))
-                                                    .then(
-                                                  (value) {
-                                                    AudioManager
-                                                        .abandonAudioFocus();
-                                                    setState(() {});
-                                                  },
-                                                );
+                                                await Future.delayed(
+                                                    const Duration(
+                                                        milliseconds: 100));
+                                                await AudioManager
+                                                    .abandonAudioFocus();
+                                                setState(() {});
                                               } else {
                                                 _videoPlayerController.play();
                                                 setState(() {});
                                                 hideControls();
 
-                                                await Future.delayed(Duration(
-                                                        milliseconds: 100))
-                                                    .then(
-                                                  (value) {
-                                                    AudioManager
-                                                        .requestAudioFocus();
-                                                    setState(() {});
-                                                  },
-                                                );
+                                                await Future.delayed(
+                                                    const Duration(
+                                                        milliseconds: 100));
+
+                                                if (_videoPlayerController
+                                                        .value.volume >
+                                                    0) {
+                                                  await AudioManager
+                                                      .requestAudioFocus();
+                                                }
+                                                setState(() {});
                                               }
                                             }
                                           : null,
