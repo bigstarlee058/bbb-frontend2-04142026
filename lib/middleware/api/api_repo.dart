@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/middleware/api/api_service.dart';
 import 'package:bbb/middleware/api/base_service.dart';
 import 'package:bbb/models/SyncDataResponseModel/avhievements_data_model.dart';
@@ -37,6 +39,7 @@ class ApiRepo extends BaseService {
         apiType: APIType.aGet,
         url: BaseService.fetchExerciseHistory,
         body: {"exerciseId": exerciseId});
+    log('response==========>>>>>$response');
     if (response is List) {
       return response
           .map((json) => ExerciseHistoryDataModel.fromJson(json))
@@ -182,6 +185,23 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(
         apiType: APIType.aPost, url: BaseService.addExtraSet, body: body);
     return response;
+  }
+
+  static Future<void> deleteExtraSet({required String id}) async {
+    var fetchSet = await ApiService().getResponse(
+        apiType: APIType.aGet,
+        url: BaseService.fetchExtraSet,
+        body: {"dataId": id});
+
+    if (fetchSet is List) {
+      List<ExtraSetDataModel> data =
+          fetchSet.map((json) => ExtraSetDataModel.fromJson(json)).toList();
+      if (data.isNotEmpty) {
+        await ApiService().getResponse(
+            apiType: APIType.aDelete,
+            url: "${BaseService.deleteExtraSet}/${data.first.id}");
+      }
+    }
   }
 
   /// ExerciseNotes ========================================================================

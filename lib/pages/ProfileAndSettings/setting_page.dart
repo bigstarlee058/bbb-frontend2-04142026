@@ -487,7 +487,7 @@ class _SettingPageState extends State<SettingPage> {
                                 height: 0,
                               ),
                             ),
-                            /*Container(
+                            Container(
                               margin: EdgeInsets.only(
                                 left: ScreenUtil.horizontalScale(6),
                                 right: ScreenUtil.horizontalScale(6),
@@ -535,7 +535,7 @@ class _SettingPageState extends State<SettingPage> {
                                 thickness: 0.3,
                                 height: 0,
                               ),
-                            ),*/
+                            ),
                             Container(
                               margin: EdgeInsets.only(
                                 left: ScreenUtil.horizontalScale(6),

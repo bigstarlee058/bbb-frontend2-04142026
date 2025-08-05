@@ -41,7 +41,13 @@ import flutter_local_notifications
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(.playback, mode: .moviePlayback, options: [])
-            try audioSession.setActive(true)
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    try audioSession.setActive(true)
+                } catch {
+                    print("Audio session activation failed: \(error)")
+                }
+            }
         } catch {
             print("Failed to set audio session: \(error)")
         }
@@ -50,9 +56,21 @@ import flutter_local_notifications
     private func abandonAudioFocus() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
+            try audioSession.setCategory(.ambient, mode: .default, options: [])
             try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
         } catch {
             print("Failed to deactivate audio session: \(error)")
         }
     }
+
+
+//     private func abandonAudioFocus() {
+//         let audioSession = AVAudioSession.sharedInstance()
+//         do {
+//             try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+//         } catch {
+//             print("Failed to deactivate audio session: \(error)")
+//         }
+//     }
+
 }

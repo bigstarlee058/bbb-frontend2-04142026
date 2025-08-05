@@ -243,7 +243,7 @@ class ExerciseDataModel {
   String? guide;
   int? sets;
   int? reps;
-  int? weight;
+  double? weight;
   int? rest;
   List<String>? formats;
   List<ExtraDataModel>? extra;
@@ -279,7 +279,7 @@ class ExerciseDataModel {
       guide: json["guide"],
       sets: json["sets"],
       reps: json["reps"],
-      weight: json["weight"],
+      weight: json["weight"].toDouble(),
       rest: json["rest"],
       formats: json["formats"].runtimeType.toString() == "String"
           ? json["formats"].toString().split(',').toList()

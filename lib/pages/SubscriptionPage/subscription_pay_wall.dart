@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -36,6 +38,13 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   Package? selectedPackage;
   bool isLoading = false;
 
+  String monthPackage = Platform.isIOS
+      ? "monthly_membership_1m_29"
+      : "monthly_membership_1m_29:monthly-membership-1m-29";
+  String yearPackage = Platform.isIOS
+      ? "yearly_membership_1y_289"
+      : "yearly_membership_1y_289:yearly-membership-1y-289";
+
   @override
   void initState() {
     super.initState();
@@ -49,16 +58,19 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       Offerings fetched = await Purchases.getOfferings();
       setState(() {
         offering = fetched;
+
         for (var offeringItem in offering!.all.values) {
           for (var package in offeringItem.availablePackages) {
-            if (package.storeProduct.identifier == "monthly_membership_1m_29") {
+            if (package.storeProduct.identifier == monthPackage) {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier ==
-                "yearly_membership_1y_289") {
+            } else if (package.storeProduct.identifier == yearPackage) {
               yearPrice = package.storeProduct.priceString;
             }
           }
         }
+        log('monthPrice==========>>>>>${monthPrice}');
+
+        log('yearPrice==========>>>>>${yearPrice}');
         selectedPackage = offering!.current?.availablePackages.first;
       });
     } catch (e) {
@@ -81,7 +93,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       final Map<String, String> queryParams = {
         "user_subscription_status": status,
         "subscription_type": type,
-        "price": type == "monthly_membership_1m_29" ? monthPrice : yearPrice,
+        "price": monthPackage.contains(type) ? monthPrice : yearPrice,
         "purchase_date": startDate,
         "end_date": endDate,
       };
@@ -99,15 +111,36 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         userDataProvider?.user = jsonResponse;
-        await userDataProvider?.fetchUserInfo();
+        await userDataProvider?.fetchUserInfo(context);
+        bool isFirstTime = userDataProvider?.user["createdAt"] ==
+                userDataProvider?.user["updatedAt"] ||
+            (userDataProvider?.user["detail"] == null ||
+                !userDataProvider?.user["detail"].containsKey('bodyfat'));
+        if (isFirstTime) {
+          if (mounted) {
+            await Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileBoardingScreen(
+                  welcomeDescription: '',
+                  welcomeImageUrl: '',
+                ),
+              ),
+              (route) => false,
+            ).then((value) async {
+              await preferences.setBool(SharedPreference.isFirstTime, false);
+            });
+          }
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
+            ),
+          );
+        }
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                const MainPage(welcomeDescription: '', welcomeImageUrl: ''),
-          ),
-        );
         await isFromNotification();
       }
     } catch (e) {
@@ -124,15 +157,15 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
 
   Future<void> _purchasePackage() async {
     Purchases.setLogLevel(LogLevel.debug);
-
     if (selectedPackage == null) return;
 
     setState(() => isLoading = true);
 
     try {
+      log('selectedPackage==========>>>>>${selectedPackage}');
       final CustomerInfo customerInfo =
           await Purchases.purchasePackage(selectedPackage!);
-
+      log('customerInfo==========>>>>>$customerInfo');
       // final DateTime now = await NTP.now();
       // log(' customerInfo.allExpirationDates==========>>>>>${customerInfo.activeSubscriptions}');
       // final entitlementId = selectedPackage!.storeProduct.identifier;
@@ -143,11 +176,19 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       if (entitlements.isNotEmpty) {
         final entitlement = entitlements.values.first;
         final String planId = entitlement.productIdentifier;
+
         final String startDate = entitlement.originalPurchaseDate;
-        final String endDate = DateTime.parse(startDate)
-            .add(
-                Duration(days: planId == "monthly_membership_1m_29" ? 28 : 365))
+        final String endDateA = DateTime.parse(startDate)
+            .add(Duration(days: planId == monthPackage ? 28 : 365))
             .toString();
+
+        final String endDateP = DateTime.parse(startDate)
+            .add(Duration(days: monthPackage.contains(planId) ? 28 : 365))
+            .toString();
+
+        final String endDate = Platform.isAndroid
+            ? entitlement.expirationDate ?? endDateP
+            : endDateA;
         final String status =
             entitlement.isActive ? "subscribed_user" : "free_user";
 
@@ -214,7 +255,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             'assets/img/back 1.png',
             height: MediaQuery.of(context).size.height / 1.8,
             width: double.infinity,
-            fit: BoxFit.fitWidth,
+            fit: BoxFit.cover,
           ),
           Utils.appImage(
             image: '',
@@ -262,7 +303,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).textTheme.labelLarge?.color,
-                          fontSize: ScreenUtil.verticalScale(2.4),
+                          fontSize: ScreenUtil.verticalScale(2.5),
                         ),
                       ),
                       SizedBox(height: ScreenUtil.verticalScale(1.5)),
@@ -270,7 +311,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                       _feature("Comprehensive Exercise Library"),
                       _feature("Community Support Group"),
                       SizedBox(height: ScreenUtil.verticalScale(1.8)),
-                      if (monthPrice.isNotEmpty && yearPrice.isNotEmpty)
+                      if (monthPrice.isNotEmpty)
                         Column(
                           children: [
                             _planOption(
@@ -278,31 +319,39 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
                               price: monthPrice,
                               selected:
                                   selectedPackage?.storeProduct.identifier ==
-                                      "monthly_membership_1m_29",
+                                      monthPackage,
                               onTap: () {
                                 setState(() {
                                   selectedPackage = offering!
                                       .current?.availablePackages
-                                      .firstWhere((p) =>
-                                          p.storeProduct.identifier ==
-                                          "monthly_membership_1m_29");
+                                      .firstWhere((p) {
+                                    return p.storeProduct.identifier ==
+                                        monthPackage;
+                                  });
                                 });
                               },
                             ),
+                            SizedBox(height: ScreenUtil.verticalScale(1)),
+                          ],
+                        ),
+                      if (yearPrice.isNotEmpty)
+                        Column(
+                          children: [
                             SizedBox(height: ScreenUtil.verticalScale(1)),
                             _planOption(
                               title: "Annual",
                               price: yearPrice,
                               selected:
                                   selectedPackage?.storeProduct.identifier ==
-                                      "yearly_membership_1y_289",
+                                      yearPackage,
                               onTap: () {
                                 setState(() {
                                   selectedPackage = offering!
                                       .current?.availablePackages
-                                      .firstWhere((p) =>
-                                          p.storeProduct.identifier ==
-                                          "yearly_membership_1y_289");
+                                      .firstWhere((p) {
+                                    return p.storeProduct.identifier ==
+                                        yearPackage;
+                                  });
                                 });
                               },
                               badge: "20% OFF",

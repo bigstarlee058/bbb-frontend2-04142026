@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
 
     context.read<MainPageProvider>().changeTab(0);
     bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-    await userData.fetchUserInfo();
+    await userData.fetchUserInfo(context);
     bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async => await _initializeFetchData().then(
@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
             if (mounted) {
               await monthProvider?.onInit(context: context).then(
                 (value) async {
-                  if (Platform.isIOS && isAppUser) {
+                  if (/*Platform.isIOS &&*/ isAppUser) {
                     try {
                       Map<String, dynamic> subscriptionData =
                           userData.user["subscription"];
@@ -228,8 +228,8 @@ class _LoginPageState extends State<LoginPage> {
                   //   }
                   // }
 
-                  if (Platform.isIOS && isAppUser) {
-                    await userData.fetchUserInfo().then(
+                  if (/*Platform.isIOS && */ isAppUser) {
+                    await userData.fetchUserInfo(context).then(
                       (value) async {
                         Map<String, dynamic> subscriptionData =
                             userData.user["subscription"];
@@ -280,7 +280,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                     );
-                  } else if (Platform.isIOS && !isAppUser) {
+                  } else if (/*Platform.isIOS && */ !isAppUser) {
                     // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
                     //     ? null
                     //     : DateTime.parse(subscriptionData["end_date"] ?? "");
@@ -311,7 +311,6 @@ class _LoginPageState extends State<LoginPage> {
                     //   }
                     // }
                     setState1();
-
                     if (isFirstTime) {
                       if (mounted) {
                         await Navigator.pushAndRemoveUntil(
@@ -379,7 +378,6 @@ class _LoginPageState extends State<LoginPage> {
                             (route) => false);
                       }
                     }
-
                     setState1();
                   }
                 },
@@ -452,7 +450,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         userData.user = jsonResponse;
-        await userData.fetchUserInfo();
+        await userData.fetchUserInfo(context);
       }
     } catch (e) {
       log("issue in month view loading => $e");

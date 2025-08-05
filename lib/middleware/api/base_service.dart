@@ -17,6 +17,7 @@ abstract class BaseService<T> {
 
   static const fetchExtraSet = "/api/extra-set/fetch";
   static const addExtraSet = "/api/extra-set/add";
+  static const deleteExtraSet = "/api/extra-set/delete";
 
   static const fetchExerciseNotes = "/api/exercise-notes/fetch";
   static const addExerciseNotes = "/api/exercise-notes/add";

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
 import 'package:bbb/pages/ProfileAndSettings/number_entry.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/user_data_provider.dart';
@@ -12,14 +11,12 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bottom_picker/bottom_picker.dart';
+import 'package:cupertino_height_picker/cupertino_height_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:keyboard_actions/keyboard_actions.dart';
-import 'package:keyboard_actions/keyboard_actions_config.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,7 +53,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   HeightUnit selectedHeightUnit = HeightUnit.cm;
   bool canConvertUnit = true;
   bool showSeparationText = true;
-
+  bool isKg = false;
   final FocusNode _nodeText1 = FocusNode();
   final FocusNode _nodeText2 = FocusNode();
   final FocusNode _nodeText3 = FocusNode();
@@ -92,6 +89,15 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       isLoading = loader;
     });
 
+    String weightText =
+        selectedWeight.text.replaceAll('lbs', "").replaceAll("kg", "");
+
+    String weight = weightText.isNotEmpty
+        ? isKg
+            ? Utils.formatDouble(double.parse(weightText) / 0.45359237)
+            : Utils.formatDouble(double.parse(weightText))
+        : "";
+
     final userDetails = {
       'lastName': '',
       'firstName': nameController.text.trim().toString().isEmpty
@@ -101,9 +107,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       //     ? genderOptions.indexOf(selectedGender!)
       //     : false,
       'dob': selectedDate != null ? selectedDate!.toIso8601String() : "",
-      'weight': selectedWeight.text.replaceAll('lbs', "").isNotEmpty
-          ? int.parse(selectedWeight.text.replaceAll('lbs', ""))
-          : "",
+      'weight': weight,
       'height': selectedHeight.text
               .replaceAll('\'', '')
               .replaceAll("\"", "")
@@ -134,7 +138,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
           : "",
     };
-    log('userDetails==========>>>>>${userDetails}');
+    log('userDetails==========>>>>>$userDetails');
     if (kDebugMode) {
       print('HERE IS USER DETAIL##, $userDetails');
     }
@@ -161,6 +165,11 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
   @override
   void initState() {
     userData = Provider.of<UserDataProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        isKg = await preferences.getBool(SharedPreference.isKG) ?? false;
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) => onInit(),
     );
@@ -524,7 +533,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             options: genderOptions,
             hint: 'Male',
             onChanged: (String? newValue) {
-              log('newValue==========>>>>>$newValue');
               setState(() {
                 selectedGender = newValue!;
               });
@@ -554,7 +562,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             label: 'Weight',
             controller: selectedWeight,
             focusNode: _nodeText1,
-            suffix: "lbs",
+            suffix: isKg ? "kg" : "lbs",
           ),
         ],
       );
@@ -593,7 +601,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           SizedBox(height: ScreenUtil.verticalScale(1.5)),
           NumberEntry(
             zeroPadding: true,
-            label: 'Hip',
+            label: 'Hips',
             controller: selectedHip,
             focusNode: _nodeText3,
             suffix: '"',
@@ -876,34 +884,34 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               ),
             ),
           ),
-          Container(
-            width: ScreenUtil.horizontalScale(50),
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(1),
-            ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: Utils.buttonRadius,
-            ),
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  await showCupertinoHeightPicker(
-                    context: context,
-                    initialHeight: heightInCm,
-                    initialSelectedHeightUnit: selectedHeightUnit,
-                    canConvertUnit: canConvertUnit,
-                    showSeparationText: showSeparationText,
-                    onHeightChanged: (val) {
-                      setState(() {
-                        heightInCm = val;
-                        int feet = (heightInCm / 2.54) ~/ 12;
-                        int inches = ((heightInCm / 2.54) % 12).floor();
-                        value.text = '$feet\'$inches"';
-                      });
-                    },
-                  );
+          GestureDetector(
+            onTap: () async {
+              await showCupertinoHeightPicker(
+                context: context,
+                initialHeight: heightInCm,
+                initialSelectedHeightUnit: selectedHeightUnit,
+                canConvertUnit: canConvertUnit,
+                showSeparationText: showSeparationText,
+                onHeightChanged: (val) {
+                  setState(() {
+                    heightInCm = val;
+                    int feet = (heightInCm / 2.54) ~/ 12;
+                    int inches = ((heightInCm / 2.54) % 12).floor();
+                    value.text = '$feet\'$inches"';
+                  });
                 },
+              );
+            },
+            child: Container(
+              width: ScreenUtil.horizontalScale(50),
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil.horizontalScale(1),
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: Utils.buttonRadius,
+              ),
+              child: Center(
                 child: Text(
                   value.text.isEmpty ? 'Height' : value.text,
                   style: TextStyle(

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -25,10 +26,10 @@ class UserDataProvider extends ChangeNotifier {
 
   var user;
 
-  Future<Map<String, dynamic>> fetchUserInfo() async {
+  Future<Map<String, dynamic>> fetchUserInfo(context) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/get_user');
     String? token = await getAuthToken();
-    log('token==========>>>>>$token');
+    log('token====get_user======>>>>>$token');
     final response = await http.get(
       url,
       headers: {
@@ -36,16 +37,34 @@ class UserDataProvider extends ChangeNotifier {
         'AUTH_TOKEN': token ?? ""
       },
     );
-    final jsonResponse = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
       getUserDataFromJson(jsonResponse);
       user = jsonResponse;
       notifyListeners();
       return jsonResponse;
     } else {
+      _handleLogout(context);
       throw Exception('Failed to load user data');
     }
+  }
+
+  void _handleLogout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    await preferences.clearPrefs();
+
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.onBoardingScreen,
+      (Route<dynamic> route) {
+        log("ROUTE NAME ${route.settings.name}");
+        return route.settings.name == AppRoutes.onBoardingScreen;
+      },
+    );
+
+    Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 
   Future<void> addUserInfo(
@@ -53,7 +72,7 @@ class UserDataProvider extends ChangeNotifier {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
-    log('userIdToken==========>>>>>$userIdToken');
+    log('userIdToken===api/users=======>>>>>$userIdToken');
     try {
       http.MultipartRequest request = http.MultipartRequest("PUT", url);
       request.fields['detail'] = jsonEncode(userDetails);
@@ -150,13 +169,13 @@ class UserDataProvider extends ChangeNotifier {
   }
 
   updateUserData() async {
-    await fetchUserInfo();
+    await fetchUserInfo(context);
     notifyListeners();
   }
 
   Future<void> loadUserInfo() async {
     try {
-      await fetchUserInfo();
+      await fetchUserInfo(context);
     } catch (e) {
       debugPrint("--------------Error loading user info: $e");
     }

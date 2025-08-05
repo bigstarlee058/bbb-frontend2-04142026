@@ -3,7 +3,7 @@ description: "Booty by Bret"
 
 publish_to: "none"
 
-version: 1.0.0+2
+version: 1.0.0+9
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -27,6 +27,7 @@ dependencies:
   flutter_slidable: ^4.0.0
   flutter_svg: ^2.0.17
   path: any
+  cupertino_height_picker: ^1.0.0
 
 
   provider: any

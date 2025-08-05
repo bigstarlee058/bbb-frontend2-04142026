@@ -16,24 +16,31 @@ class ApiService extends BaseService {
     return prefs.getString('authToken');
   }
 
-  Future<dynamic> getResponse({required APIType apiType, required String url, Map<String, dynamic>? body}) async {
+  Future<dynamic> getResponse(
+      {required APIType apiType,
+      required String url,
+      Map<String, dynamic>? body}) async {
     String mainUrl = AppConstants.serverUrl + url;
     try {
       // return;
       String? userIdToken = await getAuthToken();
+      log('userIdToken======$mainUrl====>>>>>$userIdToken');
       Map<String, String> header = {'AUTH_TOKEN': userIdToken ?? ""};
 
       Response result;
 
       switch (apiType) {
         case APIType.aGet:
-          result = await dio.get(mainUrl, options: Options(headers: header), data: body);
+          result = await dio.get(mainUrl,
+              options: Options(headers: header), data: body);
           break;
         case APIType.aPost:
-          result = await dio.post(mainUrl, data: body, options: Options(headers: header));
+          result = await dio.post(mainUrl,
+              data: body, options: Options(headers: header));
           break;
         case APIType.aPut:
-          result = await dio.put(mainUrl, data: body, options: Options(headers: header));
+          result = await dio.put(mainUrl,
+              data: body, options: Options(headers: header));
           break;
         case APIType.aDelete:
           result = await dio.delete(mainUrl, options: Options(headers: header));

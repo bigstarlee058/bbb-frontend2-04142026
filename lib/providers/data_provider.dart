@@ -110,7 +110,7 @@ class DataProvider extends ChangeNotifier {
   Future<void> fetchAppVersion() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/version/get_version');
     String? userIdToken = await getAuthToken();
-    log('userIdToken==========>>>>>$userIdToken');
+    log('userIdToken======get_version====>>>>>$userIdToken');
     try {
       final response = await http.get(
         url,
@@ -551,7 +551,7 @@ class DataProvider extends ChangeNotifier {
     Uri url =
         Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
-    log('userIdToken==========>>>>>$userIdToken');
+    log('userIdToken=====get-featured=====>>>>>$userIdToken');
     try {
       final response = await http.get(
         url,

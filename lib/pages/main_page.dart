@@ -67,7 +67,7 @@ class _MainPageState extends State<MainPage> {
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
-        userData.fetchUserInfo();
+        userData.fetchUserInfo(context);
         if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             _showWelcomeModal();

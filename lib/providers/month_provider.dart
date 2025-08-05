@@ -598,7 +598,12 @@ class MonthProvider extends ChangeNotifier {
       String split = (preferences.getString(SharedPreference.split) ?? "")
           .replaceAll("split", "");
 
+      String equipmentType =
+          preferences.getString(SharedPreference.equipmentType) ?? "A";
+
       await changeDaySplit(split);
+
+      changeEquipmentType(equipmentType);
 
       splitType ??= SplitType.split3;
       fetchAllRemovedExerciseLocalData();
@@ -872,6 +877,11 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  removeSetCountInWorkingSet() {
+    selectedWorkingSetTotal--;
+    notifyListeners();
+  }
+
   updateExerciseLoader(bool value) {
     exerciseLoader = value;
     notifyListeners();
@@ -1083,12 +1093,9 @@ class MonthProvider extends ChangeNotifier {
   getPassedTime() {
     String time =
         preferences.getString(SharedPreference.lastTimerPassed) ?? "0";
-    log('time==========>>>>>${time}');
     String lastTime =
         preferences.getString(SharedPreference.lastExitTime) ?? "";
-    log('lastTime==========>>>>>${lastTime}');
     String pause = preferences.getString(SharedPreference.isPause) ?? "false";
-
     timePassed = time;
     DateTime data =
         DateTime.parse(lastTime.isEmpty ? DateTime.now().toString() : lastTime);
@@ -1097,7 +1104,6 @@ class MonthProvider extends ChangeNotifier {
       if (pause == "true") {
         int totalTimePassed = int.parse(timePassed);
         timePassed = totalTimePassed.toString();
-        log("pause == true");
       } else {
         int totalTimePassed = int.parse(timePassed) + difference.inSeconds;
         timePassed = totalTimePassed.toString();
@@ -2832,7 +2838,7 @@ class MonthProvider extends ChangeNotifier {
   /// PAST MONTH DATA ===============================================================================================
   int currentMonthIndex = 0;
   String isCurrentMonth = "Current";
-  int weekExpandedHeight = 0;
+  double weekExpandedHeight = 0;
   bool openWeek = false;
 
   updateOpenWeek(bool value) {
@@ -2850,7 +2856,7 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateWeekExpandedHeight(int weekHeight, int weekIndex) {
+  updateWeekExpandedHeight(double weekHeight, int weekIndex) {
     if (weekHeight < 0) {
       weekHeight = 0;
     }

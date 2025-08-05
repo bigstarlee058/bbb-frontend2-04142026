@@ -99,7 +99,8 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
 
   Future<void> startTimer() async {
     currentTime = 0;
-    monthProvider.getPassedTime();
+    await monthProvider.getPassedTime();
+    log('currentTime==========>>>>>${currentTime}');
     if (monthProvider.timePassed != "") {
       currentTime = int.parse(monthProvider.timePassed);
     }
@@ -109,6 +110,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
           formattedTime = _formatTime(widget.initialDuration - currentTime);
 
           currentTime++;
+          log('currentTime==========>>>>>$currentTime');
           if (!animationCompleted && currentTime <= totalTime) {
             controller.value = currentTime / totalTime;
           }
@@ -177,40 +179,12 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
     switch (state) {
       case AppLifecycleState.resumed:
         NotificationService.clearNotification(10);
-        await monthProvider.getPassedTime();
-        if (monthProvider.timePassed != "") {
-          currentTime = 0;
-
-          currentTime = int.parse(monthProvider.timePassed);
-
-          if (int.parse(monthProvider.timePassed) > totalTime) {
-            ApiRepo.updateExerciseHistory(
-                body: {"dataId": widget.dataId, "status": "Completed"});
-            await DatabaseHelper()
-                .updateSingleValue(
-                    tableName: DatabaseHelper.exerciseHistory,
-                    id: widget.dataId,
-                    columnName: 'status',
-                    newValue: Status.completed)
-                .then(
-                  (value) async =>
-                      await monthProvider.fetchExerciseHistoryLocalData().then(
-                            (value) => widget.makeRefresh(),
-                          ),
-                );
-          }
+        if (timerTimer?.isActive == false) {
+          await startTimer();
         }
-        setState(() {});
         log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.resumed");
         break;
       case AppLifecycleState.inactive:
-        await monthProvider.savePassedTime(
-            currentTime.toString(),
-            widget.initialDuration,
-            context,
-            widget.dataId,
-            widget.index,
-            widget.subIndex);
         log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.inactive");
         break;
       case AppLifecycleState.paused:
@@ -221,26 +195,13 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
             widget.dataId,
             widget.index,
             widget.subIndex);
+        timerTimer?.cancel();
         log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.paused");
         break;
       case AppLifecycleState.detached:
-        await monthProvider.savePassedTime(
-            currentTime.toString(),
-            widget.initialDuration,
-            context,
-            widget.dataId,
-            widget.index,
-            widget.subIndex);
         log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.detached");
         break;
       case AppLifecycleState.hidden:
-        await monthProvider.savePassedTime(
-            currentTime.toString(),
-            widget.initialDuration,
-            context,
-            widget.dataId,
-            widget.index,
-            widget.subIndex);
         log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.hidden");
         break;
     }
@@ -248,6 +209,7 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
 
   @override
   void dispose() {
+    timerTimer?.cancel();
     monthProvider.savePassedTime(currentTime.toString(), widget.initialDuration,
         context, widget.dataId, widget.index, widget.subIndex);
     controller.dispose();

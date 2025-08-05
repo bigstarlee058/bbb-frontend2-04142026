@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -42,7 +41,6 @@ import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/program_info_provider.dart';
 import 'package:bbb/providers/scroll_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
-import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_routes.dart';
 import 'package:bbb/values/theme.dart';
 import 'package:device_preview/device_preview.dart';
@@ -57,7 +55,6 @@ import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
 import 'localstorage/month_database.dart';
 import 'pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'pages/Tools/seeall_achievement_page.dart';
@@ -191,6 +188,15 @@ class _MyAppState extends State<MyApp> {
       if (Platform.isIOS) {
         await Purchases.configure(
             PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
+        Offerings offering = await Purchases.getOfferings();
+        if (offering.current != null) {
+          await preferences.putString(
+              SharedPreference.offerings, jsonEncode(offering));
+        }
+      }
+      if (Platform.isAndroid) {
+        await Purchases.configure(
+            PurchasesConfiguration('goog_aSKVxtsQIDoWmCpWNvoZGPKRSDo'));
         Offerings offering = await Purchases.getOfferings();
         if (offering.current != null) {
           await preferences.putString(

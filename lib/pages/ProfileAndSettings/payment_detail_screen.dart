@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -26,6 +27,13 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
   String? selectedPackage;
   bool isLoading = false;
 
+  String monthPackage = Platform.isIOS
+      ? "monthly_membership_1m_29"
+      : "monthly_membership_1m_29:monthly-membership-1m-29";
+  String yearPackage = Platform.isIOS
+      ? "yearly_membership_1y_289"
+      : "yearly_membership_1y_289:yearly-membership-1y-289";
+
   @override
   void initState() {
     super.initState();
@@ -41,10 +49,9 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
         offering = fetched;
         for (var offeringItem in offering!.all.values) {
           for (var package in offeringItem.availablePackages) {
-            if (package.storeProduct.identifier == "monthly_membership_1m_29") {
+            if (package.storeProduct.identifier == monthPackage) {
               monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier ==
-                "yearly_membership_1y_289") {
+            } else if (package.storeProduct.identifier == yearPackage) {
               yearPrice = package.storeProduct.priceString;
             }
           }
@@ -133,22 +140,27 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
                       _feature("Comprehensive Exercise Library"),
                       _feature("Community Support Group"),
                       SizedBox(height: ScreenUtil.verticalScale(1.8)),
-                      if (monthPrice.isNotEmpty && yearPrice.isNotEmpty)
+                      if (monthPrice.isNotEmpty)
                         Column(
                           children: [
                             _planOption(
                               title: "Monthly",
                               price: monthPrice,
                               selected:
-                                  selectedPackage == "monthly_membership_1m_29",
+                                  monthPackage.contains(selectedPackage ?? ""),
                               onTap: () {},
                             ),
+                          ],
+                        ),
+                      if (yearPrice.isNotEmpty)
+                        Column(
+                          children: [
                             SizedBox(height: ScreenUtil.verticalScale(1.5)),
                             _planOption(
                               title: "Annual",
                               price: yearPrice,
                               selected:
-                                  selectedPackage == "yearly_membership_1y_289",
+                                  yearPackage.contains(selectedPackage ?? ""),
                               onTap: () {},
                               badge: "20% OFF",
                             ),
@@ -190,7 +202,7 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(
-          ScreenUtil.verticalScale(2),
+          ScreenUtil.verticalScale(1.5),
         ),
         decoration: BoxDecoration(
           border: Border.all(

@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
@@ -11,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
 import 'package:provider/provider.dart';
 
+import '../../localstorage/month_prefrence.dart';
 import '../../utils/screen_util.dart';
 
 class ExerciseHistoryPage extends StatefulWidget {
@@ -23,15 +25,22 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   List<FlSpot> chartData = [];
   List<String> dateLabels = [];
   int maxWeight = 0;
-  int totalWeight = 0;
+  double max1RepMaxWeight = 0;
+  double totalWeight = 0;
   int selectedFilterIndex = 0;
   List<ExerciseHistoryDataModel> historyDataModel = [];
   MonthProvider? monthProvider;
   bool isLoading = true;
-
+  bool isKg = false;
   @override
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        isKg = await preferences.getBool(SharedPreference.isKG) ?? false;
+      },
+    );
+
     WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) async => await fetchData().then((value) => _loadValue()));
     super.initState();
@@ -83,14 +92,16 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     }
     totalWeight = 0;
     for (final item in historyDataModel) {
-      final weight = double.tryParse(item.weight ?? '0') ?? 0;
+      final weight = isKg
+          ? (double.tryParse(item.weight ?? '0') ?? 0) * 0.45359237
+          : double.tryParse(item.weight ?? '0') ?? 0;
       final reps = int.tryParse(item.reps ?? '0') ?? 0;
       // final effort = int.tryParse(item.effort ?? '0') ?? 0;
 
       final multiplier = reps /*+ (effort == 100 ? 0 : effort)*/;
       final setTotal = weight * multiplier;
 
-      totalWeight += (setTotal.toInt());
+      totalWeight += (setTotal);
     }
 
     final Map<String, ExerciseHistoryDataModel> highestByDate = {};
@@ -101,21 +112,34 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       final dayKey = DateFormat('yyyy-MM-dd').format(date);
 
       final reps = int.tryParse(item.reps ?? "0") ?? 0;
-      final weight = double.tryParse(item.weight ?? "0") ?? 0;
+      final weight = isKg
+          ? (double.tryParse(item.weight ?? '0') ?? 0) * 0.45359237
+          : double.tryParse(item.weight ?? '0') ?? 0;
+
       final load = reps * weight;
 
       if (!highestByDate.containsKey(dayKey) ||
           (load) >
               (int.tryParse(highestByDate[dayKey]!.reps ?? "0") ?? 0) *
-                  (double.tryParse(highestByDate[dayKey]!.weight ?? "0") ??
-                      0)) {
+                  (isKg
+                      ? (double.tryParse(
+                                  highestByDate[dayKey]!.weight ?? "0") ??
+                              0) *
+                          0.45359237
+                      : double.tryParse(highestByDate[dayKey]!.weight ?? "0") ??
+                          0)) {
         highestByDate[dayKey] = item;
       }
     }
 
     final data1 = highestByDate.values.toList();
     for (var data in data1) {
-      double weight = double.tryParse(data.weight.toString()) ?? 0.0;
+      // double weight = double.tryParse(data.weight.toString()) ?? 0.0;
+
+      double weight = isKg
+          ? (double.tryParse(data.weight.toString()) ?? 0) * 0.45359237
+          : double.tryParse(data.weight.toString()) ?? 0;
+
       int reps = int.tryParse(data.reps.toString()) ?? 0;
       int repsInReverse = int.tryParse(data.effort.toString()) ?? 0;
       DateTime date = DateTime.parse(data.date!);
@@ -154,6 +178,8 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       index++;
     });
     // totalWeight = chartData.fold(0, (sum, spot) => sum + spot.y.toInt());
+    max1RepMaxWeight = chartData.fold(
+        0, (max, spot) => spot.y > max ? spot.y.toDouble() : max);
     maxWeight =
         chartData.fold(0, (max, spot) => spot.y > max ? spot.y.toInt() : max);
 
@@ -549,10 +575,11 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                           getTooltipItems: (touchedSpots) {
                                             return touchedSpots
                                                 .map((LineBarSpot touchedSpot) {
-                                              final value = touchedSpot.y
-                                                  .toStringAsFixed(0);
+                                              final value = Utils.formatDouble(
+                                                  touchedSpot.y);
+
                                               return LineTooltipItem(
-                                                '$value lbs',
+                                                '$value ${isKg ? "kg" : "lbs"}',
                                                 const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -584,17 +611,19 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '$totalWeight lbs',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.color,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            Builder(builder: (context) {
+                              return Text(
+                                '${Utils.formatDouble(totalWeight)} ${isKg ? "kg" : "lbs"}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.color,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            }),
                             const SizedBox(height: 4),
                             const Text(
                               'Total Lifted',
@@ -609,7 +638,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              '$maxWeight lbs',
+                              '${Utils.formatDouble(max1RepMaxWeight)} ${isKg ? "kg" : "lbs"}',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Theme.of(context)
@@ -765,10 +794,15 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                           padding:
                                               const EdgeInsets.only(bottom: 10),
                                           child: Builder(builder: (context) {
-                                            int result = int.parse(
+                                            double result = int.parse(
                                                     data.reps ?? "0") *
-                                                (int.parse(data.weight ?? "0"));
-
+                                                (isKg
+                                                    ? (double.parse(
+                                                            data.weight ??
+                                                                "0") *
+                                                        0.45359237)
+                                                    : double.parse(
+                                                        data.weight ?? "0"));
                                             return RichText(
                                               text: TextSpan(
                                                 children: [
@@ -798,7 +832,9 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                     ),
                                                   ),
                                                   TextSpan(
-                                                    text: '${data.weight}lbs',
+                                                    text: isKg
+                                                        ? '${Utils.formatDouble(double.parse(data.weight ?? "0") * 0.45359237)}kg'
+                                                        : '${Utils.formatDouble(double.parse(data.weight ?? "0"))}lbs',
                                                     style: TextStyle(
                                                         fontSize: ScreenUtil
                                                             .horizontalScale(
@@ -812,7 +848,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                   ),
                                                   TextSpan(
                                                     text:
-                                                        '($result) @ ${data.load}% load',
+                                                        '(${Utils.formatDouble(result)}) @ ${data.load}% load',
                                                     style: TextStyle(
                                                       fontSize: ScreenUtil
                                                           .horizontalScale(3.5),

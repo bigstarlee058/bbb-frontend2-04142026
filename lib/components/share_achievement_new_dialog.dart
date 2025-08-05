@@ -13,6 +13,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../localstorage/month_prefrence.dart';
+
 class ShareAchievementNewDialog extends StatefulWidget {
   const ShareAchievementNewDialog({
     super.key,
@@ -36,8 +38,15 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
   final PageController pageController = PageController();
   final PageController pageController1 = PageController();
   int currentPage = 0;
+  bool isKg = false;
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        isKg = await preferences.getBool(SharedPreference.isKG) ?? false;
+      },
+    );
+
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         onInit();
@@ -158,24 +167,43 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    data.achievedDate!.isEmpty &&
-                                            data.achieved == false
-                                        // ? "Not achieved yet"
-                                        ? "${widget.item.currentValue}/${data.achievementAchievementId!.value} achieved."
-                                        : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
-                                    maxLines: 1,
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil.verticalScale(1.6),
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.color,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  Builder(builder: (context) {
+                                    String cValue = "";
+                                    String aValue = "";
+                                    if (widget.item.title ==
+                                            "Total Weight lifted" &&
+                                        isKg) {
+                                      cValue = Utils.formatDouble((double.parse(
+                                              "${widget.item.currentValue}")) *
+                                          0.45359237);
+                                      aValue = Utils.formatDouble((double.parse(
+                                              "${data.achievementAchievementId!.value}")) *
+                                          0.45359237);
+                                    } else {
+                                      cValue = "${widget.item.currentValue}";
+                                      aValue =
+                                          "${data.achievementAchievementId!.value}";
+                                    }
+
+                                    return Text(
+                                      data.achievedDate!.isEmpty &&
+                                              data.achieved == false
+                                          // ? "Not achieved yet"
+                                          ? "$cValue/$aValue achieved."
+                                          : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
+                                      maxLines: 1,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil.verticalScale(1.6),
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.color,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
@@ -337,26 +365,47 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                 ),
                                               ),
                                             ),
-                                            Text(
-                                              data.achievedDate!.isEmpty &&
-                                                      data.achieved == false
-                                                  // ? "Not achieved yet"
-                                                  ? "${formatNumber(widget.item.currentValue ?? 0)}/${formatNumber(data.achievementAchievementId!.value ?? 0)} achieved."
-                                                  : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
-                                              maxLines: 1,
-                                              textAlign: TextAlign.center,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize:
-                                                    ScreenUtil.verticalScale(
-                                                        1.6),
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.color,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                            Builder(builder: (context) {
+                                              String cValue = "";
+                                              String aValue = "";
+                                              if (widget.item.title ==
+                                                      "Total Weight lifted" &&
+                                                  isKg) {
+                                                cValue = Utils.formatDouble(
+                                                    (double.parse(
+                                                            "${widget.item.currentValue}")) *
+                                                        0.45359237);
+                                                aValue = Utils.formatDouble(
+                                                    (double.parse(
+                                                            "${data.achievementAchievementId!.value}")) *
+                                                        0.45359237);
+                                              } else {
+                                                cValue =
+                                                    "${widget.item.currentValue}";
+                                                aValue =
+                                                    "${data.achievementAchievementId!.value}";
+                                              }
+                                              return Text(
+                                                data.achievedDate!.isEmpty &&
+                                                        data.achieved == false
+                                                    // ? "Not achieved yet"
+                                                    ? "$cValue/$aValue achieved."
+                                                    : "Date achieved : ${DateFormat('MM/dd/yyyy hh:mm a').format(Utils.formattedDate(data.achievedDate.toString()))}",
+                                                maxLines: 1,
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize:
+                                                      ScreenUtil.verticalScale(
+                                                          1.6),
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              );
+                                            }),
                                             SizedBox(
                                                 height:
                                                     ScreenUtil.verticalScale(
