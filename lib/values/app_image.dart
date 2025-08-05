@@ -19,24 +19,8 @@ class AppImage {
         : const SizedBox();
   }
 
-  static Widget imageDashboard(DataProvider value, {Widget? child}) {
-    // final fileImageList = value.cachedImageMap.values.toList();
-
-    return /*(fileImageList.length > 1)
-        ? Center(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: FileImage(
-                      fileImageList[0].file,
-                    ),
-                    fit: BoxFit.cover),
-              ),
-            ),
-          )
-        :*/
-        _safeImage(value, 0, child: child);
-  }
+  static Widget imageDashboard(DataProvider value, {Widget? child}) =>
+      _safeImage(value, 0, child: child);
 
   static Widget imageLogin(DataProvider value, {Widget? child}) =>
       _safeImage(value, 1, child: child);

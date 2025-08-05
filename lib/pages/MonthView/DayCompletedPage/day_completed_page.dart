@@ -505,7 +505,6 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                           // textColor: const Color(0x40000000),
                           textColor: Colors.white,
                           onPress: () {
-                            log('monthProvider!.isPumpDay==========>>>>>${monthProvider!.isPumpDay}');
                             if (monthProvider!.isPumpDay) {
                               monthProvider?.checkForPumpDay();
                               Navigator.pop(context);

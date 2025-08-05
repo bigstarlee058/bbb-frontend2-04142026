@@ -72,7 +72,6 @@ class UserDataProvider extends ChangeNotifier {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
-    log('userIdToken===api/users=======>>>>>$userIdToken');
     try {
       http.MultipartRequest request = http.MultipartRequest("PUT", url);
       request.fields['detail'] = jsonEncode(userDetails);
@@ -96,9 +95,7 @@ class UserDataProvider extends ChangeNotifier {
         'AUTH_TOKEN': userIdToken!,
         'Accept': 'application/json',
       });
-      log('REQUEST BODY==========>>>>>${request.fields}');
       http.StreamedResponse response = await request.send();
-      log('RESPONSE STATUS CODE==========>>>>>${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
@@ -141,12 +138,10 @@ class UserDataProvider extends ChangeNotifier {
         'Accept': 'application/json',
       });
       log('url==========>>>>>$url');
-      log('request==========>>>>>${request.fields}');
 
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        log('responseBody==========>>>>>${responseBody}');
         jsonDecode(responseBody);
         updateUserData();
       } else {

@@ -138,7 +138,6 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
           ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
           : "",
     };
-    log('userDetails==========>>>>>$userDetails');
     if (kDebugMode) {
       print('HERE IS USER DETAIL##, $userDetails');
     }

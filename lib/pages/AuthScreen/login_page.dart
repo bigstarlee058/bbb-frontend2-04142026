@@ -123,7 +123,6 @@ class _LoginPageState extends State<LoginPage> {
             'password': password,
           },
         );
-        log('response1==========>>>>>${response1.body}');
         if (response1.statusCode == 200) {
           await successResponse(response1);
         } else {

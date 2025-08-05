@@ -100,7 +100,6 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
   Future<void> startTimer() async {
     currentTime = 0;
     await monthProvider.getPassedTime();
-    log('currentTime==========>>>>>${currentTime}');
     if (monthProvider.timePassed != "") {
       currentTime = int.parse(monthProvider.timePassed);
     }
@@ -110,7 +109,6 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
           formattedTime = _formatTime(widget.initialDuration - currentTime);
 
           currentTime++;
-          log('currentTime==========>>>>>$currentTime');
           if (!animationCompleted && currentTime <= totalTime) {
             controller.value = currentTime / totalTime;
           }
@@ -182,10 +180,8 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
         if (timerTimer?.isActive == false) {
           await startTimer();
         }
-        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.resumed");
         break;
       case AppLifecycleState.inactive:
-        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.inactive");
         break;
       case AppLifecycleState.paused:
         await monthProvider.savePassedTime(
@@ -196,13 +192,10 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
             widget.index,
             widget.subIndex);
         timerTimer?.cancel();
-        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.paused");
         break;
       case AppLifecycleState.detached:
-        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.detached");
         break;
       case AppLifecycleState.hidden:
-        log("==========>>>>>>>>>>CYCLE<<<<<<<<<<===========AppLifecycleState.hidden");
         break;
     }
   }

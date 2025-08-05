@@ -146,7 +146,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
                   bool isAppUser =
                       userData.user["singuptype"] != "web" ? true : false;
-                  log('isAppUser==========>>>>>$isAppUser');
                   if (/*Platform.isIOS &&*/ isAppUser) {
                     try {
                       Map<String, dynamic> subscriptionData =
@@ -1204,7 +1203,6 @@ class _SplashScreenState extends State<SplashScreen> {
       Uri url =
       Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
       String? userIdToken = await getAuthToken();
-      log('userIdToken==========>>>>>$userIdToken');
 
       final response = await http.put(
         url,

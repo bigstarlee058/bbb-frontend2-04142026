@@ -134,7 +134,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         // );
       }
     } catch (e) {
-      log('e==========>>>>>${e}');
+      log('e==========>>>>>$e');
     } finally {
       loader = false;
       setState(() {});

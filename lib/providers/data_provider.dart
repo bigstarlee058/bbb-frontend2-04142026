@@ -110,7 +110,6 @@ class DataProvider extends ChangeNotifier {
   Future<void> fetchAppVersion() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/version/get_version');
     String? userIdToken = await getAuthToken();
-    log('userIdToken======get_version====>>>>>$userIdToken');
     try {
       final response = await http.get(
         url,
@@ -119,7 +118,6 @@ class DataProvider extends ChangeNotifier {
           'AUTH_TOKEN': userIdToken ?? ""
         },
       );
-      log('response==========>>>>>$response');
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
@@ -551,7 +549,6 @@ class DataProvider extends ChangeNotifier {
     Uri url =
         Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
-    log('userIdToken=====get-featured=====>>>>>$userIdToken');
     try {
       final response = await http.get(
         url,
@@ -560,7 +557,6 @@ class DataProvider extends ChangeNotifier {
           'AUTH_TOKEN': userIdToken ?? "",
         },
       );
-      log('response==========>>>>>$response');
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
@@ -844,7 +840,6 @@ class DataProvider extends ChangeNotifier {
 
   Future fetchMonthWorkouts(int month) async {
     try {
-      log('==========>>>>>${DateTime.now().toUtc()}');
       final Map<String, String> queryParams = {
         'month': month.toString(),
         'equipment': '0',

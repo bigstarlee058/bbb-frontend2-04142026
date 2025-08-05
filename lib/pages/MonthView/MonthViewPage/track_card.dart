@@ -1294,7 +1294,6 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                                           .last) -
                                       1;
 
-                                  // log('weekDataModel!.restDayList?==========>>>>>${weekDataModel!.restDayList}');
                                   return i <
                                           widget
                                               .monthProvider!

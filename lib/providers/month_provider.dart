@@ -158,8 +158,6 @@ class MonthProvider extends ChangeNotifier {
 
   fetchExerciseHistroy() async {
     try {
-      log(' selectedExercise!.exerciseId==========>>>>>${selectedExercise!.exerciseId}');
-
       exerciseHistroy = await ApiRepo.fetchExerciseForTheExercise(
           selectedExercise!.exerciseId ?? "");
       notifyListeners();
@@ -689,7 +687,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchWarmUp(String warmUpId) async {
     try {
-      log('warmUpId==========>>>>>$warmUpId');
       Uri url =
           Uri.parse('${AppConstants.serverUrl}/api/warmups/get/$warmUpId');
       url = Uri.http(url.authority, url.path);

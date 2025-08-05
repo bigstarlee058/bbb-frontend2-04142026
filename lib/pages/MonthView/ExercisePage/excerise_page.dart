@@ -2465,7 +2465,6 @@ class _ExercisePageState extends State<ExercisePage>
       "date": "${DateTime.now().toUtc()}",
       "dataId": "EXTRA-ADDED$dataId",
     };
-    log('data==========>>>>>$data');
     ApiRepo.addExtraSet(body: apiReqBody);
     await DatabaseHelper()
         .insertData(data: data, tableName: DatabaseHelper.extraSetHistory);

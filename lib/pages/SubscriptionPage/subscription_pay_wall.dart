@@ -68,9 +68,6 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
             }
           }
         }
-        log('monthPrice==========>>>>>${monthPrice}');
-
-        log('yearPrice==========>>>>>${yearPrice}');
         selectedPackage = offering!.current?.availablePackages.first;
       });
     } catch (e) {
@@ -162,12 +159,9 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
     setState(() => isLoading = true);
 
     try {
-      log('selectedPackage==========>>>>>${selectedPackage}');
       final CustomerInfo customerInfo =
           await Purchases.purchasePackage(selectedPackage!);
-      log('customerInfo==========>>>>>$customerInfo');
       // final DateTime now = await NTP.now();
-      // log(' customerInfo.allExpirationDates==========>>>>>${customerInfo.activeSubscriptions}');
       // final entitlementId = selectedPackage!.storeProduct.identifier;
       // final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
 

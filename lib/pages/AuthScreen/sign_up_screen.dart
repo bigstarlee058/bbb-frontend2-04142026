@@ -137,7 +137,6 @@ class _SignupPageState extends State<SignupPage> {
           'password': password,
         },
       );
-      log('response.statusCode==========>>>>>${response.statusCode}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         await _saveLoginState(true);
