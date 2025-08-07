@@ -113,7 +113,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> loadUserInfo() async {
-    await userData?.loadUserInfo();
+    await userData?.loadUserInfo(context);
   }
 
   void loadFeaturedCollectionData() async {

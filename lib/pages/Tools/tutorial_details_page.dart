@@ -186,7 +186,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
 
       if (_videoPlayerController.value.volume == 0) {
         await AudioManager.abandonAudioFocus().then((value) async {
-          await Future.delayed(Duration(milliseconds: 20));
+          await Future.delayed(Duration(milliseconds: 40));
           return _videoPlayerController.play();
         });
       }
@@ -309,7 +309,7 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
       final videoPlay = _videoPlayerController.value.isPlaying;
 
       await AudioManager.abandonAudioFocus().then((value) async {
-        await Future.delayed(Duration(milliseconds: 20));
+        await Future.delayed(Duration(milliseconds: 40));
         if (videoPlay) {
           return _videoPlayerController.play();
         }

@@ -498,7 +498,7 @@ class _SettingPageState extends State<SettingPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Use weight in Kg?",
+                                    "Use metric units?",
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
                                       fontSize: ScreenUtil.verticalScale(2.2),

@@ -18,8 +18,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
 
 class ProfileBoardingScreen extends StatefulWidget {
   const ProfileBoardingScreen(
@@ -70,6 +72,24 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
         setState(() {});
         String fileName = path.basename(file.path);
         log("FILE NAME $fileName");
+      }
+
+      if (file != null) {
+        final bytes = await file.readAsBytes();
+        final originalImage = img.decodeImage(bytes);
+
+        if (originalImage != null) {
+          final fixedImage = img.bakeOrientation(originalImage);
+
+          final tempDir = await getTemporaryDirectory();
+          final fileName = path.basename(file.path);
+          final correctedFile = File('${tempDir.path}/fixed_$fileName')
+            ..writeAsBytesSync(img.encodeJpg(fixedImage));
+
+          image = correctedFile;
+          setState(() {});
+          debugPrint("FILE NAME: ${correctedFile.path}");
+        }
       }
     } catch (e) {
       log("ERROR IN PICK IMAGE $e");
@@ -142,7 +162,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       print('HERE IS USER DETAIL##, $userDetails');
     }
 
-    await userData.addUserInfo(userData.userId, userDetails, image);
+    await userData.addUserInfo(userData.userId, userDetails, image, context);
     // Fluttertoast.showToast(
     //   msg: "Profile saved!",
     //   toastLength: Toast.LENGTH_LONG,

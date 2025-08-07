@@ -7,6 +7,8 @@ import 'package:bbb/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as img;
 
 class ProfileImageWidget extends StatefulWidget {
   final String? name;
@@ -33,12 +35,22 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       XFile? file = await picker.pickImage(source: ImageSource.gallery);
 
       if (file != null) {
-        image = File(file.path);
+        final bytes = await file.readAsBytes();
+        final originalImage = img.decodeImage(bytes);
 
-        widget.callBack(image);
-        setState(() {});
-        String fileName = path.basename(file.path);
-        log("FILE NAME $fileName");
+        if (originalImage != null) {
+          final fixedImage = img.bakeOrientation(originalImage);
+
+          final tempDir = await getTemporaryDirectory();
+          final fileName = path.basename(file.path);
+          final correctedFile = File('${tempDir.path}/fixed_$fileName')
+            ..writeAsBytesSync(img.encodeJpg(fixedImage));
+
+          image = correctedFile;
+          widget.callBack(image);
+          setState(() {});
+          debugPrint("FILE NAME: ${correctedFile.path}");
+        }
       }
     } catch (e) {
       log("ERROR IN PICK IMAGE $e");

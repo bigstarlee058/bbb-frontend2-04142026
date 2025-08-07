@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
@@ -57,10 +58,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
   TextEditingController selectedWeight = TextEditingController();
   TextEditingController selectedBodyFat = TextEditingController();
   String? selectedGender;
+
   TextEditingController selectedHeight = TextEditingController();
   TextEditingController selectedMidThigh = TextEditingController();
   TextEditingController selectedWaist = TextEditingController();
   TextEditingController selectedHip = TextEditingController();
+
+  TextEditingController selectedHeight1 = TextEditingController();
+
   TextEditingController nameController = TextEditingController();
   String? selectedLocation;
   String? selectedGoal;
@@ -69,7 +74,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   UserDataProvider? userData;
   double heightInCm = 183;
-  HeightUnit selectedHeightUnit = HeightUnit.cm;
 
   bool canConvertUnit = true;
   bool showSeparationText = true;
@@ -140,12 +144,20 @@ class _MyProfilePageState extends State<MyProfilePage> {
           selectedBodyFat.text = '${detail?['bodyfat'] ?? 0}%';
         }
         final heightStr = (detail?['height'] ?? "0").toString();
-
         if (detail['height'] != null) {
           if (heightStr != "0") {
             selectedHeight.text = heightStr == "0"
                 ? "0"
                 : "${heightStr[0]}'${heightStr.length > 1 ? heightStr[1] : ""}${heightStr.length > 2 ? heightStr[2] : ""}\"";
+
+            final value = Utils.convertFeetInchesToCm(
+                int.parse(heightStr[0]),
+                double.parse(heightStr.length > 1
+                    ? heightStr.replaceAll(heightStr[0], "")
+                    : "0"));
+
+            selectedHeight1.text =
+                heightStr == "0" ? "0" : "${value.toStringAsFixed(1)} cm";
           }
         }
 
@@ -160,17 +172,35 @@ class _MyProfilePageState extends State<MyProfilePage> {
         if (detail['midthigh'] != null &&
             detail['midthigh'].toString() != "0" &&
             detail['midthigh'].toString().isNotEmpty) {
-          selectedMidThigh.text = '${detail?['midthigh'] ?? 0}"';
+          if (isKg) {
+            double midThigh = double.parse(detail?['midthigh'] ?? 0) * 2.54;
+            selectedMidThigh.text = '${Utils.formatDouble(midThigh)} cm';
+          } else {
+            double midThigh = double.parse(detail?['midthigh'] ?? 0);
+            selectedMidThigh.text = '${Utils.formatDouble(midThigh)}"';
+          }
         }
         if (detail['hip'] != null &&
             detail['hip'].toString() != "0" &&
             detail['hip'].toString().isNotEmpty) {
-          selectedHip.text = '${detail?['hip'] ?? 0}"';
+          if (isKg) {
+            double hip = double.parse(detail?['hip'] ?? 0) * 2.54;
+            selectedHip.text = '${Utils.formatDouble(hip)} cm';
+          } else {
+            double hip = double.parse(detail?['hip'] ?? 0);
+            selectedHip.text = '${Utils.formatDouble(hip)}"';
+          }
         }
         if (detail['waist'] != null &&
             detail['waist'].toString() != "0" &&
             detail['waist'].toString().isNotEmpty) {
-          selectedWaist.text = '${detail?['waist'] ?? 0}"';
+          if (isKg) {
+            double waist = double.parse(detail?['waist'] ?? 0) * 2.54;
+            selectedWaist.text = '${Utils.formatDouble(waist)} cm';
+          } else {
+            double waist = double.parse(detail?['waist'] ?? 0);
+            selectedWaist.text = '${Utils.formatDouble(waist)}"';
+          }
         }
 
         selectedLocation = detail?['location'] ?? "";
@@ -227,6 +257,39 @@ class _MyProfilePageState extends State<MyProfilePage> {
             : Utils.formatDouble(double.parse(weightText))
         : "";
 
+    String waistText = selectedWaist.text
+        .replaceAll('\'', '')
+        .replaceAll("\"", "")
+        .replaceAll("cm", "");
+
+    String waist = waistText.isNotEmpty
+        ? isKg
+            ? Utils.convertCmToInch(double.parse(waistText)).toString()
+            : double.parse(waistText).toString()
+        : "";
+
+    String hipText = selectedHip.text
+        .replaceAll('\'', '')
+        .replaceAll("\"", "")
+        .replaceAll("cm", "");
+
+    String hip = hipText.isNotEmpty
+        ? isKg
+            ? Utils.convertCmToInch(double.parse(hipText)).toString()
+            : double.parse(hipText).toString()
+        : "";
+
+    String midthighText = selectedMidThigh.text
+        .replaceAll('\'', '')
+        .replaceAll("\"", "")
+        .replaceAll("cm", "");
+
+    String midthigh = midthighText.isNotEmpty
+        ? isKg
+            ? Utils.convertCmToInch(double.parse(midthighText)).toString()
+            : double.parse(midthighText).toString()
+        : "";
+
     final userDetails = {
       // 'sex': selectedGender != null ? genderOptions.indexOf(selectedGender!) : "",
       "firstName": nameController.text.toString().trim(),
@@ -237,7 +300,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               .replaceAll('\'', '')
               .replaceAll("\"", "")
               .isNotEmpty
-          ? int.parse(
+          ? double.parse(
               selectedHeight.text.replaceAll('\'', '').replaceAll("\"", ""))
           : "",
       'location': selectedLocation,
@@ -246,31 +309,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
       'city': locationProvider.selectedCityController.text,
-      'waist': selectedWaist.text
-              .replaceAll('\'', '')
-              .replaceAll("\"", "")
-              .isNotEmpty
-          ? int.parse(
-              selectedWaist.text.replaceAll('\'', '').replaceAll("\"", ""))
-          : "",
-      'hip':
-          selectedHip.text.replaceAll('\'', '').replaceAll("\"", "").isNotEmpty
-              ? int.parse(selectedHip.text.replaceAll("\"", ""))
-              : "",
-      'midthigh': selectedMidThigh.text
-              .replaceAll('\'', '')
-              .replaceAll("\"", "")
-              .isNotEmpty
-          ? int.parse(
-              selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", ""))
-          : "",
+      'waist': waist,
+      'hip': hip,
+      'midthigh': midthigh,
       'bodyfat': selectedBodyFat.text.replaceAll('%', "").isNotEmpty
           ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
           : "",
     };
+    log('userDetails==========>>>>>$userDetails');
 
     if (_id != null) {
-      await userData!.updateUserInfo(_id!, userDetails, image);
+      await userData!.updateUserInfo(_id!, userDetails, image, context);
 
       // Fluttertoast.showToast(
       //   msg: "Profile updated!",
@@ -573,6 +622,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               context: context,
                               label: 'Height',
                               value: selectedHeight,
+                              value1: selectedHeight1,
                               hint: '6\'0"',
                             ),
                             NumberEntry(
@@ -597,7 +647,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Waist',
                               controller: selectedWaist,
                               focusNode: _nodeText2,
-                              suffix: '"',
+                              suffix: isKg ? " cm" : '"',
                             ),
                             NumberEntry(
                               onchange: () {
@@ -608,7 +658,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Hips',
                               controller: selectedHip,
                               focusNode: _nodeText3,
-                              suffix: '"',
+                              suffix: isKg ? " cm" : '"',
                             ),
 
                             NumberEntry(
@@ -620,7 +670,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Mid-Thigh',
                               controller: selectedMidThigh,
                               focusNode: _nodeText4,
-                              suffix: '"',
+                              suffix: isKg ? " cm" : '"',
                             ),
 
                             NumberEntry(
@@ -897,6 +947,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       {required BuildContext context,
       required String label,
       required TextEditingController value,
+      required TextEditingController value1,
       required String hint}) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -922,16 +973,30 @@ class _MyProfilePageState extends State<MyProfilePage> {
               await showCupertinoHeightPicker(
                 context: context,
                 initialHeight: heightInCm,
-                initialSelectedHeightUnit: selectedHeightUnit,
+                initialSelectedHeightUnit:
+                    isKg ? HeightUnit.cm : HeightUnit.inches,
                 canConvertUnit: canConvertUnit,
                 showSeparationText: showSeparationText,
                 onHeightChanged: (val) {
-                  setState(() {
-                    heightInCm = val;
-                    int feet = (heightInCm / 2.54) ~/ 12;
-                    int inches = ((heightInCm / 2.54) % 12).floor();
-                    value.text = '$feet\'$inches"';
-                  });
+                  if (isKg) {
+                    setState(() {
+                      heightInCm = val;
+                      int feet = (heightInCm / 2.54) ~/ 12;
+                      double inches = ((heightInCm / 2.54) % 12);
+                      value.text = '$feet\'$inches"';
+                      value1.text = "$val cm";
+                    });
+                  } else {
+                    setState(() {
+                      heightInCm = val;
+                      int feet = (heightInCm / 2.54) ~/ 12;
+                      String inches =
+                          Utils.formatDouble(((heightInCm / 2.54) % 12));
+                      value.text = '$feet\'$inches"';
+                      value1.text = "$val cm";
+                    });
+                  }
+
                   _saveUserData();
                 },
               );
@@ -960,7 +1025,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               child: Center(
                 child: Text(
-                  value.text.isEmpty ? 'Enter here' : value.text,
+                  isKg
+                      ? value1.text.isEmpty
+                          ? 'Enter here'
+                          : value1.text
+                      : value.text.isEmpty
+                          ? 'Enter here'
+                          : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty
                         ? Colors.grey.shade700

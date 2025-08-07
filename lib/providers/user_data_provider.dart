@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/app_routes.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -18,34 +19,46 @@ class UserDataProvider extends ChangeNotifier {
   bool previousPage = false;
   var userData;
 
-  Future<String?> getAuthToken() async {
+  Future<String> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? authToken = prefs.getString('authToken');
+    String authToken = prefs.getString('authToken') ?? "";
     return authToken;
   }
 
   var user;
 
   Future<Map<String, dynamic>> fetchUserInfo(context) async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/get_user');
-    String? token = await getAuthToken();
-    log('token====get_user======>>>>>$token');
-    final response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': token ?? ""
-      },
-    );
+    final Dio dio = Dio();
+    final String url = '${AppConstants.serverUrl}/api/users/get_user';
 
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      getUserDataFromJson(jsonResponse);
-      user = jsonResponse;
-      notifyListeners();
-      return jsonResponse;
-    } else {
-      _handleLogout(context);
+    try {
+      String token = await getAuthToken();
+      debugPrint('token====get_user======>>>>>$token');
+
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {'AUTH_TOKEN': token},
+        ),
+      );
+
+      debugPrint('response==========>>>>>${response.data}');
+
+      if (response.statusCode == 200) {
+        final jsonResponse = response.data;
+        getUserDataFromJson(jsonResponse);
+        user = jsonResponse;
+        notifyListeners();
+        return jsonResponse;
+      } else {
+        _handleLogout(context);
+        throw Exception('Failed to load user data');
+      }
+    } on DioException catch (e) {
+      debugPrint('Dio error: ${e.response?.data ?? e.message}');
+      throw Exception('Failed to load user data: ${e.message}');
+    } catch (e) {
+      debugPrint('General error: $e');
       throw Exception('Failed to load user data');
     }
   }
@@ -67,8 +80,8 @@ class UserDataProvider extends ChangeNotifier {
     Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 
-  Future<void> addUserInfo(
-      String? id, Map<String, dynamic> userDetails, File? imageFile) async {
+  Future<void> addUserInfo(String? id, Map<String, dynamic> userDetails,
+      File? imageFile, BuildContext context) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
@@ -92,7 +105,7 @@ class UserDataProvider extends ChangeNotifier {
         request.fields['image'] = '';
       }
       request.headers.addAll({
-        'AUTH_TOKEN': userIdToken!,
+        'AUTH_TOKEN': userIdToken,
         'Accept': 'application/json',
       });
       http.StreamedResponse response = await request.send();
@@ -100,7 +113,7 @@ class UserDataProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         log('RESPONSE BODY==========>>>>>$responseBody');
-        updateUserData();
+        updateUserData(context);
       } else {
         debugPrint(
             'Failed to update user data. Status: ${response.statusCode}');
@@ -110,8 +123,8 @@ class UserDataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateUserInfo(
-      String? id, Map<String, dynamic> userDetails, File? imageFile) async {
+  Future<void> updateUserInfo(String? id, Map<String, dynamic> userDetails,
+      File? imageFile, BuildContext context) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
@@ -134,7 +147,7 @@ class UserDataProvider extends ChangeNotifier {
         request.fields['image'] = '';
       }
       request.headers.addAll({
-        'AUTH_TOKEN': userIdToken!,
+        'AUTH_TOKEN': userIdToken,
         'Accept': 'application/json',
       });
       log('url==========>>>>>$url');
@@ -143,7 +156,7 @@ class UserDataProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         jsonDecode(responseBody);
-        updateUserData();
+        updateUserData(context);
       } else {
         debugPrint(
             'Failed to update user data. Status: ${response.statusCode}');
@@ -163,12 +176,12 @@ class UserDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateUserData() async {
+  updateUserData(BuildContext context) async {
     await fetchUserInfo(context);
     notifyListeners();
   }
 
-  Future<void> loadUserInfo() async {
+  Future<void> loadUserInfo(BuildContext context) async {
     try {
       await fetchUserInfo(context);
     } catch (e) {

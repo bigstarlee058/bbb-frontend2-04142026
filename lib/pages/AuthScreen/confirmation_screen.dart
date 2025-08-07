@@ -11,9 +11,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class ConfirmationScreen extends StatefulWidget {
-  final String image;
-
-  const ConfirmationScreen({super.key, required this.image});
+  const ConfirmationScreen({super.key});
 
   @override
   State<ConfirmationScreen> createState() => _ConfirmationScreenState();
@@ -64,7 +62,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             ],
           ),
           Positioned(
-            top: ScreenUtil.horizontalScale(28),
+            top: ScreenUtil.horizontalScale(38),
             child: Container(
               height: 120,
               width: media.width,
@@ -114,7 +112,17 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             child: Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                Lottie.asset('assets/img/mail.json'),
+                                Container(height: ScreenUtil.verticalScale(35)),
+                                Positioned(
+                                  top: -ScreenUtil.verticalScale(2),
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                      child: Lottie.asset(
+                                          'assets/img/mail.json',
+                                          height:
+                                              ScreenUtil.verticalScale(35))),
+                                ),
                                 Positioned(
                                   bottom: -ScreenUtil.verticalScale(5.5),
                                   left: 0,
@@ -124,13 +132,13 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                       Text(
                                         'CONFIRM YOUR EMAIL',
                                         style: TextStyle(
-                                          fontSize:
-                                              ScreenUtil.verticalScale(3.32),
+                                          fontSize: ScreenUtil.verticalScale(3),
                                           color: AppColors.primaryColor,
                                           height: 1.5,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
+                                      SizedBox(height: 10),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal:
@@ -153,7 +161,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: ScreenUtil.horizontalScale(23),
+                            height: ScreenUtil.horizontalScale(20),
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(
@@ -170,7 +178,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: ScreenUtil.horizontalScale(15.3),
+                            height: ScreenUtil.horizontalScale(10),
                           ),
                         ],
                       ),

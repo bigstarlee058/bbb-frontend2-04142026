@@ -235,7 +235,7 @@ class _ExerciseLibraryDetailPageState extends State<ExerciseLibraryDetailPage>
       final videoPlay = _videoPlayerController.value.isPlaying;
 
       await AudioManager.abandonAudioFocus().then((value) async {
-        await Future.delayed(Duration(milliseconds: 20));
+        await Future.delayed(Duration(milliseconds: 40));
         if (videoPlay) {
           return _videoPlayerController.play();
         }

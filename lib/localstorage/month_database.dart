@@ -428,6 +428,16 @@ class DatabaseHelper {
     );
   }
 
+  Future<int> deleteSingleDataUsingMainId(
+      {required String tableName, required int id}) async {
+    Database db = await database;
+    return await db.delete(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<void> deleteAllData(String tableName) async {
     Database db = await database;
     await db.delete(tableName);

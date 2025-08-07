@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
@@ -16,11 +18,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/main_page_provider.dart';
 import '../providers/user_data_provider.dart';
+import 'IntroScreen/version_update_screen.dart';
 
 class MainPage extends StatefulWidget {
   final bool showWelcomeModal;
@@ -49,6 +53,67 @@ class _MainPageState extends State<MainPage> {
 
   DateTime _currentDate = DateTime.now();
   final DateStreamNotifier _dateNotifier = DateStreamNotifier();
+
+  Future<PackageInfo> getCurrentAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo;
+  }
+
+  navigateAppVersion() async {
+    PackageInfo version = await getCurrentAppVersion();
+    log("VERSION======== ${version.version}");
+
+    await Future.delayed(Duration(milliseconds: 200));
+    if (Platform.isIOS) {
+      log("VERSION======== ${version.version}");
+      if (version.version !=
+          (dataProvider?.newVersionModel?.ios?.version ?? "")) {
+        if (dataProvider!.newVersionModel!.ios!.forceUpdate == true) {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        } else {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        }
+      }
+    } else if (Platform.isAndroid) {
+      if (version.version !=
+          (dataProvider?.newVersionModel?.android?.version ?? "")) {
+        if (dataProvider!.newVersionModel!.android!.forceUpdate == true) {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        } else {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +129,11 @@ class _MainPageState extends State<MainPage> {
       }
     });
     userData = Provider.of<UserDataProvider>(context, listen: false);
+
+    /// UPDATE POP-UP
+
+    // WidgetsBinding.instance
+    //     .addPostFrameCallback((timeStamp) => navigateAppVersion());
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {

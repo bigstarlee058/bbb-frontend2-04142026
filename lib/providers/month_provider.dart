@@ -189,15 +189,19 @@ class MonthProvider extends ChangeNotifier {
   }
 
   Future<void> checkForPumpDay() async {
-    await checkPumpDayAvail();
-    await getAllPumpDayForThisWeek().then(
-      (value) {
-        if (pumpDays.isEmpty) {
-          changeIsPumpDayAvail(false);
-          changeIsPumpDay(false);
-        }
-      },
-    );
+    try {
+      await checkPumpDayAvail();
+      await getAllPumpDayForThisWeek().then(
+        (value) {
+          if (pumpDays.isEmpty) {
+            changeIsPumpDayAvail(false);
+            changeIsPumpDay(false);
+          }
+        },
+      );
+    } catch (e) {
+      log('e==========>>>>>$e');
+    }
 
     notifyListeners();
   }

@@ -23,9 +23,11 @@ class ApiRepo extends BaseService {
     var response = await ApiService()
         .getResponse(apiType: APIType.aGet, url: BaseService.radarChartHistory);
     if (response is List) {
-      return response
-          .map((json) => RadarChartHistoryModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => RadarChartHistoryModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -39,11 +41,12 @@ class ApiRepo extends BaseService {
         apiType: APIType.aGet,
         url: BaseService.fetchExerciseHistory,
         body: {"exerciseId": exerciseId});
-    log('response==========>>>>>$response');
     if (response is List) {
-      return response
-          .map((json) => ExerciseHistoryDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => ExerciseHistoryDataModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -56,9 +59,11 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchExerciseHistory,
         body: {"monthId": monthId});
     if (response is List) {
-      return response
-          .map((json) => ExerciseHistoryDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => ExerciseHistoryDataModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -82,6 +87,25 @@ class ApiRepo extends BaseService {
     return response;
   }
 
+  static Future<void> deleteExerciseHistory(
+      {required Map<String, dynamic> body}) async {
+    var response1 = await ApiService().getResponse(
+        apiType: APIType.aGet,
+        url: BaseService.fetchExerciseHistory,
+        body: body);
+    if (response1 is List) {
+      final data =
+          response1.map((json) => DayStatusDataModel.fromJson(json)).toList();
+      log('data==========>>>>>${data}');
+      if (data.isNotEmpty) {
+        var response = await ApiService().getResponse(
+            apiType: APIType.aDelete,
+            url: (BaseService.deleteExerciseHistory + (data.first.id ?? "")));
+        return response;
+      }
+    }
+  }
+
   /// ExerciseStatus ========================================================================
 
   static Future<List<ExerciseStatusDataModel>> fetchExerciseStatus(
@@ -91,9 +115,11 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchExerciseStatus,
         body: {"monthId": monthId});
     if (response is List) {
-      return response
-          .map((json) => ExerciseStatusDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => ExerciseStatusDataModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -122,7 +148,9 @@ class ApiRepo extends BaseService {
         apiType: APIType.aGet,
         url: BaseService.fetchDayStatus /*, body: {"monthId": monthId}*/);
     if (response is List) {
-      return response.map((json) => DayStatusDataModel.fromJson(json)).toList();
+      return response.isEmpty
+          ? []
+          : response.map((json) => DayStatusDataModel.fromJson(json)).toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -132,7 +160,9 @@ class ApiRepo extends BaseService {
     var response = await ApiService()
         .getResponse(apiType: APIType.aGet, url: BaseService.fetchDayStatus);
     if (response is List) {
-      return response.map((json) => DayStatusDataModel.fromJson(json)).toList();
+      return response.isEmpty
+          ? []
+          : response.map((json) => DayStatusDataModel.fromJson(json)).toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -175,7 +205,9 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchExtraSet,
         body: {"monthId": monthId});
     if (response is List) {
-      return response.map((json) => ExtraSetDataModel.fromJson(json)).toList();
+      return response.isEmpty
+          ? []
+          : response.map((json) => ExtraSetDataModel.fromJson(json)).toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -191,7 +223,7 @@ class ApiRepo extends BaseService {
     var fetchSet = await ApiService().getResponse(
         apiType: APIType.aGet,
         url: BaseService.fetchExtraSet,
-        body: {"dataId": id});
+        body: {"dataId": "EXTRA-ADDED$id"});
 
     if (fetchSet is List) {
       List<ExtraSetDataModel> data =
@@ -199,7 +231,7 @@ class ApiRepo extends BaseService {
       if (data.isNotEmpty) {
         await ApiService().getResponse(
             apiType: APIType.aDelete,
-            url: "${BaseService.deleteExtraSet}/${data.first.id}");
+            url: "${BaseService.deleteExtraSet}/${data.last.id}");
       }
     }
   }
@@ -210,9 +242,11 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(
         apiType: APIType.aGet, url: BaseService.fetchExerciseNotes);
     if (response is List) {
-      return response
-          .map((json) => ExerciseNotesDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => ExerciseNotesDataModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -234,9 +268,13 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchRemovedExercise,
         body: {"monthId": monthId});
     if (response is List) {
-      return response
-          .map((json) => RemovedExerciseDataModel.fromJson(json))
-          .toList();
+      return response.isNotEmpty
+          ? response.isEmpty
+              ? []
+              : response
+                  .map((json) => RemovedExerciseDataModel.fromJson(json))
+                  .toList()
+          : [];
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -267,9 +305,11 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchExtraExercise,
         body: {"monthId": monthId});
     if (response is List) {
-      return response
-          .map((json) => ExtraExerciseDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => ExtraExerciseDataModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -298,9 +338,11 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchSwapExercise,
         body: {"monthId": monthId});
     if (response is List) {
-      return response
-          .map((json) => SwapExerciseDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => SwapExerciseDataModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -346,9 +388,11 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(
         apiType: APIType.aGet, url: BaseService.fetchDayStatusList);
     if (response is List) {
-      return response
-          .map((json) => DayStatusListDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => DayStatusListDataModel.fromJson(json))
+              .toList();
     } else {
       debugPrint("Unexpected response format: $response");
       return null;
@@ -368,9 +412,11 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(
         apiType: APIType.aGet, url: BaseService.fetchMonthEnrollment);
     if (response is List) {
-      return response
-          .map((json) => MonthEnrollmentDataModel.fromJson(json))
-          .toList();
+      return response.isEmpty
+          ? []
+          : response
+              .map((json) => MonthEnrollmentDataModel.fromJson(json))
+              .toList();
     } else {
       throw Exception("Unexpected response format: $response");
     }
@@ -382,9 +428,11 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(
         apiType: APIType.aGet, url: BaseService.fetchAchievementsList);
     if (response is List) {
-      return response
-          .map((json) => AchievementsDataModel.fromJson(json))
-          .toList();
+      return response.isNotEmpty
+          ? response
+              .map((json) => AchievementsDataModel.fromJson(json))
+              .toList()
+          : [];
     } else {
       throw Exception("Unexpected response format: $response");
     }

@@ -51,6 +51,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -188,20 +189,10 @@ class _MyAppState extends State<MyApp> {
       if (Platform.isIOS) {
         await Purchases.configure(
             PurchasesConfiguration('appl_ZBToJDBIilfrwIWaWFcKrwbUkAr'));
-        Offerings offering = await Purchases.getOfferings();
-        if (offering.current != null) {
-          await preferences.putString(
-              SharedPreference.offerings, jsonEncode(offering));
-        }
       }
       if (Platform.isAndroid) {
         await Purchases.configure(
             PurchasesConfiguration('goog_aSKVxtsQIDoWmCpWNvoZGPKRSDo'));
-        Offerings offering = await Purchases.getOfferings();
-        if (offering.current != null) {
-          await preferences.putString(
-              SharedPreference.offerings, jsonEncode(offering));
-        }
       }
     });
   }

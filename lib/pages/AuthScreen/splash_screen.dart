@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'dart:io';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
+import 'package:bbb/pages/IntroScreen/version_update_screen.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -38,11 +39,11 @@ class _SplashScreenState extends State<SplashScreen> {
     themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     // _handleLogout(context);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        getOffering();
-      },
-    );
+    // WidgetsBinding.instance.addPostFrameCallback(
+    //   (timeStamp) {
+    //     getOffering();
+    //   },
+    // );
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
@@ -98,30 +99,12 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
+    try {
+      await dataProvider?.fetchAppVersion();
+    } catch (e) {
+      log('e==========>>>>>$e');
+    }
     await loginStatus(isLoggedIn);
-
-    // await dataProvider?.fetchAppVersion();
-    //
-    // PackageInfo version = await getCurrentAppVersion();
-    //
-    // if (Platform.isIOS) {
-    //   if (version.version ==
-    //       (dataProvider?.newVersionModel?.latestVersion ?? "")) {
-    //     await loginStatus(isLoggedIn);
-    //   } else {
-    //     if (mounted) {
-    //       Navigator.pushReplacement(
-    //         context,
-    //         MaterialPageRoute(
-    //           builder: (context) => VersionUpdateScreen(),
-    //         ),
-    //       );
-    //     }
-    //   }
-    // } else {
-    //   await loginStatus(isLoggedIn);
-    // }
   }
 
   Future<void> loginStatus(bool isLoggedIn) async {
@@ -134,43 +117,136 @@ class _SplashScreenState extends State<SplashScreen> {
             dataProvider?.fetchFeaturedChalleng();
             if (monthProvider?.monthDataModel == null) {
               if (mounted) {
-                await monthProvider?.onInit(context: context);
                 await userData.fetchUserInfo(context).then((value) async {
+                  await monthProvider?.onInit(context: context);
                   bool isFirstTime = userData.user["createdAt"] ==
                           userData.user["updatedAt"] ||
                       (userData.user["detail"] == null ||
                           !userData.user["detail"].containsKey('bodyfat'));
-
+                  CustomerInfo customerInfo = await Purchases.getCustomerInfo();
                   await preferences.setBool(
                       SharedPreference.isFirstTime, isFirstTime);
 
                   bool isAppUser =
                       userData.user["singuptype"] != "web" ? true : false;
-                  if (/*Platform.isIOS &&*/ isAppUser) {
+                  if (isAppUser) {
                     try {
                       Map<String, dynamic> subscriptionData =
                           userData.user["subscription"];
-                      DateTime now = DateTime.now().toUtc();
-                      DateTime? endDate = (subscriptionData["end_date"] ?? "")
-                              .toString()
-                              .isEmpty
-                          ? null
-                          : DateTime.parse(subscriptionData["end_date"]);
+                      if (subscriptionData["subscription_type"] ==
+                              "yearly_membership_1y_289" ||
+                          subscriptionData["subscription_type"] ==
+                              "monthly_membership_1m_29") {
+                        DateTime now = DateTime.now().toUtc();
+                        DateTime? endDate = (subscriptionData["end_date"] ?? "")
+                                .toString()
+                                .isEmpty
+                            ? null
+                            : DateTime.parse(subscriptionData["end_date"]);
 
-                      if (endDate == null || (now.isAfter(endDate))) {
-                        await _updateSubscriptionData(
-                          type: "",
-                          endDate: "",
-                          startDate: "",
-                          status: "free_user",
-                        );
+                        if (endDate == null || (now.isAfter(endDate))) {
+                          await _updateSubscriptionData(
+                            isPrice: true,
+                            type: "",
+                            endDate: "",
+                            startDate: "",
+                            status: "free_user",
+                          );
+                        }
+                      } else {
+                        final entitlements = customerInfo.entitlements.active;
+
+                        if (entitlements.values.first.productIdentifier ==
+                                "monthly_membership_1m_29" ||
+                            entitlements.values.first.productIdentifier ==
+                                "yearly_membership_1y_289") {
+                          final String startDate =
+                              customerInfo.allPurchaseDates[
+                                      subscriptionData["subscription_type"]] ??
+                                  DateTime.now().toUtc().toString();
+
+                          final String endDate =
+                              customerInfo.allExpirationDates[
+                                  subscriptionData["subscription_type"]]!;
+                          DateTime now = DateTime.now().toUtc();
+
+                          if ((now.isAfter(DateTime.parse(endDate)))) {
+                            await _updateSubscriptionData(
+                              isPrice: true,
+                              type: "",
+                              endDate: "",
+                              startDate: "",
+                              status: "free_user",
+                            );
+                          } else {
+                            await _updateSubscriptionData(
+                              isPrice: false,
+                              type: subscriptionData["subscription_type"],
+                              endDate: endDate,
+                              startDate: startDate,
+                              status: "subscribed_user",
+                            );
+                          }
+                        } else {
+                          final entitlement = entitlements.values.first;
+                          if (entitlements.isNotEmpty && entitlement.isActive) {
+                            final String planId = entitlement.productIdentifier;
+                            final String startDate =
+                                entitlement.originalPurchaseDate;
+
+                            final String endDate = entitlement.expirationDate!;
+
+                            final String status = entitlement.isActive
+                                ? "subscribed_user"
+                                : "free_user";
+
+                            DateTime now = DateTime.now().toUtc();
+
+                            if ((now.isAfter(DateTime.parse(endDate)))) {
+                              await _updateSubscriptionData(
+                                isPrice: true,
+                                type: "",
+                                endDate: "",
+                                startDate: "",
+                                status: "free_user",
+                              );
+                            } else {
+                              await _updateSubscriptionData(
+                                isPrice: false,
+                                type: planId,
+                                endDate: endDate,
+                                startDate: startDate,
+                                status: status,
+                              );
+                            }
+                          } else {
+                            DateTime now = DateTime.now().toUtc();
+
+                            DateTime? endDate = (subscriptionData["end_date"] ??
+                                        "")
+                                    .toString()
+                                    .isEmpty
+                                ? null
+                                : DateTime.parse(subscriptionData["end_date"]);
+
+                            if (endDate == null || (now.isAfter(endDate))) {
+                              await _updateSubscriptionData(
+                                isPrice: true,
+                                type: "",
+                                endDate: "",
+                                startDate: "",
+                                status: "free_user",
+                              );
+                            }
+                          }
+                        }
                       }
                     } catch (e) {
                       debugPrint("Error fetching subscription: $e");
                     }
                   }
 
-                  if (/*Platform.isIOS &&*/ isAppUser) {
+                  if (isAppUser) {
                     await userData.fetchUserInfo(context).then(
                       (value) async {
                         Map<String, dynamic> subscriptionData =
@@ -221,7 +297,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         }
                       },
                     );
-                  } else if (/*Platform.isIOS &&*/ !isAppUser) {
+                  } else if (!isAppUser) {
                     if (isFirstTime) {
                       if (mounted) {
                         await Navigator.pushAndRemoveUntil(
@@ -292,6 +368,63 @@ class _SplashScreenState extends State<SplashScreen> {
       await Future.delayed(Duration(milliseconds: 2500));
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/onboarding');
+
+        // WidgetsBinding.instance
+        //     .addPostFrameCallback((timeStamp) => navigateAppVersion());
+      }
+    }
+  }
+
+  navigateAppVersion() async {
+    PackageInfo version = await getCurrentAppVersion();
+
+    await Future.delayed(Duration(milliseconds: 200));
+    if (Platform.isIOS) {
+      log("VERSION======== ${version.version}");
+      if (version.version !=
+          (dataProvider?.newVersionModel?.ios?.version ?? "")) {
+        if (dataProvider!.newVersionModel!.ios!.forceUpdate == true) {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        } else {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        }
+      }
+    } else if (Platform.isAndroid) {
+      if (version.version !=
+          (dataProvider?.newVersionModel?.android?.version ?? "")) {
+        if (dataProvider!.newVersionModel!.android!.forceUpdate == true) {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        } else {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VersionUpdateScreen(),
+              ),
+            );
+          }
+        }
       }
     }
   }
@@ -303,27 +436,28 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  Future<void> getOffering() async {
-    try {
-      await Purchases.getOfferings();
-    } catch (e) {
-      log("Failed to fetch offerings: $e");
-    }
-  }
+  // Future<void> getOffering() async {
+  //   try {
+  //     await Purchases.getOfferings();
+  //   } catch (e) {
+  //     log("Failed to fetch offerings: $e");
+  //   }
+  // }
 
   Future<void> _updateSubscriptionData({
     required String status,
     required String type,
     required String startDate,
     required String endDate,
+    required bool isPrice,
   }) async {
     try {
       final Map<String, String> queryParams = {
         "user_subscription_status": status,
         "subscription_type": type,
-        "price": "",
         "purchase_date": startDate,
         "end_date": endDate,
+        if (isPrice) "price": "",
       };
 
       Uri url =

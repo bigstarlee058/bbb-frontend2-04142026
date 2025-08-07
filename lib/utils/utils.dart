@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bbb/components/common_network_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cupertino_height_picker/cupertino_height_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,6 +13,19 @@ class Utils {
         ? rounded.toStringAsFixed(0)
         : rounded.toStringAsFixed(2);
     return formatted;
+  }
+
+  static double convertCmToInch(double cm) {
+    return cm / 2.54;
+  }
+
+  static double convertFeetInchesToCm(int feet, double inches) {
+    double totalInches = (feet * 12) + inches;
+    return totalInches * 2.54;
+  }
+
+  static String convertInchToCm(double inch) {
+    return formatDouble(inch * 2.54);
   }
 
   static DateTime formattedDate(String date) {

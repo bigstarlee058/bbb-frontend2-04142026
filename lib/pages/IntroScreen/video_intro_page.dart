@@ -116,7 +116,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
 
       if (_videoPlayerController.value.volume == 0) {
         await AudioManager.abandonAudioFocus().then((value) async {
-          await Future.delayed(Duration(milliseconds: 20));
+          await Future.delayed(Duration(milliseconds: 40));
           return _videoPlayerController.play();
         });
       }
@@ -235,7 +235,7 @@ class _VideoIntroWidgetState extends State<VideoIntroWidget>
       final videoPlay = _videoPlayerController.value.isPlaying;
 
       await AudioManager.abandonAudioFocus().then((value) async {
-        await Future.delayed(Duration(milliseconds: 20));
+        await Future.delayed(Duration(milliseconds: 40));
         if (videoPlay) {
           return _videoPlayerController.play();
         }

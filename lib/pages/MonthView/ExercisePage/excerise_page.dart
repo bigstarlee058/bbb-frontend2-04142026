@@ -17,6 +17,7 @@ import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
+import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/payload_model.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/add_notes.dart';
@@ -557,6 +558,7 @@ class _ExercisePageState extends State<ExercisePage>
     if (data.isNotEmpty) {
       extraSetModel = List<ExtraSetModel>.from(
           json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
+      log('extraSetModel==========>>>>>${jsonEncode(extraSetModel)}');
     } else {
       extraSetModel = [];
     }
@@ -572,9 +574,9 @@ class _ExercisePageState extends State<ExercisePage>
 
     if (_videoPlayerController.value.volume == 0) {
       final videoPlay = _videoPlayerController.value.isPlaying;
-
+      setState(() {});
       await AudioManager.abandonAudioFocus().then((value) async {
-        await Future.delayed(Duration(milliseconds: 20));
+        await Future.delayed(Duration(milliseconds: 40));
         if (videoPlay) {
           return _videoPlayerController.play();
         }
@@ -823,7 +825,8 @@ class _ExercisePageState extends State<ExercisePage>
       AudioManager.abandonAudioFocus();
       monthProvider?.clearWarmupModel();
       _controller.dispose();
-
+      WidgetsBinding.instance.addPostFrameCallback(
+          (timeStamp) => monthProvider?.updateAddSet(false));
       await preferences.putString(
           SharedPreference.inTheExerciseScreenOrNot, "NO");
     });
@@ -1626,7 +1629,6 @@ class _ExercisePageState extends State<ExercisePage>
 
               List mainIndexList = [];
               List subIndexList = [];
-
               return ListView.builder(
                 itemCount: monthProvider?.selectedExercise?.extra?.length ?? 0,
                 shrinkWrap: true,
@@ -1675,27 +1677,55 @@ class _ExercisePageState extends State<ExercisePage>
                               : subIndexList.first;
 
                       if (dataHistory.isNotEmpty) {
-                        if (lastDataSubIndex ==
-                            ((monthProvider!.selectedExercise!
-                                        .extra![lastDataMainIndex].sets! -
-                                    1) +
-                                (monthProvider!.selectedExercise!
-                                            .extra![lastDataMainIndex].type ==
-                                        3
-                                    ? (extraSetModel.length)
-                                    : 0))) {
-                          lastDataMainIndex += 1;
-                          if (lastDataMainIndex ==
-                                  (monthProvider!
-                                      .selectedExercise!.extra!.length) &&
-                              lastDataSubIndex == (setCount - 1)) {
+                        final extraExercises =
+                            monthProvider?.selectedExercise?.extra;
+                        final currentExercise = (extraExercises != null &&
+                                lastDataMainIndex < extraExercises.length)
+                            ? extraExercises[lastDataMainIndex]
+                            : null;
+
+                        if (currentExercise != null) {
+                          final totalSets = (currentExercise.sets ?? 0) -
+                              1 +
+                              (currentExercise.type == 3
+                                  ? (extraSetModel.length)
+                                  : 0);
+
+                          if (lastDataSubIndex == totalSets) {
+                            lastDataMainIndex += 1;
+
+                            if (lastDataMainIndex >=
+                                (extraExercises?.length ?? 0)) {
+                            } else {
+                              lastDataSubIndex = 0;
+                            }
                           } else {
-                            lastDataSubIndex = 0;
+                            lastDataSubIndex += 1;
                           }
-                        } else {
-                          lastDataSubIndex += 1;
                         }
+
+                        // if (lastDataSubIndex ==
+                        //     ((monthProvider!.selectedExercise!
+                        //                 .extra![lastDataMainIndex].sets! -
+                        //             1) +
+                        //         (monthProvider!.selectedExercise!
+                        //                     .extra![lastDataMainIndex].type ==
+                        //                 3
+                        //             ? (extraSetModel.length)
+                        //             : 0))) {
+                        //   lastDataMainIndex += 1;
+                        //   if (lastDataMainIndex ==
+                        //           (monthProvider!
+                        //               .selectedExercise!.extra!.length) &&
+                        //       lastDataSubIndex == (setCount - 1)) {
+                        //   } else {
+                        //     lastDataSubIndex = 0;
+                        //   }
+                        // } else {
+                        //   lastDataSubIndex += 1;
+                        // }
                       }
+
                       int totalSets = 0;
 
                       if (monthProvider?.selectedExercise!.extra!.isNotEmpty ??
@@ -1713,37 +1743,73 @@ class _ExercisePageState extends State<ExercisePage>
                         }
                       }
 
-                      int subIndex = List.generate(
-                        extraItem.type == 1
-                            ? monthProvider!.selectedWarmUpSetTotal
-                            : extraItem.type == 2
-                                ? monthProvider!.selectedBackOffSetTotal
-                                : monthProvider!.selectedWorkingSetTotal,
-                        (index) => index,
-                      )[extraItem.type == 1
-                          ? warmUpIndex - 1
-                          : extraItem.type == 2
-                              ? backOffIndex - 1
-                              : workingIndex - 1];
+                      // int subIndex = tempSetAddressLoader
+                      //     ? countIndex
+                      //     : List.generate(
+                      //         extraItem.type == 1
+                      //             ? monthProvider!.selectedWarmUpSetTotal
+                      //             : extraItem.type == 2
+                      //                 ? monthProvider!.selectedBackOffSetTotal
+                      //                 : monthProvider!.selectedWorkingSetTotal,
+                      //         (index) => index,
+                      //       )[extraItem.type == 1
+                      //         ? warmUpIndex - 1
+                      //         : extraItem.type == 2
+                      //             ? backOffIndex - 1
+                      //             : workingIndex - 1];
+
+                      int subIndex = tempSetAddressLoader
+                          ? countIndex
+                          : () {
+                              int totalSets = extraItem.type == 1
+                                  ? monthProvider!.selectedWarmUpSetTotal
+                                  : extraItem.type == 2
+                                      ? monthProvider!.selectedBackOffSetTotal
+                                      : monthProvider!.selectedWorkingSetTotal;
+
+                              int index = extraItem.type == 1
+                                  ? warmUpIndex - 1
+                                  : extraItem.type == 2
+                                      ? backOffIndex - 1
+                                      : workingIndex - 1;
+
+                              if (index >= 0 && index < totalSets) {
+                                return List.generate(
+                                    totalSets, (i) => i)[index];
+                              } else {
+                                return 0;
+                              }
+                            }();
+
+                      final data1 = monthProvider?.selectedExercise!.extra
+                          ?.where((element) => extraItem.type == 3)
+                          .toList();
+
+                      bool isLast = false;
+
+                      if (data1!.isNotEmpty &&
+                          index == (data1.length - 1) &&
+                          countIndex >= (extraItem.sets ?? 0) &&
+                          countIndex + 1 == setCount) {
+                        isLast = true;
+                      }
 
                       return Padding(
-                        padding: EdgeInsets.only(bottom: false ? 4 : 20),
+                        padding: EdgeInsets.only(bottom: isLast ? 4 : 20),
                         child: ExerciseSetCard(
                           isKG: isKg,
                           onRemovePress: () async {
                             // monthProvider?.updateAddSet(true);
-                            // setState(() => tempSetAddressLoader = true);
-                            // tempSetAddress = monthProvider!.currentExpandedItem;
-                            // monthProvider?.removeSetCountInWorkingSet();
-                            // _removeExtraSet(extraSetModel.last);
-                            // workingIndex--;
-                            // setCount--;
-                            // monthProvider!.selectedWorkingSetTotal--;
-                            // monthProvider!.notifyListeners();
-                            // await Future.delayed(Duration(milliseconds: 200));
-                            // setState(() => tempSetAddressLoader = false);
+                            workingIndex - 1;
+                            setState(() => tempSetAddressLoader = true);
+                            tempSetAddress = monthProvider!.currentExpandedItem;
+                            monthProvider?.removeSetCountInWorkingSet();
+                            _removeExtraSet(extraSetModel.last);
+                            await Future.delayed(Duration(milliseconds: 200));
+                            setState(() => tempSetAddressLoader = false);
+                            // monthProvider?.updateAddSet(false);
                           },
-                          isExtraSet: false,
+                          isExtraSet: isLast,
                           totalRIRSet: totalSets,
                           extraSetLength: extraSetModel.length,
                           setCount: setCount,
@@ -1837,9 +1903,6 @@ class _ExercisePageState extends State<ExercisePage>
               );
             },
           ),
-          Builder(builder: (context) {
-            return SizedBox(height: 20);
-          }),
           if (monthProvider!.isCurrentMonth == "Future") ...[
             SizedBox()
           ] else ...[
@@ -1848,20 +1911,22 @@ class _ExercisePageState extends State<ExercisePage>
                     !isCurrentDayCompleted &&
                     !monthProvider!.isPumpDay
                 ? Padding(
-                    padding: const EdgeInsets.only(bottom: 40),
+                    padding: const EdgeInsets.only(bottom: 30, top: 10),
                     child: TextButton(
                       onPressed: () async {
                         monthProvider?.updateAddSet(true);
-                        setState(() => tempSetAddressLoader = true);
+                        // setState(() => tempSetAddressLoader = true);
                         final data = monthProvider?.selectedExercise!.extra!
                             .where((element) => element.type == 3);
                         if (data!.isNotEmpty) {
                           tempSetAddress = monthProvider!.currentExpandedItem;
                           monthProvider?.addSetCountInWorkingSet();
                           _addExtraSet(data.first);
-                          await Future.delayed(Duration(milliseconds: 200));
+                          await Future.delayed(Duration(milliseconds: 100));
                         }
-                        setState(() => tempSetAddressLoader = false);
+                        monthProvider?.updateAddSet(false);
+                        // setState(() => tempSetAddressLoader = false);
+                        setState(() {});
                       },
                       child: IntrinsicWidth(
                         child: Row(
@@ -2171,88 +2236,90 @@ class _ExercisePageState extends State<ExercisePage>
             ? "Circuit - ${monthProvider.circuitIndex}"
             : "Exercise");
 
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async {
-        String split = monthProvider.monthDataModel
-                ?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
-                .toString()
-                .split(" ")[1] ??
-            "";
-        if (isCurrentExerciseCompleted) {
-          Navigator.pop(context);
-          return;
-        } else if (monthProvider.isPumpDay && monthProvider.isCircuit) {
-          await pumpDayExerciseFinishAndNextLogic(
-              monthProvider, context, split);
-        } else {
-          for (var element in monthProvider.exerciseHistoryModel) {
-            if (element.status.toString() == Status.completed ||
-                element.status.toString() == Status.skipped) {
-              count++;
+    await Future.delayed(Duration(milliseconds: 50)).then(
+      (value) => WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) async {
+          String split = monthProvider.monthDataModel
+                  ?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                  .toString()
+                  .split(" ")[1] ??
+              "";
+          if (isCurrentExerciseCompleted) {
+            Navigator.pop(context);
+            return;
+          } else if (monthProvider.isPumpDay && monthProvider.isCircuit) {
+            await pumpDayExerciseFinishAndNextLogic(
+                monthProvider, context, split);
+          } else {
+            for (var element in monthProvider.exerciseHistoryModel) {
+              if (element.status.toString() == Status.completed ||
+                  element.status.toString() == Status.skipped) {
+                count++;
+              }
             }
-          }
-          List<ExerciseDataModel> exerciseList =
-              monthProvider.dayDataModel!.exercises!;
+            List<ExerciseDataModel> exerciseList =
+                monthProvider.dayDataModel!.exercises!;
 
-          List<ExerciseDataModel> tempExerciseList = [];
+            List<ExerciseDataModel> tempExerciseList = [];
 
-          tempExerciseList
-              .addAll(monthProvider.dayDataModel!.exercises!.where((element) {
-            return element.formats!.contains(monthProvider.equipmentType) ||
-                element.isAddedUpdated == true;
-          }));
+            tempExerciseList
+                .addAll(monthProvider.dayDataModel!.exercises!.where((element) {
+              return element.formats!.contains(monthProvider.equipmentType) ||
+                  element.isAddedUpdated == true;
+            }));
 
-          if (exerciseList.length != count &&
-              exerciseList.length != monthProvider.selectedExIndex + 1) {
-            await Future.delayed(const Duration(milliseconds: 200));
-            // int skipIndex = monthProvider.selectedExIndex + 1;
+            if (exerciseList.length != count &&
+                exerciseList.length != monthProvider.selectedExIndex + 1) {
+              await Future.delayed(const Duration(milliseconds: 200));
+              // int skipIndex = monthProvider.selectedExIndex + 1;
 
-            // if (monthProvider.selectedExercise?.isAddedUpdated == true) {
-            //   Navigator.pop(context);
-            //   return;
-            // }
+              // if (monthProvider.selectedExercise?.isAddedUpdated == true) {
+              //   Navigator.pop(context);
+              //   return;
+              // }
 
-            int index = (tempExerciseList.indexWhere((element) =>
-                element.exerciseId ==
-                monthProvider.selectedExercise?.exerciseId));
-            int newSkipIndex = index + 1;
-            if (tempo.isNotEmpty &&
-                tempo.last.exerciseId == tempExerciseList[index].exerciseId) {
+              int index = (tempExerciseList.indexWhere((element) =>
+                  element.exerciseId ==
+                  monthProvider.selectedExercise?.exerciseId));
+              int newSkipIndex = index + 1;
+              if (tempo.isNotEmpty &&
+                  tempo.last.exerciseId == tempExerciseList[index].exerciseId) {
+                Navigator.pop(context);
+                return;
+              }
+
+              for (int i = newSkipIndex; i < tempExerciseList.length; i++) {
+                var elementI = tempExerciseList[i];
+
+                String dataId =
+                    "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+                bool val = monthProvider.exerciseHistoryModel.any(
+                  (element) =>
+                      element.dataId == dataId &&
+                      (element.status == Status.completed ||
+                          element.status == Status.skipped),
+                );
+                if (val == false) {
+                  monthProvider.setSelectedExercise(elementI, i);
+                  monthProvider.updateWarmUp(false, "");
+
+                  bool isLast = i ==
+                      tempExerciseList.indexWhere((element) =>
+                          element.exerciseId == exerciseList.last.exerciseId);
+                  monthProvider.updateIsLastExercise(isLast);
+                  Navigator.pop(context);
+                  await Navigator.pushNamed(context, '/exercise',
+                      arguments: "Exercise");
+                  break;
+                }
+              }
+            } else {
               Navigator.pop(context);
               return;
             }
-
-            for (int i = newSkipIndex; i < tempExerciseList.length; i++) {
-              var elementI = tempExerciseList[i];
-
-              String dataId =
-                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-              bool val = monthProvider.exerciseHistoryModel.any(
-                (element) =>
-                    element.dataId == dataId &&
-                    (element.status == Status.completed ||
-                        element.status == Status.skipped),
-              );
-              if (val == false) {
-                monthProvider.setSelectedExercise(elementI, i);
-                monthProvider.updateWarmUp(false, "");
-
-                bool isLast = i ==
-                    tempExerciseList.indexWhere((element) =>
-                        element.exerciseId == exerciseList.last.exerciseId);
-                monthProvider.updateIsLastExercise(isLast);
-                Navigator.pop(context);
-                await Navigator.pushNamed(context, '/exercise',
-                    arguments: "Exercise");
-                break;
-              }
-            }
-          } else {
-            Navigator.pop(context);
-            return;
           }
-        }
-      },
+        },
+      ),
     );
   }
 
@@ -2398,10 +2465,7 @@ class _ExercisePageState extends State<ExercisePage>
                             child: Text(
                               "${monthProvider!.selectedExercise!.guide}",
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .color,
+                                color: Colors.black,
                               ),
                               textAlign: TextAlign.left,
                             ),
@@ -2442,7 +2506,7 @@ class _ExercisePageState extends State<ExercisePage>
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
-
+    log('dataId==========>>>>>$dataId');
     final data = {
       "sets": 1,
       "reps": extra.reps,
@@ -2472,7 +2536,25 @@ class _ExercisePageState extends State<ExercisePage>
     await fetchExtraSetLocalData(dataId);
   }
 
-  Future<void> _removeExtraSet(ExtraSetModel extra) async {}
+  Future<void> _removeExtraSet(ExtraSetModel extra) async {
+    String exId = monthProvider!.isPumpDay && monthProvider!.isCircuit
+        ? "${monthProvider?.exerciseDetailModel!.sId.toString()}-${monthProvider?.circuitIndex}"
+        : monthProvider!.exerciseDetailModel!.sId.toString();
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
+
+    ApiRepo.deleteExtraSet(id: dataId);
+    log('extra.id==========>>>>>${extra.id}');
+    await DatabaseHelper().deleteSingleDataUsingMainId(
+        tableName: DatabaseHelper.extraSetHistory, id: extra.id ?? 0);
+
+    await fetchExtraSetLocalData(dataId);
+  }
 
   Future<void> _saveExerciseData(
       {required String status,

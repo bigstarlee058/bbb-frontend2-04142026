@@ -302,8 +302,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
   Future<void> _saveData() async {
     // HapticFeedBack.buttonClick();
 
-    bool isKg = widget.isKG;
-
     _handleCloseTimer();
     monthProvider?.timerAddress = "";
     monthProvider?.timePassed = "";
@@ -329,6 +327,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
     } else {
       lastDataSubIndex += 1;
     }
+
     monthProvider?.updateExpandedItem(
         "$lastDataMainIndex:$lastDataSubIndex:${monthProvider?.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}");
 
@@ -1120,25 +1119,41 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
             ),
           ],
           if (widget.isExtraSet)
-            GestureDetector(
-              onTap: () {
-                widget.onRemovePress();
-              },
-              child: Container(
-                margin: EdgeInsets.only(top: 4, right: 10),
-                height: 20,
-                child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "Remove set",
-                      style: TextStyle(
-                        fontSize: ScreenUtil.verticalScale(1.5),
-                        fontWeight: FontWeight.normal,
+            Padding(
+              padding: EdgeInsets.only(top: 30),
+              child: TextButton(
+                onPressed: () async {
+                  log('dataId==========>>>>>$dataId');
+                  ApiRepo.deleteExerciseHistory(body: {"dataId": dataId});
+
+                  await DatabaseHelper().deleteSingleData(
+                      tableName: DatabaseHelper.exerciseHistory, id: dataId);
+
+                  widget.onRemovePress();
+                },
+                child: IntrinsicWidth(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.remove,
                         color: Colors.grey.shade600,
+                        size: ScreenUtil.verticalScale(3),
                       ),
-                    )),
+                      SizedBox(width: 4),
+                      Text(
+                        "Remove Set",
+                        style: TextStyle(
+                          fontSize: ScreenUtil.verticalScale(2),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade600,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            )
+            ),
         ],
       );
     }

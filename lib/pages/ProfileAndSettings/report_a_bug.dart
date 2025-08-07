@@ -155,7 +155,7 @@ class _ReportABugScreenState extends State<ReportABugScreen> {
                 child: AppTextFormField(
                   maxLines: 8,
                   hintText: 'Enter details here...',
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
                   onChanged: (value) {
                     if (descriptionController.text.toString().trim().isEmpty) {
