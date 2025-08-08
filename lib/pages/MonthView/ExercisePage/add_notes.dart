@@ -48,9 +48,11 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
         topLeft: Radius.circular(ScreenUtil.verticalScale(3)),
         topRight: Radius.circular(ScreenUtil.verticalScale(3)),
       ),
-      child: SingleChildScrollView(
+      child: Container(
+        color: Theme.of(context).cardColor,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          margin: EdgeInsets.only(top: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 15),
           color: Theme.of(context).cardColor,
           child: Padding(
             padding: EdgeInsets.only(
@@ -62,11 +64,17 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                 // Close Button
                 Align(
                   alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  child: SizedBox(
+                    height: 25,
+                    width: 40,
+                    child: Center(
+                      child: GestureDetector(
+                        child: const Icon(Icons.close),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
                   ),
                 ),
 
@@ -75,13 +83,13 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                   child: Text(
                     "Journal & Reminders",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       color: Theme.of(context).textTheme.labelLarge?.color,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
 
                 // Multiline Text Box
                 TextField(
@@ -92,7 +100,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
 
                 // Save Note Button
                 ButtonWidget(
@@ -118,7 +126,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                   color: AppColors.primaryColor,
                   isLoading: false,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
 
                 _buildPreviouslyAddedNotes(),
               ],
@@ -133,7 +141,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
     return Consumer<UserDataProvider>(
       builder: (context, userData, child) => dataList.isEmpty
           ? Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
               child: Text(
                 "No journal & reminders added yet.",
                 style: TextStyle(
@@ -147,14 +155,14 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                 Text(
                   "Previously Added Entries:",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.labelLarge?.color,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 SizedBox(
-                  height: 150, // You can adjust this height
+                  height: 110,
                   child: Scrollbar(
                     controller: scrollController,
                     thumbVisibility: true,
@@ -173,6 +181,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 5),
               ],
             ),
     );
@@ -186,13 +195,28 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
         children: [
           Text(
             date,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+            ),
           ),
           const SizedBox(width: 10),
-          const Text('|'),
+          Text(
+            '|',
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+            ),
+          ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(content),
+            child: Text(
+              content,
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+              ),
+            ),
           ),
         ],
       ),

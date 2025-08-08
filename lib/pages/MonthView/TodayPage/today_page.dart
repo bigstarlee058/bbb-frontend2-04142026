@@ -3004,6 +3004,7 @@ class _TodayPageState extends State<TodayPage>
                                           ),
                                         ),
                                       ),
+                                      SizedBox(height: 3.5),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 5, horizontal: 20),

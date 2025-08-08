@@ -16,6 +16,7 @@ class NumberEntry extends StatefulWidget {
     required this.focusNode,
     this.onchange,
     this.zeroPadding,
+    this.maxLength,
   });
 
   final String label;
@@ -23,6 +24,7 @@ class NumberEntry extends StatefulWidget {
   final String suffix;
   final FocusNode focusNode;
   final bool? zeroPadding;
+  final int? maxLength;
   final Function()? onchange;
 
   @override
@@ -54,19 +56,16 @@ class _NumberEntryState extends State<NumberEntry> {
       );
     });
 
-    // Add suffix when field gains focus
     widget.focusNode.addListener(() {
       if (widget.focusNode.hasFocus) {
         final suffix = widget.suffix;
         String text = widget.controller.text;
 
-        // Remove existing suffix and non-digits
         if (text.endsWith(suffix)) {
           text = text.substring(0, text.length - suffix.length);
         }
-        text = text.replaceAll(RegExp(r'\D'), '');
+        text = text.replaceAll(RegExp(r'[^\d.]'), '');
 
-        // Re-add suffix
         widget.controller.value = TextEditingValue(
           text: '$text$suffix',
           selection: TextSelection.collapsed(offset: text.length),
@@ -128,7 +127,7 @@ class _NumberEntryState extends State<NumberEntry> {
                         decimal: false, signed: true)*/
                 ,
                 textInputAction: TextInputAction.done,
-                maxLength: 6,
+                maxLength: widget.maxLength ?? 6,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: ScreenUtil.verticalScale(1.95),
@@ -145,12 +144,11 @@ class _NumberEntryState extends State<NumberEntry> {
                   isCollapsed: true,
                   contentPadding: EdgeInsets.zero,
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                  _suffixFormatter,
-                ],
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                //   _suffixFormatter,
+                // ],
                 onChanged: (value) {
-                  log('widget.onchange==========>>>>>${widget.onchange}');
                   if (widget.onchange != null) {
                     widget.onchange!();
                   }

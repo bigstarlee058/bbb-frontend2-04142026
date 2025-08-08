@@ -109,37 +109,6 @@ class _ToolsPageState extends State<ToolsPage> {
                                     )
                                   ],
                                 ),
-                                // Container(
-                                //   margin: const EdgeInsets.only(right: 10, bottom: 0),
-                                //   child: Row(
-                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                //     crossAxisAlignment: CrossAxisAlignment.start,
-                                //     children: [
-                                //       SizedBox(
-                                //         height: 15,
-                                //         width: media.width / 5,
-                                //       ),
-                                //       Padding(
-                                //         padding: EdgeInsets.only(
-                                //           top: ScreenUtil.verticalScale(1),
-                                //         ),
-                                //         child: Row(
-                                //           mainAxisAlignment: MainAxisAlignment.center,
-                                //           children: [
-                                //             Text(
-                                //               'Tools',
-                                //               style: TextStyle(
-                                //                 color: Colors.white,
-                                //                 fontSize: ScreenUtil.verticalScale(2.5),
-                                //               ),
-                                //             ),
-                                //           ],
-                                //         ),
-                                //       ),
-                                //       const CommonStreakWithNotification(routeString: "tool"),
-                                //     ],
-                                //   ),
-                                // ),
                               ],
                             ),
                           ),

@@ -62,52 +62,65 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Consumer<DataProvider>(builder: (context, value, child) {
-              return ButtonWidget(
-                text: "Submit",
-                textColor: Colors.white,
-                color: AppColors.primaryColor,
-                onPress: () async {
-                  if (image == null &&
-                      titleController.text.isEmpty &&
-                      descriptionController.text.isEmpty) {
-                    showBottomAlert(context, "Please enter details");
-                  } else if (image == null) {
-                    showBottomAlert(context, "Please select image");
-                  } else if (titleController.text.isEmpty) {
-                    showBottomAlert(context, "Please enter title");
-                  } else if (descriptionController.text.isEmpty) {
-                    showBottomAlert(context, "Please enter description");
-                  } else {
-                    bool val = await value.addOwnSpotlight(
-                      titleController.text.trim(),
-                      descriptionController.text.trim(),
-                      image,
-                    );
-                    if (val == true) {
-                      Fluttertoast.showToast(
-                        msg: "Story submitted successfully!",
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.TOP_RIGHT,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: AppColors.primaryColor,
-                        textColor: Colors.white,
-                        fontSize: 16.0,
-                      );
-                      Navigator.pop(context);
-                    } else {
-                      Fluttertoast.showToast(
-                        msg: "Failed to add spotlight, Please try again!",
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.TOP_RIGHT,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: AppColors.primaryColor,
-                        textColor: Colors.white,
-                        fontSize: 16.0,
-                      );
-                    }
-                  }
-                },
-                isLoading: value.storyLoader,
+              return Column(
+                children: [
+                  ButtonWidget(
+                    text: "Submit",
+                    textColor: Colors.white,
+                    color: AppColors.primaryColor,
+                    onPress: () async {
+                      if (image == null &&
+                          titleController.text.isEmpty &&
+                          descriptionController.text.isEmpty) {
+                        showBottomAlert(context, "Please enter details");
+                      } else if (image == null) {
+                        showBottomAlert(context, "Please select image");
+                      } else if (titleController.text.isEmpty) {
+                        showBottomAlert(context, "Please enter title");
+                      } else if (descriptionController.text.isEmpty) {
+                        showBottomAlert(context, "Please enter description");
+                      } else {
+                        bool val = await value.addOwnSpotlight(
+                          titleController.text.trim(),
+                          descriptionController.text.trim(),
+                          image,
+                        );
+                        if (val == true) {
+                          Fluttertoast.showToast(
+                            msg: "Story submitted successfully!",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.TOP_RIGHT,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: AppColors.primaryColor,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                          Navigator.pop(context);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Failed to add spotlight, Please try again!",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.TOP_RIGHT,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: AppColors.primaryColor,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      }
+                    },
+                    isLoading: value.storyLoader,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    textAlign: TextAlign.center,
+                    "By submitting your photos, you grant Booty by Bret LLC the rights outlined in Section 5.5 of our Terms of Use to use and promote these images across our platforms and marketing materials.",
+                    style: TextStyle(
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                        fontStyle: FontStyle.italic,
+                        fontSize: ScreenUtil.verticalScale(1.2)),
+                  )
+                ],
               );
             }),
           ],
@@ -153,8 +166,8 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                       clipBehavior: Clip.none,
                       children: [
                         Container(
-                          height: ScreenUtil.horizontalScale(50),
-                          width: ScreenUtil.horizontalScale(50),
+                          height: ScreenUtil.horizontalScale(48),
+                          width: ScreenUtil.horizontalScale(48),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(
                               Radius.circular(ScreenUtil.horizontalScale(5)),
@@ -169,8 +182,8 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                                     fit: BoxFit.cover,
                                   )
                                 : Container(
-                                    height: ScreenUtil.horizontalScale(50),
-                                    width: ScreenUtil.horizontalScale(50),
+                                    height: ScreenUtil.horizontalScale(48),
+                                    width: ScreenUtil.horizontalScale(48),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).cardColor,
                                       // border:
@@ -229,7 +242,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                   },
                 ),
               ),
-              SizedBox(height: ScreenUtil.verticalScale(5)),
+              SizedBox(height: ScreenUtil.verticalScale(4)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: AppTextFormField(
@@ -245,7 +258,7 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
                   controller: titleController,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 15),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: AppTextFormField(

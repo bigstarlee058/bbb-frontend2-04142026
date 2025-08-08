@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -5,7 +7,9 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:io';
 
 class VersionUpdateScreen extends StatefulWidget {
   const VersionUpdateScreen({super.key});
@@ -25,9 +29,82 @@ class _VersionUpdateScreenState extends State<VersionUpdateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log('Platform.isIOS dataP=>>>>>${dataProvider!.newVersionModel!.ios!.forceUpdate}');
+    log('Platform.isIOS dataP=>>>>>${dataProvider!.newVersionModel!.ios!.version}');
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: Platform.isIOS
+          ? dataProvider!.newVersionModel!.ios!.forceUpdate! == false
+              ? AppBar(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  leading: SizedBox(),
+                  actions: [
+                    GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            right: ScreenUtil.horizontalScale(2.5)),
+                        decoration: const BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(100))),
+                        child: Padding(
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                          child: Icon(
+                              size: ScreenUtil.verticalScale(2.5),
+                              Icons.close,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8)
+                  ],
+                )
+              : AppBar(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  leading: SizedBox(),
+                )
+          : dataProvider!.newVersionModel!.android!.forceUpdate! == false
+              ? AppBar(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  leading: SizedBox(),
+                  actions: [
+                    GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            right: ScreenUtil.horizontalScale(2.5)),
+                        decoration: const BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(100))),
+                        child: Padding(
+                          padding:
+                              EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                          child: Icon(
+                              size: ScreenUtil.verticalScale(2.5),
+                              Icons.close,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8)
+                  ],
+                )
+              : AppBar(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  leading: SizedBox(),
+                ),
       body: Align(
         alignment: Alignment.bottomCenter,
         child: Container(

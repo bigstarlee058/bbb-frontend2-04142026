@@ -1,3 +1,7 @@
+// To parse this JSON data, do
+//
+//     final newVersionModel = newVersionModelFromJson(jsonString);
+
 import 'dart:convert';
 
 NewVersionModel newVersionModelFromJson(String str) =>
@@ -14,6 +18,8 @@ class NewVersionModel {
   String? updateTitle;
   DateTime? updatedAt;
   String? updateMessage;
+  Android? android;
+  Android? ios;
   String? newVersionModelId;
 
   NewVersionModel({
@@ -24,6 +30,8 @@ class NewVersionModel {
     this.updateTitle,
     this.updatedAt,
     this.updateMessage,
+    this.android,
+    this.ios,
     this.newVersionModelId,
   });
 
@@ -40,6 +48,9 @@ class NewVersionModel {
             ? null
             : DateTime.parse(json["updatedAt"]),
         updateMessage: json["update_message"],
+        android:
+            json["android"] == null ? null : Android.fromJson(json["android"]),
+        ios: json["ios"] == null ? null : Android.fromJson(json["ios"]),
         newVersionModelId: json["id"],
       );
 
@@ -51,6 +62,28 @@ class NewVersionModel {
         "update_title": updateTitle,
         "updatedAt": updatedAt?.toIso8601String(),
         "update_message": updateMessage,
+        "android": android?.toJson(),
+        "ios": ios?.toJson(),
         "id": newVersionModelId,
+      };
+}
+
+class Android {
+  bool? forceUpdate;
+  String? version;
+
+  Android({
+    this.forceUpdate,
+    this.version,
+  });
+
+  factory Android.fromJson(Map<String, dynamic> json) => Android(
+        forceUpdate: json["forceUpdate"],
+        version: json["version"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "forceUpdate": forceUpdate,
+        "version": version,
       };
 }

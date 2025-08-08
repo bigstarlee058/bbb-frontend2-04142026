@@ -341,12 +341,20 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                                 .user["name"] !=
                                                             ""
                                                         ? Text(
-                                                            userData
-                                                                .user["name"]
-                                                                .toString()
-                                                                .replaceAll(
-                                                                    " ", "")[0]
-                                                                .capitalizeFirst(), // First character of the name
+                                                            userData.user[
+                                                                        "name"]
+                                                                    .toString()
+                                                                    .replaceAll(
+                                                                        " ", "")
+                                                                    .isNotEmpty
+                                                                ? userData.user[
+                                                                        "name"]
+                                                                    .toString()
+                                                                    .replaceAll(
+                                                                        " ",
+                                                                        "")[0]
+                                                                    .capitalizeFirst()
+                                                                : "B", // First character of the name
                                                             style: TextStyle(
                                                               fontSize: ScreenUtil
                                                                   .horizontalScale(
@@ -732,7 +740,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                         userData?.user["singuptype"] != "web"
                                             ? true
                                             : false;
-                                    if (isAppUser && Platform.isIOS) {
+                                    if (isAppUser /*&& Platform.isIOS*/) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(

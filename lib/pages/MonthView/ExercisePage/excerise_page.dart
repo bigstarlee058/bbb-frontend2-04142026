@@ -7,6 +7,7 @@ import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
+import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
@@ -16,12 +17,12 @@ import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
+import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/payload_model.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/add_notes.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/exercise_set_card.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/exercise_tutorial.dart';
-import 'package:bbb/components/video_full_screen.dart';
 import 'package:bbb/pages/MonthView/TodayPage/equipment_section.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
@@ -31,7 +32,6 @@ import 'package:bbb/values/clip_path.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -84,7 +84,7 @@ class _ExercisePageState extends State<ExercisePage>
   late VideoPlayerController _videoPlayerController1;
   ChewieController? _chewieController1;
   late Size videoSize1;
-
+  bool isKg = false;
   Future<void> fetchTutorialData() async {
     setState(() {
       loading1 = true;
@@ -222,7 +222,11 @@ class _ExercisePageState extends State<ExercisePage>
   void initState() {
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     dataProvider1 = Provider.of<DataProvider>(context, listen: false);
-
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        isKg = await preferences.getBool(SharedPreference.isKG) ?? false;
+      },
+    );
     WidgetsBinding.instance.scheduleFrameCallback((timeStamp) async {
       await preferences.putString(
           SharedPreference.inTheExerciseScreenOrNot, "YES");
@@ -502,12 +506,12 @@ class _ExercisePageState extends State<ExercisePage>
 
   bool videoNotAvailable = false;
 
-  videoInitialize() {
+  videoInitialize() async {
     try {
       setState(() => videoLoader = true);
       if (monthProvider?.isWarmup == false) {
         if (monthProvider!.exerciseDetailModel!.files!.isNotEmpty) {
-          initializeVideo(
+          await initializeVideo(
               monthProvider!.exerciseDetailModel!.files!.first.link!);
         } else {
           videoNotAvailable = true;
@@ -521,7 +525,7 @@ class _ExercisePageState extends State<ExercisePage>
         }
       } else {
         if (monthProvider!.warmUpModel!.files!.isNotEmpty) {
-          initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
+          await initializeVideo(monthProvider!.warmUpModel!.files!.first.link!);
         } else {
           videoNotAvailable = true;
           videoNotInitialized = false;
@@ -554,6 +558,7 @@ class _ExercisePageState extends State<ExercisePage>
     if (data.isNotEmpty) {
       extraSetModel = List<ExtraSetModel>.from(
           json.decode(jsonEncode(data)).map((x) => ExtraSetModel.fromJson(x)));
+      log('extraSetModel==========>>>>>${jsonEncode(extraSetModel)}');
     } else {
       extraSetModel = [];
     }
@@ -569,9 +574,9 @@ class _ExercisePageState extends State<ExercisePage>
 
     if (_videoPlayerController.value.volume == 0) {
       final videoPlay = _videoPlayerController.value.isPlaying;
-
+      setState(() {});
       await AudioManager.abandonAudioFocus().then((value) async {
-        await Future.delayed(Duration(milliseconds: 20));
+        await Future.delayed(Duration(milliseconds: 40));
         if (videoPlay) {
           return _videoPlayerController.play();
         }
@@ -582,13 +587,15 @@ class _ExercisePageState extends State<ExercisePage>
     await preferences.setBool(SharedPreference.isMute, isMute);
   }
 
+  String selectedSpeed = "";
+
   Future<void> initializeVideo(String url) async {
     try {
       _videoPlayerController = VideoPlayerController.networkUrl(
         Uri.parse(url),
         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
       );
-
+      _videoPlayerController.setPlaybackSpeed(1);
       await _videoPlayerController.initialize();
 
       bool rawData = await preferences.getBool(SharedPreference.isMute) ?? true;
@@ -598,9 +605,9 @@ class _ExercisePageState extends State<ExercisePage>
       final isPlaying = _videoPlayerController.value.isPlaying;
 
       if (isPlaying && isMute == false) {
-        await AudioManager.requestAudioFocus();
+        AudioManager.requestAudioFocus();
       } else {
-        await AudioManager.abandonAudioFocus();
+        AudioManager.abandonAudioFocus();
       }
 
       _chewieController = ChewieController(
@@ -626,7 +633,7 @@ class _ExercisePageState extends State<ExercisePage>
 
         final isPlaying = _videoPlayerController.value.isPlaying;
         if (isPlaying && isMute == true) {
-          await AudioManager.requestAudioFocus();
+          AudioManager.requestAudioFocus();
         }
 
         _onVideoTick();
@@ -710,6 +717,13 @@ class _ExercisePageState extends State<ExercisePage>
 
   bool showControls = true;
   bool isFullscreen = false;
+
+  bool val = false;
+
+  updateVal(value) {
+    val = value;
+    setState(() {});
+  }
 
   void hideControls() {
     if (_videoPlayerController.value.isPlaying) {
@@ -811,7 +825,8 @@ class _ExercisePageState extends State<ExercisePage>
       AudioManager.abandonAudioFocus();
       monthProvider?.clearWarmupModel();
       _controller.dispose();
-
+      WidgetsBinding.instance.addPostFrameCallback(
+          (timeStamp) => monthProvider?.updateAddSet(false));
       await preferences.putString(
           SharedPreference.inTheExerciseScreenOrNot, "NO");
     });
@@ -843,11 +858,67 @@ class _ExercisePageState extends State<ExercisePage>
   int backOffIndex = 0;
   int workingIndex = 0;
 
+  void _showSpeedOptions() {
+    showModalBottomSheet(
+      backgroundColor: Theme.of(context).cardColor,
+      context: context,
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.symmetric(
+                  vertical: ScreenUtil.verticalScale(3.2), horizontal: 16)
+              .copyWith(bottom: ScreenUtil.verticalScale(4)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [1.0, 1.2, 1.5, 2.0].map((speed) {
+              final isSelected = _currentSpeed == speed;
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  _changeSpeed(speed);
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primaryColor
+                        : Theme.of(context).dividerColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${speed}x',
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.white70,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _changeSpeed(double speed) {
+    setState(() => _currentSpeed = speed);
+    _videoPlayerController.setPlaybackSpeed(speed);
+  }
+
+  double _currentSpeed = 1.0;
+
+  void _downloadVideo() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Downloading video...')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    log('count1==========>>>>>$count1');
     warmUpIndex = 0;
     backOffIndex = 0;
     workingIndex = 0;
@@ -925,6 +996,82 @@ class _ExercisePageState extends State<ExercisePage>
                           /// VIDEO PROGRESS
 
                           videoProgress(media, context),
+
+                          // SafeArea(
+                          //   child: Align(
+                          //     alignment: Alignment.centerRight,
+                          //     child: Padding(
+                          //       padding: const EdgeInsets.only(right: 10),
+                          //       child: PopupMenuButton<String>(
+                          //         padding: EdgeInsets.only(right: 0),
+                          //         menuPadding:
+                          //             EdgeInsets.symmetric(vertical: 5),
+                          //         position: PopupMenuPosition.under,
+                          //         color: Theme.of(context).cardColor,
+                          //         icon: const Icon(
+                          //           Icons.more_vert,
+                          //           color: Colors.white70,
+                          //         ),
+                          //         onSelected: (value) {
+                          //           if (value == 'speed') {
+                          //             _showSpeedOptions();
+                          //           } else if (value == 'download') {
+                          //             _downloadVideo();
+                          //           }
+                          //         },
+                          //         itemBuilder: (_) => [
+                          //           PopupMenuItem(
+                          //               value: 'speed',
+                          //               child: Row(
+                          //                 children: [
+                          //                   Icon(
+                          //                     Icons.slow_motion_video,
+                          //                     color: Theme.of(context)
+                          //                         .textTheme
+                          //                         .bodyLarge
+                          //                         ?.color,
+                          //                   ),
+                          //                   SizedBox(width: 5),
+                          //                   Text(
+                          //                     'Playback Speed',
+                          //                     style: TextStyle(
+                          //                       color: Theme.of(context)
+                          //                           .textTheme
+                          //                           .bodyLarge
+                          //                           ?.color,
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               )),
+                          //           PopupMenuItem(
+                          //             value: 'download',
+                          //             child: Row(
+                          //               children: [
+                          //                 Icon(
+                          //                   Icons.download,
+                          //                   color: Theme.of(context)
+                          //                       .textTheme
+                          //                       .bodyLarge
+                          //                       ?.color,
+                          //                 ),
+                          //                 SizedBox(width: 5),
+                          //                 Text(
+                          //                   'Download',
+                          //                   style: TextStyle(
+                          //                     color: Theme.of(context)
+                          //                         .textTheme
+                          //                         .bodyLarge
+                          //                         ?.color,
+                          //                   ),
+                          //                 ),
+                          //               ],
+                          //             ),
+                          //           ),
+                          //         ],
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
 
@@ -933,8 +1080,8 @@ class _ExercisePageState extends State<ExercisePage>
                       Container(
                         margin: EdgeInsets.only(
                             top: ((isExercise == 1
-                                        ? (monthProvider?.exerciseDetailModel
-                                                    ?.files?.isNotEmpty ??
+                                        ? (monthProvider?.exerciseDetailModel?.files
+                                                    ?.isNotEmpty ??
                                                 false) &&
                                             !videoNotInitialized &&
                                             videoSize != null
@@ -945,9 +1092,14 @@ class _ExercisePageState extends State<ExercisePage>
                                             videoSize != null)
                                     ? videoSize!.height
                                     : videoNotAvailable
-                                        ? (monthProvider?.exerciseDetailModel
-                                                        ?.videoThumbnail ??
-                                                    "")
+                                        ? (isExercise == 1
+                                                    ? monthProvider
+                                                            ?.exerciseDetailModel
+                                                            ?.videoThumbnail ??
+                                                        ""
+                                                    : monthProvider?.warmUpModel
+                                                            ?.videoThumbnail ??
+                                                        "")
                                                 .isEmpty
                                             ? media.width +
                                                 media.height * 0.0605
@@ -1029,7 +1181,7 @@ class _ExercisePageState extends State<ExercisePage>
 
   Widget videoProgress(Size media, BuildContext context) => videoSize != null
       ? Positioned(
-          top: media.height * .59,
+          bottom: videoSize!.height * .15,
           left: 10,
           right: 10,
           child: !videoNotInitialized
@@ -1045,43 +1197,48 @@ class _ExercisePageState extends State<ExercisePage>
                           Column(
                             children: [
                               SizedBox(height: ScreenUtil.verticalScale(0.8)),
-                              AnimatedOpacity(
-                                opacity: showControls ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 800),
-                                curve: Curves.easeInOut,
-                                child: Row(
-                                  children: [
-                                    Spacer(),
-                                    GestureDetector(
-                                      onTap: showControls
-                                          ? () {
-                                              toggleFullscreen();
-                                            }
-                                          : null,
-                                      child: Icon(
-                                        !isFullscreen
-                                            ? Icons.fullscreen
-                                            : Icons.fullscreen_exit,
-                                        color: Colors.white70,
-                                        size: 28,
+                              GestureDetector(
+                                onTap: () {
+                                  showControlsOnTap();
+                                },
+                                child: AnimatedOpacity(
+                                  opacity: showControls ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 800),
+                                  curve: Curves.easeInOut,
+                                  child: Row(
+                                    children: [
+                                      Spacer(),
+                                      GestureDetector(
+                                        onTap: showControls
+                                            ? () {
+                                                toggleFullscreen();
+                                              }
+                                            : null,
+                                        child: Icon(
+                                          !isFullscreen
+                                              ? Icons.fullscreen
+                                              : Icons.fullscreen_exit,
+                                          color: Colors.white70,
+                                          size: 28,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    GestureDetector(
-                                      onTap: showControls
-                                          ? () {
-                                              muteUnMute();
-                                            }
-                                          : null,
-                                      child: Icon(
-                                        isMute
-                                            ? Icons.volume_up
-                                            : Icons.volume_off,
-                                        color: Colors.white70,
-                                        size: 28,
+                                      SizedBox(width: 10),
+                                      GestureDetector(
+                                        onTap: showControls
+                                            ? () {
+                                                muteUnMute();
+                                              }
+                                            : null,
+                                        child: Icon(
+                                          isMute
+                                              ? Icons.volume_up
+                                              : Icons.volume_off,
+                                          color: Colors.white70,
+                                          size: 28,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -1134,112 +1291,92 @@ class _ExercisePageState extends State<ExercisePage>
           top: media.height * .31,
           left: 10,
           right: 10,
-          child: AnimatedOpacity(
-            opacity: showControls ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeInOut,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // Skip backward button
-                IconButton(
-                  iconSize: 40,
-                  icon: const Icon(
-                    Icons.replay_10,
-                    color: Colors.white70,
-                  ),
-                  onPressed: showControls
-                      ? () {
-                          _videoPlayerController.seekTo(
-                            _videoPlayerController.value.position -
-                                const Duration(seconds: 10),
-                          );
-                          _controller.forward();
-                        }
-                      : null,
-                ),
-                IconButton(
-                  iconSize: 60,
-                  icon: Icon(
-                    _videoPlayerController.value.isPlaying
-                        ? Icons.pause_circle_filled
-                        : Icons.play_circle_filled,
-                    color: Colors.white70,
-                  ),
-                  onPressed: showControls
-                      ? () async {
-                          if (_videoPlayerController.value.isPlaying) {
-                            _videoPlayerController.pause();
-                            videoStartPlay = true;
-                            setState(() {});
-                            showControlsOnTapOfPause();
-
-                            await Future.delayed(
-                                const Duration(milliseconds: 100));
-                            await AudioManager.abandonAudioFocus();
-                            setState(() {});
-                          } else {
-                            videoStartPlay = true;
-                            _videoPlayerController.play();
-                            setState(() {});
-                            hideControls();
-
-                            await Future.delayed(
-                                const Duration(milliseconds: 100));
-
-                            if (_videoPlayerController.value.volume > 0) {
-                              await AudioManager.requestAudioFocus();
-                            }
-                            setState(() {});
+          child: GestureDetector(
+            onTap: () {
+              showControlsOnTap();
+            },
+            child: AnimatedOpacity(
+              opacity: showControls ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeInOut,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // Skip backward button
+                  IconButton(
+                    iconSize: 40,
+                    icon: const Icon(
+                      Icons.replay_10,
+                      color: Colors.white70,
+                    ),
+                    onPressed: showControls
+                        ? () {
+                            _videoPlayerController.seekTo(
+                              _videoPlayerController.value.position -
+                                  const Duration(seconds: 10),
+                            );
+                            _controller.forward();
                           }
-
-                          // if (_videoPlayerController.value.isPlaying) {
-                          //   _videoPlayerController.pause();
-                          //   videoStartPlay = true;
-                          //   setState(() {});
-                          //   showControlsOnTapOfPause();
-                          //
-                          //   await Future.delayed(Duration(milliseconds: 100))
-                          //       .then(
-                          //     (value) {
-                          //       AudioManager.abandonAudioFocus();
-                          //       setState(() {});
-                          //     },
-                          //   );
-                          // } else {
-                          //   videoStartPlay = true;
-                          //   _videoPlayerController.play();
-                          //   setState(() {});
-                          //   hideControls();
-                          //   await Future.delayed(Duration(milliseconds: 100))
-                          //       .then(
-                          //     (value) {
-                          //       AudioManager.requestAudioFocus();
-                          //       setState(() {});
-                          //     },
-                          //   );
-                          // }
-                        }
-                      : null,
-                ),
-
-                IconButton(
-                  iconSize: 40,
-                  icon: const Icon(
-                    Icons.forward_10,
-                    color: Colors.white70,
+                        : null,
                   ),
-                  onPressed: showControls
-                      ? () {
-                          _videoPlayerController.seekTo(
-                            _videoPlayerController.value.position +
-                                const Duration(seconds: 10),
-                          );
-                          _controller.forward();
-                        }
-                      : null,
-                ),
-              ],
+                  IconButton(
+                    iconSize: 60,
+                    icon: Icon(
+                      _videoPlayerController.value.isPlaying
+                          ? Icons.pause_circle_filled
+                          : Icons.play_circle_filled,
+                      color: Colors.white70,
+                    ),
+                    onPressed: showControls
+                        ? () async {
+                            if (_videoPlayerController.value.isPlaying) {
+                              updateVal(false);
+                              _videoPlayerController.pause();
+                              videoStartPlay = true;
+                              setState(() {});
+                              showControlsOnTapOfPause();
+
+                              await Future.delayed(
+                                  const Duration(milliseconds: 50));
+                              AudioManager.abandonAudioFocus();
+                              setState(() {});
+                            } else {
+                              updateVal(true);
+                              videoStartPlay = true;
+                              _videoPlayerController.play();
+                              setState(() {});
+                              hideControls();
+
+                              await Future.delayed(
+                                  const Duration(milliseconds: 50));
+
+                              if (_videoPlayerController.value.volume > 0) {
+                                AudioManager.requestAudioFocus();
+                              }
+                              setState(() {});
+                            }
+                          }
+                        : null,
+                  ),
+
+                  IconButton(
+                    iconSize: 40,
+                    icon: const Icon(
+                      Icons.forward_10,
+                      color: Colors.white70,
+                    ),
+                    onPressed: showControls
+                        ? () {
+                            _videoPlayerController.seekTo(
+                              _videoPlayerController.value.position +
+                                  const Duration(seconds: 10),
+                            );
+                            _controller.forward();
+                          }
+                        : null,
+                  ),
+                ],
+              ),
             ),
           ),
         )
@@ -1625,7 +1762,6 @@ class _ExercisePageState extends State<ExercisePage>
 
               List mainIndexList = [];
               List subIndexList = [];
-
               return ListView.builder(
                 itemCount: monthProvider?.selectedExercise?.extra?.length ?? 0,
                 shrinkWrap: true,
@@ -1674,27 +1810,55 @@ class _ExercisePageState extends State<ExercisePage>
                               : subIndexList.first;
 
                       if (dataHistory.isNotEmpty) {
-                        if (lastDataSubIndex ==
-                            ((monthProvider!.selectedExercise!
-                                        .extra![lastDataMainIndex].sets! -
-                                    1) +
-                                (monthProvider!.selectedExercise!
-                                            .extra![lastDataMainIndex].type ==
-                                        3
-                                    ? (extraSetModel.length)
-                                    : 0))) {
-                          lastDataMainIndex += 1;
-                          if (lastDataMainIndex ==
-                                  (monthProvider!
-                                      .selectedExercise!.extra!.length) &&
-                              lastDataSubIndex == (setCount - 1)) {
+                        final extraExercises =
+                            monthProvider?.selectedExercise?.extra;
+                        final currentExercise = (extraExercises != null &&
+                                lastDataMainIndex < extraExercises.length)
+                            ? extraExercises[lastDataMainIndex]
+                            : null;
+
+                        if (currentExercise != null) {
+                          final totalSets = (currentExercise.sets ?? 0) -
+                              1 +
+                              (currentExercise.type == 3
+                                  ? (extraSetModel.length)
+                                  : 0);
+
+                          if (lastDataSubIndex == totalSets) {
+                            lastDataMainIndex += 1;
+
+                            if (lastDataMainIndex >=
+                                (extraExercises?.length ?? 0)) {
+                            } else {
+                              lastDataSubIndex = 0;
+                            }
                           } else {
-                            lastDataSubIndex = 0;
+                            lastDataSubIndex += 1;
                           }
-                        } else {
-                          lastDataSubIndex += 1;
                         }
+
+                        // if (lastDataSubIndex ==
+                        //     ((monthProvider!.selectedExercise!
+                        //                 .extra![lastDataMainIndex].sets! -
+                        //             1) +
+                        //         (monthProvider!.selectedExercise!
+                        //                     .extra![lastDataMainIndex].type ==
+                        //                 3
+                        //             ? (extraSetModel.length)
+                        //             : 0))) {
+                        //   lastDataMainIndex += 1;
+                        //   if (lastDataMainIndex ==
+                        //           (monthProvider!
+                        //               .selectedExercise!.extra!.length) &&
+                        //       lastDataSubIndex == (setCount - 1)) {
+                        //   } else {
+                        //     lastDataSubIndex = 0;
+                        //   }
+                        // } else {
+                        //   lastDataSubIndex += 1;
+                        // }
                       }
+
                       int totalSets = 0;
 
                       if (monthProvider?.selectedExercise!.extra!.isNotEmpty ??
@@ -1712,9 +1876,73 @@ class _ExercisePageState extends State<ExercisePage>
                         }
                       }
 
+                      // int subIndex = tempSetAddressLoader
+                      //     ? countIndex
+                      //     : List.generate(
+                      //         extraItem.type == 1
+                      //             ? monthProvider!.selectedWarmUpSetTotal
+                      //             : extraItem.type == 2
+                      //                 ? monthProvider!.selectedBackOffSetTotal
+                      //                 : monthProvider!.selectedWorkingSetTotal,
+                      //         (index) => index,
+                      //       )[extraItem.type == 1
+                      //         ? warmUpIndex - 1
+                      //         : extraItem.type == 2
+                      //             ? backOffIndex - 1
+                      //             : workingIndex - 1];
+
+                      int subIndex = tempSetAddressLoader
+                          ? countIndex
+                          : () {
+                              int totalSets = extraItem.type == 1
+                                  ? monthProvider!.selectedWarmUpSetTotal
+                                  : extraItem.type == 2
+                                      ? monthProvider!.selectedBackOffSetTotal
+                                      : monthProvider!.selectedWorkingSetTotal;
+
+                              int index = extraItem.type == 1
+                                  ? warmUpIndex - 1
+                                  : extraItem.type == 2
+                                      ? backOffIndex - 1
+                                      : workingIndex - 1;
+
+                              if (index >= 0 && index < totalSets) {
+                                return List.generate(
+                                    totalSets, (i) => i)[index];
+                              } else {
+                                return 0;
+                              }
+                            }();
+
+                      final data1 = monthProvider?.selectedExercise!.extra
+                          ?.where((element) => extraItem.type == 3)
+                          .toList();
+
+                      bool isLast = false;
+
+                      if (data1!.isNotEmpty &&
+                          index == (data1.length - 1) &&
+                          countIndex >= (extraItem.sets ?? 0) &&
+                          countIndex + 1 == setCount) {
+                        isLast = true;
+                      }
+
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
+                        padding: EdgeInsets.only(bottom: isLast ? 4 : 20),
                         child: ExerciseSetCard(
+                          isKG: isKg,
+                          onRemovePress: () async {
+                            // monthProvider?.updateAddSet(true);
+                            workingIndex - 1;
+                            setState(() => tempSetAddressLoader = true);
+                            tempSetAddress = monthProvider!.currentExpandedItem;
+                            monthProvider?.removeSetCountInWorkingSet();
+                            _removeExtraSet(extraSetModel.last);
+                            await Future.delayed(Duration(milliseconds: 200));
+                            setState(() => tempSetAddressLoader = false);
+                            // monthProvider?.updateAddSet(false);
+                          },
+                          isExtraSet: isLast,
                           totalRIRSet: totalSets,
                           extraSetLength: extraSetModel.length,
                           setCount: setCount,
@@ -1789,20 +2017,9 @@ class _ExercisePageState extends State<ExercisePage>
                                   ? true
                                   : false,
                           index: index,
-                          subIndex: List.generate(
-                            extraItem.type == 1
-                                ? monthProvider!.selectedWarmUpSetTotal
-                                : extraItem.type == 2
-                                    ? monthProvider!.selectedBackOffSetTotal
-                                    : monthProvider!.selectedWorkingSetTotal,
-                            (index) => index,
-                          )[extraItem.type == 1
-                              ? warmUpIndex - 1
-                              : extraItem.type == 2
-                                  ? backOffIndex - 1
-                                  : workingIndex - 1],
+                          subIndex: subIndex,
                           set: int.parse(extraItem.sets.toString()),
-                          weight: int.parse(extraItem.weight.toString()),
+                          weight: double.parse(extraItem.weight.toString()),
                           reps: int.parse(extraItem.reps.toString()),
                           repsInReverse: 100,
                           load: int.parse(extraItem.load == null
@@ -1819,9 +2036,6 @@ class _ExercisePageState extends State<ExercisePage>
               );
             },
           ),
-          Builder(builder: (context) {
-            return SizedBox(height: 20);
-          }),
           if (monthProvider!.isCurrentMonth == "Future") ...[
             SizedBox()
           ] else ...[
@@ -1830,20 +2044,22 @@ class _ExercisePageState extends State<ExercisePage>
                     !isCurrentDayCompleted &&
                     !monthProvider!.isPumpDay
                 ? Padding(
-                    padding: const EdgeInsets.only(bottom: 40),
+                    padding: const EdgeInsets.only(bottom: 30, top: 10),
                     child: TextButton(
                       onPressed: () async {
                         monthProvider?.updateAddSet(true);
-                        setState(() => tempSetAddressLoader = true);
+                        // setState(() => tempSetAddressLoader = true);
                         final data = monthProvider?.selectedExercise!.extra!
                             .where((element) => element.type == 3);
                         if (data!.isNotEmpty) {
                           tempSetAddress = monthProvider!.currentExpandedItem;
                           monthProvider?.addSetCountInWorkingSet();
                           _addExtraSet(data.first);
-                          await Future.delayed(Duration(milliseconds: 200));
+                          await Future.delayed(Duration(milliseconds: 100));
                         }
-                        setState(() => tempSetAddressLoader = false);
+                        monthProvider?.updateAddSet(false);
+                        // setState(() => tempSetAddressLoader = false);
+                        setState(() {});
                       },
                       child: IntrinsicWidth(
                         child: Row(
@@ -2153,88 +2369,90 @@ class _ExercisePageState extends State<ExercisePage>
             ? "Circuit - ${monthProvider.circuitIndex}"
             : "Exercise");
 
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async {
-        String split = monthProvider.monthDataModel
-                ?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
-                .toString()
-                .split(" ")[1] ??
-            "";
-        if (isCurrentExerciseCompleted) {
-          Navigator.pop(context);
-          return;
-        } else if (monthProvider.isPumpDay && monthProvider.isCircuit) {
-          await pumpDayExerciseFinishAndNextLogic(
-              monthProvider, context, split);
-        } else {
-          for (var element in monthProvider.exerciseHistoryModel) {
-            if (element.status.toString() == Status.completed ||
-                element.status.toString() == Status.skipped) {
-              count++;
+    await Future.delayed(Duration(milliseconds: 50)).then(
+      (value) => WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) async {
+          String split = monthProvider.monthDataModel
+                  ?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
+                  .toString()
+                  .split(" ")[1] ??
+              "";
+          if (isCurrentExerciseCompleted) {
+            Navigator.pop(context);
+            return;
+          } else if (monthProvider.isPumpDay && monthProvider.isCircuit) {
+            await pumpDayExerciseFinishAndNextLogic(
+                monthProvider, context, split);
+          } else {
+            for (var element in monthProvider.exerciseHistoryModel) {
+              if (element.status.toString() == Status.completed ||
+                  element.status.toString() == Status.skipped) {
+                count++;
+              }
             }
-          }
-          List<ExerciseDataModel> exerciseList =
-              monthProvider.dayDataModel!.exercises!;
+            List<ExerciseDataModel> exerciseList =
+                monthProvider.dayDataModel!.exercises!;
 
-          List<ExerciseDataModel> tempExerciseList = [];
+            List<ExerciseDataModel> tempExerciseList = [];
 
-          tempExerciseList
-              .addAll(monthProvider.dayDataModel!.exercises!.where((element) {
-            return element.formats!.contains(monthProvider.equipmentType) ||
-                element.isAddedUpdated == true;
-          }));
+            tempExerciseList
+                .addAll(monthProvider.dayDataModel!.exercises!.where((element) {
+              return element.formats!.contains(monthProvider.equipmentType) ||
+                  element.isAddedUpdated == true;
+            }));
 
-          if (exerciseList.length != count &&
-              exerciseList.length != monthProvider.selectedExIndex + 1) {
-            await Future.delayed(const Duration(milliseconds: 200));
-            // int skipIndex = monthProvider.selectedExIndex + 1;
+            if (exerciseList.length != count &&
+                exerciseList.length != monthProvider.selectedExIndex + 1) {
+              await Future.delayed(const Duration(milliseconds: 200));
+              // int skipIndex = monthProvider.selectedExIndex + 1;
 
-            // if (monthProvider.selectedExercise?.isAddedUpdated == true) {
-            //   Navigator.pop(context);
-            //   return;
-            // }
+              // if (monthProvider.selectedExercise?.isAddedUpdated == true) {
+              //   Navigator.pop(context);
+              //   return;
+              // }
 
-            int index = (tempExerciseList.indexWhere((element) =>
-                element.exerciseId ==
-                monthProvider.selectedExercise?.exerciseId));
-            int newSkipIndex = index + 1;
-            if (tempo.isNotEmpty &&
-                tempo.last.exerciseId == tempExerciseList[index].exerciseId) {
+              int index = (tempExerciseList.indexWhere((element) =>
+                  element.exerciseId ==
+                  monthProvider.selectedExercise?.exerciseId));
+              int newSkipIndex = index + 1;
+              if (tempo.isNotEmpty &&
+                  tempo.last.exerciseId == tempExerciseList[index].exerciseId) {
+                Navigator.pop(context);
+                return;
+              }
+
+              for (int i = newSkipIndex; i < tempExerciseList.length; i++) {
+                var elementI = tempExerciseList[i];
+
+                String dataId =
+                    "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
+                bool val = monthProvider.exerciseHistoryModel.any(
+                  (element) =>
+                      element.dataId == dataId &&
+                      (element.status == Status.completed ||
+                          element.status == Status.skipped),
+                );
+                if (val == false) {
+                  monthProvider.setSelectedExercise(elementI, i);
+                  monthProvider.updateWarmUp(false, "");
+
+                  bool isLast = i ==
+                      tempExerciseList.indexWhere((element) =>
+                          element.exerciseId == exerciseList.last.exerciseId);
+                  monthProvider.updateIsLastExercise(isLast);
+                  Navigator.pop(context);
+                  await Navigator.pushNamed(context, '/exercise',
+                      arguments: "Exercise");
+                  break;
+                }
+              }
+            } else {
               Navigator.pop(context);
               return;
             }
-
-            for (int i = newSkipIndex; i < tempExerciseList.length; i++) {
-              var elementI = tempExerciseList[i];
-
-              String dataId =
-                  "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}-${elementI.exerciseId}";
-              bool val = monthProvider.exerciseHistoryModel.any(
-                (element) =>
-                    element.dataId == dataId &&
-                    (element.status == Status.completed ||
-                        element.status == Status.skipped),
-              );
-              if (val == false) {
-                monthProvider.setSelectedExercise(elementI, i);
-                monthProvider.updateWarmUp(false, "");
-
-                bool isLast = i ==
-                    tempExerciseList.indexWhere((element) =>
-                        element.exerciseId == exerciseList.last.exerciseId);
-                monthProvider.updateIsLastExercise(isLast);
-                Navigator.pop(context);
-                await Navigator.pushNamed(context, '/exercise',
-                    arguments: "Exercise");
-                break;
-              }
-            }
-          } else {
-            Navigator.pop(context);
-            return;
           }
-        }
-      },
+        },
+      ),
     );
   }
 
@@ -2380,10 +2598,7 @@ class _ExercisePageState extends State<ExercisePage>
                             child: Text(
                               "${monthProvider!.selectedExercise!.guide}",
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .color,
+                                color: Colors.black,
                               ),
                               textAlign: TextAlign.left,
                             ),
@@ -2424,7 +2639,7 @@ class _ExercisePageState extends State<ExercisePage>
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
-
+    log('dataId==========>>>>>$dataId');
     final data = {
       "sets": 1,
       "reps": extra.reps,
@@ -2447,10 +2662,29 @@ class _ExercisePageState extends State<ExercisePage>
       "date": "${DateTime.now().toUtc()}",
       "dataId": "EXTRA-ADDED$dataId",
     };
-    log('data==========>>>>>$data');
     ApiRepo.addExtraSet(body: apiReqBody);
     await DatabaseHelper()
         .insertData(data: data, tableName: DatabaseHelper.extraSetHistory);
+
+    await fetchExtraSetLocalData(dataId);
+  }
+
+  Future<void> _removeExtraSet(ExtraSetModel extra) async {
+    String exId = monthProvider!.isPumpDay && monthProvider!.isCircuit
+        ? "${monthProvider?.exerciseDetailModel!.sId.toString()}-${monthProvider?.circuitIndex}"
+        : monthProvider!.exerciseDetailModel!.sId.toString();
+    String split = monthProvider?.monthDataModel
+            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
+    String dataId =
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
+
+    ApiRepo.deleteExtraSet(id: dataId);
+    log('extra.id==========>>>>>${extra.id}');
+    await DatabaseHelper().deleteSingleDataUsingMainId(
+        tableName: DatabaseHelper.extraSetHistory, id: extra.id ?? 0);
 
     await fetchExtraSetLocalData(dataId);
   }

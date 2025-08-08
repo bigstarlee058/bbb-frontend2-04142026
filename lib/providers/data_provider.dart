@@ -108,29 +108,28 @@ class DataProvider extends ChangeNotifier {
   NewVersionModel? newVersionModel;
 
   Future<void> fetchAppVersion() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/version/get_version');
+    final Dio dio = Dio();
+    final String url = '${AppConstants.serverUrl}/api/version/get_version';
     String? userIdToken = await getAuthToken();
-    log('userIdToken==========>>>>>$userIdToken');
-    try {
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? ""
-        },
-      );
-      log('response==========>>>>>$response');
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
 
-        if (data != null) {
-          newVersionModel = NewVersionModel.fromJson(data);
-        }
+    try {
+      final response = await dio.get(url,
+          options: Options(headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'AUTH_TOKEN': userIdToken ?? ''
+          }));
+      log('response==========>>>>>$response');
+      if (response.statusCode == 200 && response.data != null) {
+        newVersionModel = NewVersionModel.fromJson(response.data);
         notifyListeners();
       } else {
         throw Exception('Failed to get app version');
       }
+    } on DioException catch (e) {
+      debugPrint('Dio error: ${e.response?.data ?? e.message}');
+      throw Exception('Failed to get app version');
     } catch (e) {
+      debugPrint('General error: $e');
       throw Exception('Failed to get app version');
     }
   }
@@ -254,97 +253,98 @@ class DataProvider extends ChangeNotifier {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/achievements-group/get');
     String? userIdToken = await getAuthToken();
 
-    // try {
-    final response = await http.get(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': userIdToken ?? "",
-      },
-    );
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'AUTH_TOKEN': userIdToken ?? "",
+        },
+      );
 
-    if (response.statusCode == 200) {
-      var data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
 
-      achievementList = List<AchievementModel>.from(
-          data.map((x) => AchievementModel.fromJson(x)));
+        achievementList = List<AchievementModel>.from(
+            data.map((x) => AchievementModel.fromJson(x)));
 
-      for (var element in achievementList) {
-        if (element.achievements!.isNotEmpty) {
-          for (var ele in element.achievements!) {
-            if (achievementsData.isEmpty) {
-              if ((ele.achievementAchievementId?.value ?? 0) <=
-                  (element.currentValue ?? 0)) {
-                await ApiRepo.addAchievementsList(
-                    body: UpdateAchievementsRequest(
-                  achievementsDate: DateTime.now().toUtc().toString(),
-                  achievementsTitle:
-                      ele.achievementAchievementId?.achievementIdId ?? "",
-                  achievementsSubtitle: "SYNC",
-                ).toJson1());
+        for (var element in achievementList) {
+          if (element.achievements!.isNotEmpty) {
+            for (var ele in element.achievements!) {
+              if (achievementsData.isEmpty) {
+                if ((ele.achievementAchievementId?.value ?? 0) <=
+                    (element.currentValue ?? 0)) {
+                  await ApiRepo.addAchievementsList(
+                      body: UpdateAchievementsRequest(
+                    achievementsDate: DateTime.now().toUtc().toString(),
+                    achievementsTitle:
+                        ele.achievementAchievementId?.achievementIdId ?? "",
+                    achievementsSubtitle: "SYNC",
+                  ).toJson1());
 
-                ele.achieved = true;
-                ele.achievedDate = DateTime.now().toUtc().toString();
-              }
-            } else if (achievementsData.isNotEmpty &&
-                (achievementsData.any((z) =>
-                        z.achievementsTitle ==
-                        ele.achievementAchievementId?.achievementIdId) ==
-                    false)) {
-              if ((ele.achievementAchievementId!.value)! <=
-                  (element.currentValue!)) {
-                final data = UpdateAchievementsRequest(
-                  achievementsDate: DateTime.now().toUtc().toString(),
-                  achievementsTitle:
-                      ele.achievementAchievementId?.achievementIdId ?? "",
-                  achievementsSubtitle: "SYNC",
-                );
-                await ApiRepo.addAchievementsList(body: data.toJson1());
+                  ele.achieved = true;
+                  ele.achievedDate = DateTime.now().toUtc().toString();
+                }
+              } else if (achievementsData.isNotEmpty &&
+                  (achievementsData.any((z) =>
+                          z.achievementsTitle ==
+                          ele.achievementAchievementId?.achievementIdId) ==
+                      false)) {
+                if ((ele.achievementAchievementId!.value)! <=
+                    (element.currentValue!)) {
+                  final data = UpdateAchievementsRequest(
+                    achievementsDate: DateTime.now().toUtc().toString(),
+                    achievementsTitle:
+                        ele.achievementAchievementId?.achievementIdId ?? "",
+                    achievementsSubtitle: "SYNC",
+                  );
+                  await ApiRepo.addAchievementsList(body: data.toJson1());
 
-                ele.achieved = true;
-                ele.achievedDate = DateTime.now().toUtc().toString();
-              }
-            } else {
-              if (achievementsData.isNotEmpty) {
-                AchievementsDataModel? data = achievementsData.firstWhere(
-                    (demo) =>
-                        demo.achievementsTitle ==
-                        (ele.achievementAchievementId?.achievementIdId ?? ""));
-                ele.achieved = true;
-                ele.achievedDate = data.achievementsDate.toString();
+                  ele.achieved = true;
+                  ele.achievedDate = DateTime.now().toUtc().toString();
+                }
+              } else {
+                if (achievementsData.isNotEmpty) {
+                  AchievementsDataModel? data = achievementsData.firstWhere(
+                      (demo) =>
+                          demo.achievementsTitle ==
+                          (ele.achievementAchievementId?.achievementIdId ??
+                              ""));
+                  ele.achieved = true;
+                  ele.achievedDate = data.achievementsDate.toString();
+                }
               }
             }
           }
         }
+
+        if (achievementList.isNotEmpty) {
+          achievementList.sort((a, b) {
+            final aAchievedCount =
+                (a.achievements)?.where((item) => item.achieved == true).length;
+            final bAchievedCount =
+                (b.achievements)?.where((item) => item.achieved == true).length;
+
+            if (bAchievedCount != aAchievedCount) {
+              return bAchievedCount!.compareTo(aAchievedCount!);
+            }
+
+            final aTitle = a.title?.toString().toLowerCase() ?? '';
+            final bTitle = b.title?.toString().toLowerCase() ?? '';
+            return aTitle.compareTo(bTitle);
+          });
+        }
+      } else {
+        throw Exception('Failed to get achievementList');
       }
-
-      if (achievementList.isNotEmpty) {
-        achievementList.sort((a, b) {
-          final aAchievedCount =
-              (a.achievements)?.where((item) => item.achieved == true).length;
-          final bAchievedCount =
-              (b.achievements)?.where((item) => item.achieved == true).length;
-
-          if (bAchievedCount != aAchievedCount) {
-            return bAchievedCount!.compareTo(aAchievedCount!);
-          }
-
-          final aTitle = a.title?.toString().toLowerCase() ?? '';
-          final bTitle = b.title?.toString().toLowerCase() ?? '';
-          return aTitle.compareTo(bTitle);
-        });
-      }
-    } else {
+    } catch (e) {
       throw Exception('Failed to get achievementList');
+    } finally {
+      if (value) {
+        loader = false;
+      }
+      notifyListeners();
     }
-    // } catch (e) {
-    //   throw Exception('Failed to get achievementList');
-    // } finally {
-    if (value) {
-      loader = false;
-    }
-    notifyListeners();
-    // }
   }
 
   List<TutorialModel> tutorialList = [];
@@ -551,7 +551,6 @@ class DataProvider extends ChangeNotifier {
     Uri url =
         Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
-    log('userIdToken==========>>>>>$userIdToken');
     try {
       final response = await http.get(
         url,
@@ -560,7 +559,6 @@ class DataProvider extends ChangeNotifier {
           'AUTH_TOKEN': userIdToken ?? "",
         },
       );
-      log('response==========>>>>>$response');
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
@@ -843,34 +841,43 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future fetchMonthWorkouts(int month) async {
+    final Dio dio = Dio();
+    final String url = '${AppConstants.serverUrl}/api/workouts/current';
+
     try {
-      log('==========>>>>>${DateTime.now().toUtc()}');
       final Map<String, String> queryParams = {
         'month': month.toString(),
         'equipment': '0',
         'split': '5',
-        'date': "${DateTime.now().toUtc()}"
+        'date': "${DateTime.now().toUtc()}",
       };
 
-      Uri url = Uri.parse('${AppConstants.serverUrl}/api/workouts/current');
       String? userIdToken = await getAuthToken();
-      final response = await http.post(
-        url,
-        body: queryParams,
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'AUTH_TOKEN': userIdToken ?? ""
-        },
-      );
-      if (response.statusCode == 200) {
-        await getMonthInfoFromJson(responseData: jsonDecode(response.body));
 
+      final response = await dio.post(
+        url,
+        data: FormData.fromMap(queryParams),
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+          headers: {
+            'AUTH_TOKEN': userIdToken ?? '',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        await getMonthInfoFromJson(responseData: response.data);
         notifyListeners();
       } else {
         await getMonthInfoFromJson();
       }
+    } on DioException catch (e) {
+      debugPrint(
+          "Dio error in month view loading => ${e.response?.data ?? e.message}");
+      await getMonthInfoFromJson();
     } catch (e) {
-      log("issue in month view loading=> $e");
+      debugPrint("General error in month view loading => $e");
+      await getMonthInfoFromJson();
     }
   }
 

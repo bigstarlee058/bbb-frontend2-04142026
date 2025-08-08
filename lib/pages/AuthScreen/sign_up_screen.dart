@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/pages/AuthScreen/confirmation_screen.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
@@ -91,10 +92,13 @@ class _SignupPageState extends State<SignupPage> {
         String message = data['message'];
 
         if (message == "User registered") {
-          Navigator.pop(context);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ConfirmationScreen()));
+
+          // Navigator.pop(context);
           // await loginUser(emailAddress, password);
-          showBottomAlert(context,
-              'Signup successfully with $emailAddress please login here.');
+          // showBottomAlert(context,
+          //     'Signup successfully with $emailAddress please login here.');
         } else {
           showBottomAlert(context, 'Failed to signup');
         }
@@ -137,7 +141,6 @@ class _SignupPageState extends State<SignupPage> {
           'password': password,
         },
       );
-      log('response.statusCode==========>>>>>${response.statusCode}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         await _saveLoginState(true);

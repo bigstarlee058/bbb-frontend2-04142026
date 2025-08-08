@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +35,10 @@ class _HeightPickerState extends State<HeightPicker> {
   late final FixedExtentScrollController _unitScrollController;
   int get _feetPart => (_cmValue / 2.54) ~/ 12;
   int get _inchesPart => ((_cmValue / 2.54) % 12).floor();
-  int get _cmWholeValue => _cmValue.floor();
-  int get _cmDecimalValue => ((_cmValue - _cmValue.truncate()) * 10).round();
+  // int get _inchesPart =>
+  //     int.parse(Utils.formatDouble(((_cmValue / 2.54) % 12)));
+  // int get _cmWholeValue => _cmValue.floor();
+  // int get _cmDecimalValue => ((_cmValue - _cmValue.truncate()) * 10).round();
   double _convertInchesToCm(int feet, int inches) {
     int inchesTotal = (feet * 12) + inches;
     return inchesTotal * 2.54;
@@ -42,7 +47,10 @@ class _HeightPickerState extends State<HeightPicker> {
   @override
   void initState() {
     _cmValue = widget.initialHeight;
+    log('_cmValue==========>>>>>${_cmValue}');
+    // log('_cmValue==========>>>>>${_cmDecimalValue}');
     _currentUnitSelected = widget.initialSelectedHeightUnit;
+    log('_currentUnitSelected====22======>>>>>$_currentUnitSelected');
     if (widget.initialSelectedHeightUnit == HeightUnit.inches) {
       _mainScrollController =
           FixedExtentScrollController(initialItem: _feetPart - 1);
@@ -51,9 +59,9 @@ class _HeightPickerState extends State<HeightPicker> {
       _unitScrollController = FixedExtentScrollController(initialItem: 0);
     } else {
       _mainScrollController =
-          FixedExtentScrollController(initialItem: _cmWholeValue - 1);
-      _secondaryScrollController =
-          FixedExtentScrollController(initialItem: _cmDecimalValue);
+          FixedExtentScrollController(initialItem: _cmValue.floor() - 1);
+      _secondaryScrollController = FixedExtentScrollController(
+          initialItem: ((_cmValue - _cmValue.truncate()) * 10).round());
       _unitScrollController = FixedExtentScrollController(initialItem: 1);
     }
     super.initState();
@@ -68,10 +76,10 @@ class _HeightPickerState extends State<HeightPicker> {
   }
 
   Future<void> onHeightUnitChanged(int index) async {
-    if (index == 0 && _currentUnitSelected != HeightUnit.inches) {
+    if (_currentUnitSelected == HeightUnit.inches) {
       setState(() {
         _isConverting = true;
-        _currentUnitSelected = HeightUnit.inches;
+        // _currentUnitSelected = HeightUnit.inches;
       });
       _mainScrollController.animateToItem(
         _feetPart - 1,
@@ -87,18 +95,18 @@ class _HeightPickerState extends State<HeightPicker> {
         _isConverting = false;
       });
     }
-    if (index == 1 && _currentUnitSelected != HeightUnit.cm) {
+    if (_currentUnitSelected == HeightUnit.cm) {
       setState(() {
         _isConverting = true;
-        _currentUnitSelected = HeightUnit.cm;
+        // _currentUnitSelected = HeightUnit.cm;
       });
       _mainScrollController.animateToItem(
-        _cmWholeValue - 1,
+        _cmValue.floor() - 1,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
       await _secondaryScrollController.animateToItem(
-        _cmDecimalValue,
+        ((_cmValue - _cmValue.truncate()) * 10).round(),
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
@@ -108,21 +116,45 @@ class _HeightPickerState extends State<HeightPicker> {
     }
   }
 
+  // void onMainSelectedItemChanged(int index) {
+  //   if (_isConverting) return;
+  //   if (_currentUnitSelected == HeightUnit.inches) {
+  //     _cmValue = _convertInchesToCm(
+  //         index + 1, _secondaryScrollController.selectedItem);
+  //   }
+  //   setState(() {});
+  //   // widget.onHeightChanged(_cmValue);
+  // }
+
   void onMainSelectedItemChanged(int index) {
     if (_isConverting) return;
     if (_currentUnitSelected == HeightUnit.inches) {
       _cmValue = _convertInchesToCm(
           index + 1, _secondaryScrollController.selectedItem);
+    } else {
+      _cmValue = (index + 1) + (_secondaryScrollController.selectedItem * 0.1);
     }
     setState(() {});
     // widget.onHeightChanged(_cmValue);
   }
+
+  // void onSecondarySelectedItemChanged(int index) {
+  //   if (_isConverting) return;
+  //   if (_currentUnitSelected == HeightUnit.inches) {
+  //     _cmValue =
+  //         _convertInchesToCm(_mainScrollController.selectedItem + 1, index);
+  //   }
+  //   setState(() {});
+  //   // widget.onHeightChanged(_cmValue);
+  // }
 
   void onSecondarySelectedItemChanged(int index) {
     if (_isConverting) return;
     if (_currentUnitSelected == HeightUnit.inches) {
       _cmValue =
           _convertInchesToCm(_mainScrollController.selectedItem + 1, index);
+    } else {
+      _cmValue = (_mainScrollController.selectedItem + 1) + (index * 0.1);
     }
     setState(() {});
     // widget.onHeightChanged(_cmValue);
@@ -159,6 +191,26 @@ class _HeightPickerState extends State<HeightPicker> {
               child: Center(
                 child: Row(
                   children: [
+                    // Expanded(
+                    //   child: CupertinoPicker(
+                    //     itemExtent: 32,
+                    //     scrollController: _mainScrollController,
+                    //     selectionOverlay:
+                    //         const CupertinoPickerDefaultSelectionOverlay(
+                    //       capEndEdge: false,
+                    //     ),
+                    //     onSelectedItemChanged: onMainSelectedItemChanged,
+                    //     children: List.generate(
+                    //       9,
+                    //       (index) => Center(
+                    //         child: Text(
+                    //           "${index + 1}",
+                    //           style: TextStyle(fontSize: 18),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
@@ -169,8 +221,9 @@ class _HeightPickerState extends State<HeightPicker> {
                         ),
                         onSelectedItemChanged: onMainSelectedItemChanged,
                         children: List.generate(
-                          9,
-                          (index) => Center(
+                          (_currentUnitSelected == HeightUnit.inches) ? 9 : 275,
+                          (index) => Padding(
+                            padding: const EdgeInsets.only(top: 5),
                             child: Text(
                               "${index + 1}",
                               style: TextStyle(fontSize: 18),
@@ -179,6 +232,34 @@ class _HeightPickerState extends State<HeightPicker> {
                         ),
                       ),
                     ),
+                    // if (widget.showSeparationText)
+                    //   Expanded(
+                    //     child: SizedBox(
+                    //       height: 32,
+                    //       child: Stack(
+                    //         children: [
+                    //           const CupertinoPickerDefaultSelectionOverlay(
+                    //             capStartEdge: false,
+                    //             capEndEdge: false,
+                    //           ),
+                    //           Center(
+                    //             child: Material(
+                    //               color: Colors.transparent,
+                    //               child: Text(
+                    //                 "Feet",
+                    //                 style: TextStyle(
+                    //                     fontSize: 18,
+                    //                     color: Theme.of(context)
+                    //                         .textTheme
+                    //                         .bodyLarge
+                    //                         ?.color),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
                     if (widget.showSeparationText)
                       Expanded(
                         child: SizedBox(
@@ -190,23 +271,45 @@ class _HeightPickerState extends State<HeightPicker> {
                                 capEndEdge: false,
                               ),
                               Center(
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    "Feet",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.color),
-                                  ),
+                                  child: Material(
+                                color: Colors.transparent,
+                                child: Text(
+                                  (_currentUnitSelected == HeightUnit.inches)
+                                      ? "feet"
+                                      : ".",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color),
                                 ),
-                              ),
+                              )),
                             ],
                           ),
                         ),
                       ),
+                    // Expanded(
+                    //   child: CupertinoPicker(
+                    //     itemExtent: 32,
+                    //     scrollController: _secondaryScrollController,
+                    //     selectionOverlay:
+                    //         const CupertinoPickerDefaultSelectionOverlay(
+                    //       capStartEdge: false,
+                    //       capEndEdge: false,
+                    //     ),
+                    //     onSelectedItemChanged: onSecondarySelectedItemChanged,
+                    //     children: List.generate(
+                    //       12,
+                    //       (index) => Center(
+                    //         child: Text(
+                    //           "$index",
+                    //           style: TextStyle(fontSize: 18),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
@@ -218,8 +321,9 @@ class _HeightPickerState extends State<HeightPicker> {
                         ),
                         onSelectedItemChanged: onSecondarySelectedItemChanged,
                         children: List.generate(
-                          12,
-                          (index) => Center(
+                          (_currentUnitSelected == HeightUnit.inches) ? 12 : 10,
+                          (index) => Padding(
+                            padding: const EdgeInsets.only(top: 5),
                             child: Text(
                               "$index",
                               style: TextStyle(fontSize: 18),
@@ -228,6 +332,27 @@ class _HeightPickerState extends State<HeightPicker> {
                         ),
                       ),
                     ),
+                    // if (widget.canConvertUnit)
+                    //   Expanded(
+                    //     child: CupertinoPicker(
+                    //       itemExtent: 32,
+                    //       scrollController: _unitScrollController,
+                    //       selectionOverlay:
+                    //           const CupertinoPickerDefaultSelectionOverlay(
+                    //         capStartEdge: false,
+                    //       ),
+                    //       onSelectedItemChanged: onHeightUnitChanged,
+                    //       children: [
+                    //         Center(
+                    //           child: Text(
+                    //             "Inches     ",
+                    //             style: TextStyle(fontSize: 18),
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+
                     if (widget.canConvertUnit)
                       Expanded(
                         child: CupertinoPicker(
@@ -239,13 +364,43 @@ class _HeightPickerState extends State<HeightPicker> {
                           ),
                           onSelectedItemChanged: onHeightUnitChanged,
                           children: [
-                            Center(
-                              child: Text(
-                                "Inches     ",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ),
+                            (_currentUnitSelected == HeightUnit.inches)
+                                ? Padding(
+                                    padding: EdgeInsets.only(top: 5, right: 8),
+                                    child: Text(
+                                      "inches",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  )
+                                : Padding(
+                                    padding: EdgeInsets.only(top: 5, right: 8),
+                                    child: Text(
+                                      "cm",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
                           ],
+                        ),
+                      ),
+                    if (!widget.canConvertUnit)
+                      Expanded(
+                        child: SizedBox(
+                          height: 32,
+                          child: Stack(
+                            children: [
+                              const CupertinoPickerDefaultSelectionOverlay(
+                                capStartEdge: false,
+                              ),
+                              Center(
+                                child: Text(
+                                  (_currentUnitSelected == HeightUnit.inches)
+                                      ? "inches"
+                                      : "cm",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                   ],
@@ -294,11 +449,11 @@ Future<void> showCupertinoHeightPicker({
   Key? key,
   required BuildContext context,
   required Function(double) onHeightChanged,
-  double initialHeight = 150.0,
+  double initialHeight = 160,
   HeightUnit initialSelectedHeightUnit = HeightUnit.inches,
   bool canConvertUnit = true,
   bool showSeparationText = true,
-  double modalHeight = 300,
+  double modalHeight = 310,
   double? maxModalWidth,
   Color? modalBackgroundColor,
   Color barrierColor = kCupertinoModalBarrierColor,

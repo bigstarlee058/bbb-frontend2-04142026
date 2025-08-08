@@ -202,7 +202,7 @@ class _WatchTutorialState extends State<WatchTutorial>
 
       if (_videoPlayerController.value.volume == 0) {
         await AudioManager.abandonAudioFocus().then((value) async {
-          await Future.delayed(Duration(milliseconds: 20));
+          await Future.delayed(Duration(milliseconds: 40));
           return _videoPlayerController.play();
         });
       }
@@ -318,7 +318,7 @@ class _WatchTutorialState extends State<WatchTutorial>
       final videoPlay = _videoPlayerController.value.isPlaying;
 
       await AudioManager.abandonAudioFocus().then((value) async {
-        await Future.delayed(Duration(milliseconds: 20));
+        await Future.delayed(Duration(milliseconds: 40));
         if (videoPlay) {
           return _videoPlayerController.play();
         }
@@ -544,107 +544,115 @@ class _WatchTutorialState extends State<WatchTutorial>
                                         bottom: videoSize.height / 2,
                                         left: 10,
                                         right: 10,
-                                        child: AnimatedOpacity(
-                                          opacity: showControls ? 1.0 : 0.0,
-                                          duration:
-                                              const Duration(milliseconds: 800),
-                                          curve: Curves.easeInOut,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              // Skip backward button
-                                              IconButton(
-                                                iconSize: 40,
-                                                icon: const Icon(
-                                                  Icons.replay_10,
-                                                  color: Colors.white70,
-                                                ),
-                                                onPressed: showControls
-                                                    ? () {
-                                                        _videoPlayerController
-                                                            .seekTo(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showControlsOnTap();
+                                          },
+                                          child: AnimatedOpacity(
+                                            opacity: showControls ? 1.0 : 0.0,
+                                            duration: const Duration(
+                                                milliseconds: 800),
+                                            curve: Curves.easeInOut,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                // Skip backward button
+                                                IconButton(
+                                                  iconSize: 40,
+                                                  icon: const Icon(
+                                                    Icons.replay_10,
+                                                    color: Colors.white70,
+                                                  ),
+                                                  onPressed: showControls
+                                                      ? () {
                                                           _videoPlayerController
-                                                                  .value
-                                                                  .position -
-                                                              const Duration(
-                                                                  seconds: 10),
-                                                        );
-                                                        _controller.forward();
-                                                      }
-                                                    : null,
-                                              ),
-                                              IconButton(
-                                                iconSize: 60,
-                                                icon: Icon(
-                                                  _videoPlayerController
-                                                          .value.isPlaying
-                                                      ? Icons
-                                                          .pause_circle_filled
-                                                      : Icons
-                                                          .play_circle_filled,
-                                                  color: Colors.white70,
-                                                ),
-                                                onPressed: showControls
-                                                    ? () async {
-                                                        if (_videoPlayerController
-                                                            .value.isPlaying) {
-                                                          _videoPlayerController
-                                                              .pause();
-                                                          setState(() {});
-                                                          showControlsOnTapOfPause();
-
-                                                          await Future.delayed(
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      100));
-                                                          await AudioManager
-                                                              .abandonAudioFocus();
-                                                          setState(() {});
-                                                        } else {
-                                                          _videoPlayerController
-                                                              .play();
-                                                          setState(() {});
-                                                          hideControls();
-                                                          await Future.delayed(
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      100));
-
-                                                          if (_videoPlayerController
-                                                                  .value
-                                                                  .volume >
-                                                              0) {
-                                                            await AudioManager
-                                                                .requestAudioFocus();
-                                                          }
-                                                          setState(() {});
+                                                              .seekTo(
+                                                            _videoPlayerController
+                                                                    .value
+                                                                    .position -
+                                                                const Duration(
+                                                                    seconds:
+                                                                        10),
+                                                          );
+                                                          _controller.forward();
                                                         }
-                                                      }
-                                                    : null,
-                                              ),
-                                              // Skip forward button
-                                              IconButton(
-                                                iconSize: 40,
-                                                icon: const Icon(
-                                                  Icons.forward_10,
-                                                  color: Colors.white70,
+                                                      : null,
                                                 ),
-                                                onPressed: showControls
-                                                    ? () {
-                                                        _videoPlayerController
-                                                            .seekTo(
+                                                IconButton(
+                                                  iconSize: 60,
+                                                  icon: Icon(
+                                                    _videoPlayerController
+                                                            .value.isPlaying
+                                                        ? Icons
+                                                            .pause_circle_filled
+                                                        : Icons
+                                                            .play_circle_filled,
+                                                    color: Colors.white70,
+                                                  ),
+                                                  onPressed: showControls
+                                                      ? () async {
+                                                          if (_videoPlayerController
+                                                              .value
+                                                              .isPlaying) {
+                                                            _videoPlayerController
+                                                                .pause();
+                                                            setState(() {});
+                                                            showControlsOnTapOfPause();
+
+                                                            await Future.delayed(
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        100));
+                                                            await AudioManager
+                                                                .abandonAudioFocus();
+                                                            setState(() {});
+                                                          } else {
+                                                            _videoPlayerController
+                                                                .play();
+                                                            setState(() {});
+                                                            hideControls();
+                                                            await Future.delayed(
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        100));
+
+                                                            if (_videoPlayerController
+                                                                    .value
+                                                                    .volume >
+                                                                0) {
+                                                              await AudioManager
+                                                                  .requestAudioFocus();
+                                                            }
+                                                            setState(() {});
+                                                          }
+                                                        }
+                                                      : null,
+                                                ),
+                                                // Skip forward button
+                                                IconButton(
+                                                  iconSize: 40,
+                                                  icon: const Icon(
+                                                    Icons.forward_10,
+                                                    color: Colors.white70,
+                                                  ),
+                                                  onPressed: showControls
+                                                      ? () {
                                                           _videoPlayerController
-                                                                  .value
-                                                                  .position +
-                                                              const Duration(
-                                                                  seconds: 10),
-                                                        );
-                                                        _controller.forward();
-                                                      }
-                                                    : null,
-                                              ),
-                                            ],
+                                                              .seekTo(
+                                                            _videoPlayerController
+                                                                    .value
+                                                                    .position +
+                                                                const Duration(
+                                                                    seconds:
+                                                                        10),
+                                                          );
+                                                          _controller.forward();
+                                                        }
+                                                      : null,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -694,56 +702,63 @@ class _WatchTutorialState extends State<WatchTutorial>
                                                           height: ScreenUtil
                                                               .verticalScale(
                                                                   0.8)),
-                                                      AnimatedOpacity(
-                                                        opacity: showControls
-                                                            ? 1.0
-                                                            : 0.0,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    800),
-                                                        curve: Curves.easeInOut,
-                                                        child: Row(
-                                                          children: [
-                                                            Spacer(),
-                                                            GestureDetector(
-                                                              onTap:
-                                                                  showControls
-                                                                      ? () {
-                                                                          toggleFullscreen();
-                                                                        }
-                                                                      : null,
-                                                              child: Icon(
-                                                                !isFullscreen
-                                                                    ? Icons
-                                                                        .fullscreen
-                                                                    : Icons
-                                                                        .fullscreen_exit,
-                                                                color: Colors
-                                                                    .white70,
-                                                                size: 28,
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          showControlsOnTap();
+                                                        },
+                                                        child: AnimatedOpacity(
+                                                          opacity: showControls
+                                                              ? 1.0
+                                                              : 0.0,
+                                                          duration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      800),
+                                                          curve:
+                                                              Curves.easeInOut,
+                                                          child: Row(
+                                                            children: [
+                                                              Spacer(),
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    showControls
+                                                                        ? () {
+                                                                            toggleFullscreen();
+                                                                          }
+                                                                        : null,
+                                                                child: Icon(
+                                                                  !isFullscreen
+                                                                      ? Icons
+                                                                          .fullscreen
+                                                                      : Icons
+                                                                          .fullscreen_exit,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  size: 28,
+                                                                ),
                                                               ),
-                                                            ),
-                                                            SizedBox(width: 10),
-                                                            GestureDetector(
-                                                              onTap:
-                                                                  showControls
-                                                                      ? () {
-                                                                          muteUnMute();
-                                                                        }
-                                                                      : null,
-                                                              child: Icon(
-                                                                isMute
-                                                                    ? Icons
-                                                                        .volume_up
-                                                                    : Icons
-                                                                        .volume_off,
-                                                                color: Colors
-                                                                    .white70,
-                                                                size: 28,
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    showControls
+                                                                        ? () {
+                                                                            muteUnMute();
+                                                                          }
+                                                                        : null,
+                                                                child: Icon(
+                                                                  isMute
+                                                                      ? Icons
+                                                                          .volume_up
+                                                                      : Icons
+                                                                          .volume_off,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  size: 28,
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ],

@@ -158,8 +158,6 @@ class MonthProvider extends ChangeNotifier {
 
   fetchExerciseHistroy() async {
     try {
-      log(' selectedExercise!.exerciseId==========>>>>>${selectedExercise!.exerciseId}');
-
       exerciseHistroy = await ApiRepo.fetchExerciseForTheExercise(
           selectedExercise!.exerciseId ?? "");
       notifyListeners();
@@ -191,15 +189,19 @@ class MonthProvider extends ChangeNotifier {
   }
 
   Future<void> checkForPumpDay() async {
-    await checkPumpDayAvail();
-    await getAllPumpDayForThisWeek().then(
-      (value) {
-        if (pumpDays.isEmpty) {
-          changeIsPumpDayAvail(false);
-          changeIsPumpDay(false);
-        }
-      },
-    );
+    try {
+      await checkPumpDayAvail();
+      await getAllPumpDayForThisWeek().then(
+        (value) {
+          if (pumpDays.isEmpty) {
+            changeIsPumpDayAvail(false);
+            changeIsPumpDay(false);
+          }
+        },
+      );
+    } catch (e) {
+      log('e==========>>>>>$e');
+    }
 
     notifyListeners();
   }
@@ -598,7 +600,12 @@ class MonthProvider extends ChangeNotifier {
       String split = (preferences.getString(SharedPreference.split) ?? "")
           .replaceAll("split", "");
 
+      String equipmentType =
+          preferences.getString(SharedPreference.equipmentType) ?? "A";
+
       await changeDaySplit(split);
+
+      changeEquipmentType(equipmentType);
 
       splitType ??= SplitType.split3;
       fetchAllRemovedExerciseLocalData();
@@ -684,7 +691,6 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> fetchWarmUp(String warmUpId) async {
     try {
-      log('warmUpId==========>>>>>$warmUpId');
       Uri url =
           Uri.parse('${AppConstants.serverUrl}/api/warmups/get/$warmUpId');
       url = Uri.http(url.authority, url.path);
@@ -869,6 +875,11 @@ class MonthProvider extends ChangeNotifier {
 
   addSetCountInWorkingSet() {
     selectedWorkingSetTotal++;
+    notifyListeners();
+  }
+
+  removeSetCountInWorkingSet() {
+    selectedWorkingSetTotal--;
     notifyListeners();
   }
 
@@ -1083,12 +1094,9 @@ class MonthProvider extends ChangeNotifier {
   getPassedTime() {
     String time =
         preferences.getString(SharedPreference.lastTimerPassed) ?? "0";
-    log('time==========>>>>>${time}');
     String lastTime =
         preferences.getString(SharedPreference.lastExitTime) ?? "";
-    log('lastTime==========>>>>>${lastTime}');
     String pause = preferences.getString(SharedPreference.isPause) ?? "false";
-
     timePassed = time;
     DateTime data =
         DateTime.parse(lastTime.isEmpty ? DateTime.now().toString() : lastTime);
@@ -1097,7 +1105,6 @@ class MonthProvider extends ChangeNotifier {
       if (pause == "true") {
         int totalTimePassed = int.parse(timePassed);
         timePassed = totalTimePassed.toString();
-        log("pause == true");
       } else {
         int totalTimePassed = int.parse(timePassed) + difference.inSeconds;
         timePassed = totalTimePassed.toString();
@@ -1903,7 +1910,9 @@ class MonthProvider extends ChangeNotifier {
         dayId: monthDataModel!
             .weeks?[overviewCurrentWeek - 1].idList![overviewCurrentDay - 1],
       );
+      String? userIdToken = await getAuthToken();
 
+      log('data==========>>>>>${userIdToken}');
       if (data.isNotEmpty) {
         swapExerciseList = List<SwapExerciseModel>.from(
             data.map((x) => SwapExerciseModel.fromJson(x)));
@@ -2832,7 +2841,7 @@ class MonthProvider extends ChangeNotifier {
   /// PAST MONTH DATA ===============================================================================================
   int currentMonthIndex = 0;
   String isCurrentMonth = "Current";
-  int weekExpandedHeight = 0;
+  double weekExpandedHeight = 0;
   bool openWeek = false;
 
   updateOpenWeek(bool value) {
@@ -2850,7 +2859,7 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateWeekExpandedHeight(int weekHeight, int weekIndex) {
+  updateWeekExpandedHeight(double weekHeight, int weekIndex) {
     if (weekHeight < 0) {
       weekHeight = 0;
     }

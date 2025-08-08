@@ -208,7 +208,7 @@ class _ScheduleSectionState extends State<ScheduleSection> {
 
                                                     monthProvider
                                                         .updateWeekExpandedHeight(
-                                                            89, mainIndex);
+                                                            82.5, mainIndex);
                                                     monthProvider
                                                         .updateExpandWeeks(
                                                             mainIndex);

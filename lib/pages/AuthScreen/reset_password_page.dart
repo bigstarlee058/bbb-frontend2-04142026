@@ -134,7 +134,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         // );
       }
     } catch (e) {
-      log('e==========>>>>>${e}');
+      log('e==========>>>>>$e');
     } finally {
       loader = false;
       setState(() {});
@@ -241,7 +241,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 ),
                                 Text(
                                   // 'Enter your email to receive a password reset mail',
-                                  "Enter your email address below. We’ll send you a mail to reset password.",
+                                  // "Enter your email address below. We’ll send you a mail to reset password.",
+                                  "Please enter your email address to receive password reset instructions.",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: ScreenUtil.verticalScale(1.65),

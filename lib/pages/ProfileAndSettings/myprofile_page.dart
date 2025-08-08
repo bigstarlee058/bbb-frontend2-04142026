@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/profile_image_handler.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/location_provider.dart';
@@ -50,14 +52,21 @@ class MyProfilePage extends StatefulWidget {
 class _MyProfilePageState extends State<MyProfilePage> {
   String? _imageUrl;
   String? selectedName = "";
+  String? firstName = "";
+  String? lastName = "";
   DateTime? selectedDate;
   TextEditingController selectedWeight = TextEditingController();
   TextEditingController selectedBodyFat = TextEditingController();
   String? selectedGender;
+
   TextEditingController selectedHeight = TextEditingController();
   TextEditingController selectedMidThigh = TextEditingController();
   TextEditingController selectedWaist = TextEditingController();
   TextEditingController selectedHip = TextEditingController();
+
+  TextEditingController selectedHeight1 = TextEditingController();
+
+  TextEditingController nameController = TextEditingController();
   String? selectedLocation;
   String? selectedGoal;
   String? _id;
@@ -65,7 +74,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   UserDataProvider? userData;
   double heightInCm = 183;
-  HeightUnit selectedHeightUnit = HeightUnit.cm;
 
   bool canConvertUnit = true;
   bool showSeparationText = true;
@@ -80,6 +88,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
   late LocationProvider locationProvider; // Example locations
   late MainPageProvider mainPageProvider;
 
+  bool isKg = false;
+
   @override
   void initState() {
     mainPageProvider = Provider.of<MainPageProvider>(context, listen: false);
@@ -87,6 +97,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     locationProvider.clearAlLData();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        isKg = await preferences.getBool(SharedPreference.isKG) ?? false;
+      },
+    );
+
     _fetchUserData();
     super.initState();
   }
@@ -97,18 +113,29 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   Future<void> _fetchUserData() async {
     setState(() => loader = true);
-    final userData1 = await userData!.fetchUserInfo();
+    final userData1 = await userData!.fetchUserInfo(context);
     if (!mounted) return;
     setState(() {
       final detail = userData1['detail'];
       _id = userData1['_id'] ?? userData1['id'];
       selectedName = userData1["name"];
+      firstName = userData1["firstName"];
+      lastName = userData1["lastName"];
+
+      nameController.text =
+          selectedName ?? "${(firstName ?? "") + (lastName ?? "")} ";
 
       if (detail != null) {
         selectedDate = DateTime.tryParse(detail?['dob'] ?? '');
 
         if (detail?['weight'] != null && detail['weight'].toString() != "0") {
-          selectedWeight.text = '${detail?['weight'] ?? 0}lbs';
+          if (isKg) {
+            selectedWeight.text =
+                '${(Utils.formatDouble(double.parse("${(double.parse(("${detail?['weight'] ?? 0}"))) * 0.45359237}")))}kg';
+          } else {
+            selectedWeight.text =
+                '${Utils.formatDouble(double.parse("${detail?['weight'] ?? 0}"))}lbs';
+          }
         }
 
         if (detail['bodyfat'] != null &&
@@ -117,12 +144,20 @@ class _MyProfilePageState extends State<MyProfilePage> {
           selectedBodyFat.text = '${detail?['bodyfat'] ?? 0}%';
         }
         final heightStr = (detail?['height'] ?? "0").toString();
-
         if (detail['height'] != null) {
           if (heightStr != "0") {
             selectedHeight.text = heightStr == "0"
                 ? "0"
                 : "${heightStr[0]}'${heightStr.length > 1 ? heightStr[1] : ""}${heightStr.length > 2 ? heightStr[2] : ""}\"";
+
+            final value = Utils.convertFeetInchesToCm(
+                int.parse(heightStr[0]),
+                double.parse(heightStr.length > 1
+                    ? heightStr.replaceAll(heightStr[0], "")
+                    : "0"));
+
+            selectedHeight1.text =
+                heightStr == "0" ? "0" : "${value.toStringAsFixed(1)} cm";
           }
         }
 
@@ -137,17 +172,35 @@ class _MyProfilePageState extends State<MyProfilePage> {
         if (detail['midthigh'] != null &&
             detail['midthigh'].toString() != "0" &&
             detail['midthigh'].toString().isNotEmpty) {
-          selectedMidThigh.text = '${detail?['midthigh'] ?? 0}"';
+          if (isKg) {
+            double midThigh = double.parse(detail?['midthigh'] ?? 0) * 2.54;
+            selectedMidThigh.text = '${Utils.formatDouble(midThigh)} cm';
+          } else {
+            double midThigh = double.parse(detail?['midthigh'] ?? 0);
+            selectedMidThigh.text = '${Utils.formatDouble(midThigh)}"';
+          }
         }
         if (detail['hip'] != null &&
             detail['hip'].toString() != "0" &&
             detail['hip'].toString().isNotEmpty) {
-          selectedHip.text = '${detail?['hip'] ?? 0}"';
+          if (isKg) {
+            double hip = double.parse(detail?['hip'] ?? 0) * 2.54;
+            selectedHip.text = '${Utils.formatDouble(hip)} cm';
+          } else {
+            double hip = double.parse(detail?['hip'] ?? 0);
+            selectedHip.text = '${Utils.formatDouble(hip)}"';
+          }
         }
         if (detail['waist'] != null &&
             detail['waist'].toString() != "0" &&
             detail['waist'].toString().isNotEmpty) {
-          selectedWaist.text = '${detail?['waist'] ?? 0}"';
+          if (isKg) {
+            double waist = double.parse(detail?['waist'] ?? 0) * 2.54;
+            selectedWaist.text = '${Utils.formatDouble(waist)} cm';
+          } else {
+            double waist = double.parse(detail?['waist'] ?? 0);
+            selectedWaist.text = '${Utils.formatDouble(waist)}"';
+          }
         }
 
         selectedLocation = detail?['location'] ?? "";
@@ -195,18 +248,59 @@ class _MyProfilePageState extends State<MyProfilePage> {
     //   isLoading = true;
     // });
 
+    String weightText =
+        selectedWeight.text.replaceAll('lbs', "").replaceAll("kg", "");
+
+    String weight = weightText.isNotEmpty
+        ? isKg
+            ? Utils.formatDouble(double.parse(weightText) / 0.45359237)
+            : Utils.formatDouble(double.parse(weightText))
+        : "";
+
+    String waistText = selectedWaist.text
+        .replaceAll('\'', '')
+        .replaceAll("\"", "")
+        .replaceAll("cm", "");
+
+    String waist = waistText.isNotEmpty
+        ? isKg
+            ? Utils.convertCmToInch(double.parse(waistText)).toString()
+            : double.parse(waistText).toString()
+        : "";
+
+    String hipText = selectedHip.text
+        .replaceAll('\'', '')
+        .replaceAll("\"", "")
+        .replaceAll("cm", "");
+
+    String hip = hipText.isNotEmpty
+        ? isKg
+            ? Utils.convertCmToInch(double.parse(hipText)).toString()
+            : double.parse(hipText).toString()
+        : "";
+
+    String midthighText = selectedMidThigh.text
+        .replaceAll('\'', '')
+        .replaceAll("\"", "")
+        .replaceAll("cm", "");
+
+    String midthigh = midthighText.isNotEmpty
+        ? isKg
+            ? Utils.convertCmToInch(double.parse(midthighText)).toString()
+            : double.parse(midthighText).toString()
+        : "";
+
     final userDetails = {
-      // 'sex':
-      //     selectedGender != null ? genderOptions.indexOf(selectedGender!) : "",
+      // 'sex': selectedGender != null ? genderOptions.indexOf(selectedGender!) : "",
+      "firstName": nameController.text.toString().trim(),
+      "lastName": "",
       'dob': selectedDate != null ? selectedDate!.toIso8601String() : "",
-      'weight': selectedWeight.text.replaceAll('lbs', "").isNotEmpty
-          ? int.parse(selectedWeight.text.replaceAll('lbs', ""))
-          : "",
+      'weight': weight,
       'height': selectedHeight.text
               .replaceAll('\'', '')
               .replaceAll("\"", "")
               .isNotEmpty
-          ? int.parse(
+          ? double.parse(
               selectedHeight.text.replaceAll('\'', '').replaceAll("\"", ""))
           : "",
       'location': selectedLocation,
@@ -215,31 +309,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'country': locationProvider.selectedCountry,
       'state': locationProvider.selectedState,
       'city': locationProvider.selectedCityController.text,
-      'waist': selectedWaist.text
-              .replaceAll('\'', '')
-              .replaceAll("\"", "")
-              .isNotEmpty
-          ? int.parse(
-              selectedWaist.text.replaceAll('\'', '').replaceAll("\"", ""))
-          : "",
-      'hip':
-          selectedHip.text.replaceAll('\'', '').replaceAll("\"", "").isNotEmpty
-              ? int.parse(selectedHip.text.replaceAll("\"", ""))
-              : "",
-      'midthigh': selectedMidThigh.text
-              .replaceAll('\'', '')
-              .replaceAll("\"", "")
-              .isNotEmpty
-          ? int.parse(
-              selectedMidThigh.text.replaceAll('\'', '').replaceAll("\"", ""))
-          : "",
+      'waist': waist,
+      'hip': hip,
+      'midthigh': midthigh,
       'bodyfat': selectedBodyFat.text.replaceAll('%', "").isNotEmpty
           ? int.parse(selectedBodyFat.text.replaceAll('%', ""))
           : "",
     };
+    log('userDetails==========>>>>>$userDetails');
 
     if (_id != null) {
-      await userData!.updateUserInfo(_id!, userDetails, image);
+      await userData!.updateUserInfo(_id!, userDetails, image, context);
 
       // Fluttertoast.showToast(
       //   msg: "Profile updated!",
@@ -361,6 +441,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                     callBack: (pickedImage) {
                                                       image = pickedImage!;
                                                       setState(() {});
+                                                      _saveUserData();
                                                     },
                                                     showPickImageButton: true,
                                                   )
@@ -453,6 +534,18 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom: ScreenUtil.verticalScale(0.8),
+                                top: ScreenUtil.verticalScale(2),
+                              ),
+                              child: _buildTextField(
+                                context: context,
+                                label: 'Name',
+                                value: nameController,
+                                hint: 'Enter here',
+                              ),
+                            ),
                             _buildProfileField(
                               context: context,
                               label: 'Birthday',
@@ -529,9 +622,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               context: context,
                               label: 'Height',
                               value: selectedHeight,
+                              value1: selectedHeight1,
                               hint: '6\'0"',
                             ),
                             NumberEntry(
+                              maxLength: 10,
                               onchange: () {
                                 _debouncer.run(() {
                                   _saveUserData();
@@ -540,7 +635,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Weight',
                               controller: selectedWeight,
                               focusNode: _nodeText1,
-                              suffix: "lbs",
+                              suffix: isKg ? "kg" : "lbs",
                             ),
 
                             NumberEntry(
@@ -552,7 +647,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Waist',
                               controller: selectedWaist,
                               focusNode: _nodeText2,
-                              suffix: '"',
+                              suffix: isKg ? " cm" : '"',
                             ),
                             NumberEntry(
                               onchange: () {
@@ -560,10 +655,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   _saveUserData();
                                 });
                               },
-                              label: 'Hip',
+                              label: 'Hips',
                               controller: selectedHip,
                               focusNode: _nodeText3,
-                              suffix: '"',
+                              suffix: isKg ? " cm" : '"',
                             ),
 
                             NumberEntry(
@@ -575,7 +670,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               label: 'Mid-Thigh',
                               controller: selectedMidThigh,
                               focusNode: _nodeText4,
-                              suffix: '"',
+                              suffix: isKg ? " cm" : '"',
                             ),
 
                             NumberEntry(
@@ -632,7 +727,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
         left: ScreenUtil.horizontalScale(7.5),
         right: ScreenUtil.horizontalScale(7.5),
         bottom: ScreenUtil.verticalScale(0.8),
-        top: ScreenUtil.verticalScale(3),
       ),
       height: ScreenUtil.verticalScale(6),
       child: Row(
@@ -853,6 +947,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       {required BuildContext context,
       required String label,
       required TextEditingController value,
+      required TextEditingController value1,
       required String hint}) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -878,19 +973,46 @@ class _MyProfilePageState extends State<MyProfilePage> {
               await showCupertinoHeightPicker(
                 context: context,
                 initialHeight: heightInCm,
-                initialSelectedHeightUnit: selectedHeightUnit,
+                initialSelectedHeightUnit:
+                    isKg ? HeightUnit.cm : HeightUnit.inches,
                 canConvertUnit: canConvertUnit,
                 showSeparationText: showSeparationText,
                 onHeightChanged: (val) {
-                  setState(() {
-                    heightInCm = val;
-                    int feet = (heightInCm / 2.54) ~/ 12;
-                    int inches = ((heightInCm / 2.54) % 12).floor();
-                    value.text = '$feet\'$inches"';
-                  });
+                  if (isKg) {
+                    setState(() {
+                      heightInCm = val;
+                      int feet = (heightInCm / 2.54) ~/ 12;
+                      double inches = ((heightInCm / 2.54) % 12);
+                      value.text = '$feet\'$inches"';
+                      value1.text = "$val cm";
+                    });
+                  } else {
+                    setState(() {
+                      heightInCm = val;
+                      int feet = (heightInCm / 2.54) ~/ 12;
+                      String inches =
+                          Utils.formatDouble(((heightInCm / 2.54) % 12));
+                      value.text = '$feet\'$inches"';
+                      value1.text = "$val cm";
+                    });
+                  }
+
                   _saveUserData();
                 },
               );
+
+              // await showCupertinoHeightPicker(
+              //   context: context,
+              //   initialHeight: heightInCm,
+              //   initialSelectedHeightUnit: selectedHeightUnit,
+              //   canConvertUnit: canConvertUnit,
+              //   showSeparationText: showSeparationText,
+              //   onHeightChanged: (val) {
+              //     setState(() {
+              //       heightInCm = val;
+              //     });
+              //   },
+              // );
             },
             child: Container(
               width: ScreenUtil.horizontalScale(50.5),
@@ -903,7 +1025,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               child: Center(
                 child: Text(
-                  value.text.isEmpty ? 'Enter here' : value.text,
+                  isKg
+                      ? value1.text.isEmpty
+                          ? 'Enter here'
+                          : value1.text
+                      : value.text.isEmpty
+                          ? 'Enter here'
+                          : value.text,
                   style: TextStyle(
                     color: value.text.isEmpty
                         ? Colors.grey.shade700
@@ -925,7 +1053,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       pickerTextStyle: TextStyle(
         fontSize: ScreenUtil.verticalScale(1.8),
         fontWeight: FontWeight.w400,
-        color: AppColors.blackColor,
+        color: Theme.of(context).textTheme.labelLarge?.color,
       ),
       dateOrder: DatePickerDateOrder.mdy,
       initialDateTime: selectedDate ?? DateTime(2000, 1, 1),
@@ -936,10 +1064,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
         setState(() {});
         _saveUserData();
       },
-      backgroundColor: Theme.of(context).canvasColor,
+      backgroundColor: Theme.of(context).cardColor,
       height: 320,
       displayCloseIcon: true,
-      closeIconColor: Colors.black,
+      closeIconColor: Theme.of(context).textTheme.labelLarge!.color!,
       buttonWidth: ScreenUtil.horizontalScale(73),
       buttonContent: Center(
         child: Text(
@@ -978,3 +1106,365 @@ class _MyProfilePageState extends State<MyProfilePage> {
   final FocusNode _nodeText4 = FocusNode();
   final FocusNode _nodeText5 = FocusNode();
 }
+
+// enum HeightUnit { inches, cm }
+//
+// Future<void> showCupertinoHeightPicker({
+//   Key? key,
+//   required BuildContext context,
+//   required Function(double) onHeightChanged,
+//   double initialHeight = 150.0,
+//   HeightUnit initialSelectedHeightUnit = HeightUnit.inches,
+//   bool canConvertUnit = true,
+//   bool showSeparationText = true,
+//   double modalHeight = 310,
+//   double? maxModalWidth,
+//   Color? modalBackgroundColor,
+//   Color barrierColor = kCupertinoModalBarrierColor,
+// }) async {
+//   return await showCupertinoModalPopup<void>(
+//     context: context,
+//     barrierColor: barrierColor,
+//     builder: (context) {
+//       return ClipRRect(
+//         borderRadius: BorderRadius.only(
+//           topLeft: Radius.circular(ScreenUtil.verticalScale(2.5)),
+//           topRight: Radius.circular(ScreenUtil.verticalScale(2.5)),
+//         ),
+//         child: SizedBox(
+//           height: modalHeight,
+//           width: maxModalWidth ?? double.infinity,
+//           child: ColoredBox(
+//             color: Theme.of(context).cardColor,
+//             child: Column(
+//               children: [
+//                 Padding(
+//                   padding: EdgeInsets.only(
+//                       right: ScreenUtil.horizontalScale(6),
+//                       top: ScreenUtil.verticalScale(2)),
+//                   child: Align(
+//                     alignment: Alignment.centerRight,
+//                     child: GestureDetector(
+//                       onTap: () => Navigator.pop(context),
+//                       child: Icon(
+//                         Icons.close,
+//                         color: Theme.of(context).textTheme.bodyLarge!.color!,
+//                         size: 22,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 Expanded(
+//                   child: HeightPicker(
+//                     key: key,
+//                     initialHeight: initialHeight,
+//                     initialSelectedHeightUnit: initialSelectedHeightUnit,
+//                     showSeparationText: showSeparationText,
+//                     canConvertUnit: canConvertUnit,
+//                     onHeightChanged: onHeightChanged,
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: EdgeInsets.only(
+//                       bottom: ScreenUtil.verticalScale(3), top: 10),
+//                   child: GestureDetector(
+//                     onTap: () {
+//                       Navigator.pop(context);
+//                     },
+//                     child: Container(
+//                       width: ScreenUtil.horizontalScale(73),
+//                       padding: EdgeInsets.all(ScreenUtil.verticalScale(1.3)),
+//                       decoration: BoxDecoration(
+//                         color: AppColors.primaryColor,
+//                         borderRadius: BorderRadius.circular(
+//                           ScreenUtil.verticalScale(1.5),
+//                         ),
+//                       ),
+//                       child: Center(
+//                         child: Material(
+//                           color: Colors.transparent,
+//                           child: Text(
+//                             "Select",
+//                             style: TextStyle(color: Colors.white, fontSize: 18),
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 )
+//               ],
+//             ),
+//           ),
+//         ),
+//       );
+//     },
+//   );
+// }
+//
+// class HeightPicker extends StatefulWidget {
+//   final double initialHeight;
+//   final HeightUnit initialSelectedHeightUnit;
+//   final bool showSeparationText;
+//   final bool canConvertUnit;
+//   final Function(double) onHeightChanged;
+//   const HeightPicker({
+//     super.key,
+//     required this.initialHeight,
+//     required this.initialSelectedHeightUnit,
+//     required this.showSeparationText,
+//     required this.canConvertUnit,
+//     required this.onHeightChanged,
+//   });
+//
+//   @override
+//   State<HeightPicker> createState() => _HeightPickerState();
+// }
+//
+// class _HeightPickerState extends State<HeightPicker> {
+//   late double _cmValue;
+//   bool _isConverting = false;
+//   late HeightUnit _currentUnitSelected;
+//   late final FixedExtentScrollController _mainScrollController;
+//   late final FixedExtentScrollController _secondaryScrollController;
+//   late final FixedExtentScrollController _unitScrollController;
+//   int get _feetPart => (_cmValue / 2.54) ~/ 12;
+//   int get _inchesPart => ((_cmValue / 2.54) % 12).floor();
+//   int get _cmWholeValue => _cmValue.floor();
+//   int get _cmDecimalValue => ((_cmValue - _cmValue.truncate()) * 10).round();
+//   double _convertInchesToCm(int feet, int inches) {
+//     int inchesTotal = (feet * 12) + inches;
+//     return inchesTotal * 2.54;
+//   }
+//
+//   @override
+//   void initState() {
+//     _cmValue = widget.initialHeight;
+//     _currentUnitSelected = widget.initialSelectedHeightUnit;
+//     if (widget.initialSelectedHeightUnit == HeightUnit.inches) {
+//       _mainScrollController =
+//           FixedExtentScrollController(initialItem: _feetPart - 1);
+//       _secondaryScrollController =
+//           FixedExtentScrollController(initialItem: _inchesPart);
+//       _unitScrollController = FixedExtentScrollController(initialItem: 0);
+//     } else {
+//       _mainScrollController =
+//           FixedExtentScrollController(initialItem: _cmWholeValue - 1);
+//       _secondaryScrollController =
+//           FixedExtentScrollController(initialItem: _cmDecimalValue);
+//       _unitScrollController = FixedExtentScrollController(initialItem: 1);
+//     }
+//     super.initState();
+//   }
+//
+//   @override
+//   void dispose() {
+//     _mainScrollController.dispose();
+//     _secondaryScrollController.dispose();
+//     _unitScrollController.dispose();
+//     super.dispose();
+//   }
+//
+//   Future<void> onHeightUnitChanged(int index) async {
+//     if (index == 0 && _currentUnitSelected != HeightUnit.inches) {
+//       setState(() {
+//         _isConverting = true;
+//         _currentUnitSelected = HeightUnit.inches;
+//       });
+//       _mainScrollController.animateToItem(
+//         _feetPart - 1,
+//         duration: const Duration(milliseconds: 300),
+//         curve: Curves.easeOut,
+//       );
+//       await _secondaryScrollController.animateToItem(
+//         _inchesPart,
+//         duration: const Duration(milliseconds: 300),
+//         curve: Curves.easeOut,
+//       );
+//       setState(() {
+//         _isConverting = false;
+//       });
+//     }
+//     if (index == 1 && _currentUnitSelected != HeightUnit.cm) {
+//       setState(() {
+//         _isConverting = true;
+//         _currentUnitSelected = HeightUnit.cm;
+//       });
+//       _mainScrollController.animateToItem(
+//         _cmWholeValue - 1,
+//         duration: const Duration(milliseconds: 300),
+//         curve: Curves.easeOut,
+//       );
+//       await _secondaryScrollController.animateToItem(
+//         _cmDecimalValue,
+//         duration: const Duration(milliseconds: 300),
+//         curve: Curves.easeOut,
+//       );
+//       setState(() {
+//         _isConverting = false;
+//       });
+//     }
+//   }
+//
+//   void onMainSelectedItemChanged(int index) {
+//     if (_isConverting) return;
+//     if (_currentUnitSelected == HeightUnit.inches) {
+//       _cmValue = _convertInchesToCm(
+//           index + 1, _secondaryScrollController.selectedItem);
+//     } else {
+//       _cmValue = (index + 1) + (_secondaryScrollController.selectedItem * 0.1);
+//     }
+//     setState(() {});
+//     widget.onHeightChanged(_cmValue);
+//   }
+//
+//   void onSecondarySelectedItemChanged(int index) {
+//     if (_isConverting) return;
+//     if (_currentUnitSelected == HeightUnit.inches) {
+//       _cmValue =
+//           _convertInchesToCm(_mainScrollController.selectedItem + 1, index);
+//     } else {
+//       _cmValue = (_mainScrollController.selectedItem + 1) + (index * 0.1);
+//     }
+//     setState(() {});
+//     widget.onHeightChanged(_cmValue);
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Expanded(
+//           child: CupertinoPicker(
+//             itemExtent: 32,
+//             scrollController: _mainScrollController,
+//             selectionOverlay: const CupertinoPickerDefaultSelectionOverlay(
+//               capEndEdge: false,
+//             ),
+//             onSelectedItemChanged: onMainSelectedItemChanged,
+//             children: List.generate(
+//               (_currentUnitSelected == HeightUnit.inches) ? 9 : 275,
+//               (index) => Padding(
+//                 padding: const EdgeInsets.only(top: 3),
+//                 child: Text(
+//                   "${index + 1}",
+//                   style: Theme.of(context)
+//                       .textTheme
+//                       .bodyLarge
+//                       ?.copyWith(fontSize: 18),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//         if (widget.showSeparationText)
+//           Expanded(
+//             child: SizedBox(
+//               height: 32,
+//               child: Stack(
+//                 children: [
+//                   const CupertinoPickerDefaultSelectionOverlay(
+//                     capStartEdge: false,
+//                     capEndEdge: false,
+//                   ),
+//                   Center(
+//                     child: Text(
+//                       (_currentUnitSelected == HeightUnit.inches)
+//                           ? "feet"
+//                           : ".",
+//                       style: (_currentUnitSelected == HeightUnit.inches)
+//                           ? Theme.of(context)
+//                               .textTheme
+//                               .bodyLarge
+//                               ?.copyWith(fontSize: 18)
+//                           : TextStyle(color: Colors.transparent),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         Expanded(
+//           child: CupertinoPicker(
+//             itemExtent: 32,
+//             scrollController: _secondaryScrollController,
+//             selectionOverlay: const CupertinoPickerDefaultSelectionOverlay(
+//               capStartEdge: false,
+//               capEndEdge: false,
+//             ),
+//             onSelectedItemChanged: onSecondarySelectedItemChanged,
+//             children: List.generate(
+//               (_currentUnitSelected == HeightUnit.inches) ? 12 : 10,
+//               (index) => Padding(
+//                 padding: const EdgeInsets.only(top: 3),
+//                 child: Text(
+//                   "$index",
+//                   style: Theme.of(context)
+//                       .textTheme
+//                       .bodyLarge
+//                       ?.copyWith(fontSize: 18),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//         if (widget.canConvertUnit)
+//           Expanded(
+//             child: CupertinoPicker(
+//               itemExtent: 32,
+//               scrollController: _unitScrollController,
+//               selectionOverlay: const CupertinoPickerDefaultSelectionOverlay(
+//                 capStartEdge: false,
+//               ),
+//               onSelectedItemChanged: onHeightUnitChanged,
+//               children: [
+//                 Padding(
+//                   padding: EdgeInsets.only(top: 3.2),
+//                   child: Text(
+//                     "inches",
+//                     style: Theme.of(context)
+//                         .textTheme
+//                         .bodyLarge
+//                         ?.copyWith(fontSize: 18),
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: EdgeInsets.only(top: 3.2),
+//                   child: Text(
+//                     "cm",
+//                     style: Theme.of(context)
+//                         .textTheme
+//                         .bodyLarge
+//                         ?.copyWith(fontSize: 18),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         if (!widget.canConvertUnit)
+//           Expanded(
+//             child: SizedBox(
+//               height: 32,
+//               child: Stack(
+//                 children: [
+//                   const CupertinoPickerDefaultSelectionOverlay(
+//                     capStartEdge: false,
+//                   ),
+//                   Center(
+//                     child: Text(
+//                       (_currentUnitSelected == HeightUnit.inches)
+//                           ? "inches"
+//                           : "cm",
+//                       style: Theme.of(context)
+//                           .textTheme
+//                           .bodyLarge
+//                           ?.copyWith(fontSize: 18),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//       ],
+//     );
+//   }
+// }

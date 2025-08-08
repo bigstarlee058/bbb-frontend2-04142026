@@ -57,13 +57,13 @@ class _LoginPageState extends State<LoginPage> {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     userData = Provider.of<UserDataProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        if (Platform.isIOS) {
-          getOffering();
-        }
-      },
-    );
+    // WidgetsBinding.instance.addPostFrameCallback(
+    //   (timeStamp) {
+    //     if (Platform.isIOS) {
+    //       getOffering();
+    //     }
+    //   },
+    // );
   }
 
   final GlobalKey _emailFieldKey = GlobalKey();
@@ -123,7 +123,6 @@ class _LoginPageState extends State<LoginPage> {
             'password': password,
           },
         );
-        log('response1==========>>>>>${response1.body}');
         if (response1.statusCode == 200) {
           await successResponse(response1);
         } else {
@@ -159,9 +158,23 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
 
+    await userData.fetchUserInfo(context);
+
+    // if (userData.user["active"] == 0 &&
+    //     !userData.user["subscription"].containsKey('subscription_type')) {
+    //   showBottomAlert(context,
+    //       'Email not verified!\nPlease open the Gmail app and click the verification link sent to your email to confirm your account.');
+    //   setState1();
+    //   SharedPreferences prefs = await SharedPreferences.getInstance();
+    //   await prefs.setBool('isLoggedIn', false);
+    //   await prefs.clear();
+    //   await preferences.clearPrefs();
+    //   return;
+    // }
+
     context.read<MainPageProvider>().changeTab(0);
     bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-    await userData.fetchUserInfo();
+
     bool isAppUser = userData.user["singuptype"] != "web" ? true : false;
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async => await _initializeFetchData().then(
@@ -171,29 +184,114 @@ class _LoginPageState extends State<LoginPage> {
                   (userData.user["detail"] == null) ||
                   !userData.user["detail"].containsKey('bodyfat');
           await preferences.setBool(SharedPreference.isFirstTime, isFirstTime);
+          CustomerInfo customerInfo = await Purchases.getCustomerInfo();
 
           dataProvider?.getAllAchievement(true);
           if (monthProvider?.monthDataModel == null) {
             if (mounted) {
               await monthProvider?.onInit(context: context).then(
                 (value) async {
-                  if (Platform.isIOS && isAppUser) {
+                  if (isAppUser) {
                     try {
                       Map<String, dynamic> subscriptionData =
                           userData.user["subscription"];
-                      DateTime now = DateTime.now().toUtc();
-                      DateTime? endDate = (subscriptionData["end_date"] ?? "")
-                              .toString()
-                              .isEmpty
-                          ? null
-                          : DateTime.parse(subscriptionData["end_date"]);
-                      if (endDate == null || (now.isAfter(endDate))) {
-                        await _updateSubscriptionData(
-                          type: "",
-                          endDate: "",
-                          startDate: "",
-                          status: "free_user",
-                        );
+
+                      if (subscriptionData["subscription_type"] ==
+                              "yearly_membership_1y_289" ||
+                          subscriptionData["subscription_type"] ==
+                              "monthly_membership_1m_29") {
+                        DateTime now = DateTime.now().toUtc();
+                        DateTime? endDate = (subscriptionData["end_date"] ?? "")
+                                .toString()
+                                .isEmpty
+                            ? null
+                            : DateTime.parse(subscriptionData["end_date"]);
+                        if (endDate == null || (now.isAfter(endDate))) {
+                          await _updateSubscriptionData(
+                            isPrice: true,
+                            type: "",
+                            endDate: "",
+                            startDate: "",
+                            status: "free_user",
+                          );
+                        }
+                      } else {
+                        final entitlements = customerInfo.entitlements.active;
+
+                        if (entitlements.values.first.productIdentifier ==
+                                "monthly_membership_1m_29" ||
+                            entitlements.values.first.productIdentifier ==
+                                "yearly_membership_1y_289") {
+                          final String startDate =
+                              customerInfo.allPurchaseDates[
+                                      subscriptionData["subscription_type"]] ??
+                                  DateTime.now().toUtc().toString();
+
+                          final String endDate =
+                              customerInfo.allExpirationDates[
+                                  subscriptionData["subscription_type"]]!;
+                          DateTime now = DateTime.now().toUtc();
+
+                          if ((now.isAfter(DateTime.parse(endDate)))) {
+                            await _updateSubscriptionData(
+                              isPrice: true,
+                              type: "",
+                              endDate: "",
+                              startDate: "",
+                              status: "free_user",
+                            );
+                          } else {
+                            await _updateSubscriptionData(
+                              isPrice: false,
+                              type: subscriptionData["subscription_type"],
+                              endDate: endDate,
+                              startDate: startDate,
+                              status: "subscribed_user",
+                            );
+                          }
+                        } else {
+                          final entitlements = customerInfo.entitlements.active;
+                          if (entitlements.isNotEmpty &&
+                              entitlements.values.first.isActive) {
+                            final entitlement = entitlements.values.first;
+                            final String planId = entitlement.productIdentifier;
+                            final String startDate =
+                                entitlement.originalPurchaseDate;
+
+                            final String endDate = entitlement.expirationDate!;
+
+                            final String status = entitlement.isActive
+                                ? "subscribed_user"
+                                : "free_user";
+
+                            await _updateSubscriptionData(
+                              isPrice: false,
+                              type: planId,
+                              endDate: endDate,
+                              startDate: startDate,
+                              status: status,
+                            );
+                          } else {
+                            DateTime now = DateTime.now().toUtc();
+
+                            DateTime? endDate = (subscriptionData["end_date"] ??
+                                        "")
+                                    .toString()
+                                    .isEmpty
+                                ? null
+                                : DateTime.parse(subscriptionData["end_date"]);
+
+                            if (endDate == null || (now.isAfter(endDate))) {
+                              await _updateSubscriptionData(
+                                isPrice: true,
+                                type: "",
+                                endDate: "",
+                                startDate: "",
+                                status: "free_user",
+                              );
+                            }
+                          }
+                        }
                       }
                     } catch (e) {
                       debugPrint("Error fetching subscription: $e");
@@ -228,8 +326,8 @@ class _LoginPageState extends State<LoginPage> {
                   //   }
                   // }
 
-                  if (Platform.isIOS && isAppUser) {
-                    await userData.fetchUserInfo().then(
+                  if (/*Platform.isIOS && */ isAppUser) {
+                    await userData.fetchUserInfo(context).then(
                       (value) async {
                         Map<String, dynamic> subscriptionData =
                             userData.user["subscription"];
@@ -280,7 +378,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                     );
-                  } else if (Platform.isIOS && !isAppUser) {
+                  } else if (/*Platform.isIOS && */ !isAppUser) {
                     // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
                     //     ? null
                     //     : DateTime.parse(subscriptionData["end_date"] ?? "");
@@ -311,7 +409,6 @@ class _LoginPageState extends State<LoginPage> {
                     //   }
                     // }
                     setState1();
-
                     if (isFirstTime) {
                       if (mounted) {
                         await Navigator.pushAndRemoveUntil(
@@ -379,7 +476,6 @@ class _LoginPageState extends State<LoginPage> {
                             (route) => false);
                       }
                     }
-
                     setState1();
                   }
                 },
@@ -400,43 +496,40 @@ class _LoginPageState extends State<LoginPage> {
   String monthPrice = "";
   String yearPrice = "";
 
-  Future<void> getOffering() async {
-    try {
-      Offerings fetched = await Purchases.getOfferings();
-      setState(() {
-        for (var offeringItem in fetched.all.values) {
-          for (var package in offeringItem.availablePackages) {
-            if (package.storeProduct.identifier == "monthly_membership_1m_29") {
-              monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier ==
-                "yearly_membership_1y_289") {
-              yearPrice = package.storeProduct.priceString;
-            }
-          }
-        }
-      });
-    } catch (e) {
-      log("Failed to fetch offerings: $e");
-    }
-  }
+  // Future<void> getOffering() async {
+  //   try {
+  //     Offerings fetched = await Purchases.getOfferings();
+  //     setState(() {
+  //       for (var offeringItem in fetched.all.values) {
+  //         for (var package in offeringItem.availablePackages) {
+  //           if (package.storeProduct.identifier == "monthly_membership_1m_29") {
+  //             monthPrice = package.storeProduct.priceString;
+  //           } else if (package.storeProduct.identifier ==
+  //               "yearly_membership_1y_289") {
+  //             yearPrice = package.storeProduct.priceString;
+  //           }
+  //         }
+  //       }
+  //     });
+  //   } catch (e) {
+  //     log("Failed to fetch offerings: $e");
+  //   }
+  // }
 
   Future<void> _updateSubscriptionData({
     required String status,
     required String type,
     required String startDate,
     required String endDate,
+    required bool isPrice,
   }) async {
     try {
       final Map<String, String> queryParams = {
         "user_subscription_status": status,
         "subscription_type": type,
-        "price": type == ""
-            ? ""
-            : type == "monthly_membership_1m_29"
-                ? monthPrice
-                : yearPrice,
         "purchase_date": startDate,
         "end_date": endDate,
+        if (isPrice) "price": "",
       };
 
       Uri url =
@@ -452,7 +545,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         userData.user = jsonResponse;
-        await userData.fetchUserInfo();
+        await userData.fetchUserInfo(context);
       }
     } catch (e) {
       log("issue in month view loading => $e");

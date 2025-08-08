@@ -487,7 +487,7 @@ class _SettingPageState extends State<SettingPage> {
                                 height: 0,
                               ),
                             ),
-                            /*Container(
+                            Container(
                               margin: EdgeInsets.only(
                                 left: ScreenUtil.horizontalScale(6),
                                 right: ScreenUtil.horizontalScale(6),
@@ -498,7 +498,7 @@ class _SettingPageState extends State<SettingPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Use weight in Kg?",
+                                    "Use metric units?",
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
                                       fontSize: ScreenUtil.verticalScale(2.2),
@@ -535,7 +535,7 @@ class _SettingPageState extends State<SettingPage> {
                                 thickness: 0.3,
                                 height: 0,
                               ),
-                            ),*/
+                            ),
                             Container(
                               margin: EdgeInsets.only(
                                 left: ScreenUtil.horizontalScale(6),

@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_routes.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -17,43 +19,72 @@ class UserDataProvider extends ChangeNotifier {
   bool previousPage = false;
   var userData;
 
-  Future<String?> getAuthToken() async {
+  Future<String> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? authToken = prefs.getString('authToken');
+    String authToken = prefs.getString('authToken') ?? "";
     return authToken;
   }
 
   var user;
 
-  Future<Map<String, dynamic>> fetchUserInfo() async {
-    Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/get_user');
-    String? token = await getAuthToken();
-    log('token==========>>>>>$token');
-    final response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': token ?? ""
-      },
-    );
-    final jsonResponse = jsonDecode(response.body);
+  Future<Map<String, dynamic>> fetchUserInfo(context) async {
+    final Dio dio = Dio();
+    final String url = '${AppConstants.serverUrl}/api/users/get_user';
 
-    if (response.statusCode == 200) {
-      getUserDataFromJson(jsonResponse);
-      user = jsonResponse;
-      notifyListeners();
-      return jsonResponse;
-    } else {
+    try {
+      String token = await getAuthToken();
+      debugPrint('token====get_user======>>>>>$token');
+
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {'AUTH_TOKEN': token},
+        ),
+      );
+
+      debugPrint('response==========>>>>>${response.data}');
+
+      if (response.statusCode == 200) {
+        final jsonResponse = response.data;
+        getUserDataFromJson(jsonResponse);
+        user = jsonResponse;
+        notifyListeners();
+        return jsonResponse;
+      } else {
+        _handleLogout(context);
+        throw Exception('Failed to load user data');
+      }
+    } on DioException catch (e) {
+      debugPrint('Dio error: ${e.response?.data ?? e.message}');
+      throw Exception('Failed to load user data: ${e.message}');
+    } catch (e) {
+      debugPrint('General error: $e');
       throw Exception('Failed to load user data');
     }
   }
 
-  Future<void> addUserInfo(
-      String? id, Map<String, dynamic> userDetails, File? imageFile) async {
+  void _handleLogout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    await preferences.clearPrefs();
+
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.onBoardingScreen,
+      (Route<dynamic> route) {
+        log("ROUTE NAME ${route.settings.name}");
+        return route.settings.name == AppRoutes.onBoardingScreen;
+      },
+    );
+
+    Navigator.pushNamed(context, AppRoutes.loginScreen);
+  }
+
+  Future<void> addUserInfo(String? id, Map<String, dynamic> userDetails,
+      File? imageFile, BuildContext context) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
-    log('userIdToken==========>>>>>$userIdToken');
     try {
       http.MultipartRequest request = http.MultipartRequest("PUT", url);
       request.fields['detail'] = jsonEncode(userDetails);
@@ -74,17 +105,15 @@ class UserDataProvider extends ChangeNotifier {
         request.fields['image'] = '';
       }
       request.headers.addAll({
-        'AUTH_TOKEN': userIdToken!,
+        'AUTH_TOKEN': userIdToken,
         'Accept': 'application/json',
       });
-      log('REQUEST BODY==========>>>>>${request.fields}');
       http.StreamedResponse response = await request.send();
-      log('RESPONSE STATUS CODE==========>>>>>${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         log('RESPONSE BODY==========>>>>>$responseBody');
-        updateUserData();
+        updateUserData(context);
       } else {
         debugPrint(
             'Failed to update user data. Status: ${response.statusCode}');
@@ -94,8 +123,8 @@ class UserDataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateUserInfo(
-      String? id, Map<String, dynamic> userDetails, File? imageFile) async {
+  Future<void> updateUserInfo(String? id, Map<String, dynamic> userDetails,
+      File? imageFile, BuildContext context) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/users/$id');
 
     String? userIdToken = await getAuthToken();
@@ -118,18 +147,16 @@ class UserDataProvider extends ChangeNotifier {
         request.fields['image'] = '';
       }
       request.headers.addAll({
-        'AUTH_TOKEN': userIdToken!,
+        'AUTH_TOKEN': userIdToken,
         'Accept': 'application/json',
       });
       log('url==========>>>>>$url');
-      log('request==========>>>>>${request.fields}');
 
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        log('responseBody==========>>>>>${responseBody}');
         jsonDecode(responseBody);
-        updateUserData();
+        updateUserData(context);
       } else {
         debugPrint(
             'Failed to update user data. Status: ${response.statusCode}');
@@ -149,14 +176,14 @@ class UserDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateUserData() async {
-    await fetchUserInfo();
+  updateUserData(BuildContext context) async {
+    await fetchUserInfo(context);
     notifyListeners();
   }
 
-  Future<void> loadUserInfo() async {
+  Future<void> loadUserInfo(BuildContext context) async {
     try {
-      await fetchUserInfo();
+      await fetchUserInfo(context);
     } catch (e) {
       debugPrint("--------------Error loading user info: $e");
     }

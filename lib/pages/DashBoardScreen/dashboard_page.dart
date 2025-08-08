@@ -113,7 +113,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> loadUserInfo() async {
-    await userData?.loadUserInfo();
+    await userData?.loadUserInfo(context);
   }
 
   void loadFeaturedCollectionData() async {
@@ -169,7 +169,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 return value.allImageList.isNotEmpty
                     ? Column(
                         children: [
-                          AppImage.imageDashboard(value),
+                          // AppImage.imageDashboard(value),
                           AppImage.imageMonthView(value),
                           AppImage.imageStreakCalendar(value),
                           AppImage.imageTools(value),
