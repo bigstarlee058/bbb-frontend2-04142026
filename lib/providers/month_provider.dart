@@ -1910,7 +1910,9 @@ class MonthProvider extends ChangeNotifier {
         dayId: monthDataModel!
             .weeks?[overviewCurrentWeek - 1].idList![overviewCurrentDay - 1],
       );
+      String? userIdToken = await getAuthToken();
 
+      log('data==========>>>>>${userIdToken}');
       if (data.isNotEmpty) {
         swapExerciseList = List<SwapExerciseModel>.from(
             data.map((x) => SwapExerciseModel.fromJson(x)));

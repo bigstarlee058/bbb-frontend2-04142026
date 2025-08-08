@@ -858,6 +858,63 @@ class _ExercisePageState extends State<ExercisePage>
   int backOffIndex = 0;
   int workingIndex = 0;
 
+  void _showSpeedOptions() {
+    showModalBottomSheet(
+      backgroundColor: Theme.of(context).cardColor,
+      context: context,
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.symmetric(
+                  vertical: ScreenUtil.verticalScale(3.2), horizontal: 16)
+              .copyWith(bottom: ScreenUtil.verticalScale(4)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [1.0, 1.2, 1.5, 2.0].map((speed) {
+              final isSelected = _currentSpeed == speed;
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  _changeSpeed(speed);
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primaryColor
+                        : Theme.of(context).dividerColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${speed}x',
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.white70,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _changeSpeed(double speed) {
+    setState(() => _currentSpeed = speed);
+    _videoPlayerController.setPlaybackSpeed(speed);
+  }
+
+  double _currentSpeed = 1.0;
+
+  void _downloadVideo() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Downloading video...')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
@@ -939,6 +996,82 @@ class _ExercisePageState extends State<ExercisePage>
                           /// VIDEO PROGRESS
 
                           videoProgress(media, context),
+
+                          // SafeArea(
+                          //   child: Align(
+                          //     alignment: Alignment.centerRight,
+                          //     child: Padding(
+                          //       padding: const EdgeInsets.only(right: 10),
+                          //       child: PopupMenuButton<String>(
+                          //         padding: EdgeInsets.only(right: 0),
+                          //         menuPadding:
+                          //             EdgeInsets.symmetric(vertical: 5),
+                          //         position: PopupMenuPosition.under,
+                          //         color: Theme.of(context).cardColor,
+                          //         icon: const Icon(
+                          //           Icons.more_vert,
+                          //           color: Colors.white70,
+                          //         ),
+                          //         onSelected: (value) {
+                          //           if (value == 'speed') {
+                          //             _showSpeedOptions();
+                          //           } else if (value == 'download') {
+                          //             _downloadVideo();
+                          //           }
+                          //         },
+                          //         itemBuilder: (_) => [
+                          //           PopupMenuItem(
+                          //               value: 'speed',
+                          //               child: Row(
+                          //                 children: [
+                          //                   Icon(
+                          //                     Icons.slow_motion_video,
+                          //                     color: Theme.of(context)
+                          //                         .textTheme
+                          //                         .bodyLarge
+                          //                         ?.color,
+                          //                   ),
+                          //                   SizedBox(width: 5),
+                          //                   Text(
+                          //                     'Playback Speed',
+                          //                     style: TextStyle(
+                          //                       color: Theme.of(context)
+                          //                           .textTheme
+                          //                           .bodyLarge
+                          //                           ?.color,
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               )),
+                          //           PopupMenuItem(
+                          //             value: 'download',
+                          //             child: Row(
+                          //               children: [
+                          //                 Icon(
+                          //                   Icons.download,
+                          //                   color: Theme.of(context)
+                          //                       .textTheme
+                          //                       .bodyLarge
+                          //                       ?.color,
+                          //                 ),
+                          //                 SizedBox(width: 5),
+                          //                 Text(
+                          //                   'Download',
+                          //                   style: TextStyle(
+                          //                     color: Theme.of(context)
+                          //                         .textTheme
+                          //                         .bodyLarge
+                          //                         ?.color,
+                          //                   ),
+                          //                 ),
+                          //               ],
+                          //             ),
+                          //           ),
+                          //         ],
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
 
