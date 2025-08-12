@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
@@ -247,165 +249,139 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: [
-                        appShimmerImage(
-                          height: media.height / 2.35,
-                          width: media.width,
-                          networkImageUrl: (collectionData?.photo ?? "")
-                                  .startsWith(
-                                      'https://storage.cloud.google.com/')
-                              ? (collectionData?.photo ?? "").replaceFirst(
-                                  'https://storage.cloud.google.com/',
-                                  'https://storage.googleapis.com/')
-                              : (collectionData?.photo ?? ""),
-                          fit: BoxFit.cover,
-                          borderRadius: BorderRadius.circular(0),
-                        ),
-                        SizedBox(
-                          height: media.height / 2,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                  surfaceTintColor: Colors.transparent,
-                                  centerTitle: true,
-                                  backgroundColor: Colors.transparent,
-                                  leading: BackArrowWidget(
-                                    onPress: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-
-                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                                  // Positioned(
-                                  //   left: 0,
-                                  //   child: BackArrowWidget(
-                                  //     onPress: () {
-                                  //       Navigator.pop(context);
-                                  //     },
-                                  //   ),
-                                  // leading: SizedBox(),
-                                  title: Text(
-                                    '',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.horizontalScale(5.5),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Column(
+                    children: [
+                      Stack(
+                        children: [
+                          appShimmerImage(
+                            height: media.height / 2.35,
+                            width: media.width,
+                            networkImageUrl: (collectionData?.photo ?? "")
+                                    .startsWith(
+                                        'https://storage.cloud.google.com/')
+                                ? (collectionData?.photo ?? "").replaceFirst(
+                                    'https://storage.cloud.google.com/',
+                                    'https://storage.googleapis.com/')
+                                : (collectionData?.photo ?? ""),
+                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(0),
+                          ),
+                          SizedBox(
+                            height: media.height / 2,
+                            width: media.width,
+                            child: SafeArea(
+                              child: Column(
+                                children: [
+                                  AppBar(
+                                    toolbarHeight:
+                                        ScreenUtil.verticalScale(5.1),
+                                    surfaceTintColor: Colors.transparent,
+                                    centerTitle: true,
+                                    backgroundColor: Colors.transparent,
+                                    leading: BackArrowWidget(
+                                      onPress: () {
+                                        Navigator.pop(context);
+                                      },
                                     ),
+
+                                    /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                                    // Positioned(
+                                    //   left: 0,
+                                    //   child: BackArrowWidget(
+                                    //     onPress: () {
+                                    //       Navigator.pop(context);
+                                    //     },
+                                    //   ),
+                                    // leading: SizedBox(),
+                                    title: Text(
+                                      '',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize:
+                                            ScreenUtil.horizontalScale(5.5),
+                                      ),
+                                    ),
+                                    actions: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 10),
+                                        child:
+                                            const CommonStreakWithNotification(
+                                                routeString:
+                                                    '/collectionDetail'),
+                                      )
+                                    ],
                                   ),
-                                  actions: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(
-                                          routeString: '/collectionDetail'),
-                                    )
-                                  ],
-                                ),
-                                Center(
-                                  child: Container(
-                                    height: media.height / 5.6,
-                                    margin: EdgeInsets.symmetric(
-                                        horizontal:
-                                            ScreenUtil.horizontalScale(15),
-                                        vertical: ScreenUtil.verticalScale(3)),
-                                    child: Center(
-                                      child: Text(
-                                        (collectionData?.title ?? "").isNotEmpty
-                                            ? collectionData?.title ?? ""
-                                            : 'Collection Title',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize:
-                                              ScreenUtil.horizontalScale(6.5),
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.35,
+                                  Center(
+                                    child: Container(
+                                      height: media.height / 5.6,
+                                      margin: EdgeInsets.symmetric(
+                                          horizontal:
+                                              ScreenUtil.horizontalScale(15),
+                                          vertical:
+                                              ScreenUtil.verticalScale(3)),
+                                      child: Center(
+                                        child: Text(
+                                          (collectionData?.title ?? "")
+                                                  .isNotEmpty
+                                              ? collectionData?.title ?? ""
+                                              : 'Collection Title',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize:
+                                                ScreenUtil.horizontalScale(6.5),
+                                            fontWeight: FontWeight.bold,
+                                            height: 1.35,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 2.79,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Consumer<DataProvider>(
-                  builder: (context, dataProvider, child) {
-                    return dataProvider.collectionData.equipments.isNotEmpty
-                        ? Container(
-                            margin: EdgeInsets.only(top: media.height / 2.8),
+                          SizedBox(
+                            height: media.height / 2.79,
                             width: media.width,
-                            padding: EdgeInsets.only(
-                                top: ScreenUtil.verticalScale(2)),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(
-                                    ScreenUtil.horizontalScale(15)),
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: ClipPath(
+                                clipper: DiagonalClipper(),
+                                child: Container(
+                                  height: media.height / 11,
+                                  width: media.width / 6,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor),
+                                ),
                               ),
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(6)),
-                              child: Consumer<DataProvider>(
-                                builder: (context, dataProvider, child) {
-                                  return Column(
-                                    children: _getPaginatedEquipments()
-                                        .map((equipment) {
-                                      return Column(
-                                        children: [
-                                          equipmentCard(
-                                            equipment.title,
-                                            equipment.thumbnail,
-                                            equipment.description,
-                                            equipment.link,
-                                          ),
-                                        ],
-                                      );
-                                    }).toList(),
-                                  );
-                                },
-                              ),
-                            ),
-                          )
-                        : Container(
-                            margin: EdgeInsets.only(top: media.height / 2.8),
-                            child: Container(
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Consumer<DataProvider>(
+                    builder: (context, dataProvider, child) {
+                      return dataProvider.collectionData.equipments.isNotEmpty
+                          ? Container(
+                              margin: EdgeInsets.only(top: media.height / 2.8),
                               width: media.width,
-                              height: media.height * 0.3,
+                              padding: EdgeInsets.only(
+                                  top: ScreenUtil.verticalScale(2)),
                               decoration: BoxDecoration(
                                 color:
                                     Theme.of(context).scaffoldBackgroundColor,
@@ -414,68 +390,108 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                       ScreenUtil.horizontalScale(15)),
                                 ),
                               ),
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: loader
-                                    ? CircularProgressIndicator(
-                                        color: AppColors.primaryColor,
-                                      )
-                                    : Text(
-                                        "No Collection",
-                                        style: TextStyle(
-                                            fontSize: 17,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .labelLarge
-                                                ?.color),
-                                      ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(6)),
+                                child: Consumer<DataProvider>(
+                                  builder: (context, dataProvider, child) {
+                                    return Column(
+                                      children: _getPaginatedEquipments()
+                                          .map((equipment) {
+                                        return Column(
+                                          children: [
+                                            equipmentCard(
+                                              equipment.title,
+                                              equipment.thumbnail,
+                                              equipment.description,
+                                              equipment.link,
+                                            ),
+                                          ],
+                                        );
+                                      }).toList(),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                          );
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 100,
-            )
-          ],
-        ),
-      ),
-      bottomSheet:
-          Consumer<DataProvider>(builder: (context, dataProvider, child) {
-        return dataProvider.collectionData.equipments.isNotEmpty
-            ? Container(
-                alignment: Alignment.center,
-                color: Theme.of(context).scaffoldBackgroundColor,
-                height: 65,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16)
-                      .copyWith(bottom: 10),
-                  child: _numPages > 0
-                      ? NumberPaginator(
-                          numberPages: _numPages,
-                          config: const NumberPaginatorUIConfig(
-                            height: 48,
-                            buttonSelectedForegroundColor:
-                                AppColors.primaryColor,
-                            buttonUnselectedForegroundColor: Colors.grey,
-                            buttonUnselectedBackgroundColor: Colors.transparent,
-                            buttonSelectedBackgroundColor: Colors.transparent,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                            buttonTextStyle: TextStyle(fontSize: 15),
-                          ),
-                          onPageChange: (int index) {
-                            setState(() {
-                              _currentPage = index;
-                            });
-                          },
-                        )
-                      : const SizedBox.shrink(),
-                ),
+                            )
+                          : Container(
+                              margin: EdgeInsets.only(top: media.height / 2.8),
+                              child: Container(
+                                width: media.width,
+                                height: media.height * 0.3,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(
+                                        ScreenUtil.horizontalScale(15)),
+                                  ),
+                                ),
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: loader
+                                      ? CircularProgressIndicator(
+                                          color: AppColors.primaryColor,
+                                        )
+                                      : Text(
+                                          "No Collection",
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .labelLarge
+                                                  ?.color),
+                                        ),
+                                ),
+                              ),
+                            );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 100,
               )
-            : SizedBox();
-      }),
+            ],
+          ),
+        ),
+        bottomSheet:
+            Consumer<DataProvider>(builder: (context, dataProvider, child) {
+          return dataProvider.collectionData.equipments.isNotEmpty
+              ? Container(
+                  alignment: Alignment.center,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  height: 65,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16)
+                        .copyWith(bottom: 10),
+                    child: _numPages > 0
+                        ? NumberPaginator(
+                            numberPages: _numPages,
+                            config: const NumberPaginatorUIConfig(
+                              height: 48,
+                              buttonSelectedForegroundColor:
+                                  AppColors.primaryColor,
+                              buttonUnselectedForegroundColor: Colors.grey,
+                              buttonUnselectedBackgroundColor:
+                                  Colors.transparent,
+                              buttonSelectedBackgroundColor: Colors.transparent,
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 0),
+                              buttonTextStyle: TextStyle(fontSize: 15),
+                            ),
+                            onPageChange: (int index) {
+                              setState(() {
+                                _currentPage = index;
+                              });
+                            },
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                )
+              : SizedBox();
+        }),
+      ),
     );
   }
 }

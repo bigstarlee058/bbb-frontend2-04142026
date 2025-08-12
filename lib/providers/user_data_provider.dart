@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/values/app_constants.dart';
@@ -8,6 +10,7 @@ import 'package:bbb/values/app_routes.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,57 +30,140 @@ class UserDataProvider extends ChangeNotifier {
 
   var user;
 
-  Future<Map<String, dynamic>> fetchUserInfo(context) async {
-    final Dio dio = Dio();
+  Future<Map<String, dynamic>> fetchUserInfo(BuildContext context,
+      {bool isFromLogin = false}) async {
     final String url = '${AppConstants.serverUrl}/api/users/get_user';
 
-    try {
-      String token = await getAuthToken();
-      debugPrint('token====get_user======>>>>>$token');
+    String token = await getAuthToken();
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'AUTH_TOKEN': token},
+    );
 
-      final response = await dio.get(
-        url,
-        options: Options(
-          headers: {'AUTH_TOKEN': token},
-        ),
-      );
-
-      debugPrint('response==========>>>>>${response.data}');
-
-      if (response.statusCode == 200) {
-        final jsonResponse = response.data;
+    switch (response.statusCode) {
+      case 200:
+        final jsonResponse = jsonDecode(response.body);
         getUserDataFromJson(jsonResponse);
         user = jsonResponse;
         notifyListeners();
         return jsonResponse;
-      } else {
-        _handleLogout(context);
-        throw Exception('Failed to load user data');
-      }
-    } on DioException catch (e) {
-      debugPrint('Dio error: ${e.response?.data ?? e.message}');
-      throw Exception('Failed to load user data: ${e.message}');
-    } catch (e) {
-      debugPrint('General error: $e');
-      throw Exception('Failed to load user data');
+
+      case 401:
+        _handleLogout(context,
+            "Your session has expired. Please log in again to continue.",
+            isFromLogin: isFromLogin);
+        throw Exception(
+            "Unauthorized - Session expired: ${response.statusCode} :::::::::: ${response.body}");
+
+      case 503:
+        _handleLogout(context, "Server is busy. Please try again in a moment.",
+            isFromLogin: isFromLogin);
+        throw Exception(
+            "Service Unavailable: ${response.statusCode} :::::::::: ${response.body}");
+
+      default:
+        _handleLogout(
+            context, "An unexpected error occurred. Please try again.",
+            isFromLogin: isFromLogin);
+        throw Exception(
+            "Unexpected Error: ${response.statusCode} :::::::::: ${response.body}");
     }
   }
 
-  void _handleLogout(BuildContext context) async {
+  // Future<Map<String, dynamic>> fetchUserInfo(context) async {
+  //   final Dio dio = Dio();
+  //   final String url = '${AppConstants.serverUrl}/api/users/get_user';
+  //
+  //   try {
+  //     String token = await getAuthToken();
+  //     debugPrint('token====get_user======>>>>>$token');
+  //
+  //     final response = await dio.get(
+  //       url,
+  //       options: Options(
+  //         headers: {'AUTH_TOKEN': token},
+  //       ),
+  //     );
+  //
+  //     debugPrint('response==========>>>>>${response.data}');
+  //
+  //     if (response.statusCode == 200) {
+  //       final jsonResponse = response.data;
+  //       getUserDataFromJson(jsonResponse);
+  //       user = jsonResponse;
+  //       notifyListeners();
+  //       return jsonResponse;
+  //     } else {
+  //       _handleLogout(context);
+  //       throw Exception('Failed to load user data');
+  //     }
+  //   } on DioException catch (e) {
+  //     debugPrint('Dio error: ${e.response?.data ?? e.message}');
+  //     throw Exception('Failed to load user data: ${e.message}');
+  //   } catch (e) {
+  //     debugPrint('General error: $e');
+  //     throw Exception('Failed to load user data');
+  //   }
+  // }
+
+  void _handleLogout(BuildContext context, String msg,
+      {bool isFromLogin = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
     await prefs.clear();
     await preferences.clearPrefs();
 
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.onBoardingScreen,
-      (Route<dynamic> route) {
-        log("ROUTE NAME ${route.settings.name}");
-        return route.settings.name == AppRoutes.onBoardingScreen;
-      },
+    if (!isFromLogin) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.loginScreen,
+        (Route<dynamic> route) {
+          log("ROUTE NAME ${route.settings.name}");
+          return route.settings.name == AppRoutes.loginScreen;
+        },
+      );
+    }
+
+    // Navigator.pushNamed(context, AppRoutes.loginScreen);
+
+    showBottomAlert(context, msg);
+  }
+
+  void showBottomAlert(BuildContext context, String msg) {
+    OverlayState? overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        bottom: 20.0,
+        left: MediaQuery.of(context).size.width * 0.1,
+        right: MediaQuery.of(context).size.width * 0.1,
+        child: SafeArea(
+          top: false,
+          bottom: Platform.isAndroid ? true : false,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Center(
+                child: Text(
+                  msg,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
 
-    Navigator.pushNamed(context, AppRoutes.loginScreen);
+    overlayState.insert(overlayEntry);
+
+    // Remove the alert after 3 seconds
+    Future.delayed(const Duration(seconds: 5), () {
+      overlayEntry.remove();
+    });
   }
 
   Future<void> addUserInfo(String? id, Map<String, dynamic> userDetails,

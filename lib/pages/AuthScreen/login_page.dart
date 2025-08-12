@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -26,6 +27,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -78,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     dataProvider?.monthProvider =
         Provider.of<MonthProvider>(context, listen: false);
+    log('dataProvider != null==========>>>>>${dataProvider != null}');
     if (dataProvider != null) {
       await dataProvider?.fetchMonthWorkouts(3);
     } else {
@@ -96,9 +99,8 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       final url = Uri.parse(
-          // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v  1/token');
+          // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
           'https://app.bootybybret.com/wp-json/jwt-auth/v1/token');
-      // '${AppConstants.serverUrl}api/users/signin_mobile');
 
       final response = await http.post(
         url,
@@ -109,8 +111,34 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
       if (response.statusCode == 200) {
-        await successResponse(response);
-      } else {
+        try {
+          await successResponse(response);
+          setState1();
+        } catch (e) {
+          setState1();
+          log('e==========>>>>>$e');
+        }
+      } /*else if (response.statusCode == 403) {
+        final data = json.decode(response.body);
+        String code = data['code'];
+        setState1();
+        if (mounted) {
+          if (code.toString().contains("incorrect_password")) {
+            showBottomAlert(context,
+                'Login Failed. Please check your email and password and, if needed, click "Forgot Password" below');
+          } else if (code.toString().contains("invalid_email")) {
+            AnimatedDialog.showAnimatedDialog(
+              context: context,
+              pageBuilder: (c1, anim1, anim2) => userNotFound(context, c1),
+            );
+          } else {
+            showBottomAlert(context,
+                'Something went wrong. Please check your connection and try again.');
+          }
+        }
+        return;
+      }*/
+      else {
         final url = Uri.parse(
             // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
             'https://bbb-backend-0df15cf8d1d2.herokuapp.com/api/users/signin_mobile');
@@ -123,19 +151,23 @@ class _LoginPageState extends State<LoginPage> {
             'password': password,
           },
         );
+        log('response1==========>>>>>${response1.statusCode}');
+
         if (response1.statusCode == 200) {
           await successResponse(response1);
         } else {
           setState1();
           if (mounted) {
-            showBottomAlert(context, 'Login failed');
+            showBottomAlert(context,
+                'Login Failed. Please check your email and password and, if needed, click "Forgot Password" below');
           }
         }
       }
     } catch (e) {
       setState1();
       if (mounted) {
-        showBottomAlert(context, 'User not found!');
+        showBottomAlert(context,
+            'Something went wrong. Please check your connection and try again.');
       }
     }
   }
@@ -150,6 +182,235 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget userNotFound(BuildContext context, BuildContext c1) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      insetPadding:
+          EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Theme.of(context).cardColor,
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: ScreenUtil.verticalScale(2)),
+                        Text(
+                          "User Not found",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            fontSize: ScreenUtil.verticalScale(2.4),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: ScreenUtil.verticalScale(1.5),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(2),
+                              vertical: ScreenUtil.verticalScale(1)),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "1.",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
+                                  fontSize: ScreenUtil.verticalScale(1.8),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                child: RichText(
+                                  textAlign: TextAlign.start,
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      height: 1.4,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                      fontSize: ScreenUtil.verticalScale(1.8),
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                    children: [
+                                      const TextSpan(
+                                        text:
+                                            "If you're a legacy user please contact ",
+                                      ),
+                                      TextSpan(
+                                        text: "support@bootybybret.zendesk.com",
+                                        style: const TextStyle(
+                                          color: AppColors.primaryColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        // Optional: make it clickable
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            launchUrl(Uri.parse(
+                                                "mailto:support@bootybybret.zendesk.com"));
+                                          },
+                                      ),
+                                      const TextSpan(
+                                        text:
+                                            " for help with migrating your account from old website to new. Do not attempt to sign up through the app here directly.",
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.horizontalScale(2)),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "2.",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
+                                  fontSize: ScreenUtil.verticalScale(1.8),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                child: RichText(
+                                  textAlign: TextAlign.start,
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                      height: 1.4,
+                                      fontSize: ScreenUtil.verticalScale(1.8),
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                    children: [
+                                      const TextSpan(
+                                        text:
+                                            "If you're a new user, please sign up at ",
+                                      ),
+                                      TextSpan(
+                                        text: "app.bootybybret.com",
+                                        style: const TextStyle(
+                                          color: AppColors.primaryColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            launchUrl(Uri.parse(
+                                                "https://app.bootybybret.com"));
+                                          },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: ScreenUtil.verticalScale(1.5),
+                        ),
+                        Padding(
+                          padding:
+                              EdgeInsets.all(ScreenUtil.horizontalScale(2)),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(c1).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    backgroundColor: AppColors.primaryColor,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: ScreenUtil.verticalScale(1.7),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Return to Login",
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil.verticalScale(2),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            right: -ScreenUtil.verticalScale(1.2),
+            top: -ScreenUtil.verticalScale(1.2),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                child: Container(
+                  decoration: const BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                  child: Padding(
+                    padding: EdgeInsets.all(ScreenUtil.verticalScale(0.7)),
+                    child: Icon(
+                        size: ScreenUtil.verticalScale(2.5),
+                        Icons.close,
+                        color: Colors.white),
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> successResponse(http.Response response) async {
     final data = json.decode(response.body);
     await _saveLoginState(true);
@@ -158,7 +419,7 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
 
-    await userData.fetchUserInfo(context);
+    await userData.fetchUserInfo(context, isFromLogin: true);
 
     // if (userData.user["active"] == 0 &&
     //     !userData.user["subscription"].containsKey('subscription_type')) {
@@ -263,14 +524,24 @@ class _LoginPageState extends State<LoginPage> {
                             final String status = entitlement.isActive
                                 ? "subscribed_user"
                                 : "free_user";
-
-                            await _updateSubscriptionData(
-                              isPrice: false,
-                              type: planId,
-                              endDate: endDate,
-                              startDate: startDate,
-                              status: status,
-                            );
+                            DateTime now = DateTime.now().toUtc();
+                            if ((now.isAfter(DateTime.parse(endDate)))) {
+                              await _updateSubscriptionData(
+                                isPrice: true,
+                                type: "",
+                                endDate: "",
+                                startDate: "",
+                                status: "free_user",
+                              );
+                            } else {
+                              await _updateSubscriptionData(
+                                isPrice: false,
+                                type: planId,
+                                endDate: endDate,
+                                startDate: startDate,
+                                status: status,
+                              );
+                            }
                           } else {
                             DateTime now = DateTime.now().toUtc();
 
@@ -327,7 +598,9 @@ class _LoginPageState extends State<LoginPage> {
                   // }
 
                   if (/*Platform.isIOS && */ isAppUser) {
-                    await userData.fetchUserInfo(context).then(
+                    await userData
+                        .fetchUserInfo(context, isFromLogin: true)
+                        .then(
                       (value) async {
                         Map<String, dynamic> subscriptionData =
                             userData.user["subscription"];
@@ -545,7 +818,8 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         userData.user = jsonResponse;
-        await userData.fetchUserInfo(context);
+        userData.getUserDataFromJson(jsonResponse);
+        // await userData.fetchUserInfo(context);
       }
     } catch (e) {
       log("issue in month view loading => $e");
@@ -563,284 +837,301 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Consumer<DataProvider>(builder: (context, value, c) {
-                return AppImage.imageLogin(
-                  value,
-                  // media,
-                  // image: dataProvider!.allImageList
-                  //     .where((element) => element["key"] == "imageLogin")
-                  //     .first["image"],
-                  // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                  // // image: dataProvider!.cachedImageMap["imageLogin"],
-                  // imageKey: "imageLogin",
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: SafeArea(
-                          child: BackArrowWidget(onPress: () {
-                            Navigator.pop(context);
-                          }),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Consumer<DataProvider>(builder: (context, value, c) {
+                  return AppImage.imageLogin(
+                    value,
+                    // media,
+                    // image: dataProvider!.allImageList
+                    //     .where((element) => element["key"] == "imageLogin")
+                    //     .first["image"],
+                    // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                    // // image: dataProvider!.cachedImageMap["imageLogin"],
+                    // imageKey: "imageLogin",
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: SafeArea(
+                            child: BackArrowWidget(onPress: () {
+                              Navigator.pop(context);
+                            }),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            ),
+            Positioned(
+              top: ScreenUtil.horizontalScale(42),
+              child: Container(
+                // height: 120,
+                height: ScreenUtil.verticalScale(15),
+                width: media.width,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/img/bbb-logo.png'),
+                    fit: BoxFit.fitHeight,
+                    opacity: 1,
                   ),
-                );
-              }),
-            ],
-          ),
-          Positioned(
-            top: ScreenUtil.horizontalScale(42),
-            child: Container(
-              // height: 120,
-              height: 150,
-              width: media.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/img/bbb-logo.png'),
-                  fit: BoxFit.fitHeight,
-                  opacity: 1,
                 ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                ClipPath(
-                  clipper: DiagonalClipper(),
-                  child: Container(
-                    height: media.height / 9.8,
-                    width: media.width / 6,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor),
+            Positioned(
+              bottom: 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ClipPath(
+                    clipper: DiagonalClipper(),
+                    child: Container(
+                      height: media.height / 9.8,
+                      width: media.width / 6,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor),
+                    ),
                   ),
-                ),
-                Container(
-                  width: media.width,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(
-                        ScreenUtil.verticalScale(7),
+                  Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(
+                          ScreenUtil.verticalScale(7),
+                        ),
                       ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: ScreenUtil.verticalScale(4.4),
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            height: ScreenUtil.verticalScale(3.2),
-                          ),
-                          Text(
-                            'Sign in',
-                            style: TextStyle(
-                              fontSize: ScreenUtil.verticalScale(3.32),
-                              color: AppColors.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: ScreenUtil.verticalScale(3.2),
-                          ),
-                          Container(
-                            key: _emailFieldKey,
-                            child: AppTextFormField(
-                              hintText: 'Your Email',
-                              keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
-                              controller: emailController,
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.only(right: 15),
-                                child: IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.email,
-                                      color: Colors.grey.shade400),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil.verticalScale(4.4)),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(3.2),
                                 ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: ScreenUtil.verticalScale(2.2)),
-                          Container(
-                            key: _passwordFieldKey,
-                            child: AppTextFormField(
-                              hintText: 'Your Password',
-                              keyboardType: TextInputType.visiblePassword,
-                              textInputAction: TextInputAction.done,
-                              controller: passwordController,
-                              obscureText: false,
-                              onChanged: (value) {
-                                if (isObscure) {
-                                  if (value.length < previousMasked.length) {
-                                    if (realPassword.isNotEmpty) {
-                                      realPassword = StringBuffer(
-                                        realPassword.toString().substring(
-                                            0, realPassword.length - 1),
-                                      );
-                                    }
-                                  } else if (value.length >
-                                      previousMasked.length) {
-                                    final newChar = value[value.length - 1];
-                                    realPassword.write(newChar);
-                                  }
-
-                                  final masked = List.generate(
-                                      realPassword.length, (_) => "•").join();
-                                  previousMasked = masked;
-
-                                  passwordController.value = TextEditingValue(
-                                    text: masked,
-                                    selection: TextSelection.collapsed(
-                                        offset: masked.length),
-                                  );
-                                } else {
-                                  realPassword
-                                    ..clear()
-                                    ..write(value);
-                                  previousMasked = value;
-                                }
-                              },
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.only(right: 15),
-                                child: IconButton(
-                                  onPressed: () {
-                                    isObscure = !isObscure;
-                                    if (isObscure) {
-                                      final masked = List.generate(
-                                              realPassword.length, (_) => "•")
-                                          .join();
-                                      passwordController.value =
-                                          TextEditingValue(
-                                        text: masked,
-                                        selection: TextSelection.collapsed(
-                                            offset: masked.length),
-                                      );
-                                    } else {
-                                      passwordController.value =
-                                          TextEditingValue(
-                                        text: realPassword.toString(),
-                                        selection: TextSelection.collapsed(
-                                            offset: realPassword.length),
-                                      );
-                                    }
-                                    setState(() {});
-                                  },
-                                  style: ButtonStyle(
-                                      minimumSize: WidgetStateProperty.all(
-                                          const Size(48, 48))),
-                                  icon: Icon(
-                                    isObscure
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                    color: Colors.grey.shade400,
+                                Text(
+                                  'Sign in',
+                                  style: TextStyle(
+                                    fontSize: ScreenUtil.verticalScale(3.32),
+                                    color: AppColors.primaryColor,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: ScreenUtil.verticalScale(1.5)),
-                          Text.rich(TextSpan(
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
-                            children: [
-                              TextSpan(
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFFA51E22),
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(3.2),
                                 ),
-                                text: "Forgot password?",
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (ctx) =>
-                                            const ResetPasswordScreen(
-                                          image: '',
+                                Container(
+                                  key: _emailFieldKey,
+                                  child: AppTextFormField(
+                                    hintText: 'Your Email',
+                                    keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
+                                    controller: emailController,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.only(right: 15),
+                                      child: IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.email,
+                                            color: Colors.grey.shade400),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: ScreenUtil.verticalScale(2.2)),
+                                Container(
+                                  key: _passwordFieldKey,
+                                  child: AppTextFormField(
+                                    hintText: 'Your Password',
+                                    keyboardType: TextInputType.visiblePassword,
+                                    textInputAction: TextInputAction.done,
+                                    controller: passwordController,
+                                    obscureText: false,
+                                    onChanged: (value) {
+                                      if (isObscure) {
+                                        if (value.length <
+                                            previousMasked.length) {
+                                          if (realPassword.isNotEmpty) {
+                                            realPassword = StringBuffer(
+                                              realPassword.toString().substring(
+                                                  0, realPassword.length - 1),
+                                            );
+                                          }
+                                        } else if (value.length >
+                                            previousMasked.length) {
+                                          final newChar =
+                                              value[value.length - 1];
+                                          realPassword.write(newChar);
+                                        }
+
+                                        final masked = List.generate(
+                                                realPassword.length, (_) => "•")
+                                            .join();
+                                        previousMasked = masked;
+
+                                        passwordController.value =
+                                            TextEditingValue(
+                                          text: masked,
+                                          selection: TextSelection.collapsed(
+                                              offset: masked.length),
+                                        );
+                                      } else {
+                                        realPassword
+                                          ..clear()
+                                          ..write(value);
+                                        previousMasked = value;
+                                      }
+                                    },
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.only(right: 15),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          isObscure = !isObscure;
+                                          if (isObscure) {
+                                            final masked = List.generate(
+                                                realPassword.length,
+                                                (_) => "•").join();
+                                            passwordController.value =
+                                                TextEditingValue(
+                                              text: masked,
+                                              selection:
+                                                  TextSelection.collapsed(
+                                                      offset: masked.length),
+                                            );
+                                          } else {
+                                            passwordController.value =
+                                                TextEditingValue(
+                                              text: realPassword.toString(),
+                                              selection:
+                                                  TextSelection.collapsed(
+                                                      offset:
+                                                          realPassword.length),
+                                            );
+                                          }
+                                          setState(() {});
+                                        },
+                                        style: ButtonStyle(
+                                            minimumSize:
+                                                WidgetStateProperty.all(
+                                                    const Size(48, 48))),
+                                        icon: Icon(
+                                          isObscure
+                                              ? Icons.visibility_off_outlined
+                                              : Icons.visibility_outlined,
+                                          color: Colors.grey.shade400,
                                         ),
                                       ),
-                                    );
-                                  },
-                              ),
-                            ],
-                          )),
-                          SizedBox(
-                            height: ScreenUtil.verticalScale(4.2),
-                          ),
-                          ButtonWidget(
-                            text: 'Sign in',
-                            textColor: Colors.white,
-                            color: AppColors.primaryColor,
-                            onPress: () {
-                              previousMasked = passwordController.text;
-                              if (_formKey.currentState?.validate() == true) {
-                                signInUser(
-                                  emailController.text,
-                                  realPassword.toString(),
-                                );
-                              }
-                            },
-                            isLoading: isLoading,
-                          ),
-                          SizedBox(
-                            height: ScreenUtil.verticalScale(0.8),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Don't have an account? ",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xff888888),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: onPressCreateAccount,
-                                style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(65, 30),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    alignment: Alignment.center),
-                                child: const Text(
-                                  'Sign up',
-                                  style: TextStyle(
-                                    color: AppColors.primaryColor,
-                                    fontSize: 14,
+                                    ),
                                   ),
                                 ),
-                              )
-                            ],
+                                SizedBox(height: ScreenUtil.verticalScale(1.5)),
+                                Text.rich(TextSpan(
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Color(0xFFA51E22),
+                                      ),
+                                      text: "Forgot password?",
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const ResetPasswordScreen(
+                                                image: '',
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                    ),
+                                  ],
+                                )),
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(4.2),
+                                ),
+                                ButtonWidget(
+                                  text: 'Sign in',
+                                  textColor: Colors.white,
+                                  color: AppColors.primaryColor,
+                                  onPress: () {
+                                    previousMasked = passwordController.text;
+                                    if (_formKey.currentState?.validate() ==
+                                        true) {
+                                      signInUser(
+                                        emailController.text,
+                                        realPassword.toString(),
+                                      );
+                                    }
+                                  },
+                                  isLoading: isLoading,
+                                ),
+                                SizedBox(
+                                  height: ScreenUtil.verticalScale(0.8),
+                                ),
+                              ],
+                            ),
                           ),
-                          SizedBox(
-                            height: ScreenUtil.verticalScale(3.4),
-                          ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(height: 2),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Don't have an account? ",
+                              style: TextStyle(
+                                fontSize: ScreenUtil.verticalScale(1.5),
+                                color: Color(0xff888888),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: onPressCreateAccount,
+                              style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(65, 30),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  alignment: Alignment.center),
+                              child: Text(
+                                'Sign up for a new account',
+                                style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontSize: ScreenUtil.verticalScale(1.5),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil.verticalScale(3.4),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          )
-        ],
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -853,18 +1144,22 @@ void showBottomAlert(BuildContext context, String msg) {
       bottom: 20.0,
       left: MediaQuery.of(context).size.width * 0.1,
       right: MediaQuery.of(context).size.width * 0.1,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: Center(
-            child: Text(
-              msg,
-              style: const TextStyle(color: Colors.white),
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Center(
+              child: Text(
+                msg,
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ),
@@ -875,7 +1170,7 @@ void showBottomAlert(BuildContext context, String msg) {
   overlayState.insert(overlayEntry);
 
   // Remove the alert after 3 seconds
-  Future.delayed(const Duration(seconds: 3), () {
+  Future.delayed(const Duration(seconds: 5), () {
     overlayEntry.remove();
   });
 }

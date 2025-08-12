@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
@@ -62,372 +63,387 @@ class _MeetOurStaffState extends State<MeetOurStaff> {
     var media = MediaQuery.of(context).size;
     final staffData = ModalRoute.of(context)?.settings.arguments as Staffs?;
     ScreenUtil.init(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        physics: ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      height: media.height / 1.7,
-                      width: media.width,
-                      // decoration: BoxDecoration(
-                      //   image: DecorationImage(
-                      //     image: staffData != null
-                      //         ? NetworkImage(staffData.photo.startsWith(
-                      //                 'https://storage.cloud.google.com/')
-                      //             ? staffData.photo.replaceFirst(
-                      //                 'https://storage.cloud.google.com/',
-                      //                 'https://storage.googleapis.com/')
-                      //             : staffData.photo)
-                      //         : const AssetImage('assets/img/back.jpg'),
-                      //     fit: BoxFit.cover,
-                      //     opacity: 1,
-                      //   ),
-                      // ),
-                      child: appShimmerImage(
-                        borderRadius: BorderRadius.circular(0),
-                        fit: BoxFit.cover,
-                        color: Colors.transparent,
-                        networkImageUrl: (staffData?.photo ?? "")
-                                .startsWith('https://storage.cloud.google.com/')
-                            ? (staffData?.photo ?? "").replaceFirst(
-                                'https://storage.cloud.google.com/',
-                                'https://storage.googleapis.com/')
-                            : (staffData?.photo ?? ""),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SingleChildScrollView(
+          physics: ClampingScrollPhysics(),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                        height: media.height / 1.7,
+                        width: media.width,
+                        // decoration: BoxDecoration(
+                        //   image: DecorationImage(
+                        //     image: staffData != null
+                        //         ? NetworkImage(staffData.photo.startsWith(
+                        //                 'https://storage.cloud.google.com/')
+                        //             ? staffData.photo.replaceFirst(
+                        //                 'https://storage.cloud.google.com/',
+                        //                 'https://storage.googleapis.com/')
+                        //             : staffData.photo)
+                        //         : const AssetImage('assets/img/back.jpg'),
+                        //     fit: BoxFit.cover,
+                        //     opacity: 1,
+                        //   ),
+                        // ),
+                        child: appShimmerImage(
+                          borderRadius: BorderRadius.circular(0),
+                          fit: BoxFit.cover,
+                          color: Colors.transparent,
+                          networkImageUrl: (staffData?.photo ?? "").startsWith(
+                                  'https://storage.cloud.google.com/')
+                              ? (staffData?.photo ?? "").replaceFirst(
+                                  'https://storage.cloud.google.com/',
+                                  'https://storage.googleapis.com/')
+                              : (staffData?.photo ?? ""),
+                        ),
+                      ),
+                      SizedBox(
+                        height: media.height / 1.8,
+                        width: media.width,
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(right: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                            left: ScreenUtil.horizontalScale(4),
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: //(isThisWeek && isCompleted)?
+                                                // Color(0xFF8A2BE2):
+                                                Color(0XFFd18a9b),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: SizedBox(
+                                            width:
+                                                ScreenUtil.verticalScale(4.65),
+                                            height:
+                                                ScreenUtil.verticalScale(4.65),
+                                            child: IconButton(
+                                              padding: EdgeInsets
+                                                  .zero, // Removes the default padding
+                                              icon: const Icon(
+                                                Icons.keyboard_arrow_left,
+                                                color: Colors.white,
+                                              ),
+                                              onPressed: () {
+                                                // HapticFeedBack.buttonClick();
+                                                Navigator.pop(context);
+                                              },
+                                              iconSize: ScreenUtil.verticalScale(
+                                                  4), // Icon size remains the same
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7)),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      height: ScreenUtil.verticalScale(1.5),
+                                    ),
+                                    SizedBox(
+                                        height: ScreenUtil.verticalScale(4)),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: media.height / 1.9, // 2.64,
+                        width: media.width,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: ClipPath(
+                            clipper: DiagonalClipper(),
+                            child: Container(
+                              height: media.height / 11,
+                              width: media.width / 6,
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                        minHeight: (media.height -
+                            (media.height / 2) -
+                            (media.height * 0.12))),
+                    margin: EdgeInsets.only(
+                      top: media.height / 1.905, //2.65,
+                    ),
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                       ),
                     ),
-                    SizedBox(
-                      height: media.height / 1.8,
-                      width: media.width,
-                      child: SafeArea(
+                    child: Container(
+                      margin:
+                          EdgeInsets.only(top: ScreenUtil.verticalScale(2.5)),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.horizontalScale(9)),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                          left: ScreenUtil.horizontalScale(4),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: //(isThisWeek && isCompleted)?
-                                              // Color(0xFF8A2BE2):
-                                              Color(0XFFd18a9b),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: SizedBox(
-                                          width: ScreenUtil.verticalScale(4.65),
-                                          height:
-                                              ScreenUtil.verticalScale(4.65),
-                                          child: IconButton(
-                                            padding: EdgeInsets
-                                                .zero, // Removes the default padding
-                                            icon: const Icon(
-                                              Icons.keyboard_arrow_left,
-                                              color: Colors.white,
+                            Text(
+                              staffData != null ? staffData.title : 'Name',
+                              style: TextStyle(
+                                fontSize: ScreenUtil.verticalScale(3.2),
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                staffData!.instagram.isEmpty
+                                    ? SizedBox()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 6, top: 10),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            await launchUrls(
+                                                "https://www.instagram.com");
+                                          },
+                                          child: Container(
+                                            height: ScreenUtil.verticalScale(4),
+                                            width: ScreenUtil.verticalScale(4),
+                                            padding: EdgeInsets.all(
+                                                ScreenUtil.verticalScale(1)),
+                                            decoration: BoxDecoration(
+                                                color: Color(0XFFd18a9b),
+                                                shape: BoxShape.circle),
+                                            child: Center(
+                                              child: SvgPicture.asset(
+                                                "assets/icons/instagram.svg",
+                                                color: Colors.white,
+                                                height:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
+                                              ),
                                             ),
-                                            onPressed: () {
-                                              // HapticFeedBack.buttonClick();
-                                              Navigator.pop(context);
-                                            },
-                                            iconSize: ScreenUtil.verticalScale(
-                                                4), // Icon size remains the same
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                staffData.facebook.isEmpty
+                                    ? SizedBox()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 6, top: 10),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            await launchUrls(
+                                                staffData.facebook);
+                                          },
+                                          child: Container(
+                                            height: ScreenUtil.verticalScale(4),
+                                            width: ScreenUtil.verticalScale(4),
+                                            padding: EdgeInsets.all(
+                                                ScreenUtil.verticalScale(1)),
+                                            decoration: BoxDecoration(
+                                                color: Color(0XFFd18a9b),
+                                                shape: BoxShape.circle),
+                                            child: Center(
+                                              child: SvgPicture.asset(
+                                                "assets/icons/facebook.svg",
+                                                color: Colors.white,
+                                                height:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                staffData.twitter.isEmpty
+                                    ? SizedBox()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 6, top: 10),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            await launchUrls(staffData.twitter);
+                                          },
+                                          child: Container(
+                                            height: ScreenUtil.verticalScale(4),
+                                            width: ScreenUtil.verticalScale(4),
+                                            padding: EdgeInsets.all(
+                                                ScreenUtil.verticalScale(1)),
+                                            decoration: BoxDecoration(
+                                                color: Color(0XFFd18a9b),
+                                                shape: BoxShape.circle),
+                                            child: Center(
+                                              child: Image.asset(
+                                                "assets/icons/twitter.png",
+                                                color: Colors.white,
+                                                height:
+                                                    ScreenUtil.verticalScale(
+                                                        1.5),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                staffData.tiktok.isEmpty
+                                    ? SizedBox()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 6, top: 10),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            await launchUrls(staffData.tiktok);
+                                          },
+                                          child: Container(
+                                            height: ScreenUtil.verticalScale(4),
+                                            width: ScreenUtil.verticalScale(4),
+                                            padding: EdgeInsets.all(
+                                                ScreenUtil.verticalScale(1)),
+                                            decoration: BoxDecoration(
+                                                color: Color(0XFFd18a9b),
+                                                shape: BoxShape.circle),
+                                            child: Center(
+                                              child: SvgPicture.asset(
+                                                "assets/icons/tiktoksvg.svg",
+                                                color: Colors.white,
+                                                height:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                staffData.linkedin.isEmpty
+                                    ? SizedBox()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 6, top: 10),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            await launchUrls(
+                                                staffData.linkedin);
+                                          },
+                                          child: Container(
+                                            height: ScreenUtil.verticalScale(4),
+                                            width: ScreenUtil.verticalScale(4),
+                                            padding: EdgeInsets.all(
+                                                ScreenUtil.verticalScale(1)),
+                                            decoration: BoxDecoration(
+                                                color: Color(0XFFd18a9b),
+                                                shape: BoxShape.circle),
+                                            child: Center(
+                                              child: SvgPicture.asset(
+                                                "assets/icons/linkedin.svg",
+                                                color: Colors.white,
+                                                height:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                              ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(7)),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    height: ScreenUtil.verticalScale(1.5),
-                                  ),
-                                  SizedBox(height: ScreenUtil.verticalScale(4)),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                            Container(
+                                alignment: Alignment.centerLeft,
+                                child: Builder(builder: (context) {
+                                  String bioContent = staffData.bio ?? "";
+
+                                  bool isPlainText = !bioContent
+                                      .trim()
+                                      .contains(RegExp(r"<[a-z][\s\S]*>"));
+
+                                  if (isPlainText) {
+                                    bioContent = "<p>$bioContent</p>";
+                                  }
+                                  return Html(
+                                    data: bioContent,
+                                    style: {
+                                      "body": Style(
+                                        fontSize: FontSize(
+                                            ScreenUtil.verticalScale(1.8)),
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color,
+                                      ),
+                                      "p": Style(
+                                        fontSize: FontSize(
+                                            ScreenUtil.verticalScale(1.8)),
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color,
+                                      ),
+                                    },
+                                  );
+                                })
+                                // Text(
+                                //   staffData.bio,
+                                //   style: const TextStyle(
+                                //       fontSize: 16, color: Colors.grey),
+                                //   textAlign: TextAlign.left,
+                                // ),
+                                ),
+                            staffData.link.isEmpty
+                                ? SizedBox()
+                                : Container(
+                                    margin: EdgeInsets.only(
+                                        top: ScreenUtil.verticalScale(1.8),
+                                        bottom: ScreenUtil.verticalScale(3.2)),
+                                    child: ButtonWidget(
+                                      text: 'View Details',
+                                      textColor: Colors.white,
+                                      color: AppColors.primaryColor,
+                                      onPress: () async {
+                                        _launchURL(staffData.link);
+                                      },
+                                      isLoading: false,
+                                    ),
+                                  )
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: media.height / 1.9, // 2.64,
-                      width: media.width,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: ClipPath(
-                          clipper: DiagonalClipper(),
-                          child: Container(
-                            height: media.height / 11,
-                            width: media.width / 6,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  constraints: BoxConstraints(
-                      minHeight: (media.height -
-                          (media.height / 2) -
-                          (media.height * 0.12))),
-                  margin: EdgeInsets.only(
-                    top: media.height / 1.905, //2.65,
                   ),
-                  width: media.width,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                    ),
-                  ),
-                  child: Container(
-                    margin: EdgeInsets.only(top: ScreenUtil.verticalScale(2.5)),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil.horizontalScale(9)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            staffData != null ? staffData.title : 'Name',
-                            style: TextStyle(
-                              fontSize: ScreenUtil.verticalScale(3.2),
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              staffData!.instagram.isEmpty
-                                  ? SizedBox()
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 6, top: 10),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await launchUrls(
-                                              "https://www.instagram.com");
-                                        },
-                                        child: Container(
-                                          height: ScreenUtil.verticalScale(4),
-                                          width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(
-                                              ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(
-                                              color: Color(0XFFd18a9b),
-                                              shape: BoxShape.circle),
-                                          child: Center(
-                                            child: SvgPicture.asset(
-                                              "assets/icons/instagram.svg",
-                                              color: Colors.white,
-                                              height:
-                                                  ScreenUtil.verticalScale(2.5),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              staffData.facebook.isEmpty
-                                  ? SizedBox()
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 6, top: 10),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await launchUrls(staffData.facebook);
-                                        },
-                                        child: Container(
-                                          height: ScreenUtil.verticalScale(4),
-                                          width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(
-                                              ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(
-                                              color: Color(0XFFd18a9b),
-                                              shape: BoxShape.circle),
-                                          child: Center(
-                                            child: SvgPicture.asset(
-                                              "assets/icons/facebook.svg",
-                                              color: Colors.white,
-                                              height:
-                                                  ScreenUtil.verticalScale(2.5),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              staffData.twitter.isEmpty
-                                  ? SizedBox()
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 6, top: 10),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await launchUrls(staffData.twitter);
-                                        },
-                                        child: Container(
-                                          height: ScreenUtil.verticalScale(4),
-                                          width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(
-                                              ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(
-                                              color: Color(0XFFd18a9b),
-                                              shape: BoxShape.circle),
-                                          child: Center(
-                                            child: Image.asset(
-                                              "assets/icons/twitter.png",
-                                              color: Colors.white,
-                                              height:
-                                                  ScreenUtil.verticalScale(1.5),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              staffData.tiktok.isEmpty
-                                  ? SizedBox()
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 6, top: 10),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await launchUrls(staffData.tiktok);
-                                        },
-                                        child: Container(
-                                          height: ScreenUtil.verticalScale(4),
-                                          width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(
-                                              ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(
-                                              color: Color(0XFFd18a9b),
-                                              shape: BoxShape.circle),
-                                          child: Center(
-                                            child: SvgPicture.asset(
-                                              "assets/icons/tiktoksvg.svg",
-                                              color: Colors.white,
-                                              height:
-                                                  ScreenUtil.verticalScale(2.5),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              staffData.linkedin.isEmpty
-                                  ? SizedBox()
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 6, top: 10),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await launchUrls(staffData.linkedin);
-                                        },
-                                        child: Container(
-                                          height: ScreenUtil.verticalScale(4),
-                                          width: ScreenUtil.verticalScale(4),
-                                          padding: EdgeInsets.all(
-                                              ScreenUtil.verticalScale(1)),
-                                          decoration: BoxDecoration(
-                                              color: Color(0XFFd18a9b),
-                                              shape: BoxShape.circle),
-                                          child: Center(
-                                            child: SvgPicture.asset(
-                                              "assets/icons/linkedin.svg",
-                                              color: Colors.white,
-                                              height:
-                                                  ScreenUtil.verticalScale(2.5),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                            ],
-                          ),
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              child: Builder(builder: (context) {
-                                String bioContent = staffData.bio ?? "";
-
-                                bool isPlainText = !bioContent
-                                    .trim()
-                                    .contains(RegExp(r"<[a-z][\s\S]*>"));
-
-                                if (isPlainText) {
-                                  bioContent = "<p>$bioContent</p>";
-                                }
-                                return Html(
-                                  data: bioContent,
-                                  style: {
-                                    "body": Style(
-                                      fontSize: FontSize(
-                                          ScreenUtil.verticalScale(1.8)),
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.color,
-                                    ),
-                                    "p": Style(
-                                      fontSize: FontSize(
-                                          ScreenUtil.verticalScale(1.8)),
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.color,
-                                    ),
-                                  },
-                                );
-                              })
-                              // Text(
-                              //   staffData.bio,
-                              //   style: const TextStyle(
-                              //       fontSize: 16, color: Colors.grey),
-                              //   textAlign: TextAlign.left,
-                              // ),
-                              ),
-                          staffData.link.isEmpty
-                              ? SizedBox()
-                              : Container(
-                                  margin: EdgeInsets.only(
-                                      top: ScreenUtil.verticalScale(1.8),
-                                      bottom: ScreenUtil.verticalScale(3.2)),
-                                  child: ButtonWidget(
-                                    text: 'View Details',
-                                    textColor: Colors.white,
-                                    color: AppColors.primaryColor,
-                                    onPress: () async {
-                                      _launchURL(staffData.link);
-                                    },
-                                    isLoading: false,
-                                  ),
-                                )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

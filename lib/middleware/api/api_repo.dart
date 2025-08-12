@@ -96,7 +96,6 @@ class ApiRepo extends BaseService {
     if (response1 is List) {
       final data =
           response1.map((json) => DayStatusDataModel.fromJson(json)).toList();
-      log('data==========>>>>>${data}');
       if (data.isNotEmpty) {
         var response = await ApiService().getResponse(
             apiType: APIType.aDelete,
@@ -147,6 +146,7 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(
         apiType: APIType.aGet,
         url: BaseService.fetchDayStatus /*, body: {"monthId": monthId}*/);
+    log('response==========>>>>>${response}');
     if (response is List) {
       return response.isEmpty
           ? []

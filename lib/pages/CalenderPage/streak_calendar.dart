@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -51,438 +52,452 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
 
     ScreenUtil.init(context);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Stack(
-        children: [
-          SizedBox(
-            height: media.height,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Positioned(
-                  top: 0,
-                  child: FittedBox(
-                    child: Consumer<DataProvider>(builder: (context, value, c) {
-                      return AppImage.imageStreakCalendar(
-                        value,
-                        // media,
-                        // image: dataProvider!.allImageList
-                        //     .where((element) =>
-                        //         element["key"] == "imageStreakCalendar")
-                        //     .first["image"],
-                        // // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
-                        // // image:
-                        // //     dataProvider!.cachedImageMap["imageStreakCalendar"],
-                        // imageKey: "imageStreakCalendar",
-                        child: SafeArea(
-                          child: SizedBox(
-                            height: media.height / 1.8,
-                            width: media.width,
-                            child: Column(
-                              children: [
-                                AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                  surfaceTintColor: Colors.transparent,
-                                  backgroundColor: Colors.transparent,
-                                  centerTitle: true,
-                                  leading: BackArrowWidget(
-                                    onPress: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  title: Text(
-                                    'Streaks',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.horizontalScale(5.5),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Stack(
+          children: [
+            SizedBox(
+              height: media.height,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned(
+                    top: 0,
+                    child: FittedBox(
+                      child:
+                          Consumer<DataProvider>(builder: (context, value, c) {
+                        return AppImage.imageStreakCalendar(
+                          value,
+                          // media,
+                          // image: dataProvider!.allImageList
+                          //     .where((element) =>
+                          //         element["key"] == "imageStreakCalendar")
+                          //     .first["image"],
+                          // // dataProvider?.screenBackgroundResponse?.imageStreakCalendar ?? "",
+                          // // image:
+                          // //     dataProvider!.cachedImageMap["imageStreakCalendar"],
+                          // imageKey: "imageStreakCalendar",
+                          child: SafeArea(
+                            child: SizedBox(
+                              height: media.height / 1.8,
+                              width: media.width,
+                              child: Column(
+                                children: [
+                                  AppBar(
+                                    toolbarHeight:
+                                        ScreenUtil.verticalScale(5.1),
+                                    surfaceTintColor: Colors.transparent,
+                                    backgroundColor: Colors.transparent,
+                                    centerTitle: true,
+                                    leading: BackArrowWidget(
+                                      onPress: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    title: Text(
+                                      'Streaks',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize:
+                                            ScreenUtil.horizontalScale(5.5),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                // Row(
-                                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                //   children: [
-                                //     Container(
-                                //       margin: EdgeInsets.only(
-                                //         left: ScreenUtil.horizontalScale(4),
-                                //       ),
-                                //       decoration: const BoxDecoration(
-                                //         color: Color(0XFFd18a9b),
-                                //         shape: BoxShape.circle,
-                                //       ),
-                                //       child: SizedBox(
-                                //         width: ScreenUtil.horizontalScale(10), // Size of the circle
-                                //         height: ScreenUtil.horizontalScale(10),
-                                //         child: IconButton(
-                                //           padding: EdgeInsets.zero, // Removes the default padding
-                                //           icon: const Icon(
-                                //             Icons.keyboard_arrow_left,
-                                //             color: Colors.white,
-                                //           ),
-                                //           onPressed: () {
-                                //             // HapticFeedBack.buttonClick();
-                                //             Navigator.pop(context);
-                                //           },
-                                //           iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
-                                //         ),
-                                //       ),
-                                //     ),
-                                //     Expanded(
-                                //       child: Center(
-                                //         child: Text(
-                                //           "Streaks",
-                                //           style: TextStyle(
-                                //             color: Colors.white,
-                                //             fontSize: ScreenUtil.verticalScale(3),
-                                //             fontWeight: FontWeight.bold,
-                                //             height: 1,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ),
-                                //     Container(
-                                //       margin: EdgeInsets.only(
-                                //         right: ScreenUtil.horizontalScale(4),
-                                //       ),
-                                //       child: SizedBox(
-                                //         width: ScreenUtil.horizontalScale(10),
-                                //         height: ScreenUtil.horizontalScale(10),
-                                //       ),
-                                //     ),
-                                //   ],
-                                // ),
-                                SizedBox(
-                                  height: media.height / 4.9,
-                                  width: media.width,
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              bottom: ScreenUtil.verticalScale(
-                                                  1.5)),
-                                          child: Text(
-                                            'Your Current Streak',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize:
-                                                  ScreenUtil.verticalScale(2.5),
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                                color: Colors.white,
-                                                width: 1.7),
-                                          ),
-                                          padding: EdgeInsets.all(
-                                              ("${context.watch<MonthProvider>().streak}")
-                                                          .length >
-                                                      3
-                                                  ? 19
-                                                  : ("${context.watch<MonthProvider>().streak}")
-                                                              .length >
-                                                          2
-                                                      ? 10
-                                                      : ("${context.watch<MonthProvider>().streak}")
-                                                                  .length >
-                                                              1
-                                                          ? 5
-                                                          : 2),
-                                          child: Center(
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  //   children: [
+                                  //     Container(
+                                  //       margin: EdgeInsets.only(
+                                  //         left: ScreenUtil.horizontalScale(4),
+                                  //       ),
+                                  //       decoration: const BoxDecoration(
+                                  //         color: Color(0XFFd18a9b),
+                                  //         shape: BoxShape.circle,
+                                  //       ),
+                                  //       child: SizedBox(
+                                  //         width: ScreenUtil.horizontalScale(10), // Size of the circle
+                                  //         height: ScreenUtil.horizontalScale(10),
+                                  //         child: IconButton(
+                                  //           padding: EdgeInsets.zero, // Removes the default padding
+                                  //           icon: const Icon(
+                                  //             Icons.keyboard_arrow_left,
+                                  //             color: Colors.white,
+                                  //           ),
+                                  //           onPressed: () {
+                                  //             // HapticFeedBack.buttonClick();
+                                  //             Navigator.pop(context);
+                                  //           },
+                                  //           iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     Expanded(
+                                  //       child: Center(
+                                  //         child: Text(
+                                  //           "Streaks",
+                                  //           style: TextStyle(
+                                  //             color: Colors.white,
+                                  //             fontSize: ScreenUtil.verticalScale(3),
+                                  //             fontWeight: FontWeight.bold,
+                                  //             height: 1,
+                                  //           ),
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     Container(
+                                  //       margin: EdgeInsets.only(
+                                  //         right: ScreenUtil.horizontalScale(4),
+                                  //       ),
+                                  //       child: SizedBox(
+                                  //         width: ScreenUtil.horizontalScale(10),
+                                  //         height: ScreenUtil.horizontalScale(10),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  SizedBox(
+                                    height: media.height / 4.9,
+                                    width: media.width,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                bottom:
+                                                    ScreenUtil.verticalScale(
+                                                        1.5)),
                                             child: Text(
-                                              '${context.watch<MonthProvider>().streak}',
+                                              'Your Current Streak',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize:
                                                     ScreenUtil.verticalScale(
-                                                        2.6),
-                                                fontWeight: FontWeight.bold,
+                                                        2.5),
+                                                fontWeight: FontWeight.normal,
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1.7),
+                                            ),
+                                            padding: EdgeInsets.all(
+                                                ("${context.watch<MonthProvider>().streak}")
+                                                            .length >
+                                                        3
+                                                    ? 19
+                                                    : ("${context.watch<MonthProvider>().streak}")
+                                                                .length >
+                                                            2
+                                                        ? 10
+                                                        : ("${context.watch<MonthProvider>().streak}")
+                                                                    .length >
+                                                                1
+                                                            ? 5
+                                                            : 2),
+                                            child: Center(
+                                              child: Text(
+                                                '${context.watch<MonthProvider>().streak}',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize:
+                                                      ScreenUtil.verticalScale(
+                                                          2.6),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                )
-                              ],
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
+                    ),
                   ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: media.width,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                        ),
+                      ),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned(
+                            right: 0,
+                            top: -(media.height / 9.8) + 0.3,
+                            child: ClipPath(
+                              clipper: DiagonalClipper(),
+                              child: Container(
+                                height: media.height / 9.8,
+                                width: media.width / 6,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                height: ScreenUtil.verticalScale(3),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                    ScreenUtil.horizontalScale(14),
+                                    1,
+                                    ScreenUtil.horizontalScale(14),
+                                    0),
+                                child: Text(
+                                  'Mark a day a complete every day to keep the perfect flame streak going.',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color,
+                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              SizedBox(
+                                height: ScreenUtil.verticalScale(2),
+                              ),
+                              CustomCalendarWidget(
+                                  userDataProvider: userDataProvider!),
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 18.0, //
+                                  horizontal: ScreenUtil.horizontalScale(8),
+                                ),
+                                child: Consumer<MonthProvider>(
+                                  builder: (context, monthProvider, child) {
+                                    if ((monthProvider.week ?? 0) < 1) {
+                                      return SizedBox();
+                                    }
+
+                                    String split = monthProvider
+                                            .monthDataModel
+                                            ?.weeks?[
+                                                (monthProvider.week ?? 1) - 1]
+                                            .idList
+                                            ?.first
+                                            .toString()
+                                            .split(" ")[1] ??
+                                        "";
+                                    String dataId =
+                                        "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
+
+                                    final data = monthProvider
+                                        .allDayHistoryModel
+                                        .where((element) =>
+                                            element.dataId == dataId);
+                                    String status = "";
+                                    String title = "";
+                                    if (data.isNotEmpty) {
+                                      status = data.first.status ?? "";
+                                      title = data.first.title ?? "";
+                                    }
+
+                                    return ButtonWidget(
+                                      text: monthProvider.todayTitleId.isEmpty
+                                          ? "Review your Week"
+                                          : (!title.contains("Pump Day") &&
+                                                  !monthProvider
+                                                      .isPumpDayAvailable &&
+                                                  monthProvider.todayTitleId
+                                                      .contains("Rest Day"))
+                                              ? "Mark Complete"
+                                              : status == Status.started
+                                                  ? 'Continue Your Workout'
+                                                  : 'Start Your Workout',
+                                      textColor: Colors.white,
+                                      onPress: monthProvider
+                                              .todayTitleId.isEmpty
+                                          ? () async {
+                                              if (mainPageProvider
+                                                      .selectedPage ==
+                                                  1) {
+                                                mainPageProvider.changeTab(0);
+                                                Navigator.pop(context);
+                                                await Future.delayed(Duration(
+                                                        milliseconds: 20))
+                                                    .then(
+                                                  (value) {
+                                                    monthProvider
+                                                        .updateIsOnMonthPage(
+                                                            false);
+                                                    monthProvider
+                                                        .updateScrollToRestDay(
+                                                            true);
+                                                    mainPageProvider
+                                                        .changeTab(1);
+                                                  },
+                                                );
+                                              } else {
+                                                mainPageProvider.changeTab(1);
+                                                monthProvider
+                                                    .updateIsOnMonthPage(false);
+                                                monthProvider
+                                                    .updateScrollToRestDay(
+                                                        true);
+                                                Navigator.pop(context);
+                                              }
+                                            }
+                                          : () => continueWorkoutOnTap(
+                                              monthProvider, context),
+                                      color: AppColors.primaryColor,
+                                      isLoading: false,
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: ScreenUtil.verticalScale(10))
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Positioned(
-                          right: 0,
-                          top: -(media.height / 9.8) + 0.3,
-                          child: ClipPath(
-                            clipper: DiagonalClipper(),
-                            child: Container(
-                              height: media.height / 9.8,
-                              width: media.width / 6,
-                              decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            SizedBox(
-                              height: ScreenUtil.verticalScale(3),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  ScreenUtil.horizontalScale(14),
-                                  1,
-                                  ScreenUtil.horizontalScale(14),
-                                  0),
-                              child: Text(
-                                'Mark a day a complete every day to keep the perfect flame streak going.',
-                                style: TextStyle(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color,
-                                  fontSize: ScreenUtil.verticalScale(1.5),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            SizedBox(
-                              height: ScreenUtil.verticalScale(2),
-                            ),
-                            CustomCalendarWidget(
-                                userDataProvider: userDataProvider!),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                vertical: 18.0, //
-                                horizontal: ScreenUtil.horizontalScale(8),
-                              ),
-                              child: Consumer<MonthProvider>(
-                                builder: (context, monthProvider, child) {
-                                  if ((monthProvider.week ?? 0) < 1) {
-                                    return SizedBox();
-                                  }
-
-                                  String split = monthProvider
-                                          .monthDataModel
-                                          ?.weeks?[
-                                              (monthProvider.week ?? 1) - 1]
-                                          .idList
-                                          ?.first
-                                          .toString()
-                                          .split(" ")[1] ??
-                                      "";
-                                  String dataId =
-                                      "$split-${monthProvider.monthDataModel?.id}-${monthProvider.monthDataModel?.weeks?[(monthProvider.week ?? 1) - 1].id}-${monthProvider.todayTitleId}";
-
-                                  final data = monthProvider.allDayHistoryModel
-                                      .where((element) =>
-                                          element.dataId == dataId);
-                                  String status = "";
-                                  String title = "";
-                                  if (data.isNotEmpty) {
-                                    status = data.first.status ?? "";
-                                    title = data.first.title ?? "";
-                                  }
-
-                                  return ButtonWidget(
-                                    text: monthProvider.todayTitleId.isEmpty
-                                        ? "Review your Week"
-                                        : (!title.contains("Pump Day") &&
-                                                !monthProvider
-                                                    .isPumpDayAvailable &&
-                                                monthProvider.todayTitleId
-                                                    .contains("Rest Day"))
-                                            ? "Mark Complete"
-                                            : status == Status.started
-                                                ? 'Continue Your Workout'
-                                                : 'Start Your Workout',
-                                    textColor: Colors.white,
-                                    onPress: monthProvider.todayTitleId.isEmpty
-                                        ? () async {
-                                            if (mainPageProvider.selectedPage ==
-                                                1) {
-                                              mainPageProvider.changeTab(0);
-                                              Navigator.pop(context);
-                                              await Future.delayed(Duration(
-                                                      milliseconds: 20))
-                                                  .then(
-                                                (value) {
-                                                  monthProvider
-                                                      .updateIsOnMonthPage(
-                                                          false);
-                                                  monthProvider
-                                                      .updateScrollToRestDay(
-                                                          true);
-                                                  mainPageProvider.changeTab(1);
-                                                },
-                                              );
-                                            } else {
-                                              mainPageProvider.changeTab(1);
-                                              monthProvider
-                                                  .updateIsOnMonthPage(false);
-                                              monthProvider
-                                                  .updateScrollToRestDay(true);
-                                              Navigator.pop(context);
-                                            }
-                                          }
-                                        : () => continueWorkoutOnTap(
-                                            monthProvider, context),
-                                    color: AppColors.primaryColor,
-                                    isLoading: false,
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(height: ScreenUtil.verticalScale(10))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.horizontalScale(15),
-                vertical: ScreenUtil.verticalScale(2),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil.verticalScale(1),
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius:
-                    BorderRadius.circular(ScreenUtil.verticalScale(5)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    spreadRadius: 1,
-                    blurRadius: 6,
-                    offset: Offset(0, 5),
                   ),
                 ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                child: Consumer<MainPageProvider>(
-                    builder: (context, value, child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          // Navigator.pushNamedAndRemoveUntil(
-                          //     context, '/home', (route) => false);
-                          value.changeTab(0);
-                          Navigator.pop(context);
-                        },
-                        icon: SvgPicture.asset(
-                          'assets/img/1-home.svg',
-                          colorFilter: ColorFilter.mode(
-                              value.selectedPage == 0
-                                  ? AppColors.primaryColor
-                                  : Colors.grey,
-                              BlendMode.srcIn),
-                          width: ScreenUtil.horizontalScale(8.5),
-                          height: ScreenUtil.horizontalScale(8.5),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          monthProvider?.updateIsOnMonthPage(true);
-                          monthProvider?.updateScrollToRestDay(false);
-
-                          // Navigator.pushNamedAndRemoveUntil(
-                          //     context, '/home', (route) => false);
-                          value.changeTab(1);
-                          Navigator.pop(context);
-                        },
-                        icon: SvgPicture.asset(
-                          'assets/img/2-calendar.svg',
-                          colorFilter: ColorFilter.mode(
-                              value.selectedPage == 1
-                                  ? AppColors.primaryColor
-                                  : Colors.grey,
-                              BlendMode.srcIn),
-                          width: ScreenUtil.horizontalScale(8.5),
-                          height: ScreenUtil.horizontalScale(8.5),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // Navigator.pushNamedAndRemoveUntil(
-                          //     context, '/home', (route) => false);
-                          value.changeTab(2);
-                          Navigator.pop(context);
-                        },
-                        icon: SvgPicture.asset(
-                          'assets/img/3-statistics.svg',
-                          colorFilter: ColorFilter.mode(
-                              value.selectedPage == 2
-                                  ? AppColors.primaryColor
-                                  : Colors.grey,
-                              BlendMode.srcIn),
-                          width: ScreenUtil.horizontalScale(8.5),
-                          height: ScreenUtil.horizontalScale(8.5),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // Navigator.pushNamedAndRemoveUntil(
-                          //     context, '/home', (route) => false);
-                          value.changeTab(3);
-                          Navigator.pop(context);
-                        },
-                        icon: SvgPicture.asset(
-                          'assets/img/4-account.svg',
-                          colorFilter: ColorFilter.mode(
-                              value.selectedPage == 3
-                                  ? AppColors.primaryColor
-                                  : Colors.grey,
-                              BlendMode.srcIn),
-                          width: ScreenUtil.horizontalScale(9),
-                          height: ScreenUtil.horizontalScale(9),
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ),
             ),
-          )
-        ],
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: ScreenUtil.horizontalScale(15),
+                  vertical: ScreenUtil.verticalScale(2),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: ScreenUtil.verticalScale(1),
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius:
+                      BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      spreadRadius: 1,
+                      blurRadius: 6,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  child: Consumer<MainPageProvider>(
+                      builder: (context, value, child) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            // Navigator.pushNamedAndRemoveUntil(
+                            //     context, '/home', (route) => false);
+                            value.changeTab(0);
+                            Navigator.pop(context);
+                          },
+                          icon: SvgPicture.asset(
+                            'assets/img/1-home.svg',
+                            colorFilter: ColorFilter.mode(
+                                value.selectedPage == 0
+                                    ? AppColors.primaryColor
+                                    : Colors.grey,
+                                BlendMode.srcIn),
+                            width: ScreenUtil.horizontalScale(8.5),
+                            height: ScreenUtil.horizontalScale(8.5),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            monthProvider?.updateIsOnMonthPage(true);
+                            monthProvider?.updateScrollToRestDay(false);
+
+                            // Navigator.pushNamedAndRemoveUntil(
+                            //     context, '/home', (route) => false);
+                            value.changeTab(1);
+                            Navigator.pop(context);
+                          },
+                          icon: SvgPicture.asset(
+                            'assets/img/2-calendar.svg',
+                            colorFilter: ColorFilter.mode(
+                                value.selectedPage == 1
+                                    ? AppColors.primaryColor
+                                    : Colors.grey,
+                                BlendMode.srcIn),
+                            width: ScreenUtil.horizontalScale(8.5),
+                            height: ScreenUtil.horizontalScale(8.5),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // Navigator.pushNamedAndRemoveUntil(
+                            //     context, '/home', (route) => false);
+                            value.changeTab(2);
+                            Navigator.pop(context);
+                          },
+                          icon: SvgPicture.asset(
+                            'assets/img/3-statistics.svg',
+                            colorFilter: ColorFilter.mode(
+                                value.selectedPage == 2
+                                    ? AppColors.primaryColor
+                                    : Colors.grey,
+                                BlendMode.srcIn),
+                            width: ScreenUtil.horizontalScale(8.5),
+                            height: ScreenUtil.horizontalScale(8.5),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // Navigator.pushNamedAndRemoveUntil(
+                            //     context, '/home', (route) => false);
+                            value.changeTab(3);
+                            Navigator.pop(context);
+                          },
+                          icon: SvgPicture.asset(
+                            'assets/img/4-account.svg',
+                            colorFilter: ColorFilter.mode(
+                                value.selectedPage == 3
+                                    ? AppColors.primaryColor
+                                    : Colors.grey,
+                                BlendMode.srcIn),
+                            width: ScreenUtil.horizontalScale(9),
+                            height: ScreenUtil.horizontalScale(9),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

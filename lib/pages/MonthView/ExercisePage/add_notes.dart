@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -43,93 +44,97 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
   ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(ScreenUtil.verticalScale(3)),
-        topRight: Radius.circular(ScreenUtil.verticalScale(3)),
-      ),
-      child: Container(
-        color: Theme.of(context).cardColor,
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(ScreenUtil.verticalScale(3)),
+          topRight: Radius.circular(ScreenUtil.verticalScale(3)),
+        ),
         child: Container(
-          margin: EdgeInsets.only(top: 20),
-          padding: const EdgeInsets.symmetric(horizontal: 15),
           color: Theme.of(context).cardColor,
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Close Button
-                Align(
-                  alignment: Alignment.topRight,
-                  child: SizedBox(
-                    height: 25,
-                    width: 40,
-                    child: Center(
-                      child: GestureDetector(
-                        child: const Icon(Icons.close),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+          child: Container(
+            margin: EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            color: Theme.of(context).cardColor,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Close Button
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: SizedBox(
+                      height: 25,
+                      width: 40,
+                      child: Center(
+                        child: GestureDetector(
+                          child: const Icon(Icons.close),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                // Add a New Note text
-                Center(
-                  child: Text(
-                    "Journal & Reminders",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Theme.of(context).textTheme.labelLarge?.color,
-                      fontWeight: FontWeight.bold,
+                  // Add a New Note text
+                  Center(
+                    child: Text(
+                      "Journal & Reminders",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).textTheme.labelLarge?.color,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 15),
+                  const SizedBox(height: 15),
 
-                // Multiline Text Box
-                TextField(
-                  controller: _noteController,
-                  maxLines: 5,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter here',
-                    border: OutlineInputBorder(),
+                  // Multiline Text Box
+                  TextField(
+                    controller: _noteController,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter here',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 15),
+                  const SizedBox(height: 15),
 
-                // Save Note Button
-                ButtonWidget(
-                  text: "Save",
-                  textColor: Colors.white,
-                  onPress: () {
-                    if (_noteController.text.isEmpty) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const AppAlertDialog(
-                            title: "",
-                            description:
-                                "Please enter text in the input field.",
-                          );
-                        },
-                      );
-                    } else {
-                      addNewNote();
-                      _noteController.clear();
-                    }
-                  },
-                  color: AppColors.primaryColor,
-                  isLoading: false,
-                ),
-                const SizedBox(height: 15),
+                  // Save Note Button
+                  ButtonWidget(
+                    text: "Save",
+                    textColor: Colors.white,
+                    onPress: () {
+                      if (_noteController.text.isEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const AppAlertDialog(
+                              title: "",
+                              description:
+                                  "Please enter text in the input field.",
+                            );
+                          },
+                        );
+                      } else {
+                        addNewNote();
+                        _noteController.clear();
+                      }
+                    },
+                    color: AppColors.primaryColor,
+                    isLoading: false,
+                  ),
+                  const SizedBox(height: 15),
 
-                _buildPreviouslyAddedNotes(),
-              ],
+                  _buildPreviouslyAddedNotes(),
+                ],
+              ),
             ),
           ),
         ),

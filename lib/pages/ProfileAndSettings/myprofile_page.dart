@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/components/profile_image_handler.dart';
+import 'package:bbb/custom/dob/lib/bottom_picker.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/ProfileAndSettings/height_picker.dart';
 import 'package:bbb/providers/data_provider.dart';
@@ -15,7 +16,6 @@ import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
-import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -357,359 +357,373 @@ class _MyProfilePageState extends State<MyProfilePage> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Consumer<DataProvider>(builder: (context, value, c) {
-                          return AppImage.imageMyProfle(value);
-                        }),
-                        SizedBox(
-                          height: media.height / 1.5,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                  surfaceTintColor: Colors.transparent,
-                                  backgroundColor: Colors.transparent,
-                                  centerTitle: true,
-                                  leading: BackArrowWidget(
-                                    onPress: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  title: Text(
-                                    'My Profile',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.horizontalScale(5.5),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Column(
+                    children: [
+                      Stack(
+                        children: [
+                          Consumer<DataProvider>(builder: (context, value, c) {
+                            return AppImage.imageMyProfle(value);
+                          }),
+                          SizedBox(
+                            height: media.height / 1.5,
+                            width: media.width,
+                            child: SafeArea(
+                              child: Column(
+                                children: [
+                                  AppBar(
+                                    toolbarHeight:
+                                        ScreenUtil.verticalScale(5.1),
+                                    surfaceTintColor: Colors.transparent,
+                                    backgroundColor: Colors.transparent,
+                                    centerTitle: true,
+                                    leading: BackArrowWidget(
+                                      onPress: () {
+                                        Navigator.pop(context);
+                                      },
                                     ),
-                                  ),
-                                  actions: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(
-                                          routeString: '/exerciseLibrary'),
-                                    )
-                                  ],
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(10),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        height: ScreenUtil.horizontalScale(2),
+                                    title: Text(
+                                      'My Profile',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize:
+                                            ScreenUtil.horizontalScale(5.5),
                                       ),
-                                      Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) =>
-                                            userData.user["name"] != ""
-                                                ? ProfileImageWidget(
-                                                    avatarUrl: userData
-                                                                        .userData[
-                                                                    'detail'] !=
-                                                                null &&
-                                                            userData.userData[
-                                                                        'detail']
-                                                                    [
-                                                                    'avatarUrl'] !=
-                                                                null &&
-                                                            userData.userData[
-                                                                        'detail']
-                                                                    [
-                                                                    'avatarUrl'] !=
-                                                                ""
-                                                        ? userData.userData[
-                                                                'detail']
-                                                            ['avatarUrl']
-                                                        : "",
-                                                    name: userData.user["name"]
-                                                        .toString()
-                                                        .replaceAll(" ", ""),
-                                                    callBack: (pickedImage) {
-                                                      image = pickedImage!;
-                                                      setState(() {});
-                                                      _saveUserData();
-                                                    },
-                                                    showPickImageButton: true,
-                                                  )
-                                                : const SizedBox(),
-                                      ),
-                                      SizedBox(
-                                        height: ScreenUtil.verticalScale(2.5),
-                                      ),
-                                      Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) =>
-                                            userData.userName != ""
-                                                ? Text(
-                                                    // 'Hi, Nick',
-                                                    userData.userName,
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: ScreenUtil
-                                                          .horizontalScale(6),
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      height: 1,
-                                                    ),
-                                                  )
-                                                : const SizedBox(),
-                                      ),
-                                      SizedBox(
-                                        height: ScreenUtil.horizontalScale(0.7),
-                                      ),
-                                      Consumer<UserDataProvider>(
-                                        builder: (context, userData, child) =>
-                                            userData.userName != ""
-                                                ? Text(
-                                                    userData.userEmail,
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: ScreenUtil
-                                                          .horizontalScale(3.5),
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      height: 1,
-                                                    ),
-                                                  )
-                                                : const SizedBox(),
-                                      ),
+                                    ),
+                                    actions: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 10),
+                                        child:
+                                            const CommonStreakWithNotification(
+                                                routeString:
+                                                    '/exerciseLibrary'),
+                                      )
                                     ],
                                   ),
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal:
+                                          ScreenUtil.horizontalScale(10),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: ScreenUtil.horizontalScale(2),
+                                        ),
+                                        Consumer<UserDataProvider>(
+                                          builder: (context, userData, child) =>
+                                              userData.user["name"] != ""
+                                                  ? ProfileImageWidget(
+                                                      avatarUrl: userData
+                                                                          .userData[
+                                                                      'detail'] !=
+                                                                  null &&
+                                                              userData.userData[
+                                                                          'detail']
+                                                                      [
+                                                                      'avatarUrl'] !=
+                                                                  null &&
+                                                              userData.userData[
+                                                                          'detail']
+                                                                      [
+                                                                      'avatarUrl'] !=
+                                                                  ""
+                                                          ? userData.userData[
+                                                                  'detail']
+                                                              ['avatarUrl']
+                                                          : "",
+                                                      name: userData
+                                                          .user["name"]
+                                                          .toString()
+                                                          .replaceAll(" ", ""),
+                                                      callBack: (pickedImage) {
+                                                        image = pickedImage!;
+                                                        setState(() {});
+                                                        _saveUserData();
+                                                      },
+                                                      showPickImageButton: true,
+                                                    )
+                                                  : const SizedBox(),
+                                        ),
+                                        SizedBox(
+                                          height: ScreenUtil.verticalScale(2.5),
+                                        ),
+                                        Consumer<UserDataProvider>(
+                                          builder: (context, userData, child) =>
+                                              userData.userName != ""
+                                                  ? Text(
+                                                      // 'Hi, Nick',
+                                                      userData.userName,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil
+                                                            .horizontalScale(6),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        height: 1,
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
+                                        ),
+                                        SizedBox(
+                                          height:
+                                              ScreenUtil.horizontalScale(0.7),
+                                        ),
+                                        Consumer<UserDataProvider>(
+                                          builder: (context, userData, child) =>
+                                              userData.userName != ""
+                                                  ? Text(
+                                                      userData.userEmail,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: ScreenUtil
+                                                            .horizontalScale(
+                                                                3.5),
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        height: 1,
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: media.height / 2.998,
+                            width: media.width,
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: ClipPath(
+                                clipper: DiagonalClipper(),
+                                child: Container(
+                                  height: media.height / 11,
+                                  width: media.width / 6,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 2.998,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  width: media.width,
-                  constraints: BoxConstraints(
-                      minHeight: media.height - (media.height / 3)),
-                  margin: EdgeInsets.only(top: media.height / 3),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
-                  child: loader
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primaryColor,
-                          ),
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                bottom: ScreenUtil.verticalScale(0.8),
-                                top: ScreenUtil.verticalScale(2),
+                  Container(
+                    width: media.width,
+                    constraints: BoxConstraints(
+                        minHeight: media.height - (media.height / 3)),
+                    margin: EdgeInsets.only(top: media.height / 3),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                      ),
+                    ),
+                    child: loader
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primaryColor,
+                            ),
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: ScreenUtil.verticalScale(0.8),
+                                  top: ScreenUtil.verticalScale(2),
+                                ),
+                                child: _buildTextField(
+                                  context: context,
+                                  label: 'Name',
+                                  value: nameController,
+                                  hint: 'Enter here',
+                                ),
                               ),
-                              child: _buildTextField(
+                              _buildProfileField(
                                 context: context,
-                                label: 'Name',
-                                value: nameController,
-                                hint: 'Enter here',
+                                label: 'Birthday',
+                                value: selectedDate != null
+                                    ? DateFormat('MM/dd/yyyy')
+                                        .format(selectedDate!)
+                                    : 'Enter here',
+                                onTap: () {
+                                  _showDatePicker(context);
+                                },
                               ),
-                            ),
-                            _buildProfileField(
-                              context: context,
-                              label: 'Birthday',
-                              value: selectedDate != null
-                                  ? DateFormat('MM/dd/yyyy')
-                                      .format(selectedDate!)
-                                  : 'Enter here',
-                              onTap: () {
-                                _showDatePicker(context);
-                              },
-                            ),
-                            _buildDropdownField(
-                              context: context,
-                              label: 'Gender',
-                              value: selectedGender,
-                              options: genderOptions,
-                              hint: 'Enter here',
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedGender = newValue!;
-                                });
-                                _saveUserData();
-                              },
-                            ),
-                            // _buildDropdownField(
-                            //   context: context,
-                            //   label: 'My Goals',
-                            //   value: selectedGoal,
-                            //   options: goalsOptions,
-                            //   hint: 'Goals',
-                            //   onChanged: (String? newValue) {
-                            //     setState(() {
-                            //       selectedGoal = newValue!;
-                            //     });
-                            //   },
-                            // ),
-                            Consumer<LocationProvider>(
-                              builder: (context, value, child) {
-                                return Column(
-                                  children: [
-                                    _buildDropdownField(
-                                      context: context,
-                                      label: 'Country',
-                                      value: value.selectedCountry,
-                                      options: value.country?.countries ?? [],
-                                      hint: 'Enter here',
-                                      onChanged: (v) {
-                                        value.onCountrySelect(v);
-                                        _saveUserData();
-                                      },
-                                    ),
-                                    _buildDropdownField(
-                                      context: context,
-                                      label: 'State',
-                                      value: value.selectedState,
-                                      options: value.states?.states ?? [],
-                                      hint: 'Enter here',
-                                      onChanged: (v) {
-                                        value.onStateSelect(v);
-                                        _saveUserData();
-                                      },
-                                    ),
-                                    _buildTextField(
-                                      context: context,
-                                      label: 'City',
-                                      value: value.selectedCityController,
-                                      hint: 'Enter here',
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                            _heightPicker(
-                              context: context,
-                              label: 'Height',
-                              value: selectedHeight,
-                              value1: selectedHeight1,
-                              hint: '6\'0"',
-                            ),
-                            NumberEntry(
-                              maxLength: 10,
-                              onchange: () {
-                                _debouncer.run(() {
+                              _buildDropdownField(
+                                context: context,
+                                label: 'Gender',
+                                value: selectedGender,
+                                options: genderOptions,
+                                hint: 'Enter here',
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    selectedGender = newValue!;
+                                  });
                                   _saveUserData();
-                                });
-                              },
-                              label: 'Weight',
-                              controller: selectedWeight,
-                              focusNode: _nodeText1,
-                              suffix: isKg ? "kg" : "lbs",
-                            ),
+                                },
+                              ),
+                              // _buildDropdownField(
+                              //   context: context,
+                              //   label: 'My Goals',
+                              //   value: selectedGoal,
+                              //   options: goalsOptions,
+                              //   hint: 'Goals',
+                              //   onChanged: (String? newValue) {
+                              //     setState(() {
+                              //       selectedGoal = newValue!;
+                              //     });
+                              //   },
+                              // ),
+                              Consumer<LocationProvider>(
+                                builder: (context, value, child) {
+                                  return Column(
+                                    children: [
+                                      _buildDropdownField(
+                                        context: context,
+                                        label: 'Country',
+                                        value: value.selectedCountry,
+                                        options: value.country?.countries ?? [],
+                                        hint: 'Enter here',
+                                        onChanged: (v) {
+                                          value.onCountrySelect(v);
+                                          _saveUserData();
+                                        },
+                                      ),
+                                      _buildDropdownField(
+                                        context: context,
+                                        label: 'State',
+                                        value: value.selectedState,
+                                        options: value.states?.states ?? [],
+                                        hint: 'Enter here',
+                                        onChanged: (v) {
+                                          value.onStateSelect(v);
+                                          _saveUserData();
+                                        },
+                                      ),
+                                      _buildTextField(
+                                        context: context,
+                                        label: 'City',
+                                        value: value.selectedCityController,
+                                        hint: 'Enter here',
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              _heightPicker(
+                                context: context,
+                                label: 'Height',
+                                value: selectedHeight,
+                                value1: selectedHeight1,
+                                hint: '6\'0"',
+                              ),
+                              NumberEntry(
+                                maxLength: 10,
+                                onchange: () {
+                                  _debouncer.run(() {
+                                    _saveUserData();
+                                  });
+                                },
+                                label: 'Weight',
+                                controller: selectedWeight,
+                                focusNode: _nodeText1,
+                                suffix: isKg ? "kg" : "lbs",
+                              ),
 
-                            NumberEntry(
-                              onchange: () {
-                                _debouncer.run(() {
-                                  _saveUserData();
-                                });
-                              },
-                              label: 'Waist',
-                              controller: selectedWaist,
-                              focusNode: _nodeText2,
-                              suffix: isKg ? " cm" : '"',
-                            ),
-                            NumberEntry(
-                              onchange: () {
-                                _debouncer.run(() {
-                                  _saveUserData();
-                                });
-                              },
-                              label: 'Hips',
-                              controller: selectedHip,
-                              focusNode: _nodeText3,
-                              suffix: isKg ? " cm" : '"',
-                            ),
+                              NumberEntry(
+                                onchange: () {
+                                  _debouncer.run(() {
+                                    _saveUserData();
+                                  });
+                                },
+                                label: 'Waist',
+                                controller: selectedWaist,
+                                focusNode: _nodeText2,
+                                suffix: isKg ? " cm" : '"',
+                              ),
+                              NumberEntry(
+                                onchange: () {
+                                  _debouncer.run(() {
+                                    _saveUserData();
+                                  });
+                                },
+                                label: 'Hips',
+                                controller: selectedHip,
+                                focusNode: _nodeText3,
+                                suffix: isKg ? " cm" : '"',
+                              ),
 
-                            NumberEntry(
-                              onchange: () {
-                                _debouncer.run(() {
-                                  _saveUserData();
-                                });
-                              },
-                              label: 'Mid-Thigh',
-                              controller: selectedMidThigh,
-                              focusNode: _nodeText4,
-                              suffix: isKg ? " cm" : '"',
-                            ),
+                              NumberEntry(
+                                onchange: () {
+                                  _debouncer.run(() {
+                                    _saveUserData();
+                                  });
+                                },
+                                label: 'Mid-Thigh',
+                                controller: selectedMidThigh,
+                                focusNode: _nodeText4,
+                                suffix: isKg ? " cm" : '"',
+                              ),
 
-                            NumberEntry(
-                              onchange: () {
-                                _debouncer.run(() {
-                                  _saveUserData();
-                                });
-                              },
-                              label: 'Body-Fat',
-                              controller: selectedBodyFat,
-                              focusNode: _nodeText5,
-                              suffix: "%", // hint: '81',
-                            ),
+                              NumberEntry(
+                                onchange: () {
+                                  _debouncer.run(() {
+                                    _saveUserData();
+                                  });
+                                },
+                                label: 'Body-Fat',
+                                controller: selectedBodyFat,
+                                focusNode: _nodeText5,
+                                suffix: "%", // hint: '81',
+                              ),
 
-                            SizedBox(height: ScreenUtil.verticalScale(2)),
-                            // isLoading == true
-                            //     ? const Center(
-                            //         child: CircularProgressIndicator(
-                            //         color: AppColors.primaryColor,
-                            //       ))
-                            //     : Container(
-                            //         margin: EdgeInsets.symmetric(
-                            //           horizontal: ScreenUtil.horizontalScale(9),
-                            //         ),
-                            //         child: ButtonWidget(
-                            //           text: "Save",
-                            //           textColor: Colors.white,
-                            //           onPress: _saveUserData,
-                            //           color: AppColors.primaryColor,
-                            //           isLoading: false,
-                            //         ),
-                            //       ),
-                            // SizedBox(height: ScreenUtil.verticalScale(3.2)),
-                          ],
-                        ),
-                ),
-              ],
-            ),
-          ],
+                              SizedBox(height: ScreenUtil.verticalScale(2)),
+                              // isLoading == true
+                              //     ? const Center(
+                              //         child: CircularProgressIndicator(
+                              //         color: AppColors.primaryColor,
+                              //       ))
+                              //     : Container(
+                              //         margin: EdgeInsets.symmetric(
+                              //           horizontal: ScreenUtil.horizontalScale(9),
+                              //         ),
+                              //         child: ButtonWidget(
+                              //           text: "Save",
+                              //           textColor: Colors.white,
+                              //           onPress: _saveUserData,
+                              //           color: AppColors.primaryColor,
+                              //           isLoading: false,
+                              //         ),
+                              //       ),
+                              // SizedBox(height: ScreenUtil.verticalScale(3.2)),
+                            ],
+                          ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

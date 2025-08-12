@@ -89,6 +89,8 @@ class _MainPageState extends State<MainPage> {
         }
       }
     } else if (Platform.isAndroid) {
+      log("VERSION======== ${version.version}");
+      log('dataProvider?.newVersionModel?.android?.version==========>>>>>${dataProvider?.newVersionModel?.android?.version}');
       if (version.version !=
           (dataProvider?.newVersionModel?.android?.version ?? "")) {
         if (dataProvider!.newVersionModel!.android!.forceUpdate == true) {
@@ -137,7 +139,6 @@ class _MainPageState extends State<MainPage> {
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
-        userData.fetchUserInfo(context);
         if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             _showWelcomeModal();
@@ -285,126 +286,131 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
-    return AnnotatedRegion(
-      value: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light),
-      child: Consumer<MainPageProvider>(
-        builder: (context, value, child) => Scaffold(
-          backgroundColor: Colors.white,
-          extendBody: true,
-          bottomNavigationBar: Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.horizontalScale(15),
-              vertical: ScreenUtil.verticalScale(2),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil.verticalScale(1),
-            ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(5)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  spreadRadius: 1,
-                  blurRadius: 6,
-                  offset: Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  IconButton(
-                    onPressed: mainPageProvider.selectedPage != 0
-                        ? () {
-                            HapticFeedBack.buttonClick();
-                            mainPageProvider.changeTab(0);
-                          }
-                        : null,
-                    icon: Consumer<UserDataProvider>(
-                      builder: (context, userData, child) => SvgPicture.asset(
-                        'assets/img/1-home.svg',
-                        colorFilter: ColorFilter.mode(
-                            value.selectedPage == 0
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
-                        width: ScreenUtil.horizontalScale(8.5),
-                        height: ScreenUtil.horizontalScale(8.5),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: mainPageProvider.selectedPage != 1
-                        ? () {
-                            HapticFeedBack.buttonClick();
-                            mainPageProvider.changeTab(1);
-                            monthProvider.updateIsOnMonthPage(true);
-                            monthProvider.updateScrollToRestDay(false);
-                          }
-                        : null,
-                    icon: Consumer<UserDataProvider>(
-                      builder: (context, userData, child) => SvgPicture.asset(
-                        'assets/img/2-calendar.svg',
-                        colorFilter: ColorFilter.mode(
-                            value.selectedPage == 1
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
-                        width: ScreenUtil.horizontalScale(8.5),
-                        height: ScreenUtil.horizontalScale(8.5),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: mainPageProvider.selectedPage != 2
-                        ? () {
-                            HapticFeedBack.buttonClick();
-                            mainPageProvider.changeTab(2);
-                          }
-                        : null,
-                    icon: Consumer<UserDataProvider>(
-                      builder: (context, userData, child) => SvgPicture.asset(
-                        'assets/img/3-statistics.svg',
-                        colorFilter: ColorFilter.mode(
-                            value.selectedPage == 2
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
-                        width: ScreenUtil.horizontalScale(8.5),
-                        height: ScreenUtil.horizontalScale(8.5),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: mainPageProvider.selectedPage != 3
-                        ? () {
-                            HapticFeedBack.buttonClick();
-                            mainPageProvider.changeTab(3);
-                          }
-                        : null,
-                    icon: Consumer<UserDataProvider>(
-                      builder: (context, userData, child) => SvgPicture.asset(
-                        'assets/img/4-account.svg',
-                        colorFilter: ColorFilter.mode(
-                            value.selectedPage == 3
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                            BlendMode.srcIn),
-                        width: ScreenUtil.horizontalScale(9),
-                        height: ScreenUtil.horizontalScale(9),
-                      ),
-                    ),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: AnnotatedRegion(
+        value: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light),
+        child: Consumer<MainPageProvider>(
+          builder: (context, value, child) => Scaffold(
+            backgroundColor: Colors.white,
+            extendBody: true,
+            bottomNavigationBar: Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: ScreenUtil.horizontalScale(15),
+                vertical: ScreenUtil.verticalScale(2),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil.verticalScale(1),
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius:
+                    BorderRadius.circular(ScreenUtil.verticalScale(5)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    spreadRadius: 1,
+                    blurRadius: 6,
+                    offset: Offset(0, 5),
                   ),
                 ],
               ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                      onPressed: mainPageProvider.selectedPage != 0
+                          ? () {
+                              HapticFeedBack.buttonClick();
+                              mainPageProvider.changeTab(0);
+                            }
+                          : null,
+                      icon: Consumer<UserDataProvider>(
+                        builder: (context, userData, child) => SvgPicture.asset(
+                          'assets/img/1-home.svg',
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 0
+                                  ? AppColors.primaryColor
+                                  : Colors.grey,
+                              BlendMode.srcIn),
+                          width: ScreenUtil.horizontalScale(8.5),
+                          height: ScreenUtil.horizontalScale(8.5),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: mainPageProvider.selectedPage != 1
+                          ? () {
+                              HapticFeedBack.buttonClick();
+                              mainPageProvider.changeTab(1);
+                              monthProvider.updateIsOnMonthPage(true);
+                              monthProvider.updateScrollToRestDay(false);
+                            }
+                          : null,
+                      icon: Consumer<UserDataProvider>(
+                        builder: (context, userData, child) => SvgPicture.asset(
+                          'assets/img/2-calendar.svg',
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 1
+                                  ? AppColors.primaryColor
+                                  : Colors.grey,
+                              BlendMode.srcIn),
+                          width: ScreenUtil.horizontalScale(8.5),
+                          height: ScreenUtil.horizontalScale(8.5),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: mainPageProvider.selectedPage != 2
+                          ? () {
+                              HapticFeedBack.buttonClick();
+                              mainPageProvider.changeTab(2);
+                            }
+                          : null,
+                      icon: Consumer<UserDataProvider>(
+                        builder: (context, userData, child) => SvgPicture.asset(
+                          'assets/img/3-statistics.svg',
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 2
+                                  ? AppColors.primaryColor
+                                  : Colors.grey,
+                              BlendMode.srcIn),
+                          width: ScreenUtil.horizontalScale(8.5),
+                          height: ScreenUtil.horizontalScale(8.5),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: mainPageProvider.selectedPage != 3
+                          ? () {
+                              HapticFeedBack.buttonClick();
+                              mainPageProvider.changeTab(3);
+                            }
+                          : null,
+                      icon: Consumer<UserDataProvider>(
+                        builder: (context, userData, child) => SvgPicture.asset(
+                          'assets/img/4-account.svg',
+                          colorFilter: ColorFilter.mode(
+                              value.selectedPage == 3
+                                  ? AppColors.primaryColor
+                                  : Colors.grey,
+                              BlendMode.srcIn),
+                          width: ScreenUtil.horizontalScale(9),
+                          height: ScreenUtil.horizontalScale(9),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
+            body: _pages[value.selectedPage],
           ),
-          body: _pages[value.selectedPage],
         ),
       ),
     );

@@ -67,84 +67,90 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
 
-    return Scaffold(
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Image.asset(
-            'assets/img/back.jpg',
-            height: MediaQuery.of(context).size.height,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: MediaQuery.of(context).size.height / 3.3,
-            child: Image.asset(
-              'assets/img/logo1.png',
-              height: 80,
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        body: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Image.asset(
+              'assets/img/back.jpg',
+              height: MediaQuery.of(context).size.height,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
-          ),
-          Container(
-            margin:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height / 1.45),
-            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5))
-                .copyWith(bottom: ScreenUtil.verticalScale(3.2)),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            Positioned(
+              left: 0,
+              right: 0,
+              top: MediaQuery.of(context).size.height / 3.3,
+              child: Image.asset(
+                'assets/img/logo1.png',
+                height: 80,
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: ScreenUtil.verticalScale(1)),
-                  child: Center(
-                    child: Text(
-                      "Your subscription is inactive",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                        fontSize: ScreenUtil.verticalScale(2.4),
+            Container(
+              margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height /
+                      (Platform.isAndroid ? 1.49 : 1.45)),
+              padding: EdgeInsets.all(ScreenUtil.horizontalScale(5)).copyWith(
+                  bottom:
+                      ScreenUtil.verticalScale(Platform.isAndroid ? 2 : 3.2)),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        vertical: ScreenUtil.verticalScale(1)),
+                    child: Center(
+                      child: Text(
+                        "Your subscription is inactive",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                          fontSize: ScreenUtil.verticalScale(2.4),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: ScreenUtil.verticalScale(1.5)),
-                Expanded(
-                  child: _feature(
-                      "It appears your subscription is either expired or inactive, please use the link below to renew or activate your subscription."),
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: ButtonWidget(
-                    color: AppColors.primaryColor,
-                    text: "My Account",
-                    textColor: Colors.white,
-                    isLoading: false,
-                    onPress: () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      String? token = prefs.getString('authToken');
-
-                      Uri url = Uri.parse(
-                          'https://app.bootybybret.com/?token=$token');
-
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(url);
-                      } else {
-                        throw 'Could not launch $url';
-                      }
-                    },
+                  SizedBox(height: ScreenUtil.verticalScale(1.5)),
+                  Expanded(
+                    child: _feature(
+                        "It appears your subscription is either expired or inactive, please use the link below to renew or activate your subscription."),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: ButtonWidget(
+                      color: AppColors.primaryColor,
+                      text: "My Account",
+                      textColor: Colors.white,
+                      isLoading: false,
+                      onPress: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String? token = prefs.getString('authToken');
+
+                        Uri url = Uri.parse(
+                            'https://app.bootybybret.com/?token=$token');
+
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        } else {
+                          throw 'Could not launch $url';
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

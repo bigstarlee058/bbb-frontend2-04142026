@@ -264,10 +264,8 @@ class DataProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-
         achievementList = List<AchievementModel>.from(
             data.map((x) => AchievementModel.fromJson(x)));
-
         for (var element in achievementList) {
           if (element.achievements!.isNotEmpty) {
             for (var ele in element.achievements!) {
@@ -1000,7 +998,7 @@ class DataProvider extends ChangeNotifier {
         await preferences.putString(
             "${SplitType.split5}-${monthDataModelSplit5.id}",
             jsonEncode(monthDataModelSplit5));
-        final dataList = [];
+        // final dataList = [];
 
         // for (var element in monthDataModelSplit3.weeks ?? []) {
         //   final data =
@@ -1011,6 +1009,8 @@ class DataProvider extends ChangeNotifier {
         // }
 
         final value = await DatabaseHelper().areAllTablesEmpty();
+
+        log('value==========>>>>>${value}');
 
         /*if (value) {
           log('responseData=========5=========>>>>>${DateTime.now()}');
@@ -1228,7 +1228,6 @@ class DataProvider extends ChangeNotifier {
 
         if (value) {
           await fetchAndStoreDayData(monthDataModelSplit3);
-
           fetchAndStoreAllData(monthDataModelSplit3);
         }
       }

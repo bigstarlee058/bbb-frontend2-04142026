@@ -85,7 +85,7 @@ class _DashboardPageState extends State<DashboardPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToTop();
     });
-    loadUserInfo();
+    // loadUserInfo();
     loadStaffsData();
     loadFeaturedChallengeData();
     loadFeaturedCollectionData();
@@ -169,7 +169,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 return value.allImageList.isNotEmpty
                     ? Column(
                         children: [
-                          // AppImage.imageDashboard(value),
+                          AppImage.imageDashboard(value),
                           AppImage.imageMonthView(value),
                           AppImage.imageStreakCalendar(value),
                           AppImage.imageTools(value),

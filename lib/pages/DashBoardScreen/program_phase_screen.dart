@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/models/program_phase_model.dart';
 import 'package:bbb/pages/DashBoardScreen/newspeper_widget.dart';
@@ -39,207 +41,216 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Consumer<DataProvider>(builder: (context, value, c) {
-        return SingleChildScrollView(
-          controller: _scrollController,
-          physics: const ClampingScrollPhysics(),
-          child: Stack(
-            children: [
-              Stack(
-                children: [
-                  Container(
-                    height: ScreenUtil.verticalScale(65),
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                    ),
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SafeArea(
-                        child: value.programPhaseModel != null
-                            ? value.programPhaseModel!.phasesmaininfo!
-                                    .thumbnail!.isEmpty
-                                ? Image.asset(
-                                    "assets/img/program-phase-1.png",
-                                  )
-                                : appShimmerImage(
-                                    color: Colors.transparent,
-                                    height: ScreenUtil.verticalScale(46),
-                                    networkImageUrl: value.programPhaseModel!
-                                            .phasesmaininfo!.thumbnail!
-                                            .startsWith(
-                                                'https://storage.cloud.google.com/')
-                                        ? value.programPhaseModel!
-                                            .phasesmaininfo!.thumbnail!
-                                            .replaceFirst(
-                                                'https://storage.cloud.google.com/',
-                                                'https://storage.googleapis.com/')
-                                        : value.programPhaseModel!
-                                            .phasesmaininfo!.thumbnail!,
-                                  )
-                            : Image.asset(
-                                "assets/img/program-phase-1.png",
-                              ),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Consumer<DataProvider>(builder: (context, value, c) {
+          return SingleChildScrollView(
+            controller: _scrollController,
+            physics: const ClampingScrollPhysics(),
+            child: Stack(
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      height: ScreenUtil.verticalScale(65),
+                      width: media.width,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil.verticalScale(65),
-                    width: media.width,
-                    child: Align(
-                      alignment: FractionalOffset.topLeft,
-                      child: SafeArea(
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Stack(
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                        left: ScreenUtil.horizontalScale(4)),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0XFFd18a9b),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: SizedBox(
-                                      width: ScreenUtil.verticalScale(4.65),
-                                      height: ScreenUtil.verticalScale(4.65),
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        icon: const Icon(
-                                            Icons.keyboard_arrow_left,
-                                            color: Colors.white),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        iconSize: ScreenUtil.verticalScale(4),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: SafeArea(
+                          child: value.programPhaseModel != null
+                              ? value.programPhaseModel!.phasesmaininfo!
+                                      .thumbnail!.isEmpty
+                                  ? Image.asset(
+                                      "assets/img/program-phase-1.png",
+                                    )
+                                  : appShimmerImage(
+                                      color: Colors.transparent,
+                                      height: ScreenUtil.verticalScale(46),
+                                      networkImageUrl: value.programPhaseModel!
+                                              .phasesmaininfo!.thumbnail!
+                                              .startsWith(
+                                                  'https://storage.cloud.google.com/')
+                                          ? value.programPhaseModel!
+                                              .phasesmaininfo!.thumbnail!
+                                              .replaceFirst(
+                                                  'https://storage.cloud.google.com/',
+                                                  'https://storage.googleapis.com/')
+                                          : value.programPhaseModel!
+                                              .phasesmaininfo!.thumbnail!,
+                                    )
+                              : Image.asset(
+                                  "assets/img/program-phase-1.png",
+                                ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil.verticalScale(54.5),
-                    width: media.width,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: ClipPath(
-                        clipper: DiagonalClipper(),
-                        child: Container(
-                          height: media.height / 11,
-                          width: media.width / 6,
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                margin: EdgeInsets.only(
-                  top: ScreenUtil.verticalScale(54.49),
-                  bottom: ScreenUtil.verticalScale(2),
-                ),
-                child: Container(
-                  width: media.width,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                    ),
-                  ),
-                  child: Container(
-                    margin: EdgeInsets.only(
-                      top: ScreenUtil.verticalScale(3.2),
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(6)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(2)),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                    SizedBox(
+                      height: ScreenUtil.verticalScale(65),
+                      width: media.width,
+                      child: Align(
+                        alignment: FractionalOffset.topLeft,
+                        child: SafeArea(
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Stack(
                                   children: [
-                                    Text(
-                                      value.programPhaseModel?.phasesmaininfo
-                                              ?.contenttitle ??
-                                          "",
-                                      style: TextStyle(
-                                        fontSize: ScreenUtil.verticalScale(3),
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryColor,
-                                      ),
-                                    ),
                                     Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 10.0, bottom: 10.0),
-                                      alignment: Alignment.centerLeft,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(0.0),
-                                        child: Text(
-                                          "${value.programPhaseModel?.phasesmaininfo?.description}",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.color,
-                                          ),
-                                          textAlign: TextAlign.left,
+                                      margin: EdgeInsets.only(
+                                          left: ScreenUtil.horizontalScale(4)),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0XFFd18a9b),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: SizedBox(
+                                        width: ScreenUtil.verticalScale(4.65),
+                                        height: ScreenUtil.verticalScale(4.65),
+                                        child: IconButton(
+                                          padding: EdgeInsets.zero,
+                                          icon: const Icon(
+                                              Icons.keyboard_arrow_left,
+                                              color: Colors.white),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          iconSize: ScreenUtil.verticalScale(4),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              ListView.separated(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                separatorBuilder: (context, index) =>
-                                    SizedBox(height: 15),
-                                padding: EdgeInsets.symmetric(vertical: 12)
-                                    .copyWith(
-                                        bottom: ScreenUtil.verticalScale(3.2)),
-                                itemCount:
-                                    value.programPhaseModel?.phases?.length ??
-                                        0,
-                                itemBuilder: (context, index) {
-                                  return buildExpansionTileItem(
-                                      index,
-                                      value.programPhaseModel!.phases![index],
-                                      value.programPhaseModel?.phases?.length ??
-                                          0);
-                                },
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil.verticalScale(54.5),
+                      width: media.width,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: ClipPath(
+                          clipper: DiagonalClipper(),
+                          child: Container(
+                            height: media.height / 11,
+                            width: media.width / 6,
+                            decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    top: ScreenUtil.verticalScale(54.49),
+                    bottom: ScreenUtil.verticalScale(2),
+                  ),
+                  child: Container(
+                    width: media.width,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                      ),
+                    ),
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        top: ScreenUtil.verticalScale(3.2),
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(6)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          ScreenUtil.horizontalScale(2)),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        value.programPhaseModel?.phasesmaininfo
+                                                ?.contenttitle ??
+                                            "",
+                                        style: TextStyle(
+                                          fontSize: ScreenUtil.verticalScale(3),
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryColor,
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 10.0, bottom: 10.0),
+                                        alignment: Alignment.centerLeft,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(0.0),
+                                          child: Text(
+                                            "${value.programPhaseModel?.phasesmaininfo?.description}",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.color,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  separatorBuilder: (context, index) =>
+                                      SizedBox(height: 15),
+                                  padding: EdgeInsets.symmetric(vertical: 12)
+                                      .copyWith(
+                                          bottom:
+                                              ScreenUtil.verticalScale(3.2)),
+                                  itemCount:
+                                      value.programPhaseModel?.phases?.length ??
+                                          0,
+                                  itemBuilder: (context, index) {
+                                    return buildExpansionTileItem(
+                                        index,
+                                        value.programPhaseModel!.phases![index],
+                                        value.programPhaseModel?.phases
+                                                ?.length ??
+                                            0);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }),
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 
